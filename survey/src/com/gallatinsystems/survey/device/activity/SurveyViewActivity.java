@@ -116,6 +116,7 @@ public class SurveyViewActivity extends TabActivity implements
 	private String userId;
 	private float currentTextSize;
 	private String[] selectedLanguageCodes;
+	private int currentTabIndex;
 
 	private LangsPreferenceData langsPrefData;
 	private String[] langsSelectedNameArray;
@@ -1114,6 +1115,7 @@ public class SurveyViewActivity extends TabActivity implements
 				hasAddedTabs = true;
 				TextView title = (TextView) findViewById(R.id.titletext);
 				title.setText(survey.getName());
+				currentTabIndex = 0;
 				tabContentFactories = new ArrayList<SurveyQuestionTabContentFactory>();
 				// if the device has an active survey, create a tab for each
 				// question group
@@ -1153,15 +1155,23 @@ public class SurveyViewActivity extends TabActivity implements
 					tabHost.addTab(tabHost.newTabSpec(SUBMIT_TAB_TAG)
 							.setIndicator(getString(R.string.submitbutton))
 							.setContent(submissionTab));
-					tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-						@Override
-						public void onTabChanged(String tabId) {
-							if (SUBMIT_TAB_TAG.equals(tabId)) {
-								submissionTab.refreshView(true);
-							}
-						}
-					});
 				}
+				tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+					@Override
+					public void onTabChanged(String tabId) {
+						// Save the state of previous tab
+						if (currentTabIndex < tabContentFactories.size()) {
+							tabContentFactories.get(currentTabIndex)
+									.saveState(respondentId);
+						}
+						// update the tab index
+						currentTabIndex = tabHost.getCurrentTab();
+						
+						if (SUBMIT_TAB_TAG.equals(tabId)) {
+							submissionTab.refreshView(true);
+						}
+					}
+					});
 				if (tabContentFactories != null) {
 					for (SurveyQuestionTabContentFactory tab : tabContentFactories) {
 						tab.loadState(respondentId);

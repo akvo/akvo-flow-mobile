@@ -512,7 +512,7 @@ public class SurveyViewActivity extends TabActivity implements
 					String newFilename = filePrefix + System.nanoTime() + fileSuffix;
 					String newPath = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
 							newFilename,
-							props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE));
+							props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
 					FileUtil.findOrCreateDir(newPath);
 					String absoluteFile = newPath + File.separator + newFilename;
 					
@@ -681,14 +681,14 @@ public class SurveyViewActivity extends TabActivity implements
 				String fileName = src.substring(src.lastIndexOf("/") + 1);
 				if (FileUtil.doesFileExist(fileName, ConstantUtil.DATA_DIR
 						+ surveyId + File.separator,
-						props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+						props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 						this)) {
 					uri = Uri
 							.parse(VIDEO_PREFIX
 									+ FileUtil.getStorageDirectory(
 											ConstantUtil.DATA_DIR + surveyId
 													+ File.separator,
-											props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE))
+											props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE))
 									+ fileName);
 				} else {
 					uri = Uri.parse(src);
@@ -1095,7 +1095,7 @@ public class SurveyViewActivity extends TabActivity implements
 							.getFileInputStream(
 									surveyFromDb.getFileName(),
 									ConstantUtil.DATA_DIR,
-									props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+									props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 									this);
 				}
 

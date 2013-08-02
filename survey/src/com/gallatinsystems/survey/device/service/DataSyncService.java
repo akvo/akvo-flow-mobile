@@ -815,7 +815,7 @@ public class DataSyncService extends Service {
 		String fileName = TEMP_FILE_NAME + System.nanoTime() + ".zip"; 
 		String dir = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
 				fileName,
-				props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE));
+				props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
 		FileUtil.findOrCreateDir(dir);		
 		if(isAll){
 			fileName = fileName.replace(".zip", "-all.zip");

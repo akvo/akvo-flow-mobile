@@ -1,0 +1,28 @@
+# Globally ignored files
+.DS_Store
+*.class
+*.rpc
+*.swp
+*build.properties
+
+# Eclipse files
+.classpath
+.externalToolBuilders
+.project
+.settings
+
+# Build config and output paths
+.gradle
+.gwt-log
+gwt-unitcache
+
+# Testing
+.calabash_settings
+
+survey/bin
+survey/gen
+survey/res/raw/survey.properties
+survey_test/bin
+survey_test/gen
+survey_test/src/com/jayway/test/SurveyDataTest.java
+

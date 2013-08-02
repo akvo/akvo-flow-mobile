@@ -25,7 +25,9 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.SQLException;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
@@ -39,6 +41,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
+import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
@@ -88,6 +91,8 @@ public class SettingsActivity extends ListActivity {
 				resources.getString(R.string.gpsstatusdesc)));
 		list.add(createMap(resources.getString(R.string.flushpointslabel),
 				resources.getString(R.string.flushpointsdesc)));
+		list.add(createMap(resources.getString(R.string.reset_responses),
+				resources.getString(R.string.reset_responses_desc)));
 		list.add(createMap(resources.getString(R.string.resetall),
 				resources.getString(R.string.resetalldesc)));
 		list.add(createMap(resources.getString(R.string.checksd),
@@ -296,102 +301,20 @@ public class SettingsActivity extends ListActivity {
 								database.close();
 							}
 						});
+			} else if (resources.getString(R.string.reset_responses).equals(val)) {
+				ViewUtil.showAdminAuthDialog(this,
+						new ViewUtil.AdminAuthDialogListener() {
+							@Override
+							public void onAuthenticated() {
+								deleteData(true);
+							}
+						});
 			} else if (resources.getString(R.string.resetall).equals(val)) {
 				ViewUtil.showAdminAuthDialog(this,
 						new ViewUtil.AdminAuthDialogListener() {
 							@Override
 							public void onAuthenticated() {
-								AlertDialog.Builder builder = new AlertDialog.Builder(
-										SettingsActivity.this);
-								builder.setMessage(
-										R.string.deletealldatawarning)
-										.setCancelable(true)
-										.setPositiveButton(
-												R.string.okbutton,
-												new DialogInterface.OnClickListener() {
-													public void onClick(
-															DialogInterface dialog,
-															int id) {
-														SurveyDbAdapter database = new SurveyDbAdapter(
-																SettingsActivity.this);
-														database.open();
-														database.clearAllData();
-														database.close();
-														// now delete all files
-														try {
-															// delete downloaded
-															// survey xml/zips
-															final boolean useInternalStorage = props
-																	.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE);
-															FileUtil.deleteFilesInDirectory(
-																	new File(
-																			FileUtil.getStorageDirectory(
-																					ConstantUtil.DATA_DIR,
-																					useInternalStorage)),
-																	false);
-															// delete stacktrace
-															// files (depending
-															// on SD card state,
-															// they may be
-															// written to both
-															// internal and
-															// external storage
-															try {
-																FileUtil.deleteFilesInDirectory(
-																		new File(
-																				FileUtil.getStorageDirectory(
-																						ConstantUtil.STACKTRACE_DIR,
-																						false)),
-																		false);
-															} catch (Exception e) {
-																Log.e(TAG,
-																		"Could not delete stacktraces on SD card",
-																		e);
-															}
-															try {
-																FileUtil.deleteFilesInDirectory(
-																		new File(
-																				FileUtil.getStorageDirectory(
-																						ConstantUtil.STACKTRACE_DIR,
-																						true)),
-																		false);
-															} catch (Exception e) {
-																Log.e(TAG,
-																		"Could not delete stacktraces on internal storage",
-																		e);
-															}
-															//delete bootstraps
-															FileUtil.deleteFilesInDirectory(
-																	new File(
-																			FileUtil.getStorageDirectory(
-																					ConstantUtil.BOOTSTRAP_DIR,
-																					useInternalStorage)),
-																	false);
-															
-															//now delete exported zips and images
-															FileUtil.deleteFilesMatchingExpression(FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,useInternalStorage),"wfp[0-9]+\\.zip",true);
-															FileUtil.deleteFilesMatchingExpression(FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,useInternalStorage),"fpPhoto[0-9]+\\.jpg",true);
-															//handle "legacy" storage location. This can be removed once all phones have been cleaned and are using the new storage path 
-															FileUtil.deleteFilesMatchingExpression(Environment.getExternalStorageDirectory().getAbsolutePath(),"wfp[0-9]+\\.zip");
-															FileUtil.deleteFilesMatchingExpression(Environment.getExternalStorageDirectory().getAbsolutePath(),"wfpPhoto[0-9]+\\.jpg");
-
-														} catch (Exception e) {
-															Log.e(TAG,
-																	"could not delete files",
-																	e);
-														}
-													}
-												})
-										.setNegativeButton(
-												R.string.cancelbutton,
-												new DialogInterface.OnClickListener() {
-													public void onClick(
-															DialogInterface dialog,
-															int id) {
-														dialog.cancel();
-													}
-												});
-								builder.show();
+								deleteData(false);
 							}
 						});
 			} else if (resources.getString(R.string.checksd).equals(val)) {
@@ -448,4 +371,151 @@ public class SettingsActivity extends ListActivity {
 			}
 		}
 	}
+	
+	private boolean unsentData() throws SQLException {
+		SurveyDbAdapter db = new  SurveyDbAdapter(this);
+		try {
+			db.open();
+			return db.unsentDataCount() > 0;
+		} finally {
+			if (db != null) {
+				db.close();
+			}
+		}
+	}
+	
+	/**
+	 * Permanently deletes data from the device. If unsubmitted data is
+	 * found on the database, the user will be prompted with a message to confirm
+	 * the operation.
+	 * 
+	 * @param keepSurveys Flag to specify a partial deletion (user generated data).
+	 */
+	private void deleteData(final boolean keepSurveys) throws SQLException {
+		try {
+			int messageId = 0;
+			if (unsentData()) {
+				messageId = R.string.unsentdatawarning;
+			} else if (keepSurveys) {
+				messageId = R.string.delete_responses_warning;
+			} else {
+				messageId = R.string.deletealldatawarning;
+			}
+		
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(
+					messageId)
+					.setCancelable(true)
+					.setPositiveButton(
+							R.string.okbutton,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									new ClearDataAsyncTask().execute(keepSurveys);
+								}
+							})
+					.setNegativeButton(
+							R.string.cancelbutton,
+							new DialogInterface.OnClickListener() {
+								public void onClick(
+										DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+								}
+							});
+			builder.show();
+		} catch (SQLException e) {
+			Log.e(TAG, e.getMessage());
+			Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
+	
+	class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(Boolean... params) {
+			final boolean keepSurveys = params[0];
+			
+			boolean ok = true;
+			try {
+				// Internal database
+				clearDatabase(keepSurveys);
+				
+				// External storage
+				clearExternalStorage(keepSurveys);
+			} catch (SQLException e) {
+				Log.e(TAG, e.getMessage());
+				ok = false;
+			}
+			
+			return ok;
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			final int messageId = result != null && result ? R.string.clear_data_success
+					: R.string.clear_data_error;
+			
+			Toast.makeText(SettingsActivity.this, messageId, Toast.LENGTH_SHORT)
+					.show();
+		}
+		
+		
+		/**
+		 * Permanently deletes data from the internal database.
+		 * 
+		 * @param keepSurveys Flag to specify a partial deletion (user generated data).
+		 */
+		private void clearDatabase(boolean keepSurveys) throws SQLException {
+			SurveyDbAdapter database = new SurveyDbAdapter(SettingsActivity.this);
+			
+			try {
+				database.open();
+				
+				if (keepSurveys) {
+					// Delete only user generated data
+					database.clearCollectedData();
+				} else {
+					database.clearAllData();
+				}
+			} finally {
+				if (database != null) {
+					database.close();
+				}
+			}
+		}
+		
+		
+		/**
+		 * Permanently deletes data from the external storage
+		 * 
+		 * @param keepSurveys Flag to specify a partial deletion (user generated data).
+		 */
+		private void clearExternalStorage(boolean keepSurveys) {
+			final boolean useInternalStorage = props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE);
+			
+			if (!keepSurveys) {
+				// Delete downloaded survey xml/zips
+				FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
+						ConstantUtil.DATA_DIR, useInternalStorage)), false);
+				
+				// Delete stacktrace files (depending on SD card state,
+				// they may be written to both internal and external storage)
+				FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
+						ConstantUtil.STACKTRACE_DIR, false)), false);
+				
+				FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
+						ConstantUtil.STACKTRACE_DIR, true)), false);
+				
+				// Delete bootstraps
+				FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
+						ConstantUtil.BOOTSTRAP_DIR, useInternalStorage)), false);
+			}
+			
+			// Delete exported zip/image files
+			FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
+					ConstantUtil.SURVEYAL_DIR, useInternalStorage)), true);
+		}
+	}
+	
 }

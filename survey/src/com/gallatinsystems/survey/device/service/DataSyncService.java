@@ -143,11 +143,11 @@ public class DataSyncService extends Service {
 	}
 	
 	private boolean unsentData() {
-		return databaseAdaptor.fetchUnsentData().getCount() > 0;
+		return databaseAdaptor.unsentDataCount() > 0;
 	}
 	
 	private boolean unexportedData() {
-		return databaseAdaptor.fetchUnexportedData().getCount() > 0;
+		return databaseAdaptor.unexportedDataCount() > 0;
 	}
 
 	/**

@@ -387,7 +387,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
 		
 		// Update the UI in case we come back later to the same instance
 		searchingIndicator.setText("");
-		statusIndicator.setText(res.getString(R.string.accuracy) + ": ");
 	}
 
 }

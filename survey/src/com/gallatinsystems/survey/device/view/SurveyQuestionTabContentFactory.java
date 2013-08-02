@@ -169,7 +169,6 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
 		group.addView(configureActionButton(R.string.nextbutton,
 				new OnClickListener() {
 					public void onClick(View v) {
-						saveState(context.getRespondentId());
 						context.advanceTab();
 					}
 				}));

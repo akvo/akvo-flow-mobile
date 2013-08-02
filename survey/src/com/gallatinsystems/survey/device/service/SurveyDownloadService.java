@@ -236,11 +236,11 @@ public class SurveyDownloadService extends Service {
 					FileUtil.getFileOutputStream(
 							survey.getId() + ConstantUtil.ARCHIVE_SUFFIX,
 							ConstantUtil.DATA_DIR,
-							props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+							props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 							this));
 			extractAndSave(FileUtil.getFileInputStream(survey.getId()
 					+ ConstantUtil.ARCHIVE_SUFFIX, ConstantUtil.DATA_DIR,
-					props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE), this));
+					props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this));
 
 			survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
 			survey.setType(DEFAULT_TYPE);
@@ -282,7 +282,7 @@ public class SurveyDownloadService extends Service {
 		while ((entry = zis.getNextEntry()) != null) {
 			FileOutputStream fout = FileUtil.getFileOutputStream(
 					entry.getName(), ConstantUtil.DATA_DIR,
-					props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE), this);
+					props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this);
 			byte[] buffer = new byte[2048];
 			int size;
 			while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
@@ -318,7 +318,7 @@ public class SurveyDownloadService extends Service {
 							.getFileInputStream(
 									survey.getFileName(),
 									ConstantUtil.DATA_DIR,
-									props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+									props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 									this);
 				}
 				Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);
@@ -387,7 +387,7 @@ public class SurveyDownloadService extends Service {
 			final FileOutputStream out = FileUtil.getFileOutputStream(
 					remoteFile.substring(remoteFile.lastIndexOf("/") + 1),
 					ConstantUtil.DATA_DIR + surveyId + "/",
-					props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE), this);
+					props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this);
 			downloadExecutor.execute(new Runnable() {
 				@Override
 				public void run() {

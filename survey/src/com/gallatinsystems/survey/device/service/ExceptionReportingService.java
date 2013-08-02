@@ -157,10 +157,10 @@ public class ExceptionReportingService extends Service {
 		if (Environment.getExternalStorageState().equals(
 				Environment.MEDIA_MOUNTED)) {
 			dirString = FileUtil.getStorageDirectory(
-					ConstantUtil.STACKTRACE_DIR, "false");
+					ConstantUtil.STACKTRACE_DIR, false);
 		} else {
 			dirString = FileUtil.getStorageDirectory(
-					ConstantUtil.STACKTRACE_DIR, "true");
+					ConstantUtil.STACKTRACE_DIR, true);
 		}
 		File dir = FileUtil.findOrCreateDir(dirString);
 		FilenameFilter traceFilter = new FilenameFilter() {
@@ -183,10 +183,10 @@ public class ExceptionReportingService extends Service {
 					if (Environment.getExternalStorageState().equals(
 							Environment.MEDIA_MOUNTED)) {
 						dirString = FileUtil.getStorageDirectory(
-								ConstantUtil.STACKTRACE_DIR, "false");
+								ConstantUtil.STACKTRACE_DIR, false);
 					} else {
 						dirString = FileUtil.getStorageDirectory(
-								ConstantUtil.STACKTRACE_DIR, "true");
+								ConstantUtil.STACKTRACE_DIR, true);
 					}
 					String[] list = getTraceFiles();
 					if (list != null && list.length > 0) {

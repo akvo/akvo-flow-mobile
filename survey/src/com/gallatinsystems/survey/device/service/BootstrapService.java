@@ -226,7 +226,7 @@ public class BootstrapService extends Service {
 								FileUtil.getFileOutputStream(
 										fileName,
 										ConstantUtil.DATA_DIR,
-										props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+										props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 										this));
 						// now read the survey XML back into memory to see if
 						// there is a version
@@ -236,7 +236,7 @@ public class BootstrapService extends Service {
 									.getFileInputStream(
 											survey.getFileName(),
 											ConstantUtil.DATA_DIR,
-											props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+											props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 											this);
 							loadedSurvey = SurveyDao.loadSurvey(survey, in);
 
@@ -262,7 +262,7 @@ public class BootstrapService extends Service {
 										fileName,
 										ConstantUtil.DATA_DIR + id
 												+ File.separator,
-										props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+										props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 										this));
 
 						// record the fact that this survey had media
@@ -322,7 +322,7 @@ public class BootstrapService extends Service {
 		if (Environment.MEDIA_MOUNTED.equals(Environment
 				.getExternalStorageState())) {
 			File dir = FileUtil.findOrCreateDir(FileUtil.getStorageDirectory(
-					ConstantUtil.BOOTSTRAP_DIR, "false"));
+					ConstantUtil.BOOTSTRAP_DIR, false));
 			if (dir != null) {
 				File[] fileList = dir.listFiles();
 				if (fileList != null) {

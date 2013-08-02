@@ -153,7 +153,7 @@ public class ApkUpdateService extends Service {
 
 			String localPath = FileUtil.getPathForFile(fileName,
 					ConstantUtil.APK_DIR + version + "/",
-					props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE));
+					props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
 			File localFile = new File(localPath);
 			if (!localFile.exists()) {
 				FileOutputStream out = null;
@@ -162,7 +162,7 @@ public class ApkUpdateService extends Service {
 							.getFileOutputStream(
 									fileName,
 									ConstantUtil.APK_DIR + version + "/",
-									props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+									props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 									this);
 				} catch (FileNotFoundException e1) {
 					Log.e(TAG, "Could not write apk file", e1);

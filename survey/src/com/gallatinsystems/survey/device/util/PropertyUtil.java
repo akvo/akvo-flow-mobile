@@ -62,5 +62,17 @@ public class PropertyUtil {
 	public String getProperty(String propertyName) {
 		return properties.getProperty(propertyName);
 	}
+	
+	/**
+	 * Load a boolean property.
+	 * Since all the properties are stored as Strings, the value will
+	 * be read first as a String, then converted into boolean.
+	 * 
+	 * @param propertyName The key for this property
+	 * @return true If the property value is "true", false otherwise
+	 */
+	public boolean getBoolean(String propertyName) {
+		return "true".equalsIgnoreCase(getProperty(propertyName));
+	}
 
 }

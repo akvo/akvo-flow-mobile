@@ -321,8 +321,8 @@ public class SettingsActivity extends ListActivity {
 														try {
 															// delete downloaded
 															// survey xml/zips
-															String useInternalStorage = props
-																	.getProperty(ConstantUtil.USE_INTERNAL_STORAGE);
+															final boolean useInternalStorage = props
+																	.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE);
 															FileUtil.deleteFilesInDirectory(
 																	new File(
 																			FileUtil.getStorageDirectory(
@@ -341,7 +341,7 @@ public class SettingsActivity extends ListActivity {
 																		new File(
 																				FileUtil.getStorageDirectory(
 																						ConstantUtil.STACKTRACE_DIR,
-																						"false")),
+																						false)),
 																		false);
 															} catch (Exception e) {
 																Log.e(TAG,
@@ -353,7 +353,7 @@ public class SettingsActivity extends ListActivity {
 																		new File(
 																				FileUtil.getStorageDirectory(
 																						ConstantUtil.STACKTRACE_DIR,
-																						"true")),
+																						true)),
 																		false);
 															} catch (Exception e) {
 																Log.e(TAG,

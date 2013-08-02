@@ -78,7 +78,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static boolean doesFileExist(String file, String subDir,
-			String useInternal, Context c) {
+			boolean useInternal, Context c) {
 		boolean exists = false;
 		if (file != null) {
 			FileInputStream in = null;
@@ -168,11 +168,10 @@ public class FileUtil {
 	}
 
 	public static FileOutputStream getFileOutputStream(String file,
-			String subDir, String useInternal, Context c)
+			String subDir, boolean useInternal, Context c)
 			throws FileNotFoundException {
 		FileOutputStream out = null;
-		if (useInternal != null && "true".equalsIgnoreCase(useInternal)
-				&& c != null) {
+		if (useInternal) {
 			out = c.openFileOutput(file, Context.MODE_WORLD_WRITEABLE);
 		} else {
 			String dir = getStorageDirectory(subDir, useInternal);
@@ -183,9 +182,9 @@ public class FileUtil {
 	}
 
 	public static String getPathForFile(String file, String subDir,
-			String useInternal) {
+			boolean useInternal) {
 		String path = null;
-		if (useInternal != null && "true".equalsIgnoreCase(useInternal)) {
+		if (useInternal) {
 			path = file;
 		} else {
 			String dir = getStorageDirectory(subDir, useInternal);
@@ -195,10 +194,10 @@ public class FileUtil {
 	}
 
 	public static FileInputStream getFileInputStream(String file,
-			String subDir, String useInternal, Context c)
+			String subDir, boolean useInternal, Context c)
 			throws FileNotFoundException {
 		FileInputStream in = null;
-		if (useInternal != null && "true".equalsIgnoreCase(useInternal)) {
+		if (useInternal) {
 			in = c.openFileInput(file);
 		} else {
 			String dir = getStorageDirectory(subDir, useInternal);
@@ -216,7 +215,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getStorageDirectory(String subDir,
-			String useInternalStorage) {
+			boolean useInternalStorage) {
 		return getStorageDirectory(subDir, null, useInternalStorage);
 	}
 
@@ -239,14 +238,12 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getStorageDirectory(String subDir, String fileName,
-			String useInternalStorage) {
+			boolean useInternalStorage) {
 		String dir = "";
-		if (useInternalStorage == null
-				|| !"true".equalsIgnoreCase(useInternalStorage)) {
-			dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-
-		} else {
+		if (useInternalStorage) {
 			dir = Environment.getDataDirectory().getAbsolutePath();
+		} else {
+			dir = Environment.getExternalStorageDirectory().getAbsolutePath();
 		}
 		if (!dir.endsWith(File.separator)) {
 			dir += File.separator;

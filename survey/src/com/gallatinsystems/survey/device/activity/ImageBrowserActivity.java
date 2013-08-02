@@ -77,7 +77,7 @@ public class ImageBrowserActivity extends Activity implements
 		surveyId = extras.getString(ConstantUtil.SURVEY_ID_KEY);
 		imageAdapter = new HelpImageBrowserAdapter(this, imageUrls, FileUtil
 				.getStorageDirectory(ConstantUtil.DATA_DIR + surveyId, props
-						.getProperty(ConstantUtil.USE_INTERNAL_STORAGE)));
+						.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE)));
 		if (imageUrls.size() == 1) {
 			gallery.setVisibility(View.GONE);
 		} else {

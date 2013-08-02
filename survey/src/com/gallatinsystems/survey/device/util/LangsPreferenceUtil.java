@@ -19,17 +19,13 @@ package com.gallatinsystems.survey.device.util;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.activity.PreferencesActivity;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
@@ -148,7 +144,7 @@ public class LangsPreferenceUtil {
 				// load from file
 				in = FileUtil.getFileInputStream(survey.getFileName(),
 						ConstantUtil.DATA_DIR,
-						props.getProperty(ConstantUtil.USE_INTERNAL_STORAGE),
+						props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
 						context);
 			}
 			Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);

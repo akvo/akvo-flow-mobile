@@ -132,13 +132,13 @@ public class PersistentUncaughtExceptionHandler implements
 							ConstantUtil.STACKTRACE_FILENAME
 									+ Long.toString(System.currentTimeMillis())
 									+ ConstantUtil.STACKTRACE_SUFFIX,
-							ConstantUtil.STACKTRACE_DIR, "false", null);
+							ConstantUtil.STACKTRACE_DIR, false, null);
 				} else {
 					out = FileUtil.getFileOutputStream(
 							ConstantUtil.STACKTRACE_FILENAME
 									+ Long.toString(System.currentTimeMillis())
 									+ ConstantUtil.STACKTRACE_SUFFIX,
-							ConstantUtil.STACKTRACE_DIR, "true", null);
+							ConstantUtil.STACKTRACE_DIR, true, null);
 				}
 
 				FileUtil.writeStringToFile(result.toString(), out);

@@ -141,6 +141,14 @@ public class DataSyncService extends Service {
 		thread.start();
 		return Service.START_STICKY;
 	}
+	
+	private boolean unsentData() {
+		return databaseAdaptor.fetchUnsentData().getCount() > 0;
+	}
+	
+	private boolean unexportedData() {
+		return databaseAdaptor.fetchUnexportedData().getCount() > 0;
+	}
 
 	/**
 	 * sets the uncaught exception handler for this thread so we can report
@@ -187,7 +195,7 @@ public class DataSyncService extends Service {
 			}
 
 			counter++;
-			if (isAbleToRun(type, uploadIndex)) {
+			if (isAbleToRun(type, uploadIndex) && unsentData()) {
 				String fileName = createFileName(ConstantUtil.EXPORT.equals(type));
 				HashSet<String>[] idList = formZip(fileName,
 						(ConstantUtil.UPLOAD_DATA_ONLY_IDX == uploadIndex));
@@ -273,7 +281,7 @@ public class DataSyncService extends Service {
 					fireNotification(NOTHING, null);
 				}
 
-			} else {
+			} else if (unexportedData()) {
 				// if we can't run the export, write the data as a zip
 				String fileName = createFileName(false);
 				HashSet<String>[] idList = formZip(fileName, true, true);

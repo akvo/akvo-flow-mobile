@@ -6,10 +6,10 @@
 *build.properties
 
 # Eclipse files
-.classpath
-.externalToolBuilders
-.project
-.settings
+*.classpath
+*.externalToolBuilders
+*.project
+*.settings
 
 # Build config and output paths
 .gradle

@@ -488,6 +488,20 @@ public class SurveyDbAdapter {
 		}
 		return cursor;
 	}
+	
+	/**
+	 * Get the amount of responses that have not been sent to the backend
+	 */
+	public int unsentDataCount() {
+		return fetchUnsentData().getCount();
+	}
+	
+	/**
+	 * Get the amount of responses that have not been exported to the sd-card
+	 */
+	public int unexportedDataCount() {
+		return fetchUnexportedData().getCount();
+	}
 
 	/**
 	 * marks the data as submitted in the respondent table (submittedFlag =
@@ -1666,12 +1680,24 @@ public class SurveyDbAdapter {
 	 * history from the database
 	 */
 	public void clearAllData() {
+		// User generated data
+		clearCollectedData();
+		
+		// Surveys and preferences
 		executeSql("delete from survey");
+		executeSql("delete from user");
+		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
+	}
+	
+	/**
+	 * Permanently deletes user generated data from the database.
+	 * It will clear any response saved in the database, as well as
+	 * the transmission history.
+	 */
+	public void clearCollectedData() {
 		executeSql("delete from survey_respondent");
 		executeSql("delete from survey_response");
-		executeSql("delete from user");
 		executeSql("delete from transmission_history");
-		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
 	}
 
 	/**

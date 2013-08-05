@@ -373,7 +373,7 @@ public class FileUtil {
 			byte[] buffer = new byte[BUFFER_SIZE];
 			
 			int read = 0;
-			while ((read = in.read(buffer)) > -1) {
+			while ((read = in.read(buffer)) != -1) {
 				md.update(buffer, 0, read);
 			}
 			

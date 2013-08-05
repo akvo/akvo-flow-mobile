@@ -16,6 +16,7 @@
 
 package com.gallatinsystems.survey.device.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -25,10 +26,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 /**
  * utility for manipulating files
@@ -37,6 +42,7 @@ import android.os.Environment;
  * 
  */
 public class FileUtil {
+	private static final String TAG = FileUtil.class.getSimpleName();
 
 	private static final int BUFFER_SIZE = 2048;
 
@@ -352,5 +358,46 @@ public class FileUtil {
 			}
 		}
 	}
+	
+	public static String getMD5Checksum(String path) {
+		return getMD5Checksum(new File(path));
+	}
+	
+	public static String getMD5Checksum(File file) {
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		InputStream in = null;
+		MessageDigest md;
+		
+		try {
+			md = MessageDigest.getInstance("MD5");
+			in = new BufferedInputStream(new FileInputStream(file));
+			
+			byte[] buffer = new byte[BUFFER_SIZE];
+			
+			int read = 0;
+			while ((read = in.read(buffer)) > -1) {
+				md.update(buffer, 0, read);
+			}
+			
+			byte[] rawHash = md.digest();
+			
+			for (byte b : rawHash) {
+				stringBuilder.append(String.format("%02x", b));
+			}
+			
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ignored) {}
+		}
+		
+		return stringBuilder.toString();
+	}
+	
 
 }

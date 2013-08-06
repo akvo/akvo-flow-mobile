@@ -55,15 +55,15 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
 	@Override
 	protected Boolean doInBackground(Boolean... params) {
-		final boolean keepSurveys = params[0];
+		final boolean responsesOnly = params[0];
 		
 		boolean ok = true;
 		try {
 			// Internal database
-			clearDatabase(keepSurveys);
+			clearDatabase(responsesOnly);
 			
 			// External storage
-			clearExternalStorage(keepSurveys);
+			clearExternalStorage(responsesOnly);
 		} catch (SQLException e) {
 			Log.e(TAG, e.getMessage());
 			ok = false;
@@ -87,13 +87,13 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 	/**
 	 * Permanently deletes data from the internal database.
 	 * 
-	 * @param keepSurveys Flag to specify a partial deletion (user generated data).
+	 * @param responsesOnly Flag to specify a partial deletion (user generated data).
 	 */
-	private void clearDatabase(boolean keepSurveys) throws SQLException {
+	private void clearDatabase(boolean responsesOnly) throws SQLException {
 		try {
 			mDatabase.open();
 			
-			if (keepSurveys) {
+			if (responsesOnly) {
 				// Delete only user generated data
 				mDatabase.clearCollectedData();
 			} else {
@@ -109,10 +109,10 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 	/**
 	 * Permanently deletes data from the external storage
 	 * 
-	 * @param keepSurveys Flag to specify a partial deletion (user generated data).
+	 * @param responsesOnly Flag to specify a partial deletion (user generated data).
 	 */
-	private void clearExternalStorage(boolean keepSurveys) {
-		if (!keepSurveys) {
+	private void clearExternalStorage(boolean responsesOnly) {
+		if (!responsesOnly) {
 			// Delete downloaded survey xml/zips
 			FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
 					ConstantUtil.DATA_DIR, mUseInternalStorage)), false);

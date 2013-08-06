@@ -385,14 +385,14 @@ public class SettingsActivity extends ListActivity {
 	 * found on the database, the user will be prompted with a message to confirm
 	 * the operation.
 	 * 
-	 * @param keepSurveys Flag to specify a partial deletion (user generated data).
+	 * @param responsesOnly Flag to specify a partial deletion (user generated data).
 	 */
-	private void deleteData(final boolean keepSurveys) throws SQLException {
+	private void deleteData(final boolean responsesOnly) throws SQLException {
 		try {
 			int messageId = 0;
 			if (unsentData()) {
 				messageId = R.string.unsentdatawarning;
-			} else if (keepSurveys) {
+			} else if (responsesOnly) {
 				messageId = R.string.delete_responses_warning;
 			} else {
 				messageId = R.string.deletealldatawarning;
@@ -406,7 +406,7 @@ public class SettingsActivity extends ListActivity {
 							R.string.okbutton,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
-									new ClearDataAsyncTask(SettingsActivity.this).execute(keepSurveys);
+									new ClearDataAsyncTask(SettingsActivity.this).execute(responsesOnly);
 								}
 							})
 					.setNegativeButton(

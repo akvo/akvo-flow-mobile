@@ -35,6 +35,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -42,6 +43,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -508,6 +510,8 @@ public class SurveyViewActivity extends TabActivity implements
 					File f = new File(Environment.getExternalStorageDirectory()
 							.getAbsolutePath() + File.separator + filePrefix + fileSuffix);
 
+					cleanDCIM(f.getAbsolutePath());// Ensure no image is saved in the DCIM folder
+					
 					sizeReminder(f.length());
 					
 					String newFilename = filePrefix + System.nanoTime() + fileSuffix;
@@ -589,6 +593,41 @@ public class SurveyViewActivity extends TabActivity implements
 			pendingRequestCode = -1;
 			pendingResultCode = -1;
 		}
+	}
+	
+	/**
+	 * Some manufacturers will duplicate the image saving a copy
+	 * in the DCIM folder. This method will try to spot those situations
+	 * and remove the duplicated image.
+	 * 
+	 * @param filepath The absolute path to the original image
+	 */
+	private void cleanDCIM(String filepath) {
+		Cursor cursor = getContentResolver().query(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				new String[]{MediaStore.Images.ImageColumns.DATA, MediaStore.Images.ImageColumns.DATE_TAKEN}, 
+				null,
+				null,
+				MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+		
+		if (cursor.moveToFirst()) {
+			final String lastImagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+			
+			if ((!filepath.equals(lastImagePath)) && (FileUtil.compareImageDatetime(filepath, lastImagePath))) {
+				final int result = getContentResolver().delete(
+						MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+						MediaStore.Images.ImageColumns.DATA + " = ?", 
+						new String[]{lastImagePath});
+				
+				if (result == 1) {
+					Log.i(TAG, "Duplicated file successfully removed: " + lastImagePath);
+				} else {
+					Log.e(TAG, "Error removing duplicated image:" + lastImagePath);
+				}
+			}
+		}
+		
+		cursor.close();
 	}
 
 	/**

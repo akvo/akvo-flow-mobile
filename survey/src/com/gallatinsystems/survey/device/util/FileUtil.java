@@ -32,7 +32,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
+import android.media.ExifInterface;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -396,5 +398,34 @@ public class FileUtil {
 		return stringBuilder.toString();
 	}
 	
+	/**
+	 * Compare to images to determine if their content is the same.
+	 * To state that the two of them are the same, the datetime contained in
+	 * their exif metadata will be compared.
+	 * 
+	 * @param image1 Absolute path to the first image
+	 * @param image2 Absolute path to the second image
+	 * @return true if their datetime is the same, false otherwise
+	 */
+	public static boolean compareImageDatetime(String image1, String image2) {
+		boolean equals = false;
+		try {
+			ExifInterface exif1 = new ExifInterface(image1);
+			ExifInterface exif2 = new ExifInterface(image2);
+			
+			final String datetime1 = exif1.getAttribute(ExifInterface.TAG_DATETIME);
+			final String datetime2 = exif2.getAttribute(ExifInterface.TAG_DATETIME);
+			
+			if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime1)) {
+				equals = datetime1.equals(datetime2);
+			} else {
+				Log.d(TAG, "Datetime is null or empty");
+			}
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+		}
+		
+		return equals;
+	}
 
 }

@@ -613,7 +613,7 @@ public class SurveyViewActivity extends TabActivity implements
 		if (cursor.moveToFirst()) {
 			final String lastImagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
 			
-			if ((!filepath.equals(lastImagePath)) && (FileUtil.compareImageDatetime(filepath, lastImagePath))) {
+			if ((!filepath.equals(lastImagePath)) && (FileUtil.compareImages(filepath, lastImagePath))) {
 				final int result = getContentResolver().delete(
 						MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 						MediaStore.Images.ImageColumns.DATA + " = ?", 

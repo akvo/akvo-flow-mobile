@@ -401,13 +401,14 @@ public class FileUtil {
 	/**
 	 * Compare to images to determine if their content is the same.
 	 * To state that the two of them are the same, the datetime contained in
-	 * their exif metadata will be compared.
+	 * their exif metadata will be compared. If the exif does not contain
+	 * a datetime, the MD5 checksum of the images will be compared.
 	 * 
 	 * @param image1 Absolute path to the first image
 	 * @param image2 Absolute path to the second image
 	 * @return true if their datetime is the same, false otherwise
 	 */
-	public static boolean compareImageDatetime(String image1, String image2) {
+	public static boolean compareImages(String image1, String image2) {
 		boolean equals = false;
 		try {
 			ExifInterface exif1 = new ExifInterface(image1);
@@ -419,13 +420,35 @@ public class FileUtil {
 			if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime1)) {
 				equals = datetime1.equals(datetime2);
 			} else {
-				Log.d(TAG, "Datetime is null or empty");
+				Log.d(TAG, "Datetime is null or empty. The MD5 checksum will be compared");
+				equals = compareFilesChecksum(image1, image2);
 			}
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage());
 		}
 		
 		return equals;
+	}
+	
+	/**
+	 * Compare to files to determine if their content is the same.
+	 * To state that the two of them are the same, the MD5 checksum
+	 * will be compared. Note that if any of the files does not exist,
+	 * or if its checksum cannot be computed, false will be returned.
+	 * 
+	 * @param path1 Absolute path to the first file
+	 * @param path2 Absolute path to the second file
+	 * @return true if their MD5 checksum is the same, false otherwise.
+	 */
+	public static boolean compareFilesChecksum(String path1, String path2) {
+		final String checksum1 = getMD5Checksum(path1);
+		final String checksum2 = getMD5Checksum(path2);
+		
+		if (!TextUtils.isEmpty(checksum1) && !TextUtils.isEmpty(checksum2)) {
+			return checksum1.equals(checksum2);
+		}
+		
+		return false;
 	}
 
 }

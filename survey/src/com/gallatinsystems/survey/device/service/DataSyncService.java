@@ -46,6 +46,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.gallatinsystems.survey.device.R;
@@ -189,16 +190,16 @@ public class DataSyncService extends Service {
 			} else {
 				serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
 			}
+			
 			int uploadIndex = -1;
-			if (uploadOption != null && uploadOption.trim().length() > 0) {
+			if (TextUtils.isEmpty(uploadOption)) {
 				uploadIndex = Integer.parseInt(uploadOption);
 			}
 
 			counter++;
 			if (isAbleToRun(type, uploadIndex) && unsentData()) {
 				String fileName = createFileName(ConstantUtil.EXPORT.equals(type));
-				HashSet<String>[] idList = formZip(fileName,
-						(ConstantUtil.UPLOAD_DATA_ONLY_IDX == uploadIndex));
+				HashSet<String>[] idList = formZip(fileName);
 				String destName = fileName;
 				if (destName.contains("/")) {
 					destName = destName
@@ -235,7 +236,7 @@ public class DataSyncService extends Service {
 											idList[0],
 											"" + StatusUtil.hasDataConnection(
 													this,
-													(ConstantUtil.UPLOAD_DATA_ONLY_IDX == uploadIndex)));
+													(ConstantUtil.UPLOAD_NEVER_IDX == uploadIndex)));
 									// update the transmission history records too
 									for (String id : idList[0]) {
 										databaseAdaptor
@@ -284,7 +285,7 @@ public class DataSyncService extends Service {
 			} else if (unexportedData()) {
 				// if we can't run the export, write the data as a zip
 				String fileName = createFileName(false);
-				HashSet<String>[] idList = formZip(fileName, true, true);
+				HashSet<String>[] idList = formZip(fileName, true);
 				if (idList != null) {
 					databaseAdaptor.markDataAsExported(idList[0]);
 				}
@@ -356,8 +357,8 @@ public class DataSyncService extends Service {
 				null);
 	}
 
-	private HashSet<String>[] formZip(String fileName, boolean dataOnly) {
-		return formZip(fileName, dataOnly, false);
+	private HashSet<String>[] formZip(String fileName) {
+		return formZip(fileName, false);
 	}
 
 	/**
@@ -370,8 +371,7 @@ public class DataSyncService extends Service {
 	 *   [2] zip checksum
 	 */
 	@SuppressWarnings("unchecked")
-	private HashSet<String>[] formZip(String fileName, boolean dataOnly,
-			boolean unexportedOnly) {
+	private HashSet<String>[] formZip(String fileName, boolean unexportedOnly) {
 		HashSet<String>[] idsToUpdate = new HashSet[3];
 		idsToUpdate[0] = new HashSet<String>();
 		idsToUpdate[1] = new HashSet<String>();
@@ -429,86 +429,83 @@ public class DataSyncService extends Service {
 					writeTextToZip(zos, regionBuf.toString(), REGION_DATA_FILE);
 				}
 
-				// write or upload images if enabled
-				if (!dataOnly) {
-					byte[] buffer = new byte[BUF_SIZE];
-					for (Entry<String, ArrayList<String>> paths : imagePaths
-							.entrySet()) {
+				byte[] buffer = new byte[BUF_SIZE];
+				for (Entry<String, ArrayList<String>> paths : imagePaths
+						.entrySet()) {
 
-						for (int i = 0; i < paths.getValue().size(); i++) {
-							String ifn = paths.getValue().get(i);
-							
-							if (INCLUDE_IMAGES_IN_ZIP) {
-								try {
-									BufferedInputStream bin = new BufferedInputStream(
-											new FileInputStream(ifn));
-									String name = ZIP_IMAGE_DIR;
-									if (ifn.contains("/")) {
-										name = name
-												+ ifn.substring(ifn.lastIndexOf("/") + 1);
-									} else {
-										name = name + ifn;
-									}
-									zos.putNextEntry(new ZipEntry(name));
-									int bytesRead = bin.read(buffer);
-									while (bytesRead > 0) {
-										zos.write(buffer, 0, bytesRead);
-										bytesRead = bin.read(buffer);
-									}
-									bin.close();
-									zos.closeEntry();
-								} catch (Exception e) {
-									Log.e(TAG, "Could not add image "
-											+ ifn + " to zip: "
-											+ e.getMessage());
+					for (int i = 0; i < paths.getValue().size(); i++) {
+						String ifn = paths.getValue().get(i);
+						
+						if (INCLUDE_IMAGES_IN_ZIP) {
+							try {
+								BufferedInputStream bin = new BufferedInputStream(
+										new FileInputStream(ifn));
+								String name = ZIP_IMAGE_DIR;
+								if (ifn.contains("/")) {
+									name = name
+											+ ifn.substring(ifn.lastIndexOf("/") + 1);
+								} else {
+									name = name + ifn;
 								}
-							} else {
-								//Upload image files separately
-								try {
-									databaseAdaptor.createTransmissionHistory(
+								zos.putNextEntry(new ZipEntry(name));
+								int bytesRead = bin.read(buffer);
+								while (bytesRead > 0) {
+									zos.write(buffer, 0, bytesRead);
+									bytesRead = bin.read(buffer);
+								}
+								bin.close();
+								zos.closeEntry();
+							} catch (Exception e) {
+								Log.e(TAG, "Could not add image "
+										+ ifn + " to zip: "
+										+ e.getMessage());
+							}
+						} else {
+							//Upload image files separately
+							try {
+								databaseAdaptor.createTransmissionHistory(
+										Long.valueOf(paths.getKey()),
+										ifn,
+										ConstantUtil.IN_PROGRESS_STATUS);
+								
+								boolean isOk;
+								if (debugFailMedia)
+									isOk = false;
+								else
+									isOk = sendFile(
+										ifn,
+										S3_IMAGE_FILE_PATH,
+										props.getProperty(ConstantUtil.IMAGE_S3_POLICY),
+										props.getProperty(ConstantUtil.IMAGE_S3_SIG),
+										IMAGE_CONTENT_TYPE);
+								if (isOk) {
+									databaseAdaptor.updateTransmissionHistory(
 											Long.valueOf(paths.getKey()),
 											ifn,
-											ConstantUtil.IN_PROGRESS_STATUS);
-									
-									boolean isOk;
-									if (debugFailMedia)
-										isOk = false;
-									else
-										isOk = sendFile(
-											ifn,
-											S3_IMAGE_FILE_PATH,
-											props.getProperty(ConstantUtil.IMAGE_S3_POLICY),
-											props.getProperty(ConstantUtil.IMAGE_S3_SIG),
-											IMAGE_CONTENT_TYPE);
-									if (isOk) {
-										databaseAdaptor.updateTransmissionHistory(
-												Long.valueOf(paths.getKey()),
-												ifn,
-												ConstantUtil.COMPLETE_STATUS);
-									} else {
-										databaseAdaptor.updateTransmissionHistory(
-												Long.valueOf(paths.getKey()),
-												ifn,
-												ConstantUtil.FAILED_STATUS);
-									}
-								} catch (Exception e) {
-									Log.e(TAG, "Could not upload image "
-											+ ifn + " to server: "
-											+ e.getMessage());
+											ConstantUtil.COMPLETE_STATUS);
+								} else {
 									databaseAdaptor.updateTransmissionHistory(
 											Long.valueOf(paths.getKey()),
 											ifn,
 											ConstantUtil.FAILED_STATUS);
 								}
+							} catch (Exception e) {
+								Log.e(TAG, "Could not upload image "
+										+ ifn + " to server: "
+										+ e.getMessage());
+								databaseAdaptor.updateTransmissionHistory(
+										Long.valueOf(paths.getKey()),
+										ifn,
+										ConstantUtil.FAILED_STATUS);
 							}
 						}
 					}
-					Log.i(TAG, "Closed zip output stream for file: " + fileName
-							+ ". Checksum: "
-							+ checkedOutStream.getChecksum().getValue());
-					idsToUpdate[2].add(""
-							+ checkedOutStream.getChecksum().getValue());
 				}
+				Log.i(TAG, "Closed zip output stream for file: " + fileName
+						+ ". Checksum: "
+						+ checkedOutStream.getChecksum().getValue());
+				idsToUpdate[2].add(""
+						+ checkedOutStream.getChecksum().getValue());
 				zos.close();
 			}
 		} catch (Exception e) {

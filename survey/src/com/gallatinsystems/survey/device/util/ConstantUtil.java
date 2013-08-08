@@ -232,8 +232,7 @@ public class ConstantUtil {
 	 * index values into string arrays
 	 */
 	public static final int UPLOAD_DATA_ALLWAYS_IDX = 0;
-	public static final int UPLOAD_DATA_ONLY_IDX = 1;
-	public static final int UPLOAD_NEVER_IDX = 2;
+	public static final int UPLOAD_NEVER_IDX = 1;
 
 	public static final int PRECACHE_ALWAYS_IDX = 0;
 	public static final int PRECACHE_WIFI_ONLY_IDX = 1;

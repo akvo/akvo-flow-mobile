@@ -2,7 +2,6 @@
 <resources>
 	<string-array name="celluploadoptions">
 		<item>Always</item>
-		<item>Data Only</item>
 		<item>Never</item>
 	</string-array>
 	<string-array name="languages">

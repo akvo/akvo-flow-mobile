@@ -111,7 +111,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
 		Resources res = getResources();
 		props = new PropertyUtil(res);
 
-
 		uploadArray = res.getStringArray(R.array.celluploadoptions);
 		precacheHelpArray = res.getStringArray(R.array.precachehelpoptions);
 		serverArray = res.getStringArray(R.array.servers);
@@ -151,7 +150,10 @@ public class PreferencesActivity extends Activity implements OnClickListener,
 
 		val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
 		if (val != null) {
-			uploadOptionTextView.setText(uploadArray[Integer.parseInt(val)]);
+			final int intVal = Integer.parseInt(val);
+			if (intVal < uploadArray.length) {
+				uploadOptionTextView.setText(uploadArray[intVal]);
+			}
 		}
 
 		val = settings.get(ConstantUtil.SURVEY_LANG_SETTING_KEY);

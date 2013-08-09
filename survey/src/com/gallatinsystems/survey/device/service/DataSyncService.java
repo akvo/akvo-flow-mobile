@@ -23,12 +23,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
@@ -199,7 +201,7 @@ public class DataSyncService extends Service {
 			counter++;
 			if (isAbleToRun(type, uploadIndex) && unsentData()) {
 				String fileName = createFileName(ConstantUtil.EXPORT.equals(type));
-				HashSet<String>[] idList = formZip(fileName);
+				ZipFileData zipFileData = formZip(fileName);
 				String destName = fileName;
 				if (destName.contains("/")) {
 					destName = destName
@@ -208,20 +210,13 @@ public class DataSyncService extends Service {
 					destName = destName
 							.substring(destName.lastIndexOf("\\") + 1);
 				}
-				if (fileName != null
-						&& (idList[0].size() > 0 || idList[1].size() > 0)) {
-					String checksum = null;
-					if (idList[2].size() > 0) {
-						checksum = idList[2].iterator().next();
-					}
+				if (zipFileData.hasData()) {
 					if (ConstantUtil.SEND.equals(type)) {
-						if (idList[0] != null) {
-							for (String id : idList[0]) {
-								databaseAdaptor.updateTransmissionHistory(
-										Long.valueOf(id),
-										fileName,
-										ConstantUtil.IN_PROGRESS_STATUS);
-							}
+						for (String id : zipFileData.respondentIDs) {
+							databaseAdaptor.updateTransmissionHistory(
+									Long.valueOf(id),
+									fileName,
+									ConstantUtil.IN_PROGRESS_STATUS);
 						}
 						boolean isOk = sendFile(fileName, S3_DATA_FILE_PATH,
 								props.getProperty(ConstantUtil.DATA_S3_POLICY),
@@ -229,35 +224,30 @@ public class DataSyncService extends Service {
 								DATA_CONTENT_TYPE);
 						if (isOk) {
 							//Notify GAE back-end that data is available
-							if (sendProcessingNotification(serverBase, destName, checksum)) {
+							if (sendProcessingNotification(serverBase, destName, zipFileData.checksum)) {
 								//Mark everything completed
-								if (idList[0].size() > 0) {
-									databaseAdaptor.markDataAsSent(
-											idList[0],
-											"" + StatusUtil.hasDataConnection(
-													this,
-													(ConstantUtil.UPLOAD_NEVER_IDX == uploadIndex)));
-									// update the transmission history records too
-									for (String id : idList[0]) {
-										databaseAdaptor
-												.updateTransmissionHistory(
-														Long.valueOf(id),
-														fileName,
-														ConstantUtil.COMPLETE_STATUS);
-									}
-
+								databaseAdaptor.markDataAsSent(
+										zipFileData.respondentIDs,
+										"" + StatusUtil.hasDataConnection(this,
+												(ConstantUtil.UPLOAD_NEVER_IDX == uploadIndex)));
+								// update the transmission history records too
+								for (String id : zipFileData.respondentIDs) {// TODO: move this code to the adapter
+									databaseAdaptor
+											.updateTransmissionHistory(
+													Long.valueOf(id),
+													fileName,
+													ConstantUtil.COMPLETE_STATUS);
 								}
-								if (idList[1].size() > 0) {
-									databaseAdaptor.updatePlotStatus(idList[1],
-											ConstantUtil.SENT_STATUS);
-								}
+								
+								databaseAdaptor.updatePlotStatus(zipFileData.regionIDs,
+										ConstantUtil.SENT_STATUS);
 								fireNotification(ConstantUtil.SEND, destName);
 							} else {
 								Log.e(TAG,
 										"Could not update send status of data in the database. It will be resent on next execution of the service");
 								//Notification failed, update transmission history
 								//TODO this could be a different "failed" status
-								for (String id : idList[0]) {
+								for (String id : zipFileData.respondentIDs) {
 									databaseAdaptor.updateTransmissionHistory(
 											Long.valueOf(id),
 											fileName,
@@ -267,7 +257,7 @@ public class DataSyncService extends Service {
 							}
 						} else {
 							//S3 upload failed, update transmission history
-							for (String id : idList[0]) {
+							for (String id : zipFileData.respondentIDs) {
 								databaseAdaptor.updateTransmissionHistory(
 										Long.valueOf(id),
 										fileName,
@@ -285,9 +275,9 @@ public class DataSyncService extends Service {
 			} else if (unexportedData()) {
 				// if we can't run the export, write the data as a zip
 				String fileName = createFileName(false);
-				HashSet<String>[] idList = formZip(fileName, true);
-				if (idList != null) {
-					databaseAdaptor.markDataAsExported(idList[0]);
+				ZipFileData zipFileData = formZip(fileName, true);
+				if (zipFileData.hasRespondentIDs()) {
+					databaseAdaptor.markDataAsExported(zipFileData.respondentIDs);
 				}
 			}
 		} catch (InterruptedException e) {
@@ -357,7 +347,7 @@ public class DataSyncService extends Service {
 				null);
 	}
 
-	private HashSet<String>[] formZip(String fileName) {
+	private ZipFileData formZip(String fileName) {
 		return formZip(fileName, false);
 	}
 
@@ -370,25 +360,20 @@ public class DataSyncService extends Service {
 	 *   [1] region ids
 	 *   [2] zip checksum
 	 */
-	@SuppressWarnings("unchecked")
-	private HashSet<String>[] formZip(String fileName, boolean unexportedOnly) {
-		HashSet<String>[] idsToUpdate = new HashSet[3];
-		idsToUpdate[0] = new HashSet<String>();
-		idsToUpdate[1] = new HashSet<String>();
-		idsToUpdate[2] = new HashSet<String>();
+	private ZipFileData formZip(String fileName, boolean unexportedOnly) {
+		ZipFileData zipFileData = new ZipFileData();
 		StringBuilder surveyBuf = new StringBuilder();
-		HashMap<String, ArrayList<String>> imagePaths = new HashMap<String, ArrayList<String>>();
 		StringBuilder regionBuf = new StringBuilder();
 		try {
 			// extract survey data
-			processSurveyData(surveyBuf, imagePaths, idsToUpdate[0],
+			processSurveyData(surveyBuf, zipFileData.imagePaths, zipFileData.respondentIDs,
 					unexportedOnly);
 
 			// extract region data
-			processRegionData(regionBuf, idsToUpdate[1]);
+			processRegionData(regionBuf, zipFileData.regionIDs);
 
 			// now write the data
-			if (idsToUpdate[0].size() > 0 || idsToUpdate[1].size() > 0) {
+			if (zipFileData.hasData()) {
 				File zipFile = new File(fileName);
 				fileName = zipFile.getAbsolutePath();//Will normalize filename. 
 				Log.i(TAG, "Creating zip file: " + fileName);
@@ -398,10 +383,9 @@ public class DataSyncService extends Service {
 				ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
 
 				// write the survey data
-				if (idsToUpdate[0].size() > 0) {
+				if (zipFileData.hasRespondentIDs()) {
 					writeTextToZip(zos, surveyBuf.toString(), SURVEY_DATA_FILE);
-					String signingKeyString = props
-							.getProperty(SIGNING_KEY_PROP);
+					String signingKeyString = props.getProperty(SIGNING_KEY_PROP);
 					if (!StringUtil.isNullOrEmpty(signingKeyString)) {
 						MessageDigest sha1Digest = MessageDigest
 								.getInstance("SHA1");
@@ -418,19 +402,19 @@ public class DataSyncService extends Service {
 					}
 					// create "queued" status records for the zip file
 					//TODO: this does not always work!
-					for (String id : idsToUpdate[0]) {
+					for (String id : zipFileData.respondentIDs) {
 						databaseAdaptor.createTransmissionHistory(Long.valueOf(id),
 								fileName, null);
 					}
 				}
 				
 				// write region data
-				if (idsToUpdate[1].size() > 0) {
+				if (zipFileData.hasRegionIDs()) {
 					writeTextToZip(zos, regionBuf.toString(), REGION_DATA_FILE);
 				}
 
 				byte[] buffer = new byte[BUF_SIZE];
-				for (Entry<String, ArrayList<String>> paths : imagePaths
+				for (Entry<String, List<String>> paths : zipFileData.imagePaths
 						.entrySet()) {
 
 					for (int i = 0; i < paths.getValue().size(); i++) {
@@ -442,8 +426,7 @@ public class DataSyncService extends Service {
 										new FileInputStream(ifn));
 								String name = ZIP_IMAGE_DIR;
 								if (ifn.contains("/")) {
-									name = name
-											+ ifn.substring(ifn.lastIndexOf("/") + 1);
+									name = name + ifn.substring(ifn.lastIndexOf("/") + 1);
 								} else {
 									name = name + ifn;
 								}
@@ -456,12 +439,11 @@ public class DataSyncService extends Service {
 								bin.close();
 								zos.closeEntry();
 							} catch (Exception e) {
-								Log.e(TAG, "Could not add image "
-										+ ifn + " to zip: "
+								Log.e(TAG, "Could not add image " + ifn + " to zip: "
 										+ e.getMessage());
 							}
 						} else {
-							//Upload image files separately
+							//Upload image files separately. No way
 							try {
 								databaseAdaptor.createTransmissionHistory(
 										Long.valueOf(paths.getKey()),
@@ -501,12 +483,10 @@ public class DataSyncService extends Service {
 						}
 					}
 				}
-				Log.i(TAG, "Closed zip output stream for file: " + fileName
-						+ ". Checksum: "
-						+ checkedOutStream.getChecksum().getValue());
-				idsToUpdate[2].add(""
-						+ checkedOutStream.getChecksum().getValue());
+				zipFileData.checksum = "" + checkedOutStream.getChecksum().getValue();
 				zos.close();
+				Log.i(TAG, "Closed zip output stream for file: " + fileName
+						+ ". Checksum: " + zipFileData.checksum);
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "Could not save zip: " + e.getMessage(), e);
@@ -515,7 +495,7 @@ public class DataSyncService extends Service {
 			PersistentUncaughtExceptionHandler.recordException(e);
 			fileName = null;
 		}
-		return idsToUpdate;
+		return zipFileData;
 	}
 
 	/**
@@ -549,7 +529,7 @@ public class DataSyncService extends Service {
 	 *            - IN param. After execution this will contain the ids of the
 	 *            plots
 	 */
-	private void processRegionData(StringBuilder buf, HashSet<String> plotIds) {
+	private void processRegionData(StringBuilder buf, Set<String> plotIds) {
 		Cursor data = null;
 		try {
 			data = databaseAdaptor.listCompletePlotPoints();
@@ -607,9 +587,8 @@ public class DataSyncService extends Service {
 	 *            - IN param. After execution this will contain the ids of the
 	 *            respondents
 	 */
-	private void processSurveyData(StringBuilder buf,
-			HashMap<String, ArrayList<String>> imagePaths,
-			HashSet<String> respondentIds, boolean unexportedOnly) {
+	private void processSurveyData(StringBuilder buf, Map<String, List<String>> imagePaths,
+			Set<String> respondentIds, boolean unexportedOnly) {
 		Cursor data = null;
 		try {
 			if (unexportedOnly) {
@@ -670,7 +649,7 @@ public class DataSyncService extends Service {
 
 					if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
 							|| ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
-						ArrayList<String> paths = imagePaths.get(respId);
+						List<String> paths = imagePaths.get(respId);
 						if (paths == null) {
 							paths = new ArrayList<String>();
 							imagePaths.put(respId, paths);
@@ -843,6 +822,30 @@ public class DataSyncService extends Service {
 			ok = true;
 		}
 		return ok;
+	}
+	
+	/**
+	 * Helper class to wrap zip file creation response
+	 *
+	 */
+	class ZipFileData {
+		Set<String> respondentIDs = new HashSet<String>();
+		Set<String> regionIDs = new HashSet<String>();
+		String checksum = null;
+		Map<String, List<String>> imagePaths = new HashMap<String, List<String>>();
+		
+		boolean hasData() {
+			return (hasRespondentIDs() || hasRegionIDs());
+		}
+		
+		boolean hasRespondentIDs() {
+			return !respondentIDs.isEmpty();
+		}
+		
+		boolean hasRegionIDs() {
+			return !regionIDs.isEmpty();
+		}
+		
 	}
 	
 }

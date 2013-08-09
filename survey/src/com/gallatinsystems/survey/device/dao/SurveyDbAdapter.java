@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
@@ -523,7 +524,7 @@ public class SurveyDbAdapter {
 	 * 
 	 * @param idList
 	 */
-	public void markDataAsSent(HashSet<String> idList, String mediaSentFlag) {
+	public void markDataAsSent(Set<String> idList, String mediaSentFlag) {
 		if (idList != null) {
 			ContentValues updatedValues = new ContentValues();
 			updatedValues.put(DELIVERED_DATE_COL, System.currentTimeMillis()
@@ -547,7 +548,7 @@ public class SurveyDbAdapter {
 	 * 
 	 * @param idList
 	 */
-	public void markDataAsExported(HashSet<String> idList) {
+	public void markDataAsExported(Set<String> idList) {
 		if (idList != null && idList.size() > 0) {
 			ContentValues updatedValues = new ContentValues();
 			updatedValues.put(EXPORTED_FLAG_COL, "true");
@@ -906,7 +907,7 @@ public class SurveyDbAdapter {
 	 * @param idList
 	 * @param status
 	 */
-	public void updatePlotStatus(HashSet<String> idList, String status) {
+	public void updatePlotStatus(Set<String> idList, String status) {
 		if (idList != null) {
 			ContentValues updatedValues = new ContentValues();
 			updatedValues.put(STATUS_COL, status);

@@ -732,7 +732,7 @@ public class DataSyncService extends Service {
 			fireNotification(ConstantUtil.PROGRESS, fileName);
 			
 			// Generate checksum, to be compared against response's ETag
-			final String checksum = getMD5Checksum(fileAbsolutePath);
+			final String checksum = FileUtil.getMD5Checksum(fileAbsolutePath);
 
 			MultipartStream stream = new MultipartStream(new URL(
 					props.getProperty(ConstantUtil.DATA_UPLOAD_URL)));
@@ -845,39 +845,4 @@ public class DataSyncService extends Service {
 		return ok;
 	}
 	
-	private byte[] getFileBytes(String path) {
-		File file = new File(path);
-		int size = (int)file.length();
-		byte[] bytes = null;
-		BufferedInputStream bis = null;
-		
-		try {
-			bis = new BufferedInputStream(new FileInputStream(file));
-			bytes = new byte[size];
-			bis.read(bytes, 0, size);
-		} catch (IOException e) {
-			Log.e(TAG, e.getMessage());
-			bytes = null;
-		} finally {
-			try {
-				bis.close();
-			} catch (IOException ignored) {}
-		}
-		return bytes;
-	}
-	
-	private String getMD5Checksum(String filePath) throws NoSuchAlgorithmException {
-		StringBuilder stringBuilder = new StringBuilder();
-		byte[] bytes = getFileBytes(filePath);
-		
-		if (bytes != null) {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] rawHash = md.digest(bytes);
-			
-			for (byte b : rawHash) {
-				stringBuilder.append(String.format("%02x", b));
-			}
-		}
-		return stringBuilder.toString();
-	}
 }

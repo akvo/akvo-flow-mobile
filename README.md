@@ -8,8 +8,8 @@ Akvo FLOW consists of 3 components:
 
 Source code locations:
 
-* **Field Survey**: [android/survey](https://github.com/akvo/akvo-flow-mobile/tree/master/survey)
-* **Flow Launcher**: [android/launcher](https://github.com/akvo/akvo-flow-mobile/tree/master/launcher)
+* **Field Survey**: [survey](https://github.com/akvo/akvo-flow-mobile/tree/master/survey)
+* **Flow Launcher**: [launcher](https://github.com/akvo/akvo-flow-mobile/tree/master/launcher)
 * **Flow Server**: [server](https://github.com/akvo/akvo-flow)
 
 [Akvo FLOW license](https://github.com/akvo/akvo-flow/blob/master/LICENSE.md)

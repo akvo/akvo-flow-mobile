@@ -35,6 +35,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -42,6 +43,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -116,6 +118,7 @@ public class SurveyViewActivity extends TabActivity implements
 	private String userId;
 	private float currentTextSize;
 	private String[] selectedLanguageCodes;
+	private int currentTabIndex;
 
 	private LangsPreferenceData langsPrefData;
 	private String[] langsSelectedNameArray;
@@ -507,6 +510,8 @@ public class SurveyViewActivity extends TabActivity implements
 					File f = new File(Environment.getExternalStorageDirectory()
 							.getAbsolutePath() + File.separator + filePrefix + fileSuffix);
 
+					cleanDCIM(f.getAbsolutePath());// Ensure no image is saved in the DCIM folder
+					
 					sizeReminder(f.length());
 					
 					String newFilename = filePrefix + System.nanoTime() + fileSuffix;
@@ -588,6 +593,41 @@ public class SurveyViewActivity extends TabActivity implements
 			pendingRequestCode = -1;
 			pendingResultCode = -1;
 		}
+	}
+	
+	/**
+	 * Some manufacturers will duplicate the image saving a copy
+	 * in the DCIM folder. This method will try to spot those situations
+	 * and remove the duplicated image.
+	 * 
+	 * @param filepath The absolute path to the original image
+	 */
+	private void cleanDCIM(String filepath) {
+		Cursor cursor = getContentResolver().query(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				new String[]{MediaStore.Images.ImageColumns.DATA, MediaStore.Images.ImageColumns.DATE_TAKEN}, 
+				null,
+				null,
+				MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+		
+		if (cursor.moveToFirst()) {
+			final String lastImagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+			
+			if ((!filepath.equals(lastImagePath)) && (FileUtil.compareImages(filepath, lastImagePath))) {
+				final int result = getContentResolver().delete(
+						MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+						MediaStore.Images.ImageColumns.DATA + " = ?", 
+						new String[]{lastImagePath});
+				
+				if (result == 1) {
+					Log.i(TAG, "Duplicated file successfully removed: " + lastImagePath);
+				} else {
+					Log.e(TAG, "Error removing duplicated image:" + lastImagePath);
+				}
+			}
+		}
+		
+		cursor.close();
 	}
 
 	/**
@@ -1114,6 +1154,7 @@ public class SurveyViewActivity extends TabActivity implements
 				hasAddedTabs = true;
 				TextView title = (TextView) findViewById(R.id.titletext);
 				title.setText(survey.getName());
+				currentTabIndex = 0;
 				tabContentFactories = new ArrayList<SurveyQuestionTabContentFactory>();
 				// if the device has an active survey, create a tab for each
 				// question group
@@ -1153,15 +1194,23 @@ public class SurveyViewActivity extends TabActivity implements
 					tabHost.addTab(tabHost.newTabSpec(SUBMIT_TAB_TAG)
 							.setIndicator(getString(R.string.submitbutton))
 							.setContent(submissionTab));
-					tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-						@Override
-						public void onTabChanged(String tabId) {
-							if (SUBMIT_TAB_TAG.equals(tabId)) {
-								submissionTab.refreshView(true);
-							}
-						}
-					});
 				}
+				tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+					@Override
+					public void onTabChanged(String tabId) {
+						// Save the state of previous tab
+						if (currentTabIndex < tabContentFactories.size()) {
+							tabContentFactories.get(currentTabIndex)
+									.saveState(respondentId);
+						}
+						// update the tab index
+						currentTabIndex = tabHost.getCurrentTab();
+						
+						if (SUBMIT_TAB_TAG.equals(tabId)) {
+							submissionTab.refreshView(true);
+						}
+					}
+					});
 				if (tabContentFactories != null) {
 					for (SurveyQuestionTabContentFactory tab : tabContentFactories) {
 						tab.loadState(respondentId);

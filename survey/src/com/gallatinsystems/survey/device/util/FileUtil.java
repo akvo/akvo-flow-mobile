@@ -16,6 +16,7 @@
 
 package com.gallatinsystems.survey.device.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -25,10 +26,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
+import android.media.ExifInterface;
 import android.os.Environment;
+import android.text.TextUtils;
+import android.util.Log;
 
 /**
  * utility for manipulating files
@@ -37,6 +44,7 @@ import android.os.Environment;
  * 
  */
 public class FileUtil {
+	private static final String TAG = FileUtil.class.getSimpleName();
 
 	private static final int BUFFER_SIZE = 2048;
 
@@ -348,6 +356,99 @@ public class FileUtil {
 				}
 			}
 		}
+	}
+	
+	public static String getMD5Checksum(String path) {
+		return getMD5Checksum(new File(path));
+	}
+	
+	public static String getMD5Checksum(File file) {
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		InputStream in = null;
+		MessageDigest md;
+		
+		try {
+			md = MessageDigest.getInstance("MD5");
+			in = new BufferedInputStream(new FileInputStream(file));
+			
+			byte[] buffer = new byte[BUFFER_SIZE];
+			
+			int read = 0;
+			while ((read = in.read(buffer)) != -1) {
+				md.update(buffer, 0, read);
+			}
+			
+			byte[] rawHash = md.digest();
+			
+			for (byte b : rawHash) {
+				stringBuilder.append(String.format("%02x", b));
+			}
+			
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ignored) {}
+		}
+		
+		return stringBuilder.toString();
+	}
+	
+	/**
+	 * Compare to images to determine if their content is the same.
+	 * To state that the two of them are the same, the datetime contained in
+	 * their exif metadata will be compared. If the exif does not contain
+	 * a datetime, the MD5 checksum of the images will be compared.
+	 * 
+	 * @param image1 Absolute path to the first image
+	 * @param image2 Absolute path to the second image
+	 * @return true if their datetime is the same, false otherwise
+	 */
+	public static boolean compareImages(String image1, String image2) {
+		boolean equals = false;
+		try {
+			ExifInterface exif1 = new ExifInterface(image1);
+			ExifInterface exif2 = new ExifInterface(image2);
+			
+			final String datetime1 = exif1.getAttribute(ExifInterface.TAG_DATETIME);
+			final String datetime2 = exif2.getAttribute(ExifInterface.TAG_DATETIME);
+			
+			if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime1)) {
+				equals = datetime1.equals(datetime2);
+			} else {
+				Log.d(TAG, "Datetime is null or empty. The MD5 checksum will be compared");
+				equals = compareFilesChecksum(image1, image2);
+			}
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+		}
+		
+		return equals;
+	}
+	
+	/**
+	 * Compare to files to determine if their content is the same.
+	 * To state that the two of them are the same, the MD5 checksum
+	 * will be compared. Note that if any of the files does not exist,
+	 * or if its checksum cannot be computed, false will be returned.
+	 * 
+	 * @param path1 Absolute path to the first file
+	 * @param path2 Absolute path to the second file
+	 * @return true if their MD5 checksum is the same, false otherwise.
+	 */
+	public static boolean compareFilesChecksum(String path1, String path2) {
+		final String checksum1 = getMD5Checksum(path1);
+		final String checksum2 = getMD5Checksum(path2);
+		
+		if (!TextUtils.isEmpty(checksum1) && !TextUtils.isEmpty(checksum2)) {
+			return checksum1.equals(checksum2);
+		}
+		
+		return false;
 	}
 
 }

@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MultipartStream {
@@ -209,12 +210,22 @@ public class MultipartStream {
 	}
 	
 	public String getResponseHeader(String name) {
-		if (responseHeaders != null && responseHeaders.containsKey(name)) {
-			List<String> values = responseHeaders.get(name);
-			if (values.size() > 0) {
-				return values.get(0);
+		if (responseHeaders != null) {
+			List<String> headerValues = responseHeaders.get(name);
+			if (headerValues == null) {
+				// Issue #13 - https://github.com/akvo/akvo-flow-mobile/issues/13
+				// Prior to Gingerbread, HttpUrlConnection converted
+				// all response headers to lower case. This is a workaround
+				// to ensure we cover those situations as well
+				final String lowercaseName = name.toLowerCase(Locale.ENGLISH);
+				headerValues = responseHeaders.get(lowercaseName);
+			}
+			
+			if (headerValues != null && headerValues.size() > 0) {
+				return headerValues.get(0);
 			}
 		}
+		
 		return null;
 	}
 

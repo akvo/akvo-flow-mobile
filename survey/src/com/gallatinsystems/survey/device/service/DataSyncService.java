@@ -752,8 +752,8 @@ public class DataSyncService extends Service {
 								percentComplete = ((double) bytesSent)
 										/ ((double) totalBytes);
 							}
-							if (percentComplete >= 1) {
-								percentComplete = 0.99d;
+							if (percentComplete > 1.0d) {
+								percentComplete = 1.0d;
 							}
 							fireNotification(ConstantUtil.PROGRESS,
 									PCT_FORMAT.format(percentComplete) + " - "

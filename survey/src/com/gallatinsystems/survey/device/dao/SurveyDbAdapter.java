@@ -557,9 +557,7 @@ public class SurveyDbAdapter {
 			for (String id : idList) {
 				if (database.update(RESPONDENT_TABLE, updatedValues, PK_ID_COL
 						+ " = ?", new String[] { id }) < 1) {
-					Log.e(TAG,
-							"Could not update record for Survey_respondent_id "
-									+ id);
+					Log.e(TAG, "Could not update record for Survey_respondent_id " + id);
 				}
 			}
 		}
@@ -1545,7 +1543,7 @@ public class SurveyDbAdapter {
 	 */
 	public void updateTransmissionHistory(Long respondId, String fileName,
 			String status) {
-		ArrayList<FileTransmission> transList = listFileTransmission(respondId,
+		List<FileTransmission> transList = listFileTransmission(respondId,
 				fileName, true);
 		Long idVal = null;
 		if (transList != null && transList.size() > 0) {
@@ -1568,10 +1566,15 @@ public class SurveyDbAdapter {
 								+ respondId
 								+ " filename "
 								+ fileName);
-
 		}
 	}
-
+	
+	public void updateTransmissionHistory(Set<String> respondentIDs, String fileName,
+			String status) {
+		for (String id : respondentIDs) {
+			updateTransmissionHistory(Long.valueOf(id), fileName, status);
+		}
+	}
 	
 	/**
 	 * lists all the file transmissions for the values passed in.
@@ -1585,9 +1588,9 @@ public class SurveyDbAdapter {
 	 *            returned
 	 * @return
 	 */
-	public ArrayList<FileTransmission> listFileTransmission(Long respondentId,
+	public List<FileTransmission> listFileTransmission(Long respondentId,
 			String fileName, boolean incompleteOnly) {
-		ArrayList<FileTransmission> transList = null;
+		List<FileTransmission> transList = null;
 
 		String whereClause = SURVEY_RESPONDENT_ID_COL + "=?";
 		if (incompleteOnly) {
@@ -1612,10 +1615,7 @@ public class SurveyDbAdapter {
 						SURVEY_RESPONDENT_ID_COL }, whereClause, whereValues,
 				null, null, TRANS_START_COL + " desc");
 		if (cursor != null) {
-			if (cursor.getCount() > 0) {
-				cursor.moveToFirst();
-
-				cursor.moveToFirst();
+			if (cursor.moveToFirst()) {
 				transList = new ArrayList<FileTransmission>();
 				do {
 					FileTransmission trans = new FileTransmission();

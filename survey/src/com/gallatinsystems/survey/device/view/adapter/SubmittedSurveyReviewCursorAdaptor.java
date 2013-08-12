@@ -18,8 +18,7 @@ package com.gallatinsystems.survey.device.view.adapter;
 
 import java.util.ArrayList;
 import java.util.Date;
-
-import com.gallatinsystems.survey.device.R;
+import java.util.List;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -31,6 +30,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
@@ -71,7 +71,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
 	int getTransmissionStatus(Long respondId){
 		databaseAdapter.open();
 		//get file transmissions, most recent first
-		ArrayList<FileTransmission> transList =
+		List<FileTransmission> transList =
 				databaseAdapter.listFileTransmission(respondId, null, true);
 		int sts = 0;
 		if (transList != null && transList.size() > 0) {
@@ -99,7 +99,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
 	int getWorstMediaTransmissionStatus(Long respondId) {
 		databaseAdapter.open();
 		//get file transmissions, most recent first, including successes
-		ArrayList<FileTransmission> transList =	databaseAdapter.listFileTransmission(respondId, null, false);
+		List<FileTransmission> transList =	databaseAdapter.listFileTransmission(respondId, null, false);
 		int sts = DETAIL_NONE;
 		if (transList != null) {
 			//first pass - mark any files that have been successful at any time as successful

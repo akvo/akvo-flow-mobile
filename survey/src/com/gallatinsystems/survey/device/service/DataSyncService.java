@@ -731,7 +731,7 @@ public class DataSyncService extends Service {
 						@Override
 						public void uploadProgress(long bytesSent,
 								long totalBytes) {
-							double percentComplete = 0;
+							double percentComplete = 0.0d;
 							if (bytesSent > 0 && totalBytes > 0) {
 								percentComplete = ((double) bytesSent)
 										/ ((double) totalBytes);

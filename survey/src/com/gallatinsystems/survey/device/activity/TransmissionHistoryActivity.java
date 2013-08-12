@@ -17,6 +17,7 @@
 package com.gallatinsystems.survey.device.activity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -63,7 +64,7 @@ public class TransmissionHistoryActivity extends ListActivity {
 	}
 
 	private void getData() {
-		ArrayList<FileTransmission> transmissionList = databaseAdapter
+		List<FileTransmission> transmissionList = databaseAdapter
 				.listFileTransmission(respondentId, null, false);
 		FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
 				this, R.layout.transmissionrow,

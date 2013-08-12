@@ -815,8 +815,14 @@ public class DataSyncService extends Service {
 	}
 	
 	/**
-	 * Helper class to wrap zip file's meta-data
-	 *
+	 * Helper class to wrap zip file's meta-data.<br>
+	 * It will contain:
+	 * <ul>
+	 * <li>Respondent IDs</li>
+	 * <li>Region IDs</li>
+	 * <li>File's checksum</li>
+	 * <li>Image Paths</li>
+	 * </ul>
 	 */
 	class ZipFileData {
 		Set<String> respondentIDs = new HashSet<String>();

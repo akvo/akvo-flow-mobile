@@ -257,6 +257,10 @@ public class DataSyncService extends Service {
 				databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
 						fileName, ConstantUtil.FAILED_STATUS);
 			}
+		} else {
+			// S3 upload failed, update transmission history
+			databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
+					fileName, ConstantUtil.FAILED_STATUS);
 		}
 	}
 	

@@ -66,15 +66,15 @@ public class FileUtil {
 	}
 
 	/**
-	 * creates the data directory if it does not exist. If the directory already
-	 * existed, the File object representing that directory will be returned,
-	 * otherwise this will return null.
+	 * Creates the data directory if it does not exist.
+	 * 
+	 * @param directory Absolute path to the location
+	 * @return The File object representing that directory
 	 */
 	public static File findOrCreateDir(String directory) {
 		File dir = new File(directory);
 		if (!dir.exists()) {
 			dir.mkdirs();
-			return null;
 		}
 		return dir;
 	}

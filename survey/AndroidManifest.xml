@@ -35,7 +35,6 @@
 		<activity android:name=".activity.ImageBrowserActivity" />
 		<activity android:name=".activity.NearbyItemActivity"/>
 		<activity android:name=".activity.NearbyItemDetailActivity"/>
-		<activity android:name=".activity.SurveyReviewActivity"/>
 		<activity android:name=".activity.SubmittedSurveyReviewActivity"/>
 		<activity android:name=".activity.SavedSurveyReviewActivity"/>
 		<activity android:name=".activity.SurveyStatusHomeActivity"/>

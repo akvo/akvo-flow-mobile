@@ -39,8 +39,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * 
  */
 public class SurveyStatusHomeActivity extends Activity {
-
-	private static final String TAG = "SurveyStatusHomeActivity";
 	private TextView SavedCount;
 	private TextView SubmittedCount;
 	private SurveyDbAdapter databaseAdapter;

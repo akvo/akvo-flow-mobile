@@ -35,69 +35,67 @@ import com.gallatinsystems.survey.device.util.HttpUtil;
  * images passed in
  * 
  * @author Christopher Fagiani
- * 
  */
 public class HelpImageBrowserAdapter extends BaseAdapter {
+    private static final String TAG = "HelpImageBrowserAdapter";
+    private ArrayList<String> imageUrls;
+    private HashMap<Integer, Bitmap> bitmaps;
+    private Context context;
+    private String cacheDir;
 
-	private static final String TAG = "HelpImageBrowserAdapter";
-	private ArrayList<String> imageUrls;
-	private HashMap<Integer, Bitmap> bitmaps;
-	private Context context;
-	private String cacheDir;
+    public HelpImageBrowserAdapter(Context ctx, ArrayList<String> imageUrls,
+            String cacheDir) {
+        context = ctx;
+        this.imageUrls = imageUrls;
+        this.cacheDir = cacheDir;
+        bitmaps = new HashMap<Integer, Bitmap>();
+    }
 
-	public HelpImageBrowserAdapter(Context ctx, ArrayList<String> imageUrls,
-			String cacheDir) {
-		context = ctx;
-		this.imageUrls = imageUrls;
-		this.cacheDir = cacheDir;
-		bitmaps = new HashMap<Integer, Bitmap>();
-	}
+    @Override
+    public int getCount() {
+        return imageUrls.size();
+    }
 
-	@Override
-	public int getCount() {
-		return imageUrls.size();
-	}
+    @Override
+    public Object getItem(int position) {
+        return position;
+    }
 
-	@Override
-	public Object getItem(int position) {
-		return position;
-	}
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
+    /**
+     * returns the bitmap associated with the url at the position indicated by
+     * the position argument. If the bitmap has not yet been downloaded, this
+     * will download it and cache it for subsequent lookups
+     * 
+     * @param position
+     * @return
+     */
+    public Bitmap getImageBitmap(int position) {
+        Bitmap bitmap = bitmaps.get(position);
+        if (bitmap == null) {
+            try {
+                bitmap = HttpUtil.getRemoteImage(imageUrls.get(position),
+                        cacheDir);
+                bitmaps.put(position, bitmap);
+            } catch (Exception e) {
+                Log.e(TAG, "Could not load image into bitmap", e);
+            }
+        }
+        return bitmap;
+    }
 
-	/**
-	 * returns the bitmap associated with the url at the position indicated by
-	 * the position argument. If the bitmap has not yet been downloaded, this
-	 * will download it and cache it for subsequent lookups
-	 * 
-	 * @param position
-	 * @return
-	 */
-	public Bitmap getImageBitmap(int position) {
-		Bitmap bitmap = bitmaps.get(position);
-		if (bitmap == null) {
-			try {
-				bitmap = HttpUtil.getRemoteImage(imageUrls.get(position),
-						cacheDir);
-				bitmaps.put(position, bitmap);
-			} catch (Exception e) {
-				Log.e(TAG, "Could not load image into bitmap", e);
-			}
-		}
-		return bitmap;
-	}
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ImageView i = new ImageView(context);
+        i.setImageBitmap(getImageBitmap(position));
+        i.setLayoutParams(new Gallery.LayoutParams(150, 100));
+        i.setScaleType(ImageView.ScaleType.FIT_XY);
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		ImageView i = new ImageView(context);
-		i.setImageBitmap(getImageBitmap(position));
-		i.setLayoutParams(new Gallery.LayoutParams(150, 100));
-		i.setScaleType(ImageView.ScaleType.FIT_XY);
-
-		return i;
-	}
+        return i;
+    }
 
 }

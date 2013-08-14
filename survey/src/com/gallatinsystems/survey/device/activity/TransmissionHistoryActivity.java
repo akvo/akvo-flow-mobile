@@ -33,64 +33,61 @@ import com.gallatinsystems.survey.device.view.adapter.FileTransmissionArrayAdapt
  * Activity to show the transmission history of all files in a survey submission
  * 
  * @author Christopher Fagiani
- * 
  */
 public class TransmissionHistoryActivity extends ListActivity {
+    private SurveyDbAdapter databaseAdapter;
+    private Long respondentId;
 
-	private SurveyDbAdapter databaseAdapter;
-	private Long respondentId;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if (savedInstanceState != null) {
+            respondentId = savedInstanceState
+                    .getLong(ConstantUtil.RESPONDENT_ID_KEY);
+        } else {
+            Bundle extras = getIntent().getExtras();
+            respondentId = extras != null ? extras
+                    .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
+        }
+        setContentView(R.layout.transmissionhistory);
+        databaseAdapter = new SurveyDbAdapter(this);
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		if (savedInstanceState != null) {
-			respondentId = savedInstanceState
-					.getLong(ConstantUtil.RESPONDENT_ID_KEY);
-		} else {
-			Bundle extras = getIntent().getExtras();
-			respondentId = extras != null ? extras
-					.getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
-		}
-		setContentView(R.layout.transmissionhistory);
-		databaseAdapter = new SurveyDbAdapter(this);
-		
-	}
-	
-	public void onResume(){
-		super.onResume();
-		databaseAdapter.open();
-		getData();
-	}
+    }
 
-	private void getData() {
-		List<FileTransmission> transmissionList = databaseAdapter
-				.listFileTransmission(respondentId, null, false);
-		FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
-				this, R.layout.transmissionrow,
-				transmissionList != null ? transmissionList
-						: new ArrayList<FileTransmission>());
-		setListAdapter(adapter);
-	}
+    public void onResume() {
+        super.onResume();
+        databaseAdapter.open();
+        getData();
+    }
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if (outState != null) {
-			outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, respondentId);
-		}
-	}
+    private void getData() {
+        List<FileTransmission> transmissionList = databaseAdapter
+                .listFileTransmission(respondentId, null, false);
+        FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
+                this, R.layout.transmissionrow,
+                transmissionList != null ? transmissionList
+                        : new ArrayList<FileTransmission>());
+        setListAdapter(adapter);
+    }
 
-	protected void onDestroy() {
-		super.onDestroy();
-		
-	}
-	
-	protected void onPause(){
-		if (databaseAdapter != null) {
-			databaseAdapter.close();
-		}
-		super.onPause();
-	}
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (outState != null) {
+            outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, respondentId);
+        }
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    protected void onPause() {
+        if (databaseAdapter != null) {
+            databaseAdapter.close();
+        }
+        super.onPause();
+    }
 
 }

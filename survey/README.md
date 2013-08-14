@@ -55,6 +55,5 @@ Contributing
 To ensure a consistent code style throughout the codebase, we stick to the [Android Code Style Guidelines]
 (http://source.android.com/source/code-style.html) as much as possible.
 
-If your IDE of choice is Eclipse, you can import a predefined [xml profile]
-(https://github.com/android/platform_development/blob/master/ide/eclipse/android-formatting.xml) 
-to automatically format the code with this patterns.
+If your IDE of choice is Eclipse, you can import a predefined xml profile to automatically format the code with this patterns, 
+which is included in this repository: `ide/eclipse/android-formatting.xml`

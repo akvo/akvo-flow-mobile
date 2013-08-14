@@ -51,7 +51,6 @@ import com.gallatinsystems.survey.device.util.StatusUtil;
  * @author Christopher Fagiani
  */
 public class ExceptionReportingService extends Service {
-
     private static final String TAG = "EXCEPTION_REPORTING_SERVICE";
     private static final String EXCEPTION_SERVICE_PATH = "/remoteexception";
     private static final String ACTION_PARAM = "action";

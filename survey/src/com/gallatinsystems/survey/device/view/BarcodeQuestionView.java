@@ -40,7 +40,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  */
 public class BarcodeQuestionView extends QuestionView implements
         OnClickListener, OnFocusChangeListener {
-
     private Button barcodeButton;
     private EditText barcodeText;
 

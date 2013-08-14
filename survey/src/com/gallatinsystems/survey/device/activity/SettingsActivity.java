@@ -57,7 +57,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class SettingsActivity extends ListActivity {
-
     private static final String TAG = "SettingsActivity";
     private static final String LABEL = "label";
     private static final String DESC = "desc";
@@ -216,7 +215,6 @@ public class SettingsActivity extends ListActivity {
                                 builder.show();
                             }
                         });
-
             } else if (resources.getString(R.string.downloadsurveylabel)
                     .equals(val)) {
                 ViewUtil.showAdminAuthDialog(this,
@@ -285,7 +283,6 @@ public class SettingsActivity extends ListActivity {
 
                             }
                         });
-
             } else if (resources.getString(R.string.flushpointslabel).equals(
                     val)) {
                 ViewUtil.showAdminAuthDialog(this,
@@ -354,7 +351,6 @@ public class SettingsActivity extends ListActivity {
                             }
                         });
                 dialog.show();
-
             } else {
                 Intent i = new Intent(view.getContext(), DataSyncService.class);
                 if (resources.getString(R.string.sendoptlabel).equals(val)) {

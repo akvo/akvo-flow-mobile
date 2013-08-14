@@ -75,7 +75,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class DataSyncService extends Service {
-
     private static final String TAG = "DATA_SYNC_SERVICE";
     private static final String NOTHING = "NADA";
     private static final String DELIMITER = "\t";
@@ -104,10 +103,11 @@ public class DataSyncService extends Service {
     private static final NumberFormat PCT_FORMAT = NumberFormat.getPercentInstance();
 
     private SurveyDbAdapter databaseAdaptor;
-    private static final String TEMP_FILE_NAME = "wfp"; // used to have an extra
-                                                        // slash. Semantically
-                                                        // harmless, but made
-                                                        // the DB lookup fail
+    
+    /**
+     * Used to have an extra  slash. Semantically  harmless, but made  the DB lookup fail 
+     */
+    private static final String TEMP_FILE_NAME = "wfp";
     private static final String ZIP_IMAGE_DIR = "images/";
     private static final String SURVEY_DATA_FILE = "data.txt";
     private static final String SIG_FILE_NAME = ".sig";
@@ -364,12 +364,8 @@ public class DataSyncService extends Service {
         } else if (ConstantUtil.ERROR.equals(type)) {
             tickerText = getResources().getText(R.string.uploaderror);
         } else {
-            tickerText = getResources().getText(R.string.nothingtoexport);// This
-                                                                          // default
-                                                                          // is
-                                                                          // unclear
-                                                                          // to
-                                                                          // user
+            // This  default  is  unclear  to  user
+            tickerText = getResources().getText(R.string.nothingtoexport);
         }
         ViewUtil.fireNotification(tickerText.toString(),
                 extraText != null ? extraText : "",

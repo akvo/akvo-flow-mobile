@@ -22,7 +22,6 @@ package com.gallatinsystems.survey.device.exception;
  * @author Christopher Fagiani
  */
 public class TransferException extends Exception {
-
     private static final long serialVersionUID = -4649864250226025982L;
     private String surveyId;
     private Long instanceId;

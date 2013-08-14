@@ -47,7 +47,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
-
     private QuestionGroup questionGroup;
 
     private HashMap<String, QuestionView> questionMap;

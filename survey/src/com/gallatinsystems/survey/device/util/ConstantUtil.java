@@ -27,7 +27,6 @@ import com.gallatinsystems.survey.device.activity.WaterflowCalculatorActivity;
  * @author Christopher Fagiani
  */
 public class ConstantUtil {
-
     /**
      * file system constants
      */

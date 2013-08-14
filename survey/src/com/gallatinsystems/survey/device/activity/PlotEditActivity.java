@@ -113,7 +113,6 @@ public class PlotEditActivity extends Activity {
 
     protected void onDestroy() {
         super.onDestroy();
-
     }
 
     /**

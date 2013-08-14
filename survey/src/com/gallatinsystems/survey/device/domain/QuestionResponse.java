@@ -21,7 +21,6 @@ import java.util.StringTokenizer;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 public class QuestionResponse {
-
     private String value;
     private String type;
     private Long id;

@@ -35,7 +35,6 @@ import com.gallatinsystems.survey.device.view.adapter.FileTransmissionArrayAdapt
  * @author Christopher Fagiani
  */
 public class TransmissionHistoryActivity extends ListActivity {
-
     private SurveyDbAdapter databaseAdapter;
     private Long respondentId;
 
@@ -82,7 +81,6 @@ public class TransmissionHistoryActivity extends ListActivity {
 
     protected void onDestroy() {
         super.onDestroy();
-
     }
 
     protected void onPause() {

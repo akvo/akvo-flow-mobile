@@ -56,7 +56,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  */
 public class PreferencesActivity extends Activity implements OnClickListener,
         OnCheckedChangeListener {
-
     private CheckBox saveUserCheckbox;
     private CheckBox beaconCheckbox;
     private CheckBox screenOnCheckbox;
@@ -278,8 +277,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                     catch (NumberFormatException e) {
                         /* could complain here */
                     }
-                    ;
-
                 }
             });
 

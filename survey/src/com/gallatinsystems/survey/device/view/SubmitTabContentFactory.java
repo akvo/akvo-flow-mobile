@@ -44,7 +44,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class SubmitTabContentFactory extends SurveyTabContentFactory {
-
     private Button submitButton;
     private static final int DEFAULT_WIDTH = 200;
     private static final int HEADING_TEXT_SIZE = 20;
@@ -54,7 +53,6 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
             SurveyDbAdapter dbAdaptor, float textSize, String defaultLang,
             String[] languageCodes) {
         super(c, dbAdaptor, textSize, defaultLang, languageCodes);
-
     }
 
     @Override

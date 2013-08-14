@@ -24,7 +24,6 @@ import java.util.Date;
  * @author Christopher Fagiani
  */
 public class FileTransmission {
-
     private Long id;
     private Long respondentId;
     private String fileName;

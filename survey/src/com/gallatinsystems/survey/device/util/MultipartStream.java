@@ -121,7 +121,6 @@ public class MultipartStream {
     }
 
     private void writeFiles(MultipartStreamStatusListner listener) throws IOException {
-
         for (int i = 0; i < files.size(); i++) {
             long fileBytesWritten = 0;
             out.writeBytes(PREFIX);
@@ -237,4 +236,5 @@ public class MultipartStream {
     public interface MultipartStreamStatusListner {
         public void uploadProgress(long bytesUploaded, long totalBytes);
     }
+    
 }

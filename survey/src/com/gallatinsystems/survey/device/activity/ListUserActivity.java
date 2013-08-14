@@ -39,7 +39,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class ListUserActivity extends AbstractListEditActivity {
-
     private static final String EDIT_USER_ACTIVITY_CLASS = "com.gallatinsystems.survey.device.activity.UserEditActivity";
     protected static final int DELETE_ID = Menu.FIRST + 2;
     private int deleteStringId;
@@ -76,7 +75,6 @@ public class ListUserActivity extends AbstractListEditActivity {
     @Override
     protected Cursor getData() {
         return databaseAdaptor.listUsers();
-
     }
 
     @Override
@@ -87,7 +85,6 @@ public class ListUserActivity extends AbstractListEditActivity {
         editStringId = R.string.editmenu;
         deleteStringId = R.string.deleteusermenu;
         editActivityClassName = EDIT_USER_ACTIVITY_CLASS;
-
     }
 
     /**
@@ -114,7 +111,6 @@ public class ListUserActivity extends AbstractListEditActivity {
                             .getMenuInfo();
                     handleDelete(info.id + "");
                     return true;
-
             }
         }
         return false;
@@ -134,4 +130,5 @@ public class ListUserActivity extends AbstractListEditActivity {
 
         fillData();
     }
+    
 }

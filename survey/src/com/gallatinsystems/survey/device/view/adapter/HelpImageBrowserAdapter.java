@@ -37,7 +37,6 @@ import com.gallatinsystems.survey.device.util.HttpUtil;
  * @author Christopher Fagiani
  */
 public class HelpImageBrowserAdapter extends BaseAdapter {
-
     private static final String TAG = "HelpImageBrowserAdapter";
     private ArrayList<String> imageUrls;
     private HashMap<Integer, Bitmap> bitmaps;

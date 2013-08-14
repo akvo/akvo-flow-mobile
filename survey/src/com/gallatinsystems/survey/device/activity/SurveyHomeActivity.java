@@ -63,7 +63,6 @@ import com.gallatinsystems.survey.device.view.adapter.HomeMenuViewAdapter;
  * @author Christopher Fagiani
  */
 public class SurveyHomeActivity extends Activity implements OnItemClickListener {
-
     private static final int DELETE_ID = Menu.FIRST + 1;
     private static final String TAG = "Survey Home Activity";
     public static final int SURVEY_ACTIVITY = 1;
@@ -186,7 +185,6 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
                             public void onAuthenticated() {
                                 menuViewAdapter.deleteItem(info.position,
                                         SurveyHomeActivity.this);
-
                             }
                         });
 
@@ -374,7 +372,6 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
     }
 
     private void saveState() {
-
     }
 
     /**

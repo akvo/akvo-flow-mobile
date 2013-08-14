@@ -33,7 +33,6 @@ import com.google.android.maps.MapView;
  * @author Christopher Fagiani
  */
 public class GeoPlotOverlay extends GeoOverlay {
-
     private RegionPlotActivity plotActivity;
 
     public GeoPlotOverlay(RegionPlotActivity ctx) {
@@ -49,7 +48,6 @@ public class GeoPlotOverlay extends GeoOverlay {
      */
     @Override
     public boolean onTap(GeoPoint point, final MapView mapView) {
-
         final GeoPoint evictionCandidate = getClosestPoint(point, mapView
                 .getZoomLevel());
         if (evictionCandidate != null) {
@@ -79,8 +77,8 @@ public class GeoPlotOverlay extends GeoOverlay {
                     });
             builder.show();
             return true;
-
         }
+        
         return false;
     }
 }

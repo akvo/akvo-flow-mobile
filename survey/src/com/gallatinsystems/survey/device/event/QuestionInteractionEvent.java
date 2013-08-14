@@ -25,7 +25,6 @@ import com.gallatinsystems.survey.device.view.QuestionView;
  * @author Christopher Fagiani
  */
 public class QuestionInteractionEvent {
-
     public static final String TAKE_PHOTO_EVENT = "PHOTO";
     public static final String TAKE_VIDEO_EVENT = "VIDEO";
     public static final String GEO_CHECK_EVENT = "GEO";

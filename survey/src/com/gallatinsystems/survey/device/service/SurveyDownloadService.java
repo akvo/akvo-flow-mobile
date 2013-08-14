@@ -63,7 +63,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class SurveyDownloadService extends Service {
-
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
     private static final String DEFAULT_TYPE = "Survey";

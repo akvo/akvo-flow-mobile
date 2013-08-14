@@ -26,7 +26,6 @@ import java.util.List;
  * @author Christopher Fagiani
  */
 public class Survey {
-
     private String name;
     private String id;
     private Date startDate;

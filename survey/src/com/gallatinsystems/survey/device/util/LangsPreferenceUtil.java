@@ -41,7 +41,6 @@ import android.util.Log;
  * @author Mark Westra
  */
 public class LangsPreferenceUtil {
-
     private static final String TAG = "LANGUAGE_SERVICE";
 
     /**
@@ -189,4 +188,5 @@ public class LangsPreferenceUtil {
         }
         return langsArray;
     }
+    
 }

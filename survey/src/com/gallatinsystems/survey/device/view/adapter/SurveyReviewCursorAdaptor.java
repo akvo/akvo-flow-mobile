@@ -37,7 +37,6 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
  * @author Christopher Fagiani
  */
 public class SurveyReviewCursorAdaptor extends CursorAdapter {
-
     public static int SURVEY_ID_KEY = com.gallatinsystems.survey.device.R.integer.surveyidkey;
     public static int RESP_ID_KEY = com.gallatinsystems.survey.device.R.integer.respidkey;
     public static int USER_ID_KEY = com.gallatinsystems.survey.device.R.integer.useridkey;

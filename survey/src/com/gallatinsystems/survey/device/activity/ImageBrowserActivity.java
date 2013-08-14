@@ -46,7 +46,6 @@ import com.gallatinsystems.survey.device.view.adapter.HelpImageBrowserAdapter;
  */
 public class ImageBrowserActivity extends Activity implements
         OnItemClickListener {
-
     private Gallery gallery;
     private ImageView mainImageView;
     private TextView captionTextView;
@@ -86,7 +85,6 @@ public class ImageBrowserActivity extends Activity implements
         gallery.setOnItemClickListener(this);
         mainImageView.setImageBitmap(imageAdapter.getImageBitmap(0));
         captionTextView.setText(captions.get(0));
-
     }
 
     @SuppressWarnings("rawtypes")

@@ -31,7 +31,6 @@ import android.widget.LinearLayout;
  * @author Christopher Fagiani
  */
 public class TransparentPanel extends LinearLayout {
-
     private static final int LINE_WIDTH = 2;
     private Paint innerColor;
     private Paint borderColor;
@@ -67,4 +66,5 @@ public class TransparentPanel extends LinearLayout {
         canvas.drawRoundRect(drawRect, 5, 5, borderColor);
         super.dispatchDraw(canvas);
     }
+    
 }

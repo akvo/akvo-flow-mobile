@@ -22,7 +22,6 @@ package com.gallatinsystems.survey.device.exception;
  * @author Christopher Fagiani
  */
 public class ValidationException extends Exception {
-
     public static final String TOO_SMALL = "too small";
     public static final String TOO_LARGE = "too large";
     public static final String INVALID_DATATYPE = "bad datatype";

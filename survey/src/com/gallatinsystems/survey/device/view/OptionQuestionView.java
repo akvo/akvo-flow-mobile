@@ -62,7 +62,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class OptionQuestionView extends QuestionView {
-
     private String OTHER_TEXT;
     private RadioGroup optionGroup;
     private ArrayList<CheckBox> checkBoxes;
@@ -678,4 +677,5 @@ public class OptionQuestionView extends QuestionView {
             }
         }
     }
+    
 }

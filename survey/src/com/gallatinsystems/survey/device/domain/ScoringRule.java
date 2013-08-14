@@ -26,7 +26,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class ScoringRule {
-
     private static final String TAG = "ScoringRule";
 
     private String type;

@@ -48,4 +48,5 @@ public class ArrayPreferenceData {
     public void setSelectedItems(boolean[] selectedItems) {
         this.selectedItems = selectedItems;
     }
+    
 }

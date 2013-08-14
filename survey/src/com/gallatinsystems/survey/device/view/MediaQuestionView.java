@@ -41,7 +41,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class MediaQuestionView extends QuestionView implements OnClickListener {
-
     private Button mediaButton;
     private ImageView completeIcon;
     private String mediaType;
@@ -147,4 +146,5 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         super.resetQuestion(fireEvent);
         completeIcon.setVisibility(View.INVISIBLE);
     }
+    
 }

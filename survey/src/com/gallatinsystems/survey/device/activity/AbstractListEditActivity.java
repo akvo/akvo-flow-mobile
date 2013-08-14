@@ -217,7 +217,6 @@ public abstract class AbstractListEditActivity extends ListActivity {
             try {
                 dataCursor.close();
             } catch (Exception e) {
-
             }
         }
         if (databaseAdaptor != null) {

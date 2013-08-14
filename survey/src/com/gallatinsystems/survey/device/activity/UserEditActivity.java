@@ -111,7 +111,6 @@ public class UserEditActivity extends Activity {
     }
 
     protected void onDestroy() {
-
         super.onDestroy();
     }
 

@@ -51,7 +51,6 @@ import com.gallatinsystems.survey.device.view.adapter.SurveyReviewCursorAdaptor;
  * @author Stellan Lagerström
  */
 public class SubmittedSurveyReviewActivity extends ListActivity {
-
     private static final String TAG = "SubmittedSurveyReviewActivity";
     private static final int DELETE_ALL = 3;
     private static final int DELETE_ONE = 4;
@@ -123,7 +122,6 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
         menu.add(0, DELETE_ONE, 0, R.string.deletesurvey);
         menu.add(0, VIEW_HISTORY, 1, R.string.transmissionhist);
         menu.add(0, RESEND_ONE, 2, R.string.resendone);
-
     }
 
     @Override
@@ -144,7 +142,6 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
             try {
                 dataCursor.close();
             } catch (Exception e) {
-
             }
         }
         if (databaseAdapter != null) {
@@ -232,7 +229,6 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case DELETE_ALL:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -275,7 +271,6 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
                                         R.string.submitcompletetitle,
                                         R.string.submitcompletetext,
                                         SubmittedSurveyReviewActivity.this);
-
                             }
                         });
 

@@ -43,7 +43,6 @@ import com.gallatinsystems.survey.device.util.StatusUtil;
  * @author Christopher Fagiani
  */
 public class PrecacheService extends Service {
-
     private static final String TAG = "PRECACHE_SERVICE";
     private static final int DEFAULT_LIMIT = 200;
 

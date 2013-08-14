@@ -55,7 +55,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  */
 public class QuestionView extends TableLayout implements
         QuestionInteractionListener {
-
     protected static final int DEFAULT_WIDTH = 290;
     private TextView questionText;
 
@@ -363,7 +362,6 @@ public class QuestionView extends TableLayout implements
     }
 
     public void onQuestionInteraction(QuestionInteractionEvent event) {
-
         if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event
                 .getEventType())) {
             // if this question is dependent, see if it has been satisfied
@@ -476,7 +474,6 @@ public class QuestionView extends TableLayout implements
      * freed/notified
      */
     public void releaseResources() {
-
     }
 
     public QuestionResponse getResponse(boolean suppressListeners) {
@@ -490,7 +487,6 @@ public class QuestionView extends TableLayout implements
     }
 
     public QuestionResponse getResponse() {
-
         return getResponse(false);
     }
 
@@ -579,4 +575,5 @@ public class QuestionView extends TableLayout implements
             questionText.setBackgroundColor(Color.TRANSPARENT);
         }
     }
+    
 }

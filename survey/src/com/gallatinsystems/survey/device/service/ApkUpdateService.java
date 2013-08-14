@@ -49,7 +49,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class ApkUpdateService extends Service {
-
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     private static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=fieldSurvey";
@@ -71,7 +70,6 @@ public class ApkUpdateService extends Service {
         thread = new Thread(new Runnable() {
             public void run() {
                 checkAndDownload(startid);
-
             }
         });
         thread.start();
@@ -225,4 +223,5 @@ public class ApkUpdateService extends Service {
                 res.getString(R.string.clicktoinstall), this, 0, null, intent,
                 true);
     }
+    
 }

@@ -51,7 +51,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  */
 public class GeoQuestionView extends QuestionView implements OnClickListener,
         LocationListener, OnFocusChangeListener {
-
     private static final int DEFAULT_WIDTH = 200;
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final float ACCURACY_THRESHOLD = 25f;
@@ -336,12 +335,10 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
 
     public void onProviderDisabled(String provider) {
         // no op. needed for LocationListener interface
-
     }
 
     public void onProviderEnabled(String provider) {
         // no op. needed for LocationListener interface
-
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {

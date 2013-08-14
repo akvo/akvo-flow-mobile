@@ -61,7 +61,6 @@ public class ListPlotActivity extends AbstractListEditActivity {
     @Override
     protected Cursor getData() {
         return databaseAdaptor.listPlots(null);
-
     }
 
     /**
@@ -75,6 +74,6 @@ public class ListPlotActivity extends AbstractListEditActivity {
         addStringId = R.string.addplot;
         editStringId = R.string.editplot;
         editActivityClassName = EDIT_PLOT_ACTIVITY_CLASS;
-
     }
+    
 }

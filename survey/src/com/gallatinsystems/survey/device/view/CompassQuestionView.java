@@ -38,7 +38,6 @@ import com.gallatinsystems.survey.device.domain.Question;
  */
 public class CompassQuestionView extends QuestionView implements
         OnClickListener {
-
     private EditText headingEdit;
     private Button captureButton;
     private Sensor orientationSensor;

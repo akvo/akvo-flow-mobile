@@ -52,7 +52,6 @@ import com.gallatinsystems.survey.device.util.PropertyUtil;
  * @author Christopher Fagiani
  */
 public class SurveyDbAdapter {
-
     public static final String QUESTION_FK_COL = "question_id";
     public static final String ANSWER_COL = "answer_value";
     public static final String ANSWER_TYPE_COL = "answer_type";
@@ -179,7 +178,6 @@ public class SurveyDbAdapter {
      * @author Christopher Fagiani
      */
     static class DatabaseHelper extends SQLiteOpenHelper {
-
         private static SQLiteDatabase database;
         private static volatile Long LOCK_OBJ = 1L;
         private volatile static int instanceCount = 0;
@@ -916,7 +914,6 @@ public class SurveyDbAdapter {
      * @return
      */
     public Cursor listPlotPoints(String plotId, String afterTime) {
-
         Cursor cursor = database
                 .query(PLOT_POINT_TABLE, new String[] {
                         PK_ID_COL, LAT_COL,

@@ -45,7 +45,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  */
 public class GeoTrackQuestionView extends QuestionView implements
         OnClickListener {
-
     private static final int BUTTON_WIDTH = 75;
     private Button trackButton;
     private boolean isRunning;
@@ -135,4 +134,5 @@ public class GeoTrackQuestionView extends QuestionView implements
                 Context.BIND_AUTO_CREATE);
         getContext().startService(i);
     }
+    
 }

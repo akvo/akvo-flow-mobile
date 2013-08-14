@@ -71,7 +71,6 @@ public class StatusUtil {
      * @return
      */
     public static String getPhoneNumber(Context context) {
-
         TelephonyManager teleMgr = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
         String number = null;
@@ -116,7 +115,6 @@ public class StatusUtil {
      * @return
      */
     public static String getImei(Context context) {
-
         TelephonyManager teleMgr = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
         String number = null;
@@ -128,4 +126,5 @@ public class StatusUtil {
         }
         return number;
     }
+    
 }

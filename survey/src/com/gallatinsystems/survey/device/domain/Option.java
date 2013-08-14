@@ -24,7 +24,6 @@ import java.util.HashMap;
  * @author Christopher Fagiani
  */
 public class Option {
-
     private String text;
     private String value;
     private HashMap<String, AltText> altTextMap = new HashMap<String, AltText>();

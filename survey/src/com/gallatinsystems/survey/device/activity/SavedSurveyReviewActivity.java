@@ -47,7 +47,6 @@ import com.gallatinsystems.survey.device.view.adapter.SurveyReviewCursorAdaptor;
  * @author Stellan Lagerström
  */
 public class SavedSurveyReviewActivity extends ListActivity {
-
     private static final String TAG = "SavedSurveyReviewActivity";
     private static final int DELETE_ALL = 3;
     private static final int DELETE_ONE = 4;

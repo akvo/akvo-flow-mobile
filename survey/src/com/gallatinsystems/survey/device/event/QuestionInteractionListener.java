@@ -23,6 +23,5 @@ package com.gallatinsystems.survey.device.event;
  * @author Christopher Fagiani
  */
 public interface QuestionInteractionListener {
-
     public void onQuestionInteraction(QuestionInteractionEvent event);
 }

@@ -47,7 +47,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christohper Fagiani
  */
 public class DateQuestionView extends QuestionView {
-
     private EditText dateTextEdit;
     private Button pickButton;
     private int curYear;
@@ -172,4 +171,5 @@ public class DateQuestionView extends QuestionView {
         dateTextEdit.setText("");
         selectedDate = null;
     }
+    
 }

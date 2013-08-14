@@ -41,7 +41,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class GeoTrackService extends Service implements LocationListener {
-
     private static long INTERVAL = 60000;
     private static float MIN_DIST = 10;
     private ArrayList<String> points;
@@ -106,19 +105,16 @@ public class GeoTrackService extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
-
     }
 
     public ArrayList<String> getPoints() {

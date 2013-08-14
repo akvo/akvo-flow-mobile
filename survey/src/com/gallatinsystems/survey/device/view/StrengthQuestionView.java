@@ -38,7 +38,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class StrengthQuestionView extends OptionQuestionView {
-
     private String STRENGTH_TEXT;
     private Spinner strengthSpinner;
     private volatile boolean suppressListeners = false;
@@ -53,7 +52,6 @@ public class StrengthQuestionView extends OptionQuestionView {
     }
 
     protected void init() {
-
         Context context = getContext();
         strengthSpinner = new Spinner(context);
         String[] optionArray = new String[(getQuestion().getStrengthMax() - getQuestion()
@@ -102,7 +100,6 @@ public class StrengthQuestionView extends OptionQuestionView {
         layout.addView(strengthSpinner);
         tr.addView(layout);
         addView(tr);
-
     }
 
     private void setResponseStrength(String val) {

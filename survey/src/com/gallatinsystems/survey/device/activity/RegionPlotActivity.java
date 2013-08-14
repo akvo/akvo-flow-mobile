@@ -58,7 +58,6 @@ import com.google.android.maps.Overlay;
  */
 public class RegionPlotActivity extends MapActivity implements OnClickListener,
         LocationListener {
-
     private static final int TOGGLE_ID = Menu.FIRST;
     private static final int INTERVAL_ID = Menu.FIRST + 1;
     private static final String AUTO_MODE = "auto";
@@ -181,7 +180,6 @@ public class RegionPlotActivity extends MapActivity implements OnClickListener,
 
     public void onDestroy() {
         super.onDestroy();
-
     }
 
     /**
@@ -381,7 +379,6 @@ public class RegionPlotActivity extends MapActivity implements OnClickListener,
             fillPlot();
             mapView.invalidate();
             // }
-
         }
     }
 

@@ -42,7 +42,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Stellan Lagerström
  */
 public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
-
     public static int SURVEY_ID_KEY = R.integer.surveyidkey;
     public static int RESP_ID_KEY = R.integer.respidkey;
     public static int USER_ID_KEY = R.integer.useridkey;

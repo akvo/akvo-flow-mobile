@@ -34,13 +34,11 @@ import com.google.android.maps.MapView;
  * @author Christopher Fagiani
  */
 public class PointsOfInterestOverlay extends GeoOverlay {
-
     private PointOfInterestMapActivity pointActivity;
 
     public PointsOfInterestOverlay(PointOfInterestMapActivity pointActivity) {
         super(false);
         this.pointActivity = pointActivity;
-
     }
 
     /**
@@ -50,7 +48,6 @@ public class PointsOfInterestOverlay extends GeoOverlay {
      */
     @Override
     public boolean onTap(GeoPoint point, final MapView mapView) {
-
         final int matchingPointIndex = getClosestPointIndex(point, mapView
                 .getZoomLevel());
         if (matchingPointIndex > -1) {
@@ -84,4 +81,5 @@ public class PointsOfInterestOverlay extends GeoOverlay {
         }
         return false;
     }
+    
 }

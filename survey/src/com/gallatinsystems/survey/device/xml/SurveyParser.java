@@ -26,6 +26,5 @@ import com.gallatinsystems.survey.device.domain.Survey;
  * @author Christopher Fagiani
  */
 public interface SurveyParser {
-
     public Survey parse(InputStream inputStream);
 }

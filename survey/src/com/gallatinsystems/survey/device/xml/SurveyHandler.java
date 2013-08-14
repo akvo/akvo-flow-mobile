@@ -42,7 +42,6 @@ import com.gallatinsystems.survey.device.util.StringUtil;
  * @author Christopher Fagiani
  **/
 public class SurveyHandler extends DefaultHandler {
-
     private static final String DEFAULT_LANG = "defaultLanguageCode";
     private static final String QUESTION_GROUP = "questionGroup";
     private static final String HEADING = "heading";
@@ -344,4 +343,5 @@ public class SurveyHandler extends DefaultHandler {
                     attributes.getValue(VALUE));
         }
     }
+    
 }

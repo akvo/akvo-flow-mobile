@@ -46,7 +46,6 @@ public abstract class SurveyTabContentFactory implements TabContentFactory {
         defaultTextSize = textSize;
         this.languageCodes = languageCodes;
         this.defaultLang = defaultLang;
-
     }
 
     protected ScrollView createSurveyTabContent() {

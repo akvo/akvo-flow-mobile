@@ -55,7 +55,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  */
 public class NearbyItemDetailActivity extends Activity implements
         LocationListener, SensorEventListener {
-
     private static final int NAVIGATE_ID = Menu.FIRST;
     private LocationManager locMgr;
     private Criteria locationCriteria;
@@ -263,7 +262,6 @@ public class NearbyItemDetailActivity extends Activity implements
     @Override
     public void onProviderDisabled(String arg0) {
         // no-op
-
     }
 
     @Override
@@ -274,7 +272,6 @@ public class NearbyItemDetailActivity extends Activity implements
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // no-op
-
     }
 
     @Override
@@ -290,7 +287,6 @@ public class NearbyItemDetailActivity extends Activity implements
         if (event.sensor == orientSensor) {
             lastOrientation = event.values[0];
             updateArrow();
-
         }
     }
 

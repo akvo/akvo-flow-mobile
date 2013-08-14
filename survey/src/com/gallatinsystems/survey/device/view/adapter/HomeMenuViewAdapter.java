@@ -41,7 +41,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class HomeMenuViewAdapter extends BaseAdapter {
-
     private static final String TAG = "Home Menu View Adapter";
 
     /**
@@ -92,7 +91,6 @@ public class HomeMenuViewAdapter extends BaseAdapter {
         this.includeOptional = includeOptional;
         inflater = (LayoutInflater) c
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
     }
 
     /**
@@ -266,4 +264,5 @@ public class HomeMenuViewAdapter extends BaseAdapter {
     public String getSelectedOperation(int index) {
         return operations.get(index);
     }
+    
 }

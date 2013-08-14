@@ -81,7 +81,6 @@ import com.gallatinsystems.survey.device.view.SurveyQuestionTabContentFactory;
  */
 public class SurveyViewActivity extends TabActivity implements
         QuestionInteractionListener {
-
     private static final String TAG = "Survey View Activity";
 
     private static final String ACTIVITY_NAME = "SurveyViewActivity";
@@ -209,7 +208,6 @@ public class SurveyViewActivity extends TabActivity implements
         }
 
         spaceLeftOnCard();
-
     }
 
     /*
@@ -219,7 +217,6 @@ public class SurveyViewActivity extends TabActivity implements
     public void spaceLeftOnCard() {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // TODO: more specific warning if card not mounted?
-
         }
         // compute space left
         StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
@@ -232,11 +229,8 @@ public class SurveyViewActivity extends TabActivity implements
 
         // keep track of changes
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
-        long lastMegaAvailable = settings.getLong("cardMBAvaliable", 101L);// assume
-                                                                           // we
-                                                                           // had
-                                                                           // space
-                                                                           // before
+        // assume we had space before
+        long lastMegaAvailable = settings.getLong("cardMBAvaliable", 101L);
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("cardMBAvaliable", megaAvailable);
         // Commit the edits!
@@ -413,10 +407,8 @@ public class SurveyViewActivity extends TabActivity implements
                                     }
                                 });
                 builder.show();
-
             }
         }
-
     }
 
     /**
@@ -430,31 +422,15 @@ public class SurveyViewActivity extends TabActivity implements
             BitmapFactory.Options bmo = new BitmapFactory.Options();
             bmo.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(f.getAbsolutePath(), bmo);
-            if (Math.max(bmo.outWidth, bmo.outHeight) > 320) { // If file is
-                                                               // unreadable,
-                                                               // both are -1
+            // If file is unreadable both are -1
+            if (Math.max(bmo.outWidth, bmo.outHeight) > 320) {
                 bmo.inJustDecodeBounds = false;
-                bmo.inSampleSize = Math.max(bmo.outWidth, bmo.outHeight) / 320; // 6
-                                                                                // for
-                                                                                // a
-                                                                                // 3MP
-                                                                                // image;
-                                                                                // will
-                                                                                // be
-                                                                                // rounded
-                                                                                // down
-                                                                                // to
-                                                                                // to
-                                                                                // 4
+                
+                // 6 for a 3MP image; will be rounded down to to 4
+                bmo.inSampleSize = Math.max(bmo.outWidth, bmo.outHeight) / 320; 
                 Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath(), bmo);
-                if (bm != null && bm.getHeight() > 0 && bm.getWidth() > 0) { // sometimes
-                                                                             // get
-                                                                             // bm
-                                                                             // width
-                                                                             // and
-                                                                             // height
-                                                                             // as
-                                                                             // -1
+                // sometimes  get  bm  width  and  height  as  -1
+                if (bm != null && bm.getHeight() > 0 && bm.getWidth() > 0) {
                     try {
                         OutputStream out = null;
                         try {
@@ -527,8 +503,8 @@ public class SurveyViewActivity extends TabActivity implements
                     File f = new File(Environment.getExternalStorageDirectory()
                             .getAbsolutePath() + File.separator + filePrefix + fileSuffix);
 
-                    cleanDCIM(f.getAbsolutePath());// Ensure no image is saved
-                                                   // in the DCIM folder
+                    // Ensure no image is saved in the DCIM folder
+                    cleanDCIM(f.getAbsolutePath());
 
                     sizeReminder(f.length());
 
@@ -545,11 +521,8 @@ public class SurveyViewActivity extends TabActivity implements
                             Log.e(ACTIVITY_NAME, "Media file delete failed");
                         }
                     } else {// just move it to the correct place
-                        if (!f.renameTo(new File(absoluteFile))) { // must check
-                                                                   // return
-                                                                   // value to
-                                                                   // know if it
-                                                                   // failed!
+                        if (!f.renameTo(new File(absoluteFile))) {
+                            // must check  return  value to  know if it  failed!
                             Log.e(ACTIVITY_NAME, "Media file rename failed");
                         }
                     }
@@ -567,7 +540,6 @@ public class SurveyViewActivity extends TabActivity implements
                                     (requestCode == PHOTO_ACTIVITY_REQUEST ? ConstantUtil.IMAGE_RESPONSE_TYPE
                                             : ConstantUtil.VIDEO_RESPONSE_TYPE),
                                     eventSourceQuestionId);
-
                         } else {
                             Log.e(ACTIVITY_NAME,
                                     "Both the source object and source question id are null");
@@ -592,7 +564,6 @@ public class SurveyViewActivity extends TabActivity implements
                                         ConstantUtil.BARCODE_CONTENT),
                                 ConstantUtil.VALUE_RESPONSE_TYPE,
                                 eventSourceQuestionId);
-
                     } else {
                         Log.e(ACTIVITY_NAME,
                                 "Both the source object and source question id are null");
@@ -1029,7 +1000,6 @@ public class SurveyViewActivity extends TabActivity implements
                                     }
                                 }
                             });
-
                 }
                 return true;
             case SAVE_SURVEY:
@@ -1051,7 +1021,6 @@ public class SurveyViewActivity extends TabActivity implements
                                         finish();
                                     else
                                         startNewSurvey();
-
                                 }
                             });
                 }
@@ -1264,7 +1233,6 @@ public class SurveyViewActivity extends TabActivity implements
     }
 
     protected void onDestroy() {
-
         // make sure we're not keeping the screen on once we're destroyed
         if (tabHost != null) {
             tabHost.setKeepScreenOn(false);

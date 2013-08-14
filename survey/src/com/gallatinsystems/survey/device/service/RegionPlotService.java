@@ -41,7 +41,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class RegionPlotService extends Service implements LocationListener {
-
     private static final int DEFAULT_INTERVAL = 60000;
     private SurveyDbAdapter database;
     private LocationManager locMgr;
@@ -129,13 +128,11 @@ public class RegionPlotService extends Service implements LocationListener {
     @Override
     public void onProviderEnabled(String provider) {
         // no op
-
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // no op
-
     }
 
     @Override

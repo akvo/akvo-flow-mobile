@@ -42,7 +42,6 @@ import com.gallatinsystems.survey.device.util.FileUtil;
  */
 public class PersistentUncaughtExceptionHandler implements
         UncaughtExceptionHandler {
-
     private static final String TAG = "UNCAUGHT_EXCEPTION_HANDLER";
     private static PersistentUncaughtExceptionHandler instance;
 
@@ -73,7 +72,6 @@ public class PersistentUncaughtExceptionHandler implements
      */
     @Override
     public void uncaughtException(Thread sourceThread, Throwable exception) {
-
         recordException(exception);
 
         // Still process the exception with the default handler so we don't
@@ -154,4 +152,5 @@ public class PersistentUncaughtExceptionHandler implements
             }
         }
     }
+    
 }

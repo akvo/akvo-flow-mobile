@@ -43,7 +43,6 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  */
 public class WaterflowCalculatorActivity extends Activity implements
         OnClickListener, OnItemSelectedListener {
-
     private Button solveButton;
     private Button clearButton;
     private Button doneButton;
@@ -252,6 +251,6 @@ public class WaterflowCalculatorActivity extends Activity implements
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
         // no-op
-
     }
+    
 }

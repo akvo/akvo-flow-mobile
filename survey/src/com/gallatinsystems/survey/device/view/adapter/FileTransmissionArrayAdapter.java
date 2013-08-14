@@ -39,7 +39,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  */
 public class FileTransmissionArrayAdapter extends
         ArrayAdapter<FileTransmission> {
-
     private DateFormat dateFormat;
     private int layoutId;
 
@@ -47,12 +46,8 @@ public class FileTransmissionArrayAdapter extends
             List<FileTransmission> objects) {
         super(context, resourceId, objects);
         layoutId = resourceId;
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); // TODO:
-                                                                  // US-style
-                                                                  // date should
-                                                                  // not be
-                                                                  // hardcoded...
-
+        // TODO:  US-style  date should  not be  hardcoded...
+        dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     }
 
     private void bindView(View view, FileTransmission trans) {
@@ -79,7 +74,6 @@ public class FileTransmissionArrayAdapter extends
 
         TextView fileName = (TextView) view.findViewById(R.id.filename);
         fileName.setText(trans.getFileName());
-
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -90,4 +84,5 @@ public class FileTransmissionArrayAdapter extends
         bindView(view, getItem(position));
         return view;
     }
+    
 }

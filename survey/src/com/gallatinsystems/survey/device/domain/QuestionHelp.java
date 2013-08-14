@@ -24,7 +24,6 @@ import java.util.HashMap;
  * @author Christopher Fagiani
  */
 public class QuestionHelp {
-
     private HashMap<String, AltText> altTextMap = new HashMap<String, AltText>();
     private String type;
     private String text;
@@ -84,6 +83,5 @@ public class QuestionHelp {
         }
 
         return true;
-
     }
 }

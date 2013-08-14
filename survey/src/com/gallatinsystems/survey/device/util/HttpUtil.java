@@ -49,7 +49,6 @@ import android.graphics.BitmapFactory;
  * @author Christopher Fagiani
  */
 public class HttpUtil {
-
     private static final int BUF_SIZE = 2048;
     private static final int PARSE_BUF_SIZE = 8192;
 
@@ -73,8 +72,8 @@ public class HttpUtil {
                     + response.getStatusLine().getStatusCode());
         } else {
             responseString = parseResponse(response);
-
         }
+        
         return responseString;
     }
 
@@ -165,8 +164,8 @@ public class HttpUtil {
                 reader.close();
             }
         }
+        
         return bitMap;
-
     }
 
     /**

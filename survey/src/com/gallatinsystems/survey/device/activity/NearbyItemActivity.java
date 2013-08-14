@@ -56,7 +56,6 @@ import com.gallatinsystems.survey.device.util.PropertyUtil;
  */
 public class NearbyItemActivity extends ListActivity implements
         LocationListener {
-
     private static final int NEARBY_DETAIL_ACTIVITY = 1;
     private static final int NAVIGATE_OPT = 2;
     private static final int COUNTRY_OPT = 3;
@@ -157,11 +156,9 @@ public class NearbyItemActivity extends ListActivity implements
             } catch (NumberFormatException e) {
                 /* could complain here */
             }
-            ;
-
         } else {
-            nearbyRadius = 100000.0d;// default to 100 km, TODO: move this to
-                                     // constants
+            // default to 100 km, TODO: move this to constants
+            nearbyRadius = 100000.0d;
         }
 
         String provider = locMgr.getBestProvider(locationCriteria, true);
@@ -435,10 +432,8 @@ public class NearbyItemActivity extends ListActivity implements
                                     int which) {
                                 country = countries[which];
                                 additive = false;
-                                loadData(null, null, country, null); // ignore
-                                                                     // our
-                                                                     // current
-                                                                     // position
+                                // Ignore our current position
+                                loadData(null, null, country, null);
                             }
                         }).create();
         dia.show();
@@ -500,13 +495,11 @@ public class NearbyItemActivity extends ListActivity implements
     @Override
     public void onProviderDisabled(String provider) {
         // no-op
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
         // no-op
-
     }
 
     @Override

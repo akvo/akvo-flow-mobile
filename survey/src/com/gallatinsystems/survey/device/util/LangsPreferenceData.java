@@ -20,43 +20,42 @@ package com.gallatinsystems.survey.device.util;
  * simple data structure to return language preference data
  * 
  * @author Mark Westra
- * 
  */
 public class LangsPreferenceData {
-	private String[] langsSelectedNameArray;
-	private boolean[] langsSelectedBooleanArray;
-	private int[] langsSelectedMasterIndexArray;
+    private String[] langsSelectedNameArray;
+    private boolean[] langsSelectedBooleanArray;
+    private int[] langsSelectedMasterIndexArray;
 
-	public LangsPreferenceData(String[] langsSelectedNameArray, boolean[] langsSelectedBooleanArray, int[] langsSelectedMasterIndexArray) {
-		this.setLangsSelectedNameArray(langsSelectedNameArray);
-		this.setLangsSelectedBooleanArray(langsSelectedBooleanArray);
-		this.setLangsSelectedMasterIndexArray(langsSelectedMasterIndexArray);
-	}
+    public LangsPreferenceData(String[] langsSelectedNameArray,
+            boolean[] langsSelectedBooleanArray, int[] langsSelectedMasterIndexArray) {
+        this.setLangsSelectedNameArray(langsSelectedNameArray);
+        this.setLangsSelectedBooleanArray(langsSelectedBooleanArray);
+        this.setLangsSelectedMasterIndexArray(langsSelectedMasterIndexArray);
+    }
 
-	public String[] getLangsSelectedNameArray() {
-		return langsSelectedNameArray;
-	}
+    public String[] getLangsSelectedNameArray() {
+        return langsSelectedNameArray;
+    }
 
-	public void setLangsSelectedNameArray(String[] langsSelectedNameArray) {
-		this.langsSelectedNameArray = langsSelectedNameArray;
-	}
+    public void setLangsSelectedNameArray(String[] langsSelectedNameArray) {
+        this.langsSelectedNameArray = langsSelectedNameArray;
+    }
 
-	public boolean[] getLangsSelectedBooleanArray() {
-		return langsSelectedBooleanArray;
-	}
+    public boolean[] getLangsSelectedBooleanArray() {
+        return langsSelectedBooleanArray;
+    }
 
-	public void setLangsSelectedBooleanArray(boolean[] langsSelectedBooleanArray) {
-		this.langsSelectedBooleanArray = langsSelectedBooleanArray;
-	}
+    public void setLangsSelectedBooleanArray(boolean[] langsSelectedBooleanArray) {
+        this.langsSelectedBooleanArray = langsSelectedBooleanArray;
+    }
 
-	public int[] getLangsSelectedMasterIndexArray() {
-		return langsSelectedMasterIndexArray;
-	}
+    public int[] getLangsSelectedMasterIndexArray() {
+        return langsSelectedMasterIndexArray;
+    }
 
-	public void setLangsSelectedMasterIndexArray(
-			int[] langsSelectedMasterIndexArray) {
-		this.langsSelectedMasterIndexArray = langsSelectedMasterIndexArray;
-	}
+    public void setLangsSelectedMasterIndexArray(
+            int[] langsSelectedMasterIndexArray) {
+        this.langsSelectedMasterIndexArray = langsSelectedMasterIndexArray;
+    }
 
-	
 }

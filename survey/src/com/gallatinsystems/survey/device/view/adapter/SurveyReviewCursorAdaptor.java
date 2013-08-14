@@ -35,60 +35,58 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
  * to displaying them to the screen
  * 
  * @author Christopher Fagiani
- * 
  */
 public class SurveyReviewCursorAdaptor extends CursorAdapter {
+    public static int SURVEY_ID_KEY = com.gallatinsystems.survey.device.R.integer.surveyidkey;
+    public static int RESP_ID_KEY = com.gallatinsystems.survey.device.R.integer.respidkey;
+    public static int USER_ID_KEY = com.gallatinsystems.survey.device.R.integer.useridkey;
 
-	public static int SURVEY_ID_KEY = com.gallatinsystems.survey.device.R.integer.surveyidkey;
-	public static int RESP_ID_KEY = com.gallatinsystems.survey.device.R.integer.respidkey;
-	public static int USER_ID_KEY = com.gallatinsystems.survey.device.R.integer.useridkey;
+    public SurveyReviewCursorAdaptor(Context context, Cursor c) {
+        super(context, c);
+    }
 
-	public SurveyReviewCursorAdaptor(Context context, Cursor c) {
-		super(context, c);
-	}
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        TextView dateView = (TextView) view.findViewById(R.id.text2);
+        String status = "Sent: ";
+        long millis = cursor.getLong(cursor
+                .getColumnIndex(SurveyDbAdapter.DELIVERED_DATE_COL));
+        // if millis is 0, that's because we haven't yet sent it
+        if (millis == 0) {
+            status = "Submitted: ";
+            millis = cursor.getLong(cursor
+                    .getColumnIndex(SurveyDbAdapter.SUBMITTED_DATE_COL));
+        }
+        // if millis is still null, then the survey hasn't been submitted yet
+        if (millis == 0) {
+            status = "Saved: ";
+            millis = cursor.getLong(cursor
+                    .getColumnIndex(SurveyDbAdapter.SAVED_DATE_COL));
+        }
 
-	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
-		TextView dateView = (TextView) view.findViewById(R.id.text2);
-		String status = "Sent: ";
-		long millis = cursor.getLong(cursor
-				.getColumnIndex(SurveyDbAdapter.DELIVERED_DATE_COL));
-		// if millis is 0, that's because we haven't yet sent it
-		if (millis == 0) {
-			status = "Submitted: ";
-			millis = cursor.getLong(cursor
-					.getColumnIndex(SurveyDbAdapter.SUBMITTED_DATE_COL));
-		}
-		// if millis is still null, then the survey hasn't been submitted yet
-		if (millis == 0) {
-			status = "Saved: ";
-			millis = cursor.getLong(cursor
-					.getColumnIndex(SurveyDbAdapter.SAVED_DATE_COL));
-		}
+        // Format the date string
+        Date date = new Date(millis);
+        dateView.setText(status
+                + DateFormat.getLongDateFormat(context).format(date) + " "
+                + DateFormat.getTimeFormat(context).format(date));
+        TextView headingView = (TextView) view.findViewById(R.id.text1);
+        headingView.setText(cursor.getString(cursor
+                .getColumnIndex(SurveyDbAdapter.DISP_NAME_COL)));
+        view.setTag(SURVEY_ID_KEY, cursor.getLong(cursor
+                .getColumnIndex(SurveyDbAdapter.SURVEY_FK_COL)));
+        view.setTag(RESP_ID_KEY, cursor.getLong(cursor
+                .getColumnIndex(SurveyDbAdapter.PK_ID_COL)));
+        view.setTag(USER_ID_KEY, cursor.getLong(cursor
+                .getColumnIndex(SurveyDbAdapter.USER_FK_COL)));
+    }
 
-		// Format the date string
-		Date date = new Date(millis);
-		dateView.setText(status
-				+ DateFormat.getLongDateFormat(context).format(date) + " "
-				+ DateFormat.getTimeFormat(context).format(date));
-		TextView headingView = (TextView) view.findViewById(R.id.text1);
-		headingView.setText(cursor.getString(cursor
-				.getColumnIndex(SurveyDbAdapter.DISP_NAME_COL)));
-		view.setTag(SURVEY_ID_KEY, cursor.getLong(cursor
-				.getColumnIndex(SurveyDbAdapter.SURVEY_FK_COL)));
-		view.setTag(RESP_ID_KEY, cursor.getLong(cursor
-				.getColumnIndex(SurveyDbAdapter.PK_ID_COL)));
-		view.setTag(USER_ID_KEY, cursor.getLong(cursor
-				.getColumnIndex(SurveyDbAdapter.USER_FK_COL)));
-	}
-
-	@Override
-	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View view = inflater.inflate(R.layout.two_line_list_item, null);
-		bindView(view, context, cursor);
-		return view;
-	}
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.two_line_list_item, null);
+        bindView(view, context, cursor);
+        return view;
+    }
 
 }

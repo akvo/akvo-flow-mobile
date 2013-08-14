@@ -721,13 +721,13 @@ public class DataSyncService extends Service {
 						@Override
 						public void uploadProgress(long bytesSent,
 								long totalBytes) {
-							double percentComplete = 0;
+							double percentComplete = 0.0d;
 							if (bytesSent > 0 && totalBytes > 0) {
 								percentComplete = ((double) bytesSent)
 										/ ((double) totalBytes);
 							}
-							if (percentComplete >= 1) {
-								percentComplete = 0.99d;
+							if (percentComplete > 1.0d) {
+								percentComplete = 1.0d;
 							}
 							fireNotification(ConstantUtil.PROGRESS,
 									PCT_FORMAT.format(percentComplete) + " - "

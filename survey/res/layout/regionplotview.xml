@@ -9,7 +9,7 @@
 		android:id="@+id/mapview" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:apiKey="0-VFNHx65gE7XrBkuymcDhoWWiU1dgCx3mN9GkQ"
 		android:enabled="true" android:clickable="true" />
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:orientation="vertical" android:gravity="top"
 		android:paddingLeft="5px" android:paddingTop="5px"

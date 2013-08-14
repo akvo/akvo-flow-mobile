@@ -48,3 +48,13 @@ You can override the default output directory with the property **out.dir**, set
 or just passing it as a parameter to the build script (which will override the build.properties one):
     
     ant flow-release -Dout.dir=/path/to/dir
+
+Contributing
+------------
+
+To ensure a consistent code style throughout the codebase, we stick to the [Android Code Style Guidelines]
+(http://source.android.com/source/code-style.html) as much as possible.
+
+If your IDE of choice is Eclipse, you can import a predefined [xml profile]
+(https://github.com/android/platform_development/blob/master/ide/eclipse/android-formatting.xml) 
+to automatically format the code with this patterns.

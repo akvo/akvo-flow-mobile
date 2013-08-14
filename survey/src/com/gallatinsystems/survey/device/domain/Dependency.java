@@ -23,43 +23,41 @@ package com.gallatinsystems.survey.device.domain;
  * the dependency's questionID has an answer that matches the answerValue in the
  * A question can have 0 or 1 dependencies.
  * 
- * 
  * @author Christopher Fagiani
- * 
  */
 public class Dependency {
-	private String question;
-	private String answer;
+    private String question;
+    private String answer;
 
-	public String getQuestion() {
-		return question;
-	}
+    public String getQuestion() {
+        return question;
+    }
 
-	public void setQuestion(String question) {
-		this.question = question;
-	}
+    public void setQuestion(String question) {
+        this.question = question;
+    }
 
-	public String getAnswer() {
-		return answer;
-	}
+    public String getAnswer() {
+        return answer;
+    }
 
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
 
-	public boolean isMatch(String val) {
-		boolean isMatch = false;
-		if (answer != null) {
-			String[] tokens = answer.split("\\|");
-			for (int i = 0; i < tokens.length; i++) {
-				if (tokens[i].trim().equals(val.trim())) {
-					isMatch = true;
-					break;
-				}
-			}
-		} else if (val == null) {
-			isMatch = true;
-		}
-		return isMatch;
-	}
+    public boolean isMatch(String val) {
+        boolean isMatch = false;
+        if (answer != null) {
+            String[] tokens = answer.split("\\|");
+            for (int i = 0; i < tokens.length; i++) {
+                if (tokens[i].trim().equals(val.trim())) {
+                    isMatch = true;
+                    break;
+                }
+            }
+        } else if (val == null) {
+            isMatch = true;
+        }
+        return isMatch;
+    }
 }

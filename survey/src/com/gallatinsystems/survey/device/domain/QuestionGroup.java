@@ -22,7 +22,6 @@ import java.util.ArrayList;
  * data structure for grouping questions under a common heading.
  * 
  * @author Christopher Fagiani
- * 
  */
 public class QuestionGroup {
 

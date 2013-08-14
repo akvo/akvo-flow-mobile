@@ -32,7 +32,6 @@ import com.gallatinsystems.survey.device.domain.Survey;
  * will use a SurveyHandler to process the XML document in a streaming fashion.
  * 
  * @author Christopher Fagiani
- * 
  */
 public class SaxSurveyParser implements SurveyParser {
 
@@ -40,10 +39,10 @@ public class SaxSurveyParser implements SurveyParser {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
-            SurveyHandler handler = new SurveyHandler();   
-            Reader reader = new InputStreamReader(inputStream,"UTF-8");
+            SurveyHandler handler = new SurveyHandler();
+            Reader reader = new InputStreamReader(inputStream, "UTF-8");
             InputSource source = new InputSource(reader);
-            source.setEncoding("UTF-8");            
+            source.setEncoding("UTF-8");
             parser.parse(source, handler);
             return handler.getSurvey();
         } catch (Exception e) {

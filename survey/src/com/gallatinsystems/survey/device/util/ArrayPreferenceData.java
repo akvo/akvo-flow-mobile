@@ -23,30 +23,29 @@ package com.gallatinsystems.survey.device.util;
  * on 4+
  * 
  * @author Christopher Fagiani
- * 
  */
 public class ArrayPreferenceData {
-	private String[] items;
-	private boolean[] selectedItems;
+    private String[] items;
+    private boolean[] selectedItems;
 
-	public ArrayPreferenceData(String[] items, boolean[] selections) {
-		this.items = items;
-		selectedItems = selections;
-	}
+    public ArrayPreferenceData(String[] items, boolean[] selections) {
+        this.items = items;
+        selectedItems = selections;
+    }
 
-	public String[] getItems() {
-		return items;
-	}
+    public String[] getItems() {
+        return items;
+    }
 
-	public void setItems(String[] items) {
-		this.items = items;
-	}
+    public void setItems(String[] items) {
+        this.items = items;
+    }
 
-	public boolean[] getSelectedItems() {
-		return selectedItems;
-	}
+    public boolean[] getSelectedItems() {
+        return selectedItems;
+    }
 
-	public void setSelectedItems(boolean[] selectedItems) {
-		this.selectedItems = selectedItems;
-	}
+    public void setSelectedItems(boolean[] selectedItems) {
+        this.selectedItems = selectedItems;
+    }
 }

@@ -34,99 +34,94 @@ import com.gallatinsystems.survey.device.util.StringUtil;
  * the database.
  * 
  * @author Christopher Fagiani
- * 
  */
 public class UserEditActivity extends Activity {
-	private EditText displayName;
-	private EditText emailAddr;
-	private Long userId;
-	private SurveyDbAdapter databaseAdaptor;
+    private EditText displayName;
+    private EditText emailAddr;
+    private Long userId;
+    private SurveyDbAdapter databaseAdaptor;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.useredit);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.useredit);
 
-		displayName = (EditText) findViewById(R.id.displayNameField);
-		emailAddr = (EditText) findViewById(R.id.emailField);
+        displayName = (EditText) findViewById(R.id.displayNameField);
+        emailAddr = (EditText) findViewById(R.id.emailField);
 
-		databaseAdaptor = new SurveyDbAdapter(this);
-		
+        databaseAdaptor = new SurveyDbAdapter(this);
 
-		Button saveButton = (Button) findViewById(R.id.confirm);
+        Button saveButton = (Button) findViewById(R.id.confirm);
 
-		userId = savedInstanceState != null ? savedInstanceState
-				.getLong(ConstantUtil.ID_KEY) : null;
-		if (userId == null || userId == 0L) {
-			Bundle extras = getIntent().getExtras();
-			userId = extras != null ? Long.valueOf(extras
-					.getString(ConstantUtil.ID_KEY)) : null;
-		}
-		
+        userId = savedInstanceState != null ? savedInstanceState
+                .getLong(ConstantUtil.ID_KEY) : null;
+        if (userId == null || userId == 0L) {
+            Bundle extras = getIntent().getExtras();
+            userId = extras != null ? Long.valueOf(extras
+                    .getString(ConstantUtil.ID_KEY)) : null;
+        }
 
-		saveButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				saveState();
-				setResult(RESULT_OK);
-				finish();
-			}
-		});
-	}
-	
-	
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                saveState();
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
+    }
 
-	/**
-	 * put loaded data into the views for display
-	 */
-	private void populateFields() {
-		if (userId != null) {
-			Cursor user = databaseAdaptor.findUser(userId);
-			startManagingCursor(user);
-			if (user.getCount() > 0) {
-				displayName.setText(user.getString(user
-						.getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL)));
-				emailAddr.setText(user.getString(user
-						.getColumnIndexOrThrow(SurveyDbAdapter.EMAIL_COL)));
-			}
-		}
-	}
+    /**
+     * put loaded data into the views for display
+     */
+    private void populateFields() {
+        if (userId != null) {
+            Cursor user = databaseAdaptor.findUser(userId);
+            startManagingCursor(user);
+            if (user.getCount() > 0) {
+                displayName.setText(user.getString(user
+                        .getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL)));
+                emailAddr.setText(user.getString(user
+                        .getColumnIndexOrThrow(SurveyDbAdapter.EMAIL_COL)));
+            }
+        }
+    }
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if (outState != null && userId != null) {
-			outState.putLong(ConstantUtil.ID_KEY, userId);
-		}
-	}
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (outState != null && userId != null) {
+            outState.putLong(ConstantUtil.ID_KEY, userId);
+        }
+    }
 
-	@Override
-	protected void onPause() {
-		if (databaseAdaptor != null) {
-			databaseAdaptor.close();
-		}
-		super.onPause();		
-	}
+    @Override
+    protected void onPause() {
+        if (databaseAdaptor != null) {
+            databaseAdaptor.close();
+        }
+        super.onPause();
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		databaseAdaptor.open();		
-		populateFields();
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        databaseAdaptor.open();
+        populateFields();
+    }
 
-	protected void onDestroy() {
-		
-		super.onDestroy();
-	}
+    protected void onDestroy() {
 
-	/**
-	 * save the sanitized name and email address to the db
-	 */
-	private void saveState() {
-		String name = StringUtil.ControlCommaToSPace(displayName.getText().toString()).trim();
-		String email = StringUtil.ControlCommaToSPace(emailAddr.getText().toString()).trim();
-		databaseAdaptor.createOrUpdateUser(userId, name, email);
-	}
+        super.onDestroy();
+    }
+
+    /**
+     * save the sanitized name and email address to the db
+     */
+    private void saveState() {
+        String name = StringUtil.ControlCommaToSPace(displayName.getText().toString()).trim();
+        String email = StringUtil.ControlCommaToSPace(emailAddr.getText().toString()).trim();
+        databaseAdaptor.createOrUpdateUser(userId, name, email);
+    }
 
 }

@@ -28,211 +28,213 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MultipartStream {
-	private static final String BOUNDRY = "***xxx";
-	private static final String PREFIX = "--";
-	private static final String ENDLINE = "\r\n";
-	private static final int DELIMITER_BYTES = (PREFIX.getBytes().length
-			+ BOUNDRY.getBytes().length + ENDLINE.getBytes().length);
-	private static final int BUFFER_SIZE = 2048;
-	private static final String FORM_PARAM_TEXT_START = "Content-Disposition: form-data; name=\"";
-	private static final String FILE_PARAM_TEXT_MID = "\"; filename=\"";
-	private List<String> names;
-	private List<String> values;
-	private List<String> formParamTextList;
-	private List<File> files;
-	private List<String> fileParamTextList;
-	private int totalBytes;
-	private List<String> mimeTypeTextList;
-	private URL url;	
-	private List<Long> fileBytes;
+    private static final String BOUNDRY = "***xxx";
+    private static final String PREFIX = "--";
+    private static final String ENDLINE = "\r\n";
+    private static final int DELIMITER_BYTES = (PREFIX.getBytes().length
+            + BOUNDRY.getBytes().length + ENDLINE.getBytes().length);
+    private static final int BUFFER_SIZE = 2048;
+    private static final String FORM_PARAM_TEXT_START = "Content-Disposition: form-data; name=\"";
+    private static final String FILE_PARAM_TEXT_MID = "\"; filename=\"";
+    private List<String> names;
+    private List<String> values;
+    private List<String> formParamTextList;
+    private List<File> files;
+    private List<String> fileParamTextList;
+    private int totalBytes;
+    private List<String> mimeTypeTextList;
+    private URL url;
+    private List<Long> fileBytes;
 
-	private DataOutputStream out;
-	
-	private Map<String, List<String>> responseHeaders;
+    private DataOutputStream out;
 
-	public MultipartStream(URL url) {
-		names = new ArrayList<String>();
-		values = new ArrayList<String>();
-		files = new ArrayList<File>();
-		formParamTextList = new ArrayList<String>();
-		fileParamTextList = new ArrayList<String>();
-		mimeTypeTextList = new ArrayList<String>();
-		fileBytes = new ArrayList<Long>();
-		this.url = url;
-		totalBytes = DELIMITER_BYTES + PREFIX.getBytes().length;
-		responseHeaders = null;
-	}
+    private Map<String, List<String>> responseHeaders;
 
-	public void addFormField(String name, String value) {
-		names.add(name);
-		if (value == null) {
-			value = "";
-		}
-		values.add(value);
-		totalBytes += DELIMITER_BYTES;
-		String formParamText = FORM_PARAM_TEXT_START + name + "\"";
-		formParamTextList.add(formParamText);
-		totalBytes += formParamText.getBytes().length;
-		totalBytes += (3 * ENDLINE.getBytes().length);
-		totalBytes += value.getBytes().length;
-	}
+    public MultipartStream(URL url) {
+        names = new ArrayList<String>();
+        values = new ArrayList<String>();
+        files = new ArrayList<File>();
+        formParamTextList = new ArrayList<String>();
+        fileParamTextList = new ArrayList<String>();
+        mimeTypeTextList = new ArrayList<String>();
+        fileBytes = new ArrayList<Long>();
+        this.url = url;
+        totalBytes = DELIMITER_BYTES + PREFIX.getBytes().length;
+        responseHeaders = null;
+    }
 
-	private void writeFormField(String name, String value, String formParamText)
-			throws IOException {
-		out.writeBytes(PREFIX);
-		out.writeBytes(BOUNDRY);
-		out.writeBytes(ENDLINE);
-		out.writeBytes(formParamText);
-		out.writeBytes(ENDLINE);
-		out.writeBytes(ENDLINE);
-		out.writeBytes(value);
-		out.writeBytes(ENDLINE);
-		out.flush();
-	}
+    public void addFormField(String name, String value) {
+        names.add(name);
+        if (value == null) {
+            value = "";
+        }
+        values.add(value);
+        totalBytes += DELIMITER_BYTES;
+        String formParamText = FORM_PARAM_TEXT_START + name + "\"";
+        formParamTextList.add(formParamText);
+        totalBytes += formParamText.getBytes().length;
+        totalBytes += (3 * ENDLINE.getBytes().length);
+        totalBytes += value.getBytes().length;
+    }
 
-	public void addFile(String key, String filePath, String mimeType) {
-		File file = new File(filePath);
-		files.add(file);
-		totalBytes += DELIMITER_BYTES;
-		fileBytes.add(file.length());
+    private void writeFormField(String name, String value, String formParamText)
+            throws IOException {
+        out.writeBytes(PREFIX);
+        out.writeBytes(BOUNDRY);
+        out.writeBytes(ENDLINE);
+        out.writeBytes(formParamText);
+        out.writeBytes(ENDLINE);
+        out.writeBytes(ENDLINE);
+        out.writeBytes(value);
+        out.writeBytes(ENDLINE);
+        out.flush();
+    }
 
-		String destName = filePath;
-		if (destName.contains("/")) {
-			destName = destName.substring(destName.lastIndexOf("/") + 1);
-		} else if (destName.contains("\\")) {
-			destName = destName.substring(destName.lastIndexOf("\\") + 1);
-		}
-		String fileParamText = FORM_PARAM_TEXT_START + key
-				+ FILE_PARAM_TEXT_MID + destName + "\"";
-		totalBytes += (fileParamText.getBytes().length);
-		fileParamTextList.add(fileParamText);
+    public void addFile(String key, String filePath, String mimeType) {
+        File file = new File(filePath);
+        files.add(file);
+        totalBytes += DELIMITER_BYTES;
+        fileBytes.add(file.length());
 
-		if (mimeType != null) {
-			String mimeTypeText = "Content-Type: " + mimeType;
-			mimeTypeTextList.add(mimeTypeText);
-			totalBytes += mimeTypeText.getBytes().length
-					+ ENDLINE.getBytes().length;
-		} else {
-			mimeTypeTextList.add("");
-		}
+        String destName = filePath;
+        if (destName.contains("/")) {
+            destName = destName.substring(destName.lastIndexOf("/") + 1);
+        } else if (destName.contains("\\")) {
+            destName = destName.substring(destName.lastIndexOf("\\") + 1);
+        }
+        String fileParamText = FORM_PARAM_TEXT_START + key
+                + FILE_PARAM_TEXT_MID + destName + "\"";
+        totalBytes += (fileParamText.getBytes().length);
+        fileParamTextList.add(fileParamText);
 
-		totalBytes += file.length();
-		totalBytes += 3 * ENDLINE.getBytes().length;
-	}
+        if (mimeType != null) {
+            String mimeTypeText = "Content-Type: " + mimeType;
+            mimeTypeTextList.add(mimeTypeText);
+            totalBytes += mimeTypeText.getBytes().length
+                    + ENDLINE.getBytes().length;
+        } else {
+            mimeTypeTextList.add("");
+        }
 
-	private void writeFiles(MultipartStreamStatusListner listener) throws IOException {
+        totalBytes += file.length();
+        totalBytes += 3 * ENDLINE.getBytes().length;
+    }
 
-		for (int i = 0; i < files.size(); i++) {
-			long fileBytesWritten = 0;
-			out.writeBytes(PREFIX);
-			out.writeBytes(BOUNDRY);
-			out.writeBytes(ENDLINE);
+    private void writeFiles(MultipartStreamStatusListner listener) throws IOException {
 
-			out.writeBytes(fileParamTextList.get(i));
-			out.writeBytes(ENDLINE);
-			String mimeTypeText = mimeTypeTextList.get(i);
-			if (mimeTypeText != null && mimeTypeText.length() > 0) {
-				out.writeBytes(mimeTypeText);
-				out.writeBytes(ENDLINE);
-			}
-			out.writeBytes(ENDLINE);
+        for (int i = 0; i < files.size(); i++) {
+            long fileBytesWritten = 0;
+            out.writeBytes(PREFIX);
+            out.writeBytes(BOUNDRY);
+            out.writeBytes(ENDLINE);
 
-			byte[] buffer = new byte[BUFFER_SIZE];
-			int bytesRead = 0;
-			FileInputStream fis = new FileInputStream(files.get(i));
+            out.writeBytes(fileParamTextList.get(i));
+            out.writeBytes(ENDLINE);
+            String mimeTypeText = mimeTypeTextList.get(i);
+            if (mimeTypeText != null && mimeTypeText.length() > 0) {
+                out.writeBytes(mimeTypeText);
+                out.writeBytes(ENDLINE);
+            }
+            out.writeBytes(ENDLINE);
 
-			while ((bytesRead = fis.read(buffer)) != -1) {
-				out.write(buffer, 0, bytesRead);
-				fileBytesWritten+= bytesRead;
-				if(listener!= null){
-					listener.uploadProgress(fileBytesWritten,fileBytes.get(i));
-				}
-			}
-			try {
-				fis.close();
-			} catch (Exception e) {
-			}
-			out.writeBytes(ENDLINE);
-			out.flush();
-		}
-	}
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int bytesRead = 0;
+            FileInputStream fis = new FileInputStream(files.get(i));
 
-	private void close() throws IOException {
-		out.writeBytes(PREFIX);
-		out.writeBytes(BOUNDRY);
-		out.writeBytes(PREFIX);
-		out.writeBytes(ENDLINE);
-		out.flush();
-		out.close();
-	}
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+                fileBytesWritten += bytesRead;
+                if (listener != null) {
+                    listener.uploadProgress(fileBytesWritten, fileBytes.get(i));
+                }
+            }
+            try {
+                fis.close();
+            } catch (Exception e) {
+            }
+            out.writeBytes(ENDLINE);
+            out.flush();
+        }
+    }
 
-	public int execute(MultipartStreamStatusListner listener) throws java.io.IOException {
-		HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-		if (urlConn instanceof HttpURLConnection) {
-			HttpURLConnection httpConn = (HttpURLConnection) urlConn;
-			httpConn.setRequestMethod("POST");
-		}
-		
-		// Ensure no redirection is done, so we can extract the ETag from the headers
-		urlConn.setInstanceFollowRedirects(false);
-		
-		// connection level settings. This doesn't seem to have any effect with
-		// https!
-		urlConn.setDoInput(true);
-		urlConn.setDoOutput(true);
-		urlConn.setUseCaches(false);
-		
-		urlConn.setDefaultUseCaches(false);
-		urlConn.setFixedLengthStreamingMode(totalBytes);
+    private void close() throws IOException {
+        out.writeBytes(PREFIX);
+        out.writeBytes(BOUNDRY);
+        out.writeBytes(PREFIX);
+        out.writeBytes(ENDLINE);
+        out.flush();
+        out.close();
+    }
 
-		// set up request props
-		urlConn.setRequestProperty("Accept", "*/*");
-		urlConn.setRequestProperty("Content-Type",
-				"multipart/form-data; boundary=" + BOUNDRY);
-		urlConn.setRequestProperty("Connection", "Keep-Alive");
-		urlConn.setRequestProperty("Cache-Control", "no-cache");
-		urlConn.setRequestProperty("Content-Length", totalBytes + "");
-		out = new DataOutputStream(urlConn.getOutputStream());
-		for (int i = 0; i < names.size(); i++) {
-			writeFormField(names.get(i), values.get(i), formParamTextList
-					.get(i));
-		}
-		writeFiles(listener);
-		close();
-		
-		final int code = urlConn.getResponseCode();
-		responseHeaders = urlConn.getHeaderFields();
-		
-		// Release the connection
-		urlConn.disconnect();
-		
-		return code;
-	}
-	
-	public String getResponseHeader(String name) {
-		if (responseHeaders != null) {
-			List<String> headerValues = responseHeaders.get(name);
-			if (headerValues == null) {
-				// Issue #13 - https://github.com/akvo/akvo-flow-mobile/issues/13
-				// Prior to Gingerbread, HttpUrlConnection converted
-				// all response headers to lower case. This is a workaround
-				// to ensure we cover those situations as well
-				final String lowercaseName = name.toLowerCase(Locale.ENGLISH);
-				headerValues = responseHeaders.get(lowercaseName);
-			}
-			
-			if (headerValues != null && headerValues.size() > 0) {
-				return headerValues.get(0);
-			}
-		}
-		
-		return null;
-	}
+    public int execute(MultipartStreamStatusListner listener) throws java.io.IOException {
+        HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+        if (urlConn instanceof HttpURLConnection) {
+            HttpURLConnection httpConn = (HttpURLConnection) urlConn;
+            httpConn.setRequestMethod("POST");
+        }
 
-	/**
-	* Interface that can be used to be notified of upload progress
-	*/
-	public interface MultipartStreamStatusListner{
-		public void uploadProgress(long bytesUploaded, long totalBytes);
-	}
+        // Ensure no redirection is done, so we can extract the ETag from the
+        // headers
+        urlConn.setInstanceFollowRedirects(false);
+
+        // connection level settings. This doesn't seem to have any effect with
+        // https!
+        urlConn.setDoInput(true);
+        urlConn.setDoOutput(true);
+        urlConn.setUseCaches(false);
+
+        urlConn.setDefaultUseCaches(false);
+        urlConn.setFixedLengthStreamingMode(totalBytes);
+
+        // set up request props
+        urlConn.setRequestProperty("Accept", "*/*");
+        urlConn.setRequestProperty("Content-Type",
+                "multipart/form-data; boundary=" + BOUNDRY);
+        urlConn.setRequestProperty("Connection", "Keep-Alive");
+        urlConn.setRequestProperty("Cache-Control", "no-cache");
+        urlConn.setRequestProperty("Content-Length", totalBytes + "");
+        out = new DataOutputStream(urlConn.getOutputStream());
+        for (int i = 0; i < names.size(); i++) {
+            writeFormField(names.get(i), values.get(i), formParamTextList
+                    .get(i));
+        }
+        writeFiles(listener);
+        close();
+
+        final int code = urlConn.getResponseCode();
+        responseHeaders = urlConn.getHeaderFields();
+
+        // Release the connection
+        urlConn.disconnect();
+
+        return code;
+    }
+
+    public String getResponseHeader(String name) {
+        if (responseHeaders != null) {
+            List<String> headerValues = responseHeaders.get(name);
+            if (headerValues == null) {
+                // Issue #13 -
+                // https://github.com/akvo/akvo-flow-mobile/issues/13
+                // Prior to Gingerbread, HttpUrlConnection converted
+                // all response headers to lower case. This is a workaround
+                // to ensure we cover those situations as well
+                final String lowercaseName = name.toLowerCase(Locale.ENGLISH);
+                headerValues = responseHeaders.get(lowercaseName);
+            }
+
+            if (headerValues != null && headerValues.size() > 0) {
+                return headerValues.get(0);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Interface that can be used to be notified of upload progress
+     */
+    public interface MultipartStreamStatusListner {
+        public void uploadProgress(long bytesUploaded, long totalBytes);
+    }
 }

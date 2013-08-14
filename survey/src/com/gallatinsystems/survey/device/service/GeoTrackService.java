@@ -39,103 +39,101 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * it start/stops.
  * 
  * @author Christopher Fagiani
- * 
  */
 public class GeoTrackService extends Service implements LocationListener {
 
-	private static long INTERVAL = 60000;
-	private static float MIN_DIST = 10;
-	private ArrayList<String> points;
-	private LocationManager locMgr;
-	private Criteria locationCriteria;
-	private final GeoTrackBinder binder = new GeoTrackBinder();
+    private static long INTERVAL = 60000;
+    private static float MIN_DIST = 10;
+    private ArrayList<String> points;
+    private LocationManager locMgr;
+    private Criteria locationCriteria;
+    private final GeoTrackBinder binder = new GeoTrackBinder();
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
-	}
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
+    }
 
-	private void startRecording() {
-		locMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
-		locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, INTERVAL,
-				MIN_DIST, this);
-		locationCriteria = new Criteria();
-		locationCriteria.setAccuracy(Criteria.NO_REQUIREMENT);
-	}
+    private void startRecording() {
+        locMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, INTERVAL,
+                MIN_DIST, this);
+        locationCriteria = new Criteria();
+        locationCriteria.setAccuracy(Criteria.NO_REQUIREMENT);
+    }
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		points = new ArrayList<String>();
-		sendNotification();
-		startRecording();
-		return START_STICKY;
-	}
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        points = new ArrayList<String>();
+        sendNotification();
+        startRecording();
+        return START_STICKY;
+    }
 
-	/**
-	 * cancels the notification and terminates the recording of points. This
-	 * will also unsubscribe from location updates to conserve battery
-	 */
-	@Override
-	public void onDestroy() {
-		if (locMgr != null) {
-			locMgr.removeUpdates(this);
-			ViewUtil.cancelNotification(R.string.trackstartnotification, this);
-			Toast.makeText(this, R.string.trackendnotification,
-					Toast.LENGTH_SHORT).show();
-		}
-	}
+    /**
+     * cancels the notification and terminates the recording of points. This
+     * will also unsubscribe from location updates to conserve battery
+     */
+    @Override
+    public void onDestroy() {
+        if (locMgr != null) {
+            locMgr.removeUpdates(this);
+            ViewUtil.cancelNotification(R.string.trackstartnotification, this);
+            Toast.makeText(this, R.string.trackendnotification,
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return binder;
-	}
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
 
-	private void sendNotification() {
-		CharSequence text = getText(R.string.trackstartnotification);
-		ViewUtil.fireNotification(text.toString(), text.toString(), this,
-				R.string.trackstartnotification,
-				android.R.drawable.stat_notify_sync);
-	}
+    private void sendNotification() {
+        CharSequence text = getText(R.string.trackstartnotification);
+        ViewUtil.fireNotification(text.toString(), text.toString(), this,
+                R.string.trackstartnotification,
+                android.R.drawable.stat_notify_sync);
+    }
 
-	@Override
-	public void onLocationChanged(Location location) {
-		points.add(new String(location.getLatitude() + " "
-				+ location.getLongitude()));
-	}
+    @Override
+    public void onLocationChanged(Location location) {
+        points.add(new String(location.getLatitude() + " "
+                + location.getLongitude()));
+    }
 
-	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onProviderDisabled(String provider) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onProviderEnabled(String provider) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	public ArrayList<String> getPoints() {
-		return points;
-	}
+    public ArrayList<String> getPoints() {
+        return points;
+    }
 
-	/**
-	 * Binder class so clients can call methods on the service instance
-	 * 
-	 * @author Christopher Fagiani
-	 * 
-	 */
-	public class GeoTrackBinder extends Binder {
-		public GeoTrackService getService() {
-			return GeoTrackService.this;
-		}
-	}
+    /**
+     * Binder class so clients can call methods on the service instance
+     * 
+     * @author Christopher Fagiani
+     */
+    public class GeoTrackBinder extends Binder {
+        public GeoTrackService getService() {
+            return GeoTrackService.this;
+        }
+    }
 
 }

@@ -42,99 +42,97 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * button that toggles the recording of way points).
  * 
  * @author Christopher Fagiani
- * 
  */
 public class GeoTrackQuestionView extends QuestionView implements
-		OnClickListener {
+        OnClickListener {
 
-	private static final int BUTTON_WIDTH = 75;
-	private Button trackButton;
-	private boolean isRunning;
-	private GeoTrackService geoTrackService;
-	private ServiceConnection connection;
+    private static final int BUTTON_WIDTH = 75;
+    private Button trackButton;
+    private boolean isRunning;
+    private GeoTrackService geoTrackService;
+    private ServiceConnection connection;
 
-	public GeoTrackQuestionView(Context context, Question q,
-			String defaultLang, String[] langs, boolean readOnly) {
-		super(context, q, defaultLang, langs, readOnly);
-		trackButton = new Button(context);
-		trackButton.setText(R.string.starttrack);
-		trackButton.setOnClickListener(this);
-		trackButton.setWidth(BUTTON_WIDTH);
-		TableRow tr = new TableRow(context);
-		tr.addView(trackButton);
-		addView(tr);
-		isRunning = false;
-		configureConnection();
-	}
+    public GeoTrackQuestionView(Context context, Question q,
+            String defaultLang, String[] langs, boolean readOnly) {
+        super(context, q, defaultLang, langs, readOnly);
+        trackButton = new Button(context);
+        trackButton.setText(R.string.starttrack);
+        trackButton.setOnClickListener(this);
+        trackButton.setWidth(BUTTON_WIDTH);
+        TableRow tr = new TableRow(context);
+        tr.addView(trackButton);
+        addView(tr);
+        isRunning = false;
+        configureConnection();
+    }
 
-	/**
-	 * sets up the service connection callbacks so we can bind to the instance
-	 * of the geo track service that we'll start later
-	 */
-	private void configureConnection() {
-		connection = new ServiceConnection() {
-			public void onServiceConnected(ComponentName className,
-					IBinder service) {
-				geoTrackService = ((GeoTrackService.GeoTrackBinder) service)
-						.getService();
-			}
+    /**
+     * sets up the service connection callbacks so we can bind to the instance
+     * of the geo track service that we'll start later
+     */
+    private void configureConnection() {
+        connection = new ServiceConnection() {
+            public void onServiceConnected(ComponentName className,
+                    IBinder service) {
+                geoTrackService = ((GeoTrackService.GeoTrackBinder) service)
+                        .getService();
+            }
 
-			public void onServiceDisconnected(ComponentName className) {
-				geoTrackService = null;
-			}
-		};
-	}
+            public void onServiceDisconnected(ComponentName className) {
+                geoTrackService = null;
+            }
+        };
+    }
 
-	/**
-	 * starts or stops the background service to record track information and
-	 * fires an event to tell the survey view whether or not to allow survey
-	 * submission/save/clear
-	 * 
-	 */
-	@Override
-	public void onClick(View v) {
-		if (!isRunning) {
-			LocationManager locMgr = (LocationManager) getContext()
-					.getSystemService(Context.LOCATION_SERVICE);
-			if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				startRecording();
-			} else {
-				// we can't turn GPS on directly, the best we can do is launch
-				// the settings page
-				ViewUtil.showGPSDialog(getContext());
-			}
-		} else {
-			notifyQuestionListeners(QuestionInteractionEvent.END_TRACK);
-			trackButton.setText(R.string.starttrack);
-			isRunning = false;
-			ArrayList<String> points = geoTrackService.getPoints();
-			if (points != null) {
-				StringBuilder builder = new StringBuilder();
-				for (int i = 0; i < points.size(); i++) {
-					builder.append(points.get(i)).append(" ");
-				}
-				if (getResponse() != null) {
-					getResponse().setValue(builder.toString().trim());
-				} else {
-					setResponse(new QuestionResponse(builder.toString().trim(),
-							ConstantUtil.TRACK_RESPONSE_TYPE, getQuestion()
-									.getId()));
-				}
-			}
-			Intent i = new Intent(getContext(), GeoTrackService.class);
-			getContext().unbindService(connection);
-			getContext().getApplicationContext().stopService(i);
+    /**
+     * starts or stops the background service to record track information and
+     * fires an event to tell the survey view whether or not to allow survey
+     * submission/save/clear
+     */
+    @Override
+    public void onClick(View v) {
+        if (!isRunning) {
+            LocationManager locMgr = (LocationManager) getContext()
+                    .getSystemService(Context.LOCATION_SERVICE);
+            if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                startRecording();
+            } else {
+                // we can't turn GPS on directly, the best we can do is launch
+                // the settings page
+                ViewUtil.showGPSDialog(getContext());
+            }
+        } else {
+            notifyQuestionListeners(QuestionInteractionEvent.END_TRACK);
+            trackButton.setText(R.string.starttrack);
+            isRunning = false;
+            ArrayList<String> points = geoTrackService.getPoints();
+            if (points != null) {
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < points.size(); i++) {
+                    builder.append(points.get(i)).append(" ");
+                }
+                if (getResponse() != null) {
+                    getResponse().setValue(builder.toString().trim());
+                } else {
+                    setResponse(new QuestionResponse(builder.toString().trim(),
+                            ConstantUtil.TRACK_RESPONSE_TYPE, getQuestion()
+                                    .getId()));
+                }
+            }
+            Intent i = new Intent(getContext(), GeoTrackService.class);
+            getContext().unbindService(connection);
+            getContext().getApplicationContext().stopService(i);
 
-		}
-	}
+        }
+    }
 
-	private void startRecording() {
-		notifyQuestionListeners(QuestionInteractionEvent.START_TRACK);
-		trackButton.setText(R.string.endtrack);
-		isRunning = true;
-		Intent i = new Intent(getContext(), GeoTrackService.class);
-		getContext().bindService(new Intent(i), connection,
-				Context.BIND_AUTO_CREATE);
-		getContext().startService(i);
-	}
+    private void startRecording() {
+        notifyQuestionListeners(QuestionInteractionEvent.START_TRACK);
+        trackButton.setText(R.string.endtrack);
+        isRunning = true;
+        Intent i = new Intent(getContext(), GeoTrackService.class);
+        getContext().bindService(new Intent(i), connection,
+                Context.BIND_AUTO_CREATE);
+        getContext().startService(i);
+    }
 }

@@ -30,22 +30,21 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * up correctly in the application manifest
  * 
  * @author Christopher Fagiani
- * 
  */
 public class BroadcastDispatcher extends BroadcastReceiver {
-	@SuppressWarnings("unused")
-	private static final String TAG = "BroadcastDispatcher";
+    @SuppressWarnings("unused")
+    private static final String TAG = "BroadcastDispatcher";
 
-	public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent) {
 
-		if (ConstantUtil.DATA_AVAILABLE_INTENT.equals(intent.getAction())) {
-			// launch the service telling it to SEND data to the server
-			Intent i = new Intent(context, DataSyncService.class);
-			i.putExtra(ConstantUtil.OP_TYPE_KEY, ConstantUtil.SEND);
-			context.startService(i);
-		} else if (ConstantUtil.PRECACHE_INTENT.equals(intent.getAction())) {
-			context.startService(new Intent(context,
-					SurveyDownloadService.class));
-		}
-	}
+        if (ConstantUtil.DATA_AVAILABLE_INTENT.equals(intent.getAction())) {
+            // launch the service telling it to SEND data to the server
+            Intent i = new Intent(context, DataSyncService.class);
+            i.putExtra(ConstantUtil.OP_TYPE_KEY, ConstantUtil.SEND);
+            context.startService(i);
+        } else if (ConstantUtil.PRECACHE_INTENT.equals(intent.getAction())) {
+            context.startService(new Intent(context,
+                    SurveyDownloadService.class));
+        }
+    }
 }

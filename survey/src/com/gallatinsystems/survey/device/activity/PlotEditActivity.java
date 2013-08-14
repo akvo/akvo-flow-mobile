@@ -30,102 +30,98 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 /**
  * create or edit a new Plot record. This activity just allows editing of the
- * plot metadata fields (i.e. name & description), not the points within that plot.
- * 
- * TODO: include current userID?
+ * plot metadata fields (i.e. name & description), not the points within that
+ * plot. TODO: include current userID?
  * 
  * @author Christopher Fagiani
- * 
  */
 public class PlotEditActivity extends Activity {
-	private EditText displayName;
-	private EditText description;
-	private Long plotId;
-	private SurveyDbAdapter databaseAdaptor;
+    private EditText displayName;
+    private EditText description;
+    private Long plotId;
+    private SurveyDbAdapter databaseAdaptor;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.plotedit);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.plotedit);
 
-		displayName = (EditText) findViewById(R.id.displayNameField);
-		description = (EditText) findViewById(R.id.descField);
+        displayName = (EditText) findViewById(R.id.displayNameField);
+        description = (EditText) findViewById(R.id.descField);
 
-		databaseAdaptor = new SurveyDbAdapter(this);
-		
+        databaseAdaptor = new SurveyDbAdapter(this);
 
-		Button saveButton = (Button) findViewById(R.id.confirm);
+        Button saveButton = (Button) findViewById(R.id.confirm);
 
-		plotId = savedInstanceState != null ? savedInstanceState
-				.getLong(ConstantUtil.ID_KEY) : null;
-		if (plotId == null || plotId == 0L) {
-			Bundle extras = getIntent().getExtras();
-			plotId = extras != null ? new Long(
-					extras.getString(ConstantUtil.ID_KEY)) : null;
-		}
-		
+        plotId = savedInstanceState != null ? savedInstanceState
+                .getLong(ConstantUtil.ID_KEY) : null;
+        if (plotId == null || plotId == 0L) {
+            Bundle extras = getIntent().getExtras();
+            plotId = extras != null ? new Long(
+                    extras.getString(ConstantUtil.ID_KEY)) : null;
+        }
 
-		saveButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				setResult(RESULT_OK);
-				finish();
-			}
-		});
-	}
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
+    }
 
-	/**
-	 * put loaded data into the views for display
-	 */
-	private void populateFields() {
-		if (plotId != null) {
-			Cursor plot = databaseAdaptor.findPlot(plotId);
-			startManagingCursor(plot);
-			displayName.setText(plot.getString(plot
-					.getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL)));
-			description.setText(plot.getString(plot
-					.getColumnIndexOrThrow(SurveyDbAdapter.DESC_COL)));
-		}
-	}
+    /**
+     * put loaded data into the views for display
+     */
+    private void populateFields() {
+        if (plotId != null) {
+            Cursor plot = databaseAdaptor.findPlot(plotId);
+            startManagingCursor(plot);
+            displayName.setText(plot.getString(plot
+                    .getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL)));
+            description.setText(plot.getString(plot
+                    .getColumnIndexOrThrow(SurveyDbAdapter.DESC_COL)));
+        }
+    }
 
-	/**
-	 * sets the id of the selected plot (if there is one) in the bundle
-	 */
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if (outState != null && plotId != null) {
-			outState.putLong(ConstantUtil.ID_KEY, plotId);
-		}
-	}
+    /**
+     * sets the id of the selected plot (if there is one) in the bundle
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (outState != null && plotId != null) {
+            outState.putLong(ConstantUtil.ID_KEY, plotId);
+        }
+    }
 
-	@Override
-	protected void onPause() {		
-		saveState();
-		if (databaseAdaptor != null) {
-			databaseAdaptor.close();
-		}
-		super.onPause();
-	}
+    @Override
+    protected void onPause() {
+        saveState();
+        if (databaseAdaptor != null) {
+            databaseAdaptor.close();
+        }
+        super.onPause();
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		databaseAdaptor.open();
-		populateFields();
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        databaseAdaptor.open();
+        populateFields();
+    }
 
-	protected void onDestroy() {
-		super.onDestroy();
-		
-	}
+    protected void onDestroy() {
+        super.onDestroy();
 
-	/**
-	 * save the name and description to the db
-	 */
-	private void saveState() {
-		String name = displayName.getText().toString();
-		String desc = description.getText().toString();
-		databaseAdaptor.createOrUpdatePlot(plotId, name, desc, null);
-	}
+    }
+
+    /**
+     * save the name and description to the db
+     */
+    private void saveState() {
+        String name = displayName.getText().toString();
+        String desc = description.getText().toString();
+        databaseAdaptor.createOrUpdatePlot(plotId, name, desc, null);
+    }
 }

@@ -49,195 +49,194 @@ import com.gallatinsystems.survey.device.util.StatusUtil;
  * trace file is deleted from the file system.
  * 
  * @author Christopher Fagiani
- * 
  */
 public class ExceptionReportingService extends Service {
 
-	private static final String TAG = "EXCEPTION_REPORTING_SERVICE";
-	private static final String EXCEPTION_SERVICE_PATH = "/remoteexception";
-	private static final String ACTION_PARAM = "action";
-	private static final String ACTION_VALUE = "saveTrace";
-	private static final String PHONE_PARAM = "phoneNumber";
-	private static final String IMEI_PARAM = "imei";
-	private static final String VER_PARAM = "version";
-	private static final String DEV_ID_PARAM = "deviceIdentifier";
-	private static final String DATE_PARAM = "date";
-	private static final String TRACE_PARAM = "trace";
-	private static final long INITIAL_DELAY = 60000;
-	private static final long INTERVAL = 300000;
+    private static final String TAG = "EXCEPTION_REPORTING_SERVICE";
+    private static final String EXCEPTION_SERVICE_PATH = "/remoteexception";
+    private static final String ACTION_PARAM = "action";
+    private static final String ACTION_VALUE = "saveTrace";
+    private static final String PHONE_PARAM = "phoneNumber";
+    private static final String IMEI_PARAM = "imei";
+    private static final String VER_PARAM = "version";
+    private static final String DEV_ID_PARAM = "deviceIdentifier";
+    private static final String DATE_PARAM = "date";
+    private static final String TRACE_PARAM = "trace";
+    private static final long INITIAL_DELAY = 60000;
+    private static final long INTERVAL = 300000;
 
-	private static final DateFormat DATE_FMT = new SimpleDateFormat(
-			"yyyy-MM-dd HH:mm:ss");
+    private static final DateFormat DATE_FMT = new SimpleDateFormat(
+            "yyyy-MM-dd HH:mm:ss");
 
-	private static Timer timer;
+    private static Timer timer;
 
-	private String version;
-	private String deviceId;
-	private PropertyUtil props;
-	private String phoneNumber;
-	private String imei;
-	private static volatile int uploadOption = 0;
+    private String version;
+    private String deviceId;
+    private PropertyUtil props;
+    private String phoneNumber;
+    private String imei;
+    private static volatile int uploadOption = 0;
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
-	/**
-	 * life cycle method for the service. This is called by the system when the
-	 * service is started. It will schedule a timerTask that will periodically
-	 * check the file system for trace files and, if found, will send them to
-	 * the server via a REST call
-	 */
-	public int onStartCommand(final Intent intent, int flags, int startid) {
-		SurveyDbAdapter database = null;
-		String server = null;
+    /**
+     * life cycle method for the service. This is called by the system when the
+     * service is started. It will schedule a timerTask that will periodically
+     * check the file system for trace files and, if found, will send them to
+     * the server via a REST call
+     */
+    public int onStartCommand(final Intent intent, int flags, int startid) {
+        SurveyDbAdapter database = null;
+        String server = null;
 
-		try {
-			database = new SurveyDbAdapter(this);
-			database.open();
-			deviceId = database.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
-			Resources resources = getResources();
-			version = PlatformUtil.getVersionName(this);
-			String serverBase = database
-					.findPreference(ConstantUtil.SERVER_SETTING_KEY);
-			if (serverBase != null && serverBase.trim().length() > 0) {
-				serverBase = resources.getStringArray(R.array.servers)[Integer
-						.parseInt(serverBase)];
-			} else {
-				serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
-			}
-			server = serverBase;
-			phoneNumber = StatusUtil.getPhoneNumber(this);
-			imei = StatusUtil.getImei(this);
-			try {
-				uploadOption = Integer.parseInt(database
-						.findPreference(ConstantUtil.UPLOAD_ERRORS));
-			} catch (Exception e) {
-				// no-op
-				uploadOption = 0;
-			}
+        try {
+            database = new SurveyDbAdapter(this);
+            database.open();
+            deviceId = database.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+            Resources resources = getResources();
+            version = PlatformUtil.getVersionName(this);
+            String serverBase = database
+                    .findPreference(ConstantUtil.SERVER_SETTING_KEY);
+            if (serverBase != null && serverBase.trim().length() > 0) {
+                serverBase = resources.getStringArray(R.array.servers)[Integer
+                        .parseInt(serverBase)];
+            } else {
+                serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
+            }
+            server = serverBase;
+            phoneNumber = StatusUtil.getPhoneNumber(this);
+            imei = StatusUtil.getImei(this);
+            try {
+                uploadOption = Integer.parseInt(database
+                        .findPreference(ConstantUtil.UPLOAD_ERRORS));
+            } catch (Exception e) {
+                // no-op
+                uploadOption = 0;
+            }
 
-		} finally {
-			if (database != null) {
-				database.close();
-			}
-		}
-		final String finalServer = server;
-		if (timer == null) {
-			timer = new Timer(true);
-			timer.scheduleAtFixedRate(new TimerTask() {
+        } finally {
+            if (database != null) {
+                database.close();
+            }
+        }
+        final String finalServer = server;
+        if (timer == null) {
+            timer = new Timer(true);
+            timer.scheduleAtFixedRate(new TimerTask() {
 
-				@Override
-				public void run() {
-					if (StatusUtil.hasDataConnection(
-							ExceptionReportingService.this, false)) {
-						submitStackTraces(finalServer);
-					}
-				}
-			}, INITIAL_DELAY, INTERVAL);
-		}
-		return Service.START_STICKY;
-	}
+                @Override
+                public void run() {
+                    if (StatusUtil.hasDataConnection(
+                            ExceptionReportingService.this, false)) {
+                        submitStackTraces(finalServer);
+                    }
+                }
+            }, INITIAL_DELAY, INTERVAL);
+        }
+        return Service.START_STICKY;
+    }
 
-	public void onCreate() {
-		super.onCreate();
-		Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-				.getInstance());
-		props = new PropertyUtil(getResources());
-	}
+    public void onCreate() {
+        super.onCreate();
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
+                .getInstance());
+        props = new PropertyUtil(getResources());
+    }
 
-	/**
-	 * Returns all stack trace files on the files system
-	 * 
-	 * @return
-	 */
-	private String[] getTraceFiles() {
-		String dirString = null;
-		if (Environment.getExternalStorageState().equals(
-				Environment.MEDIA_MOUNTED)) {
-			dirString = FileUtil.getStorageDirectory(
-					ConstantUtil.STACKTRACE_DIR, false);
-		} else {
-			dirString = FileUtil.getStorageDirectory(
-					ConstantUtil.STACKTRACE_DIR, true);
-		}
-		File dir = FileUtil.findOrCreateDir(dirString);
-		FilenameFilter traceFilter = new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.endsWith(ConstantUtil.STACKTRACE_SUFFIX);
-			}
-		};
-		return dir.list(traceFilter);
-	}
+    /**
+     * Returns all stack trace files on the files system
+     * 
+     * @return
+     */
+    private String[] getTraceFiles() {
+        String dirString = null;
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            dirString = FileUtil.getStorageDirectory(
+                    ConstantUtil.STACKTRACE_DIR, false);
+        } else {
+            dirString = FileUtil.getStorageDirectory(
+                    ConstantUtil.STACKTRACE_DIR, true);
+        }
+        File dir = FileUtil.findOrCreateDir(dirString);
+        FilenameFilter traceFilter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(ConstantUtil.STACKTRACE_SUFFIX);
+            }
+        };
+        return dir.list(traceFilter);
+    }
 
-	/**
-	 * Look in the trace directory for any files. If any are found, upload to
-	 * the server and, on success, delete the file.
-	 */
-	public void submitStackTraces(String server) {
-		if (canUpload(uploadOption)) {
-			try {
-				if (server != null) {
-					String dirString = null;
-					if (Environment.getExternalStorageState().equals(
-							Environment.MEDIA_MOUNTED)) {
-						dirString = FileUtil.getStorageDirectory(
-								ConstantUtil.STACKTRACE_DIR, false);
-					} else {
-						dirString = FileUtil.getStorageDirectory(
-								ConstantUtil.STACKTRACE_DIR, true);
-					}
-					String[] list = getTraceFiles();
-					if (list != null && list.length > 0) {
-						for (int i = 0; i < list.length; i++) {
-							String trace = FileUtil.readFileAsString(dirString
-									+ list[i]);
-							File f = new File(dirString + list[i]);
+    /**
+     * Look in the trace directory for any files. If any are found, upload to
+     * the server and, on success, delete the file.
+     */
+    public void submitStackTraces(String server) {
+        if (canUpload(uploadOption)) {
+            try {
+                if (server != null) {
+                    String dirString = null;
+                    if (Environment.getExternalStorageState().equals(
+                            Environment.MEDIA_MOUNTED)) {
+                        dirString = FileUtil.getStorageDirectory(
+                                ConstantUtil.STACKTRACE_DIR, false);
+                    } else {
+                        dirString = FileUtil.getStorageDirectory(
+                                ConstantUtil.STACKTRACE_DIR, true);
+                    }
+                    String[] list = getTraceFiles();
+                    if (list != null && list.length > 0) {
+                        for (int i = 0; i < list.length; i++) {
+                            String trace = FileUtil.readFileAsString(dirString
+                                    + list[i]);
+                            File f = new File(dirString + list[i]);
 
-							Map<String, String> params = new HashMap<String, String>();
-							params.put(ACTION_PARAM, ACTION_VALUE);
-							params.put(PHONE_PARAM, phoneNumber);
-							params.put(IMEI_PARAM, imei);
-							params.put(VER_PARAM, version);
-							params.put(DATE_PARAM,
-									DATE_FMT.format(new Date(f.lastModified())));
-							params.put(DEV_ID_PARAM, deviceId);
-							params.put(TRACE_PARAM, trace);
+                            Map<String, String> params = new HashMap<String, String>();
+                            params.put(ACTION_PARAM, ACTION_VALUE);
+                            params.put(PHONE_PARAM, phoneNumber);
+                            params.put(IMEI_PARAM, imei);
+                            params.put(VER_PARAM, version);
+                            params.put(DATE_PARAM,
+                                    DATE_FMT.format(new Date(f.lastModified())));
+                            params.put(DEV_ID_PARAM, deviceId);
+                            params.put(TRACE_PARAM, trace);
 
-							String response = HttpUtil.httpPost(server
-									+ EXCEPTION_SERVICE_PATH, params);
-							if (response == null
-									|| response.trim().length() == 0
-									|| "ok".equalsIgnoreCase(response)) {
-								f.delete();
-							}
-						}
-					}
-				}
-			} catch (Exception e) {
-				Log.e(TAG, "Could not send exception", e);
-			}
-		}
-	}
+                            String response = HttpUtil.httpPost(server
+                                    + EXCEPTION_SERVICE_PATH, params);
+                            if (response == null
+                                    || response.trim().length() == 0
+                                    || "ok".equalsIgnoreCase(response)) {
+                                f.delete();
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Could not send exception", e);
+            }
+        }
+    }
 
-	/**
-	 * this method checks if the service can send exception files based on the
-	 * user preference and the type of network connection currently held
-	 * 
-	 * @param type
-	 * @return
-	 */
-	private boolean canUpload(int optionIndex) {
-		boolean ok = false;
-		if (optionIndex > -1
-				&& ConstantUtil.PRECACHE_WIFI_ONLY_IDX == optionIndex) {
+    /**
+     * this method checks if the service can send exception files based on the
+     * user preference and the type of network connection currently held
+     * 
+     * @param type
+     * @return
+     */
+    private boolean canUpload(int optionIndex) {
+        boolean ok = false;
+        if (optionIndex > -1
+                && ConstantUtil.PRECACHE_WIFI_ONLY_IDX == optionIndex) {
 
-			ok = StatusUtil.hasDataConnection(this, true);
-		} else {
-			ok = StatusUtil.hasDataConnection(this, false);
-		}
-		return ok;
-	}
+            ok = StatusUtil.hasDataConnection(this, true);
+        } else {
+            ok = StatusUtil.hasDataConnection(this, false);
+        }
+        return ok;
+    }
 
 }

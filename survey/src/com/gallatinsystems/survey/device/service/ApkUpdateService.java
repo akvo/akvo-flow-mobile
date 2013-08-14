@@ -13,6 +13,7 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+
 package com.gallatinsystems.survey.device.service;
 
 import java.io.File;
@@ -45,187 +46,183 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
  * If found, it will attempt to download automatically and then fire a
  * notification prompting the user to install
  * 
- * 
  * @author Christopher Fagiani
- * 
  */
 public class ApkUpdateService extends Service {
 
-	private static final String TAG = "APK_UPDATE_SERVICE";
+    private static final String TAG = "APK_UPDATE_SERVICE";
 
-	private static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=fieldSurvey";
+    private static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=fieldSurvey";
 
-	private PropertyUtil props;
-	private Thread thread;
-	private SurveyDbAdapter databaseAdaptor;
-	private static Semaphore lock = new Semaphore(1);
+    private PropertyUtil props;
+    private Thread thread;
+    private SurveyDbAdapter databaseAdaptor;
+    private static Semaphore lock = new Semaphore(1);
 
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
-	/**
-	 * life cycle method for the service. This is called by the system when the
-	 * service is started
-	 */
-	public int onStartCommand(final Intent intent, int flags, final int startid) {
-		thread = new Thread(new Runnable() {
-			public void run() {
-				checkAndDownload(startid);
+    /**
+     * life cycle method for the service. This is called by the system when the
+     * service is started
+     */
+    public int onStartCommand(final Intent intent, int flags, final int startid) {
+        thread = new Thread(new Runnable() {
+            public void run() {
+                checkAndDownload(startid);
 
-			}
-		});
-		thread.start();
-		return Service.START_REDELIVER_INTENT;
-	}
+            }
+        });
+        thread.start();
+        return Service.START_REDELIVER_INTENT;
+    }
 
-	public void onCreate() {
-		super.onCreate();
-		Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-				.getInstance());
-		props = new PropertyUtil(getResources());
-	}
+    public void onCreate() {
+        super.onCreate();
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
+                .getInstance());
+        props = new PropertyUtil(getResources());
+    }
 
-	private void checkAndDownload(int startId) {
-		String serverBase = null;
-		int precacheOption = -1;
-		try {
-			databaseAdaptor = new SurveyDbAdapter(this);
-			databaseAdaptor.open();
-			precacheOption = Integer.parseInt(databaseAdaptor
-					.findPreference(ConstantUtil.PRECACHE_SETTING_KEY));
-			serverBase = databaseAdaptor
-					.findPreference(ConstantUtil.SERVER_SETTING_KEY);
-		} finally {
-			databaseAdaptor.close();
-			databaseAdaptor = null;
-		}
-		if (isAbleToRun(precacheOption)) {
+    private void checkAndDownload(int startId) {
+        String serverBase = null;
+        int precacheOption = -1;
+        try {
+            databaseAdaptor = new SurveyDbAdapter(this);
+            databaseAdaptor.open();
+            precacheOption = Integer.parseInt(databaseAdaptor
+                    .findPreference(ConstantUtil.PRECACHE_SETTING_KEY));
+            serverBase = databaseAdaptor
+                    .findPreference(ConstantUtil.SERVER_SETTING_KEY);
+        } finally {
+            databaseAdaptor.close();
+            databaseAdaptor = null;
+        }
+        if (isAbleToRun(precacheOption)) {
 
-			if (serverBase != null && serverBase.trim().length() > 0) {
-				serverBase = getResources().getStringArray(R.array.servers)[Integer
-						.parseInt(serverBase)];
-			} else {
-				serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
-			}
-			try {
-				String response = HttpUtil.httpGet(serverBase
-						+ APK_VERSION_SERVICE_PATH);
+            if (serverBase != null && serverBase.trim().length() > 0) {
+                serverBase = getResources().getStringArray(R.array.servers)[Integer
+                        .parseInt(serverBase)];
+            } else {
+                serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
+            }
+            try {
+                String response = HttpUtil.httpGet(serverBase
+                        + APK_VERSION_SERVICE_PATH);
 
-				if (response != null) {
-					JSONObject json = new JSONObject(response);
-					if (json != null) {
-						String ver = json.getString("version");
-						if (ver != null) {
-							String installedVer = PlatformUtil.getVersionName(this);
-							if (installedVer != null) {
-								if (ver.toLowerCase()
-										.trim()
-										.compareTo(
-												installedVer.toLowerCase()
-														.trim()) > 0) {
-									// there is a newer version so we need to
-									// download
-									downloadApk(json.getString("fileName"), ver);
-								}
-							}
-						}
-					}
-				}
-			} catch (Exception e) {
-				Log.e(TAG, "Could not call apk version service", e);
-			}
-		}
-		stopSelf(startId);
-	}
+                if (response != null) {
+                    JSONObject json = new JSONObject(response);
+                    if (json != null) {
+                        String ver = json.getString("version");
+                        if (ver != null) {
+                            String installedVer = PlatformUtil.getVersionName(this);
+                            if (installedVer != null) {
+                                if (ver.toLowerCase()
+                                        .trim()
+                                        .compareTo(
+                                                installedVer.toLowerCase()
+                                                        .trim()) > 0) {
+                                    // there is a newer version so we need to
+                                    // download
+                                    downloadApk(json.getString("fileName"), ver);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Could not call apk version service", e);
+            }
+        }
+        stopSelf(startId);
+    }
 
-	/**
-	 * downloads the apk file and stores it on the file system
-	 * 
-	 * 
-	 * @param remoteFile
-	 * @param surveyId
-	 */
-	private void downloadApk(String fileName, String version) {
-		try {
-			String remoteFile = props.getProperty(ConstantUtil.DATA_UPLOAD_URL)
-					+ ConstantUtil.REMOTE_APK_DIR + fileName;
+    /**
+     * downloads the apk file and stores it on the file system
+     * 
+     * @param remoteFile
+     * @param surveyId
+     */
+    private void downloadApk(String fileName, String version) {
+        try {
+            String remoteFile = props.getProperty(ConstantUtil.DATA_UPLOAD_URL)
+                    + ConstantUtil.REMOTE_APK_DIR + fileName;
 
-			String localPath = FileUtil.getPathForFile(fileName,
-					ConstantUtil.APK_DIR + version + "/",
-					props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
-			File localFile = new File(localPath);
-			if (!localFile.exists()) {
-				FileOutputStream out = null;
-				try {
-					out = FileUtil
-							.getFileOutputStream(
-									fileName,
-									ConstantUtil.APK_DIR + version + "/",
-									props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-									this);
-				} catch (FileNotFoundException e1) {
-					Log.e(TAG, "Could not write apk file", e1);
-					PersistentUncaughtExceptionHandler.recordException(e1);
-				}
-				HttpUtil.httpDownload(remoteFile, out);
-				if (out != null) {
-					try {
-						out.close();
-					} catch (Exception e) {
-						// ignore
-					}
-				}
+            String localPath = FileUtil.getPathForFile(fileName,
+                    ConstantUtil.APK_DIR + version + "/",
+                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
+            File localFile = new File(localPath);
+            if (!localFile.exists()) {
+                FileOutputStream out = null;
+                try {
+                    out = FileUtil
+                            .getFileOutputStream(
+                                    fileName,
+                                    ConstantUtil.APK_DIR + version + "/",
+                                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
+                                    this);
+                } catch (FileNotFoundException e1) {
+                    Log.e(TAG, "Could not write apk file", e1);
+                    PersistentUncaughtExceptionHandler.recordException(e1);
+                }
+                HttpUtil.httpDownload(remoteFile, out);
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                }
 
-			}
-			fireNotification(localPath);
-		} catch (Exception e) {
-			Log.e(TAG, "Could not download apk file", e);
-		}
-	}
+            }
+            fireNotification(localPath);
+        } catch (Exception e) {
+            Log.e(TAG, "Could not download apk file", e);
+        }
+    }
 
-	/**
-	 * this method checks if the service can perform the requested operation. If
-	 * there is no connectivity, this will return false, otherwise it will
-	 * return true
-	 * 
-	 * 
-	 * @param type
-	 * @return
-	 */
-	private boolean isAbleToRun(int precacheOption) {
-		try {
-			lock.acquire();
+    /**
+     * this method checks if the service can perform the requested operation. If
+     * there is no connectivity, this will return false, otherwise it will
+     * return true
+     * 
+     * @param type
+     * @return
+     */
+    private boolean isAbleToRun(int precacheOption) {
+        try {
+            lock.acquire();
 
-			if (precacheOption > -1
-					&& ConstantUtil.PRECACHE_WIFI_ONLY_IDX == precacheOption) {
-				return StatusUtil.hasDataConnection(this, true);
-			} else {
-				return StatusUtil.hasDataConnection(this, false);
-			}
-		} catch (Exception e) {
-			Log.e(TAG, "Could not check connectivity", e);
-		} finally {
+            if (precacheOption > -1
+                    && ConstantUtil.PRECACHE_WIFI_ONLY_IDX == precacheOption) {
+                return StatusUtil.hasDataConnection(this, true);
+            } else {
+                return StatusUtil.hasDataConnection(this, false);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not check connectivity", e);
+        } finally {
 
-			lock.release();
-		}
-		return false;
-	}
+            lock.release();
+        }
+        return false;
+    }
 
-	/**
-	 * sends a notification indicating that an apk is ready for install
-	 * 
-	 * @param count
-	 */
-	private void fireNotification(String filePath) {
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setDataAndType(Uri.fromFile(new File(filePath)),
-				"application/vnd.android.package-archive");
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    /**
+     * sends a notification indicating that an apk is ready for install
+     * 
+     * @param count
+     */
+    private void fireNotification(String filePath) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(filePath)),
+                "application/vnd.android.package-archive");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		Resources res = getResources();
-		ViewUtil.fireNotification(res.getString(R.string.updateavail),
-				res.getString(R.string.clicktoinstall), this, 0, null, intent,
-				true);
-	}
+        Resources res = getResources();
+        ViewUtil.fireNotification(res.getString(R.string.updateavail),
+                res.getString(R.string.clicktoinstall), this, 0, null, intent,
+                true);
+    }
 }

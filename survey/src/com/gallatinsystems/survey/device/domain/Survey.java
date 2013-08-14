@@ -24,135 +24,133 @@ import java.util.List;
  * domain object for Surveys
  * 
  * @author Christopher Fagiani
- * 
  */
 public class Survey {
 
-	private String name;
-	private String id;
-	private Date startDate;
-	private Date endDate;
-	private List<QuestionGroup> questionGroups;
-	private double version;
-	private String type;
-	private String location;
-	private String fileName;
-	private boolean helpDownloaded;
-	private String language;
+    private String name;
+    private String id;
+    private Date startDate;
+    private Date endDate;
+    private List<QuestionGroup> questionGroups;
+    private double version;
+    private String type;
+    private String location;
+    private String fileName;
+    private boolean helpDownloaded;
+    private String language;
 
-	public String getLanguage() {
-		return language;
-	}
+    public String getLanguage() {
+        return language;
+    }
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
-	public boolean isHelpDownloaded() {
-		return helpDownloaded;
-	}
+    public boolean isHelpDownloaded() {
+        return helpDownloaded;
+    }
 
-	public void setHelpDownloaded(boolean helpDownloaded) {
-		this.helpDownloaded = helpDownloaded;
-	}
+    public void setHelpDownloaded(boolean helpDownloaded) {
+        this.helpDownloaded = helpDownloaded;
+    }
 
-	public void setHelpDownloaded(String flagVal) {
-		if (flagVal != null) {
-			if (flagVal.trim().equalsIgnoreCase("Y")
-					|| flagVal.trim().equalsIgnoreCase("true")) {
-				helpDownloaded = true;
-			} else {
-				helpDownloaded = false;
-			}
-		} else {
-			helpDownloaded = false;
-		}
-	}
-	
-	
-	public String getType() {
-		return type;
-	}
+    public void setHelpDownloaded(String flagVal) {
+        if (flagVal != null) {
+            if (flagVal.trim().equalsIgnoreCase("Y")
+                    || flagVal.trim().equalsIgnoreCase("true")) {
+                helpDownloaded = true;
+            } else {
+                helpDownloaded = false;
+            }
+        } else {
+            helpDownloaded = false;
+        }
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public String getLocation() {
-		return location;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public String getLocation() {
+        return location;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public double getVersion() {
-		return version;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public void setVersion(double version) {
-		this.version = version;
-	}
+    public double getVersion() {
+        return version;
+    }
 
-	public String getName() {
-		return name;
+    public void setVersion(double version) {
+        this.version = version;
+    }
 
-	}
+    public String getName() {
+        return name;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public Date getStartDate() {
-		return startDate;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
+    public Date getStartDate() {
+        return startDate;
+    }
 
-	public Date getEndDate() {
-		return endDate;
-	}
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+    public Date getEndDate() {
+        return endDate;
+    }
 
-	public List<QuestionGroup> getQuestionGroups() {
-		return questionGroups;
-	}
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
-	public void setQuestionGroups(List<QuestionGroup> questionGroups) {
-		this.questionGroups = questionGroups;
-	}
+    public List<QuestionGroup> getQuestionGroups() {
+        return questionGroups;
+    }
 
-	/**
-	 * adds a new quesitonGroup to the survey at the end of the questionGroup
-	 * list. If the questionGroup list is null, it is initialized before adding.
-	 * 
-	 * @param group
-	 */
-	public void addQuestionGroup(QuestionGroup group) {
-		if (questionGroups == null) {
-			questionGroups = new ArrayList<QuestionGroup>();
-		}
-		questionGroups.add(group);
-	}
+    public void setQuestionGroups(List<QuestionGroup> questionGroups) {
+        this.questionGroups = questionGroups;
+    }
+
+    /**
+     * adds a new quesitonGroup to the survey at the end of the questionGroup
+     * list. If the questionGroup list is null, it is initialized before adding.
+     * 
+     * @param group
+     */
+    public void addQuestionGroup(QuestionGroup group) {
+        if (questionGroups == null) {
+            questionGroups = new ArrayList<QuestionGroup>();
+        }
+        questionGroups.add(group);
+    }
 }

@@ -21,7 +21,6 @@ package com.gallatinsystems.survey.device.event;
  * of QuestionInteractionEvent occurrences.
  * 
  * @author Christopher Fagiani
- * 
  */
 public interface QuestionInteractionListener {
 

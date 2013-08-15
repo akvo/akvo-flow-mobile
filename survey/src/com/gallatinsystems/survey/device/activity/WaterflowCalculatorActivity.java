@@ -134,15 +134,17 @@ public class WaterflowCalculatorActivity extends Activity implements
 
             try {
                 Double result = solve(dia, vel, flow);
-                if (dia == null) {
-                    setText(result, diameterText, diaMetricSpinner
-                            .getSelectedItemPosition(), lengthConversion);
-                } else if (vel == null) {
-                    setText(result, velocityText, velocityMetricSpinner
-                            .getSelectedItemPosition(), velocityConversion);
-                } else {
-                    setText(result, flowRateText, flowRateMetricSpinner
-                            .getSelectedItemPosition(), flowConversion);
+                if (result != null) {
+                    if (dia == null) {
+                        setText(result, diameterText, diaMetricSpinner
+                                .getSelectedItemPosition(), lengthConversion);
+                    } else if (vel == null) {
+                        setText(result, velocityText, velocityMetricSpinner
+                                .getSelectedItemPosition(), velocityConversion);
+                    } else {
+                        setText(result, flowRateText, flowRateMetricSpinner
+                                .getSelectedItemPosition(), flowConversion);
+                    }
                 }
             } catch (Exception e) {
                 // if we get a NPE, then more than 1 entry was null
@@ -213,9 +215,12 @@ public class WaterflowCalculatorActivity extends Activity implements
             return Math.sqrt((4 * flowRate * 0.001) / (Math.PI * velocity));
         } else if (velocity == null && flowRate != null && diameter != null) {
             return (4 * flowRate * 0.001) / (Math.PI * Math.pow(diameter, 2d));
-        } else {
+        } else if (diameter != null && velocity != null){
+            // Avoid null pointer exception
             return (diameter * diameter * Math.PI * .25d * velocity) / 0.001;
         }
+        
+        return null;
     }
 
     /**

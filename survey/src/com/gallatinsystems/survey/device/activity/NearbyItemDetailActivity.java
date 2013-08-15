@@ -109,9 +109,12 @@ public class NearbyItemDetailActivity extends Activity implements
             pointOfInterest = extras != null ? (PointOfInterest) extras
                     .getSerializable(ConstantUtil.AP_KEY) : null;
         }
+        
         apLocation = new Location(LocationManager.GPS_PROVIDER);
-        apLocation.setLatitude(pointOfInterest.getLatitude());
-        apLocation.setLongitude(pointOfInterest.getLongitude());
+        if (pointOfInterest != null) {
+            apLocation.setLatitude(pointOfInterest.getLatitude());
+            apLocation.setLongitude(pointOfInterest.getLongitude());
+        }
         populateFields();
     }
 

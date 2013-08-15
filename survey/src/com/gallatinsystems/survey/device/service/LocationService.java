@@ -106,6 +106,8 @@ public class LocationService extends Service {
                 database.close();
             }
         }
+        // Safe to lazy initialize the static field, since this method
+        // will always be called in the Main Thread
         if (timer == null && sendBeacon) {
             timer = new Timer(true);
             timer.scheduleAtFixedRate(new TimerTask() {

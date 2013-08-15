@@ -41,7 +41,7 @@ public class PropertyUtil {
      * @param resources
      * @return
      */
-    private static void loadProperties(Resources resources) {
+    private static synchronized void loadProperties(Resources resources) {
         if (properties == null) {
             properties = new Properties();
             try {

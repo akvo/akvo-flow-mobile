@@ -122,6 +122,8 @@ public class ExceptionReportingService extends Service {
             }
         }
         final String finalServer = server;
+        // Safe to lazy initialize the static field, since this method
+        // will always be called in the Main Thread
         if (timer == null) {
             timer = new Timer(true);
             timer.scheduleAtFixedRate(new TimerTask() {

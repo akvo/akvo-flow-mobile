@@ -60,8 +60,8 @@ public class LocationService extends Service {
     private static final String DEV_ID = "&devId=";
     private static final String OS_VERSION = "&osVersion=";
     private static final String TAG = "LocationService";
-    private static String version;
-    private static String deviceId;
+    private String version;
+    private String deviceId;
     private PropertyUtil props;
 
     public IBinder onBind(Intent intent) {

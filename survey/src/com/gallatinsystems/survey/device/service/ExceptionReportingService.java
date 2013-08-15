@@ -64,7 +64,7 @@ public class ExceptionReportingService extends Service {
     private static final long INITIAL_DELAY = 60000;
     private static final long INTERVAL = 300000;
 
-    private static final DateFormat DATE_FMT = new SimpleDateFormat(
+    private final DateFormat DATE_FMT = new SimpleDateFormat(
             "yyyy-MM-dd HH:mm:ss");
 
     private static Timer timer;

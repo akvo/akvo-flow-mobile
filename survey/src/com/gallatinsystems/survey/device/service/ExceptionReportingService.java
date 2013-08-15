@@ -64,8 +64,12 @@ public class ExceptionReportingService extends Service {
     private static final long INITIAL_DELAY = 60000;
     private static final long INTERVAL = 300000;
 
-    private final DateFormat DATE_FMT = new SimpleDateFormat(
-            "yyyy-MM-dd HH:mm:ss");
+    private static final ThreadLocal<DateFormat> DATE_FMT = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+    };
 
     private static Timer timer;
 
@@ -201,7 +205,7 @@ public class ExceptionReportingService extends Service {
                             params.put(IMEI_PARAM, imei);
                             params.put(VER_PARAM, version);
                             params.put(DATE_PARAM,
-                                    DATE_FMT.format(new Date(f.lastModified())));
+                                    DATE_FMT.get().format(new Date(f.lastModified())));
                             params.put(DEV_ID_PARAM, deviceId);
                             params.put(TRACE_PARAM, trace);
 

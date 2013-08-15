@@ -16,7 +16,6 @@
 
 package com.gallatinsystems.survey.device.view.adapter;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

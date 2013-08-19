@@ -22,6 +22,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -51,6 +52,7 @@ import com.gallatinsystems.survey.device.service.LocationService;
 import com.gallatinsystems.survey.device.service.SurveyDownloadService;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
+import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.adapter.HomeMenuViewAdapter;
 
@@ -115,14 +117,26 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
         if (currentUserId == null) {
             loadLastUser();
         }
-
-        startSyncService();
-        startService(SurveyDownloadService.class);
-        startService(LocationService.class);
-        // startService(PrecacheService.class);
-        startService(BootstrapService.class);
-        // startService(ApkUpdateService.class);
-        startService(ExceptionReportingService.class);
+        
+        if (!StatusUtil.hasExternalStorage()) {
+            ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
+                false, 
+                new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        SurveyHomeActivity.this.finish();
+                    }
+                }, 
+                null);
+        } else {
+            startSyncService();
+            startService(SurveyDownloadService.class);
+            startService(LocationService.class);
+            // startService(PrecacheService.class);
+            startService(BootstrapService.class);
+            // startService(ApkUpdateService.class);
+            startService(ExceptionReportingService.class);
+        }
     }
 
     /**

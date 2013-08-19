@@ -21,6 +21,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Environment;
 import android.telephony.TelephonyManager;
 
 /**
@@ -125,6 +126,10 @@ public class StatusUtil {
             number = "NO_IMEI";
         }
         return number;
+    }
+    
+    public static boolean hasExternalStorage() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
     
 }

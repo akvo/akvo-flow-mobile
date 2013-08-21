@@ -7,9 +7,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="18dip"
+        android:paddingBottom="18dp"
         android:text="@string/calctext"
-        android:textSize="22dip" >
+        android:textSize="22sp" >
     </TextView>
 
     <TableLayout
@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:text="@string/dialabel"
-                    android:textSize="16dip" >
+                    android:textSize="16sp" >
                 </TextView>
 
                 <EditText
@@ -38,7 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/dialabel"
-                    android:width="100dip" >
+                    android:width="100dp" >
                 </EditText>
 
                 <Spinner
@@ -65,7 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:text="@string/velocitylabel"
-                    android:textSize="16dip" >
+                    android:textSize="16sp" >
                 </TextView>
 
                 <EditText
@@ -74,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@id/diaedit"
                     android:layout_toRightOf="@id/velocitylabel"
-                    android:width="100dip" />
+                    android:width="100dp" />
 
                 <Spinner
                     android:id="@+id/velocitymetricspinner"
@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:text="@string/flowratelabel"
-                    android:textSize="16dip" >
+                    android:textSize="16sp" >
                 </TextView>
 
                 <EditText
@@ -109,7 +109,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@id/velocityedit"
                     android:layout_toRightOf="@id/flowratelabel"
-                    android:width="100dip" />
+                    android:width="100dp" />
 
                 <Spinner
                     android:id="@+id/flowratemetricspinner"

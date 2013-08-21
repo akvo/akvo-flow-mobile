@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/gosavedsurveyslabel"
-            android:textSize="20dip" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/savedSurveysCount"
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/gosubmittedsurveyslabel"
-            android:textSize="20dip" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/submittedSurveysCount"

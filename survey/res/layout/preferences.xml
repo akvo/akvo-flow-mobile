@@ -27,14 +27,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/radiusbutton"
                 android:text="@string/radiuslabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/radiusvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/radiuslabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/lastusercheckbox"
                 android:text="@string/savelastuserlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/screenoptcheckbox"
                 android:text="@string/screenoptlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="fill_parent"
@@ -80,7 +80,7 @@
                 android:layout_below="@id/screenopttxt"
                 android:layout_toLeftOf="@id/screenoptcheckbox"
                 android:text="@string/screenoptdesc"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -100,14 +100,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/uploadoptionbutton"
                 android:text="@string/uploadoptionlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/uploadoptionvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uploadoptionlabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -127,14 +127,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/surveylangbutton"
                 android:text="@string/surveylanglabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/surveylangvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/surveylanglabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -154,14 +154,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/precachepointbutton"
                 android:text="@string/cacheptcountrylabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/cacheptcountryvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/cacheptcountrylabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -180,7 +180,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/beaconcheckbox"
                 android:text="@string/beaconlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -200,14 +200,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/surveycheckbutton"
                 android:text="@string/surveychecklabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/surveycheckvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/surveychecklabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -227,14 +227,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/uploaderrorbutton"
                 android:text="@string/uploaderrorlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/uploaderrorvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uploaderrorlabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -254,14 +254,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/precachehelpbutton"
                 android:text="@string/precachehelplabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/precachehelpvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/precachehelplabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -281,14 +281,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/serverbutton"
                 android:text="@string/serverlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/servervalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/serverlabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -308,14 +308,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/identbutton"
                 android:text="@string/identlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/identvalue"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/identlabel"
-                android:textSize="10dip" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -334,7 +334,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/photosizeremindercheckbox"
                 android:text="@string/photosizereminderlabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -353,7 +353,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/shrinkphotoscheckbox"
                 android:text="@string/shrinkphotoslabel"
-                android:textSize="20dip" />
+                android:textSize="20sp" />
         </RelativeLayout>
     </LinearLayout>
 

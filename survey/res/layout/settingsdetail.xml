@@ -8,11 +8,12 @@
         android:id="@+id/optionLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dip" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/optionDesc"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textSize="14sp" />
 
 </LinearLayout>

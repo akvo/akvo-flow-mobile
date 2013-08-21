@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="10dip" >
+    android:padding="10dp" >
 
     <ImageView
         android:id="@+id/homebuttonimg"
@@ -19,6 +19,6 @@
         android:layout_below="@id/homebuttonimg"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:width="150dip" />
+        android:width="150dp" />
 
 </RelativeLayout>

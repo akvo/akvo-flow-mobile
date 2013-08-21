@@ -19,17 +19,17 @@
         android:layout_height="fill_parent"
         android:gravity="top"
         android:orientation="vertical"
-        android:paddingLeft="5px"
-        android:paddingRight="5px"
-        android:paddingTop="5px" >
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp" >
 
         <com.gallatinsystems.survey.device.view.TransparentPanel
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="5px"
-            android:paddingLeft="5px"
-            android:paddingRight="5px"
-            android:paddingTop="5px" >
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="5dp" >
 
             <Button
                 android:id="@+id/plotaction_button"

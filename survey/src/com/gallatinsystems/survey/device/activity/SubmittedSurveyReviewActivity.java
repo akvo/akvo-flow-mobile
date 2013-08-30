@@ -64,12 +64,16 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
     private Long selectedSurvey;
     private Cursor dataCursor;
     private SurveyDbAdapter databaseAdapter;
+    
+    private SubmittedSurveyReviewCursorAdaptor mSurveyAdapter;
 
     private Handler mHandler = new Handler();
 
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
-            getData();
+            if (mSurveyAdapter != null) {
+                mSurveyAdapter.notifyDataSetChanged();
+            }
             mHandler.postDelayed(this, UPDATE_INTERVAL_MS);
         }
     };
@@ -100,9 +104,8 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
         }
         dataCursor = databaseAdapter.listSurveyRespondent(ConstantUtil.SUBMITTED_STATUS, true);
 
-        SubmittedSurveyReviewCursorAdaptor surveys = new SubmittedSurveyReviewCursorAdaptor(this,
-                dataCursor);
-        setListAdapter(surveys);
+        mSurveyAdapter = new SubmittedSurveyReviewCursorAdaptor(this, dataCursor);
+        setListAdapter(mSurveyAdapter);
 
         String label = null;
         label = getString(R.string.submittedsurveyslabel);

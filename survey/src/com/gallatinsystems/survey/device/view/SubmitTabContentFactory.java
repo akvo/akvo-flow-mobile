@@ -18,11 +18,12 @@ package com.gallatinsystems.survey.device.view;
 
 import java.util.ArrayList;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.Html;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -79,13 +80,19 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                         Intent i = new Intent(
                                 ConstantUtil.DATA_AVAILABLE_INTENT);
                         context.sendBroadcast(i);
+                        
                         ViewUtil.showConfirmDialog(
-                                R.string.submitcompletetitle,
-                                R.string.submitcompletetext, context);
-                        if (context.isSingleSurvey())
-                            context.finish();
-                        else
-                            startNewSurvey();
+                                R.string.submitcompletetitle, 
+                                R.string.submitcompletetext, context, 
+                                false,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        if (dialog != null) {
+                                            dialog.cancel();
+                                            context.finish();
+                                        }
+                                    }
+                                });
                     }
                 });
         TableLayout table = new TableLayout(context);
@@ -153,19 +160,6 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                         + "</font>"), BufferType.SPANNABLE);
         tr.addView(heading);
         return tr;
-    }
-
-    /**
-     * creates a new response object/record and sets the id in the context then
-     * resets the question view.
-     */
-    private void startNewSurvey() {
-        // create a new response object so we're ready for the
-        // next instance
-        context.setRespondentId(databaseAdaptor.createSurveyRespondent(
-                context.getSurveyId(), context.getUserId()));
-        context.resetAllQuestions();
-        context.spaceLeftOnCard();
     }
 
 }

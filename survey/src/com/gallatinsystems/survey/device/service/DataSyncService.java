@@ -598,6 +598,7 @@ public class DataSyncService extends Service {
                 int scored_val_col = data.getColumnIndexOrThrow(SurveyDbAdapter.SCORED_VAL_COL);
                 int strength_col = data.getColumnIndexOrThrow(SurveyDbAdapter.STRENGTH_COL);
                 int uuid_col = data.getColumnIndexOrThrow(SurveyDbAdapter.UUID_COL);
+                int survey_start_col = data.getColumnIndexOrThrow(SurveyDbAdapter.SURVEY_START_COL);
 
                 do {
                     // Sanitize answer value. No newlines or tabs!
@@ -611,6 +612,9 @@ public class DataSyncService extends Service {
                     if (value == null || value.length() == 0) {
                         continue;
                     }
+                    final long submitted_date = data.getLong(submitted_date_col);
+                    final long started_date = data.getLong(survey_start_col);
+                    final long surveyal_time = (submitted_date - started_date) / 1000;
 
                     buf.append(data.getString(survey_fk_col));
                     String respId = data.getString(pk_id_col);
@@ -621,13 +625,14 @@ public class DataSyncService extends Service {
                     buf.append(DELIMITER).append(value);
                     buf.append(DELIMITER).append(cleanVal(data.getString(disp_name_col)));
                     buf.append(DELIMITER).append(cleanVal(data.getString(email_col)));
-                    buf.append(DELIMITER).append(data.getString(submitted_date_col));
+                    buf.append(DELIMITER).append(submitted_date);
                     buf.append(DELIMITER).append(deviceIdentifier);
                     buf.append(DELIMITER).append(neverNull(data.getString(scored_val_col)));
                     buf.append(DELIMITER).append(neverNull(data.getString(strength_col)));
                     buf.append(DELIMITER).append(data.getString(uuid_col));
+                    buf.append(DELIMITER).append(surveyal_time);
                     buf.append("\n");
-
+                    
                     if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
                             || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
                         List<String> paths = imagePaths.get(respId);

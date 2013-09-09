@@ -63,6 +63,7 @@ public class SurveyDbAdapter {
     public static final String EMAIL_COL = "email";
     public static final String SUBMITTED_FLAG_COL = "submitted_flag";
     public static final String SUBMITTED_DATE_COL = "submitted_date";
+    public static final String SURVEY_START_COL = "survey_start";
     public static final String DELIVERED_DATE_COL = "delivered_date";
     public static final String CREATED_DATE_COL = "created_date";
     public static final String UPDATED_DATE_COL = "updated_date";
@@ -354,7 +355,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL
+                STRENGTH_COL, UUID_COL, SURVEY_START_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND" + "(" + DELIVERED_DATE_COL
                 + " is null OR " + MEDIA_SENT_COL + " <> 'true')", null, null,
@@ -376,7 +377,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL
+                STRENGTH_COL, UUID_COL, SURVEY_START_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND " + EXPORTED_FLAG_COL
                 + " <> 'true' AND " + "(" + DELIVERED_DATE_COL + " is null OR "
@@ -670,8 +671,7 @@ public class SurveyDbAdapter {
      */
     public long createOrLoadSurveyRespondent(String surveyId, String userId) {
         Cursor results = database.query(RESPONDENT_TABLE, new String[] {
-            "max("
-                    + PK_ID_COL + ")"
+            "max(" + PK_ID_COL + ")"
         }, SUBMITTED_FLAG_COL + "='false' and "
                 + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?", new String[] {
                 surveyId, ConstantUtil.CURRENT_STATUS
@@ -704,6 +704,7 @@ public class SurveyDbAdapter {
         initialValues.put(USER_FK_COL, userId);
         initialValues.put(STATUS_COL, ConstantUtil.CURRENT_STATUS);
         initialValues.put(UUID_COL, UUID.randomUUID().toString());
+        initialValues.put(SURVEY_START_COL, System.currentTimeMillis());
         return database.insert(RESPONDENT_TABLE, null, initialValues);
     }
 

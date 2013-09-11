@@ -203,7 +203,10 @@ public class SurveyDbAdapter {
             
             int version = oldVersion;
             
-            // Apply database updates sequentially.
+            // Apply database updates sequentially. It starts in the current 
+            // version, hooking into the correspondent case block, and falls 
+            // through to any future upgrade. If no break statement is found,
+            // the upgrade will end up in the current version.
             switch (version) {
                 case VER_LAUNCH:
                     // changes in version 76 - Time track

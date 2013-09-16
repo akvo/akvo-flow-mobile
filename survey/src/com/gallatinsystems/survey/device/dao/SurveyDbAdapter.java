@@ -42,7 +42,6 @@ import com.gallatinsystems.survey.device.domain.PointOfInterest;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
-import com.gallatinsystems.survey.device.util.PropertyUtil;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well
@@ -64,6 +63,7 @@ public class SurveyDbAdapter {
     public static final String EMAIL_COL = "email";
     public static final String SUBMITTED_FLAG_COL = "submitted_flag";
     public static final String SUBMITTED_DATE_COL = "submitted_date";
+    public static final String SURVEY_START_COL = "survey_start";
     public static final String DELIVERED_DATE_COL = "delivered_date";
     public static final String CREATED_DATE_COL = "created_date";
     public static final String UPDATED_DATE_COL = "updated_date";
@@ -105,7 +105,8 @@ public class SurveyDbAdapter {
             + "display_name text not null, version real, type text, location text, filename text, language, help_downloaded_flag text, deleted_flag text);";
 
     private static final String SURVEY_RESPONDENT_CREATE = "create table survey_respondent (_id integer primary key autoincrement, "
-            + "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, status text, saved_date long, exported_flag text, uuid text);";
+            + "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, "
+            + "status text, saved_date long, exported_flag text, uuid text, survey_start integer);";
 
     private static final String SURVEY_RESPONSE_CREATE = "create table survey_response (survey_response_id integer primary key autoincrement, "
             + " survey_respondent_id integer not null, question_id text not null, answer_value text not null, answer_type text not null, include_flag text not null, scored_val text, strength text);";
@@ -123,33 +124,24 @@ public class SurveyDbAdapter {
     private static final String TRANSMISSION_HISTORY_TABLE_CREATE = "create table transmission_history (_id integer primary key, survey_respondent_id integer not null, status text, filename text, trans_start_date long, delivered_date long);";
 
     private static final String[] DEFAULT_INSERTS = new String[] {
-            // "insert into survey values(999991,'Sample Survey', 1.0,'Survey','res','testsurvey','en','N','N')",
-            // "insert into survey values(1039101,'Houshold Interview', 1.0,'Survey','res','hh1039101','en','N','N')",
-            // "insert into survey values(1062135,'Public Institution', 1.0,'Survey','res','pi1062135','en','N','N')",
-            // "insert into survey values(1086117,'CommunityWaterPoint', 1.0,'Survey','res','cwp1086117','en','N','N')",
-
-            // "insert into survey values(943186,'Community Water Point', 1.0,'Survey','res','cw943186','en','N','N')",
-            // "insert into survey values(1007024,'Household Interview', 1.0,'Survey','res','hh1007024','en','N','N')",
-            // "insert into survey values(971189,'Public Institution', 1.0,'Survey','res','pi971189','en','N','N')",
-
-            "insert into preferences values('survey.language','')",
-            "insert into preferences values('survey.languagespresent','')",
-            "insert into preferences values('user.storelast','false')",
-            "insert into preferences values('data.cellular.upload','0')",
-            "insert into preferences values('plot.default.mode','manual')",
-            "insert into preferences values('plot.interval','60000')",
-            "insert into preferences values('user.lastuser.id','')",
-            "insert into preferences values('location.sendbeacon','true')",
-            "insert into preferences values('survey.precachehelp','1')",
-            "insert into preferences values('backend.server','')",
-            "insert into preferences values('screen.keepon','true')",
-            "insert into preferences values('precache.points.countries','2')",
-            "insert into preferences values('precache.points.limit','200')",
-            "insert into preferences values('survey.textsize','LARGE')",
-            "insert into preferences values('survey.checkforupdates','0')",
-            "insert into preferences values('remoteexception.upload','0')",
-            "insert into preferences values('survey.media.photo.shrink','true')",
-            "insert into preferences values('survey.media.photo.sizereminder','true')"
+            "INSERT INTO preferences VALUES('survey.language','')",
+            "INSERT INTO preferences VALUES('survey.languagespresent','')",
+            "INSERT INTO preferences VALUES('user.storelast','false')",
+            "INSERT INTO preferences VALUES('data.cellular.upload','0')",
+            "INSERT INTO preferences VALUES('plot.default.mode','manual')",
+            "INSERT INTO preferences VALUES('plot.interval','60000')",
+            "INSERT INTO preferences VALUES('user.lastuser.id','')",
+            "INSERT INTO preferences VALUES('location.sendbeacon','true')",
+            "INSERT INTO preferences VALUES('survey.precachehelp','1')",
+            "INSERT INTO preferences VALUES('backend.server','')",
+            "INSERT INTO preferences VALUES('screen.keepon','true')",
+            "INSERT INTO preferences VALUES('precache.points.countries','2')",
+            "INSERT INTO preferences VALUES('precache.points.limit','200')",
+            "INSERT INTO preferences VALUES('survey.textsize','LARGE')",
+            "INSERT INTO preferences VALUES('survey.checkforupdates','0')",
+            "INSERT INTO preferences VALUES('remoteexception.upload','0')",
+            "INSERT INTO preferences VALUES('survey.media.photo.shrink','true')",
+            "INSERT INTO preferences VALUES('survey.media.photo.sizereminder','true')"
     };
 
     private static final String DATABASE_NAME = "surveydata";
@@ -167,7 +159,9 @@ public class SurveyDbAdapter {
     private static final String PLOT_JOIN = "plot LEFT OUTER JOIN plot_point ON (plot._id = plot_point.plot_id) LEFT OUTER JOIN user ON (user._id = plot.user_id)";
     private static final String RESPONDENT_JOIN = "survey_respondent LEFT OUTER JOIN survey ON (survey_respondent.survey_id = survey._id)";
 
-    private static final int DATABASE_VERSION = 75;
+    private static final int VER_LAUNCH = 75;// FLOW version <= 1.11.1
+    private static final int VER_TIME_TRACK = 76;
+    private static final int DATABASE_VERSION = VER_TIME_TRACK;
 
     private final Context context;
 
@@ -181,11 +175,9 @@ public class SurveyDbAdapter {
         private static SQLiteDatabase database;
         private static volatile Object LOCK_OBJ = new Object();
         private volatile static int instanceCount = 0;
-        private Context context;
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
-            this.context = context;
         }
 
         @Override
@@ -206,10 +198,25 @@ public class SurveyDbAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+            Log.d(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion);
+            
+            int version = oldVersion;
+            
+            // Apply database updates sequentially. It starts in the current 
+            // version, hooking into the correspondent case block, and falls 
+            // through to any future upgrade. If no break statement is found,
+            // the upgrade will end up in the current version.
+            switch (version) {
+                case VER_LAUNCH:
+                    // changes in version 76 - Time track
+                    db.execSQL("ALTER TABLE survey_respondent ADD COLUMN survey_start INTEGER");
+                    version = VER_TIME_TRACK;
+            }
 
-            if (oldVersion < 57) {
+            if (version != DATABASE_VERSION) {
+                Log.d(TAG, "onUpgrade() - Recreating the Database.");
+                
                 db.execSQL("DROP TABLE IF EXISTS " + RESPONSE_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + RESPONDENT_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + SURVEY_TABLE);
@@ -219,117 +226,8 @@ public class SurveyDbAdapter {
                 db.execSQL("DROP TABLE IF EXISTS " + PREFERENCES_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + POINT_OF_INTEREST_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + TRANSMISSION_HISTORY_TABLE);
+                
                 onCreate(db);
-            } else if (oldVersion < 75) {
-
-                // changes made in version 57
-                runSQL(TRANSMISSION_HISTORY_TABLE_CREATE, db);
-
-                // changes made in version 58
-                try {
-                    String value = null;
-                    Cursor cursor = db.query(PREFERENCES_TABLE, new String[] {
-                            KEY_COL, VALUE_COL
-                    }, KEY_COL + " = ?",
-                            new String[] {
-                                "survey.textsize"
-                            }, null, null,
-                            null);
-                    if (cursor != null) {
-                        if (cursor.getCount() > 0) {
-                            cursor.moveToFirst();
-                            value = cursor.getString(cursor
-                                    .getColumnIndexOrThrow(VALUE_COL));
-                        }
-                        cursor.close();
-                    }
-                    if (value == null) {
-                        runSQL("insert into preferences values('survey.textsize','LARGE')",
-                                db);
-                    }
-                } catch (Exception e) {
-                    // swallow
-                }
-
-                // changes in version 63
-                runSQL("alter table survey_respondent add column exported_flag text",
-                        db);
-
-                // changes in version 68
-                try {
-                    runSQL("alter table survey_respondent add column uuid text",
-                            db);
-                    // also generate a uuid for all in-flight responses
-                    Cursor cursor = db.query(RESPONDENT_JOIN, new String[] {
-                            RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
-                            SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL,
-                            SUBMITTED_DATE_COL, DELIVERED_DATE_COL, UUID_COL
-                    },
-                            null, null, null, null, null);
-                    if (cursor != null) {
-                        cursor.moveToFirst();
-                        do {
-                            String uuid = cursor.getString(cursor
-                                    .getColumnIndex(UUID_COL));
-                            if (uuid == null || uuid.trim().length() == 0) {
-                                db.execSQL("update " + RESPONDENT_TABLE
-                                        + " set " + UUID_COL + "= '"
-                                        + UUID.randomUUID().toString() + "'");
-                            }
-                        } while (cursor.moveToNext());
-                        cursor.close();
-                    }
-                } catch (Exception e) {
-                    // swallow
-                }
-                // changes made in version 69
-                runSQL("alter table user add column deleted_flag text", db);
-                runSQL("update user set deleted_flag = 'N' where deleted_flag <> 'Y'",
-                        db);
-
-                runSQL("update survey set language = 'en' where language = 'english' or language is null",
-                        db);
-                if (oldVersion < 74) {
-                    runSQL("insert into preferences values('survey.checkforupdates','0')",
-                            db);
-                    runSQL("insert into preferences values('remoteexception.upload','0')",
-                            db);
-                }
-            }
-
-            // now handle defaults
-            checkDefaults(db);
-
-            this.context = null;
-        }
-
-        // executes a sql statement and swallows errors
-        private void runSQL(String ddl, SQLiteDatabase db) {
-            try {
-                db.execSQL(ddl);
-            } catch (Exception e) {
-                // no-op
-            }
-        }
-
-        /**
-         * checks whether we should restore defaults and, if so, sets the
-         * properties in the table to the values from the prop file
-         * 
-         * @param db
-         */
-        private void checkDefaults(SQLiteDatabase db) {
-            // check for defaults and set them
-            PropertyUtil props = new PropertyUtil(context.getResources());
-            String defaults = props.getProperty(ConstantUtil.DEFAULT_SETTINGS);
-            if (defaults != null) {
-                String[] defaultPairs = defaults.split(";");
-                for (int i = 0; i < defaultPairs.length; i++) {
-                    String[] nvp = defaultPairs[i].split("=");
-                    if (nvp.length == 2) {
-                        savePreference(db, nvp[0].trim(), nvp[1].trim());
-                    }
-                }
             }
         }
 
@@ -460,7 +358,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL
+                STRENGTH_COL, UUID_COL, SURVEY_START_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND" + "(" + DELIVERED_DATE_COL
                 + " is null OR " + MEDIA_SENT_COL + " <> 'true')", null, null,
@@ -482,7 +380,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL
+                STRENGTH_COL, UUID_COL, SURVEY_START_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND " + EXPORTED_FLAG_COL
                 + " <> 'true' AND " + "(" + DELIVERED_DATE_COL + " is null OR "
@@ -776,8 +674,7 @@ public class SurveyDbAdapter {
      */
     public long createOrLoadSurveyRespondent(String surveyId, String userId) {
         Cursor results = database.query(RESPONDENT_TABLE, new String[] {
-            "max("
-                    + PK_ID_COL + ")"
+            "max(" + PK_ID_COL + ")"
         }, SUBMITTED_FLAG_COL + "='false' and "
                 + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?", new String[] {
                 surveyId, ConstantUtil.CURRENT_STATUS
@@ -810,6 +707,7 @@ public class SurveyDbAdapter {
         initialValues.put(USER_FK_COL, userId);
         initialValues.put(STATUS_COL, ConstantUtil.CURRENT_STATUS);
         initialValues.put(UUID_COL, UUID.randomUUID().toString());
+        initialValues.put(SURVEY_START_COL, System.currentTimeMillis());
         return database.insert(RESPONDENT_TABLE, null, initialValues);
     }
 

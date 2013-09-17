@@ -1,5 +1,9 @@
 Akvo FLOW Field Survey app 
-last update 17 july 2013, co
+last update 2 august 2013, co
+
+#ver 1.11.1
+* Change accuracy threshold of device GPS to 25 meters and stop checking for location after threshold is reached (#301)
+* Check HTTP response's ETag to ensure an upload to Amazon S3 has been successful (#303)
 
 #ver 1.11.0
 * Update available survey languages on device to dynamic list that builds according to languages available in the survey xml for all surveys currently assigned to the device (#259)

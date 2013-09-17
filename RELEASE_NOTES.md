@@ -1,7 +1,7 @@
 Akvo FLOW Field Survey app 
 Last update 17 September 2013
 
-#ver 1.11.2
+#ver 1.12.0
 
 New features & enhancements
 ---------------------------

@@ -1,5 +1,25 @@
 Akvo FLOW Field Survey app 
-last update 2 august 2013, co
+Last update 17 September 2013
+
+#ver 1.11.2
+
+New features & enhancements
+---------------------------
+* Data deletion option (partial or total) in Settings (#2)
+* Remove unused assets and general cleanup (#4)
+* Performance improvement in the communication between FLOW and Amazon S3 (#9)
+* Remove duplicate images from DCIM directory in sd card (#11)
+* Notify the user and close the app if no external storage is found (#21)
+* Record survey duration (#28)
+* Go back to Home Screen after survey submission (#30)
+
+Bug fixes
+---------
+* GPS keeps working when the application is no longer active (#1)
+* HttpUrlConnection converts request headers to lowercase (#13)
+* File upload stalls at 99% (#15)
+* Avoid recreating the list every 10 seconds in survey transmission history (#26)
+
 
 #ver 1.11.1
 * Change accuracy threshold of device GPS to 25 meters and stop checking for location after threshold is reached (#301)

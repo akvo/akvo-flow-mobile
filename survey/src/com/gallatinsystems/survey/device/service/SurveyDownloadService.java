@@ -47,8 +47,10 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionHelp;
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.exception.TransferException;
+import com.gallatinsystems.survey.device.parser.csv.SurveyGroupParser;
 import com.gallatinsystems.survey.device.parser.csv.SurveyMetaParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
@@ -134,6 +136,12 @@ public class SurveyDownloadService extends Service {
                 lock.acquire();
                 databaseAdaptor = new SurveyDbAdapter(this);
                 databaseAdaptor.open();
+                
+                // First of all, sync Survey Groups
+                // TODO: We will need to somehow synchronize SurveyGroups for
+                // arbitrary survey downloads.
+                syncSurveyGroups();
+                
                 int precacheOption = Integer.parseInt(databaseAdaptor
                         .findPreference(ConstantUtil.PRECACHE_SETTING_KEY));
                 String serverBase = databaseAdaptor
@@ -222,6 +230,12 @@ public class SurveyDownloadService extends Service {
                     "Error while waiting for download executor to terminate", e);
         }
         stopSelf();
+    }
+    
+    private void syncSurveyGroups() throws IOException {
+        String response = "";// TODO: talk to the server...
+        List<SurveyGroup> surveyGroups = new SurveyGroupParser().parseList(response);
+        databaseAdaptor.addSurveyGroups(surveyGroups);
     }
 
     /**

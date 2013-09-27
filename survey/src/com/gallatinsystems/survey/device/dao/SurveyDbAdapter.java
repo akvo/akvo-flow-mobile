@@ -41,6 +41,8 @@ import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.domain.PointOfInterest;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 /**
@@ -93,6 +95,17 @@ public class SurveyDbAdapter {
     public static final String TRANS_START_COL = "trans_start_date";
     public static final String EXPORTED_FLAG_COL = "exported_flag";
     public static final String UUID_COL = "uuid";
+    
+    interface SurveyGroupAttrs {
+        String ID   = "id";
+        String NAME = "name";
+    }
+    
+    interface SurveyedLocaleAttrs {
+        String ID        = "id";
+        String LATITUDE  = "latitude";
+        String LONGITUDE = "longitude";
+    }
 
     private static final String TAG = "SurveyDbAdapter";
     private DatabaseHelper databaseHelper;
@@ -101,8 +114,8 @@ public class SurveyDbAdapter {
     /**
      * Database creation sql statement
      */
-    private static final String SURVEY_TABLE_CREATE = "create table survey (_id integer primary key, "
-            + "display_name text not null, version real, type text, location text, filename text, language, help_downloaded_flag text, deleted_flag text);";
+    private static final String SURVEY_TABLE_CREATE = "create table survey (_id integer primary key, display_name text not null, "
+            + "version real, type text, location text, filename text, language, help_downloaded_flag text, deleted_flag text, survey_group_id int);";
 
     private static final String SURVEY_RESPONDENT_CREATE = "create table survey_respondent (_id integer primary key autoincrement, "
             + "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, "
@@ -122,6 +135,10 @@ public class SurveyDbAdapter {
     private static final String POINT_OF_INTEREST_TABLE_CREATE = "create table point_of_interest (_id integer primary key, country text, display_name text, lat real, lon real, property_names text, property_values text, type text, updated_date integer);";
 
     private static final String TRANSMISSION_HISTORY_TABLE_CREATE = "create table transmission_history (_id integer primary key, survey_respondent_id integer not null, status text, filename text, trans_start_date long, delivered_date long);";
+    
+    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (id integer primary key, name text);";
+    
+    private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (id text primary key, latitude real, longitude real);";
 
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
@@ -145,6 +162,7 @@ public class SurveyDbAdapter {
     };
 
     private static final String DATABASE_NAME = "surveydata";
+    // Tables
     private static final String SURVEY_TABLE = "survey";
     private static final String RESPONDENT_TABLE = "survey_respondent";
     private static final String RESPONSE_TABLE = "survey_response";
@@ -154,14 +172,17 @@ public class SurveyDbAdapter {
     private static final String PREFERENCES_TABLE = "preferences";
     private static final String POINT_OF_INTEREST_TABLE = "point_of_interest";
     private static final String TRANSMISSION_HISTORY_TABLE = "transmission_history";
+    private static final String SURVEY_GROUP_TABLE = "survey_group";// Introduced in Point Updates
+    private static final String SURVEYED_LOCALE_TABLE = "surveyed_locale";// Introduced in Point Updates
 
     private static final String RESPONSE_JOIN = "survey_respondent LEFT OUTER JOIN survey_response ON (survey_respondent._id = survey_response.survey_respondent_id) LEFT OUTER JOIN user ON (user._id = survey_respondent.user_id)";
     private static final String PLOT_JOIN = "plot LEFT OUTER JOIN plot_point ON (plot._id = plot_point.plot_id) LEFT OUTER JOIN user ON (user._id = plot.user_id)";
     private static final String RESPONDENT_JOIN = "survey_respondent LEFT OUTER JOIN survey ON (survey_respondent.survey_id = survey._id)";
 
-    private static final int VER_LAUNCH = 75;// FLOW version <= 1.11.1
+    private static final int VER_LAUNCH = 75;// FLOW version <= 1.12.0
     private static final int VER_TIME_TRACK = 76;
-    private static final int DATABASE_VERSION = VER_TIME_TRACK;
+    private static final int VER_POINT_UPDATES = 77;
+    private static final int DATABASE_VERSION = VER_POINT_UPDATES;
 
     private final Context context;
 
@@ -191,6 +212,8 @@ public class SurveyDbAdapter {
             db.execSQL(PREFERENCES_TABLE_CREATE);
             db.execSQL(POINT_OF_INTEREST_TABLE_CREATE);
             db.execSQL(TRANSMISSION_HISTORY_TABLE_CREATE);
+            db.execSQL(SURVEY_GROUP_TABLE_CREATE);
+            db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
             for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
                 db.execSQL(DEFAULT_INSERTS[i]);
             }
@@ -212,6 +235,11 @@ public class SurveyDbAdapter {
                     // changes in version 76 - Time track
                     db.execSQL("ALTER TABLE survey_respondent ADD COLUMN survey_start INTEGER");
                     version = VER_TIME_TRACK;
+                case VER_TIME_TRACK:
+                    // changes in version 77 - Point Updates
+                    db.execSQL("ALTER TABLE survey ADD COLUMN survey_group_id INTEGER");
+                    db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
+                    version = VER_POINT_UPDATES;
             }
 
             if (version != DATABASE_VERSION) {
@@ -226,6 +254,8 @@ public class SurveyDbAdapter {
                 db.execSQL("DROP TABLE IF EXISTS " + PREFERENCES_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + POINT_OF_INTEREST_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + TRANSMISSION_HISTORY_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + SURVEY_GROUP_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + SURVEYED_LOCALE_TABLE);
                 
                 onCreate(db);
             }
@@ -1773,6 +1803,68 @@ public class SurveyDbAdapter {
         savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY, newLangsSelection);
         savePreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY,
                 newLangsPresentIndexes);
+    }
+    
+    public void addSurveyGroups(List<SurveyGroup> surveyGroups) {
+        database.beginTransaction();
+        try {
+            for (SurveyGroup group : surveyGroups) {
+                ContentValues values = new ContentValues();
+                values.put(SurveyGroupAttrs.ID, group.getId());
+                values.put(SurveyGroupAttrs.NAME, group.getName());
+                database.insert(SURVEY_GROUP_TABLE, null, values);
+            }
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
+        
+    }
+    
+    public SurveyGroup getSurveyGroup(int id) {
+        Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
+                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME}, 
+                SurveyGroupAttrs.ID + "= ?",
+                new String[] {String.valueOf(id)},
+                null, null, null);
+        
+        SurveyGroup surveyGroup = null;
+        if (cursor.moveToFirst()) {
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
+            surveyGroup = new SurveyGroup(id, name);
+        }
+        cursor.close();
+        return surveyGroup;
+    }
+    
+    public String createSurveyedLocale() {
+        String id = UUID.randomUUID().toString();
+        double lat = 0.0d;// TODO
+        double lon = 0.0d;// TODO
+        ContentValues values = new ContentValues();
+        values.put(SurveyedLocaleAttrs.ID, id);
+        values.put(SurveyedLocaleAttrs.LATITUDE, lat);
+        values.put(SurveyedLocaleAttrs.LONGITUDE, lon);
+        database.insert(SURVEYED_LOCALE_TABLE, null, values);
+        
+        return id;
+    }
+    
+    public SurveyedLocale getSurveyedLocale(String id) {
+        Cursor cursor = database.query(SURVEYED_LOCALE_TABLE, 
+                new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE}, 
+                SurveyedLocaleAttrs.ID + "= ?",
+                new String[] {id},
+                null, null, null);
+        
+        SurveyedLocale surveyedLocale = null;
+        if (cursor.moveToFirst()) {
+            double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LATITUDE));
+            double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LONGITUDE));
+            surveyedLocale = new SurveyedLocale(id, latitude, longitude);
+        }
+        cursor.close();
+        return surveyedLocale;
     }
 
 }

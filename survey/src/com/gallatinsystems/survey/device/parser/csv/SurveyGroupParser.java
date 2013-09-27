@@ -16,6 +16,7 @@
 
 package com.gallatinsystems.survey.device.parser.csv;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -44,6 +45,12 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
         }
         
         return surveyGroupList;
+    }
+
+    @Override
+    public SurveyGroup parse(InputStream inputStream) {
+        // Not implemented
+        throw new RuntimeException("Method not implemented");
     }
 
     interface Attr {

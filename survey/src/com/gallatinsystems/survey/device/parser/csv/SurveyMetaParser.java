@@ -16,6 +16,7 @@
 
 package com.gallatinsystems.survey.device.parser.csv;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -26,8 +27,13 @@ import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.parser.FlowParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
-public class SurveyParser implements FlowParser<Survey> {
-    private static final String TAG = SurveyParser.class.getSimpleName();
+/**
+ * Parser for Survey definitions (CSV). No question-answer pairs
+ * will be returned.
+ *
+ */
+public class SurveyMetaParser implements FlowParser<Survey> {
+    private static final String TAG = SurveyMetaParser.class.getSimpleName();
 
     @Override
     public Survey parse(String response) {
@@ -58,6 +64,12 @@ public class SurveyParser implements FlowParser<Survey> {
         }
         
         return surveyList;
+    }
+
+    @Override
+    public Survey parse(InputStream inputStream) {
+        // Not implemented
+        throw new RuntimeException("Method not implemented");
     }
 
     interface Attr {

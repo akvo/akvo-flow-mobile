@@ -49,7 +49,7 @@ import com.gallatinsystems.survey.device.domain.QuestionHelp;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.exception.TransferException;
-import com.gallatinsystems.survey.device.parser.csv.SurveyParser;
+import com.gallatinsystems.survey.device.parser.csv.SurveyMetaParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
@@ -475,7 +475,7 @@ public class SurveyDownloadService extends Service {
                             + (deviceId != null ? DEV_ID_PARAM
                                     + URLEncoder.encode(deviceId, "UTF-8") : ""));
             if (response != null) {
-                surveys = new SurveyParser().parseList(response);
+                surveys = new SurveyMetaParser().parseList(response);
             }
         } catch (HttpException e) {
             Log.e(TAG, "Server returned an unexpected response", e);

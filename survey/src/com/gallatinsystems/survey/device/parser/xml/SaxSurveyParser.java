@@ -19,6 +19,7 @@ package com.gallatinsystems.survey.device.parser.xml;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -26,6 +27,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.parser.FlowParser;
 
 /**
  * implementation of the SurveyParser using the Simple Api for XML (SAX). This
@@ -33,8 +35,9 @@ import com.gallatinsystems.survey.device.domain.Survey;
  * 
  * @author Christopher Fagiani
  */
-public class SaxSurveyParser implements SurveyParser {
+public class SaxSurveyParser implements FlowParser<Survey> {
 
+    @Override
     public Survey parse(InputStream inputStream) {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
@@ -48,6 +51,16 @@ public class SaxSurveyParser implements SurveyParser {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Survey parse(String response) {
+        throw new RuntimeException("Method not implemented");
+    }
+
+    @Override
+    public List<Survey> parseList(String response) {
+        throw new RuntimeException("Method not implemented");
     }
 
 }

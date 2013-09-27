@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -48,6 +49,7 @@ import com.gallatinsystems.survey.device.domain.QuestionHelp;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.exception.TransferException;
+import com.gallatinsystems.survey.device.parser.csv.SurveyParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
@@ -147,7 +149,7 @@ public class SurveyDownloadService extends Service {
                         .findPreference(ConstantUtil.CHECK_FOR_SURVEYS));
                 String deviceId = databaseAdaptor
                         .findPreference(ConstantUtil.DEVICE_IDENT_KEY);
-                ArrayList<Survey> surveys = null;
+                List<Survey> surveys = null;
 
                 if (surveyId != null && surveyId.trim().length() > 0) {
                     surveys = getSurveyHeader(serverBase, surveyId, deviceId);
@@ -458,9 +460,9 @@ public class SurveyDownloadService extends Service {
      * @return - an arrayList of Survey objects with the id and version
      *         populated
      */
-    private ArrayList<Survey> checkForSurveys(String serverBase, String deviceId) {
+    private List<Survey> checkForSurveys(String serverBase, String deviceId) {
         String response = null;
-        ArrayList<Survey> surveys = new ArrayList<Survey>();
+        List<Survey> surveys = null;
         try {
             response = HttpUtil
                     .httpGet(serverBase
@@ -473,24 +475,7 @@ public class SurveyDownloadService extends Service {
                             + (deviceId != null ? DEV_ID_PARAM
                                     + URLEncoder.encode(deviceId, "UTF-8") : ""));
             if (response != null) {
-                StringTokenizer strTok = new StringTokenizer(response, "\n");
-                while (strTok.hasMoreTokens()) {
-                    String currentLine = strTok.nextToken();
-                    String[] touple = currentLine.split(",");
-                    if (touple.length < 5) {
-                        Log.e(TAG,
-                                "Survey list response is in an unrecognized format");
-                    } else {
-                        Survey temp = new Survey();
-                        temp.setId(touple[1]);
-                        temp.setName(touple[2]);
-                        temp.setLanguage(touple[3]);
-                        temp.setVersion(Double.parseDouble(touple[4]));
-                        temp.setType(ConstantUtil.FILE_SURVEY_LOCATION_TYPE);
-                        surveys.add(temp);
-
-                    }
-                }
+                surveys = new SurveyParser().parseList(response);
             }
         } catch (HttpException e) {
             Log.e(TAG, "Server returned an unexpected response", e);
@@ -499,6 +484,7 @@ public class SurveyDownloadService extends Service {
             Log.e(TAG, "Could not download survey", e);
             PersistentUncaughtExceptionHandler.recordException(e);
         }
+        
         return surveys;
     }
 

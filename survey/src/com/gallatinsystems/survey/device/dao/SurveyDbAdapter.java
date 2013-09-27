@@ -907,8 +907,8 @@ public class SurveyDbAdapter {
      * @param surveys
      * @return
      */
-    public ArrayList<Survey> checkSurveyVersions(ArrayList<Survey> surveys) {
-        ArrayList<Survey> outOfDateSurveys = new ArrayList<Survey>();
+    public List<Survey> checkSurveyVersions(List<Survey> surveys) {
+        List<Survey> outOfDateSurveys = new ArrayList<Survey>();
         for (int i = 0; i < surveys.size(); i++) {
             Cursor cursor = database.query(SURVEY_TABLE,
                     new String[] {

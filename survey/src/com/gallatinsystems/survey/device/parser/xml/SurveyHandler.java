@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package com.gallatinsystems.survey.device.xml;
+package com.gallatinsystems.survey.device.parser.xml;
 
 import java.util.ArrayList;
 

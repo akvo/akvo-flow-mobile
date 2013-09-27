@@ -20,7 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import com.gallatinsystems.survey.device.domain.Survey;
-import com.gallatinsystems.survey.device.xml.SaxSurveyParser;
+import com.gallatinsystems.survey.device.parser.xml.SaxSurveyParser;
 
 /**
  * utility to read survey xml files from wherever they may reside

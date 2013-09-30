@@ -31,7 +31,8 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
         String[] touple = response.split(",");
         int id = Integer.parseInt(touple[Attr.ID]);
         String name = touple[Attr.NAME];
-        return new SurveyGroup(id, name);
+        boolean monitored = Boolean.valueOf(touple[Attr.MONITORED]);
+        return new SurveyGroup(id, name, monitored);
     }
 
     @Override
@@ -54,8 +55,9 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
     }
 
     interface Attr {
-        int ID   = 0;
-        int NAME = 1;
+        int ID        = 0;
+        int NAME      = 1;
+        int MONITORED = 2;
     }
 
 }

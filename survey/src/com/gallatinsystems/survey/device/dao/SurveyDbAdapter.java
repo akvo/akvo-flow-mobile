@@ -97,8 +97,9 @@ public class SurveyDbAdapter {
     public static final String UUID_COL = "uuid";
     
     interface SurveyGroupAttrs {
-        String ID   = "id";
-        String NAME = "name";
+        String ID        = "id";
+        String NAME      = "name";
+        String MONITORED = "monitored";
     }
     
     interface SurveyedLocaleAttrs {
@@ -136,7 +137,7 @@ public class SurveyDbAdapter {
 
     private static final String TRANSMISSION_HISTORY_TABLE_CREATE = "create table transmission_history (_id integer primary key, survey_respondent_id integer not null, status text, filename text, trans_start_date long, delivered_date long);";
     
-    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (id integer primary key, name text);";
+    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (id integer primary key, name text, monitored int);";
     
     private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (id text primary key, latitude real, longitude real);";
 
@@ -238,6 +239,7 @@ public class SurveyDbAdapter {
                 case VER_TIME_TRACK:
                     // changes in version 77 - Point Updates
                     db.execSQL("ALTER TABLE survey ADD COLUMN survey_group_id INTEGER");
+                    db.execSQL(SURVEY_GROUP_TABLE_CREATE);
                     db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
                     version = VER_POINT_UPDATES;
             }
@@ -1812,6 +1814,7 @@ public class SurveyDbAdapter {
                 ContentValues values = new ContentValues();
                 values.put(SurveyGroupAttrs.ID, group.getId());
                 values.put(SurveyGroupAttrs.NAME, group.getName());
+                values.put(SurveyGroupAttrs.MONITORED, group.isMonitored() ? 1 : 0);
                 database.insert(SURVEY_GROUP_TABLE, null, values);
             }
             database.setTransactionSuccessful();
@@ -1831,7 +1834,8 @@ public class SurveyDbAdapter {
         SurveyGroup surveyGroup = null;
         if (cursor.moveToFirst()) {
             String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
-            surveyGroup = new SurveyGroup(id, name);
+            boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.MONITORED)) > 0;
+            surveyGroup = new SurveyGroup(id, name, monitored);
         }
         cursor.close();
         return surveyGroup;

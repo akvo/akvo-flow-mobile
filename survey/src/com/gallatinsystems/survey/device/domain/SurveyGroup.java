@@ -19,10 +19,12 @@ package com.gallatinsystems.survey.device.domain;
 public class SurveyGroup {
     private int mId;
     private String mName;
+    private boolean mMonitored;
 
-    public SurveyGroup (int id, String name) {
+    public SurveyGroup (int id, String name, boolean monitored) {
         mId = id;
         mName = name;
+        mMonitored = monitored;
     }
     
     public int getId() {
@@ -31,5 +33,9 @@ public class SurveyGroup {
     
     public String getName() {
         return mName;
+    }
+    
+    public boolean isMonitored() {
+        return mMonitored;
     }
 }

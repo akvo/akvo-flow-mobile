@@ -29,9 +29,14 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
     @Override
     public SurveyGroup parse(String response) {
         String[] touple = response.split(",");
+        if (touple.length <= Attr.NAME) {
+            return null;// Wrong format...
+        }
         int id = Integer.parseInt(touple[Attr.ID]);
         String name = touple[Attr.NAME];
-        boolean monitored = Boolean.valueOf(touple[Attr.MONITORED]);
+        boolean monitored = touple.length > Attr.MONITORED ? 
+                Boolean.valueOf(touple[Attr.MONITORED])
+                : false;
         return new SurveyGroup(id, name, monitored);
     }
 
@@ -42,7 +47,9 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
         while (strTok.hasMoreTokens()) {
             String currentLine = strTok.nextToken();
             SurveyGroup surveyGroup = parse(currentLine);
-            surveyGroupList.add(surveyGroup);
+            if (surveyGroup != null) {
+                surveyGroupList.add(surveyGroup);
+            }
         }
         
         return surveyGroupList;

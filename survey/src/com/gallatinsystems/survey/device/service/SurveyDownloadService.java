@@ -75,6 +75,7 @@ public class SurveyDownloadService extends Service {
 
     @SuppressWarnings("unused")
     private static final String NO_SURVEY = "No Survey Found";
+    private static final String SURVEY_GROUP_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveyGroupsDevice&devicePhoneNumber=";
     private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice&devicePhoneNumber=";
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
     private static final String DEV_ID_PARAM = "&devId=";
@@ -137,28 +138,18 @@ public class SurveyDownloadService extends Service {
                 databaseAdaptor = new SurveyDbAdapter(this);
                 databaseAdaptor.open();
                 
+                // Load preferences
+                final int precacheOption = getPrecacheOption();
+                final int surveyCheckOption = getSurveyCheckOption();
+                final String serverBase = getServerBase();
+                final String deviceId = getDeviceId();
+                
                 // First of all, sync Survey Groups
                 // TODO: We will need to somehow synchronize SurveyGroups for
                 // arbitrary survey downloads.
-                syncSurveyGroups();
+                syncSurveyGroups(serverBase, deviceId);
                 
-                int precacheOption = Integer.parseInt(databaseAdaptor
-                        .findPreference(ConstantUtil.PRECACHE_SETTING_KEY));
-                String serverBase = databaseAdaptor
-                        .findPreference(ConstantUtil.SERVER_SETTING_KEY);
-                if (serverBase != null && serverBase.trim().length() > 0) {
-                    serverBase = getResources().getStringArray(R.array.servers)[Integer
-                            .parseInt(serverBase)];
-                } else {
-                    serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
-                }
-
-                int surveyCheckOption = Integer.parseInt(databaseAdaptor
-                        .findPreference(ConstantUtil.CHECK_FOR_SURVEYS));
-                String deviceId = databaseAdaptor
-                        .findPreference(ConstantUtil.DEVICE_IDENT_KEY);
                 List<Survey> surveys = null;
-
                 if (surveyId != null && surveyId.trim().length() > 0) {
                     surveys = getSurveyHeader(serverBase, surveyId, deviceId);
                     if (surveys != null && surveys.size() > 0) {
@@ -232,8 +223,41 @@ public class SurveyDownloadService extends Service {
         stopSelf();
     }
     
-    private void syncSurveyGroups() throws IOException {
-        String response = "";// TODO: talk to the server...
+    private int getPrecacheOption() {
+        return Integer.parseInt(databaseAdaptor.findPreference(
+                ConstantUtil.PRECACHE_SETTING_KEY));
+    }
+    
+    private String getServerBase() {
+        String serverBase = databaseAdaptor
+                .findPreference(ConstantUtil.SERVER_SETTING_KEY);
+        if (serverBase != null && serverBase.trim().length() > 0) {
+            serverBase = getResources().getStringArray(R.array.servers)[Integer
+                    .parseInt(serverBase)];
+        } else {
+            serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
+        }
+        
+        return serverBase;
+    }
+    
+    private int getSurveyCheckOption() {
+        return Integer.parseInt(databaseAdaptor.findPreference(
+                ConstantUtil.CHECK_FOR_SURVEYS));
+    }
+    
+    private String getDeviceId() {
+        return databaseAdaptor.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+    }
+    
+    private void syncSurveyGroups(String serverBase, String deviceId) throws Exception {// TODO: Narrow exception scope!!!!!!!
+        String url = serverBase + SURVEY_GROUP_LIST_SERVICE_PATH
+                + URLEncoder.encode(StatusUtil.getPhoneNumber(this), "UTF-8")
+                + IMEI_PARAM + URLEncoder.encode(StatusUtil.getImei(this), "UTF-8")
+                + VERSION_PARAM + URLEncoder.encode(PlatformUtil.getVersionName(this), "UTF-8")
+                + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
+
+        String response = HttpUtil.httpGet(url);
         List<SurveyGroup> surveyGroups = new SurveyGroupParser().parseList(response);
         databaseAdaptor.addSurveyGroups(surveyGroups);
     }

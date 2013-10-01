@@ -194,7 +194,7 @@ public class SurveyDownloadService extends Service {
                 // now check if any previously downloaded surveys still need
                 // don't have their help media pre-cached
                 if (canDownload(precacheOption)) {
-                    surveys = databaseAdaptor.listSurveys(null);
+                    surveys = databaseAdaptor.listSurveys(SurveyGroup.ID_NONE);
                     if (surveys != null) {
                         for (int i = 0; i < surveys.size(); i++) {
                             if (!surveys.get(i).isHelpDownloaded()) {

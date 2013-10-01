@@ -17,6 +17,8 @@
 package com.gallatinsystems.survey.device.domain;
 
 public class SurveyGroup {
+    public static final int ID_NONE = -1;
+    
     private int mId;
     private String mName;
     private boolean mMonitored;

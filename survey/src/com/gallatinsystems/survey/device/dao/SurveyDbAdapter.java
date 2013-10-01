@@ -85,6 +85,7 @@ public class SurveyDbAdapter {
     public static final String MEDIA_SENT_COL = "media_sent_flag";
     public static final String HELP_DOWNLOADED_COL = "help_downloaded_flag";
     public static final String LANGUAGE_COL = "language";
+    public static final String SURVEY_GROUP_ID_COL = "survey_group_id";
     public static final String SAVED_DATE_COL = "saved_date";
     public static final String COUNTRY_COL = "country";
     public static final String PROP_NAME_COL = "property_names";
@@ -97,7 +98,7 @@ public class SurveyDbAdapter {
     public static final String UUID_COL = "uuid";
     
     interface SurveyGroupAttrs {
-        String ID        = "id";
+        String ID        = "_id";
         String NAME      = "name";
         String MONITORED = "monitored";
     }
@@ -137,7 +138,7 @@ public class SurveyDbAdapter {
 
     private static final String TRANSMISSION_HISTORY_TABLE_CREATE = "create table transmission_history (_id integer primary key, survey_respondent_id integer not null, status text, filename text, trans_start_date long, delivered_date long);";
     
-    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (id integer primary key, name text, monitored int);";
+    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (_id integer primary key on conflict replace, name text, monitored int);";
     
     private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (id text primary key, latitude real, longitude real);";
 
@@ -1003,6 +1004,7 @@ public class SurveyDbAdapter {
         updatedValues.put(DISP_NAME_COL, survey.getName());
         updatedValues.put(LANGUAGE_COL, survey.getLanguage() != null ? survey
                 .getLanguage().toLowerCase() : ConstantUtil.ENGLISH_CODE);
+        updatedValues.put(SURVEY_GROUP_ID_COL, survey.getSurveyGroupId());
         updatedValues.put(HELP_DOWNLOADED_COL, survey.isHelpDownloaded() ? "Y"
                 : "N");
         updatedValues.put(DELETED_COL, ConstantUtil.NOT_DELETED);
@@ -1116,15 +1118,15 @@ public class SurveyDbAdapter {
     /**
      * Lists all non-deleted surveys from the database
      */
-    public ArrayList<Survey> listSurveys(String language) {
+    public ArrayList<Survey> listSurveys(int surveyGroupId) {
         ArrayList<Survey> surveys = new ArrayList<Survey>();
         String whereClause = DELETED_COL + " <> ?";
         String[] whereParams = null;
-        if (language != null) {
-            whereClause += " and " + LANGUAGE_COL + " = ?";
+        if (surveyGroupId > 0) {
+            whereClause += " and " + SURVEY_GROUP_ID_COL + " = ?";
             whereParams = new String[] {
                     ConstantUtil.IS_DELETED,
-                    language.toLowerCase().trim()
+                    String.valueOf(surveyGroupId)
             };
         } else {
             whereParams = new String[] {

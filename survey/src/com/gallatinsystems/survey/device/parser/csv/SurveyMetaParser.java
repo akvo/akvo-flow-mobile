@@ -47,6 +47,10 @@ public class SurveyMetaParser implements FlowParser<Survey> {
         survey.setName(touple[Attr.NAME]);
         survey.setLanguage(touple[Attr.LANGUAGE]);
         survey.setVersion(Double.parseDouble(touple[Attr.VERSION]));
+        
+        //========>> HARD-CODED SURVEY GROUP <<===========//
+        survey.setSurveyGroupId(1083000);
+        
         survey.setType(ConstantUtil.FILE_SURVEY_LOCATION_TYPE);
         return survey;
     }

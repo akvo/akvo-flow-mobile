@@ -35,6 +35,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.SurveyedLocaleListActivity"
+            android:label="Select Record" />
+        <activity
             android:name=".activity.SurveyViewActivity"
             android:configChanges="keyboardHidden|orientation" />
         <activity android:name=".activity.ListUserActivity" />

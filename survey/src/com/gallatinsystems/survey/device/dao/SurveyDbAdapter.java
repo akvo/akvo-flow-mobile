@@ -98,16 +98,18 @@ public class SurveyDbAdapter {
     public static final String EXPORTED_FLAG_COL = "exported_flag";
     public static final String UUID_COL = "uuid";
     
-    interface SurveyGroupAttrs {
+    public interface SurveyGroupAttrs {
         String ID        = "_id";
         String NAME      = "name";
         String MONITORED = "monitored";
     }
     
-    interface SurveyedLocaleAttrs {
-        String ID        = "id";
-        String LATITUDE  = "latitude";
-        String LONGITUDE = "longitude";
+    public interface SurveyedLocaleAttrs {
+        String ID                 = "_id";
+        String SURVEYED_LOCALE_ID = "surveyed_locale_id";
+        String SURVEY_GROUP_ID    = "survey_group_id";
+        String LATITUDE           = "latitude";
+        String LONGITUDE          = "longitude";
     }
 
     private static final String TAG = "SurveyDbAdapter";
@@ -141,7 +143,8 @@ public class SurveyDbAdapter {
     
     private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (_id integer primary key on conflict replace, name text, monitored int);";
     
-    private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (id text primary key, latitude real, longitude real);";
+    private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (_id integer primay key autoincrement, surveyed_locale_id text, survey_group_id int, latitude real, longitude real, "
+    		+ " UNIQUE(surveyed_locale_id) ON CONFLICT REPLACE);";
 
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
@@ -1884,6 +1887,16 @@ public class SurveyDbAdapter {
         database.insert(SURVEYED_LOCALE_TABLE, null, values);
         
         return id;
+    }
+    
+    public Cursor getSurveyLocales(int surveyGroupId) {
+        Cursor cursor = database.query(SURVEYED_LOCALE_TABLE, 
+                new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE}, 
+                SurveyedLocaleAttrs.SURVEY_GROUP_ID + "= ?",
+                new String[] {String.valueOf(surveyGroupId)},
+                null, null, null);
+        
+        return cursor;
     }
     
     public SurveyedLocale getSurveyedLocale(String id) {

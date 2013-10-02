@@ -46,7 +46,8 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     private static final int ID_SURVEY_GROUP_LIST = 0;
     
     // Activity IDs
-    private static final int ID_ACTIVITY_USERS = 0;
+    private static final int ID_ACTIVITY_USERS       = 0;
+    private static final int ID_SURVEYED_LOCALE_LIST = 1;
     
     private static final String[] TABS = {"Surveys", "Responses"};// TODO: localized strings
     
@@ -285,6 +286,13 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 return true;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.locales_icon:
+                Intent intent = new Intent(this, SurveyedLocaleListActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt(SurveyedLocaleListActivity.EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
+                intent.putExtras(extras);
+                startActivityForResult(intent, ID_SURVEYED_LOCALE_LIST);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

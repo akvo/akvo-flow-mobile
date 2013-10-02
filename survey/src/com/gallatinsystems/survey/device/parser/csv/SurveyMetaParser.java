@@ -47,9 +47,7 @@ public class SurveyMetaParser implements FlowParser<Survey> {
         survey.setName(touple[Attr.NAME]);
         survey.setLanguage(touple[Attr.LANGUAGE]);
         survey.setVersion(Double.parseDouble(touple[Attr.VERSION]));
-        
-        //========>> HARD-CODED SURVEY GROUP <<===========//
-        survey.setSurveyGroupId(1083000);
+        survey.setSurveyGroupId(Integer.parseInt(touple[Attr.SURVEY_GROUP]));
         
         survey.setType(ConstantUtil.FILE_SURVEY_LOCATION_TYPE);
         return survey;
@@ -77,13 +75,14 @@ public class SurveyMetaParser implements FlowParser<Survey> {
     }
 
     interface Attr {
-        int DEVICE   = 0;// Unused attribute. Should not be sent
-        int ID       = 1;
-        int NAME     = 2;
-        int LANGUAGE = 3;
-        int VERSION  = 4;
+        int DEVICE       = 0;// Unused attribute. Should not be sent
+        int ID           = 1;
+        int NAME         = 2;
+        int LANGUAGE     = 3;
+        int VERSION      = 4;
+        int SURVEY_GROUP = 5;
         
-        int COUNT    = 5;// Length of column array
+        int COUNT    = 6;// Length of column array
     }
 
 }

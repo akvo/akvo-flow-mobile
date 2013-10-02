@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.util.ArrayUtil;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
@@ -176,7 +177,7 @@ public class HomeMenuViewAdapter extends BaseAdapter {
     private ArrayList<Survey> fetchSurveys(Context c) {
         SurveyDbAdapter database = new SurveyDbAdapter(c);
         database.open();
-        surveys = database.listSurveys(null);
+        surveys = database.listSurveys(SurveyGroup.ID_NONE);
         database.close();
         return surveys;
     }

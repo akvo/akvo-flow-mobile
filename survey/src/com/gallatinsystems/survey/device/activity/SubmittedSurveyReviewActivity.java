@@ -104,7 +104,7 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
         }
         dataCursor = databaseAdapter.listSurveyRespondent(ConstantUtil.SUBMITTED_STATUS, true);
 
-        mSurveyAdapter = new SubmittedSurveyReviewCursorAdaptor(this, dataCursor);
+        mSurveyAdapter = new SubmittedSurveyReviewCursorAdaptor(this);
         setListAdapter(mSurveyAdapter);
 
         String label = null;

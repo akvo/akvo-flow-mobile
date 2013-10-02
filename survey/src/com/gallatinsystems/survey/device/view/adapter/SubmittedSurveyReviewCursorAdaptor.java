@@ -52,8 +52,8 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
 
     private SurveyDbAdapter databaseAdapter;
 
-    public SubmittedSurveyReviewCursorAdaptor(Context context, Cursor c) {
-        super(context, c);
+    public SubmittedSurveyReviewCursorAdaptor(Context context) {
+        super(context, null, false);
         databaseAdapter = new SurveyDbAdapter(context);
     }
 

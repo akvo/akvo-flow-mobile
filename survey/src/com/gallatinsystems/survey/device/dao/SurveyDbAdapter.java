@@ -1826,18 +1826,46 @@ public class SurveyDbAdapter {
         
     }
     
-    public SurveyGroup getSurveyGroup(int id) {
+    private SurveyGroup getSurveyGroup(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.ID));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
+        boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.MONITORED)) > 0;
+        return new SurveyGroup(id, name, monitored);
+    }
+    
+    public List<SurveyGroup> getSurveyGroups() {
         Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
-                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME}, 
-                SurveyGroupAttrs.ID + "= ?",
-                new String[] {String.valueOf(id)},
+                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.MONITORED}, 
+                null, null, null, null, null);
+        
+        List<SurveyGroup> surveyGroups = new ArrayList<SurveyGroup>();
+        if (cursor.moveToFirst()) {
+            do {
+                SurveyGroup surveyGroup = getSurveyGroup(cursor);
+                surveyGroups.add(surveyGroup);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return surveyGroups;
+    }
+    
+    public SurveyGroup getSurveyGroup(int id) {
+        String where = null;
+        String[] selectionArgs = null;
+        
+        if (id != SurveyGroup.ID_NONE) {
+            where = SurveyGroupAttrs.ID + "= ?";
+            selectionArgs = new String[] {String.valueOf(id)};
+        }
+        
+        Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
+                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.MONITORED}, 
+                where, selectionArgs,
                 null, null, null);
         
         SurveyGroup surveyGroup = null;
         if (cursor.moveToFirst()) {
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
-            boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.MONITORED)) > 0;
-            surveyGroup = new SurveyGroup(id, name, monitored);
+            surveyGroup = getSurveyGroup(cursor);
         }
         cursor.close();
         return surveyGroup;

@@ -86,6 +86,7 @@ public class SurveyDbAdapter {
     public static final String HELP_DOWNLOADED_COL = "help_downloaded_flag";
     public static final String LANGUAGE_COL = "language";
     public static final String SURVEY_GROUP_ID_COL = "survey_group_id";
+    public static final String SURVEYED_LOCALE_ID_COL = "surveyed_locale_id";
     public static final String SAVED_DATE_COL = "saved_date";
     public static final String COUNTRY_COL = "country";
     public static final String PROP_NAME_COL = "property_names";
@@ -121,7 +122,7 @@ public class SurveyDbAdapter {
 
     private static final String SURVEY_RESPONDENT_CREATE = "create table survey_respondent (_id integer primary key autoincrement, "
             + "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, "
-            + "status text, saved_date long, exported_flag text, uuid text, survey_start integer);";
+            + "status text, saved_date long, exported_flag text, uuid text, survey_start integer, surveyed_locale_id text);";
 
     private static final String SURVEY_RESPONSE_CREATE = "create table survey_response (survey_response_id integer primary key autoincrement, "
             + " survey_respondent_id integer not null, question_id text not null, answer_value text not null, answer_type text not null, include_flag text not null, scored_val text, strength text);";
@@ -240,6 +241,7 @@ public class SurveyDbAdapter {
                 case VER_TIME_TRACK:
                     // changes in version 77 - Point Updates
                     db.execSQL("ALTER TABLE survey ADD COLUMN survey_group_id INTEGER");
+                    db.execSQL("ALTER TABLE survey_respondent ADD COLUMN surveyed_locale_id TEXT");
                     db.execSQL(SURVEY_GROUP_TABLE_CREATE);
                     db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
                     version = VER_POINT_UPDATES;

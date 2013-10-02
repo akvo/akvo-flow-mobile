@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="10" />
+        android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -25,8 +25,9 @@
         android:icon="@drawable/acrlogo"
         android:label="@string/app_name" >
         <activity
-            android:name=".activity.SurveyHomeActivity"
-            android:label="@string/app_name" >
+            android:name=".activity.SurveyGroupActivity"
+            android:label="@string/app_name"
+            android:theme="@style/FieldSurveyTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

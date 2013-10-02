@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:flowapp="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_menu_preferences"
+        android:orderInCategory="101"
+        android:title="@string/settingslabel"
+        flowapp:showAsAction="always"/>
+    
+    <item
+        android:id="@+id/users"
+        android:icon="@drawable/ic_menu_allfriends"
+        android:orderInCategory="100"
+        android:title="@string/userlabel"
+        flowapp:showAsAction="always"/>
+
+</menu>

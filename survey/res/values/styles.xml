@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <style name="FieldSurveyTheme" parent="@style/Theme.AppCompat">
+        <item name="vpiTabPageIndicatorStyle">@style/FieldSurveyTabIndicator</item>
+    </style>
+    
+    <style name="FieldSurveyTabIndicator" parent="@style/Widget.TabPageIndicator">
+        <item name="android:textColorHint">@android:color/white</item>
+    </style>
+    
+</resources>

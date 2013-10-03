@@ -3,9 +3,11 @@ package com.gallatinsystems.survey.device.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -87,6 +89,19 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         
         init();// No external storage will finish the application
         display();// Configure navigation and display surveys
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerReceiver(mSurveysSyncReceiver,
+                new IntentFilter(getString(R.string.action_surveys_sync)));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mSurveysSyncReceiver);
     }
     
     @Override
@@ -313,5 +328,17 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    /**
+     * BroadcastReceiver to notify of surveys synchronisation. This should be
+     * fired from SurveyDownloadService.
+     */
+    private BroadcastReceiver mSurveysSyncReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
+            getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, SurveyGroupActivity.this);
+        }
+    };
     
 }

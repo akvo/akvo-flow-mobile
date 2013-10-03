@@ -231,9 +231,16 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         }
         
         public void onSurveyGroupChanged() {
-            Fragment surveyListFragment = getSupportFragmentManager().findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
-            if (surveyListFragment != null)
-            ((SurveyListFragment)surveyListFragment).setSurveyGroup(getActiveSurveyGroupId());
+            SurveyListFragment surveyListFragment = (SurveyListFragment) getSupportFragmentManager().
+                    findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
+            ResponseListFragment responseListFragment = (ResponseListFragment) getSupportFragmentManager().
+                    findFragmentByTag(getFragmentTag(POSITION_RESPONSES));
+            if (surveyListFragment != null) {
+                surveyListFragment.setSurveyGroup(getActiveSurveyGroupId());
+            }
+            if (responseListFragment != null) {
+                responseListFragment.setSurveyGroup(getActiveSurveyGroupId());
+            }
         }
 
         @Override

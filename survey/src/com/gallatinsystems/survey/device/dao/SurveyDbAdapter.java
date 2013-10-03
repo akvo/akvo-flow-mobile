@@ -1958,5 +1958,20 @@ public class SurveyDbAdapter {
         return surveyedLocale;
     }
     */
+    
+    public Cursor getSurveyInstances(int surveyGroupId) {
+        final String sortBy = 
+            "case when " + DELIVERED_DATE_COL
+                    + " is null then 0 else 1 end, " + DELIVERED_DATE_COL
+                    + " desc";
+        Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
+                RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
+                SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL, SUBMITTED_DATE_COL,
+                DELIVERED_DATE_COL, UUID_COL},
+                SURVEY_TABLE + "." + SURVEY_GROUP_ID_COL + "= ?",
+                new String[]{String.valueOf(surveyGroupId)},
+                null, null, sortBy);
+        return cursor;
+    }
 
 }

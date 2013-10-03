@@ -217,7 +217,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_INSTANCE_LIST:
-                return new SurveyInstanceLoader(getActivity(), mDatabase, 0);
+                return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroupId);
         }
         return null;
     }

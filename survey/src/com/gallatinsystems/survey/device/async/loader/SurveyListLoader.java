@@ -11,8 +11,8 @@ import com.gallatinsystems.survey.device.domain.Survey;
 public class SurveyListLoader extends DataLoader<List<Survey>> {
     private int mSurveyGroupId;
     
-    public SurveyListLoader(Context context, int surveyGroupId) {
-        super(context);
+    public SurveyListLoader(Context context, SurveyDbAdapter db, int surveyGroupId) {
+        super(context, db);
         mSurveyGroupId = surveyGroupId;
     }
 

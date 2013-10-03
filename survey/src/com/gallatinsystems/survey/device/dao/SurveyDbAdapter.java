@@ -120,7 +120,7 @@ public class SurveyDbAdapter {
      * Database creation sql statement
      */
     private static final String SURVEY_TABLE_CREATE = "create table survey (_id integer primary key, display_name text not null, "
-            + "version real, type text, location text, filename text, language, help_downloaded_flag text, deleted_flag text, survey_group_id int);";
+            + "version real, type text, location text, filename text, language, help_downloaded_flag text, deleted_flag text, survey_group_id integer);";
 
     private static final String SURVEY_RESPONDENT_CREATE = "create table survey_respondent (_id integer primary key autoincrement, "
             + "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, "
@@ -141,9 +141,9 @@ public class SurveyDbAdapter {
 
     private static final String TRANSMISSION_HISTORY_TABLE_CREATE = "create table transmission_history (_id integer primary key, survey_respondent_id integer not null, status text, filename text, trans_start_date long, delivered_date long);";
     
-    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (_id integer primary key on conflict replace, name text, monitored int);";
+    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (_id integer primary key on conflict replace, name text, monitored integer);";
     
-    private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (_id integer primay key autoincrement, surveyed_locale_id text, survey_group_id int, latitude real, longitude real, "
+    private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (_id integer primary key autoincrement, surveyed_locale_id text, survey_group_id integer, latitude real, longitude real, "
     		+ " UNIQUE(surveyed_locale_id) ON CONFLICT REPLACE);";
 
     private static final String[] DEFAULT_INSERTS = new String[] {
@@ -1831,18 +1831,21 @@ public class SurveyDbAdapter {
         
     }
     
-    private SurveyGroup getSurveyGroup(Cursor cursor) {
+    public static SurveyGroup getSurveyGroup(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.MONITORED)) > 0;
         return new SurveyGroup(id, name, monitored);
     }
     
-    public List<SurveyGroup> getSurveyGroups() {
+    public Cursor getSurveyGroups() {
         Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
                 new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.MONITORED}, 
                 null, null, null, null, null);
         
+        return cursor;
+        
+        /*
         List<SurveyGroup> surveyGroups = new ArrayList<SurveyGroup>();
         if (cursor.moveToFirst()) {
             do {
@@ -1852,8 +1855,36 @@ public class SurveyDbAdapter {
         }
         cursor.close();
         return surveyGroups;
+        */
     }
     
+    public Cursor getSurveyGroup(int id) {
+        String where = null;
+        String[] selectionArgs = null;
+        
+        if (id != SurveyGroup.ID_NONE) {
+            where = SurveyGroupAttrs.ID + "= ?";
+            selectionArgs = new String[] {String.valueOf(id)};
+        }
+        
+        Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
+                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.MONITORED}, 
+                where, selectionArgs,
+                null, null, null);
+        
+        return cursor;
+        
+        /*
+        SurveyGroup surveyGroup = null;
+        if (cursor.moveToFirst()) {
+            surveyGroup = getSurveyGroup(cursor);
+        }
+        cursor.close();
+        return surveyGroup;
+        */
+    }
+    
+    /*
     public SurveyGroup getSurveyGroup(int id) {
         String where = null;
         String[] selectionArgs = null;
@@ -1875,13 +1906,15 @@ public class SurveyDbAdapter {
         cursor.close();
         return surveyGroup;
     }
+    */
     
-    public String createSurveyedLocale() {
+    public String createSurveyedLocale(int surveyGroupId) {
         String id = UUID.randomUUID().toString();
         double lat = 0.0d;// TODO
         double lon = 0.0d;// TODO
         ContentValues values = new ContentValues();
-        values.put(SurveyedLocaleAttrs.ID, id);
+        values.put(SurveyedLocaleAttrs.SURVEYED_LOCALE_ID, id);
+        values.put(SurveyedLocaleAttrs.SURVEY_GROUP_ID, surveyGroupId);
         values.put(SurveyedLocaleAttrs.LATITUDE, lat);
         values.put(SurveyedLocaleAttrs.LONGITUDE, lon);
         database.insert(SURVEYED_LOCALE_TABLE, null, values);
@@ -1889,16 +1922,25 @@ public class SurveyDbAdapter {
         return id;
     }
     
-    public Cursor getSurveyLocales(int surveyGroupId) {
+    public static SurveyedLocale getSurveyedLocale(Cursor cursor) {
+        String id = cursor.getString(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.SURVEYED_LOCALE_ID));
+        double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LATITUDE));
+        double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LONGITUDE));
+        return new SurveyedLocale(id, latitude, longitude);
+    }
+    
+    public Cursor getSurveyedLocales(int surveyGroupId) {
         Cursor cursor = database.query(SURVEYED_LOCALE_TABLE, 
-                new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE}, 
-                SurveyedLocaleAttrs.SURVEY_GROUP_ID + "= ?",
+                new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.SURVEYED_LOCALE_ID, SurveyedLocaleAttrs.SURVEY_GROUP_ID, 
+                        SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE}, 
+                SurveyedLocaleAttrs.SURVEY_GROUP_ID + " = ?",
                 new String[] {String.valueOf(surveyGroupId)},
                 null, null, null);
         
         return cursor;
     }
     
+    /*
     public SurveyedLocale getSurveyedLocale(String id) {
         Cursor cursor = database.query(SURVEYED_LOCALE_TABLE, 
                 new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE}, 
@@ -1915,5 +1957,6 @@ public class SurveyDbAdapter {
         cursor.close();
         return surveyedLocale;
     }
+    */
 
 }

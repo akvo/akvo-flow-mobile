@@ -22,12 +22,12 @@ import android.widget.Toast;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyListLoader;
-import com.gallatinsystems.survey.device.async.loader.base.AsyncResult;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.service.BootstrapService;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
-public class SurveyListFragment extends ListFragment implements LoaderCallbacks<AsyncResult<List<Survey>>>, OnItemClickListener {
+public class SurveyListFragment extends ListFragment implements LoaderCallbacks<List<Survey>>, OnItemClickListener {
     private static final String TAG = SurveyListFragment.class.getSimpleName();
     private static final String ARG_SURVEY_GROUP = "survey_group";
     private static final int ID_SURVEY_LIST = 0;
@@ -35,6 +35,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     private String mUserId;
     private int mSurveyGroupId;
     private SurveyAdapter mAdapter;
+    
+    private SurveyDbAdapter mDatabase;
     
     public static SurveyListFragment instantiate(int surveyGroupId) {
         SurveyListFragment fragment = new SurveyListFragment();
@@ -51,9 +53,17 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     }
     
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDatabase.close();
+    }
+    
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //setRetainInstance(true);
+        mDatabase = new SurveyDbAdapter(getActivity());
+        mDatabase.open();
 
         if(mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity(), new ArrayList<Survey>());
@@ -114,24 +124,16 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     }
 
     @Override
-    public Loader<AsyncResult<List<Survey>>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<Survey>> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_LIST:
-                return new SurveyListLoader(getActivity(), mSurveyGroupId);
+                return new SurveyListLoader(getActivity(), mDatabase, mSurveyGroupId);
         }
         return null;
     }
 
     @Override
-    public void onLoadFinished(Loader<AsyncResult<List<Survey>>> loader,
-            AsyncResult<List<Survey>> result) {
-        Exception e = result.getException();
-        if (e != null) {
-            Log.e(TAG, e.getMessage());
-            return;
-        }
-        
-        List<Survey> surveys = result.getData();
+    public void onLoadFinished(Loader<List<Survey>> loader, List<Survey> surveys) {
         if (surveys != null) {
             mAdapter.clear();
             for (Survey survey : surveys) {
@@ -143,7 +145,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     }
 
     @Override
-    public void onLoaderReset(Loader<AsyncResult<List<Survey>>> loader) {
+    public void onLoaderReset(Loader<List<Survey>> loader) {
         loader.reset();
     }
     

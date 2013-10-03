@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,8 +24,9 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.async.loader.SurveyGroupListLoader;
-import com.gallatinsystems.survey.device.async.loader.base.AsyncResult;
+import com.gallatinsystems.survey.device.async.loader.SurveyGroupLoader;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyGroupAttrs;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.fragment.ResponseListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyListFragment;
@@ -39,7 +41,7 @@ import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.viewpagerindicator.TabPageIndicator;
 
 public class SurveyGroupActivity extends ActionBarActivity implements 
-            LoaderCallbacks<AsyncResult<List<SurveyGroup>>>, OnNavigationListener {
+            LoaderCallbacks<Cursor>, OnNavigationListener {
     private static final String TAG = SurveyGroupActivity.class.getSimpleName();
     
     // Loader IDs
@@ -62,6 +64,8 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     private TabsAdapter mAdapter;
     private TextView mUserTextView;
     
+    private SurveyDbAdapter mDatabase;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,12 +79,20 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         TabPageIndicator indicator = (TabPageIndicator) findViewById(R.id.indicator);
         indicator.setViewPager(mPager);
         
+        mDatabase = new SurveyDbAdapter(this);
+        mDatabase.open();
         mSurveyGroups = new ArrayList<SurveyGroup>();
         
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         
         init();// No external storage will finish the application
         display();// Configure navigation and display surveys
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDatabase.close();
     }
     
     private void init() {
@@ -233,38 +245,41 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     // ==================================== //
 
     @Override
-    public Loader<AsyncResult<List<SurveyGroup>>> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_GROUP_LIST:
-                return new SurveyGroupListLoader(this);
+                return new SurveyGroupLoader(this, mDatabase);
         }
         return null;
     }
 
     @Override
-    public void onLoadFinished(Loader<AsyncResult<List<SurveyGroup>>> loader,
-            AsyncResult<List<SurveyGroup>> result) {
-        Exception e = result.getException();
-        if (e != null) {
-            Log.e(TAG, e.getMessage());
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null) {
+            Log.e(TAG, "onFinished() - Loader returned no data");
             return;
         }
         
         switch (loader.getId()) {
             case ID_SURVEY_GROUP_LIST:
-                if (result.getData() != null) {
-                    mSurveyGroups = result.getData();
-                    display();
-                } else {
-                    Log.e(TAG, "onFinished() - Loader returned no data");
+                mSurveyGroups.clear();
+                if (cursor.moveToFirst()) {
+                    do {
+                        int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.ID));
+                        String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
+                        boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.MONITORED)) > 0;
+                        SurveyGroup surveyGroup = new SurveyGroup(id, name, monitored);
+                        mSurveyGroups.add(surveyGroup);
+                    } while (cursor.moveToNext());
                 }
+                cursor.close();
+                display();
                 break;
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<AsyncResult<List<SurveyGroup>>> loader) {
-        loader.reset();
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
     // ==================================== //

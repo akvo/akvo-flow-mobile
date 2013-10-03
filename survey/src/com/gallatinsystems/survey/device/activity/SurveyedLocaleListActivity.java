@@ -7,21 +7,33 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.async.loader.SurveyInstanceLoader;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
+import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 
 
 public class SurveyedLocaleListActivity extends ActionBarActivity implements LoaderCallbacks<Cursor> {
+    public static final String TAG = SurveyedLocaleListActivity.class.getSimpleName();
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
+    
+    private int mSurveyGroupId;
+    
+    private ListView mListView;
+    private CursorAdapter mAdapter;
+    
+    private SurveyDbAdapter mDatabase;
     
     // Loader id
     private static final int ID_SURVEYED_LOCALE_LIST = 0;
@@ -30,6 +42,26 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.surveyed_locale_list_activity);
+        
+        mSurveyGroupId = getIntent().getIntExtra(EXTRA_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        
+        mDatabase = new SurveyDbAdapter(this);
+        mDatabase.open();
+        mAdapter = new SurveyedLocaleListAdapter(this);
+        mListView = (ListView) findViewById(R.id.listview);
+        mListView.setAdapter(mAdapter);
+        
+        display();
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDatabase.close();
+    }
+    
+    private void display() {
+        getSupportLoaderManager().restartLoader(ID_SURVEYED_LOCALE_LIST, null, this);
     }
     
     @Override
@@ -42,8 +74,10 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_record:
-                // TODO
-                Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                SurveyDbAdapter db = new SurveyDbAdapter(this).open();
+                db.createSurveyedLocale(mSurveyGroupId);
+                db.close();
+                display();
                 return true;
             case R.id.map_results:
                 // TODO
@@ -56,21 +90,20 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements Loa
     
     class SurveyedLocaleListAdapter extends CursorAdapter {
 
-        public SurveyedLocaleListAdapter(Context context, Cursor c) {
-            super(context, c, false);
+        public SurveyedLocaleListAdapter(Context context) {
+            super(context, null, false);
         }
 
         @Override
         public void bindView(View view, Context context, Cursor c) {
             TextView tv = (TextView) view.findViewById(R.id.text1);
-            final String localeId = c.getString(c.getColumnIndexOrThrow(
-                    SurveyedLocaleAttrs.SURVEYED_LOCALE_ID));
-            tv.setText(localeId);
+            final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
+            tv.setText(surveyedLocale.getId());
         }
 
         @Override
         public View newView(Context context, Cursor c, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(getParent());
+            LayoutInflater inflater = LayoutInflater.from(SurveyedLocaleListActivity.this);
             return inflater.inflate(R.layout.surveyed_locale_item, null);
         }
         
@@ -80,16 +113,21 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements Loa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEYED_LOCALE_LIST:
-                return new SurveyInstanceLoader(this, 0);// TODO: pass survey group
+                return new SurveyedLocaleLoader(this, mDatabase, mSurveyGroupId);
         }
         return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null) {
+            Log.e(TAG, "onFinished() - Loader returned no data");
+            return;
+        }
+        
         switch (loader.getId()) {
             case ID_SURVEYED_LOCALE_LIST:
-                //mAdapter.changeCursor(cursor);
+                mAdapter.changeCursor(cursor);
                 break;
         }
     }

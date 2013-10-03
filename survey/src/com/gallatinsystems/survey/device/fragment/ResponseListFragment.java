@@ -50,6 +50,8 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private int mSurveyGroupId;// TODO: Use these filters
     private SubmittedSurveyReviewCursorAdaptor mAdapter;
     
+    private SurveyDbAdapter mDatabase;
+    
     private Handler mHandler = new Handler();
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
@@ -76,6 +78,12 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         mHandler.removeCallbacks(mUpdateTimeTask);
     }
     
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDatabase.close();
+    }
+    
     private void refresh() {
         getLoaderManager().restartLoader(ID_SURVEY_INSTANCE_LIST, null, 
                 ResponseListFragment.this);
@@ -93,6 +101,8 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //setRetainInstance(true);
+        mDatabase = new SurveyDbAdapter(getActivity());
+        mDatabase.open();
 
         if(mAdapter == null) {
             mAdapter = new SubmittedSurveyReviewCursorAdaptor(getActivity());// Cursor Adapter
@@ -207,7 +217,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_INSTANCE_LIST:
-                return new SurveyInstanceLoader(getActivity(), 0);
+                return new SurveyInstanceLoader(getActivity(), mDatabase, 0);
         }
         return null;
     }

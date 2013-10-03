@@ -36,7 +36,8 @@
         </activity>
         <activity
             android:name=".activity.SurveyedLocaleListActivity"
-            android:label="Select Record" />
+            android:label="Select Record"
+            android:theme="@style/FieldSurveyTheme" />
         <activity
             android:name=".activity.SurveyViewActivity"
             android:configChanges="keyboardHidden|orientation" />

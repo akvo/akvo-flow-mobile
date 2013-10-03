@@ -78,6 +78,8 @@ public class SurveyHandler extends DefaultHandler {
     private static final String STRENGTH_MIN = "strengthMin";
     private static final String STRENGTH_MAX = "strengthMax";
     private static final String VERSION = "version";
+    private static final String LOCALE_NAME = "localeNameFlag";
+    private static final String LOCALE_LOCATION = "localeLocationFlag";
 
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
@@ -288,6 +290,16 @@ public class SurveyHandler extends DefaultHandler {
                 }
             } else {
                 currentQuestion.setUseStrength(false);
+            }
+            
+            // Locale Flags
+            if (attributes.getValue(LOCALE_NAME) != null) {
+                currentQuestion.setIsLocaleName(Boolean.parseBoolean(attributes
+                        .getValue(LOCALE_NAME)));
+            }
+            if (attributes.getValue(LOCALE_LOCATION) != null) {
+                currentQuestion.setIsLocaleLocation(Boolean.parseBoolean(attributes
+                        .getValue(LOCALE_LOCATION)));
             }
 
         } else if (localName.equalsIgnoreCase(OPTIONS)) {

@@ -53,6 +53,24 @@ public class Question {
     private boolean useStrength;
     private int strengthMin;
     private int strengthMax;
+    private boolean localeName = false;
+    private boolean localeLocation = false;
+    
+    public void setIsLocaleName(boolean localeName) {
+        this.localeName = localeName;
+    }
+    
+    public void setIsLocaleLocation(boolean localeLocation) {
+        this.localeLocation = localeLocation;
+    }
+    
+    public boolean isLocaleName() {
+        return localeName;
+    }
+    
+    public boolean isLocaleLocation() {
+        return localeLocation;
+    }
 
     public void setUseStrength(boolean val) {
         useStrength = val;

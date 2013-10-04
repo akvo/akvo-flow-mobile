@@ -599,6 +599,7 @@ public class DataSyncService extends Service {
                 int strength_col = data.getColumnIndexOrThrow(SurveyDbAdapter.STRENGTH_COL);
                 int uuid_col = data.getColumnIndexOrThrow(SurveyDbAdapter.UUID_COL);
                 int survey_start_col = data.getColumnIndexOrThrow(SurveyDbAdapter.SURVEY_START_COL);
+                int localeId_col = data.getColumnIndexOrThrow(SurveyDbAdapter.SURVEYED_LOCALE_ID_COL);
 
                 do {
                     // Sanitize answer value. No newlines or tabs!
@@ -631,6 +632,7 @@ public class DataSyncService extends Service {
                     buf.append(DELIMITER).append(neverNull(data.getString(strength_col)));
                     buf.append(DELIMITER).append(data.getString(uuid_col));
                     buf.append(DELIMITER).append(surveyal_time);
+                    buf.append(DELIMITER).append(data.getString(localeId_col));
                     buf.append("\n");
                     
                     if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)

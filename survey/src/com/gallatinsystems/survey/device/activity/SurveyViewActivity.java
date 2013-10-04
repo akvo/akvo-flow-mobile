@@ -135,6 +135,9 @@ public class SurveyViewActivity extends TabActivity implements
     private PropertyUtil props;
     private HashSet<String> missingQuestions;
     private boolean hasAddedTabs;
+    
+    private int mSurveyGroupId;
+    private String mSurveyedLocaleId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -201,6 +204,14 @@ public class SurveyViewActivity extends TabActivity implements
             respondentId = savedInstanceState != null ? savedInstanceState
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
         }
+        
+        mSurveyGroupId = extras != null ? 
+                extras.getInt(ConstantUtil.SURVEY_GROUP_ID)
+                : null;
+
+        mSurveyedLocaleId = extras != null ? 
+                extras.getString(ConstantUtil.SURVEYED_LOCALE_ID)
+                : null;
 
         if (eventQuestionSource == null && savedInstanceState != null) {
             eventSourceQuestionId = savedInstanceState
@@ -1045,10 +1056,10 @@ public class SurveyViewActivity extends TabActivity implements
      * resets the question view.
      */
     private void startNewSurvey() {
-        // create a new response object so we're ready for the
-        // next instance
-        setRespondentId(databaseAdapter
-                .createSurveyRespondent(surveyId, userId));
+        // create a new response object so we're ready for the next instance
+        // Create new surveyed locale
+        mSurveyedLocaleId = databaseAdapter.createSurveyedLocale(mSurveyGroupId);
+        setRespondentId(databaseAdapter.createSurveyRespondent(surveyId, userId, mSurveyedLocaleId));
         resetAllQuestions();
         spaceLeftOnCard();
     }
@@ -1152,7 +1163,7 @@ public class SurveyViewActivity extends TabActivity implements
 
             if (respondentId == null) {
                 respondentId = databaseAdapter.createOrLoadSurveyRespondent(
-                        surveyId.toString(), userId.toString());
+                        surveyId.toString(), userId.toString(), mSurveyGroupId, mSurveyedLocaleId);
             }
 
             if (survey != null && !hasAddedTabs) {

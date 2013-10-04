@@ -95,6 +95,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 Intent i = new Intent(getActivity(), SurveyViewActivity.class);
                 i.putExtra(ConstantUtil.USER_ID_KEY, mUserId);
                 i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
+                i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
+                i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mLocaleId);
                 startActivity(i);
             } else {
                 Toast.makeText(getActivity(), R.string.pleasewaitforbootstrap, 

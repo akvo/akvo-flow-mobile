@@ -711,7 +711,7 @@ public class SurveyDbAdapter {
      * @param surveyId
      * @return
      */
-    public long createOrLoadSurveyRespondent(String surveyId, String userId) {
+    public long createOrLoadSurveyRespondent(String surveyId, String userId, int surveyGroupId, String surveyedLocaleId) {
         Cursor results = database.query(RESPONDENT_TABLE, new String[] {
             "max(" + PK_ID_COL + ")"
         }, SUBMITTED_FLAG_COL + "='false' and "
@@ -727,7 +727,10 @@ public class SurveyDbAdapter {
             results.close();
         }
         if (id <= 0) {
-            id = createSurveyRespondent(surveyId, userId);
+            if (surveyedLocaleId == null) {
+                surveyedLocaleId = createSurveyedLocale(surveyGroupId);
+            }
+            id = createSurveyRespondent(surveyId, userId, surveyedLocaleId);
         }
         return id;
     }
@@ -738,7 +741,7 @@ public class SurveyDbAdapter {
      * @param surveyId
      * @return
      */
-    public long createSurveyRespondent(String surveyId, String userId) {
+    public long createSurveyRespondent(String surveyId, String userId, String surveyedLocaleId) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(SURVEY_FK_COL, surveyId);
         initialValues.put(SUBMITTED_FLAG_COL, "false");
@@ -747,6 +750,7 @@ public class SurveyDbAdapter {
         initialValues.put(STATUS_COL, ConstantUtil.CURRENT_STATUS);
         initialValues.put(UUID_COL, UUID.randomUUID().toString());
         initialValues.put(SURVEY_START_COL, System.currentTimeMillis());
+        initialValues.put(SURVEYED_LOCALE_ID_COL, surveyedLocaleId);
         return database.insert(RESPONDENT_TABLE, null, initialValues);
     }
 

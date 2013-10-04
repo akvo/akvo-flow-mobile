@@ -225,8 +225,10 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 break;
             case ID_SURVEYED_LOCALE_LIST:
                 if (resultCode == RESULT_OK) {
-                    mLocaleId = intent.getStringExtra(SurveyedLocaleListActivity.EXTRA_SURVEYED_LOCALE_ID);
-                    mLocaleTextView.setText("Record: " + mLocaleId != null ? mLocaleId : "New Record");
+                    mLocaleId = intent != null ? 
+                            intent.getStringExtra(SurveyedLocaleListActivity.EXTRA_SURVEYED_LOCALE_ID)
+                            : null;
+                    displayRecord();
                     mAdapter.onSurveyedLocaleChange();
                 }
             break;

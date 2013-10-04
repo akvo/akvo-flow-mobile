@@ -7,14 +7,14 @@
         android:icon="@drawable/ic_menu_preferences"
         android:orderInCategory="102"
         android:title="@string/settingslabel"
-        flowapp:showAsAction="always"/>
+        flowapp:showAsAction="ifRoom"/>
     
     <item
         android:id="@+id/users"
         android:icon="@drawable/ic_menu_allfriends"
         android:orderInCategory="101"
         android:title="@string/userlabel"
-        flowapp:showAsAction="always"/>
+        flowapp:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/locales_icon"

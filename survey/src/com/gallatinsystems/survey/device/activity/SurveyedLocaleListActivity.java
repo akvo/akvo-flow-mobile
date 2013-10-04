@@ -80,10 +80,14 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_record:
+                /*
                 SurveyDbAdapter db = new SurveyDbAdapter(this).open();
                 db.createSurveyedLocale(mSurveyGroupId);
                 db.close();
                 display();
+                */
+                setResult(RESULT_OK);// Return null locale (new record will be created)
+                finish();
                 return true;
             case R.id.map_results:
                 // TODO

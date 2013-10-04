@@ -29,7 +29,6 @@ import android.widget.TextView;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.async.loader.SurveyGroupLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyGroupAttrs;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.fragment.ResponseListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyListFragment;
@@ -236,10 +235,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         }
     }
     
-    private int getActiveSurveyGroupId() {
-        return mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-    }
-    
     class TabsAdapter extends FragmentPagerAdapter {
         private static final int POSITION_SURVEYS = 0;
         private static final int POSITION_RESPONSES = 1;
@@ -265,6 +260,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
             return "android:switcher:" + R.id.pager + ":" + pos;
         }
         
+        // TODO: DRY - Cleanup these methods
         public void onSurveyGroupChanged() {
             SurveyListFragment surveyListFragment = (SurveyListFragment) getSupportFragmentManager().
                     findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
@@ -274,16 +270,21 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 surveyListFragment.refresh(mSurveyGroup);
             }
             if (responseListFragment != null) {
-                responseListFragment.setSurveyGroup(getActiveSurveyGroupId());
+                responseListFragment.refresh(mSurveyGroup, mLocaleId);
             }
         }
         
         public void onSurveyedLocaleChange() {
             SurveyListFragment surveyListFragment = (SurveyListFragment) getSupportFragmentManager().
                     findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
+            ResponseListFragment responseListFragment = (ResponseListFragment) getSupportFragmentManager().
+                    findFragmentByTag(getFragmentTag(POSITION_RESPONSES));
             
             if (surveyListFragment != null && mSurveyGroup != null) {
                 surveyListFragment.refresh(mSurveyGroup, mLocaleId);
+            }
+            if (responseListFragment != null) {
+                responseListFragment.refresh(mSurveyGroup, mLocaleId);
             }
         }
 
@@ -293,7 +294,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 case POSITION_SURVEYS:
                     return SurveyListFragment.instantiate();
                 case POSITION_RESPONSES:
-                    return ResponseListFragment.instantiate(getActiveSurveyGroupId());
+                    return ResponseListFragment.instantiate();
             }
             
             return null;

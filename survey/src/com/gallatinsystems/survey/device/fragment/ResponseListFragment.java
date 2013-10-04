@@ -24,6 +24,7 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.TransmissionHistoryActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyInstanceLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.adapter.SubmittedSurveyReviewCursorAdaptor;
@@ -31,7 +32,6 @@ import com.gallatinsystems.survey.device.view.adapter.SubmittedSurveyReviewCurso
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor>, 
             OnItemClickListener {
     private static final String TAG = ResponseListFragment.class.getSimpleName();
-    private static final String ARG_SURVEY_GROUP = "survey_group";
     // Loader id
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
     
@@ -46,8 +46,9 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     
     private static final int UPDATE_INTERVAL_MS = 10000; // every ten seconds
     
-    private String mUserId;// TODO: Use these filters
-    private int mSurveyGroupId;// TODO: Use these filters
+    private String mUserId;
+    private SurveyGroup mSurveyGroup;
+    private String mSurveyedLocaleId;
     private SubmittedSurveyReviewCursorAdaptor mAdapter;
     
     private SurveyDbAdapter mDatabase;
@@ -63,7 +64,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getInt(ARG_SURVEY_GROUP);
     }
     
     @Override
@@ -84,23 +84,24 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         mDatabase.close();
     }
     
-    private void refresh() {
-        getLoaderManager().restartLoader(ID_SURVEY_INSTANCE_LIST, null, 
-                ResponseListFragment.this);
+    public void refresh(SurveyGroup surveyGroup, String surveyedLocaleId) {
+        mSurveyGroup = surveyGroup;
+        mSurveyedLocaleId = surveyedLocaleId;
+        refresh();
     }
     
-    public static ResponseListFragment instantiate(int surveyGroupId) {
+    private void refresh() {// TODO: Rename these methods
+        getLoaderManager().restartLoader(ID_SURVEY_INSTANCE_LIST, null, ResponseListFragment.this);
+    }
+    
+    public static ResponseListFragment instantiate() {
         ResponseListFragment fragment = new ResponseListFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SURVEY_GROUP, surveyGroupId);
-        fragment.setArguments(bundle);
         return fragment;
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //setRetainInstance(true);
         mDatabase = new SurveyDbAdapter(getActivity());
         mDatabase.open();
 
@@ -111,11 +112,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         registerForContextMenu(getListView());// Same implementation as before
         setHasOptionsMenu(true);
         
-        refresh();
-    }
-    
-    public void setSurveyGroup(int surveyGroupId) {
-        mSurveyGroupId = surveyGroupId;
         refresh();
     }
     
@@ -217,7 +213,8 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_INSTANCE_LIST:
-                return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroupId, null);// TODO: Monitoring
+                final int surveyGroupId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
+                return new SurveyInstanceLoader(getActivity(), mDatabase, surveyGroupId, mSurveyedLocaleId);
         }
         return null;
     }

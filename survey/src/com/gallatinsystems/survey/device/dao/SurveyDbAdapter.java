@@ -99,9 +99,10 @@ public class SurveyDbAdapter {
     public static final String UUID_COL = "uuid";
     
     public interface SurveyGroupAttrs {
-        String ID        = "_id";
-        String NAME      = "name";
-        String MONITORED = "monitored";
+        String ID                 = "_id";
+        String NAME               = "name";
+        String REGISTER_SURVEY_ID = "register_survey_id";
+        String MONITORED          = "monitored";
     }
     
     public interface SurveyedLocaleAttrs {
@@ -141,7 +142,7 @@ public class SurveyDbAdapter {
 
     private static final String TRANSMISSION_HISTORY_TABLE_CREATE = "create table transmission_history (_id integer primary key, survey_respondent_id integer not null, status text, filename text, trans_start_date long, delivered_date long);";
     
-    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (_id integer primary key on conflict replace, name text, monitored integer);";
+    private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (_id integer primary key on conflict replace, name text, register_survey_id text, monitored integer);";
     
     private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (_id integer primary key autoincrement, surveyed_locale_id text, survey_group_id integer, latitude real, longitude real, "
     		+ " UNIQUE(surveyed_locale_id) ON CONFLICT REPLACE);";
@@ -1821,6 +1822,7 @@ public class SurveyDbAdapter {
                 ContentValues values = new ContentValues();
                 values.put(SurveyGroupAttrs.ID, group.getId());
                 values.put(SurveyGroupAttrs.NAME, group.getName());
+                values.put(SurveyGroupAttrs.REGISTER_SURVEY_ID, group.getRegisterSurveyId());
                 values.put(SurveyGroupAttrs.MONITORED, group.isMonitored() ? 1 : 0);
                 database.insert(SURVEY_GROUP_TABLE, null, values);
             }
@@ -1834,13 +1836,14 @@ public class SurveyDbAdapter {
     public static SurveyGroup getSurveyGroup(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
+        String registerSurveyId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.REGISTER_SURVEY_ID));
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.MONITORED)) > 0;
-        return new SurveyGroup(id, name, monitored);
+        return new SurveyGroup(id, name, registerSurveyId, monitored);
     }
     
     public Cursor getSurveyGroups() {
         Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
-                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.MONITORED}, 
+                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.REGISTER_SURVEY_ID, SurveyGroupAttrs.MONITORED}, 
                 null, null, null, null, null);
         
         return cursor;
@@ -1868,7 +1871,7 @@ public class SurveyDbAdapter {
         }
         
         Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
-                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.MONITORED}, 
+                new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.REGISTER_SURVEY_ID, SurveyGroupAttrs.MONITORED}, 
                 where, selectionArgs,
                 null, null, null);
         
@@ -1959,6 +1962,41 @@ public class SurveyDbAdapter {
     }
     */
     
+    public static Survey getSurvey(Cursor cursor) {
+        Survey survey = new Survey();
+        survey.setId(cursor.getString(cursor.getColumnIndexOrThrow(PK_ID_COL)));
+        survey.setName(cursor.getString(cursor.getColumnIndexOrThrow(DISP_NAME_COL)));
+        survey.setLocation(cursor.getString(cursor.getColumnIndexOrThrow(LOCATION_COL)));
+        survey.setFileName(cursor.getString(cursor.getColumnIndexOrThrow(FILENAME_COL)));
+        survey.setType(cursor.getString(cursor.getColumnIndexOrThrow(TYPE_COL)));
+        survey.setHelpDownloaded(cursor.getString(cursor.getColumnIndexOrThrow(HELP_DOWNLOADED_COL)));
+        survey.setLanguage(cursor.getString(cursor.getColumnIndexOrThrow(LANGUAGE_COL)));
+        survey.setVersion(cursor.getDouble(cursor.getColumnIndexOrThrow(VERSION_COL)));
+        return survey;
+    }
+
+    public Cursor getSurveys(int surveyGroupId) {
+        String whereClause = DELETED_COL + " <> ?";
+        String[] whereParams = null;
+        if (surveyGroupId > 0) {
+            whereClause += " and " + SURVEY_GROUP_ID_COL + " = ?";
+            whereParams = new String[] {
+                    ConstantUtil.IS_DELETED,
+                    String.valueOf(surveyGroupId)
+            };
+        } else {
+            whereParams = new String[] {
+                ConstantUtil.IS_DELETED
+            };
+        }
+        
+        return database.query(SURVEY_TABLE, new String[] {
+                PK_ID_COL,
+                DISP_NAME_COL, LOCATION_COL, FILENAME_COL, TYPE_COL,
+                LANGUAGE_COL, HELP_DOWNLOADED_COL, VERSION_COL},
+                whereClause, whereParams, null, null, null);
+    }
+    
     public Cursor getSurveyInstances(int surveyGroupId) {
         final String sortBy = 
             "case when " + DELIVERED_DATE_COL
@@ -1970,6 +2008,21 @@ public class SurveyDbAdapter {
                 DELIVERED_DATE_COL, UUID_COL},
                 SURVEY_TABLE + "." + SURVEY_GROUP_ID_COL + "= ?",
                 new String[]{String.valueOf(surveyGroupId)},
+                null, null, sortBy);
+        return cursor;
+    }
+    
+    public Cursor getSurveyInstances(String surveyedLocaleId) {
+        final String sortBy = 
+            "case when " + DELIVERED_DATE_COL
+                    + " is null then 0 else 1 end, " + DELIVERED_DATE_COL
+                    + " desc";
+        Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
+                RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
+                SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL, SUBMITTED_DATE_COL,
+                DELIVERED_DATE_COL, UUID_COL},
+                RESPONDENT_TABLE + "." + SURVEYED_LOCALE_ID_COL + "= ?",
+                new String[]{String.valueOf(surveyedLocaleId)},
                 null, null, sortBy);
         return cursor;
     }

@@ -22,11 +22,17 @@ public class SurveyGroup {
     private int mId;
     private String mName;
     private boolean mMonitored;
+    private String mRegisterSurveyId;
 
-    public SurveyGroup (int id, String name, boolean monitored) {
+    public SurveyGroup (int id, String name, String registerSurveyId, boolean monitored) {
         mId = id;
         mName = name;
+        mRegisterSurveyId = registerSurveyId;
         mMonitored = monitored;
+    }
+    
+    public String getRegisterSurveyId() {
+        return mRegisterSurveyId;
     }
     
     public int getId() {

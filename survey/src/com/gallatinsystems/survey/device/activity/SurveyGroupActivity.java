@@ -22,6 +22,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -59,12 +60,17 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     private String mUserId;
     private String mUserName;
     
+    private String mLocaleId;
+    
     private SurveyGroup mSurveyGroup;// Active SurveyGroup
     private List<SurveyGroup> mSurveyGroups;// Available surveyGroups
     private ArrayAdapter<String> mNavigationAdapter;
     private ViewPager mPager;
     private TabsAdapter mAdapter;
     private TextView mUserTextView;
+    private TextView mLocaleTextView;
+    
+    private MenuItem mLocalesIcon;
     
     private SurveyDbAdapter mDatabase;
     
@@ -74,6 +80,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         setContentView(R.layout.survey_group_activity);
         
         mUserTextView = (TextView) findViewById(R.id.username_text);
+        mLocaleTextView = (TextView) findViewById(R.id.locale_text);
         mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new TabsAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
@@ -140,6 +147,10 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         mUserTextView.setText(getString(R.string.currentuser) + " " + name);
     }
     
+    private void displayRecord() {
+        mLocaleTextView.setText("Record: " + (mLocaleId != null ? mLocaleId : "New Record"));
+    }
+    
     private void display() {
         displayUser();
         
@@ -173,6 +184,20 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
         mSurveyGroup = mSurveyGroups.get(position);
+        
+        mLocaleId = null;// Start over again
+        //TODO: cleanup
+        displayRecord();
+        // Enable/Disable monitoring features
+        if (mSurveyGroup.isMonitored()) {
+            // Show locale selection icon
+            mLocalesIcon.setVisible(true);
+            mLocaleTextView.setVisibility(View.VISIBLE);
+        } else {
+            mLocalesIcon.setVisible(false);
+            mLocaleTextView.setVisibility(View.GONE);
+        }
+        
         mAdapter.onSurveyGroupChanged();
         return true;
     }
@@ -198,6 +223,14 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 displayUser();
                 mAdapter.onUserChanged();
                 break;
+            case ID_SURVEYED_LOCALE_LIST:
+                if (resultCode == RESULT_OK) {
+                    mLocaleId = intent.getStringExtra(SurveyedLocaleListActivity.EXTRA_SURVEYED_LOCALE_ID);
+                    mLocaleTextView.setText("Record: " + mLocaleId != null ? mLocaleId : "New Record");
+                    mAdapter.onSurveyedLocaleChange();
+                }
+            break;
+                
         }
     }
     
@@ -235,11 +268,20 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                     findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
             ResponseListFragment responseListFragment = (ResponseListFragment) getSupportFragmentManager().
                     findFragmentByTag(getFragmentTag(POSITION_RESPONSES));
-            if (surveyListFragment != null) {
-                surveyListFragment.setSurveyGroup(getActiveSurveyGroupId());
+            if (surveyListFragment != null && mSurveyGroup != null) {
+                surveyListFragment.refresh(mSurveyGroup);
             }
             if (responseListFragment != null) {
                 responseListFragment.setSurveyGroup(getActiveSurveyGroupId());
+            }
+        }
+        
+        public void onSurveyedLocaleChange() {
+            SurveyListFragment surveyListFragment = (SurveyListFragment) getSupportFragmentManager().
+                    findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
+            
+            if (surveyListFragment != null && mSurveyGroup != null) {
+                surveyListFragment.refresh(mSurveyGroup, mLocaleId);
             }
         }
 
@@ -247,7 +289,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         public Fragment getItem(int position) {
             switch (position) {
                 case POSITION_SURVEYS:
-                    return SurveyListFragment.instantiate(getActiveSurveyGroupId());
+                    return SurveyListFragment.instantiate();
                 case POSITION_RESPONSES:
                     return ResponseListFragment.instantiate(getActiveSurveyGroupId());
             }
@@ -287,11 +329,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 mSurveyGroups.clear();
                 if (cursor.moveToFirst()) {
                     do {
-                        int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.ID));
-                        String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.NAME));
-                        boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupAttrs.MONITORED)) > 0;
-                        SurveyGroup surveyGroup = new SurveyGroup(id, name, monitored);
-                        mSurveyGroups.add(surveyGroup);
+                        mSurveyGroups.add(SurveyDbAdapter.getSurveyGroup(cursor));
                     } while (cursor.moveToNext());
                 }
                 cursor.close();
@@ -311,6 +349,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.survey_group_activity, menu);
+        mLocalesIcon = menu.findItem(R.id.locales_icon);
         return super.onCreateOptionsMenu(menu);
     }
 

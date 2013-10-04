@@ -1,14 +1,12 @@
 package com.gallatinsystems.survey.device.async.loader;
 
-import java.util.List;
-
 import android.content.Context;
+import android.database.Cursor;
 
 import com.gallatinsystems.survey.device.async.loader.base.DataLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
-import com.gallatinsystems.survey.device.domain.Survey;
 
-public class SurveyListLoader extends DataLoader<List<Survey>> {
+public class SurveyListLoader extends DataLoader<Cursor> {
     private int mSurveyGroupId;
     
     public SurveyListLoader(Context context, SurveyDbAdapter db, int surveyGroupId) {
@@ -17,8 +15,8 @@ public class SurveyListLoader extends DataLoader<List<Survey>> {
     }
 
     @Override
-    protected List<Survey> loadData(SurveyDbAdapter database) {
-        return database.listSurveys(mSurveyGroupId);
+    protected Cursor loadData(SurveyDbAdapter database) {
+        return database.getSurveys(mSurveyGroupId);
     }
 
 }

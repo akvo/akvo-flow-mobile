@@ -5,10 +5,12 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,32 +26,32 @@ import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyListLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.service.BootstrapService;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
-public class SurveyListFragment extends ListFragment implements LoaderCallbacks<List<Survey>>, OnItemClickListener {
+public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>, OnItemClickListener {
     private static final String TAG = SurveyListFragment.class.getSimpleName();
-    private static final String ARG_SURVEY_GROUP = "survey_group";
+    
+    // Cursor IDs
     private static final int ID_SURVEY_LIST = 0;
+    //private static final int ID_SURVEY_INSTANCE_LIST = 1;
     
     private String mUserId;
-    private int mSurveyGroupId;
-    private SurveyAdapter mAdapter;
+    private SurveyGroup mSurveyGroup;
+    private String mLocaleId;// If null, we need to create one
     
+    private SurveyAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
     
-    public static SurveyListFragment instantiate(int surveyGroupId) {
+    public static SurveyListFragment instantiate() {
         SurveyListFragment fragment = new SurveyListFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SURVEY_GROUP, surveyGroupId);
-        fragment.setArguments(bundle);
         return fragment;
     }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getInt(ARG_SURVEY_GROUP);
     }
     
     @Override
@@ -61,7 +63,6 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //setRetainInstance(true);
         mDatabase = new SurveyDbAdapter(getActivity());
         mDatabase.open();
 
@@ -70,11 +71,15 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             setListAdapter(mAdapter);
         }
         getListView().setOnItemClickListener(this);
-        //getLoaderManager().restartLoader(ID_SURVEY_LIST, null, this);
     }
     
-    public void setSurveyGroup(int surveyGroupId) {
-        mSurveyGroupId = surveyGroupId;
+    public void refresh(SurveyGroup surveyGroup) {
+        refresh(surveyGroup, null);
+    }
+    
+    public void refresh(SurveyGroup surveyGroup, String localeId) {
+        mSurveyGroup = surveyGroup;
+        mLocaleId = localeId;
         getLoaderManager().restartLoader(ID_SURVEY_LIST, null, this);
     }
     
@@ -107,6 +112,34 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         public SurveyAdapter(Context context, List<Survey> surveys) {
             super(context, LAYOUT_RES, surveys);
         }
+        
+        @Override
+        public boolean areAllItemsEnabled() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            return isEnabled(getItem(position));
+        }
+        
+        private boolean isEnabled(Survey survey) {
+            // If the group is monitored, we need disable some surveys
+            if (mSurveyGroup.isMonitored()) {
+                final boolean isRegistered = !TextUtils.isEmpty(mLocaleId);
+                final boolean isRegistrationSurvey = survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
+                if (!isRegistered) {
+                    // Enable only registration survey
+                    //listItem.setEnabled(isRegistrationSurvey);
+                    return isRegistrationSurvey;
+                } else {
+                    //listItem.setEnabled(!isRegistrationSurvey);
+                    return !isRegistrationSurvey;
+                }
+            } 
+            
+            return true;// Not monitored. All surveys are enabled
+        }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -118,34 +151,57 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             TextView surveyNameView = (TextView)listItem.findViewById(android.R.id.text1);
             surveyNameView.setText(survey.getName());
             
+            listItem.setEnabled(isEnabled(survey));
+            
             return listItem;
         }
         
     }
 
     @Override
-    public Loader<List<Survey>> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_LIST:
-                return new SurveyListLoader(getActivity(), mDatabase, mSurveyGroupId);
+                return new SurveyListLoader(getActivity(), mDatabase, mSurveyGroup.getId());
+            /*
+            case ID_SURVEY_INSTANCE_LIST:
+                return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroup.getId(), mLocaleId);
+            */
         }
         return null;
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Survey>> loader, List<Survey> surveys) {
-        if (surveys != null) {
-            mAdapter.clear();
-            for (Survey survey : surveys) {
-                mAdapter.add(survey);
-            }
-        } else {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null) {
             Log.e(TAG, "onFinished() - Loader returned no data");
+            return;
+        }
+        
+        switch (loader.getId()) {
+            case ID_SURVEY_LIST:
+                mAdapter.clear();
+                if (cursor.moveToFirst()) {
+                    do {
+                        mAdapter.add(SurveyDbAdapter.getSurvey(cursor));
+                    } while (cursor.moveToNext());
+                    
+                } else {
+                    Log.e(TAG, "onFinished() - Loader returned no data");
+                }
+                break;
+            /*
+            case ID_SURVEY_INSTANCE_LIST:
+                // We just need the count. If no record exists, we should only enable register survey
+                mRegistered = cursor.getCount() > 0;
+                mAdapter.notifyDataSetChanged();
+                break;
+            */
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Survey>> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         loader.reset();
     }
     

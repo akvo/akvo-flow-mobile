@@ -29,7 +29,7 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
     @Override
     public SurveyGroup parse(String response) {
         String[] touple = response.split(",");
-        if (touple.length <= Attr.NAME) {
+        if (touple.length < Attr.REGISTER_SURVEY + 1) {
             return null;// Wrong format...
         }
         int id = Integer.parseInt(touple[Attr.ID]);
@@ -37,7 +37,8 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
         boolean monitored = touple.length > Attr.MONITORED ? 
                 Boolean.valueOf(touple[Attr.MONITORED])
                 : false;
-        return new SurveyGroup(id, name, monitored);
+        String registerSurveyId = touple[Attr.REGISTER_SURVEY];
+        return new SurveyGroup(id, name, registerSurveyId, monitored);
     }
 
     @Override
@@ -62,9 +63,10 @@ public class SurveyGroupParser implements FlowParser<SurveyGroup> {
     }
 
     interface Attr {
-        int ID        = 0;
-        int NAME      = 1;
-        int MONITORED = 2;
+        int ID              = 0;
+        int NAME            = 1;
+        int MONITORED       = 2;
+        int REGISTER_SURVEY = 3;
     }
 
 }

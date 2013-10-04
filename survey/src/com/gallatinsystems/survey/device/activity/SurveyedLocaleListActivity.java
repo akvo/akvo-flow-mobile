@@ -1,6 +1,7 @@
 package com.gallatinsystems.survey.device.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -13,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,13 +23,15 @@ import android.widget.Toast;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 
 
-public class SurveyedLocaleListActivity extends ActionBarActivity implements LoaderCallbacks<Cursor> {
+public class SurveyedLocaleListActivity extends ActionBarActivity implements LoaderCallbacks<Cursor>, OnItemClickListener {
     public static final String TAG = SurveyedLocaleListActivity.class.getSimpleName();
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
+    public static final String EXTRA_SURVEYED_LOCALE_ID = "surveyed_locale_id";
     
     private int mSurveyGroupId;
     
@@ -50,6 +55,7 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements Loa
         mAdapter = new SurveyedLocaleListAdapter(this);
         mListView = (ListView) findViewById(R.id.listview);
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(this);
         
         display();
     }
@@ -86,6 +92,17 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements Loa
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Cursor cursor = (Cursor) mAdapter.getItem(position);
+        final String localeId = cursor.getString(cursor.getColumnIndexOrThrow(
+                SurveyedLocaleAttrs.SURVEYED_LOCALE_ID));
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_SURVEYED_LOCALE_ID, localeId);
+        setResult(RESULT_OK, intent);
+        finish();
     }
     
     class SurveyedLocaleListAdapter extends CursorAdapter {

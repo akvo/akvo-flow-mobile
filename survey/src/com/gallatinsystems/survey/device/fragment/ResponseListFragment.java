@@ -69,7 +69,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     @Override
     public void onResume() {
         super.onResume();
-        mHandler.postDelayed(mUpdateTimeTask, UPDATE_INTERVAL_MS);
+        mHandler.post(mUpdateTimeTask);
     }
     
     @Override

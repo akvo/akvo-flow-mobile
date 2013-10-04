@@ -43,6 +43,7 @@ import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
+import com.gallatinsystems.survey.device.util.Base32;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 /**
@@ -1916,7 +1917,7 @@ public class SurveyDbAdapter {
     */
     
     public String createSurveyedLocale(int surveyGroupId) {
-        String id = UUID.randomUUID().toString();
+        String id = Base32.base32Uuid();
         double lat = 0.0d;// TODO
         double lon = 0.0d;// TODO
         ContentValues values = new ContentValues();

@@ -109,7 +109,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     }
 
     class SurveyAdapter extends ArrayAdapter<Survey> {
-        static final int LAYOUT_RES = android.R.layout.simple_list_item_1;
+        static final int LAYOUT_RES = R.layout.survey_item;
 
         public SurveyAdapter(Context context, List<Survey> surveys) {
             super(context, LAYOUT_RES, surveys);
@@ -132,10 +132,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 final boolean isRegistrationSurvey = survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
                 if (!isRegistered) {
                     // Enable only registration survey
-                    //listItem.setEnabled(isRegistrationSurvey);
                     return isRegistrationSurvey;
                 } else {
-                    //listItem.setEnabled(!isRegistrationSurvey);
                     return !isRegistrationSurvey;
                 }
             } 
@@ -150,10 +148,12 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
 
             final Survey survey = getItem(position);
             
-            TextView surveyNameView = (TextView)listItem.findViewById(android.R.id.text1);
+            TextView surveyNameView = (TextView)listItem.findViewById(R.id.text1);
             surveyNameView.setText(survey.getName());
             
-            listItem.setEnabled(isEnabled(survey));
+            boolean enabled = isEnabled(survey);
+            listItem.setEnabled(enabled);
+            surveyNameView.setEnabled(enabled);
             
             return listItem;
         }

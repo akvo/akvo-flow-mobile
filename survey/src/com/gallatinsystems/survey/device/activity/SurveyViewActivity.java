@@ -1275,5 +1275,9 @@ public class SurveyViewActivity extends TabActivity implements
     public boolean isSingleSurvey() {
         return single;
     }
+    
+    public String getSurveyedLocaleId() {
+        return mSurveyedLocaleId;
+    }
 
 }

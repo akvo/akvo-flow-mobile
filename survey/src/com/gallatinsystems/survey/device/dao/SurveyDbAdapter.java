@@ -34,6 +34,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.gallatinsystems.survey.device.R;
@@ -2025,11 +2026,57 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
                 RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
                 SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL, SUBMITTED_DATE_COL,
-                DELIVERED_DATE_COL, UUID_COL},
+                DELIVERED_DATE_COL, UUID_COL, SURVEYED_LOCALE_ID_COL},
                 RESPONDENT_TABLE + "." + SURVEYED_LOCALE_ID_COL + "= ?",
                 new String[]{String.valueOf(surveyedLocaleId)},
                 null, null, sortBy);
         return cursor;
+    }
+    
+    public String getSurveyedLocaleId(long surveyInstanceId) {
+        Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
+                RESPONDENT_TABLE + "." + PK_ID_COL, SURVEYED_LOCALE_ID_COL},
+                RESPONDENT_TABLE + "." + PK_ID_COL + "= ?",
+                new String[]{String.valueOf(surveyInstanceId)},
+                null, null, null);
+        
+        String id = null;
+        if (cursor.moveToFirst()) {
+            id = cursor.getString(cursor.getColumnIndexOrThrow(SURVEYED_LOCALE_ID_COL));
+        }
+        cursor.close();
+        return id;
+    }
+    
+    public void updateSurveyedLocale(long surveyInstanceId, QuestionResponse resp) {
+        String geoResponse = resp.getValue();
+        if (!TextUtils.isEmpty(geoResponse)) {
+            String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
+            String[] parts = geoResponse.split("\\|");
+            if (parts.length >= 2) {
+                double lat = Double.parseDouble(parts[0]);
+                double lon = Double.parseDouble(parts[1]);
+                
+                ContentValues values = new ContentValues();
+                values.put(SurveyedLocaleAttrs.LATITUDE, lat);
+                values.put(SurveyedLocaleAttrs.LONGITUDE, lon);
+                database.update(SURVEYED_LOCALE_TABLE, values,
+                        SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " = ?",
+                        new String[] {surveyedLocaleId});
+            }
+            
+            // Store the META_GEO as a response
+            ContentValues values = new ContentValues();
+            values.put(ANSWER_COL, resp.getValue());
+            values.put(ANSWER_TYPE_COL, "META_GEO");
+            values.put(QUESTION_FK_COL, resp.getQuestionId());
+            values.put(SURVEY_RESPONDENT_ID_COL, resp.getRespondentId());
+            values.put(SCORED_VAL_COL, resp.getScoredValue());
+            values.put(INCLUDE_FLAG_COL, resp.getIncludeFlag());
+            values.put(STRENGTH_COL, resp.getStrength());
+            
+            database.insert(RESPONSE_TABLE, null, values);
+        }
     }
 
 }

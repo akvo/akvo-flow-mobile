@@ -1,13 +1,14 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp" 
-    android:orientation="horizontal">
+    android:padding="8dp" >
 
     <ImageView 
+        android:id="@+id/survey_icon"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
+        android:layout_alignParentLeft="true"
         android:adjustViewBounds="true"
         android:layout_gravity="center_vertical"
         android:src="@drawable/checklist" />
@@ -16,7 +17,17 @@
         android:id="@+id/text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/survey_icon"
         android:layout_gravity="center_vertical"
         android:textSize="18sp" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/survey_icon"
+        android:layout_below="@id/text1"
+        android:layout_gravity="center_vertical"
+        android:textSize="14sp" />
+
+</RelativeLayout>

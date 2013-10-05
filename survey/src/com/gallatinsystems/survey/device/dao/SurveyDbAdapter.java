@@ -2078,5 +2078,35 @@ public class SurveyDbAdapter {
             database.insert(RESPONSE_TABLE, null, values);
         }
     }
+    
+    /**
+    * Filters surveyd locales based on the parameters passed in.
+    * @param projectId
+    * @param latitude
+    * @param longitude
+    * @param filterString
+    * @param nearbyRadius
+    * @return
+    */
+    public Cursor getFilteredSurveyedLocales(int surveyGroupId, Double latitude, Double longitude,
+                Double nearbyRadius) {
+        String queryString = "SELECT sl.* FROM " + SURVEYED_LOCALE_TABLE + " AS sl";
+        String whereClause = " WHERE sl." + SurveyedLocaleAttrs.SURVEY_GROUP_ID + " =?";
+        
+        // location part
+        if (latitude != null && longitude != null){
+            // this is to correct the distance for the shortening at higher latitudes
+            Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)),2);
+            
+            // this uses a simple planar approximation of distance. this should be good enough for our purpose.
+            String orderByTempl = " ORDER BY ((%s - " + SurveyedLocaleAttrs.LATITUDE + ") * (%s - " + SurveyedLocaleAttrs.LATITUDE + ") + (%s - " + SurveyedLocaleAttrs.LONGITUDE + ") * (%s - " + SurveyedLocaleAttrs.LONGITUDE + ") * %s)";
+            whereClause += String.format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
+        }
+        
+        String[] whereValues = new String[] {String.valueOf(surveyGroupId)};
+        Cursor cursor = database.rawQuery(queryString + whereClause, whereValues);
+        
+        return cursor;
+    }
 
 }

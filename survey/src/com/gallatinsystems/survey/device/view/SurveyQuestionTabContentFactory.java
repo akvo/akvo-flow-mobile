@@ -348,11 +348,11 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                 QuestionResponse curResponse = q.getResponse(true);
                 if (curResponse != null
                         && curResponse.hasValue()) {
+                    curResponse.setRespondentId(respondentId);
                     if (q.getQuestion().isLocaleLocation()) {
-                        // Ultra-mega-super hack.
+                        // super hack
                         databaseAdaptor.updateSurveyedLocale(respondentId, curResponse);
                     }
-                    curResponse.setRespondentId(respondentId);
                     databaseAdaptor.createOrUpdateSurveyResponse(curResponse);
                     responseMap.put(curResponse.getQuestionId(),
                             curResponse);

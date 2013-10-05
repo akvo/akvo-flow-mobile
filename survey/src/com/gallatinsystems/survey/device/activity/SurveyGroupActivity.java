@@ -69,8 +69,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     private TextView mUserTextView;
     private TextView mLocaleTextView;
     
-    private MenuItem mLocalesIcon;
-    
     private SurveyDbAdapter mDatabase;
     
     @Override
@@ -183,17 +181,15 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
         mSurveyGroup = mSurveyGroups.get(position);
-        
         mLocaleId = null;// Start over again
+        
+        supportInvalidateOptionsMenu();
         //TODO: cleanup
         displayRecord();
         // Enable/Disable monitoring features
         if (mSurveyGroup.isMonitored()) {
-            // Show locale selection icon
-            mLocalesIcon.setVisible(true);
             mLocaleTextView.setVisibility(View.VISIBLE);
         } else {
-            mLocalesIcon.setVisible(false);
             mLocaleTextView.setVisibility(View.GONE);
         }
         
@@ -351,8 +347,12 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.survey_group_activity, menu);
-        mLocalesIcon = menu.findItem(R.id.locales_icon);
+        if (mSurveyGroup != null) {
+            final int menuRes = mSurveyGroup.isMonitored() ?
+                    R.menu.survey_group_activity_monitored
+                    : R.menu.survey_group_activity;
+            getMenuInflater().inflate(menuRes, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 

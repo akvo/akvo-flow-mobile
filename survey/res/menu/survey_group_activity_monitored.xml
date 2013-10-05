@@ -16,4 +16,11 @@
         android:title="@string/userlabel"
         flowapp:showAsAction="always"/>
 
+    <item
+        android:id="@+id/locales_icon"
+        android:icon="@drawable/ic_menu_archive"
+        android:orderInCategory="100"
+        android:title="Manage Records"
+        flowapp:showAsAction="always"/>
+
 </menu>

@@ -18,9 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
+import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.activity.TransmissionHistoryActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyInstanceLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
@@ -28,9 +30,9 @@ import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.adapter.SubmittedSurveyReviewCursorAdaptor;
+import com.gallatinsystems.survey.device.view.adapter.SurveyReviewCursorAdaptor;
 
-public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor>, 
-            OnItemClickListener {
+public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
     private static final String TAG = ResponseListFragment.class.getSimpleName();
     // Loader id
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
@@ -109,6 +111,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             mAdapter = new SubmittedSurveyReviewCursorAdaptor(getActivity());// Cursor Adapter
             setListAdapter(mAdapter);
         }
+        //getListView().setOnItemClickListener(this);
         registerForContextMenu(getListView());// Same implementation as before
         setHasOptionsMenu(true);
         
@@ -117,11 +120,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     
     public void setUserId(String userId) {
         mUserId = userId;
-    }
-    
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getActivity(), "Not Implemented", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -207,6 +205,30 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                                 getActivity());
                     }
                 });
+    }
+    
+    /**
+     * when a list item is clicked, get the user id and name of the selected
+     * item and open one-survey activity, readonly.
+     */
+    @Override
+    public void onListItemClick(ListView list, View view, int position, long id) {
+        super.onListItemClick(list, view, position, id);
+
+        Intent i = new Intent(view.getContext(), SurveyViewActivity.class);
+        i.putExtra(ConstantUtil.USER_ID_KEY, ((Long) view
+                .getTag(SurveyReviewCursorAdaptor.USER_ID_KEY)).toString());
+        i.putExtra(ConstantUtil.SURVEY_ID_KEY, ((Long) view
+                .getTag(SurveyReviewCursorAdaptor.SURVEY_ID_KEY)).toString());
+        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY,
+                (Long) view.getTag(SurveyReviewCursorAdaptor.RESP_ID_KEY));
+        i.putExtra(ConstantUtil.READONLY_KEY, true);
+
+        // do not close us
+        // Intent intent = new Intent();
+        // setResult(RESULT_OK, intent);
+        // finish();
+        startActivity(i);
     }
 
     @Override

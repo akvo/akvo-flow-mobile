@@ -44,6 +44,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
     public static int SURVEY_ID_KEY = R.integer.surveyidkey;
     public static int RESP_ID_KEY = R.integer.respidkey;
     public static int USER_ID_KEY = R.integer.useridkey;
+    public static int FINISHED_KEY = R.integer.finishedkey;
 
     public final int DETAIL_NONE = 0;
     public final int DETAIL_QUEUED = 1;
@@ -145,6 +146,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
         int icon = R.drawable.checkmark2; // the square one
         String status = "Sent: "; // TODO: move to string resource for
                                   // localization
+        boolean finished = true;// Or can it be edited yet?
 
         long millis = cursor.getLong(cursor.getColumnIndex(SurveyDbAdapter.DELIVERED_DATE_COL));
         if (millis != 0) {
@@ -187,6 +189,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
             // if millis is still null, then the survey hasn't been submitted
             // yet (should not happen)
             if (millis == 0) {
+                finished = false;
                 status = "Saved: ";
                 icon = R.drawable.disk;
                 millis = cursor.getLong(cursor
@@ -209,6 +212,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
                 .getColumnIndex(SurveyDbAdapter.PK_ID_COL)));
         view.setTag(USER_ID_KEY, cursor.getLong(cursor
                 .getColumnIndex(SurveyDbAdapter.USER_FK_COL)));
+        view.setTag(FINISHED_KEY, finished);
         ImageView stsIcon = (ImageView) view.findViewById(R.id.xmitstsicon);
         stsIcon.setImageResource(icon);
     }

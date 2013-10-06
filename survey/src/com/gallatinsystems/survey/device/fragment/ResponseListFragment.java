@@ -17,9 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
@@ -30,10 +28,9 @@ import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.adapter.SubmittedSurveyReviewCursorAdaptor;
-import com.gallatinsystems.survey.device.view.adapter.SurveyReviewCursorAdaptor;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
-    private static final String TAG = ResponseListFragment.class.getSimpleName();
+    //private static final String TAG = ResponseListFragment.class.getSimpleName();
     // Loader id
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
     
@@ -111,7 +108,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             mAdapter = new SubmittedSurveyReviewCursorAdaptor(getActivity());// Cursor Adapter
             setListAdapter(mAdapter);
         }
-        //getListView().setOnItemClickListener(this);
         registerForContextMenu(getListView());// Same implementation as before
         setHasOptionsMenu(true);
         
@@ -217,17 +213,20 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
         Intent i = new Intent(view.getContext(), SurveyViewActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, ((Long) view
-                .getTag(SurveyReviewCursorAdaptor.USER_ID_KEY)).toString());
+                .getTag(SubmittedSurveyReviewCursorAdaptor.USER_ID_KEY)).toString());
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, ((Long) view
-                .getTag(SurveyReviewCursorAdaptor.SURVEY_ID_KEY)).toString());
+                .getTag(SubmittedSurveyReviewCursorAdaptor.SURVEY_ID_KEY)).toString());
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY,
-                (Long) view.getTag(SurveyReviewCursorAdaptor.RESP_ID_KEY));
-        i.putExtra(ConstantUtil.READONLY_KEY, true);
+                (Long) view.getTag(SubmittedSurveyReviewCursorAdaptor.RESP_ID_KEY));
+        
+        // Read-only vs editable
+        if ((Boolean)view.getTag(SubmittedSurveyReviewCursorAdaptor.FINISHED_KEY)) {
+            i.putExtra(ConstantUtil.READONLY_KEY, true);
+        } else {
+            i.putExtra(ConstantUtil.SINGLE_SURVEY_KEY, true);
+        }
+        
 
-        // do not close us
-        // Intent intent = new Intent();
-        // setResult(RESULT_OK, intent);
-        // finish();
         startActivity(i);
     }
 

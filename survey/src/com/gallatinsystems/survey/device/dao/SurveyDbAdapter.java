@@ -2108,5 +2108,17 @@ public class SurveyDbAdapter {
         
         return cursor;
     }
+    
+    public int getSurveyedLocalesCount(int surveyGroupId) {
+        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM " + SURVEYED_LOCALE_TABLE
+                + " WHERE " + SurveyedLocaleAttrs.SURVEY_GROUP_ID + " = ?",
+                new String[]{String.valueOf(surveyGroupId)});
+        
+        if (cursor.moveToFirst()) {
+            return cursor.getInt(0);
+        }
+        
+        return 0;
+    }
 
 }

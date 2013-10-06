@@ -5,8 +5,15 @@
     <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_menu_preferences"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:title="@string/settingslabel"
+        flowapp:showAsAction="never"/>
+
+    <item
+        android:id="@+id/download_records"
+        android:icon="@drawable/ic_menu_download"
+        android:orderInCategory="102"
+        android:title="Download Records"
         flowapp:showAsAction="never"/>
     
     <item

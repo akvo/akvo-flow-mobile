@@ -46,4 +46,9 @@ public class SurveyGroup {
     public boolean isMonitored() {
         return mMonitored;
     }
+    
+    @Override
+    public String toString() {
+        return mName;
+    }
 }

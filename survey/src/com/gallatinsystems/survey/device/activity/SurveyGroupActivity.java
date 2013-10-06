@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -63,7 +64,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     
     private SurveyGroup mSurveyGroup;// Active SurveyGroup
     private List<SurveyGroup> mSurveyGroups;// Available surveyGroups
-    private ArrayAdapter<String> mNavigationAdapter;
+    private ListNavigationAdapter mNavigationAdapter;
     private ViewPager mPager;
     private TabsAdapter mAdapter;
     private TextView mUserTextView;
@@ -92,7 +93,8 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         
         init();// No external storage will finish the application
-        display();// Configure navigation and display surveys
+        setupNavigationList();
+        displayUser();
     }
     
     @Override
@@ -145,21 +147,26 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     }
     
     private void displayRecord() {
-        mLocaleTextView.setText("Record: " + (mLocaleId != null ? mLocaleId : "New Record"));
+        // Enable/Disable monitoring features
+        if (mSurveyGroup.isMonitored()) {
+            mLocaleTextView.setVisibility(View.VISIBLE);
+            mLocaleTextView.setText("Record: " + (mLocaleId != null ? mLocaleId : "New Record"));
+        } else {
+            mLocaleTextView.setVisibility(View.GONE);
+        }
     }
     
-    private void display() {
-        displayUser();
-        
+    private void setupNavigationList() {
         // Now the navigation...
         final ActionBar actionBar = getSupportActionBar();
         final Context context = actionBar.getThemedContext();
         
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         
-        final int activeSurveyGroupId = mSurveyGroup != null ? mSurveyGroup.getId() : 0;
+        //final int activeSurveyGroupId = mSurveyGroup != null ? mSurveyGroup.getId() : 0;
         
         if (mSurveyGroups.size() > 0) {
+        /*
             String[] names = new String[mSurveyGroups.size()];
             int currentIndex = 0;
             for (int i = 0; i < mSurveyGroups.size(); i++) {
@@ -170,11 +177,13 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                     currentIndex = i;
                 }
             }
+            */
     
-            mNavigationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, android.R.id.text1, names);
+            //mNavigationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, android.R.id.text1, names);
+            mNavigationAdapter = new ListNavigationAdapter(context, R.layout.spinner_item, android.R.id.text1, mSurveyGroups);
             mNavigationAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
             actionBar.setListNavigationCallbacks(mNavigationAdapter, this);
-            actionBar.setSelectedNavigationItem(currentIndex);
+            //actionBar.setSelectedNavigationItem(currentIndex);
         }
     }
 
@@ -183,16 +192,8 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         mSurveyGroup = mSurveyGroups.get(position);
         mLocaleId = null;// Start over again
         
+        displayRecord();// Or hide it
         supportInvalidateOptionsMenu();
-        //TODO: cleanup
-        displayRecord();
-        // Enable/Disable monitoring features
-        if (mSurveyGroup.isMonitored()) {
-            mLocaleTextView.setVisibility(View.VISIBLE);
-        } else {
-            mLocaleTextView.setVisibility(View.GONE);
-        }
-        
         mAdapter.onSurveyGroupChanged();
         return true;
     }
@@ -226,7 +227,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                     displayRecord();
                     mAdapter.onSurveyedLocaleChange();
                 }
-            break;
+                break;
                 
         }
     }
@@ -332,7 +333,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                     } while (cursor.moveToNext());
                 }
                 cursor.close();
-                display();
+                setupNavigationList();
                 break;
         }
     }
@@ -376,6 +377,42 @@ public class SurveyGroupActivity extends ActionBarActivity implements
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    
+    class ListNavigationAdapter extends ArrayAdapter<SurveyGroup> {
+
+        public ListNavigationAdapter(Context context, int resource, int textViewResourceId,
+                List<SurveyGroup> objects) {
+            super(context, resource, textViewResourceId, objects);
+        }
+        
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view;
+            TextView nameView;
+            TextView monitoredView;
+            
+            if (convertView == null) {
+                view = getLayoutInflater().inflate(R.layout.spinner_item, parent, false);
+            } else {
+                view = convertView;
+            }
+            
+            final SurveyGroup surveyGroup = getItem(position);
+            
+            nameView = (TextView) view.findViewById(R.id.text1);
+            monitoredView = (TextView) view.findViewById(R.id.text2);
+            nameView.setText(surveyGroup.getName());
+            
+            if (surveyGroup.isMonitored()) {
+                monitoredView.setVisibility(View.VISIBLE);
+            } else {
+                monitoredView.setVisibility(View.GONE);
+            }
+            
+            return view;
+        }
+        
     }
 
     /**

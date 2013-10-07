@@ -75,7 +75,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:text="User: Inigo"
             android:textSize="14sp" />
 
         <TextView
@@ -83,7 +82,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:text="Record: 128735bcsghf24"
             android:textSize="14sp" />
     </LinearLayout>
 

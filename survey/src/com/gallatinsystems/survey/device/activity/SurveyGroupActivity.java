@@ -54,7 +54,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     private static final int ID_ACTIVITY_USERS       = 0;
     private static final int ID_SURVEYED_LOCALE_LIST = 1;
     
-    private static final String[] TABS = {"Surveys", "Responses"};// TODO: localized strings
+    private static final String[] TABS = {"SURVEYS", "RESPONSES"};// TODO: localized strings
     
     // Active user info
     private String mUserId;

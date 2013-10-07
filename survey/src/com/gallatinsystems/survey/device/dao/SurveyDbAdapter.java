@@ -43,6 +43,7 @@ import com.gallatinsystems.survey.device.domain.PointOfInterest;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.SurveyInstance;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.util.Base32;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
@@ -223,6 +224,7 @@ public class SurveyDbAdapter {
             db.execSQL(TRANSMISSION_HISTORY_TABLE_CREATE);
             db.execSQL(SURVEY_GROUP_TABLE_CREATE);
             db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
+            createIndexes(db);
             for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
                 db.execSQL(DEFAULT_INSERTS[i]);
             }
@@ -250,6 +252,7 @@ public class SurveyDbAdapter {
                     db.execSQL("ALTER TABLE survey_respondent ADD COLUMN surveyed_locale_id TEXT");
                     db.execSQL(SURVEY_GROUP_TABLE_CREATE);
                     db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
+                    createIndexes(db);
                     version = VER_POINT_UPDATES;
             }
 
@@ -301,6 +304,12 @@ public class SurveyDbAdapter {
                     database = null;
                 }
             }
+        }
+        
+        private void createIndexes(SQLiteDatabase db) {
+            // Included in point updates
+            db.execSQL("CREATE INDEX respondent_uuid_idx ON " + RESPONDENT_TABLE + "(uuid)");
+            db.execSQL("CREATE INDEX response_idx ON " + RESPONSE_TABLE + "(survey_respondent_id, question_id)");
         }
 
         /**
@@ -1933,9 +1942,10 @@ public class SurveyDbAdapter {
     
     public static SurveyedLocale getSurveyedLocale(Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.SURVEYED_LOCALE_ID));
+        int surveyGroupId = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.SURVEY_GROUP_ID));
         double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LATITUDE));
         double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LONGITUDE));
-        return new SurveyedLocale(id, latitude, longitude);
+        return new SurveyedLocale(id, surveyGroupId, latitude, longitude);
     }
     
     public Cursor getSurveyedLocales(int surveyGroupId) {
@@ -2120,5 +2130,94 @@ public class SurveyDbAdapter {
         
         return 0;
     }
+    
+    public void syncResponses(List<QuestionResponse> responses, String surveyInstanceId) {
+        database.beginTransaction();
+        try {
+            for (QuestionResponse response : responses) {
+                Cursor cursor = database.query(RESPONSE_TABLE, new String[] {
+                        "survey_respondent_id, question_id"},
+                        "survey_respondent_id = ? AND question_id = ?",
+                        new String[] { surveyInstanceId, response.getQuestionId()},
+                        null, null, null);
+                
+                boolean exists = cursor.getCount() > 0;
+                cursor.close();
+                
+                ContentValues values = new ContentValues();
+                values.put(ANSWER_COL, response.getValue());
+                values.put(ANSWER_TYPE_COL, response.getType());
+                values.put(QUESTION_FK_COL, response.getQuestionId());
+                values.put(INCLUDE_FLAG_COL, response.getIncludeFlag());
+                values.put(SURVEY_RESPONDENT_ID_COL, surveyInstanceId);
+                
+                if (exists) {
+                    database.update(RESPONSE_TABLE, values, 
+                            "survey_respondent_id = ? AND question_id = ?",
+                            new String[] { surveyInstanceId, response.getQuestionId()});
+                } else {
+                    database.insert(RESPONSE_TABLE, null, values);
+                }
+            }
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
+    }
+    
+    public void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
+        database.beginTransaction();
+        try {
+            for (SurveyInstance surveyInstance : surveyInstances) {
+                Cursor cursor = database.query(RESPONDENT_TABLE, new String[] {
+                        UUID_COL},
+                        UUID_COL + " = ?",
+                        new String[] { surveyInstance.getUuid()},
+                        null, null, null);
+                
+                boolean exists = cursor.getCount() > 0;
+                cursor.close();
+                
+                ContentValues values = new ContentValues();
+                values.put(SURVEY_FK_COL, surveyInstance.getSurveyId());
+                values.put(SUBMITTED_DATE_COL, surveyInstance.getDate());
+                values.put(SURVEYED_LOCALE_ID_COL, surveyedLocaleId);
+                values.put(STATUS_COL, ConstantUtil.SUBMITTED_STATUS);// ???
+                
+                if (exists) {
+                    database.update(RESPONDENT_TABLE, values, UUID_COL + " = ?", new String[] { surveyInstance.getUuid()});
+                } else {
+                    values.put(UUID_COL, surveyInstance.getUuid());
+                    database.insert(RESPONDENT_TABLE, null, values);
+                }
+                
+                // Now the responses...
+                syncResponses(surveyInstance.getResponses(), surveyInstance.getUuid());
+            }
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
+    }
+    
+    public void syncSurveyedLocales(List<SurveyedLocale> surveyedLocales) {
+        database.beginTransaction();
+        try {
+            for (SurveyedLocale surveyedLocale : surveyedLocales) {
+                ContentValues values = new ContentValues();
+                values.put(SurveyedLocaleAttrs.SURVEYED_LOCALE_ID, surveyedLocale.getId());
+                values.put(SurveyedLocaleAttrs.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
+                values.put(SurveyedLocaleAttrs.LATITUDE, surveyedLocale.getLatitude());
+                values.put(SurveyedLocaleAttrs.LONGITUDE, surveyedLocale.getLongitude());
+                database.insert(SURVEYED_LOCALE_TABLE, null, values);
+                
+                syncSurveyInstances(surveyedLocale.getSurveyInstances(), surveyedLocale.getId());
+            }
+            database.setTransactionSuccessful();
+        } finally {
+          database.endTransaction();
+        }
+    }
+
 
 }

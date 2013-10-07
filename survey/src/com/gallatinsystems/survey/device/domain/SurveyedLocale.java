@@ -16,15 +16,24 @@
 
 package com.gallatinsystems.survey.device.domain;
 
+import java.util.List;
+
 public class SurveyedLocale {
     private String mId;
+    private int mSurveyGroupId;
     private double mLatitude;
     private double mLongitude;
+    private List<SurveyInstance> mSurveyInstances = null;
 
-    public SurveyedLocale (String id, double latitude, double longitude) {
+    public SurveyedLocale (String id, int surveyGroupId, double latitude, double longitude) {
         mId = id;
+        mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
+    }
+    
+    public int getSurveyGroupId() {
+        return mSurveyGroupId;
     }
     
     public String getId() {
@@ -38,4 +47,13 @@ public class SurveyedLocale {
     public double getLongitude() {
         return mLongitude;
     }
+    
+    public void setSurveyInstances(List<SurveyInstance> surveyInstances) {
+        mSurveyInstances = surveyInstances;
+    }
+    
+    public List<SurveyInstance> getSurveyInstances() {
+        return mSurveyInstances;
+    }
+    
 }

@@ -73,7 +73,7 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
         mListView.setOnItemClickListener(this);
 
         mListView.setEmptyView(findViewById(android.R.id.empty));
-        loadData();
+        //loadData();
     }
     
     
@@ -89,12 +89,10 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
             if (loc != null) {
                 mLatitude = loc.getLatitude();
                 mLongitude = loc.getLongitude();
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-            } else {
-                // if we don't know where we are, ask for updates
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
             }
         }
+        loadData();
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
     }
     
     @Override
@@ -238,7 +236,6 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
 
-        // Nope. Use loader
         loadData();
     }
 

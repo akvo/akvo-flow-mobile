@@ -5,6 +5,7 @@
     android:orientation="vertical" >
 
     <com.viewpagerindicator.TabPageIndicator
+        android:background="#4d4949"
         android:id="@+id/indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

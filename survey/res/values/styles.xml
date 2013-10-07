@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     
     <style name="FieldSurveyTheme" parent="@style/Theme.AppCompat">
         <item name="vpiTabPageIndicatorStyle">@style/FieldSurveyTabIndicator</item>
@@ -7,6 +7,14 @@
     
     <style name="FieldSurveyTabIndicator" parent="@style/Widget.TabPageIndicator">
         <item name="android:textColorHint">@android:color/white</item>
+        <item name="android:divider">@drawable/abc_list_divider_holo_dark</item>
+        <item name="android:showDividers">middle</item>
+        <item name="android:dividerPadding">2dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:fadingEdge">horizontal</item>
+        <item name="android:fadingEdgeLength">8dp</item>
+        
     </style>
     
 </resources>

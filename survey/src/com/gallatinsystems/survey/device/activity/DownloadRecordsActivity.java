@@ -111,15 +111,17 @@ public class DownloadRecordsActivity extends ActionBarActivity {
         
         @Override
         protected void onPostExecute(Integer result) {
-            switch (mMode) {
-                case MODE_COUNT:
-                    mServerRecordsView.setText(result.toString());
-                    break;
-                case MODE_DOWNLOAD:
-                    Toast.makeText(DownloadRecordsActivity.this, "Synced " + result.toString()  + " records", 
-                            Toast.LENGTH_LONG).show();
-                    setupDeviceRecords();
-                    break;
+            if (result != null) {
+                switch (mMode) {
+                    case MODE_COUNT:
+                        mServerRecordsView.setText(result.toString());
+                        break;
+                    case MODE_DOWNLOAD:
+                        Toast.makeText(DownloadRecordsActivity.this, "Synced " + result.toString()  + " records", 
+                                Toast.LENGTH_LONG).show();
+                        setupDeviceRecords();
+                        break;
+                }
             }
         }
         

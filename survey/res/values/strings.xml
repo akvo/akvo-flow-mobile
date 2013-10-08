@@ -146,7 +146,7 @@
     <string name="downloadsurveylabel">Download Survey</string>
     <string name="downloadsurveydesc">Downloads arbitrary surveys (only run if instructed)</string>
     <string name="downloadsurveyinstr">Enter the survey id you wish to download.</string>
-    <string name="deleteall">Delete all</string>
+    <string name="deleteall">Delete all Responses</string>
     <string name="submittedsurveysmenu">Submitted Surveys</string>
     <string name="deleteallwarning">This will permanently delete all survey responses (saved AND submitted) on the device. Click OK to proceed or cancel to abort.</string>
     <string name="deletealldatawarning">This will permanently delete all data (surveys, responses, images, and users) on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
@@ -194,7 +194,7 @@
     <string name="transmissionhist">Transmission History</string>
     <string name="transstartdate">Transmission Started:</string>
     <string name="transenddate">Transmission Finished:</string>
-    <string name="resendall">Resend all Surveys</string>
+    <string name="resendall">Resend all Responses</string>
     <string name="resendone">Resend Survey</string>
     <string name="generatedcode">Unique Code</string>
     <string name="confirmchangetitle">Change response?</string>

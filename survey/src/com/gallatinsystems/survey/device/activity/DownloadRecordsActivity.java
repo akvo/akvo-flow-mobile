@@ -44,7 +44,6 @@ public class DownloadRecordsActivity extends ActionBarActivity {
     
     private SurveyDbAdapter mDatabase;
     private String mServerBase;
-    private String mDeviceId;
     
     private TextView mServerRecordsView;
     private TextView mDeviceRecordsView;
@@ -65,47 +64,62 @@ public class DownloadRecordsActivity extends ActionBarActivity {
         surveyGroupNameView.setText(mSurveyGroupName);
         
         // Tmp hack
-        mDatabase = new SurveyDbAdapter(this).open();
+        mDatabase = new SurveyDbAdapter(this);
+        mDatabase.open();
         mServerBase = getServerBase();
-        mDeviceId = getDeviceId();
-        mDatabase.close();
         
         setupDeviceRecords();
         
         mServerRecordsView.setText("Loading...");
-        new DownloadRecordsTask().execute(false);
+        new DownloadRecordsTask().execute(DownloadRecordsTask.MODE_COUNT);
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        mDatabase.open();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDatabase.close();
     }
     
     private void setupDeviceRecords() {
-        // Dirty way of getting the records...
-        SurveyDbAdapter database = new SurveyDbAdapter(this).open();
-        final int count = database.getSurveyedLocalesCount(mSurveyGroupId);
-        database.close();
+        final int count = mDatabase.getSurveyedLocalesCount(mSurveyGroupId);
         mDeviceRecordsView.setText(String.valueOf(count));
     }
     
-    class DownloadRecordsTask extends AsyncTask<Boolean, Void, Integer> {
+    class DownloadRecordsTask extends AsyncTask<Integer, Void, Integer> {
+        public static final int MODE_COUNT    = 0;
+        public static final int MODE_DOWNLOAD = 1;
         
-        @Override
-        protected void onPreExecute() {
-        }
+        private int mMode;
 
         @Override
-        protected Integer doInBackground(Boolean... params) {
-            boolean download = params[0];
-            if (!download) {
-                return getServerRecordCount();
-            } 
-            
-            return downloadRecords();
+        protected Integer doInBackground(Integer... params) {
+            mMode = params[0];
+            switch (mMode) {
+                case MODE_COUNT:
+                    return getServerRecordCount();
+                case MODE_DOWNLOAD:
+                    return downloadRecords();
+            }
+            return null;
         }
         
         @Override
         protected void onPostExecute(Integer result) {
-            if (result != null) {
-                mServerRecordsView.setText(result.toString());
-            } else {
-                Toast.makeText(DownloadRecordsActivity.this, "Synced", Toast.LENGTH_LONG).show();
+            switch (mMode) {
+                case MODE_COUNT:
+                    mServerRecordsView.setText(result.toString());
+                    break;
+                case MODE_DOWNLOAD:
+                    Toast.makeText(DownloadRecordsActivity.this, "Synced " + result.toString()  + " records", 
+                            Toast.LENGTH_LONG).show();
+                    setupDeviceRecords();
+                    break;
             }
         }
         
@@ -135,6 +149,7 @@ public class DownloadRecordsActivity extends ActionBarActivity {
         
         private Integer downloadRecords() {
             String response = null;
+            int syncedRecords = 0;
             try {
                 final String url = mServerBase
                         + SURVEYED_LOCALE_SERVICE_PATH + mSurveyGroupId
@@ -148,6 +163,7 @@ public class DownloadRecordsActivity extends ActionBarActivity {
                         SurveyDbAdapter database = new SurveyDbAdapter(DownloadRecordsActivity.this).open();
                         database.syncSurveyedLocales(surveyedLocales);
                         database.close();
+                        syncedRecords = surveyedLocales.size();
                     }
                 }
             } catch (HttpException e) {
@@ -158,7 +174,7 @@ public class DownloadRecordsActivity extends ActionBarActivity {
                 PersistentUncaughtExceptionHandler.recordException(e);
             }
             
-            return null;
+            return syncedRecords;
         }
         
     }
@@ -176,16 +192,12 @@ public class DownloadRecordsActivity extends ActionBarActivity {
         return serverBase;
     }
     
-    private String getDeviceId() {
-        return mDatabase.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
-    }
-    
     private OnClickListener mOnDownloadRecordsListener = new OnClickListener() {
         
         @Override
         public void onClick(View v) {
             Toast.makeText(DownloadRecordsActivity.this, "Downloading...", Toast.LENGTH_LONG).show();
-            new DownloadRecordsTask().execute(true);
+            new DownloadRecordsTask().execute(DownloadRecordsTask.MODE_DOWNLOAD);
         }
     };
 

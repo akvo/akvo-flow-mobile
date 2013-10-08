@@ -2132,78 +2132,67 @@ public class SurveyDbAdapter {
     }
     
     public void syncResponses(List<QuestionResponse> responses, String surveyInstanceId) {
-        database.beginTransaction();
-        try {
-            for (QuestionResponse response : responses) {
-                Cursor cursor = database.query(RESPONSE_TABLE, new String[] {
-                        "survey_respondent_id, question_id"},
+        for (QuestionResponse response : responses) {
+            Cursor cursor = database.query(RESPONSE_TABLE, new String[] {
+                    "survey_respondent_id, question_id"},
+                    "survey_respondent_id = ? AND question_id = ?",
+                    new String[] { surveyInstanceId, response.getQuestionId()},
+                    null, null, null);
+                
+            boolean exists = cursor.getCount() > 0;
+            cursor.close();
+                
+            ContentValues values = new ContentValues();
+            values.put(ANSWER_COL, response.getValue());
+            values.put(ANSWER_TYPE_COL, response.getType());
+            values.put(QUESTION_FK_COL, response.getQuestionId());
+            values.put(INCLUDE_FLAG_COL, response.getIncludeFlag());
+            values.put(SURVEY_RESPONDENT_ID_COL, surveyInstanceId);
+                
+            if (exists) {
+                database.update(RESPONSE_TABLE, values, 
                         "survey_respondent_id = ? AND question_id = ?",
-                        new String[] { surveyInstanceId, response.getQuestionId()},
-                        null, null, null);
-                
-                boolean exists = cursor.getCount() > 0;
-                cursor.close();
-                
-                ContentValues values = new ContentValues();
-                values.put(ANSWER_COL, response.getValue());
-                values.put(ANSWER_TYPE_COL, response.getType());
-                values.put(QUESTION_FK_COL, response.getQuestionId());
-                values.put(INCLUDE_FLAG_COL, response.getIncludeFlag());
-                values.put(SURVEY_RESPONDENT_ID_COL, surveyInstanceId);
-                
-                if (exists) {
-                    database.update(RESPONSE_TABLE, values, 
-                            "survey_respondent_id = ? AND question_id = ?",
-                            new String[] { surveyInstanceId, response.getQuestionId()});
-                } else {
-                    database.insert(RESPONSE_TABLE, null, values);
-                }
+                        new String[] { surveyInstanceId, response.getQuestionId()});
+            } else {
+                database.insert(RESPONSE_TABLE, null, values);
             }
-            database.setTransactionSuccessful();
-        } finally {
-            database.endTransaction();
         }
     }
     
     public void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
-        database.beginTransaction();
-        try {
-            for (SurveyInstance surveyInstance : surveyInstances) {
-                Cursor cursor = database.query(RESPONDENT_TABLE, new String[] {
-                        UUID_COL},
-                        UUID_COL + " = ?",
-                        new String[] { surveyInstance.getUuid()},
-                        null, null, null);
+        for (SurveyInstance surveyInstance : surveyInstances) {
+            Cursor cursor = database.query(RESPONDENT_TABLE, new String[] {
+                    UUID_COL},
+                    UUID_COL + " = ?",
+                    new String[] { surveyInstance.getUuid()},
+                    null, null, null);
                 
-                boolean exists = cursor.getCount() > 0;
-                cursor.close();
+            boolean exists = cursor.getCount() > 0;
+            cursor.close();
                 
-                ContentValues values = new ContentValues();
-                values.put(SURVEY_FK_COL, surveyInstance.getSurveyId());
-                values.put(SUBMITTED_DATE_COL, surveyInstance.getDate());
-                values.put(SURVEYED_LOCALE_ID_COL, surveyedLocaleId);
-                values.put(STATUS_COL, ConstantUtil.SUBMITTED_STATUS);// ???
+            ContentValues values = new ContentValues();
+            values.put(SURVEY_FK_COL, surveyInstance.getSurveyId());
+            values.put(SUBMITTED_DATE_COL, surveyInstance.getDate());
+            values.put(SURVEYED_LOCALE_ID_COL, surveyedLocaleId);
+            values.put(STATUS_COL, ConstantUtil.SUBMITTED_STATUS);// ???
                 
-                if (exists) {
-                    database.update(RESPONDENT_TABLE, values, UUID_COL + " = ?", new String[] { surveyInstance.getUuid()});
-                } else {
-                    values.put(UUID_COL, surveyInstance.getUuid());
-                    database.insert(RESPONDENT_TABLE, null, values);
-                }
-                
-                // Now the responses...
-                syncResponses(surveyInstance.getResponses(), surveyInstance.getUuid());
+            if (exists) {
+                database.update(RESPONDENT_TABLE, values, UUID_COL + " = ?", new String[] { surveyInstance.getUuid()});
+            } else {
+                values.put(UUID_COL, surveyInstance.getUuid());
+                database.insert(RESPONDENT_TABLE, null, values);
             }
-            database.setTransactionSuccessful();
-        } finally {
-            database.endTransaction();
+                
+            // Now the responses...
+            syncResponses(surveyInstance.getResponses(), surveyInstance.getUuid());
         }
     }
     
     public void syncSurveyedLocales(List<SurveyedLocale> surveyedLocales) {
-        database.beginTransaction();
-        try {
-            for (SurveyedLocale surveyedLocale : surveyedLocales) {
+        for (SurveyedLocale surveyedLocale : surveyedLocales) {
+            try {
+                database.beginTransaction();
+                
                 ContentValues values = new ContentValues();
                 values.put(SurveyedLocaleAttrs.SURVEYED_LOCALE_ID, surveyedLocale.getId());
                 values.put(SurveyedLocaleAttrs.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
@@ -2212,12 +2201,11 @@ public class SurveyDbAdapter {
                 database.insert(SURVEYED_LOCALE_TABLE, null, values);
                 
                 syncSurveyInstances(surveyedLocale.getSurveyInstances(), surveyedLocale.getId());
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
             }
-            database.setTransactionSuccessful();
-        } finally {
-          database.endTransaction();
         }
     }
-
 
 }

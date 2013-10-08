@@ -50,6 +50,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
     public final int DETAIL_QUEUED = 1;
     public final int DETAIL_INPROG = 2;
     public final int DETAIL_FAILED = 3;
+    public final int DETAIL_DOWNLOADED = 4;
 
     private SurveyDbAdapter databaseAdapter;
 
@@ -78,6 +79,8 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
                     sts = DETAIL_INPROG;
                 } else if (ConstantUtil.FAILED_STATUS.equals(stsTxt)) {
                     sts = DETAIL_FAILED;
+                } else if (ConstantUtil.DOWNLOADED_STATUS.equals(stsTxt)) {
+                    sts = DETAIL_DOWNLOADED;
                 }
                 // COMPLETE_STATUS records should not be returned
             }
@@ -176,6 +179,10 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
                 case DETAIL_FAILED:
                     status = "Not sent ";
                     icon = R.drawable.redx;
+                    break;
+                case DETAIL_DOWNLOADED:
+                    status = "Downloaded: ";
+                    icon = R.drawable.checkmark2;
                     break;
                 default: // Should not happen
                     status = "Submitted: ";

@@ -2162,12 +2162,15 @@ public class SurveyDbAdapter {
     public void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
         for (SurveyInstance surveyInstance : surveyInstances) {
             Cursor cursor = database.query(RESPONDENT_TABLE, new String[] {
-                    UUID_COL},
+                    PK_ID_COL, UUID_COL},
                     UUID_COL + " = ?",
                     new String[] { surveyInstance.getUuid()},
                     null, null, null);
                 
-            boolean exists = cursor.getCount() > 0;
+            long id = -1;
+            if (cursor.moveToFirst()) {
+                id = cursor.getInt(0);
+            }
             cursor.close();
                 
             ContentValues values = new ContentValues();
@@ -2176,12 +2179,14 @@ public class SurveyDbAdapter {
             values.put(SURVEYED_LOCALE_ID_COL, surveyedLocaleId);
             values.put(STATUS_COL, ConstantUtil.SUBMITTED_STATUS);// ???
                 
-            if (exists) {
+            if (id != -1) {
                 database.update(RESPONDENT_TABLE, values, UUID_COL + " = ?", new String[] { surveyInstance.getUuid()});
             } else {
                 values.put(UUID_COL, surveyInstance.getUuid());
-                database.insert(RESPONDENT_TABLE, null, values);
+                id = database.insert(RESPONDENT_TABLE, null, values);
             }
+            
+            createTransmissionHistory(id, null, ConstantUtil.DOWNLOADED_STATUS);
                 
             // Now the responses...
             syncResponses(surveyInstance.getResponses(), surveyInstance.getUuid());

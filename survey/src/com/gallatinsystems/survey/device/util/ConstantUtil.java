@@ -71,6 +71,7 @@ public class ConstantUtil {
     public static final String IN_PROGRESS_STATUS = "In Progress";
     public static final String QUEUED_STATUS = "Queued";
     public static final String FAILED_STATUS = "Failed";
+    public static final String DOWNLOADED_STATUS = "Downloaded";
 
     /**
      * deletion indicators

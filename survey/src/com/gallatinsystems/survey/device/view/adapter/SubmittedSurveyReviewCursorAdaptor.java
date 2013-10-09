@@ -106,7 +106,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
             for (int i = 0; i < transList.size(); i++) {
                 // need to remember all non-zip files
                 String fn = transList.get(i).getFileName();
-                if (!fn.endsWith(".zip")) {
+                if (fn != null && !fn.endsWith(".zip")) {
                     String stsTxt = transList.get(i).getStatus();
                     if (stsTxt != null) {
                         if (ConstantUtil.COMPLETE_STATUS.equals(stsTxt)) {
@@ -122,7 +122,7 @@ public class SubmittedSurveyReviewCursorAdaptor extends CursorAdapter {
             // second pass - find any files that were not successful
             for (int i = 0; i < transList.size(); i++) {
                 String fn = transList.get(i).getFileName();
-                if (!fn.endsWith(".zip")) {
+                if (fn != null && !fn.endsWith(".zip")) {
                     String stsTxt = transList.get(i).getStatus();
                     if (stsTxt != null) {
                         if (ConstantUtil.QUEUED_STATUS.equals(stsTxt)) {

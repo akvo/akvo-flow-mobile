@@ -88,7 +88,6 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         if (dialog != null) {
-                                            dialog.cancel();
                                             context.finish();
                                         }
                                     }

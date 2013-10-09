@@ -348,12 +348,12 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mSurveyGroup != null) {
-            final int menuRes = mSurveyGroup.isMonitored() ?
-                    R.menu.survey_group_activity_monitored
-                    : R.menu.survey_group_activity;
-            getMenuInflater().inflate(menuRes, menu);
+        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+            getMenuInflater().inflate(R.menu.survey_group_activity_monitored, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.survey_group_activity, menu);
         }
+        
         return super.onCreateOptionsMenu(menu);
     }
 

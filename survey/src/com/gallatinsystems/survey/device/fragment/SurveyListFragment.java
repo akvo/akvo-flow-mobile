@@ -134,7 +134,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                     // Enable only registration survey
                     return isRegistrationSurvey;
                 } else {
-                    return !isRegistrationSurvey;
+                    return true;
                 }
             } 
             

@@ -110,7 +110,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         
         init();// No external storage will finish the application
         setupNavigationList();
-        displayUser();
+        loadLastUser();
     }
     
     @Override
@@ -130,6 +130,27 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     public void onDestroy() {
         super.onDestroy();
         mDatabase.close();
+    }
+    
+    /**
+     * Checks if the user preference to persist logged-in users is set and, if
+     * so, loads the last logged-in user from the DB
+     */
+    private void loadLastUser() {
+        // First check if they want to keep users logged in
+        String val = mDatabase.findPreference(ConstantUtil.USER_SAVE_SETTING_KEY);
+        if (val != null && Boolean.parseBoolean(val)) {
+            val = mDatabase.findPreference(ConstantUtil.LAST_USER_SETTING_KEY);
+            if (val != null && val.trim().length() > 0) {
+                Cursor cur = mDatabase.findUser(Long.valueOf(val));
+                if (cur != null) {
+                    mUserId = val;
+                    mUserName = cur.getString(cur.getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL));
+                    cur.close();
+                }
+            }
+        }
+        displayUser();
     }
     
     private void init() {

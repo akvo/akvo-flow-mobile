@@ -1,7 +1,26 @@
+/*
+ *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
 
 package com.gallatinsystems.survey.device.activity;
 
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.List;
+
+import org.apache.http.HttpException;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +29,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -33,6 +53,12 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
+import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
+import com.gallatinsystems.survey.device.parser.json.SurveyedLocaleParser;
+import com.gallatinsystems.survey.device.util.ConstantUtil;
+import com.gallatinsystems.survey.device.util.HttpUtil;
+import com.gallatinsystems.survey.device.util.PropertyUtil;
+import com.gallatinsystems.survey.device.util.StatusUtil;
 
 public class SurveyedLocaleListActivity extends ActionBarActivity implements
         LoaderCallbacks<Cursor>,
@@ -40,21 +66,24 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
     public static final String TAG = SurveyedLocaleListActivity.class.getSimpleName();
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
     public static final String EXTRA_SURVEYED_LOCALE_ID = "surveyed_locale_id";
+    
+    // API parameters
+    private static final String SURVEYED_LOCALE_SERVICE_PATH = "/surveyedlocale?surveyGroupId=";
+    private static final String PARAM_PHONE_NUMBER = "&phoneNumber=";
+    private static final String PARAM_IMEI = "&imei=";
+    private static final String PARAM_ONLY_COUNT = "&checkAvailable=";
 
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
     private double mLongitude = 0.0d;
-    private static final double RADIUS = 100000d; // Meters
+    private static final double RADIUS = 100000d;// Meters
 
     private int mSurveyGroupId;
+    private String mServerBase;
+    private SurveyDbAdapter mDatabase;
 
     private ListView mListView;
     private CursorAdapter mAdapter;
-
-    private SurveyDbAdapter mDatabase;
-
-    // Loader id
-    private static final int ID_SURVEYED_LOCALE_LIST = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,19 +96,21 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
 
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
+        mServerBase = getServerBase();
+        
         mAdapter = new SurveyedLocaleListAdapter(this);
         mListView = (ListView) findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
 
         mListView.setEmptyView(findViewById(android.R.id.empty));
-        //loadData();
     }
     
     
     @Override
     public void onResume() {
         super.onResume();
+        mDatabase.open();
         // try to find out where we are
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -99,16 +130,11 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
     public void onPause() {
         super.onPause();
         mLocationManager.removeUpdates(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         mDatabase.close();
     }
 
     private void loadData() {
-        getSupportLoaderManager().restartLoader(ID_SURVEYED_LOCALE_LIST, null, this);
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -121,18 +147,16 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_record:
-                /*
-                 * SurveyDbAdapter db = new SurveyDbAdapter(this).open();
-                 * db.createSurveyedLocale(mSurveyGroupId); db.close();
-                 * display();
-                 */
-                setResult(RESULT_OK);// Return null locale (new record will be
-                                     // created)
+                setResult(RESULT_OK);// Return null locale (new record will be created)
                 finish();
                 return true;
             case R.id.map_results:
                 // TODO
                 Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.sync_records:
+                Toast.makeText(SurveyedLocaleListActivity.this, "Syncing...", Toast.LENGTH_LONG).show();
+                new DownloadRecordsTask().execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -149,7 +173,71 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
         setResult(RESULT_OK, intent);
         finish();
     }
+            
+    private String getServerBase() {
+        String serverBase = mDatabase.findPreference(ConstantUtil.SERVER_SETTING_KEY);
+        if (serverBase != null && serverBase.trim().length() > 0) {
+            serverBase = getResources().getStringArray(R.array.servers)[Integer
+                    .parseInt(serverBase)];
+        } else {
+            serverBase = new PropertyUtil(getResources()).
+                    getProperty(ConstantUtil.SERVER_BASE);
+        }
+            
+        return serverBase;
+    }
+    
+    // ==================================== //
+    // ========= Loader Callbacks ========= //
+    // ==================================== //
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new SurveyedLocaleLoader(this, mDatabase, mSurveyGroupId, mLatitude, mLongitude, RADIUS);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null) {
+            Log.e(TAG, "onFinished() - Loader returned no data");
+            return;
+        }
+
+        mAdapter.changeCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+    
+    // ==================================== //
+    // ========= Location Callbacks ========= //
+    // ==================================== //
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // a single location is all we need
+        mLocationManager.removeUpdates(this);
+        mLatitude = location.getLatitude();
+        mLongitude = location.getLongitude();
+        loadData();
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    /**
+     * List Adapter to bind the Surveyed Locales into the list items
+     */
     class SurveyedLocaleListAdapter extends CursorAdapter {
 
         public SurveyedLocaleListAdapter(Context context) {
@@ -201,53 +289,51 @@ public class SurveyedLocaleListActivity extends ActionBarActivity implements
         }
 
     }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case ID_SURVEYED_LOCALE_LIST:
-                return new SurveyedLocaleLoader(this, mDatabase, mSurveyGroupId, mLatitude, mLongitude, RADIUS);
+    
+    /**
+     * Worker thread to download the records.
+     */
+    class DownloadRecordsTask extends AsyncTask<Void, Void, Integer> {
+        
+        @Override
+        protected Integer doInBackground(Void... params) {
+            String response = null;
+            int syncedRecords = 0;
+            try {
+                final String url = mServerBase
+                        + SURVEYED_LOCALE_SERVICE_PATH + mSurveyGroupId
+                        + PARAM_PHONE_NUMBER + URLEncoder.encode(StatusUtil.getPhoneNumber(SurveyedLocaleListActivity.this), "UTF-8")
+                        + PARAM_IMEI + URLEncoder.encode(StatusUtil.getImei(SurveyedLocaleListActivity.this), "UTF-8")
+                        + PARAM_ONLY_COUNT + false;
+                response = HttpUtil.httpGet(url);
+                if (response != null) {
+                    List<SurveyedLocale> surveyedLocales = new SurveyedLocaleParser().parseList(response);
+                    if (surveyedLocales != null) {
+                        SurveyDbAdapter database = new SurveyDbAdapter(SurveyedLocaleListActivity.this).open();
+                        database.syncSurveyedLocales(surveyedLocales);
+                        database.close();
+                        syncedRecords = surveyedLocales.size();
+                    }
+                }
+            } catch (HttpException e) {
+                Log.e(TAG, "Server returned an unexpected response", e);
+                PersistentUncaughtExceptionHandler.recordException(e);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                PersistentUncaughtExceptionHandler.recordException(e);
+            }
+            
+            return syncedRecords;
         }
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
-            return;
+        
+        @Override
+        protected void onPostExecute(Integer result) {
+            Toast.makeText(SurveyedLocaleListActivity.this, "Synced " + result.toString()  + " records", 
+                    Toast.LENGTH_LONG).show();
+            // Refresh the list with synced records
+            loadData();
         }
-
-        switch (loader.getId()) {
-            case ID_SURVEYED_LOCALE_LIST:
-                mAdapter.changeCursor(cursor);
-                break;
-        }
+        
     }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        // a single location is all we need
-        mLocationManager.removeUpdates(this);
-        mLatitude = location.getLatitude();
-        mLongitude = location.getLongitude();
-
-        loadData();
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
+    
 }

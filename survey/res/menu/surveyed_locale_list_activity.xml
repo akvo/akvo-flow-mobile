@@ -16,4 +16,10 @@
         android:title="Map Results"
         flowapp:showAsAction="always"/>
 
+    <item
+        android:id="@+id/sync_records"
+        android:orderInCategory="102"
+        android:title="Sync Records"
+        flowapp:showAsAction="never"/>
+
 </menu>

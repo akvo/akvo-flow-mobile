@@ -411,14 +411,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 intent.putExtras(extras);
                 startActivityForResult(intent, ID_SURVEYED_LOCALE_LIST);
                 return true;
-            case R.id.download_records:
-                Intent activity = new Intent(this, DownloadRecordsActivity.class);
-                Bundle args = new Bundle();
-                args.putInt(DownloadRecordsActivity.EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
-                args.putString(DownloadRecordsActivity.EXTRA_SURVEY_GROUP_NAME, mSurveyGroup.getName());
-                activity.putExtras(args);
-                startActivity(activity);
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -21,6 +21,7 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <application
+        android:name=".app.FlowApp"
         android:hasCode="true"
         android:icon="@drawable/acrlogo"
         android:label="@string/app_name" >

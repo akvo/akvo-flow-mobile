@@ -222,6 +222,7 @@
     <string name="clicktoinstall">Click to install</string>
     <string name="clear_data_success">Data successfully deleted from the device</string>
     <string name="clear_data_error">Error deleting data from the device</string>
+    <string name="configuring_languages">Configuring survey languages...</string>
 
     <!-- Action to identify the BroadcastReceiver, notifying new surveys have been downloaded -->
     <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>

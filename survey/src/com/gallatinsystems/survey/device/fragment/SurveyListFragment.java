@@ -49,10 +49,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>, OnItemClickListener {
     private static final String TAG = SurveyListFragment.class.getSimpleName();
     
-    // Cursor IDs
-    private static final int ID_SURVEY_LIST = 0;
-    //private static final int ID_SURVEY_INSTANCE_LIST = 1;
-    
     private String mUserId;
     private SurveyGroup mSurveyGroup;
     private String mLocaleId;// If null, we need to create one
@@ -96,7 +92,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     public void refresh(SurveyGroup surveyGroup, String localeId) {
         mSurveyGroup = surveyGroup;
         mLocaleId = localeId;
-        getLoaderManager().restartLoader(ID_SURVEY_LIST, null, this);
+        getLoaderManager().restartLoader(0, null, this);
     }
     
     public void setUserId(String userId) {
@@ -183,15 +179,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case ID_SURVEY_LIST:
-                return new SurveyListLoader(getActivity(), mDatabase, mSurveyGroup.getId());
-            /*
-            case ID_SURVEY_INSTANCE_LIST:
-                return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroup.getId(), mLocaleId);
-            */
-        }
-        return null;
+        return new SurveyListLoader(getActivity(), mDatabase, mSurveyGroup.getId());
     }
 
     @Override
@@ -201,25 +189,11 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             return;
         }
         
-        switch (loader.getId()) {
-            case ID_SURVEY_LIST:
-                mAdapter.clear();
-                if (cursor.moveToFirst()) {
-                    do {
-                        mAdapter.add(SurveyDbAdapter.getSurvey(cursor));
-                    } while (cursor.moveToNext());
-                    
-                } else {
-                    Log.e(TAG, "onFinished() - Loader returned no data");
-                }
-                break;
-            /*
-            case ID_SURVEY_INSTANCE_LIST:
-                // We just need the count. If no record exists, we should only enable register survey
-                mRegistered = cursor.getCount() > 0;
-                mAdapter.notifyDataSetChanged();
-                break;
-            */
+        mAdapter.clear();
+        if (cursor.moveToFirst()) {
+            do {
+                mAdapter.add(SurveyDbAdapter.getSurvey(cursor));
+            } while (cursor.moveToNext());
         }
     }
 

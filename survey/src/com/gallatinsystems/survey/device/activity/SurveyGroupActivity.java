@@ -265,7 +265,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                     mAdapter.onSurveyedLocaleChange();
                 }
                 break;
-                
         }
     }
     

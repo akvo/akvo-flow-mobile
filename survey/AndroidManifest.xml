@@ -35,12 +35,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SurveyedLocaleListActivity"
+            android:name=".activity.SurveyedLocalesActivity"
             android:label="Select Record"
-            android:theme="@style/FieldSurveyTheme" />
-        <activity
-            android:name=".activity.DownloadRecordsActivity"
-            android:label="Download Records"
             android:theme="@style/FieldSurveyTheme" />
         <activity
             android:name=".activity.SurveyViewActivity"

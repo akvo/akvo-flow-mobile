@@ -259,7 +259,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
             case ID_SURVEYED_LOCALE_LIST:
                 if (resultCode == RESULT_OK) {
                     mLocaleId = intent != null ? 
-                            intent.getStringExtra(SurveyedLocaleListActivity.EXTRA_SURVEYED_LOCALE_ID)
+                            intent.getStringExtra(SurveyedLocalesActivity.EXTRA_SURVEYED_LOCALE_ID)
                             : null;
                     displayRecord();
                     mAdapter.onSurveyedLocaleChange();
@@ -404,9 +404,9 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.locales_icon:
-                Intent intent = new Intent(this, SurveyedLocaleListActivity.class);
+                Intent intent = new Intent(this, SurveyedLocalesActivity.class);
                 Bundle extras = new Bundle();
-                extras.putInt(SurveyedLocaleListActivity.EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
+                extras.putInt(SurveyedLocalesActivity.EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
                 intent.putExtras(extras);
                 startActivityForResult(intent, ID_SURVEYED_LOCALE_LIST);
                 return true;

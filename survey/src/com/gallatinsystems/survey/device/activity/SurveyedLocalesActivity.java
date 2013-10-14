@@ -34,6 +34,7 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
+import com.gallatinsystems.survey.device.fragment.MapFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocaleListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocalesFragmentListener;
 import com.gallatinsystems.survey.device.parser.json.SurveyedLocaleParser;
@@ -41,6 +42,7 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
+import com.google.android.gms.maps.SupportMapFragment;
 
 public class SurveyedLocalesActivity extends ActionBarActivity implements SurveyedLocalesFragmentListener {
     
@@ -63,6 +65,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     private static final int FRAGMENT_LIST = 0;
     private static final int FRAGMENT_MAP  = 1;
     private SurveyedLocaleListFragment mListFragment;
+    private SupportMapFragment mMapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +85,13 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
 
             // Create a new Fragment to be placed in the activity layout
             mListFragment = new SurveyedLocaleListFragment();
+            mMapFragment = MapFragment.newInstance();
             // Pass the arguments on to let the fragment retrieve the survey group
             mListFragment.setArguments(getIntent().getExtras());
             
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, mListFragment).commit();
+                    .add(R.id.fragment_container, mMapFragment).commit();
         }
     }
     

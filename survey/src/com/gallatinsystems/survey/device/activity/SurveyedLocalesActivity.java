@@ -24,6 +24,8 @@ import org.apache.http.HttpException;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -42,7 +44,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
-import com.google.android.gms.maps.SupportMapFragment;
 
 public class SurveyedLocalesActivity extends ActionBarActivity implements SurveyedLocalesFragmentListener {
     
@@ -61,11 +62,8 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     
     private SurveyDbAdapter mDatabase;
     
-    // Fragments
-    private static final int FRAGMENT_LIST = 0;
-    private static final int FRAGMENT_MAP  = 1;
-    private SurveyedLocaleListFragment mListFragment;
-    private SupportMapFragment mMapFragment;
+    // False for MapFragment. List by default.
+    private boolean mListResults = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,16 +80,8 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
             if (savedInstanceState != null) {
                 return;
             }
-
-            // Create a new Fragment to be placed in the activity layout
-            mListFragment = new SurveyedLocaleListFragment();
-            mMapFragment = MapFragment.newInstance();
-            // Pass the arguments on to let the fragment retrieve the survey group
-            mListFragment.setArguments(getIntent().getExtras());
             
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, mMapFragment).commit();
+            display();
         }
     }
     
@@ -106,27 +96,55 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         super.onPause();
         mDatabase.close();
     }
+    
+    private void display() {
+        Fragment fragment = mListResults ? new SurveyedLocaleListFragment() : MapFragment.newInstance();
+        // Pass the arguments on to let the fragment retrieve the survey group
+        fragment.setArguments(getIntent().getExtras());
+            
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        // Add the fragment to the 'fragment_container' FrameLayout
+        transaction.replace(R.id.fragment_container, fragment);
+        //transaction.addToBackStack(null);
+        transaction.commit();
+    }
+    
+    private void switchFragment() {
+        mListResults = !mListResults;
+        supportInvalidateOptionsMenu();
+        display();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.surveyed_locale_list_activity, menu);
+        // We must hide list/map results option depending on the current fragment
+        if (mListResults) {
+            menu.removeItem(R.id.list_results);
+        } else {
+            menu.removeItem(R.id.map_results);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.search:
+                // TODO
+                Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                return true;
             case R.id.new_record:
                 setResult(RESULT_OK);// Return null locale (new record will be created)
                 finish();
                 return true;
-            case R.id.map_results:
-                // TODO
-                Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                return true;
             case R.id.sync_records:
                 Toast.makeText(SurveyedLocalesActivity.this, "Syncing...", Toast.LENGTH_LONG).show();
                 new DownloadRecordsTask().execute();
+                return true;
+            case R.id.list_results:
+            case R.id.map_results:
+                switchFragment();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -195,7 +213,13 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
             Toast.makeText(SurveyedLocalesActivity.this, "Synced " + result.toString()  + " records", 
                     Toast.LENGTH_LONG).show();
             // Refresh the list with synced records
-            mListFragment.refresh();
+            if (mListResults) {
+                SurveyedLocaleListFragment fragment = (SurveyedLocaleListFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.fragment_container);
+                fragment.refresh();
+            } else {
+                // TODO   
+            }
         }
         
     }

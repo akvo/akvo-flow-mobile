@@ -3,22 +3,34 @@
     xmlns:flowapp="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_menu_search"
+        android:orderInCategory="100"
+        android:title="Search"
+        flowapp:showAsAction="always"/>
+
+    <item
         android:id="@+id/new_record"
         android:icon="@drawable/ic_menu_add"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:title="New Record"
-        flowapp:showAsAction="always"/>
+        flowapp:showAsAction="never"/>
+
+    <item
+        android:id="@+id/list_results"
+        android:orderInCategory="102"
+        android:title="List Results"
+        flowapp:showAsAction="never"/>
 
     <item
         android:id="@+id/map_results"
-        android:icon="@drawable/ic_menu_mapmode"
-        android:orderInCategory="101"
+        android:orderInCategory="103"
         android:title="Map Results"
-        flowapp:showAsAction="always"/>
+        flowapp:showAsAction="never"/>
 
     <item
         android:id="@+id/sync_records"
-        android:orderInCategory="102"
+        android:orderInCategory="104"
         android:title="Sync Records"
         flowapp:showAsAction="never"/>
 

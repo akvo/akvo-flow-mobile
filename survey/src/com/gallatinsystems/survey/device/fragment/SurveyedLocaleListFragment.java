@@ -163,7 +163,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     }
     
     // ==================================== //
-    // ========= Location Callbacks ========= //
+    // ======== Location Callbacks ======== //
     // ==================================== //
 
     @Override

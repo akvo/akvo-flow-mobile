@@ -27,6 +27,8 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
     private double mLatitude;
     private double mLongitude;
     private double mRadius;
+    
+    private boolean mFilter;
 
     public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, int surveyGroupId,
             double latitude, double longitude, double radius) {
@@ -35,12 +37,23 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
         mLatitude = latitude;
         mLongitude = longitude;
         mRadius = radius;
+        
+        mFilter = true;
+    }
+    
+    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, int surveyGroupId) {
+        super(context, db);
+        mSurveyGroupId = surveyGroupId;
+        
+        mFilter = false;
     }
 
     @Override
     protected Cursor loadData(SurveyDbAdapter database) {
-        //return database.getSurveyedLocales(mSurveyGroupId);
-        return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mRadius);
+        if (mFilter) {
+            return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mRadius);
+        }
+        return database.getSurveyedLocales(mSurveyGroupId);
     }
 
 }

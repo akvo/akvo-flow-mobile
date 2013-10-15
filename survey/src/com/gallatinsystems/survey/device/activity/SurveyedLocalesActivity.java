@@ -98,7 +98,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     }
     
     private void display() {
-        Fragment fragment = mListResults ? new SurveyedLocaleListFragment() : MapFragment.newInstance();
+        Fragment fragment = mListResults ? new SurveyedLocaleListFragment() : new MapFragment();
         // Pass the arguments on to let the fragment retrieve the survey group
         fragment.setArguments(getIntent().getExtras());
             

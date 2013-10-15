@@ -285,11 +285,13 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         
         public void onUserChanged() {
             Fragment surveyListFragment = getSupportFragmentManager().findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
-            if (surveyListFragment != null)
-            ((SurveyListFragment)surveyListFragment).setUserId(mUserId);
+            if (surveyListFragment != null) {
+                ((SurveyListFragment)surveyListFragment).setUserId(mUserId);
+            }
         }
         
         private String getFragmentTag(int pos){
+            // Hell of a hack. This should be changed for a more reliable method
             return "android:switcher:" + R.id.pager + ":" + pos;
         }
         

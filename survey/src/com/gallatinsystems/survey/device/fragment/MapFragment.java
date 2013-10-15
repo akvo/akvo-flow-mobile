@@ -1,13 +1,25 @@
+/*
+ *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
+
 package com.gallatinsystems.survey.device.fragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
 import android.database.Cursor;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -27,13 +39,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapFragment extends SupportMapFragment implements LocationListener, LoaderCallbacks<Cursor> {
+public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor> {
     private static final String TAG = MapFragment.class.getSimpleName();
-    
-    private LocationManager mLocationManager;
     
     private int mSurveyGroupId;
     private SurveyDbAdapter mDatabase;
+    
+    private GoogleMap mMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,16 +56,17 @@ public class MapFragment extends SupportMapFragment implements LocationListener,
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         mDatabase = new SurveyDbAdapter(getActivity());
+        if (mMap == null) {
+            mMap = getMap();
+            mMap.setMyLocationEnabled(true);
+        }
     }
     
     @Override
     public void onResume() {
         super.onResume();
         mDatabase.open();
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
         refresh();
     }
     
@@ -61,7 +74,6 @@ public class MapFragment extends SupportMapFragment implements LocationListener,
     public void onPause() {
         super.onPause();
         mDatabase.close();
-        mLocationManager.removeUpdates(this);
     }
     
     @Override
@@ -88,12 +100,13 @@ public class MapFragment extends SupportMapFragment implements LocationListener,
     }
     
     private void displaySurveyedLocales(List<SurveyedLocale> surveyedLocales) {
-        GoogleMap map = getMap();
-        
-        for (SurveyedLocale surveyedLocale : surveyedLocales) {
-            map.addMarker(new MarkerOptions()
-                    .position(new LatLng(surveyedLocale.getLatitude(), surveyedLocale.getLongitude()))
-                    .title(surveyedLocale.getId()));
+        if (mMap != null) {
+            mMap.clear();
+            for (SurveyedLocale surveyedLocale : surveyedLocales) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(surveyedLocale.getLatitude(), surveyedLocale.getLongitude()))
+                        .title(surveyedLocale.getId()));
+            }
         }
     }
 
@@ -127,29 +140,4 @@ public class MapFragment extends SupportMapFragment implements LocationListener,
     public void onLoaderReset(Loader<Cursor> loader) {
     }
     
-    // ==================================== //
-    // ======== Location Callbacks ======== //
-    // ==================================== //
-
-    @Override
-    public void onLocationChanged(Location location) {
-        // a single location is all we need
-        mLocationManager.removeUpdates(this);
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        // TODO: center map
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
 }

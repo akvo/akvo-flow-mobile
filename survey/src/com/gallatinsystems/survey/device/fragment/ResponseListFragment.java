@@ -61,7 +61,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     
     private static final int UPDATE_INTERVAL_MS = 10000; // every ten seconds
     
-    private String mUserId;
     private SurveyGroup mSurveyGroup;
     private String mSurveyedLocaleId;
     private SubmittedSurveyReviewCursorAdaptor mAdapter;
@@ -128,10 +127,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         setHasOptionsMenu(true);
         
         refresh();
-    }
-    
-    public void setUserId(String userId) {
-        mUserId = userId;
     }
 
     @Override

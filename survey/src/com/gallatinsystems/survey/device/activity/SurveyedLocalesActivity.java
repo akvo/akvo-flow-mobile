@@ -218,7 +218,9 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
                         .findFragmentById(R.id.fragment_container);
                 fragment.refresh();
             } else {
-                // TODO   
+                MapFragment fragment = (MapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.fragment_container);
+                fragment.refresh();
             }
         }
         

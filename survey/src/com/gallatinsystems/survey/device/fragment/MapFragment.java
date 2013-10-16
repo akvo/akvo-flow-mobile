@@ -19,6 +19,7 @@ package com.gallatinsystems.survey.device.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -35,15 +36,18 @@ import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor> {
+public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener {
     private static final String TAG = MapFragment.class.getSimpleName();
     
     private int mSurveyGroupId;
     private SurveyDbAdapter mDatabase;
+    private SurveyedLocalesFragmentListener mListener;
     
     private GoogleMap mMap;
 
@@ -54,12 +58,27 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     }
     
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mListener = (SurveyedLocalesFragmentListener)activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement SurveyedLocalesFragmentListener");
+        }
+    }
+    
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mDatabase = new SurveyDbAdapter(getActivity());
         if (mMap == null) {
             mMap = getMap();
             mMap.setMyLocationEnabled(true);
+            mMap.setOnInfoWindowClickListener(this);
         }
     }
     
@@ -108,6 +127,12 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
                         .title(surveyedLocale.getId()));
             }
         }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        final String surveyedLocaleId = marker.getTitle();
+        mListener.onSurveyedLocaleSelected(surveyedLocaleId);
     }
 
     // ==================================== //

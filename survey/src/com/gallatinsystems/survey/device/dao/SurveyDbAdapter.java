@@ -101,6 +101,20 @@ public class SurveyDbAdapter {
     public static final String EXPORTED_FLAG_COL = "exported_flag";
     public static final String UUID_COL = "uuid";
     
+    public interface Tables {
+        String SURVEY = "survey";
+        String RESPONDENT = "survey_respondent";
+        String RESPONSE = "survey_response";
+        String USER = "user";
+        String PLOT = "plot";
+        String PLOT_POINT = "plot_point";
+        String PREFERENCES = "preferences";
+        String POINT_OF_INTEREST = "point_of_interest";
+        String TRANSMISSION_HISTORY = "transmission_history";
+        String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
+        String SURVEYED_LOCALE = "surveyed_locale";// Introduced in Point Updates
+    }
+    
     public interface SurveyGroupAttrs {
         String ID                 = "_id";
         String NAME               = "name";
@@ -172,18 +186,6 @@ public class SurveyDbAdapter {
     };
 
     private static final String DATABASE_NAME = "surveydata";
-    // Tables
-    private static final String SURVEY_TABLE = "survey";
-    private static final String RESPONDENT_TABLE = "survey_respondent";
-    private static final String RESPONSE_TABLE = "survey_response";
-    private static final String USER_TABLE = "user";
-    private static final String PLOT_TABLE = "plot";
-    private static final String PLOT_POINT_TABLE = "plot_point";
-    private static final String PREFERENCES_TABLE = "preferences";
-    private static final String POINT_OF_INTEREST_TABLE = "point_of_interest";
-    private static final String TRANSMISSION_HISTORY_TABLE = "transmission_history";
-    private static final String SURVEY_GROUP_TABLE = "survey_group";// Introduced in Point Updates
-    private static final String SURVEYED_LOCALE_TABLE = "surveyed_locale";// Introduced in Point Updates
 
     private static final String RESPONSE_JOIN = "survey_respondent LEFT OUTER JOIN survey_response ON (survey_respondent._id = survey_response.survey_respondent_id) LEFT OUTER JOIN user ON (user._id = survey_respondent.user_id)";
     private static final String PLOT_JOIN = "plot LEFT OUTER JOIN plot_point ON (plot._id = plot_point.plot_id) LEFT OUTER JOIN user ON (user._id = plot.user_id)";
@@ -259,17 +261,17 @@ public class SurveyDbAdapter {
             if (version != DATABASE_VERSION) {
                 Log.d(TAG, "onUpgrade() - Recreating the Database.");
                 
-                db.execSQL("DROP TABLE IF EXISTS " + RESPONSE_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + RESPONDENT_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + SURVEY_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + PLOT_POINT_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + PLOT_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + PREFERENCES_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + POINT_OF_INTEREST_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + TRANSMISSION_HISTORY_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + SURVEY_GROUP_TABLE);
-                db.execSQL("DROP TABLE IF EXISTS " + SURVEYED_LOCALE_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONDENT);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.PLOT_POINT);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.PLOT);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.USER);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.POINT_OF_INTEREST);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION_HISTORY);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_GROUP);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEYED_LOCALE);
                 
                 onCreate(db);
             }
@@ -308,8 +310,8 @@ public class SurveyDbAdapter {
         
         private void createIndexes(SQLiteDatabase db) {
             // Included in point updates
-            db.execSQL("CREATE INDEX respondent_uuid_idx ON " + RESPONDENT_TABLE + "(uuid)");
-            db.execSQL("CREATE INDEX response_idx ON " + RESPONSE_TABLE + "(survey_respondent_id, question_id)");
+            db.execSQL("CREATE INDEX respondent_uuid_idx ON " + Tables.RESPONDENT + "(uuid)");
+            db.execSQL("CREATE INDEX response_idx ON " + Tables.RESPONSE + "(survey_respondent_id, question_id)");
         }
 
         /**
@@ -317,7 +319,7 @@ public class SurveyDbAdapter {
          */
         public String findPreference(SQLiteDatabase db, String key) {
             String value = null;
-            Cursor cursor = db.query(PREFERENCES_TABLE, new String[] {
+            Cursor cursor = db.query(Tables.PREFERENCES, new String[] {
                     KEY_COL,
                     VALUE_COL
             }, KEY_COL + " = ?", new String[] {
@@ -343,13 +345,13 @@ public class SurveyDbAdapter {
         public void savePreference(SQLiteDatabase db, String key, String value) {
             ContentValues updatedValues = new ContentValues();
             updatedValues.put(VALUE_COL, value);
-            int updated = db.update(PREFERENCES_TABLE, updatedValues, KEY_COL
+            int updated = db.update(Tables.PREFERENCES, updatedValues, KEY_COL
                     + " = ?", new String[] {
                 key
             });
             if (updated <= 0) {
                 updatedValues.put(KEY_COL, key);
-                db.insert(PREFERENCES_TABLE, null, updatedValues);
+                db.insert(Tables.PREFERENCES, null, updatedValues);
             }
         }
     }
@@ -394,7 +396,7 @@ public class SurveyDbAdapter {
         ContentValues initialValues = new ContentValues();
         initialValues.put(DISP_NAME_COL, name);
         initialValues.put(HELP_DOWNLOADED_COL, "N");
-        return database.insert(SURVEY_TABLE, null, initialValues);
+        return database.insert(Tables.SURVEY, null, initialValues);
     }
 
     /**
@@ -404,10 +406,10 @@ public class SurveyDbAdapter {
      */
     public Cursor fetchUnsentData() {
         Cursor cursor = database.query(RESPONSE_JOIN, new String[] {
-                RESPONDENT_TABLE + "." + PK_ID_COL, RESP_ID_COL, ANSWER_COL,
+                Tables.RESPONDENT + "." + PK_ID_COL, RESP_ID_COL, ANSWER_COL,
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
-                RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
+                Tables.RESPONDENT + "." + SURVEY_FK_COL, SCORED_VAL_COL,
                 STRENGTH_COL, UUID_COL, SURVEY_START_COL, SURVEYED_LOCALE_ID_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND" + "(" + DELIVERED_DATE_COL
@@ -426,10 +428,10 @@ public class SurveyDbAdapter {
      */
     public Cursor fetchUnexportedData() {
         Cursor cursor = database.query(RESPONSE_JOIN, new String[] {
-                RESPONDENT_TABLE + "." + PK_ID_COL, RESP_ID_COL, ANSWER_COL,
+                Tables.RESPONDENT + "." + PK_ID_COL, RESP_ID_COL, ANSWER_COL,
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
-                RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
+                Tables.RESPONDENT + "." + SURVEY_FK_COL, SCORED_VAL_COL,
                 STRENGTH_COL, UUID_COL, SURVEY_START_COL, SURVEYED_LOCALE_ID_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND " + EXPORTED_FLAG_COL
@@ -466,7 +468,7 @@ public class SurveyDbAdapter {
         vals.put(SUBMITTED_FLAG_COL, "true");
         vals.put(SUBMITTED_DATE_COL, System.currentTimeMillis());
         vals.put(STATUS_COL, ConstantUtil.SUBMITTED_STATUS);
-        database.update(RESPONDENT_TABLE, vals,
+        database.update(Tables.RESPONDENT, vals,
                 PK_ID_COL + "= " + respondentId, null);
     }
 
@@ -484,7 +486,7 @@ public class SurveyDbAdapter {
             // enhanced FOR ok here since we're dealing with an implicit
             // iterator anyway
             for (String id : idList) {
-                if (database.update(RESPONDENT_TABLE, updatedValues, PK_ID_COL
+                if (database.update(Tables.RESPONDENT, updatedValues, PK_ID_COL
                         + " = ?", new String[] {
                     id
                 }) < 1) {
@@ -508,7 +510,7 @@ public class SurveyDbAdapter {
             // enhanced FOR ok here since we're dealing with an implicit
             // iterator anyway
             for (String id : idList) {
-                if (database.update(RESPONDENT_TABLE, updatedValues, PK_ID_COL
+                if (database.update(Tables.RESPONDENT, updatedValues, PK_ID_COL
                         + " = ?", new String[] {
                     id
                 }) < 1) {
@@ -529,7 +531,7 @@ public class SurveyDbAdapter {
             ContentValues updatedValues = new ContentValues();
             updatedValues.put(STATUS_COL, status);
             updatedValues.put(SAVED_DATE_COL, System.currentTimeMillis());
-            if (database.update(RESPONDENT_TABLE, updatedValues, PK_ID_COL
+            if (database.update(Tables.RESPONDENT, updatedValues, PK_ID_COL
                     + " = ?", new String[] {
                 surveyRespondentId
             }) < 1) {
@@ -547,7 +549,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public Cursor listUsers() {
-        Cursor cursor = database.query(USER_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.USER, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, EMAIL_COL
         }, DELETED_COL + " <> ?",
@@ -567,7 +569,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public Cursor findUser(Long id) {
-        Cursor cursor = database.query(USER_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.USER, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, EMAIL_COL
         }, PK_ID_COL + "=?",
@@ -597,9 +599,9 @@ public class SurveyDbAdapter {
         initialValues.put(DELETED_COL, ConstantUtil.NOT_DELETED);
 
         if (idVal == null) {
-            idVal = database.insert(USER_TABLE, null, initialValues);
+            idVal = database.insert(Tables.USER, null, initialValues);
         } else {
-            if (database.update(USER_TABLE, initialValues, PK_ID_COL + "=?",
+            if (database.update(Tables.USER, initialValues, PK_ID_COL + "=?",
                     new String[] {
                         idVal.toString()
                     }) > 0) {
@@ -615,7 +617,7 @@ public class SurveyDbAdapter {
      * @return Cursor over all responses
      */
     public Cursor fetchResponsesByRespondent(String respondentID) {
-        return database.query(RESPONSE_TABLE, new String[] {
+        return database.query(Tables.RESPONSE, new String[] {
                 RESP_ID_COL,
                 QUESTION_FK_COL, ANSWER_COL, ANSWER_TYPE_COL,
                 SURVEY_RESPONDENT_ID_COL, INCLUDE_FLAG_COL, SCORED_VAL_COL,
@@ -636,7 +638,7 @@ public class SurveyDbAdapter {
     public QuestionResponse findSingleResponse(Long respondentId,
             String questionId) {
         QuestionResponse resp = null;
-        Cursor cursor = database.query(RESPONSE_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.RESPONSE, new String[] {
                 RESP_ID_COL, QUESTION_FK_COL, ANSWER_COL, ANSWER_TYPE_COL,
                 SURVEY_RESPONDENT_ID_COL, INCLUDE_FLAG_COL, SCORED_VAL_COL,
                 STRENGTH_COL
@@ -701,9 +703,9 @@ public class SurveyDbAdapter {
         initialValues.put(INCLUDE_FLAG_COL, resp.getIncludeFlag());
         initialValues.put(STRENGTH_COL, responseToSave.getStrength());
         if (responseToSave.getId() == null) {
-            id = database.insert(RESPONSE_TABLE, null, initialValues);
+            id = database.insert(Tables.RESPONSE, null, initialValues);
         } else {
-            if (database.update(RESPONSE_TABLE, initialValues, RESP_ID_COL
+            if (database.update(Tables.RESPONSE, initialValues, RESP_ID_COL
                     + "=?", new String[] {
                 responseToSave.getId().toString()
             }) > 0) {
@@ -723,7 +725,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public long createOrLoadSurveyRespondent(String surveyId, String userId, int surveyGroupId, String surveyedLocaleId) {
-        Cursor results = database.query(RESPONDENT_TABLE, new String[] {
+        Cursor results = database.query(Tables.RESPONDENT, new String[] {
             "max(" + PK_ID_COL + ")"
         }, SUBMITTED_FLAG_COL + "='false' and "
                 + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?", new String[] {
@@ -762,7 +764,7 @@ public class SurveyDbAdapter {
         initialValues.put(UUID_COL, UUID.randomUUID().toString());
         initialValues.put(SURVEY_START_COL, System.currentTimeMillis());
         initialValues.put(SURVEYED_LOCALE_ID_COL, surveyedLocaleId);
-        return database.insert(RESPONDENT_TABLE, null, initialValues);
+        return database.insert(Tables.RESPONDENT, null, initialValues);
     }
 
     /**
@@ -782,7 +784,7 @@ public class SurveyDbAdapter {
         initialValues.put(LON_COL, lon);
         initialValues.put(ELEVATION_COL, currentElevation);
         initialValues.put(CREATED_DATE_COL, System.currentTimeMillis());
-        return database.insert(PLOT_POINT_TABLE, null, initialValues);
+        return database.insert(Tables.PLOT_POINT, null, initialValues);
     }
 
     /**
@@ -792,7 +794,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public Cursor listPlots(String status) {
-        Cursor cursor = database.query(PLOT_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.PLOT, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, DESC_COL, CREATED_DATE_COL, STATUS_COL
         },
@@ -814,7 +816,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public Cursor findPlot(Long id) {
-        Cursor cursor = database.query(PLOT_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.PLOT, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, DESC_COL, CREATED_DATE_COL, STATUS_COL
         },
@@ -848,9 +850,9 @@ public class SurveyDbAdapter {
         initialValues.put(STATUS_COL, ConstantUtil.IN_PROGRESS_STATUS);
 
         if (idVal == null) {
-            idVal = database.insert(PLOT_TABLE, null, initialValues);
+            idVal = database.insert(Tables.PLOT, null, initialValues);
         } else {
-            if (database.update(PLOT_TABLE, initialValues, PK_ID_COL + "=?",
+            if (database.update(Tables.PLOT, initialValues, PK_ID_COL + "=?",
                     new String[] {
                         idVal.toString()
                     }) > 0) {
@@ -867,7 +869,7 @@ public class SurveyDbAdapter {
      */
     public Cursor listPlotPoints(String plotId, String afterTime) {
         Cursor cursor = database
-                .query(PLOT_POINT_TABLE, new String[] {
+                .query(Tables.PLOT_POINT, new String[] {
                         PK_ID_COL, LAT_COL,
                         LON_COL, CREATED_DATE_COL
                 }, PLOT_FK_COL + " = ? and "
@@ -890,7 +892,7 @@ public class SurveyDbAdapter {
     public long updatePlotStatus(String plotId, String status) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(STATUS_COL, status);
-        return database.update(PLOT_TABLE, initialValues, PK_ID_COL + " = ?",
+        return database.update(Tables.PLOT, initialValues, PK_ID_COL + " = ?",
                 new String[] {
                     plotId
                 });
@@ -925,11 +927,11 @@ public class SurveyDbAdapter {
     public Cursor listCompletePlotPoints() {
         Cursor cursor = database
                 .query(PLOT_JOIN, new String[] {
-                        PLOT_TABLE + "." + PK_ID_COL + " as plot_id",
-                        PLOT_TABLE + "." + DISP_NAME_COL,
-                        PLOT_POINT_TABLE + "." + PK_ID_COL, LAT_COL, LON_COL,
+                        Tables.PLOT + "." + PK_ID_COL + " as plot_id",
+                        Tables.PLOT + "." + DISP_NAME_COL,
+                        Tables.PLOT_POINT + "." + PK_ID_COL, LAT_COL, LON_COL,
                         ELEVATION_COL,
-                        PLOT_POINT_TABLE + "." + CREATED_DATE_COL
+                        Tables.PLOT_POINT + "." + CREATED_DATE_COL
                 }, STATUS_COL
                         + "= ?", new String[] {
                     ConstantUtil.COMPLETE_STATUS
@@ -947,7 +949,7 @@ public class SurveyDbAdapter {
      * @param id
      */
     public void deletePlotPoint(String id) {
-        database.delete(PLOT_POINT_TABLE, PK_ID_COL + " = ?",
+        database.delete(Tables.PLOT_POINT, PK_ID_COL + " = ?",
                 new String[] {
                     id
                 });
@@ -964,7 +966,7 @@ public class SurveyDbAdapter {
     public List<Survey> checkSurveyVersions(List<Survey> surveys) {
         List<Survey> outOfDateSurveys = new ArrayList<Survey>();
         for (int i = 0; i < surveys.size(); i++) {
-            Cursor cursor = database.query(SURVEY_TABLE,
+            Cursor cursor = database.query(Tables.SURVEY,
                     new String[] {
                         PK_ID_COL
                     },
@@ -994,7 +996,7 @@ public class SurveyDbAdapter {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(HELP_DOWNLOADED_COL, isDownloaded ? "Y" : "N");
 
-        if (database.update(SURVEY_TABLE, updatedValues, PK_ID_COL + " = ?",
+        if (database.update(Tables.SURVEY, updatedValues, PK_ID_COL + " = ?",
                 new String[] {
                     surveyId
                 }) < 1) {
@@ -1009,7 +1011,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public void saveSurvey(Survey survey) {
-        Cursor cursor = database.query(SURVEY_TABLE,
+        Cursor cursor = database.query(Tables.SURVEY,
                 new String[] {
                     PK_ID_COL
                 }, PK_ID_COL + " = ?",
@@ -1032,12 +1034,12 @@ public class SurveyDbAdapter {
 
         if (cursor != null && cursor.getCount() > 0) {
             // if we found an item, it's an update, otherwise, it's an insert
-            database.update(SURVEY_TABLE, updatedValues, PK_ID_COL + " = ?",
+            database.update(Tables.SURVEY, updatedValues, PK_ID_COL + " = ?",
                     new String[] {
                         survey.getId()
                     });
         } else {
-            database.insert(SURVEY_TABLE, null, updatedValues);
+            database.insert(Tables.SURVEY, null, updatedValues);
         }
 
         if (cursor != null) {
@@ -1050,7 +1052,7 @@ public class SurveyDbAdapter {
      */
     public Survey findSurvey(String surveyId) {
         Survey survey = null;
-        Cursor cursor = database.query(SURVEY_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.SURVEY, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, LOCATION_COL, FILENAME_COL, TYPE_COL,
                 LANGUAGE_COL, HELP_DOWNLOADED_COL
@@ -1099,10 +1101,10 @@ public class SurveyDbAdapter {
                     + " is null then 0 else 1 end, " + DELIVERED_DATE_COL
                     + " desc";
         } else {
-            sortBy = RESPONDENT_TABLE + "." + PK_ID_COL + " desc";
+            sortBy = Tables.RESPONDENT + "." + PK_ID_COL + " desc";
         }
         Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
-                RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
+                Tables.RESPONDENT + "." + PK_ID_COL, DISP_NAME_COL,
                 SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL, SUBMITTED_DATE_COL,
                 DELIVERED_DATE_COL, UUID_COL
         }, "status = ?", whereParams,
@@ -1154,7 +1156,7 @@ public class SurveyDbAdapter {
                 ConstantUtil.IS_DELETED
             };
         }
-        Cursor cursor = database.query(SURVEY_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.SURVEY, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, LOCATION_COL, FILENAME_COL, TYPE_COL,
                 LANGUAGE_COL, HELP_DOWNLOADED_COL, VERSION_COL
@@ -1198,12 +1200,12 @@ public class SurveyDbAdapter {
         if (!physicalDelete) {
             ContentValues updatedValues = new ContentValues();
             updatedValues.put(DELETED_COL, ConstantUtil.IS_DELETED);
-            database.update(SURVEY_TABLE, updatedValues, PK_ID_COL + " = ?",
+            database.update(Tables.SURVEY, updatedValues, PK_ID_COL + " = ?",
                     new String[] {
                         surveyId
                     });
         } else {
-            database.delete(SURVEY_TABLE, PK_ID_COL + " = ? ",
+            database.delete(Tables.SURVEY, PK_ID_COL + " = ? ",
                     new String[] {
                         surveyId
                     });
@@ -1222,7 +1224,7 @@ public class SurveyDbAdapter {
      */
     public HashMap<String, String> listPreferences() {
         HashMap<String, String> settings = new HashMap<String, String>();
-        Cursor cursor = database.query(PREFERENCES_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.PREFERENCES, new String[] {
                 KEY_COL, VALUE_COL
         }, null, null, null, null, null);
         if (cursor != null) {
@@ -1252,29 +1254,29 @@ public class SurveyDbAdapter {
      * deletes all the surveys from the database
      */
     public void deleteAllSurveys() {
-        database.delete(SURVEY_TABLE, null, null);
+        database.delete(Tables.SURVEY, null, null);
     }
 
     /**
      * deletes all the points of interest
      */
     public void deleteAllPoints() {
-        database.delete(POINT_OF_INTEREST_TABLE, null, null);
+        database.delete(Tables.POINT_OF_INTEREST, null, null);
     }
 
     /**
      * deletes all survey responses from the database
      */
     public void deleteAllResponses() {
-        database.delete(RESPONSE_TABLE, null, null);
-        database.delete(RESPONDENT_TABLE, null, null);
+        database.delete(Tables.RESPONSE, null, null);
+        database.delete(Tables.RESPONDENT, null, null);
     }
 
     /**
      * deletes all survey responses from the database for a specific respondent
      */
     public void deleteResponses(String respondentId) {
-        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "=?",
+        database.delete(Tables.RESPONSE, SURVEY_RESPONDENT_ID_COL + "=?",
                 new String[] {
                     respondentId
                 });
@@ -1287,7 +1289,7 @@ public class SurveyDbAdapter {
      */
     public void deleteRespondent(String respondentId) {
         deleteResponses(respondentId);
-        database.delete(RESPONDENT_TABLE, PK_ID_COL + "=?",
+        database.delete(Tables.RESPONDENT, PK_ID_COL + "=?",
                 new String[] {
                     respondentId
                 });
@@ -1300,7 +1302,7 @@ public class SurveyDbAdapter {
      * @param questionId
      */
     public void deleteResponse(String respondentId, String questionId) {
-        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "=? AND "
+        database.delete(Tables.RESPONSE, SURVEY_RESPONDENT_ID_COL + "=? AND "
                 + QUESTION_FK_COL + "=?", new String[] {
                 respondentId,
                 questionId
@@ -1315,7 +1317,7 @@ public class SurveyDbAdapter {
      * @param jsonString
      */
     public void saveOrUpdatePointOfInterest(PointOfInterest point) {
-        Cursor cursor = database.query(POINT_OF_INTEREST_TABLE,
+        Cursor cursor = database.query(Tables.POINT_OF_INTEREST,
                 new String[] {
                     PK_ID_COL
                 }, PK_ID_COL + "=?",
@@ -1354,12 +1356,12 @@ public class SurveyDbAdapter {
         }
 
         if (isUpdate) {
-            database.update(POINT_OF_INTEREST_TABLE, updatedValues, PK_ID_COL
+            database.update(Tables.POINT_OF_INTEREST, updatedValues, PK_ID_COL
                     + "=?", new String[] {
                 point.getId().toString()
             });
         } else {
-            database.insert(POINT_OF_INTEREST_TABLE, null, updatedValues);
+            database.insert(Tables.POINT_OF_INTEREST, null, updatedValues);
         }
     }
 
@@ -1397,7 +1399,7 @@ public class SurveyDbAdapter {
                 };
             }
         }
-        Cursor cursor = database.query(POINT_OF_INTEREST_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.POINT_OF_INTEREST, new String[] {
                 PK_ID_COL, COUNTRY_COL, DISP_NAME_COL, UPDATED_DATE_COL,
                 LAT_COL, LON_COL, PROP_NAME_COL, PROP_VAL_COL, TYPE_COL
         },
@@ -1507,7 +1509,7 @@ public class SurveyDbAdapter {
          * + " like ?"; whereValues = new String[2]; whereValues[i] = country;
          * whereValues[i+1] = prefix + "%"; }
          */
-        Cursor cursor = database.query(POINT_OF_INTEREST_TABLE, new String[] {
+        Cursor cursor = database.query(Tables.POINT_OF_INTEREST, new String[] {
                 PK_ID_COL, COUNTRY_COL, DISP_NAME_COL, UPDATED_DATE_COL,
                 LAT_COL, LON_COL, PROP_NAME_COL, PROP_VAL_COL, TYPE_COL
         },
@@ -1576,7 +1578,7 @@ public class SurveyDbAdapter {
             initialValues.put(STATUS_COL, ConstantUtil.QUEUED_STATUS);
         }
         idVal = database
-                .insert(TRANSMISSION_HISTORY_TABLE, null, initialValues);
+                .insert(Tables.TRANSMISSION_HISTORY, null, initialValues);
         return idVal;
     }
 
@@ -1605,7 +1607,7 @@ public class SurveyDbAdapter {
                 } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
                     vals.put(TRANS_START_COL, System.currentTimeMillis() + "");
                 }
-                database.update(TRANSMISSION_HISTORY_TABLE, vals, PK_ID_COL
+                database.update(Tables.TRANSMISSION_HISTORY, vals, PK_ID_COL
                         + " = ?", new String[] {
                     idVal.toString()
                 });
@@ -1659,7 +1661,7 @@ public class SurveyDbAdapter {
             };
         }
 
-        Cursor cursor = database.query(TRANSMISSION_HISTORY_TABLE,
+        Cursor cursor = database.query(Tables.TRANSMISSION_HISTORY,
                 new String[] {
                         PK_ID_COL, FILENAME_COL, STATUS_COL,
                         TRANS_START_COL, DELIVERED_DATE_COL,
@@ -1760,7 +1762,7 @@ public class SurveyDbAdapter {
     public void deleteUser(Long id) {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(DELETED_COL, "Y");
-        database.update(USER_TABLE, updatedValues, PK_ID_COL + " = ?",
+        database.update(Tables.USER, updatedValues, PK_ID_COL + " = ?",
                 new String[] {
                     id.toString()
                 });
@@ -1839,7 +1841,7 @@ public class SurveyDbAdapter {
                 values.put(SurveyGroupAttrs.NAME, group.getName());
                 values.put(SurveyGroupAttrs.REGISTER_SURVEY_ID, group.getRegisterSurveyId());
                 values.put(SurveyGroupAttrs.MONITORED, group.isMonitored() ? 1 : 0);
-                database.insert(SURVEY_GROUP_TABLE, null, values);
+                database.insert(Tables.SURVEY_GROUP, null, values);
             }
             database.setTransactionSuccessful();
         } finally {
@@ -1857,7 +1859,7 @@ public class SurveyDbAdapter {
     }
     
     public Cursor getSurveyGroups() {
-        Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
+        Cursor cursor = database.query(Tables.SURVEY_GROUP, 
                 new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.REGISTER_SURVEY_ID, SurveyGroupAttrs.MONITORED}, 
                 null, null, null, null, null);
         
@@ -1885,7 +1887,7 @@ public class SurveyDbAdapter {
             selectionArgs = new String[] {String.valueOf(id)};
         }
         
-        Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
+        Cursor cursor = database.query(Tables.SURVEY_GROUP, 
                 new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.REGISTER_SURVEY_ID, SurveyGroupAttrs.MONITORED}, 
                 where, selectionArgs,
                 null, null, null);
@@ -1912,7 +1914,7 @@ public class SurveyDbAdapter {
             selectionArgs = new String[] {String.valueOf(id)};
         }
         
-        Cursor cursor = database.query(SURVEY_GROUP_TABLE, 
+        Cursor cursor = database.query(Tables.SURVEY_GROUP, 
                 new String[] {SurveyGroupAttrs.ID, SurveyGroupAttrs.NAME, SurveyGroupAttrs.MONITORED}, 
                 where, selectionArgs,
                 null, null, null);
@@ -1935,7 +1937,7 @@ public class SurveyDbAdapter {
         values.put(SurveyedLocaleAttrs.SURVEY_GROUP_ID, surveyGroupId);
         values.put(SurveyedLocaleAttrs.LATITUDE, lat);
         values.put(SurveyedLocaleAttrs.LONGITUDE, lon);
-        database.insert(SURVEYED_LOCALE_TABLE, null, values);
+        database.insert(Tables.SURVEYED_LOCALE, null, values);
         
         return id;
     }
@@ -1949,7 +1951,7 @@ public class SurveyDbAdapter {
     }
     
     public Cursor getSurveyedLocales(int surveyGroupId) {
-        Cursor cursor = database.query(SURVEYED_LOCALE_TABLE, 
+        Cursor cursor = database.query(Tables.SURVEYED_LOCALE, 
                 new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.SURVEYED_LOCALE_ID, SurveyedLocaleAttrs.SURVEY_GROUP_ID, 
                         SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE}, 
                 SurveyedLocaleAttrs.SURVEY_GROUP_ID + " = ?",
@@ -1961,7 +1963,7 @@ public class SurveyDbAdapter {
     
     /*
     public SurveyedLocale getSurveyedLocale(String id) {
-        Cursor cursor = database.query(SURVEYED_LOCALE_TABLE, 
+        Cursor cursor = database.query(Tables.SURVEYED_LOCALE, 
                 new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE}, 
                 SurveyedLocaleAttrs.ID + "= ?",
                 new String[] {id},
@@ -2006,7 +2008,7 @@ public class SurveyDbAdapter {
             };
         }
         
-        return database.query(SURVEY_TABLE, new String[] {
+        return database.query(Tables.SURVEY, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, LOCATION_COL, FILENAME_COL, TYPE_COL,
                 LANGUAGE_COL, HELP_DOWNLOADED_COL, VERSION_COL},
@@ -2019,10 +2021,10 @@ public class SurveyDbAdapter {
                     + " is null then 0 else 1 end, " + DELIVERED_DATE_COL
                     + " desc";
         Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
-                RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
+                Tables.RESPONDENT + "." + PK_ID_COL, DISP_NAME_COL,
                 SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL, SUBMITTED_DATE_COL,
                 DELIVERED_DATE_COL, UUID_COL},
-                SURVEY_TABLE + "." + SURVEY_GROUP_ID_COL + "= ?",
+                Tables.SURVEY + "." + SURVEY_GROUP_ID_COL + "= ?",
                 new String[]{String.valueOf(surveyGroupId)},
                 null, null, sortBy);
         return cursor;
@@ -2034,10 +2036,10 @@ public class SurveyDbAdapter {
                     + " is null then 0 else 1 end, " + DELIVERED_DATE_COL
                     + " desc";
         Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
-                RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
+                Tables.RESPONDENT + "." + PK_ID_COL, DISP_NAME_COL,
                 SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL, SUBMITTED_DATE_COL,
                 DELIVERED_DATE_COL, UUID_COL, SURVEYED_LOCALE_ID_COL},
-                RESPONDENT_TABLE + "." + SURVEYED_LOCALE_ID_COL + "= ?",
+                Tables.RESPONDENT + "." + SURVEYED_LOCALE_ID_COL + "= ?",
                 new String[]{String.valueOf(surveyedLocaleId)},
                 null, null, sortBy);
         return cursor;
@@ -2045,8 +2047,8 @@ public class SurveyDbAdapter {
     
     public String getSurveyedLocaleId(long surveyInstanceId) {
         Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
-                RESPONDENT_TABLE + "." + PK_ID_COL, SURVEYED_LOCALE_ID_COL},
-                RESPONDENT_TABLE + "." + PK_ID_COL + "= ?",
+                Tables.RESPONDENT + "." + PK_ID_COL, SURVEYED_LOCALE_ID_COL},
+                Tables.RESPONDENT + "." + PK_ID_COL + "= ?",
                 new String[]{String.valueOf(surveyInstanceId)},
                 null, null, null);
         
@@ -2070,7 +2072,7 @@ public class SurveyDbAdapter {
                 ContentValues values = new ContentValues();
                 values.put(SurveyedLocaleAttrs.LATITUDE, lat);
                 values.put(SurveyedLocaleAttrs.LONGITUDE, lon);
-                database.update(SURVEYED_LOCALE_TABLE, values,
+                database.update(Tables.SURVEYED_LOCALE, values,
                         SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " = ?",
                         new String[] {surveyedLocaleId});
             }
@@ -2085,7 +2087,7 @@ public class SurveyDbAdapter {
             values.put(INCLUDE_FLAG_COL, resp.getIncludeFlag());
             values.put(STRENGTH_COL, resp.getStrength());
             
-            database.insert(RESPONSE_TABLE, null, values);
+            database.insert(Tables.RESPONSE, null, values);
         }
     }
     
@@ -2100,7 +2102,7 @@ public class SurveyDbAdapter {
     */
     public Cursor getFilteredSurveyedLocales(int surveyGroupId, Double latitude, Double longitude,
                 Double nearbyRadius) {
-        String queryString = "SELECT sl.* FROM " + SURVEYED_LOCALE_TABLE + " AS sl";
+        String queryString = "SELECT sl.* FROM " + Tables.SURVEYED_LOCALE + " AS sl";
         String whereClause = " WHERE sl." + SurveyedLocaleAttrs.SURVEY_GROUP_ID + " =?";
         
         // location part
@@ -2120,7 +2122,7 @@ public class SurveyDbAdapter {
     }
     
     public int getSurveyedLocalesCount(int surveyGroupId) {
-        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM " + SURVEYED_LOCALE_TABLE
+        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM " + Tables.SURVEYED_LOCALE
                 + " WHERE " + SurveyedLocaleAttrs.SURVEY_GROUP_ID + " = ?",
                 new String[]{String.valueOf(surveyGroupId)});
         
@@ -2133,7 +2135,7 @@ public class SurveyDbAdapter {
     
     public void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
         for (QuestionResponse response : responses) {
-            Cursor cursor = database.query(RESPONSE_TABLE, new String[] {
+            Cursor cursor = database.query(Tables.RESPONSE, new String[] {
                     "survey_respondent_id, question_id"},
                     "survey_respondent_id = ? AND question_id = ?",
                     new String[] { String.valueOf(surveyInstanceId), response.getQuestionId()},
@@ -2150,18 +2152,18 @@ public class SurveyDbAdapter {
             values.put(SURVEY_RESPONDENT_ID_COL, surveyInstanceId);
                 
             if (exists) {
-                database.update(RESPONSE_TABLE, values, 
+                database.update(Tables.RESPONSE, values, 
                         "survey_respondent_id = ? AND question_id = ?",
                         new String[] { String.valueOf(surveyInstanceId), response.getQuestionId()});
             } else {
-                database.insert(RESPONSE_TABLE, null, values);
+                database.insert(Tables.RESPONSE, null, values);
             }
         }
     }
     
     public void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
         for (SurveyInstance surveyInstance : surveyInstances) {
-            Cursor cursor = database.query(RESPONDENT_TABLE, new String[] {
+            Cursor cursor = database.query(Tables.RESPONDENT, new String[] {
                     PK_ID_COL, UUID_COL},
                     UUID_COL + " = ?",
                     new String[] { surveyInstance.getUuid()},
@@ -2180,10 +2182,10 @@ public class SurveyDbAdapter {
             values.put(STATUS_COL, ConstantUtil.SUBMITTED_STATUS);// ???
                 
             if (id != -1) {
-                database.update(RESPONDENT_TABLE, values, UUID_COL + " = ?", new String[] { surveyInstance.getUuid()});
+                database.update(Tables.RESPONDENT, values, UUID_COL + " = ?", new String[] { surveyInstance.getUuid()});
             } else {
                 values.put(UUID_COL, surveyInstance.getUuid());
-                id = database.insert(RESPONDENT_TABLE, null, values);
+                id = database.insert(Tables.RESPONDENT, null, values);
             }
             
             createTransmissionHistory(id, null, ConstantUtil.DOWNLOADED_STATUS);
@@ -2203,7 +2205,7 @@ public class SurveyDbAdapter {
                 values.put(SurveyedLocaleAttrs.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
                 values.put(SurveyedLocaleAttrs.LATITUDE, surveyedLocale.getLatitude());
                 values.put(SurveyedLocaleAttrs.LONGITUDE, surveyedLocale.getLongitude());
-                database.insert(SURVEYED_LOCALE_TABLE, null, values);
+                database.insert(Tables.SURVEYED_LOCALE, null, values);
                 
                 syncSurveyInstances(surveyedLocale.getSurveyInstances(), surveyedLocale.getId());
                 database.setTransactionSuccessful();

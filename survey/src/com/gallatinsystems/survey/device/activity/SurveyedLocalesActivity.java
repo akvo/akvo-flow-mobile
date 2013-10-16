@@ -97,6 +97,15 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         mDatabase.close();
     }
     
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String surveyedLocaleId = intent.getDataString();
+            onSurveyedLocaleSelected(surveyedLocaleId);
+        }
+    }
+    
     private void display() {
         Fragment fragment = mListResults ? new SurveyedLocaleListFragment() : new MapFragment();
         // Pass the arguments on to let the fragment retrieve the survey group
@@ -117,7 +126,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.surveyed_locale_list_activity, menu);
+        getMenuInflater().inflate(R.menu.surveyed_locales_activity, menu);
         // We must hide list/map results option depending on the current fragment
         if (mListResults) {
             menu.removeItem(R.id.list_results);
@@ -131,9 +140,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                // TODO
-                Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                return true;
+                return onSearchRequested();
             case R.id.new_record:
                 setResult(RESULT_OK);// Return null locale (new record will be created)
                 finish();

@@ -77,6 +77,12 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         mDatabase = new SurveyDbAdapter(getActivity());
         if (mMap == null) {
             mMap = getMap();
+            configMap();
+        }
+    }
+    
+    private void configMap() {
+        if (mMap != null) {
             mMap.setMyLocationEnabled(true);
             mMap.setOnInfoWindowClickListener(this);
         }

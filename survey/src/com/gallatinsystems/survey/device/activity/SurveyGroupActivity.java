@@ -35,6 +35,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.OnNavigationListener;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -79,6 +80,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     private String mLocaleId;
     
     private SurveyGroup mSurveyGroup;// Active SurveyGroup
+    
     private List<SurveyGroup> mSurveyGroups;// Available surveyGroups
     private ListNavigationAdapter mNavigationAdapter;
     private ViewPager mPager;
@@ -200,10 +202,20 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         
-        //final int activeSurveyGroupId = mSurveyGroup != null ? mSurveyGroup.getId() : 0;
+        // Determine which survey group will be preselected
+        int activeSurveyGroupId = SurveyGroup.ID_NONE;
+        if (mSurveyGroup != null) {
+            // If we already have a group selected, no doubt it's that one
+            activeSurveyGroupId = mSurveyGroup.getId();
+        } else {
+            // Otherwise, try and get the cached survey group from the database
+            String surveyGroupPref = mDatabase.findPreference(ConstantUtil.SURVEY_GROUP_KEY);
+            if (!TextUtils.isEmpty(surveyGroupPref)) {
+                activeSurveyGroupId = Integer.valueOf(surveyGroupPref);
+            }
+        }
         
         if (mSurveyGroups.size() > 0) {
-        /*
             String[] names = new String[mSurveyGroups.size()];
             int currentIndex = 0;
             for (int i = 0; i < mSurveyGroups.size(); i++) {
@@ -214,13 +226,11 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                     currentIndex = i;
                 }
             }
-            */
     
-            //mNavigationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, android.R.id.text1, names);
             mNavigationAdapter = new ListNavigationAdapter(context, R.layout.spinner_item, android.R.id.text1, mSurveyGroups);
             mNavigationAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
             actionBar.setListNavigationCallbacks(mNavigationAdapter, this);
-            //actionBar.setSelectedNavigationItem(currentIndex);
+            actionBar.setSelectedNavigationItem(currentIndex);
         }
     }
 
@@ -232,6 +242,9 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         displayRecord();// Or hide it
         supportInvalidateOptionsMenu();
         mAdapter.onSurveyGroupChanged();
+        
+        // Cache the survey group
+        mDatabase.savePreference(ConstantUtil.SURVEY_GROUP_KEY, String.valueOf(mSurveyGroup.getId()));
         return true;
     }
     

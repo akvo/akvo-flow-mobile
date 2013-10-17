@@ -226,10 +226,12 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
         @Override
         public void bindView(View view, Context context, Cursor c) {
+            TextView nameView = (TextView) view.findViewById(R.id.locale_name);
             TextView idView = (TextView) view.findViewById(R.id.locale_id);
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
             final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
 
+            nameView.setText(surveyedLocale.getName());
             idView.setText(surveyedLocale.getId());
             distanceView.setText(getDistanceText(surveyedLocale));
         }

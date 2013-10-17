@@ -20,13 +20,15 @@ import java.util.List;
 
 public class SurveyedLocale {
     private String mId;
+    private String mName;
     private int mSurveyGroupId;
     private double mLatitude;
     private double mLongitude;
     private List<SurveyInstance> mSurveyInstances = null;
 
-    public SurveyedLocale (String id, int surveyGroupId, double latitude, double longitude) {
+    public SurveyedLocale (String id, String name, int surveyGroupId, double latitude, double longitude) {
         mId = id;
+        mName = name;
         mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
@@ -54,6 +56,10 @@ public class SurveyedLocale {
     
     public List<SurveyInstance> getSurveyInstances() {
         return mSurveyInstances;
+    }
+    
+    public String getName() {
+        return mName;
     }
     
 }

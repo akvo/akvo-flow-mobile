@@ -130,14 +130,15 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             for (SurveyedLocale surveyedLocale : surveyedLocales) {
                 mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(surveyedLocale.getLatitude(), surveyedLocale.getLongitude()))
-                        .title(surveyedLocale.getId()));
+                        .title(surveyedLocale.getName())
+                        .snippet(surveyedLocale.getId()));
             }
         }
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        final String surveyedLocaleId = marker.getTitle();
+        final String surveyedLocaleId = marker.getSnippet();
         mListener.onSurveyedLocaleSelected(surveyedLocaleId);
     }
 

@@ -6,10 +6,17 @@
     android:padding="8dp" >
 
     <TextView
+        android:id="@+id/locale_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+
+    <TextView
         android:id="@+id/locale_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp" />
+        android:textSize="14sp" />
     
     <TextView
         android:id="@+id/locale_distance"

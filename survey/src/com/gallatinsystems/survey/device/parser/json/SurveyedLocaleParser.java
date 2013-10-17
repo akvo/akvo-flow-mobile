@@ -67,6 +67,7 @@ public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
         try {
             String id = jSurveyedLocale.getString(Attrs.ID);
             int surveyGroupId = jSurveyedLocale.getInt(Attrs.SURVEY_GROUP_ID);
+            String name = "Unknown";// TODO
             double latitude = 0.0d;
             double longitude = 0.0d;
             
@@ -80,7 +81,7 @@ public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
             JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
             List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);
             
-            SurveyedLocale surveyedLocale = new SurveyedLocale(id, surveyGroupId, latitude, longitude);
+            SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, surveyGroupId, latitude, longitude);
             surveyedLocale.setSurveyInstances(surveyInstances);
             
             return surveyedLocale;
@@ -108,6 +109,7 @@ public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
         // SurveyedLocale
         String ID               = "id";
         String SURVEY_GROUP_ID  = "surveyGroupId";
+        String NAME             = "name";
         String LATITUDE         = "lat";
         String LONGITUDE        = "lon";
         String SURVEY_INSTANCES = "surveyInstances";

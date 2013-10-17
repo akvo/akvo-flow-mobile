@@ -114,7 +114,6 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         // Add the fragment to the 'fragment_container' FrameLayout
         transaction.replace(R.id.fragment_container, fragment);
-        //transaction.addToBackStack(null);
         transaction.commit();
     }
     

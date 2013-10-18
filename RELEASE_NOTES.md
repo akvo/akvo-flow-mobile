@@ -1,5 +1,15 @@
 Akvo FLOW Field Survey app 
-Last update 17 September 2013
+Last update 18 October 2013
+
+#ver 1.12.1
+
+New features & enhancements
+---------------------------
+* Recompute survey langauges when upgrading from an old version (Issue #34)
+
+Bug fixes
+---------
+* Fix memory leak in Dialogs (Issue #33)
 
 #ver 1.12.0
 

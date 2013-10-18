@@ -20,7 +20,8 @@ public class DataProvider extends ContentProvider {
     private static final int SEARCH_SUGGEST = 1;
     
     private static final String SUGGEST_SELECTION = SurveyedLocaleAttrs.SURVEY_GROUP_ID
-            + " = ? AND " + SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " LIKE ?";
+            + " = ? AND (" + SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " LIKE ? OR "
+            + SurveyedLocaleAttrs.NAME + " Like ?)";
     
     private static final UriMatcher sUriMatcher;
     
@@ -55,13 +56,15 @@ public class DataProvider extends ContentProvider {
                         SurveyedLocaleAttrs.ID,
                         SurveyedLocaleAttrs.SURVEYED_LOCALE_ID
                         + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                        SurveyedLocaleAttrs.NAME
+                        + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1,
                         SurveyedLocaleAttrs.SURVEYED_LOCALE_ID
-                        + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1};
+                        + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_2};
                 cursor = db.query(
                     Tables.SURVEYED_LOCALE,
                     projection,
                     SUGGEST_SELECTION,
-                    new String[]{String.valueOf(surveyGroupPref), term},
+                    new String[]{String.valueOf(surveyGroupPref), term, term},
                     null, null, sortOrder);
                 break;
         }

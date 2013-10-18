@@ -33,6 +33,7 @@ import android.widget.TableRow;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionGroup;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
@@ -349,9 +350,12 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                 if (curResponse != null
                         && curResponse.hasValue()) {
                     curResponse.setRespondentId(respondentId);
-                    if (q.getQuestion().isLocaleLocation()) {
+                    if (q.getQuestion().isLocaleName()) {
                         // super hack
-                        databaseAdaptor.updateSurveyedLocale(respondentId, curResponse);
+                        databaseAdaptor.updateSurveyedLocale(respondentId, curResponse, SurveyedLocaleMeta.NAME);
+                    } else if (q.getQuestion().isLocaleLocation()) {
+                        // super hack
+                        databaseAdaptor.updateSurveyedLocale(respondentId, curResponse, SurveyedLocaleMeta.GEOLOCATION);
                     }
                     databaseAdaptor.createOrUpdateSurveyResponse(curResponse);
                     responseMap.put(curResponse.getQuestionId(),

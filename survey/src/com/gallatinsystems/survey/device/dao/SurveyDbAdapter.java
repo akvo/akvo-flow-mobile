@@ -2001,34 +2001,45 @@ public class SurveyDbAdapter {
         return id;
     }
     
-    public void updateSurveyedLocale(long surveyInstanceId, QuestionResponse resp) {
-        String geoResponse = resp.getValue();
-        if (!TextUtils.isEmpty(geoResponse)) {
+    /**
+     * Flag to indicate the type of locale update from a given response
+     */
+    public enum SurveyedLocaleMeta {NAME, GEOLOCATION};
+    
+    public void updateSurveyedLocale(long surveyInstanceId, QuestionResponse resp, SurveyedLocaleMeta type) {
+        String response = resp.getValue();
+        if (!TextUtils.isEmpty(response)) {
             String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
-            String[] parts = geoResponse.split("\\|");
-            if (parts.length >= 2) {
-                double lat = Double.parseDouble(parts[0]);
-                double lon = Double.parseDouble(parts[1]);
-                
-                ContentValues values = new ContentValues();
-                values.put(SurveyedLocaleAttrs.LATITUDE, lat);
-                values.put(SurveyedLocaleAttrs.LONGITUDE, lon);
-                database.update(Tables.SURVEYED_LOCALE, values,
-                        SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " = ?",
-                        new String[] {surveyedLocaleId});
+            ContentValues surveyedLocaleValues = new ContentValues();
+            ContentValues responseValues = new ContentValues();
+            switch (type) {
+                case NAME:
+                    surveyedLocaleValues.put(SurveyedLocaleAttrs.NAME, response);
+                    responseValues.put(ANSWER_TYPE_COL, "META_NAME");
+                    break;
+                case GEOLOCATION:
+                    String[] parts = response.split("\\|");
+                    if (parts.length >= 2) {
+                        surveyedLocaleValues.put(SurveyedLocaleAttrs.LATITUDE, Double.parseDouble(parts[0]));
+                        surveyedLocaleValues.put(SurveyedLocaleAttrs.LONGITUDE, Double.parseDouble(parts[1]));
+                    }
+                    responseValues.put(ANSWER_TYPE_COL, "META_LOCATION");
+                    break;
             }
             
-            // Store the META_GEO as a response
-            ContentValues values = new ContentValues();
-            values.put(ANSWER_COL, resp.getValue());
-            values.put(ANSWER_TYPE_COL, "META_GEO");
-            values.put(QUESTION_FK_COL, resp.getQuestionId());
-            values.put(SURVEY_RESPONDENT_ID_COL, resp.getRespondentId());
-            values.put(SCORED_VAL_COL, resp.getScoredValue());
-            values.put(INCLUDE_FLAG_COL, resp.getIncludeFlag());
-            values.put(STRENGTH_COL, resp.getStrength());
+            // Update the surveyed locale info
+            database.update(Tables.SURVEYED_LOCALE, surveyedLocaleValues,
+                    SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " = ?",
+                    new String[] {surveyedLocaleId});
             
-            database.insert(Tables.RESPONSE, null, values);
+            // Store the META_NAME/META_GEO as a response
+            responseValues.put(ANSWER_COL, resp.getValue());
+            responseValues.put(QUESTION_FK_COL, resp.getQuestionId());
+            responseValues.put(SURVEY_RESPONDENT_ID_COL, resp.getRespondentId());
+            responseValues.put(SCORED_VAL_COL, resp.getScoredValue());
+            responseValues.put(INCLUDE_FLAG_COL, resp.getIncludeFlag());
+            responseValues.put(STRENGTH_COL, resp.getStrength());
+            database.insert(Tables.RESPONSE, null, responseValues);
         }
     }
     

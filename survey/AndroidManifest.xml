@@ -24,11 +24,11 @@
     <application
         android:hasCode="true"
         android:icon="@drawable/acrlogo"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:theme="@style/FieldSurveyTheme" >
         <activity
             android:name=".activity.SurveyGroupActivity"
-            android:label="@string/app_name"
-            android:theme="@style/FieldSurveyTheme" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,8 +38,7 @@
         <activity
             android:name=".activity.SurveyedLocalesActivity"
             android:label="Select Record"
-            android:launchMode="singleTop"
-            android:theme="@style/FieldSurveyTheme">
+            android:launchMode="singleTop">
             <intent-filter>
                     <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -50,7 +49,8 @@
         <activity
             android:name=".activity.SurveyViewActivity"
             android:configChanges="keyboardHidden|orientation" />
-        <activity android:name=".activity.ListUserActivity" />
+        <activity android:name=".activity.ListUserActivity" 
+            android:label="@string/userlabel"/>
         <activity android:name=".activity.UserEditActivity" />
         <activity android:name=".activity.SettingsActivity" />
         <activity android:name=".activity.ListPlotActivity" />

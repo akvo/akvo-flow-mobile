@@ -47,7 +47,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -142,7 +141,6 @@ public class SurveyViewActivity extends TabActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         currentTextSize = NORMAL_TXT_SIZE;
         missingQuestions = new HashSet<String>();
         readOnly = false;
@@ -936,13 +934,15 @@ public class SurveyViewActivity extends TabActivity implements
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
         super.onMenuOpened(featureId, menu);
-        if (currentTextSize == LARGE_TXT_SIZE) {
-            menu.getItem(0).setTitle(R.string.normaltxtoption);
-        } else {
-            menu.getItem(0).setTitle(R.string.largetxtoption);
+        if (menu != null) {
+            if (currentTextSize == LARGE_TXT_SIZE) {
+                menu.getItem(0).setTitle(R.string.normaltxtoption);
+            } else {
+                menu.getItem(0).setTitle(R.string.largetxtoption);
+            }
+            menu.getItem(1).setEnabled(!isTrackRecording);
+            menu.getItem(3).setEnabled(!isTrackRecording);
         }
-        menu.getItem(1).setEnabled(!isTrackRecording);
-        menu.getItem(3).setEnabled(!isTrackRecording);
 
         return true;
     }
@@ -1156,6 +1156,11 @@ public class SurveyViewActivity extends TabActivity implements
                 }
 
                 survey = SurveyDao.loadSurvey(surveyFromDb, in);
+                
+                // Set the survey name as Activity title
+                if (survey != null) {
+                    setTitle(survey.getName());
+                }
 
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "Could not load survey xml file");

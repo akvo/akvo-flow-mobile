@@ -67,16 +67,9 @@ public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
         try {
             String id = jSurveyedLocale.getString(Attrs.ID);
             int surveyGroupId = jSurveyedLocale.getInt(Attrs.SURVEY_GROUP_ID);
-            String name = "Unknown";// TODO
-            double latitude = 0.0d;
-            double longitude = 0.0d;
-            
-            if (jSurveyedLocale.has(Attrs.LATITUDE)) {
-                latitude = jSurveyedLocale.optDouble(Attrs.LATITUDE);
-            }
-            if (jSurveyedLocale.has(Attrs.LONGITUDE)) {
-                longitude = jSurveyedLocale.optDouble(Attrs.LONGITUDE);
-            }
+            double latitude = jSurveyedLocale.optDouble(Attrs.LATITUDE, 0.0d);
+            double longitude = jSurveyedLocale.optDouble(Attrs.LONGITUDE, 0.0d);
+            String name = jSurveyedLocale.optString(Attrs.NAME, "Unknown");
             
             JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
             List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);
@@ -109,7 +102,7 @@ public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
         // SurveyedLocale
         String ID               = "id";
         String SURVEY_GROUP_ID  = "surveyGroupId";
-        String NAME             = "name";
+        String NAME             = "displayName";
         String LATITUDE         = "lat";
         String LONGITUDE        = "lon";
         String SURVEY_INSTANCES = "surveyInstances";

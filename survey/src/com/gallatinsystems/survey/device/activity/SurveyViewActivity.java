@@ -1104,7 +1104,9 @@ public class SurveyViewActivity extends TabActivity implements
 
     @Override
     protected void onPause() {
-        saveAllResponses();
+        if (!readOnly) {
+            saveAllResponses();
+        }
         if (databaseAdapter != null) {
             databaseAdapter.close();
         }

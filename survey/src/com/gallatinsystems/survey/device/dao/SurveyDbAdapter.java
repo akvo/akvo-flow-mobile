@@ -2011,11 +2011,15 @@ public class SurveyDbAdapter {
         if (!TextUtils.isEmpty(response)) {
             String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
             ContentValues surveyedLocaleValues = new ContentValues();
-            ContentValues responseValues = new ContentValues();
+            
+            QuestionResponse metaResponse = new QuestionResponse(resp.getId(), resp.getRespondentId(), 
+                    null, resp.getValue(), null, resp.getIncludeFlag(), resp.getStrength());
+            
             switch (type) {
                 case NAME:
                     surveyedLocaleValues.put(SurveyedLocaleAttrs.NAME, response);
-                    responseValues.put(ANSWER_TYPE_COL, "META_NAME");
+                    metaResponse.setType("META_NAME");
+                    metaResponse.setQuestionId(ConstantUtil.QUESTION_LOCALE_NAME);
                     break;
                 case GEOLOCATION:
                     String[] parts = response.split("\\|");
@@ -2023,7 +2027,8 @@ public class SurveyDbAdapter {
                         surveyedLocaleValues.put(SurveyedLocaleAttrs.LATITUDE, Double.parseDouble(parts[0]));
                         surveyedLocaleValues.put(SurveyedLocaleAttrs.LONGITUDE, Double.parseDouble(parts[1]));
                     }
-                    responseValues.put(ANSWER_TYPE_COL, "META_LOCATION");
+                    metaResponse.setType("META_GEO");
+                    metaResponse.setQuestionId(ConstantUtil.QUESTION_LOCALE_GEO);
                     break;
             }
             
@@ -2033,13 +2038,7 @@ public class SurveyDbAdapter {
                     new String[] {surveyedLocaleId});
             
             // Store the META_NAME/META_GEO as a response
-            responseValues.put(ANSWER_COL, resp.getValue());
-            responseValues.put(QUESTION_FK_COL, resp.getQuestionId());
-            responseValues.put(SURVEY_RESPONDENT_ID_COL, resp.getRespondentId());
-            responseValues.put(SCORED_VAL_COL, resp.getScoredValue());
-            responseValues.put(INCLUDE_FLAG_COL, resp.getIncludeFlag());
-            responseValues.put(STRENGTH_COL, resp.getStrength());
-            database.insert(Tables.RESPONSE, null, responseValues);
+            createOrUpdateSurveyResponse(metaResponse);
         }
     }
     

@@ -300,6 +300,14 @@ public class ConstantUtil {
      */
     public static final String RESOURCE_PACKAGE = "com.gallatinsystems.survey.device";
     public static final String RAW_RESOURCE = "raw";
+    
+    /**
+     * SurveyedLocale meta question IDs. Negative IDs to avoid collisions.
+     * Irrelevant for the server side, they are used to identify a locale meta-data 
+     * response among the rest of the 'real' question answers
+     */
+    public static final String QUESTION_LOCALE_NAME = "-1";
+    public static final String QUESTION_LOCALE_GEO = "-2";
 
     /**
      * recognized help activities

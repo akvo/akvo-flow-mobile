@@ -85,10 +85,6 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         getListView().setOnItemClickListener(this);
     }
     
-    public void refresh(SurveyGroup surveyGroup) {
-        refresh(surveyGroup, null);
-    }
-    
     public void refresh(SurveyGroup surveyGroup, String localeId) {
         mSurveyGroup = surveyGroup;
         mLocaleId = localeId;

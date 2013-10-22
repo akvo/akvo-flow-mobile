@@ -48,6 +48,7 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.async.loader.SurveyGroupLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.fragment.ResponseListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyListFragment;
 import com.gallatinsystems.survey.device.service.BootstrapService;
@@ -77,7 +78,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     private String mUserId;
     private String mUserName;
     
-    private String mLocaleId;
+    private SurveyedLocale mLocale;
     
     private SurveyGroup mSurveyGroup;// Active SurveyGroup
     
@@ -189,7 +190,11 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         // Enable/Disable monitoring features
         if (mSurveyGroup.isMonitored()) {
             mLocaleTextView.setVisibility(View.VISIBLE);
-            mLocaleTextView.setText("Record: " + (mLocaleId != null ? mLocaleId : "New Record"));
+            if (mLocale != null) {
+                mLocaleTextView.setText("Record: " + mLocale.getName() + " - " + mLocale.getId());
+            } else {
+                mLocaleTextView.setText("New Record");
+            }
         } else {
             mLocaleTextView.setVisibility(View.GONE);
         }
@@ -237,11 +242,11 @@ public class SurveyGroupActivity extends ActionBarActivity implements
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
         mSurveyGroup = mSurveyGroups.get(position);
-        mLocaleId = null;// Start over again
+        mLocale = null;// Start over again
         
         displayRecord();// Or hide it
         supportInvalidateOptionsMenu();
-        mAdapter.onSurveyGroupChanged();
+        mAdapter.refreshFragments();
         
         // Cache the survey group
         mDatabase.savePreference(ConstantUtil.SURVEY_GROUP_KEY, String.valueOf(mSurveyGroup.getId()));
@@ -271,11 +276,14 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 break;
             case ID_SURVEYED_LOCALE_LIST:
                 if (resultCode == RESULT_OK) {
-                    mLocaleId = intent != null ? 
-                            intent.getStringExtra(SurveyedLocalesActivity.EXTRA_SURVEYED_LOCALE_ID)
-                            : null;
+                    if (intent != null) {
+                        String localeId = intent.getStringExtra(SurveyedLocalesActivity.EXTRA_SURVEYED_LOCALE_ID);
+                        mLocale = mDatabase.getSurveyedLocale(localeId);
+                    } else {
+                        mLocale = null;
+                    }
                     displayRecord();
-                    mAdapter.onSurveyedLocaleChange();
+                    mAdapter.refreshFragments();
                 }
                 break;
         }
@@ -308,31 +316,19 @@ public class SurveyGroupActivity extends ActionBarActivity implements
             return "android:switcher:" + R.id.pager + ":" + pos;
         }
         
-        // TODO: DRY - Cleanup these methods
-        public void onSurveyGroupChanged() {
-            SurveyListFragment surveyListFragment = (SurveyListFragment) getSupportFragmentManager().
-                    findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
-            ResponseListFragment responseListFragment = (ResponseListFragment) getSupportFragmentManager().
-                    findFragmentByTag(getFragmentTag(POSITION_RESPONSES));
-            if (surveyListFragment != null && mSurveyGroup != null) {
-                surveyListFragment.refresh(mSurveyGroup);
-            }
-            if (responseListFragment != null) {
-                responseListFragment.refresh(mSurveyGroup, mLocaleId);
-            }
-        }
-        
-        public void onSurveyedLocaleChange() {
+        public void refreshFragments() {
             SurveyListFragment surveyListFragment = (SurveyListFragment) getSupportFragmentManager().
                     findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
             ResponseListFragment responseListFragment = (ResponseListFragment) getSupportFragmentManager().
                     findFragmentByTag(getFragmentTag(POSITION_RESPONSES));
             
+            final String localeId = mLocale != null ? mLocale.getId() : null;
+            
             if (surveyListFragment != null && mSurveyGroup != null) {
-                surveyListFragment.refresh(mSurveyGroup, mLocaleId);
+                surveyListFragment.refresh(mSurveyGroup, localeId);
             }
             if (responseListFragment != null) {
-                responseListFragment.refresh(mSurveyGroup, mLocaleId);
+                responseListFragment.refresh(mSurveyGroup, localeId);
             }
         }
 

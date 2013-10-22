@@ -1921,6 +1921,23 @@ public class SurveyDbAdapter {
         return cursor;
     }
     
+    public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
+        Cursor cursor = database.query(Tables.SURVEYED_LOCALE, 
+                new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.SURVEYED_LOCALE_ID, SurveyedLocaleAttrs.SURVEY_GROUP_ID,
+                        SurveyedLocaleAttrs.NAME, SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE},
+                SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " = ?",
+                new String[] {String.valueOf(surveyedLocaleId)},
+                null, null, null);
+        
+        SurveyedLocale locale = null;
+        if (cursor.moveToFirst()) {
+            locale = getSurveyedLocale(cursor);
+        }
+        cursor.close();
+        
+        return locale;
+    }
+    
     public static Survey getSurvey(Cursor cursor) {
         Survey survey = new Survey();
         survey.setId(cursor.getString(cursor.getColumnIndexOrThrow(PK_ID_COL)));
@@ -2083,6 +2100,10 @@ public class SurveyDbAdapter {
         
         return 0;
     }
+    
+    // ======================================================= //
+    // =========== SurveyedLocales synchronization =========== //
+    // ======================================================= //
     
     public void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
         for (QuestionResponse response : responses) {

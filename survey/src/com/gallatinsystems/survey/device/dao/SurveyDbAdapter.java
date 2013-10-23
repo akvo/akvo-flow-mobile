@@ -727,12 +727,23 @@ public class SurveyDbAdapter {
      * @return
      */
     public long createOrLoadSurveyRespondent(String surveyId, String userId, int surveyGroupId, String surveyedLocaleId) {
+        String where = SUBMITTED_FLAG_COL + "='false' and "
+                + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?";
+        List<String> argList =  new ArrayList<String>();
+        argList.add(surveyId);
+        argList.add(ConstantUtil.CURRENT_STATUS);
+        
+        if (surveyedLocaleId != null) {
+            where += " and " + SURVEYED_LOCALE_ID_COL + " =?";
+            argList.add(surveyedLocaleId);
+        }
+        
         Cursor results = database.query(Tables.RESPONDENT, new String[] {
-            "max(" + PK_ID_COL + ")"
-        }, SUBMITTED_FLAG_COL + "='false' and "
-                + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?", new String[] {
-                surveyId, ConstantUtil.CURRENT_STATUS
-        }, null, null, null);
+            "max(" + PK_ID_COL + ")" }, 
+            where,
+            argList.toArray(new String[argList.size()]),
+            null, null, null);
+        
         long id = -1;
         if (results != null && results.getCount() > 0) {
             results.moveToFirst();

@@ -47,10 +47,12 @@ import android.widget.TextView;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.async.loader.SurveyGroupLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.fragment.ResponseListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyListFragment;
+import com.gallatinsystems.survey.device.fragment.SurveyListFragment.SurveyListListener;
 import com.gallatinsystems.survey.device.service.BootstrapService;
 import com.gallatinsystems.survey.device.service.DataSyncService;
 import com.gallatinsystems.survey.device.service.ExceptionReportingService;
@@ -61,7 +63,7 @@ import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.viewpagerindicator.TabPageIndicator;
 
-public class SurveyGroupActivity extends ActionBarActivity implements 
+public class SurveyGroupActivity extends ActionBarActivity implements SurveyListListener,
             LoaderCallbacks<Cursor>, OnNavigationListener {
     private static final String TAG = SurveyGroupActivity.class.getSimpleName();
     
@@ -121,6 +123,13 @@ public class SurveyGroupActivity extends ActionBarActivity implements
         super.onResume();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
+        
+        // A survey might have changed the name of the locale we're in,
+        // thus we refresh it. TODO: You can do this way better...
+        if (mLocale != null) {
+            mLocale = mDatabase.getSurveyedLocale(mLocale.getId());
+            displayRecord();
+        }
     }
 
     @Override
@@ -287,6 +296,28 @@ public class SurveyGroupActivity extends ActionBarActivity implements
                 }
                 break;
         }
+    }
+
+    @Override
+    public void startSurvey(Survey survey) {
+        // We might need to create a new record
+        if (mLocale == null && mSurveyGroup.isMonitored()) {
+            String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+            mLocale = mDatabase.getSurveyedLocale(newLocaleId);
+            
+            // we have to notify our fragments of this new locale
+            mAdapter.refreshFragments();
+        }
+                
+        Intent i = new Intent(this, SurveyViewActivity.class);
+        i.putExtra(ConstantUtil.USER_ID_KEY, mUserId);
+        i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
+        i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
+        if (mSurveyGroup.isMonitored()) {
+            // The locale will automatically be managed in non monitored groups
+            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mLocale.getId());
+        }
+        startActivity(i);
     }
     
     class TabsAdapter extends FragmentPagerAdapter {

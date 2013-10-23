@@ -19,8 +19,8 @@ package com.gallatinsystems.survey.device.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -38,16 +38,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyListLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.service.BootstrapService;
-import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>, OnItemClickListener {
     private static final String TAG = SurveyListFragment.class.getSimpleName();
+    
+    public interface SurveyListListener {
+        public void startSurvey(Survey survey);
+    }
     
     private String mUserId;
     private SurveyGroup mSurveyGroup;
@@ -56,9 +58,25 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     private SurveyAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
     
+    private SurveyListListener mListener;
+    
     public static SurveyListFragment instantiate() {
         SurveyListFragment fragment = new SurveyListFragment();
         return fragment;
+    }
+    
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mListener = (SurveyListListener)activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement SurveyListListener");
+        }
     }
     
     @Override
@@ -100,12 +118,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         if (mUserId != null) {
             if (!BootstrapService.isProcessing) {
                 Survey survey = mAdapter.getItem(position);
-                Intent i = new Intent(getActivity(), SurveyViewActivity.class);
-                i.putExtra(ConstantUtil.USER_ID_KEY, mUserId);
-                i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
-                i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
-                i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mLocaleId);
-                startActivity(i);
+                mListener.startSurvey(survey);
             } else {
                 Toast.makeText(getActivity(), R.string.pleasewaitforbootstrap, 
                         Toast.LENGTH_LONG).show();

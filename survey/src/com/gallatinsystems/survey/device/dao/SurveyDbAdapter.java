@@ -1582,9 +1582,14 @@ public class SurveyDbAdapter {
         initialValues.put(FILENAME_COL, fileName);
 
         if (status != null) {
+            final long time = System.currentTimeMillis();
             initialValues.put(STATUS_COL, status);
             if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
-                initialValues.put(TRANS_START_COL, System.currentTimeMillis());
+                initialValues.put(TRANS_START_COL, time);
+            } else if (ConstantUtil.DOWNLOADED_STATUS.equals(status)) {
+                // Mark both columns with the same timestamp.
+                initialValues.put(TRANS_START_COL, time);
+                initialValues.put(DELIVERED_DATE_COL, time);
             }
         } else {
             initialValues.put(TRANS_START_COL, (Long) null);

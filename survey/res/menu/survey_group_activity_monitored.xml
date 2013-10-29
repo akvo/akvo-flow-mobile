@@ -23,4 +23,10 @@
         android:title="Manage Records"
         flowapp:showAsAction="always"/>
 
+    <item
+        android:id="@+id/map_icon"
+        android:orderInCategory="99"
+        android:title="View on Map"
+        flowapp:showAsAction="never"/>
+
 </menu>

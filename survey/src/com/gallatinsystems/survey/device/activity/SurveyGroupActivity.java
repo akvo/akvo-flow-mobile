@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -43,6 +44,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.async.loader.SurveyGroupLoader;
@@ -438,6 +440,9 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.map_icon:
+                viewOnMap();
+                return true;
             case R.id.users:
                 Intent i = new Intent(this, ListUserActivity.class);
                 startActivityForResult(i, ID_ACTIVITY_USERS);
@@ -454,6 +459,18 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private void viewOnMap() {
+        // Will only show the position of existing records
+        if (mLocale != null) {
+            final String uri = "geo:" + mLocale.getLatitude() + "," + mLocale.getLongitude() + "?q="
+            		+ mLocale.getLatitude() + "," + mLocale.getLongitude() + "(" + mLocale.getName() + ")";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "No locale selected", Toast.LENGTH_SHORT).show();
         }
     }
     

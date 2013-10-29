@@ -71,18 +71,20 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         setContentView(R.layout.surveyed_locales_activity);
         
         mSurveyGroupId = getIntent().getExtras().getInt(EXTRA_SURVEY_GROUP_ID);
+        
+        if (savedInstanceState != null) {
+            mListResults = savedInstanceState.getBoolean("list_results", true);
+        }
 
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
         mServerBase = getServerBase();
         
-        if (findViewById(R.id.fragment_container) != null) {
-            if (savedInstanceState != null) {
-                return;
-            }
-            
-            display();
-        }
+        display();
+    }
+    
+    protected void onSaveInstanceState (Bundle outState) {
+        outState.putBoolean("list_results", mListResults);
     }
     
     @Override

@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import android.util.Log;
 
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.parser.FlowParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
@@ -47,7 +48,15 @@ public class SurveyMetaParser implements FlowParser<Survey> {
         survey.setName(touple[Attr.NAME]);
         survey.setLanguage(touple[Attr.LANGUAGE]);
         survey.setVersion(Double.parseDouble(touple[Attr.VERSION]));
-        survey.setSurveyGroupId(Integer.parseInt(touple[Attr.SURVEY_GROUP]));
+        
+        // Parse the SurveyGroup
+        int groupId = Integer.parseInt(touple[Attr.GROUP_ID]);
+        String groupName = touple[Attr.GROUP_NAME];
+        boolean monitored = Boolean.valueOf(touple[Attr.GROUP_MONITORED]);
+        String registerSurveyId = touple[Attr.GROUP_REGISTRATION_SURVEY];
+        SurveyGroup group = new SurveyGroup(groupId, groupName, registerSurveyId, monitored);
+        
+        survey.setSurveyGroup(group);
         
         survey.setType(ConstantUtil.FILE_SURVEY_LOCATION_TYPE);
         return survey;
@@ -80,9 +89,14 @@ public class SurveyMetaParser implements FlowParser<Survey> {
         int NAME         = 2;
         int LANGUAGE     = 3;
         int VERSION      = 4;
-        int SURVEY_GROUP = 5;
         
-        int COUNT    = 6;// Length of column array
+        // SurveyGroup information
+        int GROUP_ID                  = 5;
+        int GROUP_NAME                = 6;
+        int GROUP_MONITORED           = 7;
+        int GROUP_REGISTRATION_SURVEY = 8;
+        
+        int COUNT    = 9;// Length of column array
     }
 
 }

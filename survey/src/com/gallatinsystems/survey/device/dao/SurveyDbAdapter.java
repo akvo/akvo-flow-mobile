@@ -1031,6 +1031,10 @@ public class SurveyDbAdapter {
                 new String[] {
                     survey.getId(),
                 }, null, null, null);
+        final int surveyGroupId = survey.getSurveyGroup() != null ? 
+                survey.getSurveyGroup().getId() 
+                : SurveyGroup.ID_NONE;
+        
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(PK_ID_COL, survey.getId());
         updatedValues.put(VERSION_COL, survey.getVersion());
@@ -1040,7 +1044,7 @@ public class SurveyDbAdapter {
         updatedValues.put(DISP_NAME_COL, survey.getName());
         updatedValues.put(LANGUAGE_COL, survey.getLanguage() != null ? survey
                 .getLanguage().toLowerCase() : ConstantUtil.ENGLISH_CODE);
-        updatedValues.put(SURVEY_GROUP_ID_COL, survey.getSurveyGroupId());
+        updatedValues.put(SURVEY_GROUP_ID_COL, surveyGroupId);
         updatedValues.put(HELP_DOWNLOADED_COL, survey.isHelpDownloaded() ? "Y"
                 : "N");
         updatedValues.put(DELETED_COL, ConstantUtil.NOT_DELETED);
@@ -1850,22 +1854,13 @@ public class SurveyDbAdapter {
                 newLangsPresentIndexes);
     }
     
-    public void addSurveyGroups(List<SurveyGroup> surveyGroups) {
-        database.beginTransaction();
-        try {
-            for (SurveyGroup group : surveyGroups) {
-                ContentValues values = new ContentValues();
-                values.put(SurveyGroupAttrs.ID, group.getId());
-                values.put(SurveyGroupAttrs.NAME, group.getName());
-                values.put(SurveyGroupAttrs.REGISTER_SURVEY_ID, group.getRegisterSurveyId());
-                values.put(SurveyGroupAttrs.MONITORED, group.isMonitored() ? 1 : 0);
-                database.insert(Tables.SURVEY_GROUP, null, values);
-            }
-            database.setTransactionSuccessful();
-        } finally {
-            database.endTransaction();
-        }
-        
+    public void addSurveyGroup(SurveyGroup surveyGroup) {
+        ContentValues values = new ContentValues();
+        values.put(SurveyGroupAttrs.ID, surveyGroup.getId());
+        values.put(SurveyGroupAttrs.NAME, surveyGroup.getName());
+        values.put(SurveyGroupAttrs.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
+        values.put(SurveyGroupAttrs.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
+        database.insert(Tables.SURVEY_GROUP, null, values);
     }
     
     public static SurveyGroup getSurveyGroup(Cursor cursor) {

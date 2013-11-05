@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +32,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.net.URLEncoder;
 
 import org.apache.http.HttpException;
 
@@ -40,6 +40,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
@@ -50,7 +51,6 @@ import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.exception.TransferException;
-import com.gallatinsystems.survey.device.parser.csv.SurveyGroupParser;
 import com.gallatinsystems.survey.device.parser.csv.SurveyMetaParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
@@ -75,7 +75,6 @@ public class SurveyDownloadService extends Service {
 
     @SuppressWarnings("unused")
     private static final String NO_SURVEY = "No Survey Found";
-    private static final String SURVEY_GROUP_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveyGroupsDevice&devicePhoneNumber=";
     private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice&devicePhoneNumber=";
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
     private static final String DEV_ID_PARAM = "&devId=";
@@ -144,11 +143,6 @@ public class SurveyDownloadService extends Service {
                 final String serverBase = getServerBase();
                 final String deviceId = getDeviceId();
                 
-                // First of all, sync Survey Groups
-                // TODO: We will need to somehow synchronize SurveyGroups for
-                // arbitrary survey downloads.
-                syncSurveyGroups(serverBase, deviceId);
-                
                 List<Survey> surveys = null;
                 if (surveyId != null && surveyId.trim().length() > 0) {
                     surveys = getSurveyHeader(serverBase, surveyId, deviceId);
@@ -162,6 +156,9 @@ public class SurveyDownloadService extends Service {
                     }
                 }
                 if (surveys != null && surveys.size() > 0) {
+                    // First, sync the SurveyGroups
+                    syncSurveyGroups(surveys);
+                    
                     // if there are surveys for this device, see if we need
                     // them
                     surveys = databaseAdaptor.checkSurveyVersions(surveys);
@@ -250,16 +247,21 @@ public class SurveyDownloadService extends Service {
         return databaseAdaptor.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
     }
     
-    private void syncSurveyGroups(String serverBase, String deviceId) throws Exception {// TODO: Narrow exception scope!!!!!!!
-        String url = serverBase + SURVEY_GROUP_LIST_SERVICE_PATH
-                + URLEncoder.encode(StatusUtil.getPhoneNumber(this), "UTF-8")
-                + IMEI_PARAM + URLEncoder.encode(StatusUtil.getImei(this), "UTF-8")
-                + VERSION_PARAM + URLEncoder.encode(PlatformUtil.getVersionName(this), "UTF-8")
-                + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
-
-        String response = HttpUtil.httpGet(url);
-        List<SurveyGroup> surveyGroups = new SurveyGroupParser().parseList(response);
-        databaseAdaptor.addSurveyGroups(surveyGroups);
+    private void syncSurveyGroups(List<Survey> surveys) {
+        // First, form the groups
+        SparseArray<SurveyGroup> surveyGroups = new SparseArray<SurveyGroup>();
+        for (Survey survey : surveys) {
+            SurveyGroup group = survey.getSurveyGroup();
+            if (group != null) {
+                surveyGroups.put(group.getId(), group);
+            }
+        }
+        
+        // Now, add them to the database
+        for (int i=0; i<surveyGroups.size(); i++) {
+            int id = surveyGroups.keyAt(i);
+            databaseAdaptor.addSurveyGroup(surveyGroups.get(id));
+        }
     }
 
     /**

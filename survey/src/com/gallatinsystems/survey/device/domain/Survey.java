@@ -26,7 +26,7 @@ import java.util.List;
  * @author Christopher Fagiani
  */
 public class Survey {
-    private int surveyGroupId;// TODO: Use java mMemberName convention
+    private SurveyGroup surveyGroup;// TODO: Use java mMemberName convention
     private String name;
     private String id;
     private Date startDate;
@@ -39,12 +39,12 @@ public class Survey {
     private boolean helpDownloaded;
     private String language;
     
-    public void setSurveyGroupId(int surveyGroupId) {
-        this.surveyGroupId = surveyGroupId;
+    public void setSurveyGroup(SurveyGroup surveyGroup) {
+        this.surveyGroup = surveyGroup;
     }
     
-    public int getSurveyGroupId() {
-        return surveyGroupId;
+    public SurveyGroup getSurveyGroup() {
+        return surveyGroup;
     }
 
     public String getLanguage() {

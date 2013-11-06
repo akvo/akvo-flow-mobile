@@ -25,7 +25,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -452,10 +451,10 @@ public class SurveyDownloadService extends Service {
      * @param surveyId
      * @return
      */
-    private ArrayList<Survey> getSurveyHeader(String serverBase,
+    private List<Survey> getSurveyHeader(String serverBase,
             String surveyId, String deviceId) {
         String response = null;
-        ArrayList<Survey> surveys = new ArrayList<Survey>();
+        List<Survey> surveys = new ArrayList<Survey>();
         try {
             response = HttpUtil.httpGet(serverBase
                     + SURVEY_HEADER_SERVICE_PATH
@@ -465,23 +464,7 @@ public class SurveyDownloadService extends Service {
                     + (deviceId != null ? (DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8"))
                             : ""));
             if (response != null) {
-                StringTokenizer strTok = new StringTokenizer(response, "\n");
-                while (strTok.hasMoreTokens()) {
-                    String currentLine = strTok.nextToken();
-                    String[] touple = currentLine.split(",");
-                    if (touple.length < 4) {
-                        Log.e(TAG,
-                                "Survey list response is in an unrecognized format");
-                    } else {
-                        Survey temp = new Survey();
-                        temp.setId(touple[0]);
-                        temp.setName(touple[1]);
-                        temp.setLanguage(touple[2]);
-                        temp.setVersion(Double.parseDouble(touple[3]));
-                        temp.setType(ConstantUtil.FILE_SURVEY_LOCATION_TYPE);
-                        surveys.add(temp);
-                    }
-                }
+                surveys = new SurveyMetaParser().parseList(response, true);
             }
         } catch (HttpException e) {
             Log.e(TAG, "Server returned an unexpected response", e);

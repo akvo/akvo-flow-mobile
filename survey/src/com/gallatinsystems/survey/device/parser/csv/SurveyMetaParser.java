@@ -61,13 +61,24 @@ public class SurveyMetaParser implements FlowParser<Survey> {
         survey.setType(ConstantUtil.FILE_SURVEY_LOCATION_TYPE);
         return survey;
     }
-
-    @Override
-    public List<Survey> parseList(String response) {
+    
+    /**
+     * Survey metadata feeds might contain no phone, thus we will
+     * need to prepend the rows with a fake comma to ensure consistency.
+     * 
+     * @param response
+     * @param addColumn
+     * @return survey list
+     */
+    public List<Survey> parseList(String response, boolean addColumn) {
         List<Survey> surveyList = new ArrayList<Survey>();
         StringTokenizer strTok = new StringTokenizer(response, "\n");
         while (strTok.hasMoreTokens()) {
             String currentLine = strTok.nextToken();
+            if (addColumn) {
+                // Add a fake column
+                currentLine = "," + currentLine;
+            }
             Survey survey = parse(currentLine);
             if (survey != null) {
                 surveyList.add(survey);
@@ -75,6 +86,11 @@ public class SurveyMetaParser implements FlowParser<Survey> {
         }
         
         return surveyList;
+    }
+
+    @Override
+    public List<Survey> parseList(String response) {
+        return parseList(response, false);
     }
 
     @Override

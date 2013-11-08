@@ -155,14 +155,15 @@ public class FreetextQuestionView extends QuestionView implements
             }
         }
     }
-
-    @Override
-    public void resetQuestion(boolean fireEvent) {
-        super.resetQuestion(fireEvent);
-        freetextEdit.setText("");
-        if (isDoubleEntry) {
-            doubleEntryEdit.setText("");
+    
+    private void resetQuestion(boolean clearFields, boolean fireEvent) {
+        if (clearFields) {
+            freetextEdit.setText("");
+            if (isDoubleEntry) {
+                doubleEntryEdit.setText("");
+            }
         }
+        super.resetQuestion(fireEvent);
     }
 
     /**
@@ -215,7 +216,7 @@ public class FreetextQuestionView extends QuestionView implements
                                     }
                                 });
                         builder.show();
-                        resetQuestion(false); // Enforce validation by clearing
+                        resetQuestion(true, false); // Enforce validation by clearing
                                               // field
                     }
                 } 
@@ -241,7 +242,7 @@ public class FreetextQuestionView extends QuestionView implements
                                     }
                                 })
                             .show();
-                    resetQuestion(true);
+                    resetQuestion(false, true);
                 }
             }
         }

@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 
 import android.app.AlertDialog;
@@ -673,7 +674,7 @@ public class SurveyViewActivity extends TabActivity implements
      * 
      * @param questions
      */
-    public void setMissingQuestions(ArrayList<Question> questions) {
+    public void setMissingQuestions(List<Question> questions) {
         missingQuestions.clear();
         if (questions != null) {
             for (int i = 0; i < questions.size(); i++) {
@@ -846,6 +847,22 @@ public class SurveyViewActivity extends TabActivity implements
 
     }
 
+    /**
+     * checks if all the double entry questions (on all tabs) are satisfied.
+     * 
+     * @return list of unsatisfied questions
+     */
+    public List<Question> checkDoubleEntry() {
+        List<Question> unmatchedQuestions = new ArrayList<Question>();
+        if (tabContentFactories != null) {
+            for (int i = 0; i < tabContentFactories.size(); i++) {
+                unmatchedQuestions.addAll(tabContentFactories.get(i)
+                        .checkDoubleQuestions());
+            }
+        }
+        return unmatchedQuestions;
+    }
+    
     /**
      * checks if all the mandatory questions (on all tabs) have responses
      * 

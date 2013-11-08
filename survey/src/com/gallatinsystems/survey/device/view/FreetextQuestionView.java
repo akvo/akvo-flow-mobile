@@ -42,11 +42,13 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  */
 public class FreetextQuestionView extends QuestionView implements
         OnFocusChangeListener {
+    private boolean isDoubleEntry;
     private EditText freetextEdit;
 
     public FreetextQuestionView(Context context, Question q,
             String defaultLang, String[] langCodes, boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
+        this.isDoubleEntry = q.isDoubleEntry();
         init();
     }
 

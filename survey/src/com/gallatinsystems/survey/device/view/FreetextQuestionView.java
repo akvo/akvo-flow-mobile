@@ -43,7 +43,14 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 public class FreetextQuestionView extends QuestionView implements
         OnFocusChangeListener {
     private boolean isDoubleEntry;
+    
     private EditText freetextEdit;
+    private EditText doubleEntryEdit;
+    
+    /**
+     * Tag to recognize doubleEntryEdit in the focus callback
+     */
+    private Object doubleEntryTag = new Object();
 
     public FreetextQuestionView(Context context, Question q,
             String defaultLang, String[] langCodes, boolean readOnly) {
@@ -55,9 +62,30 @@ public class FreetextQuestionView extends QuestionView implements
     protected void init() {
         Context context = getContext();
         TableRow tr = new TableRow(context);
-        freetextEdit = new EditText(context);
-        freetextEdit.setWidth(DEFAULT_WIDTH);
-        freetextEdit.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        freetextEdit = createQuestionView();
+        tr.addView(freetextEdit);
+        addView(tr);
+        
+        if (isDoubleEntry) {
+            TableRow repeatTitle = new TableRow(context);
+            TextView title = new TextView(context);
+            title.setWidth(getMaxTextWidth());
+            title.setText("Please, repeat answer");
+            repeatTitle.addView(title);
+            addView(repeatTitle);
+            
+            TableRow tr2 = new TableRow(context);
+            doubleEntryEdit = createQuestionView();
+            doubleEntryEdit.setTag(doubleEntryTag);
+            tr2.addView(doubleEntryEdit);
+            addView(tr2);
+        }
+    }
+    
+    private EditText createQuestionView() {
+        EditText editText = new EditText(getContext());
+        editText.setWidth(DEFAULT_WIDTH);
+        editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         if (readOnly) {
             freetextEdit.setFocusable(false);
         }
@@ -68,21 +96,20 @@ public class FreetextQuestionView extends QuestionView implements
                 InputFilter[] FilterArray = new InputFilter[1];
                 FilterArray[0] = new InputFilter.LengthFilter(getQuestion()
                         .getValidationRule().getMaxLength());
-                freetextEdit.setFilters(FilterArray);
+                editText.setFilters(FilterArray);
             }
             // if the type is numeric, add numeric-specific rules
             if (ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(rule
                     .getValidationType())) {
                 DigitsKeyListener MyDigitKeyListener = new DigitsKeyListener(
                         rule.getAllowSigned(), rule.getAllowDecimal());
-                freetextEdit.setKeyListener(MyDigitKeyListener);
+                editText.setKeyListener(MyDigitKeyListener);
             }
         }
-        freetextEdit.setOnFocusChangeListener(this);
-        freetextEdit.setWidth(screenWidth - 50);
+        editText.setOnFocusChangeListener(this);
+        editText.setWidth(screenWidth - 50);
 
-        tr.addView(freetextEdit);
-        addView(tr);
+        return editText;
     }
 
     /**
@@ -97,6 +124,9 @@ public class FreetextQuestionView extends QuestionView implements
     public void setResponse(QuestionResponse resp) {
         if (resp != null && freetextEdit != null) {
             freetextEdit.setText(resp.getValue());
+            if (isDoubleEntry && doubleEntryEdit != null) {
+                doubleEntryEdit.setText(resp.getValue());
+            }
         }
         super.setResponse(resp);
     }
@@ -106,8 +136,11 @@ public class FreetextQuestionView extends QuestionView implements
      * possibly suppressing listeners
      */
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(freetextEdit.getText().toString(),
-                ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
+        String answer = "";
+        if (checkDoubleEntry()) {
+            answer = freetextEdit.getText().toString();
+        }
+        setResponse(new QuestionResponse(answer, ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
                 suppressListeners);
     }
 
@@ -116,6 +149,9 @@ public class FreetextQuestionView extends QuestionView implements
         super.rehydrate(resp);
         if (resp != null) {
             freetextEdit.setText(resp.getValue());
+            if (isDoubleEntry) {
+                doubleEntryEdit.setText(resp.getValue());
+            }
         }
     }
 
@@ -123,6 +159,9 @@ public class FreetextQuestionView extends QuestionView implements
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         freetextEdit.setText("");
+        if (isDoubleEntry) {
+            doubleEntryEdit.setText("");
+        }
     }
 
     /**
@@ -143,8 +182,6 @@ public class FreetextQuestionView extends QuestionView implements
                                 .performValidation(textEdit.getText()
                                         .toString());
                         textEdit.setText(validatedText);
-                        // now capture the response
-                        captureResponse();
                     } catch (ValidationException e) {
                         // if we failed validation, display
                         // a message to the user
@@ -180,11 +217,71 @@ public class FreetextQuestionView extends QuestionView implements
                         resetQuestion(false); // Enforce validation by clearing
                                               // field
                     }
-                } else {
+                } 
+                
+                if (checkDoubleEntry()) {
+                    captureResponse();
+                } else if (doubleEntryTag.equals(view.getTag())) {
+                    // Warn only if the focus callback is from the second EditText
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    String message = getContext().getString(R.string.unmatchedwarning)
+                            + " " + getQuestion().getText();
+                    builder.setTitle(R.string.validationerrtitle)
+                            .setMessage(message)
+                            .setPositiveButton(R.string.okbutton,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,
+                                            int id) {
+                                        if (dialog != null) {
+                                            dialog.dismiss();
+                                        }
+                                    }
+                                })
+                            .show();
+                    resetQuestion(true);
+                }
+                    
+                
+                
+                
+                
+                
+                
+                /*
+                } else if (doubleEntryTag.equals(view.getTag()) && !checkDoubleEntry()) {
+                    // Warn only if the focus callback is from the second EditText
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    String message = getContext().getString(R.string.unmatchedwarning)
+                            + " " + getQuestion().getText();
+                    builder.setTitle(R.string.validationerrtitle)
+                            .setMessage(message)
+                            .setPositiveButton(R.string.okbutton,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,
+                                            int id) {
+                                        if (dialog != null) {
+                                            dialog.dismiss();
+                                        }
+                                    }
+                                })
+                            .show();
+                    resetQuestion(true);
+                } else if (checkDoubleEntry()){
                     captureResponse();
                 }
+                */
             }
         }
+    }
+    
+    public boolean checkDoubleEntry() {
+        if (!isDoubleEntry) {
+            // No double entry required. Return true
+            return true;
+        }
+        String text1 = freetextEdit.getText().toString();
+        String text2 = doubleEntryEdit.getText().toString();
+        return text1.equals(text2);
     }
     
 }

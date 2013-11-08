@@ -70,6 +70,7 @@
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>
     <string name="mandatorywarning">Questions marked with a * are mandatory. You must answer the following questions before you can submit:</string>
+    <string name="unmatchedwarning">Questions with double entry must contain the same answer:</string>
     <string name="cannotsave">Cannot submit responses</string>
     <string name="plottinglabel">Area Plotting</string>
     <string name="addpoint">Add Point</string>

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -221,8 +222,10 @@ public class FreetextQuestionView extends QuestionView implements
                 
                 if (checkDoubleEntry()) {
                     captureResponse();
-                } else if (doubleEntryTag.equals(view.getTag())) {
+                } else if (doubleEntryTag.equals(view.getTag())
+                        || (getResponse() != null && !TextUtils.isEmpty(getResponse().getValue()))) {
                     // Warn only if the focus callback is from the second EditText
+                    // or we already had a response
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     String message = getContext().getString(R.string.unmatchedwarning)
                             + " " + getQuestion().getText();
@@ -240,36 +243,6 @@ public class FreetextQuestionView extends QuestionView implements
                             .show();
                     resetQuestion(true);
                 }
-                    
-                
-                
-                
-                
-                
-                
-                /*
-                } else if (doubleEntryTag.equals(view.getTag()) && !checkDoubleEntry()) {
-                    // Warn only if the focus callback is from the second EditText
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    String message = getContext().getString(R.string.unmatchedwarning)
-                            + " " + getQuestion().getText();
-                    builder.setTitle(R.string.validationerrtitle)
-                            .setMessage(message)
-                            .setPositiveButton(R.string.okbutton,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,
-                                            int id) {
-                                        if (dialog != null) {
-                                            dialog.dismiss();
-                                        }
-                                    }
-                                })
-                            .show();
-                    resetQuestion(true);
-                } else if (checkDoubleEntry()){
-                    captureResponse();
-                }
-                */
             }
         }
     }

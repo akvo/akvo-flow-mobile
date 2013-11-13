@@ -223,6 +223,7 @@
     <string name="clear_data_success">Data successfully deleted from the device</string>
     <string name="clear_data_error">Error deleting data from the device</string>
     
+    <string name="configuring_languages">Configuring survey languages...</string>
     <!-- Search -->
     <string name="search_name">@string/app_name</string>
     <string name="search_hint">Search Record</string>

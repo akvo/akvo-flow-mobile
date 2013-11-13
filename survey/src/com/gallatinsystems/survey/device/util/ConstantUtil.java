@@ -294,6 +294,7 @@ public class ConstantUtil {
     public static final String INCLUDE_OPTIONAL_ICONS = "includeOptionalIcons";
     public static final String PROMPT_ON_OPT_CHANGE = "promptOnOptionChange";
     public static final String DEFAULT_SETTINGS = "defaultSettings";
+    public static final String API_KEY = "apiKey";
 
     /**
      * resource related constants

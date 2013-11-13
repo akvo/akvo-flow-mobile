@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.LangsPreferenceUtil;
 
@@ -71,7 +72,7 @@ public class FlowApp extends Application {
                 database.savePreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY, "");
 
                 // Recompute all the surveys, and store their languages
-                for (Survey survey : database.listSurveys(null)) {
+                for (Survey survey : database.listSurveys(SurveyGroup.ID_NONE)) {
                     String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
                     Log.d(TAG, "Adding languages: " + langs.toString());
                     database.addLanguages(langs);

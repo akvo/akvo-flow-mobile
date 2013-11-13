@@ -16,10 +16,8 @@
 
 package com.gallatinsystems.survey.device.activity;
 
-import java.net.URLEncoder;
+import java.io.IOException;
 import java.util.List;
-
-import org.apache.http.HttpException;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -33,17 +31,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
+import com.gallatinsystems.survey.device.api.FlowApi;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
-import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.fragment.MapFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocaleListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocalesFragmentListener;
-import com.gallatinsystems.survey.device.parser.json.SurveyedLocaleParser;
-import com.gallatinsystems.survey.device.util.ConstantUtil;
-import com.gallatinsystems.survey.device.util.HttpUtil;
-import com.gallatinsystems.survey.device.util.PropertyUtil;
-import com.gallatinsystems.survey.device.util.StatusUtil;
 
 public class SurveyedLocalesActivity extends ActionBarActivity implements SurveyedLocalesFragmentListener {
     
@@ -51,14 +44,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
     public static final String EXTRA_SURVEYED_LOCALE_ID = "surveyed_locale_id";
     
-    // API parameters
-    private static final String SURVEYED_LOCALE_SERVICE_PATH = "/surveyedlocale?surveyGroupId=";
-    private static final String PARAM_PHONE_NUMBER = "&phoneNumber=";
-    private static final String PARAM_IMEI = "&imei=";
-    private static final String PARAM_ONLY_COUNT = "&checkAvailable=";
-    
     private int mSurveyGroupId;
-    private String mServerBase;
     
     private SurveyDbAdapter mDatabase;
     
@@ -77,8 +63,6 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         }
 
         mDatabase = new SurveyDbAdapter(this);
-        mDatabase.open();
-        mServerBase = getServerBase();
         
         display();
     }
@@ -166,19 +150,6 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         setResult(RESULT_OK, intent);
         finish();
     }
-            
-    private String getServerBase() {
-        String serverBase = mDatabase.findPreference(ConstantUtil.SERVER_SETTING_KEY);
-        if (serverBase != null && serverBase.trim().length() > 0) {
-            serverBase = getResources().getStringArray(R.array.servers)[Integer
-                    .parseInt(serverBase)];
-        } else {
-            serverBase = new PropertyUtil(getResources()).
-                    getProperty(ConstantUtil.SERVER_BASE);
-        }
-            
-        return serverBase;
-    }
 
     /**
      * Worker thread to download the records.
@@ -187,30 +158,18 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         
         @Override
         protected Integer doInBackground(Void... params) {
-            String response = null;
             int syncedRecords = 0;
+            FlowApi api = new FlowApi();
             try {
-                final String url = mServerBase
-                        + SURVEYED_LOCALE_SERVICE_PATH + mSurveyGroupId
-                        + PARAM_PHONE_NUMBER + URLEncoder.encode(StatusUtil.getPhoneNumber(SurveyedLocalesActivity.this), "UTF-8")
-                        + PARAM_IMEI + URLEncoder.encode(StatusUtil.getImei(SurveyedLocalesActivity.this), "UTF-8")
-                        + PARAM_ONLY_COUNT + false;
-                response = HttpUtil.httpGet(url);
-                if (response != null) {
-                    List<SurveyedLocale> surveyedLocales = new SurveyedLocaleParser().parseList(response);
-                    if (surveyedLocales != null) {
-                        SurveyDbAdapter database = new SurveyDbAdapter(SurveyedLocalesActivity.this).open();
-                        database.syncSurveyedLocales(surveyedLocales);
-                        database.close();
-                        syncedRecords = surveyedLocales.size();
-                    }
+                List<SurveyedLocale> surveyedLocales = api.getSurveyedLocales(mSurveyGroupId);
+                if (surveyedLocales != null) {
+                    SurveyDbAdapter database = new SurveyDbAdapter(SurveyedLocalesActivity.this).open();
+                    database.syncSurveyedLocales(surveyedLocales);
+                    database.close();
+                    syncedRecords = surveyedLocales.size();
                 }
-            } catch (HttpException e) {
-                Log.e(TAG, "Server returned an unexpected response", e);
-                PersistentUncaughtExceptionHandler.recordException(e);
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
-                PersistentUncaughtExceptionHandler.recordException(e);
+            } catch (IOException e) {
+                Log.e(TAG, "doInBackground() - " + e.getMessage());
             }
             
             return syncedRecords;

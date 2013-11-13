@@ -21,6 +21,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,6 @@ import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
-import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -59,7 +59,7 @@ public class HttpUtil {
      * @return
      * @throws Exception
      */
-    public static String httpGet(String url) throws Exception {
+    public static String httpGet(String url) throws IOException {
         DefaultHttpClient client = new DefaultHttpClient();
         HttpResponse response = null;
         String responseString = null;
@@ -68,7 +68,7 @@ public class HttpUtil {
         request.setHeader("User-Agent", "gzip");
         response = client.execute(request);
         if (response.getStatusLine().getStatusCode() != 200) {
-            throw new HttpException("Server error: "
+            throw new IOException("Server error: "
                     + response.getStatusLine().getStatusCode());
         } else {
             responseString = parseResponse(response);
@@ -86,7 +86,7 @@ public class HttpUtil {
      * @throws Exception
      */
     public static String httpPost(String url, Map<String, String> params)
-            throws Exception {
+            throws IOException {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
         HttpResponse response = null;
@@ -103,7 +103,7 @@ public class HttpUtil {
         }
         response = httpClient.execute(httpPost);
         if (response.getStatusLine().getStatusCode() != 200) {
-            throw new HttpException("Server error: "
+            throw new IOException("Server error: "
                     + response.getStatusLine().getStatusCode());
         } else {
             responseString = parseResponse(response);
@@ -238,7 +238,7 @@ public class HttpUtil {
      * @return
      * @throws Exception
      */
-    private static String parseResponse(HttpResponse response) throws Exception {
+    private static String parseResponse(HttpResponse response) throws IOException {
         String result = null;
         BufferedReader reader = null;
         try {

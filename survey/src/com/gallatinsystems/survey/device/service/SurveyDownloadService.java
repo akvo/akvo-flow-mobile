@@ -32,8 +32,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.http.HttpException;
-
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -466,11 +464,8 @@ public class SurveyDownloadService extends Service {
             if (response != null) {
                 surveys = new SurveyMetaParser().parseList(response, true);
             }
-        } catch (HttpException e) {
+        } catch (IOException e) {
             Log.e(TAG, "Server returned an unexpected response", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
-        } catch (Exception e) {
-            Log.e(TAG, "Could not get survey headers", e);
             PersistentUncaughtExceptionHandler.recordException(e);
         }
         return surveys;
@@ -500,11 +495,8 @@ public class SurveyDownloadService extends Service {
             if (response != null) {
                 surveys = new SurveyMetaParser().parseList(response);
             }
-        } catch (HttpException e) {
+        } catch (IOException e) {
             Log.e(TAG, "Server returned an unexpected response", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
-        } catch (Exception e) {
-            Log.e(TAG, "Could not download survey", e);
             PersistentUncaughtExceptionHandler.recordException(e);
         }
         

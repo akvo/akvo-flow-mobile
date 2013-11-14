@@ -16,14 +16,12 @@
 
 package com.gallatinsystems.survey.device.api.parser.csv;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import android.util.Log;
 
-import com.gallatinsystems.survey.device.api.parser.FlowParser;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
@@ -33,10 +31,9 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * will be returned.
  *
  */
-public class SurveyMetaParser implements FlowParser<Survey> {
+public class SurveyMetaParser {
     private static final String TAG = SurveyMetaParser.class.getSimpleName();
 
-    @Override
     public Survey parse(String response) {
         String[] touple = response.split(",");
         if (touple.length < Attr.COUNT) {
@@ -88,15 +85,8 @@ public class SurveyMetaParser implements FlowParser<Survey> {
         return surveyList;
     }
 
-    @Override
     public List<Survey> parseList(String response) {
         return parseList(response, false);
-    }
-
-    @Override
-    public Survey parse(InputStream inputStream) {
-        // Not implemented
-        throw new RuntimeException("Method not implemented");
     }
 
     interface Attr {

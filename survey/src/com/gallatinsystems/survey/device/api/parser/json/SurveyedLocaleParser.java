@@ -16,7 +16,6 @@
 
 package com.gallatinsystems.survey.device.api.parser.json;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,44 +25,37 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.gallatinsystems.survey.device.api.parser.FlowParser;
+import com.gallatinsystems.survey.device.api.response.SurveyedLocalesResponse;
 import com.gallatinsystems.survey.device.domain.SurveyInstance;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 
-public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
+public class SurveyedLocaleParser {
     private static final String TAG = SurveyedLocaleParser.class.getSimpleName();
-
-    @Override
-    public SurveyedLocale parse(InputStream inputStream) {
-        return null;
-    }
-
-    @Override
-    public SurveyedLocale parse(String response) {
-        return null;
-    }
-
-    @Override
-    public List<SurveyedLocale> parseList(String response) {
+    
+    public SurveyedLocalesResponse parseResponse(String response) {
+        SurveyedLocalesResponse surveyedLocaleResponse = null;
         List<SurveyedLocale> surveyedLocales = new ArrayList<SurveyedLocale>();
         try {
             JSONObject jResponse = new JSONObject(response);
+            String syncTime = String.valueOf(jResponse.getLong(Attrs.SYNC_TIME));
             JSONArray jSurveyedLocales = jResponse.getJSONArray(Attrs.SURVEYED_LOCALE_DATA);
             for (int i=0; i<jSurveyedLocales.length(); i++) {
                 JSONObject jSurveyedLocale = jSurveyedLocales.getJSONObject(i);
-                SurveyedLocale surveyedLocale = parse(jSurveyedLocale);
+                SurveyedLocale surveyedLocale = parseSurveyedLocale(jSurveyedLocale);
                 if (surveyedLocale != null) {
                     surveyedLocales.add(surveyedLocale);
                 }
             }
+            
+            surveyedLocaleResponse = new SurveyedLocalesResponse(syncTime, surveyedLocales);
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
         
-        return surveyedLocales;
+        return surveyedLocaleResponse;
     }
 
-    public SurveyedLocale parse(JSONObject jSurveyedLocale) {
+    public SurveyedLocale parseSurveyedLocale(JSONObject jSurveyedLocale) {
         try {
             String id = jSurveyedLocale.getString(Attrs.ID);
             int surveyGroupId = jSurveyedLocale.getInt(Attrs.SURVEY_GROUP_ID);
@@ -78,16 +70,6 @@ public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
             surveyedLocale.setSurveyInstances(surveyInstances);
             
             return surveyedLocale;
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
-        }
-    }
-    
-    public String getSyncTime(String response) {
-        try {
-            JSONObject jResponse = new JSONObject(response);
-            return String.valueOf(jResponse.getInt(Attrs.SYNC_TIME));
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
             return null;

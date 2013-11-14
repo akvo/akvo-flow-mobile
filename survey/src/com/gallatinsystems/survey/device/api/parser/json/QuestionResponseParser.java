@@ -16,7 +16,6 @@
 
 package com.gallatinsystems.survey.device.api.parser.json;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,22 +25,11 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.gallatinsystems.survey.device.api.parser.FlowParser;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
-public class QuestionResponseParser implements FlowParser<QuestionResponse> {
+public class QuestionResponseParser {
     private static final String TAG = QuestionResponseParser.class.getSimpleName();
-
-    @Override
-    public QuestionResponse parse(InputStream inputStream) {
-        return null;
-    }
-
-    @Override
-    public QuestionResponse parse(String response) {
-        return null;
-    }
 
     public QuestionResponse parse(JSONObject jSurveyedLocale) {
         try {
@@ -53,11 +41,6 @@ public class QuestionResponseParser implements FlowParser<QuestionResponse> {
             Log.e(TAG, e.getMessage());
             return null;
         }
-    }
-
-    @Override
-    public List<QuestionResponse> parseList(String questionResponses) {
-        return null;
     }
 
     public List<QuestionResponse> parseList(JSONArray jResponses) {

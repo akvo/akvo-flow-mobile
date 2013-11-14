@@ -16,7 +16,6 @@
 
 package com.gallatinsystems.survey.device.api.parser.json;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,27 +25,11 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.gallatinsystems.survey.device.api.parser.FlowParser;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.domain.SurveyInstance;
 
-public class SurveyInstanceParser implements FlowParser<SurveyInstance> {
+public class SurveyInstanceParser {
     private static final String TAG = SurveyInstanceParser.class.getSimpleName();
-
-    @Override
-    public SurveyInstance parse(InputStream inputStream) {
-        return null;
-    }
-
-    @Override
-    public SurveyInstance parse(String response) {
-        return null;
-    }
-
-    @Override
-    public List<SurveyInstance> parseList(String response) {
-        return null;
-    }
 
     public SurveyInstance parse(JSONObject jSurveyInstance) {
         try {

@@ -1,7 +1,13 @@
 package com.gallatinsystems.survey.device.api;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +19,7 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
@@ -23,7 +30,6 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.parser.json.SurveyedLocaleParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
-import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 
@@ -53,13 +59,49 @@ public class FlowApi {
             
         final String url = BASE_URL + Path.SURVEYED_LOCALE 
                 + "?" + query
-                + "&" + PARAM.HMAC + URLEncoder.encode(getAuthorization(query), "UTF-8");
-        String response = HttpUtil.httpGet(url);
+                //+ "&" + PARAM.HMAC + URLEncoder.encode(getAuthorization(query), "UTF-8");
+                + "&" + PARAM.HMAC + getAuthorization(query);
+        String response = httpGet(url);
         if (response != null) {
             surveyedLocales = new SurveyedLocaleParser().parseList(response);
         }
         
         return surveyedLocales;
+    }
+    
+    private String httpGet(String url) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) (new URL(url).openConnection());
+        String response = null;
+
+        try {
+            int status = getStatusCode(conn);
+            if ((status / 100) == 2) {// Allow any 2XX status code
+                InputStream in = new BufferedInputStream(conn.getInputStream());
+                response = readStream(in);
+            } else {
+                Log.e(TAG, "Status Code: " + status + ". Expected: 2XX");
+            }
+            return response;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+    
+    private int getStatusCode(HttpURLConnection conn) throws IOException {
+        int status = 0;
+        try {
+            status = conn.getResponseCode();
+        } catch (IOException e) {
+            // HttpUrlConnection will throw an IOException if any 4XX
+            // response is sent. If we request the status again, this
+            // time the internal status will be properly set, and we'll be
+            // able to retrieve it.
+            status = conn.getResponseCode();
+        }
+        
+        return status;
     }
     
     private static String getBaseUrl(Context context) {
@@ -121,6 +163,7 @@ public class FlowApi {
         return authorization;
     }
     
+    @SuppressLint("SimpleDateFormat")
     private String getTimestamp() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -133,6 +176,23 @@ public class FlowApi {
         }
     }
     
+    private String readStream(InputStream in) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder builder = new StringBuilder();
+        
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line + "\n");
+            }
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception ignored) {}
+        }
+        
+        return builder.toString();
+    }
 
     interface Path {
         String SURVEYED_LOCALE = "/surveyedlocale";

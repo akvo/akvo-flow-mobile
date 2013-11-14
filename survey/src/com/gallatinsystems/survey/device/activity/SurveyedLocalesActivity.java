@@ -17,7 +17,6 @@
 package com.gallatinsystems.survey.device.activity;
 
 import java.io.IOException;
-import java.util.List;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -32,8 +31,8 @@ import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.api.FlowApi;
+import com.gallatinsystems.survey.device.api.response.SurveyedLocalesResponse;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
-import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.fragment.MapFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocaleListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocalesFragmentListener;
@@ -160,16 +159,20 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         protected Integer doInBackground(Void... params) {
             int syncedRecords = 0;
             FlowApi api = new FlowApi();
+            SurveyDbAdapter database = new SurveyDbAdapter(SurveyedLocalesActivity.this).open();
+            String syncTime = database.getSyncTime(mSurveyGroupId);
             try {
-                List<SurveyedLocale> surveyedLocales = api.getSurveyedLocales(mSurveyGroupId);
-                if (surveyedLocales != null) {
-                    SurveyDbAdapter database = new SurveyDbAdapter(SurveyedLocalesActivity.this).open();
-                    database.syncSurveyedLocales(surveyedLocales);
+                SurveyedLocalesResponse response = api.getSurveyedLocales(mSurveyGroupId, syncTime);
+                if (response != null && response.getSurveyedLocales() != null) {
+                    database.syncSurveyedLocales(response.getSurveyedLocales());
+                    database.setSyncTime(mSurveyGroupId, response.getSyncTime());
                     database.close();
-                    syncedRecords = surveyedLocales.size();
+                    syncedRecords = response.getSurveyedLocales().size();
                 }
             } catch (IOException e) {
                 Log.e(TAG, "doInBackground() - " + e.getMessage());
+            } finally {
+                database.close();
             }
             
             return syncedRecords;

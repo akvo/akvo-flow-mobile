@@ -113,6 +113,7 @@ public class SurveyDbAdapter {
         String TRANSMISSION_HISTORY = "transmission_history";
         String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
         String SURVEYED_LOCALE = "surveyed_locale";// Introduced in Point Updates
+        String SYNC_TIME = "sync_time";// Introduced in Point Updates
     }
     
     public interface SurveyGroupAttrs {
@@ -129,6 +130,12 @@ public class SurveyDbAdapter {
         String NAME               = "name";
         String LATITUDE           = "latitude";
         String LONGITUDE          = "longitude";
+    }
+    
+    public interface SyncTimeAttrs {
+        String ID                 = "_id";
+        String SURVEY_GROUP_ID    = "survey_group_id";
+        String TIME               = "time";
     }
 
     private static final String TAG = "SurveyDbAdapter";
@@ -164,6 +171,8 @@ public class SurveyDbAdapter {
     
     private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (_id integer primary key autoincrement, surveyed_locale_id text, survey_group_id integer, name text, latitude real, longitude real, "
     		+ " UNIQUE(surveyed_locale_id) ON CONFLICT REPLACE);";
+    
+    private static final String SYNC_TIME_TABLE_CREATE = "CREATE TABLE sync_time (_id INTEGER PRIMARY KEY AUTOINCREMENT, survey_group_id INTEGER, time TEXT, UNIQUE (survey_group_id) ON CONFLICT REPLACE);";
 
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
@@ -227,6 +236,7 @@ public class SurveyDbAdapter {
             db.execSQL(TRANSMISSION_HISTORY_TABLE_CREATE);
             db.execSQL(SURVEY_GROUP_TABLE_CREATE);
             db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
+            db.execSQL(SYNC_TIME_TABLE_CREATE);
             createIndexes(db);
             for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
                 db.execSQL(DEFAULT_INSERTS[i]);
@@ -255,6 +265,7 @@ public class SurveyDbAdapter {
                     db.execSQL("ALTER TABLE survey_respondent ADD COLUMN surveyed_locale_id TEXT");
                     db.execSQL(SURVEY_GROUP_TABLE_CREATE);
                     db.execSQL(SURVEYED_LOCALE_TABLE_CREATE);
+                    db.execSQL(SYNC_TIME_TABLE_CREATE);
                     createIndexes(db);
                     version = VER_POINT_UPDATES;
             }
@@ -2197,6 +2208,38 @@ public class SurveyDbAdapter {
                 database.endTransaction();
             }
         }
+    }
+    
+    /**
+     * Get the synchronization time for a particular survey group.
+     * @param surveyGroupId id of the SurveyGroup
+     * @return time if exists for this key, null otherwise
+     */
+    public String getSyncTime(int surveyGroupId) {
+        Cursor cursor = database.query(Tables.SYNC_TIME, 
+                new String[] {SyncTimeAttrs.SURVEY_GROUP_ID, SyncTimeAttrs.TIME},
+                SyncTimeAttrs.SURVEY_GROUP_ID + "=?",
+                new String[] {String.valueOf(surveyGroupId)},
+                null, null, null);
+        
+        String time = null;
+        if (cursor.moveToFirst()) {
+            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeAttrs.TIME));
+        }
+        cursor.close();
+        return time;
+    }
+    
+    /**
+     * Save the time of synchronization time for a particular SurveyGroup
+     * @param surveyGroupId id of the SurveyGroup
+     * @param time String containing the timestamp
+     */
+    public void setSyncTime(int surveyGroupId, String time) {
+        ContentValues values = new ContentValues();
+        values.put(SyncTimeAttrs.SURVEY_GROUP_ID, surveyGroupId);
+        values.put(SyncTimeAttrs.TIME, time);
+        database.insert(Tables.SYNC_TIME, null, values);
     }
 
 }

@@ -29,7 +29,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import javax.crypto.Mac;
@@ -37,14 +36,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
 import com.gallatinsystems.survey.device.R;
+import com.gallatinsystems.survey.device.api.parser.json.SurveyedLocaleParser;
+import com.gallatinsystems.survey.device.api.response.SurveyedLocalesResponse;
 import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
-import com.gallatinsystems.survey.device.domain.SurveyedLocale;
-import com.gallatinsystems.survey.device.parser.json.SurveyedLocaleParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
@@ -65,10 +65,11 @@ public class FlowApi {
         API_KEY = getApiKey(context);
     }
     
-    public List<SurveyedLocale> getSurveyedLocales(int surveyGroup) throws IOException {
-        List<SurveyedLocale> surveyedLocales = null;
+    public SurveyedLocalesResponse getSurveyedLocales(int surveyGroup, String timestamp) 
+            throws IOException {
+        SurveyedLocalesResponse surveyedLocalesResponse = null;
         final String query =  PARAM.IMEI + IMEI
-                + "&" + PARAM.LAST_UPDATED + 0// TODO
+                + "&" + PARAM.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
                 + "&" + PARAM.PHONE_NUMBER + PHONE_NUMBER
                 + "&" + PARAM.SURVEY_GROUP + surveyGroup
                 + "&" + PARAM.TIMESTAMP + getTimestamp();
@@ -79,10 +80,10 @@ public class FlowApi {
                 + "&" + PARAM.HMAC + getAuthorization(query);
         String response = httpGet(url);
         if (response != null) {
-            surveyedLocales = new SurveyedLocaleParser().parseList(response);
+            surveyedLocalesResponse = new SurveyedLocaleParser().parseResponse(response);
         }
         
-        return surveyedLocales;
+        return surveyedLocalesResponse;
     }
     
     private String httpGet(String url) throws IOException {

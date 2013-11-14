@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package com.gallatinsystems.survey.device.parser.csv;
+package com.gallatinsystems.survey.device.api.parser.csv;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ import java.util.StringTokenizer;
 
 import android.util.Log;
 
+import com.gallatinsystems.survey.device.api.parser.FlowParser;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
-import com.gallatinsystems.survey.device.parser.FlowParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 /**

@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package com.gallatinsystems.survey.device.parser.json;
+package com.gallatinsystems.survey.device.api.parser.json;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.gallatinsystems.survey.device.api.parser.FlowParser;
 import com.gallatinsystems.survey.device.domain.SurveyInstance;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
-import com.gallatinsystems.survey.device.parser.FlowParser;
 
 public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
     private static final String TAG = SurveyedLocaleParser.class.getSimpleName();
@@ -84,20 +84,21 @@ public class SurveyedLocaleParser implements FlowParser<SurveyedLocale> {
         }
     }
     
-    public int getSurveyedLocaleCount(String response) {
+    public String getSyncTime(String response) {
         try {
             JSONObject jResponse = new JSONObject(response);
-            return jResponse.getInt(Attrs.SURVEYED_LOCALE_COUNT);
+            return String.valueOf(jResponse.getInt(Attrs.SYNC_TIME));
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
-            return 0;
+            return null;
         }
     }
     
     interface Attrs {
         // Main response
         String SURVEYED_LOCALE_COUNT = "surveyedLocaleCount";
-        String SURVEYED_LOCALE_DATA = "surveyedLocaleData";
+        String SYNC_TIME             = "lastUpdateTime";
+        String SURVEYED_LOCALE_DATA  = "surveyedLocaleData";
         
         // SurveyedLocale
         String ID               = "id";

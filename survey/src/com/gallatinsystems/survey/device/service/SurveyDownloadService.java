@@ -40,6 +40,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.gallatinsystems.survey.device.R;
+import com.gallatinsystems.survey.device.api.parser.csv.SurveyMetaParser;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Question;
@@ -48,7 +49,6 @@ import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.exception.TransferException;
-import com.gallatinsystems.survey.device.parser.csv.SurveyMetaParser;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;

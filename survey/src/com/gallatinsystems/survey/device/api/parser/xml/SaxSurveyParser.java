@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package com.gallatinsystems.survey.device.parser.xml;
+package com.gallatinsystems.survey.device.api.parser.xml;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,8 +26,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.InputSource;
 
+import com.gallatinsystems.survey.device.api.parser.FlowParser;
 import com.gallatinsystems.survey.device.domain.Survey;
-import com.gallatinsystems.survey.device.parser.FlowParser;
 
 /**
  * implementation of the SurveyParser using the Simple Api for XML (SAX). This

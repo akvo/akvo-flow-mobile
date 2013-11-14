@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package com.gallatinsystems.survey.device.parser.json;
+package com.gallatinsystems.survey.device.api.parser.json;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.gallatinsystems.survey.device.api.parser.FlowParser;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.domain.SurveyInstance;
-import com.gallatinsystems.survey.device.parser.FlowParser;
 
 public class SurveyInstanceParser implements FlowParser<SurveyInstance> {
     private static final String TAG = SurveyInstanceParser.class.getSimpleName();

@@ -71,7 +71,7 @@ public class FreetextQuestionView extends QuestionView implements
             TableRow repeatTitle = new TableRow(context);
             TextView title = new TextView(context);
             title.setWidth(getMaxTextWidth());
-            title.setText("Please, repeat answer");
+            title.setText(R.string.repeat_answer);
             repeatTitle.addView(title);
             addView(repeatTitle);
             

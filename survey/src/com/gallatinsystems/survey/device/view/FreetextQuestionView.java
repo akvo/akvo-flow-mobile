@@ -88,7 +88,7 @@ public class FreetextQuestionView extends QuestionView implements
         editText.setWidth(DEFAULT_WIDTH);
         editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         if (readOnly) {
-            freetextEdit.setFocusable(false);
+            editText.setFocusable(false);
         }
         ValidationRule rule = getQuestion().getValidationRule();
         if (rule != null) {

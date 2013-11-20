@@ -160,14 +160,10 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
             int syncedRecords = 0;
             FlowApi api = new FlowApi();
             SurveyDbAdapter database = new SurveyDbAdapter(SurveyedLocalesActivity.this).open();
-            String syncTime = database.getSyncTime(mSurveyGroupId);
             try {
-                SurveyedLocalesResponse response = api.getSurveyedLocales(mSurveyGroupId, syncTime);
-                if (response != null && response.getSurveyedLocales() != null) {
-                    database.syncSurveyedLocales(response.getSurveyedLocales());
-                    database.setSyncTime(mSurveyGroupId, response.getSyncTime());
-                    database.close();
-                    syncedRecords = response.getSurveyedLocales().size();
+                int batchSize = 0;
+                while ((batchSize = sync(database, api)) != 0) {
+                    syncedRecords += batchSize;
                 }
             } catch (IOException e) {
                 Log.e(TAG, "doInBackground() - " + e.getMessage());
@@ -176,6 +172,19 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
             }
             
             return syncedRecords;
+        }
+        
+        private int sync(SurveyDbAdapter database, FlowApi api) throws IOException {
+            final String syncTime = database.getSyncTime(mSurveyGroupId);
+            Log.d(TAG, "sync() - SurveyGroup: " + mSurveyGroupId + ". SyncTime: " + syncTime);
+            SurveyedLocalesResponse response = api.getSurveyedLocales(mSurveyGroupId, syncTime);
+            if (response != null && !(response.getSyncTime().equals(syncTime))) {
+                database.syncSurveyedLocales(response.getSurveyedLocales());
+                database.setSyncTime(mSurveyGroupId, response.getSyncTime());
+                return response.getSurveyedLocales().size();
+            }
+            
+            return 0;
         }
         
         @Override

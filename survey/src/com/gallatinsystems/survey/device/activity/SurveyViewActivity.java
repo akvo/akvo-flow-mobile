@@ -980,6 +980,10 @@ public class SurveyViewActivity extends TabActivity implements
                                             .updateQuestionLanguages(
                                                     selectedLanguageCodes);
                                 }
+                                // Also update the submit tab, if exists
+                                if (submissionTab != null) {
+                                    submissionTab.updateSelectedLanguages(selectedLanguageCodes);
+                                }
                             }
                         });
                 return true;

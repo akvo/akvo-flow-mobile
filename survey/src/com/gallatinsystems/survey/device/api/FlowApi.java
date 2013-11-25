@@ -92,11 +92,11 @@ public class FlowApi {
 
         try {
             int status = getStatusCode(conn);
-            if ((status / 100) == 2) {// Allow any 2XX status code
+            if (status == 200) {
                 InputStream in = new BufferedInputStream(conn.getInputStream());
                 response = readStream(in);
             } else {
-                Log.e(TAG, "Status Code: " + status + ". Expected: 2XX");
+                Log.e(TAG, "Status Code: " + status + ". Expected: 200");
             }
             return response;
         } finally {

@@ -16,30 +16,24 @@
 
 package com.gallatinsystems.survey.device.activity;
 
-import java.io.IOException;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.api.FlowApi;
-import com.gallatinsystems.survey.device.api.response.SurveyedLocalesResponse;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.fragment.MapFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocaleListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocalesFragmentListener;
+import com.gallatinsystems.survey.device.service.SurveyedLocaleSyncService;
 
 public class SurveyedLocalesActivity extends ActionBarActivity implements SurveyedLocalesFragmentListener {
-    
-    public static final String TAG = SurveyedLocalesActivity.class.getSimpleName();
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
     public static final String EXTRA_SURVEYED_LOCALE_ID = "surveyed_locale_id";
     
@@ -131,7 +125,10 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
                 return true;
             case R.id.sync_records:
                 Toast.makeText(SurveyedLocalesActivity.this, "Syncing...", Toast.LENGTH_LONG).show();
-                new DownloadRecordsTask().execute();
+                Intent intent = new Intent(this, SurveyedLocaleSyncService.class);
+                intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroupId);
+                startService(intent);
+                //new DownloadRecordsTask().execute();
                 return true;
             case R.id.list_results:
             case R.id.map_results:
@@ -150,59 +147,22 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         finish();
     }
 
-    /**
-     * Worker thread to download the records.
-     */
-    class DownloadRecordsTask extends AsyncTask<Void, Void, Integer> {
-        
-        @Override
-        protected Integer doInBackground(Void... params) {
-            int syncedRecords = 0;
-            FlowApi api = new FlowApi();
-            SurveyDbAdapter database = new SurveyDbAdapter(SurveyedLocalesActivity.this).open();
-            try {
-                int batchSize = 0;
-                while ((batchSize = sync(database, api)) != 0) {
-                    syncedRecords += batchSize;
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "doInBackground() - " + e.getMessage());
-            } finally {
-                database.close();
-            }
-            
-            return syncedRecords;
+    /*
+    @Override
+    protected void onPostExecute(Integer result) {
+        Toast.makeText(SurveyedLocalesActivity.this, "Synced " + result.toString()  + " records", 
+                Toast.LENGTH_LONG).show();
+        // Refresh the list with synced records
+        if (mListResults) {
+            SurveyedLocaleListFragment fragment = (SurveyedLocaleListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment_container);
+            fragment.refresh();
+        } else {
+            MapFragment fragment = (MapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment_container);
+            fragment.refresh();
         }
-        
-        private int sync(SurveyDbAdapter database, FlowApi api) throws IOException {
-            final String syncTime = database.getSyncTime(mSurveyGroupId);
-            Log.d(TAG, "sync() - SurveyGroup: " + mSurveyGroupId + ". SyncTime: " + syncTime);
-            SurveyedLocalesResponse response = api.getSurveyedLocales(mSurveyGroupId, syncTime);
-            if (response != null && !(response.getSyncTime().equals(syncTime))) {
-                database.syncSurveyedLocales(response.getSurveyedLocales());
-                database.setSyncTime(mSurveyGroupId, response.getSyncTime());
-                return response.getSurveyedLocales().size();
-            }
-            
-            return 0;
-        }
-        
-        @Override
-        protected void onPostExecute(Integer result) {
-            Toast.makeText(SurveyedLocalesActivity.this, "Synced " + result.toString()  + " records", 
-                    Toast.LENGTH_LONG).show();
-            // Refresh the list with synced records
-            if (mListResults) {
-                SurveyedLocaleListFragment fragment = (SurveyedLocaleListFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.fragment_container);
-                fragment.refresh();
-            } else {
-                MapFragment fragment = (MapFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.fragment_container);
-                fragment.refresh();
-            }
-        }
-        
     }
-
+    */
+        
 }

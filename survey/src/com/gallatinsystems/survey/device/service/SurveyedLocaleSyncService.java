@@ -1,3 +1,19 @@
+/*
+ *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
+
 package com.gallatinsystems.survey.device.service;
 
 import java.io.IOException;
@@ -36,6 +52,7 @@ public class SurveyedLocaleSyncService extends IntentService {
             int batchSize = 0;
             while ((batchSize = sync(database, api, surveyGroupId)) != 0) {
                 syncedRecords += batchSize;
+                sendBroadcastNotification();// Keep the UI fresh!
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
@@ -45,8 +62,6 @@ public class SurveyedLocaleSyncService extends IntentService {
             
         displayNotification("Records Sync Finished",
                 "Synced " + syncedRecords + " records", false);
-        // notify the activity
-        // TODO
     }
         
     private int sync(SurveyDbAdapter database, FlowApi api, 
@@ -68,10 +83,20 @@ public class SurveyedLocaleSyncService extends IntentService {
                 .setSmallIcon(R.drawable.info)
                 .setContentTitle(title)
                 .setContentText(text);
-        mBuilder.setProgress(0, 0, progress);
+        mBuilder.setProgress(1, 1, progress);
         NotificationManager notificationManager = 
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    /**
+     * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
+     * This notification will be received in SurveyedLocalesActivity, in order to
+     * refresh its data
+     */
+    private void sendBroadcastNotification() {
+        Intent intentBroadcast = new Intent(getString(R.string.action_locales_sync));
+        sendBroadcast(intentBroadcast);
     }
     
 }

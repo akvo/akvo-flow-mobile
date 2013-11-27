@@ -16,12 +16,15 @@
 
 package com.gallatinsystems.survey.device.activity;
 
-
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -34,6 +37,8 @@ import com.gallatinsystems.survey.device.fragment.SurveyedLocalesFragmentListene
 import com.gallatinsystems.survey.device.service.SurveyedLocaleSyncService;
 
 public class SurveyedLocalesActivity extends ActionBarActivity implements SurveyedLocalesFragmentListener {
+    private static final String TAG = SurveyedLocalesActivity.class.getSimpleName();
+    
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
     public static final String EXTRA_SURVEYED_LOCALE_ID = "surveyed_locale_id";
     
@@ -68,12 +73,15 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     public void onResume() {
         super.onResume();
         mDatabase.open();
+        registerReceiver(surveyedLocalesSyncReceiver,
+                new IntentFilter(getString(R.string.action_locales_sync)));
     }
     
     @Override
     public void onPause() {
         super.onPause();
         mDatabase.close();
+        unregisterReceiver(surveyedLocalesSyncReceiver);
     }
     
     @Override
@@ -146,6 +154,32 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         setResult(RESULT_OK, intent);
         finish();
     }
+    
+    /**
+     * BroadcastReceiver to notify of locales synchronisation. This should be
+     * fired from SurveyedLocalesSyncService.
+     */
+    private BroadcastReceiver surveyedLocalesSyncReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "New Records have been synchronised. Refreshing fragments...");
+            
+            // Refresh the list with synced records
+            if (mListResults) {
+                SurveyedLocaleListFragment fragment = (SurveyedLocaleListFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.fragment_container);
+                if (fragment != null) {
+                    fragment.refresh();
+                }
+            } else {
+                MapFragment fragment = (MapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.fragment_container);
+                if (fragment != null) {
+                    fragment.refresh();
+                }
+            }
+        }
+    };
 
     /*
     @Override

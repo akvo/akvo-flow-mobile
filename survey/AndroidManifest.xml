@@ -77,6 +77,7 @@
         <service android:name=".service.BootstrapService" />
         <service android:name=".service.ExceptionReportingService" />
         <service android:name=".service.ApkUpdateService" />
+        <service android:name=".service.SurveyedLocaleSyncService" />
 
         <receiver android:name=".broadcast.BroadcastDispatcher" >
             <intent-filter>

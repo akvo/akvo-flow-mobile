@@ -89,12 +89,15 @@ public class FlowApi {
     private String httpGet(String url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) (new URL(url).openConnection());
         String response = null;
+        final long t0 = System.currentTimeMillis();
 
         try {
             int status = getStatusCode(conn);
             if (status == 200) {
                 InputStream in = new BufferedInputStream(conn.getInputStream());
                 response = readStream(in);
+                final long t = System.currentTimeMillis() - t0;
+                Log.d(TAG, "Request time: " + t + ". URL: " + url);
             } else {
                 Log.e(TAG, "Status Code: " + status + ". Expected: 200");
             }

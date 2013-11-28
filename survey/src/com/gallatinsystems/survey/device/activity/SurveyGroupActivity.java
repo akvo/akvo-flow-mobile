@@ -68,6 +68,10 @@ import com.viewpagerindicator.TabPageIndicator;
 public class SurveyGroupActivity extends ActionBarActivity implements SurveyListListener,
             LoaderCallbacks<Cursor>, OnNavigationListener {
     private static final String TAG = SurveyGroupActivity.class.getSimpleName();
+    private static final String STATE_USER_ID       = "state_user_id";
+    private static final String STATE_USER_NAME     = "state_user_name";
+    private static final String STATE_LOCALE        = "state_locale";
+    private static final String STATE_SURVEY_GROUP  = "state_survey_group";
     
     // Loader IDs
     private static final int ID_SURVEY_GROUP_LIST = 0;
@@ -117,7 +121,16 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
         
         init();// No external storage will finish the application
         setupNavigationList();
-        loadLastUser();
+        
+        if (savedInstanceState != null) {
+            mUserId = savedInstanceState.getString(STATE_USER_ID);
+            mUserName = savedInstanceState.getString(STATE_USER_NAME);
+            mLocale = (SurveyedLocale) savedInstanceState.getSerializable(STATE_LOCALE);
+            mSurveyGroup = (SurveyGroup) savedInstanceState.getSerializable(STATE_SURVEY_GROUP);
+        } else {
+            loadLastUser();
+        }
+        displayUser();
     }
     
     @Override
@@ -128,7 +141,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
         
         // A survey might have changed the name of the locale we're in,
         // thus we refresh it. TODO: You can do this way better...
-        if (mLocale != null) {
+        if (mSurveyGroup != null && mLocale != null) {
             mLocale = mDatabase.getSurveyedLocale(mLocale.getId());
             displayRecord();
         }
@@ -144,6 +157,15 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
     public void onDestroy() {
         super.onDestroy();
         mDatabase.close();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_USER_ID, mUserId);
+        outState.putString(STATE_USER_NAME, mUserName);
+        outState.putSerializable(STATE_LOCALE, mLocale);
+        outState.putSerializable(STATE_SURVEY_GROUP, mSurveyGroup);
     }
     
     /**
@@ -164,7 +186,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
                 }
             }
         }
-        displayUser();
     }
     
     private void init() {
@@ -252,8 +273,13 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
 
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
+        final int previousId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
         mSurveyGroup = mSurveyGroups.get(position);
-        mLocale = null;// Start over again
+        
+        // If the Survey Group has been changed, remove the old locale
+        if (previousId != mSurveyGroup.getId()) {
+            mLocale = null;
+        }
         
         displayRecord();// Or hide it
         supportInvalidateOptionsMenu();

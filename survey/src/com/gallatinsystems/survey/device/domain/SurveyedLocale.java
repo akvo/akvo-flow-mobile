@@ -16,9 +16,15 @@
 
 package com.gallatinsystems.survey.device.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SurveyedLocale {
+public class SurveyedLocale implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3556354410813212814L;
+    
     private String mId;
     private String mName;
     private int mSurveyGroupId;

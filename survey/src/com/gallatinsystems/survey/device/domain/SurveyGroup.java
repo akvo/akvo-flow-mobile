@@ -16,7 +16,14 @@
 
 package com.gallatinsystems.survey.device.domain;
 
-public class SurveyGroup {
+import java.io.Serializable;
+
+public class SurveyGroup implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5146372662599353969L;
+
     public static final int ID_NONE = -1;
     
     private int mId;

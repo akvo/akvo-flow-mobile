@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
@@ -53,14 +54,15 @@ public class SurveyedLocaleSyncService extends IntentService {
             while ((batchSize = sync(database, api, surveyGroupId)) != 0) {
                 syncedRecords += batchSize;
                 sendBroadcastNotification();// Keep the UI fresh!
+                // TODO: Update notification with new batch info?
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         } finally {
             database.close();
         }
-            
-        displayNotification("Records Sync Finished",
+        
+        displayNotification("Record Sync Finished",
                 "Synced " + syncedRecords + " records", false);
     }
         
@@ -83,12 +85,19 @@ public class SurveyedLocaleSyncService extends IntentService {
                 .setSmallIcon(R.drawable.info)
                 .setContentTitle(title)
                 .setContentText(text);
+        
+        // Progress will only be displayed in Android versions > 4.0
         mBuilder.setProgress(1, 1, progress);
+        
+        // Dummy intent. Do nothing when clicked
+        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        mBuilder.setContentIntent(intent);
+        
         NotificationManager notificationManager = 
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
-
+    
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
      * This notification will be received in SurveyedLocalesActivity, in order to

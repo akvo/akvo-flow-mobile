@@ -17,6 +17,7 @@
 package com.gallatinsystems.survey.device.domain;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * data structure for grouping questions under a common heading.
@@ -57,5 +58,29 @@ public class QuestionGroup {
             questions = new ArrayList<Question>();
         }
         questions.add(q);
+    }
+    
+    public List<String> getLocaleNameQuestions() {
+        List<String> localeNameQuestions = new ArrayList<String>();
+        if (questions != null) {
+            for (Question q : questions) {
+                if (q.isLocaleName()) {
+                    localeNameQuestions.add(q.getId());
+                }
+            }
+        }
+        
+        return localeNameQuestions;
+    }
+    
+    public String getLocaleGeoQuestion() {
+        if (questions != null) {
+            for (Question q : questions) {
+                if (q.isLocaleLocation()) {
+                    return q.getId();
+                }
+            }
+        }
+        return null;
     }
 }

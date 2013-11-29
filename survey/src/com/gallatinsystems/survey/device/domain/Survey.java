@@ -161,4 +161,28 @@ public class Survey {
         }
         questionGroups.add(group);
     }
+    
+    public List<String> getLocaleNameQuestions() {
+        List<String> localeNameQuestions = new ArrayList<String>();
+        if (questionGroups != null) {
+            for (QuestionGroup group : questionGroups) {
+                localeNameQuestions.addAll(group.getLocaleNameQuestions());
+            }
+        }
+        
+        return localeNameQuestions;
+    }
+    
+    public String getLocaleGeoQuestion() {
+        if (questionGroups != null) {
+            for (QuestionGroup group : questionGroups) {
+                String localeGeoQuestion = group.getLocaleGeoQuestion();
+                // Just return the first occurrence
+                if (localeGeoQuestion != null) {
+                    return localeGeoQuestion;
+                }
+            }
+        }
+        return null;
+    }
 }

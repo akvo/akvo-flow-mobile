@@ -2045,14 +2045,15 @@ public class SurveyDbAdapter {
      */
     public enum SurveyedLocaleMeta {NAME, GEOLOCATION};
     
-    public void updateSurveyedLocale(long surveyInstanceId, QuestionResponse resp, SurveyedLocaleMeta type) {
-        String response = resp.getValue();
+    public void updateSurveyedLocale(long surveyInstanceId, String response, SurveyedLocaleMeta type) {
         if (!TextUtils.isEmpty(response)) {
             String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
             ContentValues surveyedLocaleValues = new ContentValues();
             
-            QuestionResponse metaResponse = new QuestionResponse(resp.getId(), resp.getRespondentId(), 
-                    null, resp.getValue(), null, resp.getIncludeFlag(), resp.getStrength());
+            QuestionResponse metaResponse = new QuestionResponse();
+            metaResponse.setRespondentId(surveyInstanceId);
+            metaResponse.setValue(response);
+            metaResponse.setIncludeFlag("true");
             
             switch (type) {
                 case NAME:

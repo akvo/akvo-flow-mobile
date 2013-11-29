@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 
 import android.app.AlertDialog;
@@ -44,6 +45,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,12 +55,14 @@ import android.widget.TextView;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
 import com.gallatinsystems.survey.device.domain.Dependency;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionGroup;
 import com.gallatinsystems.survey.device.domain.QuestionHelp;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
 import com.gallatinsystems.survey.device.domain.Survey;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.event.QuestionInteractionEvent;
 import com.gallatinsystems.survey.device.event.QuestionInteractionListener;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
@@ -1048,7 +1052,55 @@ public class SurveyViewActivity extends TabActivity implements
             for (int i = 0; i < tabContentFactories.size(); i++) {
                 tabContentFactories.get(i).saveState(respondentId);
             }
+            
+            // Save Locale meta-data, if applies
+            SurveyGroup group = getSurveyGroup();
+            if (group != null && surveyId.equals(group.getRegisterSurveyId())) {
+                saveSurveyedLocaleMetadata();
+            }
         }
+    }
+    
+    private void saveSurveyedLocaleMetadata() {
+        // META_NAME
+        StringBuilder builder = new StringBuilder();
+        List<String> localeNameQuestions = survey.getLocaleNameQuestions();
+                
+        // Check the responses given to these questions (marked as name)
+        // and concatenate them so it becomes the Locale name.
+        for (int i=0; i<localeNameQuestions.size(); i++) {
+            QuestionResponse questionResponse = databaseAdapter.findSingleResponse(
+                    respondentId, localeNameQuestions.get(i));
+            
+            String answer = questionResponse != null ? questionResponse.getValue() : null;
+                    
+            if (!TextUtils.isEmpty(answer)) {
+                if (i > 0) {
+                    builder.append(" - ");
+                }
+                builder.append(answer);
+            }
+        }
+        databaseAdapter.updateSurveyedLocale(respondentId, builder.toString(), SurveyedLocaleMeta.NAME);
+        
+        // META_GEO
+        String localeGeoQuestion = survey.getLocaleGeoQuestion();
+        if (localeGeoQuestion != null) {
+            QuestionResponse response = databaseAdapter.findSingleResponse(
+                    respondentId, localeGeoQuestion);
+            String answer = response.getValue();
+            databaseAdapter.updateSurveyedLocale(respondentId, answer, SurveyedLocaleMeta.GEOLOCATION);
+        }
+    }
+    
+    private SurveyGroup getSurveyGroup() {
+        SurveyGroup group = null;
+        Cursor cursor = databaseAdapter.getSurveyGroup(mSurveyGroupId);
+        if (cursor.moveToFirst()) {
+            group = SurveyDbAdapter.getSurveyGroup(cursor);
+        }
+        
+        return group;
     }
 
     /**

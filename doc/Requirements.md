@@ -47,9 +47,17 @@ The FLOW app is an Android app that runs on phones or tablets. Users can log in 
 * [Languages](functionalDesign/Languages.md) - multi-lingual display of surveys and user interface
 * [RemoteManagement](functionalDesign/RemoteManagement.md) - updating the app, reporting exceptions to the server
 
-## Use cases
+## User roles
 We have defined a number of user roles, representing ways that people with different roles can interact with the system. Each roles has a detailed description in the form of a persona. The user roles are:
-* [Enumerator](useCases/Enumerator.md)
-* [Field Manager](useCases/FieldManager.md)
-* [Akvo staff](useCases/AkvoStaff.md)
-We have also formulated a number of [use case examples](useCases/UserCaseExamples.md).
+* [Enumerator](userRoles/Enumerator.md)
+* [Field Manager](userRoles/FieldManager.md)
+* [Dashboard Admin](userRoles/DashboardAdmin.md)
+* [Akvo staff](userRoles/AkvoStaff.md)
+
+## User Stories
+For each user type, we have collected a number of user stories, reflecting the way the different users interact with the system. They can be found here:
+* [Enumerator](userStories/Enumerator.md)
+* [Field Manager](userStories/FieldManager.md)
+* [Dashboard Admin](userStories/DashboardAdmin.md)
+* [Akvo staff](userStories/AkvoStaff.md)
+

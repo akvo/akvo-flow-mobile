@@ -16,11 +16,6 @@
 
 package com.gallatinsystems.survey.device.util;
 
-import java.util.HashMap;
-
-import com.gallatinsystems.survey.device.activity.NearbyItemActivity;
-import com.gallatinsystems.survey.device.activity.WaterflowCalculatorActivity;
-
 /**
  * Class to hold all public constants used in the application
  * 
@@ -97,7 +92,6 @@ public class ConstantUtil {
      */
     public static final String VIDEO_HELP_TYPE = "video";
     public static final String IMAGE_HELP_TYPE = "image";
-    public static final String ACTIVITY_HELP_TYPE = "activity";
     public static final String TIP_HELP_TYPE = "tip";
 
     /**
@@ -296,18 +290,6 @@ public class ConstantUtil {
      */
     public static final String RESOURCE_PACKAGE = "com.gallatinsystems.survey.device";
     public static final String RAW_RESOURCE = "raw";
-
-    /**
-     * recognized help activities
-     */
-    @SuppressWarnings("rawtypes")
-    public static final HashMap<String, Class> HELP_ACTIVITIES = new HashMap<String, Class>() {
-        private static final long serialVersionUID = -6196886832065440000L;
-        {
-            put("waterflowcalculator", WaterflowCalculatorActivity.class);
-            put("nearbypoint", NearbyItemActivity.class);
-        }
-    };
 
     /**
      * prevent instantiation

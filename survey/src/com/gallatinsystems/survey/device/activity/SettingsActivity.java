@@ -82,8 +82,6 @@ public class SettingsActivity extends ListActivity {
                 resources.getString(R.string.poweroptdesc)));
         list.add(createMap(resources.getString(R.string.gpsstatuslabel),
                 resources.getString(R.string.gpsstatusdesc)));
-        list.add(createMap(resources.getString(R.string.flushpointslabel),
-                resources.getString(R.string.flushpointsdesc)));
         list.add(createMap(resources.getString(R.string.reset_responses),
                 resources.getString(R.string.reset_responses_desc)));
         list.add(createMap(resources.getString(R.string.resetall),
@@ -281,19 +279,6 @@ public class SettingsActivity extends ListActivity {
 
                                 inputDialog.show();
 
-                            }
-                        });
-            } else if (resources.getString(R.string.flushpointslabel).equals(
-                    val)) {
-                ViewUtil.showAdminAuthDialog(this,
-                        new ViewUtil.AdminAuthDialogListener() {
-                            @Override
-                            public void onAuthenticated() {
-                                SurveyDbAdapter database = new SurveyDbAdapter(
-                                        SettingsActivity.this);
-                                database.open();
-                                database.deleteAllPoints();
-                                database.close();
                             }
                         });
             } else if (resources.getString(R.string.reset_responses).equals(val)) {

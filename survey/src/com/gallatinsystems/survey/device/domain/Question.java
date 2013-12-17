@@ -232,9 +232,6 @@ public class Question {
         if (getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).size() > 0) {
             count++;
         }
-        if (getHelpByType(ConstantUtil.ACTIVITY_HELP_TYPE).size() > 0) {
-            count++;
-        }
         return count;
     }
 

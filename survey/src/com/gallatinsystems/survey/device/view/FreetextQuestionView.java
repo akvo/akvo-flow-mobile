@@ -59,14 +59,13 @@ public class FreetextQuestionView extends QuestionView implements
         if (readOnly) {
             freetextEdit.setFocusable(false);
         }
+        
+        int maxLength = ValidationRule.DEFAULT_MAX_LENGTH;
         ValidationRule rule = getQuestion().getValidationRule();
         if (rule != null) {
             // set the maximum length
             if (rule.getMaxLength() != null) {
-                InputFilter[] FilterArray = new InputFilter[1];
-                FilterArray[0] = new InputFilter.LengthFilter(getQuestion()
-                        .getValidationRule().getMaxLength());
-                freetextEdit.setFilters(FilterArray);
+                maxLength = Math.min(rule.getMaxLength(), ValidationRule.DEFAULT_MAX_LENGTH);
             }
             // if the type is numeric, add numeric-specific rules
             if (ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(rule
@@ -76,6 +75,11 @@ public class FreetextQuestionView extends QuestionView implements
                 freetextEdit.setKeyListener(MyDigitKeyListener);
             }
         }
+        
+        InputFilter[] FilterArray = new InputFilter[1];
+        FilterArray[0] = new InputFilter.LengthFilter(maxLength);
+        freetextEdit.setFilters(FilterArray);
+        
         freetextEdit.setOnFocusChangeListener(this);
         freetextEdit.setWidth(screenWidth - 50);
 

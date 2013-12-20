@@ -51,6 +51,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
@@ -95,6 +96,7 @@ public class SurveyViewActivity extends TabActivity implements
     private static final int SURVEY_LANG = 3;
     private static final int SAVE_SURVEY = 4;
     private static final int CLEAR_SURVEY = 5;
+    private static final int PREFILL_SURVEY = 6;
     private static final String SUBMIT_TAB_TAG = "subtag";
 
     private static final float LARGE_TXT_SIZE = 22;
@@ -932,6 +934,12 @@ public class SurveyViewActivity extends TabActivity implements
         menu.add(0, SAVE_SURVEY, 1, R.string.savestartnew);
         menu.add(0, SURVEY_LANG, 2, R.string.langoption);
         menu.add(0, CLEAR_SURVEY, 3, R.string.clearbutton);
+        
+        SurveyGroup group = getSurveyGroup();
+        if (!readOnly && group != null && group.isMonitored()) {
+            menu.add(0, PREFILL_SURVEY, 4, "Prefill Answers");
+        }
+        
         return true;
     }
 
@@ -1038,6 +1046,26 @@ public class SurveyViewActivity extends TabActivity implements
                                         startNewSurvey();
                                 }
                             });
+                }
+                return true;
+            case PREFILL_SURVEY:
+                // Check for previous values in this record
+                if (mSurveyedLocaleId != null) {
+                    Long lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId, 
+                            Long.valueOf(surveyId));
+                    if (lastSurveyInstance != null) {
+                        // Load the state form the old survey instance
+                        if (tabContentFactories != null) {
+                            for (SurveyQuestionTabContentFactory tab : tabContentFactories) {
+                                tab.loadState(lastSurveyInstance);
+                            }
+                            
+                            saveAllResponses();
+                        }
+                    } else {
+                        Toast.makeText(this, "No previous values for this record", 
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
                 return true;
         }

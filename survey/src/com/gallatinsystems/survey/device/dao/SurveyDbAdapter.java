@@ -2025,6 +2025,27 @@ public class SurveyDbAdapter {
         return cursor;
     }
     
+    /**
+     * Given a particular surveyedLocale and one of its surveys,
+     * retrieves the ID of the last surveyInstance matching that criteria
+     * @param surveyedLocaleId
+     * @param surveyId
+     * @return last surveyInstance with those attributes
+     */
+    public Long getLastSurveyInstance(String surveyedLocaleId, long surveyId) {
+        Cursor cursor = database.query(Tables.RESPONDENT, 
+                new String[] {PK_ID_COL, SURVEYED_LOCALE_ID_COL, SURVEY_FK_COL, SUBMITTED_DATE_COL},
+                SURVEYED_LOCALE_ID_COL + "= ? AND " + SURVEY_FK_COL + "= ? AND " + SUBMITTED_DATE_COL + " IS NOT NULL",
+                new String[]{surveyedLocaleId, String.valueOf(surveyId)},
+                null, null,
+                SUBMITTED_DATE_COL + " DESC");
+        if (cursor != null && cursor.moveToFirst()) {
+            return cursor.getLong(cursor.getColumnIndexOrThrow(PK_ID_COL));
+        }
+        
+        return null;
+    }
+    
     public String getSurveyedLocaleId(long surveyInstanceId) {
         Cursor cursor = database.query(RESPONDENT_JOIN, new String[] {
                 Tables.RESPONDENT + "." + PK_ID_COL, SURVEYED_LOCALE_ID_COL},

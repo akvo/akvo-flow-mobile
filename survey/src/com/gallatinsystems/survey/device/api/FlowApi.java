@@ -142,7 +142,11 @@ public class FlowApi {
     
     private static String getPhoneNumber(Context context) {
         try {
-            return URLEncoder.encode(StatusUtil.getPhoneNumber(context), "UTF-8");
+            String phoneNumber = StatusUtil.getPhoneNumber(context);
+            if (phoneNumber != null) {
+                return URLEncoder.encode(phoneNumber, "UTF-8");
+            }
+            return "";
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, e.getMessage());
             return null;
@@ -151,7 +155,11 @@ public class FlowApi {
 
     private static String getImei(Context context) {
         try {
-            return URLEncoder.encode(StatusUtil.getImei(context), "UTF-8");
+            String imei = StatusUtil.getImei(context);
+            if (imei != null) {
+                return URLEncoder.encode(StatusUtil.getImei(context), "UTF-8");
+            }
+            return "";
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, e.getMessage());
             return null;

@@ -230,6 +230,11 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY,
                 (Long) view.getTag(SubmittedSurveyReviewCursorAdaptor.RESP_ID_KEY));
         
+        i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
+        if (mSurveyGroup.isMonitored()) {
+            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mSurveyedLocaleId);
+        }
+        
         // Read-only vs editable
         if ((Boolean)view.getTag(SubmittedSurveyReviewCursorAdaptor.FINISHED_KEY)) {
             i.putExtra(ConstantUtil.READONLY_KEY, true);

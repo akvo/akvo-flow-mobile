@@ -172,10 +172,11 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            // TODO: Reuse views
-            
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            View listItem = inflater.inflate(LAYOUT_RES, null);
+            View listItem = convertView;
+            if (listItem == null) {
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                listItem = inflater.inflate(LAYOUT_RES, null);
+            }
 
             final Survey survey = getItem(position);
             

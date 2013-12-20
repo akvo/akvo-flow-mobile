@@ -1088,8 +1088,9 @@ public class SurveyViewActivity extends TabActivity implements
         if (localeGeoQuestion != null) {
             QuestionResponse response = databaseAdapter.findSingleResponse(
                     respondentId, localeGeoQuestion);
-            String answer = response.getValue();
-            databaseAdapter.updateSurveyedLocale(respondentId, answer, SurveyedLocaleMeta.GEOLOCATION);
+            if (response != null) {
+                databaseAdapter.updateSurveyedLocale(respondentId, response.getValue(), SurveyedLocaleMeta.GEOLOCATION);
+            }
         }
     }
     

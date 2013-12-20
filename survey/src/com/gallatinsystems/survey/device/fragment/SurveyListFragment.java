@@ -53,7 +53,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     
     private String mUserId;
     private SurveyGroup mSurveyGroup;
-    private String mLocaleId;// If null, we need to create one
+    private String mLocaleId;
     
     private SurveyAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
@@ -147,6 +147,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         }
         
         private boolean isEnabled(Survey survey) {
+            /*
             // If the group is monitored, we need disable some surveys
             if (mSurveyGroup.isMonitored()) {
                 final boolean isRegistered = !TextUtils.isEmpty(mLocaleId);
@@ -157,7 +158,14 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 } else {
                     return true;
                 }
-            } 
+            }
+            */
+            
+            if (mSurveyGroup.isMonitored()) {
+                // Enabled if we have a locale selected. False otherwise.
+                // TODO: Determine if the locale is registered
+                return !TextUtils.isEmpty(mLocaleId);
+            }
             
             return true;// Not monitored. All surveys are enabled
         }

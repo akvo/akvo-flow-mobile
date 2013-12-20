@@ -127,8 +127,9 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
             case R.id.search:
                 return onSearchRequested();
             case R.id.new_record:
-                setResult(RESULT_OK);// Return null locale (new record will be created)
-                finish();
+                // Create new record and return the ID
+                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroupId);
+                onSurveyedLocaleSelected(newLocaleId);
                 return true;
             case R.id.sync_records:
                 Intent intent = new Intent(this, SurveyedLocaleSyncService.class);

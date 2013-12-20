@@ -225,7 +225,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
             if (mLocale != null) {
                 mLocaleTextView.setText("Record: " + mLocale.getName() + " - " + mLocale.getId());
             } else {
-                mLocaleTextView.setText("New Record");
+                mLocaleTextView.setText("No Record Selected");
             }
         } else {
             mLocaleTextView.setVisibility(View.GONE);
@@ -328,13 +328,11 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
 
     @Override
     public void startSurvey(Survey survey) {
-        // We might need to create a new record
         if (mLocale == null && mSurveyGroup.isMonitored()) {
-            String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-            mLocale = mDatabase.getSurveyedLocale(newLocaleId);
-            
-            // we have to notify our fragments of this new locale
-            mAdapter.refreshFragments();
+            // We cannot start the survey if the group is monitored
+            // and no record is selected yet
+            Toast.makeText(this, "Please, select a record", Toast.LENGTH_LONG).show();
+            return;
         }
                 
         Intent i = new Intent(this, SurveyViewActivity.class);

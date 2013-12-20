@@ -27,7 +27,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
@@ -132,11 +131,9 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
                 finish();
                 return true;
             case R.id.sync_records:
-                Toast.makeText(SurveyedLocalesActivity.this, "Syncing...", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, SurveyedLocaleSyncService.class);
                 intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroupId);
                 startService(intent);
-                //new DownloadRecordsTask().execute();
                 return true;
             case R.id.list_results:
             case R.id.map_results:
@@ -181,22 +178,4 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         }
     };
 
-    /*
-    @Override
-    protected void onPostExecute(Integer result) {
-        Toast.makeText(SurveyedLocalesActivity.this, "Synced " + result.toString()  + " records", 
-                Toast.LENGTH_LONG).show();
-        // Refresh the list with synced records
-        if (mListResults) {
-            SurveyedLocaleListFragment fragment = (SurveyedLocaleListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.fragment_container);
-            fragment.refresh();
-        } else {
-            MapFragment fragment = (MapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.fragment_container);
-            fragment.refresh();
-        }
-    }
-    */
-        
 }

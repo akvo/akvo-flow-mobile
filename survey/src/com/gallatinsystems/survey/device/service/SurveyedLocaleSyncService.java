@@ -23,8 +23,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.api.FlowApi;
@@ -37,6 +39,8 @@ public class SurveyedLocaleSyncService extends IntentService {
     private static final int NOTIFICATION_ID = 100;
     
     public static final String SURVEY_GROUP = "survey_group";
+    
+    private Handler mHandler = new Handler();
     
     public SurveyedLocaleSyncService() {
         super(TAG);
@@ -56,14 +60,16 @@ public class SurveyedLocaleSyncService extends IntentService {
                 sendBroadcastNotification();// Keep the UI fresh!
                 // TODO: Update notification with new batch info?
             }
+            
+            displayNotification("Record Sync Finished",
+                    "Synced " + syncedRecords + " records", false);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+            displayToast("Network Error");
+            displayNotification("Record Sync Failed", "Network Error", false);
         } finally {
             database.close();
         }
-        
-        displayNotification("Record Sync Finished",
-                "Synced " + syncedRecords + " records", false);
     }
         
     private int sync(SurveyDbAdapter database, FlowApi api, 
@@ -78,6 +84,16 @@ public class SurveyedLocaleSyncService extends IntentService {
         }
             
         return 0;
+    }
+    
+    private void displayToast(final String text) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
     }
     
     private void displayNotification(String title, String text, boolean progress) {

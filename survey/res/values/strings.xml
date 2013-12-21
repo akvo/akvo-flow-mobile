@@ -224,6 +224,12 @@
     <string name="clear_data_error">Error deleting data from the device</string>
     
     <string name="configuring_languages">Configuring survey languages...</string>
+    <string name="syncing_records">Syncing Records...</string>
+    <string name="sync_finished">Records Sync finished</string>
+    <string name="synced_records">Synced %1$d Records</string>
+    <string name="sync_error">Records Sync failed</string>
+    <string name="network_error">Network Error</string>
+    
     <!-- Search -->
     <string name="search_name">@string/app_name</string>
     <string name="search_hint">Search Record</string>

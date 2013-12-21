@@ -52,7 +52,8 @@ public class SurveyedLocaleSyncService extends IntentService {
         int syncedRecords = 0;
         FlowApi api = new FlowApi();
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
-        displayNotification("Synchronising Records...", "Please, wait", true);
+        displayNotification(getString(R.string.syncing_records), 
+                getString(R.string.pleasewait), true);
         try {
             int batchSize = 0;
             while ((batchSize = sync(database, api, surveyGroupId)) != 0) {
@@ -61,12 +62,13 @@ public class SurveyedLocaleSyncService extends IntentService {
                 // TODO: Update notification with new batch info?
             }
             
-            displayNotification("Record Sync Finished",
-                    "Synced " + syncedRecords + " records", false);
+            displayNotification(getString(R.string.sync_finished),
+                    String.format(getString(R.string.synced_records), syncedRecords), false);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
-            displayToast("Network Error");
-            displayNotification("Record Sync Failed", "Network Error", false);
+            displayToast(getString(R.string.network_error));
+            displayNotification(getString(R.string.sync_error), 
+                    getString(R.string.network_error), false);
         } finally {
             database.close();
         }

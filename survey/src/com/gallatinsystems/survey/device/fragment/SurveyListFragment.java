@@ -54,6 +54,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     private String mUserId;
     private SurveyGroup mSurveyGroup;
     private String mLocaleId;
+    private boolean mRegisteredLocale;
     
     private SurveyAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
@@ -106,6 +107,12 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     public void refresh(SurveyGroup surveyGroup, String localeId) {
         mSurveyGroup = surveyGroup;
         mLocaleId = localeId;
+        
+        // Calculate if this locale is not registered yet
+        if (mLocaleId != null) {
+            mRegisteredLocale = mDatabase.getSurveyInstances(localeId).getCount() > 0;
+        }
+        
         getLoaderManager().restartLoader(0, null, this);
     }
     
@@ -147,24 +154,16 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         }
         
         private boolean isEnabled(Survey survey) {
-            /*
             // If the group is monitored, we need disable some surveys
             if (mSurveyGroup.isMonitored()) {
-                final boolean isRegistered = !TextUtils.isEmpty(mLocaleId);
-                final boolean isRegistrationSurvey = survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
-                if (!isRegistered) {
+                if (TextUtils.isEmpty(mLocaleId)) {
+                    return false;
+                } else if (!mRegisteredLocale) {
                     // Enable only registration survey
-                    return isRegistrationSurvey;
+                    return survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
                 } else {
                     return true;
                 }
-            }
-            */
-            
-            if (mSurveyGroup.isMonitored()) {
-                // Enabled if we have a locale selected. False otherwise.
-                // TODO: Determine if the locale is registered
-                return !TextUtils.isEmpty(mLocaleId);
             }
             
             return true;// Not monitored. All surveys are enabled

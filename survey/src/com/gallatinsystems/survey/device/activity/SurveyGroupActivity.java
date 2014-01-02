@@ -143,6 +143,7 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
         // thus we refresh it. TODO: You can do this way better...
         if (mSurveyGroup != null && mLocale != null) {
             mLocale = mDatabase.getSurveyedLocale(mLocale.getId());
+            mAdapter.refreshFragments();
             displayRecord();
         }
     }

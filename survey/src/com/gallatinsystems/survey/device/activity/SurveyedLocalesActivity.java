@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
@@ -134,6 +135,8 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
                 onSurveyedLocaleSelected(newLocaleId);
                 return true;
             case R.id.sync_records:
+                Toast.makeText(SurveyedLocalesActivity.this, R.string.syncing_records, 
+                        Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, SurveyedLocaleSyncService.class);
                 intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroupId);
                 startService(intent);

@@ -160,6 +160,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
             addView(tr);
             tr = new TableRow(context);
             tr.addView(generatedCodeField);
+            tr.setVisibility(View.GONE);
             addView(tr);
         }
 

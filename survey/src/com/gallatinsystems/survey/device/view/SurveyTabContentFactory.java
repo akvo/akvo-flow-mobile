@@ -104,7 +104,7 @@ public abstract class SurveyTabContentFactory implements TabContentFactory {
      * 
      * @param langCodes
      */
-    protected void updateSelectedLanguages(String[] langCodes) {
+    public void updateSelectedLanguages(String[] langCodes) {
         languageCodes = langCodes;
     }
 

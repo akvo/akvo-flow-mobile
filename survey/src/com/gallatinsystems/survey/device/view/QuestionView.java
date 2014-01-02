@@ -135,8 +135,6 @@ public class QuestionView extends TableLayout implements
                         } else if (question.getHelpByType(
                                 ConstantUtil.IMAGE_HELP_TYPE).size() > 0) {
                             displayHelp(ConstantUtil.IMAGE_HELP_TYPE);
-                        } else {
-                            displayHelp(ConstantUtil.ACTIVITY_HELP_TYPE);
                         }
                     }
                 }
@@ -225,11 +223,6 @@ public class QuestionView extends TableLayout implements
         if (tempList != null && tempList.size() > 0) {
             items[itemIndex++] = resources.getString(R.string.texthelpoption);
         }
-        tempList = question.getHelpByType(ConstantUtil.ACTIVITY_HELP_TYPE);
-        if (tempList != null && tempList.size() > 0) {
-            items[itemIndex++] = resources
-                    .getString(R.string.activityhelpoption);
-        }
 
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -242,8 +235,6 @@ public class QuestionView extends TableLayout implements
                 } else if (resources.getString(R.string.photohelpoption)
                         .equals(val)) {
                     displayHelp(ConstantUtil.IMAGE_HELP_TYPE);
-                } else {
-                    displayHelp(ConstantUtil.ACTIVITY_HELP_TYPE);
                 }
                 if (dialog != null) {
                     dialog.dismiss();

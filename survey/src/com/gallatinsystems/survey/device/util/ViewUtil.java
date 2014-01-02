@@ -266,16 +266,6 @@ public class ViewUtil {
     }
 
     /**
-     * displays a dialog box for selection of one or more countries
-     */
-    public static void displayCountrySelector(final Context context,
-            final boolean[] selections,
-            final DialogInterface.OnClickListener listener) {
-        displaySelectionDialog(context, selections, listener,
-                R.string.cacheptcountrylabel, R.array.countries, false, 0, 0);
-    }
-
-    /**
      * displays a dialog box for allowing selection of values from an array
      * resource
      * 

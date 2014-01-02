@@ -28,7 +28,7 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class ValidationRule {
-    private static final int DEFAULT_MAX_LENGTH = 9999;
+    public static final int DEFAULT_MAX_LENGTH = 500;
 
     private String validationType;
     private Integer maxLength;

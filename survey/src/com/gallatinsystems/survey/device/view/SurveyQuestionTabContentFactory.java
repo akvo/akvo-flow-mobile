@@ -124,10 +124,6 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                     .getType())) {
                 questionView = new BarcodeQuestionView(context, q,
                         getDefaultLang(), languageCodes, readOnly);
-            } else if (ConstantUtil.TRACK_QUESTION_TYPE.equalsIgnoreCase(q
-                    .getType())) {
-                questionView = new GeoTrackQuestionView(context, q,
-                        getDefaultLang(), languageCodes, readOnly);
             } else if (ConstantUtil.STRENGTH_QUESTION_TYPE.equalsIgnoreCase(q
                     .getType())) {
                 questionView = new StrengthQuestionView(context, q,

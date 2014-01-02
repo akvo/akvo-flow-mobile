@@ -91,7 +91,6 @@ public class SurveyViewActivity extends TabActivity implements
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST = 3;
-    private static final int ACTIVITY_HELP_REQ = 4;
     private static final int TXT_SIZE = 1;
     private static final int SURVEY_LANG = 3;
     private static final int SAVE_SURVEY = 4;
@@ -584,17 +583,6 @@ public class SurveyViewActivity extends TabActivity implements
                                 "Both the source object and source question id are null");
                     }
                 }
-            } else if (requestCode == ACTIVITY_HELP_REQ) {
-                if (resultCode == RESULT_OK) {
-                    QuestionResponse resp = new QuestionResponse(null,
-                            respondentId, eventQuestionSource.getQuestion()
-                                    .getId(),
-                            data.getStringExtra(ConstantUtil.CALC_RESULT_KEY),
-                            ConstantUtil.VALUE_RESPONSE_TYPE, "true");
-
-                    resp = databaseAdapter.createOrUpdateSurveyResponse(resp);
-                    eventQuestionSource.setResponse(resp);
-                }
             }
         } catch (Exception e) {
             Log.e(ACTIVITY_NAME, "Error handling activity return", e);
@@ -774,26 +762,6 @@ public class SurveyViewActivity extends TabActivity implements
             intent.putExtra(ConstantUtil.IMAGE_CAPTION_LIST_KEY, captions);
 
             startActivity(intent);
-        } else if (QuestionInteractionEvent.ACTIVITY_TIP_VIEW.equals(event
-                .getEventType())) {
-            if (event.getSource() != null) {
-                eventQuestionSource = event.getSource();
-            } else {
-                Log.e(ACTIVITY_NAME, "Question source was null in the event");
-            }
-            try {
-                Intent i = new Intent(this,
-                        ConstantUtil.HELP_ACTIVITIES.get(event.getSource()
-                                .getQuestion()
-                                .getHelpByType(ConstantUtil.ACTIVITY_HELP_TYPE)
-                                .get(0).getValue()));
-                i.putExtra(ConstantUtil.MODE_KEY,
-                        ConstantUtil.SURVEY_RESULT_MODE);
-
-                startActivityForResult(i, ACTIVITY_HELP_REQ);
-            } catch (Exception e) {
-                Log.e(TAG, "Could not start activity help", e);
-            }
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event
                 .getEventType())) {
             // fire off the intent
@@ -1002,6 +970,10 @@ public class SurveyViewActivity extends TabActivity implements
                                     tabContentFactories.get(i)
                                             .updateQuestionLanguages(
                                                     selectedLanguageCodes);
+                                }
+                                // Also update the submit tab, if exists
+                                if (submissionTab != null) {
+                                    submissionTab.updateSelectedLanguages(selectedLanguageCodes);
                                 }
                             }
                         });

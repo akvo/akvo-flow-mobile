@@ -64,14 +64,6 @@ public class HomeMenuViewAdapter extends BaseAdapter {
             R.drawable.plotting,
             R.drawable.infoactivity, R.drawable.calc
     };
-    private static final Integer[] optionalLabels = {
-            R.string.plottinglabel,
-            R.string.nearbylabel, R.string.waterflowcalclabel
-    };
-
-    private static final String[] optionalOperations = {
-            ConstantUtil.PLOT_OP, ConstantUtil.NEARBY_OP, ConstantUtil.WATERFLOW_CALC_OP
-    };
 
     // references to our buttons
     private Integer[] buttonImages = new Integer[0];
@@ -81,15 +73,13 @@ public class HomeMenuViewAdapter extends BaseAdapter {
     private ArrayList<String> operations;
     private LayoutInflater inflater;
     private boolean easterEgg = false;
-    private boolean includeOptional;
 
     /**
      * initializes the view inflater
      * 
      * @param c
      */
-    public HomeMenuViewAdapter(Context c, boolean includeOptional) {
-        this.includeOptional = includeOptional;
+    public HomeMenuViewAdapter(Context c) {
         inflater = (LayoutInflater) c
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -112,9 +102,6 @@ public class HomeMenuViewAdapter extends BaseAdapter {
         operations = new ArrayList<String>();
 
         int arraySize = surveys.size() + preSurveyButtons.length + postSurveyButtons.length;
-        if (includeOptional) {
-            arraySize += optionalButtons.length;
-        }
         if (easterEgg) {
             arraySize += 1;
         }
@@ -156,13 +143,6 @@ public class HomeMenuViewAdapter extends BaseAdapter {
         operations.add(ConstantUtil.CONF_OP);
         p += postSurveyButtons.length;
 
-        if (includeOptional) {
-            ArrayUtil.combineArrays(buttonImages, optionalButtons, p);
-            ArrayUtil.combineArrays(buttonLabels, optionalLabels, p);
-            for (int i = 0; i < optionalOperations.length; i++) {
-                operations.add(optionalOperations[i]);
-            }
-        }
         p += optionalButtons.length;
 
         notifyDataSetChanged();

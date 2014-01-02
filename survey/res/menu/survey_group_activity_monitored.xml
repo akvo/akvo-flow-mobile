@@ -3,11 +3,11 @@
     xmlns:flowapp="http://schemas.android.com/apk/res-auto" >
 
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_menu_preferences"
-        android:orderInCategory="103"
-        android:title="@string/settingslabel"
-        flowapp:showAsAction="never"/>
+        android:id="@+id/locales_icon"
+        android:icon="@drawable/ic_menu_archive"
+        android:orderInCategory="100"
+        android:title="Manage Records"
+        flowapp:showAsAction="always"/>
     
     <item
         android:id="@+id/users"
@@ -15,18 +15,25 @@
         android:orderInCategory="101"
         android:title="@string/userlabel"
         flowapp:showAsAction="always"/>
-
+    
     <item
-        android:id="@+id/locales_icon"
-        android:icon="@drawable/ic_menu_archive"
-        android:orderInCategory="100"
-        android:title="Manage Records"
-        flowapp:showAsAction="always"/>
-
-    <item
-        android:id="@+id/map_icon"
-        android:orderInCategory="99"
-        android:title="View on Map"
-        flowapp:showAsAction="never"/>
+        android:id="@+id/more_submenu"
+        android:icon="@drawable/ic_menu_moreoverflow_normal_holo_dark"
+        android:orderInCategory="102"
+        flowapp:showAsAction="always">
+        
+        <menu>
+            <item
+                android:id="@+id/map_icon"
+                flowapp:showAsAction="always"
+                android:title="View on Map"/>
+        
+            <item
+                android:id="@+id/settings"
+                flowapp:showAsAction="always"
+                android:title="@string/settingslabel"/>
+        </menu>
+        
+    </item>
 
 </menu>

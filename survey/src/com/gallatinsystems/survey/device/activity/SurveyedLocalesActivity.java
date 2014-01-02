@@ -27,6 +27,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
@@ -113,10 +114,11 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.surveyed_locales_activity, menu);
         // We must hide list/map results option depending on the current fragment
+        SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
         if (mListResults) {
-            menu.removeItem(R.id.list_results);
+            submenu.removeItem(R.id.list_results);
         } else {
-            menu.removeItem(R.id.map_results);
+            submenu.removeItem(R.id.map_results);
         }
         return super.onCreateOptionsMenu(menu);
     }

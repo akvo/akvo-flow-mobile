@@ -14,24 +14,29 @@
         android:icon="@drawable/ic_menu_add"
         android:orderInCategory="101"
         android:title="New Record"
-        flowapp:showAsAction="never"/>
-
+        flowapp:showAsAction="always"/>
+    
+    
     <item
-        android:id="@+id/list_results"
+        android:id="@+id/more_submenu"
+        android:icon="@drawable/ic_menu_moreoverflow_normal_holo_dark"
         android:orderInCategory="102"
-        android:title="List Results"
-        flowapp:showAsAction="never"/>
-
-    <item
-        android:id="@+id/map_results"
-        android:orderInCategory="103"
-        android:title="Map Results"
-        flowapp:showAsAction="never"/>
-
-    <item
-        android:id="@+id/sync_records"
-        android:orderInCategory="104"
-        android:title="Sync Records"
-        flowapp:showAsAction="never"/>
+        flowapp:showAsAction="always">
+        
+        <menu>
+            <item
+                android:id="@+id/list_results"
+                android:title="List Results"/>
+        
+            <item
+                android:id="@+id/map_results"
+                android:title="Map Results"/>
+        
+            <item
+                android:id="@+id/sync_records"
+                android:title="Sync Records"/>
+        </menu>
+        
+    </item>
 
 </menu>

@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.fragment.MapFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocaleListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocalesFragmentListener;
@@ -43,7 +45,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
     public static final String EXTRA_SURVEYED_LOCALE_ID = "surveyed_locale_id";
     
-    private int mSurveyGroupId;
+    private SurveyGroup mSurveyGroup;
     
     private SurveyDbAdapter mDatabase;
     
@@ -55,15 +57,27 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
         super.onCreate(savedInstanceState);
         setContentView(R.layout.surveyed_locales_activity);
         
-        mSurveyGroupId = getIntent().getExtras().getInt(EXTRA_SURVEY_GROUP_ID);
+        final int surveyGroupId = getIntent().getExtras().getInt(EXTRA_SURVEY_GROUP_ID);
         
         if (savedInstanceState != null) {
             mListResults = savedInstanceState.getBoolean("list_results", true);
         }
 
         mDatabase = new SurveyDbAdapter(this);
+        mDatabase.open();
+        
+        mSurveyGroup = loadSurveyGroup(surveyGroupId);
+        
+        setTitle(mSurveyGroup.getName());
         
         display();
+    }
+    
+    private SurveyGroup loadSurveyGroup(int surveyGroupId) {
+        // C'mon... you can do this better
+        Cursor cursor = mDatabase.getSurveyGroup(surveyGroupId);
+        cursor.moveToFirst();
+        return SurveyDbAdapter.getSurveyGroup(cursor);
     }
     
     protected void onSaveInstanceState (Bundle outState) {
@@ -131,14 +145,14 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements Survey
                 return onSearchRequested();
             case R.id.new_record:
                 // Create new record and return the ID
-                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroupId);
+                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
                 onSurveyedLocaleSelected(newLocaleId);
                 return true;
             case R.id.sync_records:
                 Toast.makeText(SurveyedLocalesActivity.this, R.string.syncing_records, 
                         Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, SurveyedLocaleSyncService.class);
-                intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroupId);
+                intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroup.getId());
                 startService(intent);
                 return true;
             case R.id.list_results:

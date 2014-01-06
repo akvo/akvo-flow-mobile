@@ -286,6 +286,12 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
         
         // Cache the survey group
         mDatabase.savePreference(ConstantUtil.SURVEY_GROUP_KEY, String.valueOf(mSurveyGroup.getId()));
+        
+        // If the group is monitored, we must prompt the user with 'Manage Records' screen
+        if (mSurveyGroup.isMonitored()) {
+            onManageRecords();
+        }
+        
         return true;
     }
     
@@ -311,15 +317,14 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
                 mAdapter.onUserChanged();
                 break;
             case ID_SURVEYED_LOCALE_LIST:
-                if (resultCode == RESULT_OK) {
-                    if (intent != null) {
-                        String localeId = intent.getStringExtra(SurveyedLocalesActivity.EXTRA_SURVEYED_LOCALE_ID);
-                        mLocale = mDatabase.getSurveyedLocale(localeId);
-                    } else {
-                        mLocale = null;
-                    }
+                if (resultCode == RESULT_OK && intent != null) {
+                    String localeId = intent.getStringExtra(SurveyedLocalesActivity.EXTRA_SURVEYED_LOCALE_ID);
+                    mLocale = mDatabase.getSurveyedLocale(localeId);
                     displayRecord();
                     mAdapter.refreshFragments();
+                } else {
+                    //mLocale = null;
+                    finish();
                 }
                 break;
         }
@@ -477,15 +482,19 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.locales_icon:
-                Intent intent = new Intent(this, SurveyedLocalesActivity.class);
-                Bundle extras = new Bundle();
-                extras.putInt(SurveyedLocalesActivity.EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
-                intent.putExtras(extras);
-                startActivityForResult(intent, ID_SURVEYED_LOCALE_LIST);
+                onManageRecords();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    
+    private void onManageRecords() {
+        Intent intent = new Intent(this, SurveyedLocalesActivity.class);
+        Bundle extras = new Bundle();
+        extras.putInt(SurveyedLocalesActivity.EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
+        intent.putExtras(extras);
+        startActivityForResult(intent, ID_SURVEYED_LOCALE_LIST);
     }
     
     private void viewOnMap() {

@@ -80,8 +80,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
     private static final int ID_ACTIVITY_USERS       = 0;
     private static final int ID_SURVEYED_LOCALE_LIST = 1;
     
-    private static final String[] TABS = {"SURVEYS", "RESPONSES"};// TODO: localized strings
-    
     // Active user info
     private String mUserId;
     private String mUserName;
@@ -350,11 +348,14 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
     class TabsAdapter extends FragmentPagerAdapter {
         private static final int POSITION_SURVEYS = 0;
         private static final int POSITION_RESPONSES = 1;
+    
+        private final String[] TABS;
         
         ResponseListFragment mResponseListFragment;
 
         public TabsAdapter(FragmentManager fm) {
             super(fm);
+            TABS = getResources().getStringArray(R.array.survey_group_tabs);
         }
 
         @Override

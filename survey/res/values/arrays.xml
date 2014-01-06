@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
+    <string-array name="survey_group_tabs">
+        <item>SURVEYS</item>
+        <item>RESPONSES</item>
+    </string-array>
 
     <string-array name="celluploadoptions">
         <item>Always</item>

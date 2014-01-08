@@ -287,10 +287,12 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
         // Cache the survey group
         mDatabase.savePreference(ConstantUtil.SURVEY_GROUP_KEY, String.valueOf(mSurveyGroup.getId()));
         
+        /*
         // If the group is monitored, we must prompt the user with 'Manage Records' screen
         if (mSurveyGroup.isMonitored()) {
             onManageRecords();
         }
+        */
         
         return true;
     }
@@ -314,7 +316,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
                     }
                 }
                 displayUser();
-                mAdapter.onUserChanged();
                 break;
             case ID_SURVEYED_LOCALE_LIST:
                 if (resultCode == RESULT_OK && intent != null) {
@@ -332,22 +333,24 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
 
     @Override
     public void startSurvey(Survey survey) {
-        if (mLocale == null && mSurveyGroup.isMonitored()) {
+        if (mUserId == null) {
+            // if the current user is null, we can't enter survey mode
+            Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
+        } else if (mLocale == null && mSurveyGroup.isMonitored()) {
             // We cannot start the survey if the group is monitored
             // and no record is selected yet
             Toast.makeText(this, "Please, select a record", Toast.LENGTH_LONG).show();
-            return;
+        } else {
+            Intent i = new Intent(this, SurveyViewActivity.class);
+            i.putExtra(ConstantUtil.USER_ID_KEY, mUserId);
+            i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
+            i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
+            if (mSurveyGroup.isMonitored()) {
+                // The locale will automatically be managed in non monitored groups
+                i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mLocale.getId());
+            }
+            startActivity(i);
         }
-                
-        Intent i = new Intent(this, SurveyViewActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, mUserId);
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
-        i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
-        if (mSurveyGroup.isMonitored()) {
-            // The locale will automatically be managed in non monitored groups
-            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mLocale.getId());
-        }
-        startActivity(i);
     }
     
     class TabsAdapter extends FragmentPagerAdapter {
@@ -366,13 +369,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
         @Override
         public int getCount() {
             return TABS.length;
-        }
-        
-        public void onUserChanged() {
-            Fragment surveyListFragment = getSupportFragmentManager().findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
-            if (surveyListFragment != null) {
-                ((SurveyListFragment)surveyListFragment).setUserId(mUserId);
-            }
         }
         
         private String getFragmentTag(int pos){

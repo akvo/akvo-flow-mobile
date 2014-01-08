@@ -51,7 +51,6 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         public void startSurvey(Survey survey);
     }
     
-    private String mUserId;
     private SurveyGroup mSurveyGroup;
     private String mLocaleId;
     private boolean mRegisteredLocale;
@@ -116,23 +115,15 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         getLoaderManager().restartLoader(0, null, this);
     }
     
-    public void setUserId(String userId) {
-        mUserId = userId;
-    }
-    
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (mUserId != null) {
-            if (!BootstrapService.isProcessing) {
-                Survey survey = mAdapter.getItem(position);
-                mListener.startSurvey(survey);
-            } else {
-                Toast.makeText(getActivity(), R.string.pleasewaitforbootstrap, 
-                        Toast.LENGTH_LONG).show();
-            }
+        if (!BootstrapService.isProcessing) {
+            // TODO: consider moving this logic to the activity
+            Survey survey = mAdapter.getItem(position);
+            mListener.startSurvey(survey);
         } else {
-            // if the current user is null, we can't enter survey mode
-            Toast.makeText(getActivity(), R.string.mustselectuser, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.pleasewaitforbootstrap, 
+                    Toast.LENGTH_LONG).show();
         }
     }
 

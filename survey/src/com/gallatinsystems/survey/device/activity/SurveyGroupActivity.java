@@ -333,13 +333,15 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
 
     @Override
     public void startSurvey(Survey survey) {
-        if (mUserId == null) {
+        if (!BootstrapService.isProcessing) {
+            Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
+        } else if (mUserId == null) {
             // if the current user is null, we can't enter survey mode
             Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
         } else if (mLocale == null && mSurveyGroup.isMonitored()) {
             // We cannot start the survey if the group is monitored
             // and no record is selected yet
-            Toast.makeText(this, "Please, select a record", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.select_record, Toast.LENGTH_LONG).show();
         } else {
             Intent i = new Intent(this, SurveyViewActivity.class);
             i.putExtra(ConstantUtil.USER_ID_KEY, mUserId);

@@ -35,14 +35,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.async.loader.SurveyListLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
-import com.gallatinsystems.survey.device.service.BootstrapService;
 
 public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>, OnItemClickListener {
     private static final String TAG = SurveyListFragment.class.getSimpleName();
@@ -117,14 +115,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (!BootstrapService.isProcessing) {
-            // TODO: consider moving this logic to the activity
-            Survey survey = mAdapter.getItem(position);
-            mListener.startSurvey(survey);
-        } else {
-            Toast.makeText(getActivity(), R.string.pleasewaitforbootstrap, 
-                    Toast.LENGTH_LONG).show();
-        }
+        Survey survey = mAdapter.getItem(position);
+        mListener.startSurvey(survey);
     }
 
     class SurveyAdapter extends ArrayAdapter<Survey> {

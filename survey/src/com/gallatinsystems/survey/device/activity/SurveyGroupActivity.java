@@ -361,8 +361,6 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
     
         private final String[] TABS;
         
-        ResponseListFragment mResponseListFragment;
-
         public TabsAdapter(FragmentManager fm) {
             super(fm);
             TABS = getResources().getStringArray(R.array.survey_group_tabs);

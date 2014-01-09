@@ -139,13 +139,16 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         private boolean isEnabled(Survey survey) {
             // If the group is monitored, we need disable some surveys
             if (mSurveyGroup.isMonitored()) {
+                boolean isRegistrationForm = survey.getId().equals(
+                        mSurveyGroup.getRegisterSurveyId());
                 if (TextUtils.isEmpty(mLocaleId)) {
                     return false;
-                } else if (!mRegisteredLocale) {
-                    // Enable only registration survey
-                    return survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
+                } else if (mRegisteredLocale) {
+                    // Disable only registration survey
+                    return !isRegistrationForm;
                 } else {
-                    return true;
+                    // Enable only registration survey
+                    return isRegistrationForm;
                 }
             }
             

@@ -287,12 +287,10 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
         // Cache the survey group
         mDatabase.savePreference(ConstantUtil.SURVEY_GROUP_KEY, String.valueOf(mSurveyGroup.getId()));
         
-        /*
         // If the group is monitored, we must prompt the user with 'Manage Records' screen
         if (mSurveyGroup.isMonitored()) {
             onManageRecords();
         }
-        */
         
         return true;
     }
@@ -324,8 +322,11 @@ public class SurveyGroupActivity extends ActionBarActivity implements SurveyList
                     displayRecord();
                     mAdapter.refreshFragments();
                 } else {
-                    //mLocale = null;
-                    finish();
+                    //TODO: Handle no record selection.
+                    //finish();
+                    mLocale = null;
+                    displayRecord();
+                    mAdapter.refreshFragments();
                 }
                 break;
         }

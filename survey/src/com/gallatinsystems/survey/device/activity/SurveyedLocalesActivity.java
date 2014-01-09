@@ -83,27 +83,11 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
         
         setTitle(mSurveyGroup.getName());
         
-        setupTabs();
-        //display();
-    }
-    
-    private void setupTabs() {
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        
-        Tab listTab = actionBar.newTab()
-                .setText("RECORDS")
-                .setTabListener(this);
-        Tab mapTab = actionBar.newTab()
-                .setText("MAP")
-                .setTabListener(this);
-        
-        actionBar.addTab(listTab);
-        actionBar.addTab(mapTab);
+        display();
     }
     
     private SurveyGroup loadSurveyGroup(int surveyGroupId) {
-        // C'mon... you can do this better
+        //TODO: C'mon... you can do this better
         Cursor cursor = mDatabase.getSurveyGroup(surveyGroupId);
         cursor.moveToFirst();
         return SurveyDbAdapter.getSurveyGroup(cursor);
@@ -137,35 +121,37 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
         }
     }
     
-    /*
     private void display() {
-        Fragment fragment = mListResults ? new SurveyedLocaleListFragment() : new MapFragment();
-        // Pass the arguments on to let the fragment retrieve the survey group
-        fragment.setArguments(getIntent().getExtras());
-            
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        // Add the fragment to the 'fragment_container' FrameLayout
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.commit();
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        
+        Tab listTab = actionBar.newTab()
+                .setText("RECORDS")
+                .setTabListener(this);
+        Tab mapTab = actionBar.newTab()
+                .setText("MAP")
+                .setTabListener(this);
+        
+        actionBar.addTab(listTab);
+        actionBar.addTab(mapTab);
     }
-    
-    private void switchFragment() {
-        mListResults = !mListResults;
-        supportInvalidateOptionsMenu();
-        display();
-    }
-    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.surveyed_locales_activity, menu);
         // We must hide list/map results option depending on the current fragment
         SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
+        
+        // TODO: Add 'sort' functionality...
+        submenu.removeItem(R.id.list_results);
+        submenu.removeItem(R.id.map_results);
+        /*
         if (mListResults) {
             submenu.removeItem(R.id.list_results);
         } else {
             submenu.removeItem(R.id.map_results);
         }
+        */
         return super.onCreateOptionsMenu(menu);
     }
 

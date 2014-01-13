@@ -35,7 +35,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.activity.SurveyedLocalesActivity;
+import com.gallatinsystems.survey.device.activity.RecordListActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
@@ -59,7 +59,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getInt(SurveyedLocalesActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroupId = getArguments().getInt(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
     }
     
     @Override

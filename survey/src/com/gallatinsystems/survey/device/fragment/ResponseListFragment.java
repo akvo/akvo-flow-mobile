@@ -41,12 +41,17 @@ import com.gallatinsystems.survey.device.activity.TransmissionHistoryActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyInstanceLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.adapter.SubmittedSurveyReviewCursorAdaptor;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
     //private static final String TAG = ResponseListFragment.class.getSimpleName();
+    
+    private static final String EXTRA_SURVEY_GROUP = "survey_group";
+    private static final String EXTRA_RECORD       = "record";
+    
     // Loader id
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
     
@@ -62,7 +67,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private static final int UPDATE_INTERVAL_MS = 10000; // every ten seconds
     
     private SurveyGroup mSurveyGroup;
-    private String mSurveyedLocaleId;
+    private SurveyedLocale mRecord;
     private SubmittedSurveyReviewCursorAdaptor mAdapter;
     
     private SurveyDbAdapter mDatabase;
@@ -75,9 +80,20 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         }
     };
     
+    public static ResponseListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
+        ResponseListFragment fragment = new ResponseListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(EXTRA_RECORD, record);
+        fragment.setArguments(args);
+        return fragment;
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
+        mRecord = (SurveyedLocale) getArguments().getSerializable(EXTRA_RECORD);
     }
     
     @Override
@@ -98,19 +114,8 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         mDatabase.close();
     }
     
-    public void refresh(SurveyGroup surveyGroup, String surveyedLocaleId) {
-        mSurveyGroup = surveyGroup;
-        mSurveyedLocaleId = surveyedLocaleId;
-        refresh();
-    }
-    
-    private void refresh() {// TODO: Rename these methods
+    private void refresh() {
         getLoaderManager().restartLoader(ID_SURVEY_INSTANCE_LIST, null, ResponseListFragment.this);
-    }
-    
-    public static ResponseListFragment instantiate() {
-        ResponseListFragment fragment = new ResponseListFragment();
-        return fragment;
     }
     
     @Override
@@ -232,7 +237,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         
         i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
         if (mSurveyGroup.isMonitored()) {
-            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mSurveyedLocaleId);
+            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
         }
         
         // Read-only vs editable
@@ -250,9 +255,9 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_INSTANCE_LIST:
-                final int surveyGroupId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-                final boolean isMonitored = mSurveyGroup != null ? mSurveyGroup.isMonitored() : false;
-                return new SurveyInstanceLoader(getActivity(), mDatabase, surveyGroupId, isMonitored, mSurveyedLocaleId);
+                return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroup.getId(), 
+                        mSurveyGroup.isMonitored(), 
+                        mRecord != null ? mRecord.getId() : null);
         }
         return null;
     }

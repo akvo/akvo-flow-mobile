@@ -39,7 +39,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.activity.SurveyedLocalesActivity;
+import com.gallatinsystems.survey.device.activity.RecordListActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
@@ -63,7 +63,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getInt(SurveyedLocalesActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroupId = getArguments().getInt(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
     }
     
     @Override

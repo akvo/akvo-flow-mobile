@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,25 +40,32 @@ import com.gallatinsystems.survey.device.async.loader.SurveyListLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 
 public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>, OnItemClickListener {
     private static final String TAG = SurveyListFragment.class.getSimpleName();
+    
+    private static final String EXTRA_SURVEY_GROUP = "survey_group";
+    private static final String EXTRA_RECORD       = "record";
     
     public interface SurveyListListener {
         public void startSurvey(Survey survey);
     }
     
     private SurveyGroup mSurveyGroup;
-    private String mLocaleId;
-    private boolean mRegisteredLocale;
+    private SurveyedLocale mRecord;
+    private boolean mRegistered;
     
     private SurveyAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
-    
     private SurveyListListener mListener;
     
-    public static SurveyListFragment instantiate() {
+    public static SurveyListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
         SurveyListFragment fragment = new SurveyListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(EXTRA_RECORD, record);
+        fragment.setArguments(args);
         return fragment;
     }
     
@@ -80,6 +86,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
+        mRecord = (SurveyedLocale) getArguments().getSerializable(EXTRA_RECORD);
     }
     
     @Override
@@ -99,15 +107,13 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             setListAdapter(mAdapter);
         }
         getListView().setOnItemClickListener(this);
+        refresh();
     }
     
-    public void refresh(SurveyGroup surveyGroup, String localeId) {
-        mSurveyGroup = surveyGroup;
-        mLocaleId = localeId;
-        
+    public void refresh() {
         // Calculate if this locale is not registered yet
-        if (mLocaleId != null) {
-            mRegisteredLocale = mDatabase.getSurveyInstances(localeId).getCount() > 0;
+        if (mSurveyGroup.isMonitored() && mRecord != null) {
+            mRegistered = mDatabase.getSurveyInstances(mRecord.getId()).getCount() > 0;
         }
         
         getLoaderManager().restartLoader(0, null, this);
@@ -137,13 +143,11 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         }
         
         private boolean isEnabled(Survey survey) {
-            // If the group is monitored, we need disable some surveys
+            // If the group is monitored, we need to disable some surveys
             if (mSurveyGroup.isMonitored()) {
                 boolean isRegistrationForm = survey.getId().equals(
                         mSurveyGroup.getRegisterSurveyId());
-                if (TextUtils.isEmpty(mLocaleId)) {
-                    return false;
-                } else if (mRegisteredLocale) {
+                if (mRegistered) {
                     // Disable only registration survey
                     return !isRegistrationForm;
                 } else {

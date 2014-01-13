@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,68 +32,53 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.fragment.MapFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocaleListFragment;
 import com.gallatinsystems.survey.device.fragment.SurveyedLocalesFragmentListener;
 import com.gallatinsystems.survey.device.service.SurveyedLocaleSyncService;
 
-public class SurveyedLocalesActivity extends ActionBarActivity implements 
+public class RecordListActivity extends ActionBarActivity implements 
             SurveyedLocalesFragmentListener, ActionBar.TabListener {
-    private static final String TAG = SurveyedLocalesActivity.class.getSimpleName();
+    private static final String TAG = RecordListActivity.class.getSimpleName();
     
+    public static final String EXTRA_SURVEY_GROUP = "survey_group";
+    
+    // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
-    public static final String EXTRA_SURVEYED_LOCALE_ID = "surveyed_locale_id";
+    
+    private static final int POSITION_LIST = 0;
+    private static final int POSITION_MAP  = 1;
     
     private SurveyGroup mSurveyGroup;
-    
     private SurveyDbAdapter mDatabase;
     
     private ViewPager mPager;
     private TabsAdapter mAdapter;
-    
-    // False for MapFragment. List by default.
-    private boolean mListResults = true;
+    private String[] mTabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.surveyed_locales_activity);
+        setContentView(R.layout.record_list_activity);
+        
+        mTabs = getResources().getStringArray(R.array.records_activity_tabs);
         
         mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new TabsAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
         
-        final int surveyGroupId = getIntent().getExtras().getInt(EXTRA_SURVEY_GROUP_ID);
-        
-        if (savedInstanceState != null) {
-            mListResults = savedInstanceState.getBoolean("list_results", true);
-        }
-
-        mDatabase = new SurveyDbAdapter(this);
-        mDatabase.open();
-        
-        mSurveyGroup = loadSurveyGroup(surveyGroupId);
-        
+        mSurveyGroup = (SurveyGroup) getIntent().getExtras().getSerializable(EXTRA_SURVEY_GROUP);
         setTitle(mSurveyGroup.getName());
         
-        display();
-    }
-    
-    private SurveyGroup loadSurveyGroup(int surveyGroupId) {
-        //TODO: C'mon... you can do this better
-        Cursor cursor = mDatabase.getSurveyGroup(surveyGroupId);
-        cursor.moveToFirst();
-        return SurveyDbAdapter.getSurveyGroup(cursor);
-    }
-    
-    protected void onSaveInstanceState (Bundle outState) {
-        outState.putBoolean("list_results", mListResults);
+        mDatabase = new SurveyDbAdapter(this);
+        
+        setupActionBar();
     }
     
     @Override
@@ -121,15 +105,16 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
         }
     }
     
-    private void display() {
+    private void setupActionBar() {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         
         Tab listTab = actionBar.newTab()
-                .setText("RECORDS")
+                .setText(mTabs[POSITION_LIST])
                 .setTabListener(this);
         Tab mapTab = actionBar.newTab()
-                .setText("MAP")
+                .setText(mTabs[POSITION_MAP])
                 .setTabListener(this);
         
         actionBar.addTab(listTab);
@@ -138,26 +123,16 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.surveyed_locales_activity, menu);
-        // We must hide list/map results option depending on the current fragment
-        SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
-        
-        // TODO: Add 'sort' functionality...
-        submenu.removeItem(R.id.list_results);
-        submenu.removeItem(R.id.map_results);
-        /*
-        if (mListResults) {
-            submenu.removeItem(R.id.list_results);
-        } else {
-            submenu.removeItem(R.id.map_results);
-        }
-        */
+        getMenuInflater().inflate(R.menu.records_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.search:
                 return onSearchRequested();
             case R.id.new_record:
@@ -166,15 +141,11 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
                 onSurveyedLocaleSelected(newLocaleId);
                 return true;
             case R.id.sync_records:
-                Toast.makeText(SurveyedLocalesActivity.this, R.string.syncing_records, 
+                Toast.makeText(RecordListActivity.this, R.string.syncing_records, 
                         Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, SurveyedLocaleSyncService.class);
                 intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroup.getId());
                 startService(intent);
-                return true;
-            case R.id.list_results:
-            case R.id.map_results:
-                //switchFragment();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -183,26 +154,25 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
 
     @Override
     public void onSurveyedLocaleSelected(String surveyedLocaleId) {
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_SURVEYED_LOCALE_ID, surveyedLocaleId);
-        setResult(RESULT_OK, intent);
-        finish();
+        // Start SurveysActivity, sending SurveyGroup + Record
+        SurveyedLocale record = mDatabase.getSurveyedLocale(surveyedLocaleId);
+        Intent intent = new Intent(this, RecordActivity.class);
+        Bundle extras = new Bundle();
+        extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
+        extras.putSerializable(RecordActivity.EXTRA_RECORD, record);
+        intent.putExtras(extras);
+        startActivity(intent);
     }
     
     class TabsAdapter extends FragmentPagerAdapter {
-        static final int POSITION_LIST = 0;
-        static final int POSITION_MAP  = 1;
-    
-        final String[] TABS = {"RECORDS", "MAP"};
         
         public TabsAdapter(FragmentManager fm) {
             super(fm);
-            //TABS = getResources().getStringArray(R.array.survey_group_tabs);
         }
 
         @Override
         public int getCount() {
-            return TABS.length;
+            return mTabs.length;
         }
         
         private Fragment getFragment(int pos){
@@ -226,6 +196,8 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
         @Override
         public Fragment getItem(int position) {
             Fragment fragment = null;
+            Bundle extras = new Bundle();
+            extras.putInt(EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
             switch (position) {
                 case POSITION_LIST:
                     fragment =  new SurveyedLocaleListFragment();
@@ -236,7 +208,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
             }
             
             if (fragment != null) {
-                fragment.setArguments(getIntent().getExtras());
+                fragment.setArguments(extras);
             }
             
             return fragment;
@@ -244,7 +216,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
         
         @Override
         public CharSequence getPageTitle(int position) {
-            return TABS[position];
+            return mTabs[position];
         }
         
     }
@@ -263,7 +235,7 @@ public class SurveyedLocalesActivity extends ActionBarActivity implements
     }
     
     /**
-     * BroadcastReceiver to notify of locales synchronisation. This should be
+     * BroadcastReceiver to notify of records synchronisation. This should be
      * fired from SurveyedLocalesSyncService.
      */
     private BroadcastReceiver surveyedLocalesSyncReceiver = new BroadcastReceiver() {

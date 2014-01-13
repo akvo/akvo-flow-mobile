@@ -2,7 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="FieldSurveyTheme" parent="@style/Theme.AppCompat">
-        <item name="actionBarStyle">@style/FlowActionBarStyle</item>
+        <item name="android:actionBarStyle">@style/FlowActionBarStyle</item>
     </style>
 
     <style name="FlowActionBarStyle" parent="@style/Widget.AppCompat.ActionBar.Solid">

@@ -17,6 +17,7 @@
 package com.gallatinsystems.survey.device.app;
 
 import android.app.Application;
+import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,12 +25,15 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
+import com.gallatinsystems.survey.device.domain.User;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.LangsPreferenceUtil;
 
 public class FlowApp extends Application {
     private static final String TAG = FlowApp.class.getSimpleName();
     private static FlowApp app;// Singleton
+    
+    private User mUser;
 
     @Override
     public void onCreate() {
@@ -43,7 +47,42 @@ public class FlowApp extends Application {
     }
     
     private void init() {
+        loadLastUser();
         mSurveyChecker.run();// Ensure surveys have put their languages
+    }
+    
+    public void setUser(User user) {
+        mUser = user;
+    }
+    
+    public User getUser() {
+        return mUser;
+    }
+    
+    /**
+     * Checks if the user preference to persist logged-in users is set and, if
+     * so, loads the last logged-in user from the DB
+     */
+    private void loadLastUser() {
+        // TODO: This DB connection should not be in the UI thread
+        SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
+        database.open();
+        
+        // First check if they want to keep users logged in
+        String val = database.findPreference(ConstantUtil.USER_SAVE_SETTING_KEY);
+        if (val != null && Boolean.parseBoolean(val)) {
+            val = database.findPreference(ConstantUtil.LAST_USER_SETTING_KEY);
+            if (val != null && val.trim().length() > 0) {
+                Cursor cur = database.findUser(Long.valueOf(val));
+                if (cur != null) {
+                    String userId = val;
+                    String userName = cur.getString(cur.getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL));
+                    mUser = new User(userId, userName);
+                    cur.close();
+                }
+            }
+        }
+        database.close();
     }
 
     /**

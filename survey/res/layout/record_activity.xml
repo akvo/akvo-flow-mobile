@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:id="@+id/record_view"
-        android:background="#4d4949"
+        android:background="#262424"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >

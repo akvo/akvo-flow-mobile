@@ -68,6 +68,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_group_activity);
+        setTitle(R.string.survey_groups_activity);
         
         mDatabase = new SurveyDbAdapter(getApplicationContext());
         mDatabase.open();
@@ -76,6 +77,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         mAdapter = new SurveyGroupListAdapter(this, null);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(mAdapter);
+        listView.setEmptyView(findViewById(android.R.id.empty));
         
         init();// No external storage will finish the application
     }

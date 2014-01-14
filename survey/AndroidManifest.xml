@@ -28,8 +28,7 @@
         android:label="@string/app_name"
         android:theme="@style/FieldSurveyTheme" >
         <activity
-            android:name=".activity.SurveyGroupListActivity"
-            android:label="Survey Groups">
+            android:name=".activity.SurveyGroupListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +37,7 @@
         </activity>
         <activity
             android:name=".activity.RecordListActivity"
-            android:label="Select Record"
+            android:label="@string/record_list_activity"
             android:launchMode="singleTop">
             <intent-filter>
                     <action android:name="android.intent.action.SEARCH" />

@@ -218,15 +218,18 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             // If the group is monitored, we need to trigger record selection Activity.
             // Otherwise, go directly to RecordActivity
             final SurveyGroup group = (SurveyGroup) view.getTag();
+            Intent intent;
             if (group.isMonitored()) {
-                Intent intent = new Intent(SurveyGroupListActivity.this, RecordListActivity.class);
-                Bundle extras = new Bundle();
-                extras.putSerializable(RecordListActivity.EXTRA_SURVEY_GROUP, group);
-                intent.putExtras(extras);
-                startActivity(intent);
+                // Trigger record selection Activity
+                intent = new Intent(SurveyGroupListActivity.this, RecordListActivity.class);
             } else {
-                // TODO
+                // Go directly to Surveys/Responses (No record)
+                intent = new Intent(SurveyGroupListActivity.this, RecordActivity.class);
             }
+            Bundle extras = new Bundle();
+            extras.putSerializable(RecordListActivity.EXTRA_SURVEY_GROUP, group);
+            intent.putExtras(extras);
+            startActivity(intent);
         }
         
     }

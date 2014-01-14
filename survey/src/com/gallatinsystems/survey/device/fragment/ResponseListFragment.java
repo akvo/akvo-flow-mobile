@@ -31,6 +31,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -148,8 +149,10 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.add(0, DELETE_ALL, 0, R.string.deleteall);
-        menu.add(0, RESEND_ALL, 1, R.string.resendall);
+        // Add this fragment's options to the 'more' submenu
+        SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
+        submenu.add(0, DELETE_ALL, 0, R.string.deleteall);
+        submenu.add(0, RESEND_ALL, 1, R.string.resendall);
     }
 
     @Override

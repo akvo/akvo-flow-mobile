@@ -77,9 +77,15 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         
         mRecordView = findViewById(R.id.record_view);
         mRecordTextView = (TextView) findViewById(R.id.record_text);
-        mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new TabsAdapter(getSupportFragmentManager());
+        mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                getSupportActionBar().setSelectedNavigationItem(position);
+            }
+        });
         
         mDatabase = new SurveyDbAdapter(this);
         

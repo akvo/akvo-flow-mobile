@@ -69,9 +69,15 @@ public class RecordListActivity extends ActionBarActivity implements
         
         mTabs = getResources().getStringArray(R.array.records_activity_tabs);
         
-        mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new TabsAdapter(getSupportFragmentManager());
+        mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                getSupportActionBar().setSelectedNavigationItem(position);
+            }
+        });
         
         mSurveyGroup = (SurveyGroup) getIntent().getExtras().getSerializable(EXTRA_SURVEY_GROUP);
         setTitle(mSurveyGroup.getName());

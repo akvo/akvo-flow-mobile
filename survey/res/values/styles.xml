@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-
+    
     <style name="FieldSurveyTheme" parent="@style/Theme.AppCompat">
+        <item name="android:actionBarStyle">@style/FlowActionBarStyle</item>
+        
+        <!-- Support library compatibility -->
         <item name="actionBarStyle">@style/FlowActionBarStyle</item>
     </style>
 
     <style name="FlowActionBarStyle" parent="@style/Widget.AppCompat.ActionBar.Solid">
     </style>
+    
 
 </resources>

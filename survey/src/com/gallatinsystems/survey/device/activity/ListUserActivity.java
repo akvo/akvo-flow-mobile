@@ -51,8 +51,8 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class ListUserActivity extends ActionBarActivity {
-    protected static final int EDIT_ID = 0;
-    protected static final int DELETE_ID = 1;
+    private static final int EDIT_ID = 0;
+    private static final int DELETE_ID = 1;
     
     private SurveyDbAdapter mDatabase;
     private UserListAdapter mAdapter;
@@ -190,6 +190,14 @@ public class ListUserActivity extends ActionBarActivity {
             
             TextView nameView = (TextView) view.findViewById(R.id.itemheader);
             nameView.setText(name);
+            
+            int leftDrawable = 0;
+            if (FlowApp.getApp().getUser() != null) {
+                if (FlowApp.getApp().getUser().getId() == id) {
+                    leftDrawable = R.drawable.ic_menu_allfriends;
+                }
+            }
+            nameView.setCompoundDrawablesWithIntrinsicBounds(leftDrawable, 0, 0, 0);
         }
 
         @Override
@@ -197,6 +205,7 @@ public class ListUserActivity extends ActionBarActivity {
             // Set the user in the App, and finish the Activity
             User user = (User) view.getTag();
             FlowApp.getApp().setUser(user);
+            display();
             Toast.makeText(ListUserActivity.this, "Logged in as " + user.getName(), 
                     Toast.LENGTH_LONG).show();
             finish();

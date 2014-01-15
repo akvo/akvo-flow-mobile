@@ -139,7 +139,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
 
     @Override
     public void startSurvey(Survey survey) {
-        if (!BootstrapService.isProcessing) {
+        if (BootstrapService.isProcessing) {
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
         } else if (mUser == null) {
             // if the current user is null, we can't enter survey mode

@@ -60,9 +60,10 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     private static final int ID_SURVEY_GROUP_LIST = 0;
     
     private User mUser;
-    
     private SurveyGroupListAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
+    
+    private ListView mListView;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +74,11 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         mDatabase = new SurveyDbAdapter(getApplicationContext());
         mDatabase.open();
         
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        mListView = (ListView) findViewById(R.id.list_view);
         mAdapter = new SurveyGroupListAdapter(this, null);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(mAdapter);
-        listView.setEmptyView(findViewById(android.R.id.empty));
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(mAdapter);
+        mListView.setEmptyView(findViewById(android.R.id.empty));
         
         init();// No external storage will finish the application
     }
@@ -242,6 +243,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
+            mListView.setEmptyView(null);
             getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, SurveyGroupListActivity.this);
         }
     };

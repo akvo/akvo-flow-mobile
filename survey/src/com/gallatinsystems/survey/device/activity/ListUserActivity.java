@@ -16,18 +16,31 @@
 
 package com.gallatinsystems.survey.device.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
+import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.domain.User;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 /**
@@ -38,53 +51,67 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * 
  * @author Christopher Fagiani
  */
-public class ListUserActivity extends AbstractListEditActivity {
-    private static final String EDIT_USER_ACTIVITY_CLASS = "com.gallatinsystems.survey.device.activity.UserEditActivity";
-    protected static final int DELETE_ID = Menu.FIRST + 2;
-    private int deleteStringId;
-
-    /**
-     * when a list item is clicked, get the user id and name of the selected
-     * item and return it to the calling activity.
-     */
+public class ListUserActivity extends ActionBarActivity {
+    protected static final int EDIT_ID = 0;
+    protected static final int DELETE_ID = 1;
+    
+    private SurveyDbAdapter mDatabase;
+    private UserListAdapter mAdapter;
+    private ListView mListView;
+    
     @Override
-    protected void onListItemClick(ListView list, View view, int position,
-            long id) {
-        super.onListItemClick(list, view, position, id);
-        Intent intent = new Intent();
-        Cursor user = databaseAdaptor.findUser(id);
-
-        intent.putExtra(ConstantUtil.ID_KEY, user.getString(user
-                .getColumnIndexOrThrow(SurveyDbAdapter.PK_ID_COL)));
-        intent.putExtra(ConstantUtil.DISPLAY_NAME_KEY, user.getString(user
-                .getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL)));
-        intent.putExtra(ConstantUtil.EMAIL_KEY, user.getString(user
-                .getColumnIndexOrThrow(SurveyDbAdapter.EMAIL_COL)));
-        // save the user to the prefs table
-        databaseAdaptor.savePreference(ConstantUtil.LAST_USER_SETTING_KEY, id
-                + "");
-        user.close();
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
-    /**
-     * fetches the data for this view (users) from the database. This method
-     * assumes that the database has been opened.
-     */
-    @Override
-    protected Cursor getData() {
-        return databaseAdaptor.listUsers();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.userlist_activity);
+        
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
+        mDatabase = new SurveyDbAdapter(getApplicationContext());
+        
+        mListView = (ListView) findViewById(android.R.id.list);
+        mAdapter = new UserListAdapter(this, null);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(mAdapter);
+        mListView.setEmptyView(findViewById(android.R.id.empty));
+        registerForContextMenu(mListView);
     }
 
     @Override
-    protected void initializeFields() {
-        instructionsStringId = R.string.userinstructions;
-        emptyStringId = R.string.nouser;
-        addStringId = R.string.adduser;
-        editStringId = R.string.editmenu;
-        deleteStringId = R.string.deleteusermenu;
-        editActivityClassName = EDIT_USER_ACTIVITY_CLASS;
+    public void onResume() {
+        super.onResume();
+        mDatabase.open();
+        display();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mDatabase.close();
+    }
+    
+    private void display() {
+        Cursor cursor = mDatabase.listUsers();
+        mAdapter.changeCursor(cursor);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.userlist_activity, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.add_user:
+                handleCreate(null);
+                return true;
+        }
+        
+        return onOptionsItemSelected(item);
     }
 
     /**
@@ -96,7 +123,8 @@ public class ListUserActivity extends AbstractListEditActivity {
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         // the parent method adds the "edit" button
-        menu.add(1, DELETE_ID, 0, deleteStringId);
+        menu.add(0, EDIT_ID, EDIT_ID, R.string.editmenu);
+        menu.add(0, DELETE_ID, DELETE_ID, R.string.deleteusermenu);
     }
 
     /**
@@ -104,31 +132,77 @@ public class ListUserActivity extends AbstractListEditActivity {
      */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (!super.onContextItemSelected(item)) {
-            switch (item.getItemId()) {
-                case DELETE_ID:
-                    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-                            .getMenuInfo();
-                    handleDelete(info.id + "");
-                    return true;
-            }
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+                .getMenuInfo();
+        switch (item.getItemId()) {
+            case EDIT_ID:
+                handleCreate(info.id);
+                return true;
+            case DELETE_ID:
+                handleDelete(info.id);
+                return true;
         }
-        return false;
+        return super.onContextItemSelected(item);
+    }
+    
+    private void handleCreate(Long id) {
+        Intent i = new Intent(this, UserEditActivity.class);
+        if (id != null) {
+            i.putExtra(ConstantUtil.ID_KEY, id);
+        }
+        startActivityForResult(i, 0);
     }
 
-    private void handleDelete(String id) {
-        String savedId = databaseAdaptor
-                .findPreference(ConstantUtil.LAST_USER_SETTING_KEY);
-        databaseAdaptor.deleteUser(new Long(id));
+    private void handleDelete(long id) {
+        String savedId = mDatabase.findPreference(ConstantUtil.LAST_USER_SETTING_KEY);
+        mDatabase.deleteUser(id);
         if (savedId != null && savedId.equals(id)) {
-            databaseAdaptor.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
-                    "");
-            Intent intent = new Intent();
-            intent.putExtra(ConstantUtil.DELETED_SAVED_USER, new Boolean(true));
-            setResult(RESULT_CANCELED, intent);
+            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY, "");
         }
 
-        fillData();
+        display();
+    }
+    
+    class UserListAdapter extends CursorAdapter implements OnItemClickListener {
+        
+        public UserListAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+        }
+        
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View view = inflater.inflate(R.layout.itemlistrow, null);
+            bindView(view, context, cursor);
+            return view;
+        }
+        
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(
+                    SurveyDbAdapter.PK_ID_COL));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(
+                    SurveyDbAdapter.DISP_NAME_COL));
+            String email = cursor.getString(cursor.getColumnIndexOrThrow(
+                    SurveyDbAdapter.EMAIL_COL));
+            
+            final User user = new User(id, name, email);
+            view.setTag(user);
+            
+            TextView nameView = (TextView) view.findViewById(R.id.itemheader);
+            nameView.setText(name);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Set the user in the App, and finish the Activity
+            User user = (User) view.getTag();
+            FlowApp.getApp().setUser(user);
+            Toast.makeText(ListUserActivity.this, "Logged in as " + user.getName(), 
+                    Toast.LENGTH_LONG).show();
+            finish();
+        }
+        
     }
     
 }

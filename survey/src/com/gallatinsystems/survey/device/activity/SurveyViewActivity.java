@@ -117,7 +117,7 @@ public class SurveyViewActivity extends TabActivity implements
     private SurveyDbAdapter databaseAdapter;
     private String surveyId;
     private Long respondentId;
-    private String userId;
+    private Long userId;
     private float currentTextSize;
     private String[] selectedLanguageCodes;
     private int currentTabIndex;
@@ -174,11 +174,11 @@ public class SurveyViewActivity extends TabActivity implements
                 .getWidth();
 
         Bundle extras = getIntent().getExtras();
-        userId = extras != null ? extras.getString(ConstantUtil.USER_ID_KEY)
+        userId = extras != null ? extras.getLong(ConstantUtil.USER_ID_KEY)
                 : null;
         if (userId == null) {
             userId = savedInstanceState != null ? savedInstanceState
-                    .getString(ConstantUtil.USER_ID_KEY) : null;
+                    .getLong(ConstantUtil.USER_ID_KEY) : null;
         }
 
         if (extras != null && extras.containsKey(ConstantUtil.READONLY_KEY)) {
@@ -1112,7 +1112,8 @@ public class SurveyViewActivity extends TabActivity implements
         // create a new response object so we're ready for the next instance
         // Create new surveyed locale
         mSurveyedLocaleId = databaseAdapter.createSurveyedLocale(mSurveyGroupId);
-        setRespondentId(databaseAdapter.createSurveyRespondent(surveyId, userId, mSurveyedLocaleId));
+        setRespondentId(databaseAdapter.createSurveyRespondent(surveyId, 
+                String.valueOf(userId), mSurveyedLocaleId));
         resetAllQuestions();
         spaceLeftOnCard();
     }
@@ -1146,7 +1147,7 @@ public class SurveyViewActivity extends TabActivity implements
                 outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, respondentId);
             }
             if (userId != null) {
-                outState.putString(ConstantUtil.USER_ID_KEY, userId);
+                outState.putLong(ConstantUtil.USER_ID_KEY, userId);
             }
             if (eventQuestionSource != null) {
                 outState.putString(ConstantUtil.QUESTION_ID_KEY,
@@ -1322,10 +1323,6 @@ public class SurveyViewActivity extends TabActivity implements
 
     public Long getRespondentId() {
         return respondentId;
-    }
-
-    public String getUserId() {
-        return userId;
     }
 
     public boolean isTrackRecording() {

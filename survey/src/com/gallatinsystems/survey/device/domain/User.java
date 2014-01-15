@@ -17,21 +17,27 @@
 package com.gallatinsystems.survey.device.domain;
 
 public class User {
-    private String mId;
+    private long mId;
     private String mName;
+    private String mEmail;
     private boolean mAdmin = false;// TODO
     
-    public User(String id, String name) {
+    public User(long id, String name, String email) {
         mId = id;
         mName = name;
+        mEmail = email;
     }
     
-    public String getId() {
+    public long getId() {
         return mId;
     }
     
     public String getName() {
         return mName;
+    }
+    
+    public String getEmail() {
+        return mEmail;
     }
 
 }

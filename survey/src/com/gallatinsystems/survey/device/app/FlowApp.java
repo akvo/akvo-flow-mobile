@@ -73,11 +73,12 @@ public class FlowApp extends Application {
         if (val != null && Boolean.parseBoolean(val)) {
             val = database.findPreference(ConstantUtil.LAST_USER_SETTING_KEY);
             if (val != null && val.trim().length() > 0) {
-                Cursor cur = database.findUser(Long.valueOf(val));
+                long id = Long.valueOf(val);
+                Cursor cur = database.findUser(id);
                 if (cur != null) {
-                    String userId = val;
                     String userName = cur.getString(cur.getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL));
-                    mUser = new User(userId, userName);
+                    String email = cur.getString(cur.getColumnIndexOrThrow(SurveyDbAdapter.EMAIL_COL));
+                    mUser = new User(id, userName, email);
                     cur.close();
                 }
             }

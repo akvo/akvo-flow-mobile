@@ -323,6 +323,7 @@ public class SurveyDbAdapter {
             db.execSQL("CREATE INDEX respondent_uuid_idx ON " + Tables.RESPONDENT + "(uuid)");
             db.execSQL("CREATE INDEX response_idx ON " + Tables.RESPONSE + "(survey_respondent_id, question_id)");
             db.execSQL("CREATE INDEX locale_name_idx ON " + Tables.SURVEYED_LOCALE + "(name)");
+            db.execSQL("CREATE INDEX submitted_date_idx ON " + Tables.RESPONDENT + "(submitted_date)");
         }
 
         /**
@@ -1868,22 +1869,26 @@ public class SurveyDbAdapter {
     * @return
     */
     public Cursor getFilteredSurveyedLocales(int surveyGroupId, Double latitude, Double longitude,
-                Double nearbyRadius) {
-        String queryString = "SELECT sl.* FROM " + Tables.SURVEYED_LOCALE + " AS sl";
+                Double nearbyRadius, int orderBy) {
+        String queryString = "SELECT sl.*, MAX(r." + SUBMITTED_DATE_COL + ") as "+ SUBMITTED_DATE_COL + " FROM " 
+                + Tables.SURVEYED_LOCALE + " AS sl JOIN " + Tables.RESPONDENT + " AS r ON "
+                + "sl." + SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + "=" + "r." + SURVEYED_LOCALE_ID_COL;
         String whereClause = " WHERE sl." + SurveyedLocaleAttrs.SURVEY_GROUP_ID + " =?";
+        String groupBy = " GROUP BY sl." + SurveyedLocaleAttrs.SURVEYED_LOCALE_ID;
+        String orderByStr = " ORDER BY " + SUBMITTED_DATE_COL + " DESC";// By date
         
         // location part
-        if (latitude != null && longitude != null){
+        if (orderBy == ConstantUtil.ORDER_BY_DISTANCE && latitude != null && longitude != null){
             // this is to correct the distance for the shortening at higher latitudes
             Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)),2);
             
             // this uses a simple planar approximation of distance. this should be good enough for our purpose.
             String orderByTempl = " ORDER BY ((%s - " + SurveyedLocaleAttrs.LATITUDE + ") * (%s - " + SurveyedLocaleAttrs.LATITUDE + ") + (%s - " + SurveyedLocaleAttrs.LONGITUDE + ") * (%s - " + SurveyedLocaleAttrs.LONGITUDE + ") * %s)";
-            whereClause += String.format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
-        }
+            orderByStr = String.format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
+        } 
         
         String[] whereValues = new String[] {String.valueOf(surveyGroupId)};
-        Cursor cursor = database.rawQuery(queryString + whereClause, whereValues);
+        Cursor cursor = database.rawQuery(queryString + whereClause + groupBy + orderByStr, whereValues);
         
         return cursor;
     }

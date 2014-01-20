@@ -39,6 +39,7 @@ import com.gallatinsystems.survey.device.activity.RecordListActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
+import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -164,7 +165,8 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId);
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, 
+                ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override

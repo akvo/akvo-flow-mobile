@@ -26,6 +26,12 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/last_modified"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/locale_distance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

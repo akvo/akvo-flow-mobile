@@ -303,6 +303,13 @@ public class ConstantUtil {
      */
     public static final String QUESTION_LOCALE_NAME = "-1";
     public static final String QUESTION_LOCALE_GEO = "-2";
+    
+    /**
+     * Order By
+     */
+    public static final int ORDER_BY_NONE     = -1;
+    public static final int ORDER_BY_DATE     = 0;
+    public static final int ORDER_BY_DISTANCE = 1;
 
     /**
      * prevent instantiation

@@ -17,6 +17,9 @@
 package com.gallatinsystems.survey.device.fragment;
 
 import java.text.DecimalFormat;
+import java.util.Date;
+
+import org.ocpsoft.prettytime.PrettyTime;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,12 +29,17 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,16 +52,21 @@ import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
+import com.gallatinsystems.survey.device.fragment.OrderByDialogFragment.OrderByDialogListener;
+import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 public class SurveyedLocaleListFragment extends ListFragment implements LocationListener, 
-            OnItemClickListener, LoaderCallbacks<Cursor> {
+            OnItemClickListener, LoaderCallbacks<Cursor>, OrderByDialogListener {
     private static final String TAG = SurveyedLocaleListFragment.class.getSimpleName();
+    
+    private static final int ORDER_BY = 0;
 
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
     private double mLongitude = 0.0d;
     private static final double RADIUS = 100000d;// Meters
     
+    private int mOrderBy;
     private int mSurveyGroupId;
     private SurveyDbAdapter mDatabase;
     
@@ -64,6 +77,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroupId = getArguments().getInt(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
+        mOrderBy = ConstantUtil.ORDER_BY_DISTANCE;// Default case
+        setHasOptionsMenu(true);
     }
     
     @Override
@@ -83,7 +98,6 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         mDatabase = new SurveyDbAdapter(getActivity());
         if(mAdapter == null) {
@@ -109,7 +123,10 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             }
         }
         refresh();
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+        
+        if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE) {
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+        }
     }
     
     @Override
@@ -137,6 +154,35 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         
         mListener.onSurveyedLocaleSelected(localeId);// Notify the host activity
     }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Add this fragment's options to the 'more' submenu
+        SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
+        submenu.add(0, ORDER_BY, 0, R.string.order_by);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case ORDER_BY:
+                DialogFragment dialogFragment = new OrderByDialogFragment();
+                dialogFragment.setTargetFragment(this, 0);
+                dialogFragment.show(getFragmentManager(), "order_by");
+                return true;
+        }
+        
+        return false;
+    }
+
+    @Override
+    public void onOrderByClick(int order) {
+        if (mOrderBy != order) {
+            mOrderBy = order;
+            refresh();
+        }
+    }
 
     // ==================================== //
     // ========= Loader Callbacks ========= //
@@ -144,7 +190,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, mLatitude, mLongitude, RADIUS);
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, mLatitude, mLongitude, RADIUS, mOrderBy);
     }
 
     @Override
@@ -172,7 +218,9 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mLocationManager.removeUpdates(this);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
-        refresh();
+        if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE) {
+            refresh();
+        }
     }
 
     @Override
@@ -223,16 +271,27 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             
             return builder.toString();
         }
+        
+        private String getDateText(Long time) {
+            if (time != null) {
+                PrettyTime prettyTime = new PrettyTime();
+                return "Last Modified: " + prettyTime.format(new Date(time));
+            }
+            return "";
+        }
 
         @Override
         public void bindView(View view, Context context, Cursor c) {
             TextView nameView = (TextView) view.findViewById(R.id.locale_name);
             TextView idView = (TextView) view.findViewById(R.id.locale_id);
+            TextView dateView = (TextView) view.findViewById(R.id.last_modified);
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
             final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
+            Long time = c.getLong(c.getColumnIndexOrThrow(SurveyDbAdapter.SUBMITTED_DATE_COL));
 
             nameView.setText(surveyedLocale.getName());
             idView.setText(surveyedLocale.getId());
+            dateView.setText(getDateText(time));
             distanceView.setText(getDistanceText(surveyedLocale));
         }
 

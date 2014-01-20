@@ -177,6 +177,7 @@
     <string name="configuring_languages">Configuring survey languages...</string>
     <string name="new_record">New Record</string>
     <string name="sync_records">Sync Records</string>
+    <string name="order_by">Order By</string>
     <string name="syncing_records">Syncing Records...</string>
     <string name="sync_finished">Records Sync finished</string>
     <string name="synced_records">Synced %1$d Records</string>

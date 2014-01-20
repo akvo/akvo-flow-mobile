@@ -21,6 +21,7 @@ import android.database.Cursor;
 
 import com.gallatinsystems.survey.device.async.loader.base.DataLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 public class SurveyedLocaleLoader extends DataLoader<Cursor> {
     private int mSurveyGroupId;
@@ -28,32 +29,35 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
     private double mLongitude;
     private double mRadius;
     
-    private boolean mFilter;
+    private int mOrderBy;
 
     public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, int surveyGroupId,
-            double latitude, double longitude, double radius) {
+            double latitude, double longitude, double radius, int orderBy) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
         mRadius = radius;
-        
-        mFilter = true;
+        mOrderBy = orderBy;
     }
     
-    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, int surveyGroupId) {
+    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, int surveyGroupId, int orderBy) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
-        
-        mFilter = false;
+        mOrderBy = orderBy;
     }
 
     @Override
     protected Cursor loadData(SurveyDbAdapter database) {
-        if (mFilter) {
-            return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mRadius);
+        switch (mOrderBy) {
+            case ConstantUtil.ORDER_BY_DISTANCE:
+            case ConstantUtil.ORDER_BY_DATE:
+                return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mRadius, mOrderBy);
+            case ConstantUtil.ORDER_BY_NONE:
+                return database.getSurveyedLocales(mSurveyGroupId);
+            default:
+                return null;
         }
-        return database.getSurveyedLocales(mSurveyGroupId);
     }
 
 }

@@ -28,6 +28,9 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -99,6 +102,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         mDatabase = new SurveyDbAdapter(getActivity());
         mDatabase.open();
 
@@ -123,6 +127,12 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Survey survey = mAdapter.getItem(position);
         mListener.startSurvey(survey);
+    }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Add this fragment's options to the 'more' submenu
+        menu.removeItem(R.id.more_submenu);
     }
 
     class SurveyAdapter extends ArrayAdapter<Survey> {

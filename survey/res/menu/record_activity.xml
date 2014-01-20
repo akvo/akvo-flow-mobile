@@ -17,16 +17,9 @@
         flowapp:showAsAction="always">
         
         <menu>
-            <item
-                android:id="@+id/users"
-                android:icon="@drawable/ic_menu_allfriends"
-                android:title="@string/userlabel"/>
-        
-            <item
-                android:id="@+id/settings"
-                android:title="@string/settingslabel"
-                android:icon="@drawable/ic_menu_preferences" />
+            
         </menu>
+        
         
     </item>
 

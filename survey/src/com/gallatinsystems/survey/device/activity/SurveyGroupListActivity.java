@@ -231,6 +231,9 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             extras.putSerializable(RecordListActivity.EXTRA_SURVEY_GROUP, group);
             intent.putExtras(extras);
             startActivity(intent);
+            // Add group id - Used by the Content Provider
+            // TODO: Find a less dirty solution...
+            FlowApp.getApp().setSurveyGroupId(group.getId());
         }
         
     }

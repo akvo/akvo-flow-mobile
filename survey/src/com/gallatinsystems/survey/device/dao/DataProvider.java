@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.DatabaseHelper;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.Tables;
@@ -49,7 +50,7 @@ public class DataProvider extends ContentProvider {
             case SEARCH_SUGGEST:
                 // Suggestions search
                 // Adjust incoming query to become SQL text match
-                String surveyGroupPref = mDatabaseHelper.findPreference(db, ConstantUtil.SURVEY_GROUP_KEY);
+                int surveyGroupId = FlowApp.getApp().getSurveyGroupId();
                 
                 final String term = selectionArgs[0] + "%";
                 projection = new String[] {
@@ -64,7 +65,7 @@ public class DataProvider extends ContentProvider {
                     Tables.SURVEYED_LOCALE,
                     projection,
                     SUGGEST_SELECTION,
-                    new String[]{String.valueOf(surveyGroupPref), term, term},
+                    new String[]{String.valueOf(surveyGroupId), term, term},
                     null, null, sortOrder);
                 break;
         }

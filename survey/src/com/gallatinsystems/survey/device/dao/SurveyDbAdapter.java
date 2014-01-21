@@ -1664,7 +1664,9 @@ public class SurveyDbAdapter {
     }
     
     public String createSurveyedLocale(int surveyGroupId) {
-        String id = Base32.base32Uuid();
+        String base32Id = Base32.base32Uuid();
+        // Put dashes between the 4-5 and 8-9 positions to increase readability
+        String id = base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
         String name = "Unknown";// TODO
         double lat = 0.0d;// TODO
         double lon = 0.0d;// TODO
@@ -1871,7 +1873,7 @@ public class SurveyDbAdapter {
     public Cursor getFilteredSurveyedLocales(int surveyGroupId, Double latitude, Double longitude,
                 Double nearbyRadius, int orderBy) {
         String queryString = "SELECT sl.*, MAX(r." + SUBMITTED_DATE_COL + ") as "+ SUBMITTED_DATE_COL + " FROM " 
-                + Tables.SURVEYED_LOCALE + " AS sl JOIN " + Tables.RESPONDENT + " AS r ON "
+                + Tables.SURVEYED_LOCALE + " AS sl LEFT JOIN " + Tables.RESPONDENT + " AS r ON "
                 + "sl." + SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + "=" + "r." + SURVEYED_LOCALE_ID_COL;
         String whereClause = " WHERE sl." + SurveyedLocaleAttrs.SURVEY_GROUP_ID + " =?";
         String groupBy = " GROUP BY sl." + SurveyedLocaleAttrs.SURVEYED_LOCALE_ID;

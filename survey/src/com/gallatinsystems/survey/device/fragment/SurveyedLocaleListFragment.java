@@ -273,11 +273,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         }
         
         private String getDateText(Long time) {
-            if (time != null) {
-                PrettyTime prettyTime = new PrettyTime();
-                return "Last Modified: " + prettyTime.format(new Date(time));
+            String text = "Last Modified: ";
+            if (time != null && time > 0) {
+                text += new PrettyTime().format(new Date(time));
             }
-            return "";
+            return text;
         }
 
         @Override

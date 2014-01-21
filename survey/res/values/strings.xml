@@ -78,7 +78,7 @@
     <string name="helpheading">Help Options</string>
     <string name="plotsettings">Settings</string>
     <string name="surveysupdated">Installed surveys have been updated</string>
-    <string name="deletesurvey">Delete Survey</string>
+    <string name="deleteresponse">Delete Response</string>
     <string name="othertext">Other...</string>
     <string name="savelastuserlabel">Keep the last selected user logged-in between sessions</string>
     <string name="uploadoptionlabel">Upload data over cellular network</string>
@@ -119,7 +119,6 @@
     <string name="downloadsurveylabel">Download Survey</string>
     <string name="downloadsurveydesc">Downloads arbitrary surveys (only run if instructed)</string>
     <string name="downloadsurveyinstr">Enter the survey id you wish to download.</string>
-    <string name="deleteall">Delete all Responses</string>
     <string name="submittedsurveysmenu">Submitted Surveys</string>
     <string name="deleteallwarning">This will permanently delete all survey responses (saved AND submitted) on the device. Click OK to proceed or cancel to abort.</string>
     <string name="deletealldatawarning">This will permanently delete all data (surveys, responses, images, and users) on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>

@@ -57,8 +57,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
     
     // Menu items
-    private static final int DELETE_ALL = 0;
-    private static final int RESEND_ALL = 1;
+    private static final int RESEND_ALL = 0;
     
     // Context menu items
     private static final int DELETE_ONE = 0;
@@ -139,9 +138,15 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onCreateContextMenu(ContextMenu menu, View view,
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
-        menu.add(0, DELETE_ONE, 0, R.string.deletesurvey);
-        menu.add(0, VIEW_HISTORY, 1, R.string.transmissionhist);
-        menu.add(0, RESEND_ONE, 2, R.string.resendone);
+        menu.add(0, VIEW_HISTORY, 0, R.string.transmissionhist);
+        menu.add(0, RESEND_ONE, 1, R.string.resendone);
+        
+        // Allow deletion only for 'saved' responses
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        View itemView = info.targetView;
+        if (!(Boolean)itemView.getTag(SubmittedSurveyReviewCursorAdaptor.FINISHED_KEY)) {
+            menu.add(0, DELETE_ONE, 2, R.string.deleteresponse);
+        }
     }
 
     /**
@@ -151,8 +156,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Add this fragment's options to the 'more' submenu
         SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
-        submenu.add(0, DELETE_ALL, 0, R.string.deleteall);
-        submenu.add(0, RESEND_ALL, 1, R.string.resendall);
+        submenu.add(0, RESEND_ALL, 0, R.string.resendall);
     }
 
     @Override

@@ -99,10 +99,13 @@ public class SurveyedLocaleSyncService extends IntentService {
     }
     
     private void displayNotification(String title, String text, boolean progress) {
+        int icon = progress ? android.R.drawable.stat_sys_download
+                : android.R.drawable.stat_sys_download_done;
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.info)
+                .setSmallIcon(icon)
                 .setContentTitle(title)
-                .setContentText(text);
+                .setContentText(text)
+                .setTicker(title);
         
         // Progress will only be displayed in Android versions > 4.0
         mBuilder.setProgress(1, 1, progress);

@@ -316,24 +316,27 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                         resp.setStrength(responseCursor.getString(i));
                     }
                 }
+                
+                String questionId = resp.getQuestionId();
+                QuestionView questionView = questionMap.get(questionId);
+                if (questionView == null) {
+                    // Fill in the answer form the source question, if exists
+                    questionId = sourceQuestionMap.get(resp.getQuestionId());
+                    questionView = questionId != null ? questionMap.get(questionId) : null;
+                    resp.setQuestionId(questionId);
+                }
+                
                 if (prefill) {
                     // Copying values from old instance; Get rid of its Id
                     // Also, update the respondentId, matching the current one
                     resp.setId(null);
                     resp.setRespondentId(context.getRespondentId());
                 }
-                responseMap.put(resp.getQuestionId(), resp);
-                
-                // Update the question view to reflect the loaded data
-                QuestionView questionView = questionMap.get(resp.getQuestionId());
-                if (questionView == null) {
-                    // Fill in the answer form the source question, if exists
-                    String questionId = sourceQuestionMap.get(resp.getQuestionId());
-                    questionView = questionId != null ? questionMap.get(questionId) : null;
-                }
                 
                 if (questionView != null) {
+                    // Update the question view to reflect the loaded data
                     questionView.rehydrate(resp);
+                    responseMap.put(resp.getQuestionId(), resp);
                 }
             }
             responseCursor.close();

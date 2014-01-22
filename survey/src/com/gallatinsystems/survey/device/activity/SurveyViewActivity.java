@@ -1060,9 +1060,7 @@ public class SurveyViewActivity extends TabActivity implements
             }
             
             // Save Locale meta-data, if applies
-            if (surveyId.equals(mSurveyGroup.getRegisterSurveyId())) {
-                saveSurveyedLocaleMetadata();
-            }
+            saveSurveyedLocaleMetadata();
         }
     }
     
@@ -1073,20 +1071,22 @@ public class SurveyViewActivity extends TabActivity implements
                 
         // Check the responses given to these questions (marked as name)
         // and concatenate them so it becomes the Locale name.
-        for (int i=0; i<localeNameQuestions.size(); i++) {
-            QuestionResponse questionResponse = databaseAdapter.findSingleResponse(
-                    respondentId, localeNameQuestions.get(i));
-            
-            String answer = questionResponse != null ? questionResponse.getValue() : null;
-                    
-            if (!TextUtils.isEmpty(answer)) {
-                if (i > 0) {
-                    builder.append(" - ");
+        if (localeNameQuestions.size() > 0) {
+            for (int i=0; i<localeNameQuestions.size(); i++) {
+                QuestionResponse questionResponse = databaseAdapter.findSingleResponse(
+                        respondentId, localeNameQuestions.get(i));
+                
+                String answer = questionResponse != null ? questionResponse.getValue() : null;
+                        
+                if (!TextUtils.isEmpty(answer)) {
+                    if (i > 0) {
+                        builder.append(" - ");
+                    }
+                    builder.append(answer);
                 }
-                builder.append(answer);
             }
+            databaseAdapter.updateSurveyedLocale(respondentId, builder.toString(), SurveyedLocaleMeta.NAME);
         }
-        databaseAdapter.updateSurveyedLocale(respondentId, builder.toString(), SurveyedLocaleMeta.NAME);
         
         // META_GEO
         String localeGeoQuestion = survey.getLocaleGeoQuestion();

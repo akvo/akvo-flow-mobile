@@ -55,6 +55,7 @@ public class Question {
     private int strengthMax;
     private boolean localeName = false;
     private boolean localeLocation = false;
+    private String sourceQuestionId;// "Copied-from" question Id
     
     public void setIsLocaleName(boolean localeName) {
         this.localeName = localeName;
@@ -228,6 +229,14 @@ public class Question {
 
     public ValidationRule getValidationRule() {
         return validationRule;
+    }
+    
+    public void setSourceQuestionId(String sourceQuestionId) {
+        this.sourceQuestionId = sourceQuestionId;
+    }
+    
+    public String getSourceQuestionId() {
+        return sourceQuestionId;
     }
 
     public void setValidationRule(ValidationRule validationRule) {

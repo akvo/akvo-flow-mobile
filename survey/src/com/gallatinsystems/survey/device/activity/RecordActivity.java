@@ -131,7 +131,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         // Display/Hide monitoring features
         if (mSurveyGroup.isMonitored() && mRecord != null) {
             mRecordView.setVisibility(View.VISIBLE);
-            mRecordTextView.setText("Record: " + mRecord.getName() + " - " + mRecord.getId());
+            mRecordTextView.setText("Record: " + mRecord.getName() + ", " + mRecord.getId());
         } else {
             mRecordView.setVisibility(View.GONE);
         }

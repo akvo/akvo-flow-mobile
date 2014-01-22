@@ -65,7 +65,7 @@ public class FlowApi {
         API_KEY = getApiKey(context);
     }
     
-    public SurveyedLocalesResponse getSurveyedLocales(int surveyGroup, String timestamp) 
+    public SurveyedLocalesResponse getSurveyedLocales(long surveyGroup, String timestamp) 
             throws IOException {
         SurveyedLocalesResponse surveyedLocalesResponse = null;
         final String query =  PARAM.IMEI + IMEI

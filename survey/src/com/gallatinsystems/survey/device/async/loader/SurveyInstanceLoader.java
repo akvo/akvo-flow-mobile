@@ -23,11 +23,11 @@ import com.gallatinsystems.survey.device.async.loader.base.DataLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 
 public class SurveyInstanceLoader extends DataLoader<Cursor> {
-    private int mSurveyGroupId;
+    private long mSurveyGroupId;
     private boolean mIsMonitored;
     private String mSurveyedLocaleId;
 
-    public SurveyInstanceLoader(Context context, SurveyDbAdapter db, int surveyGroupId, 
+    public SurveyInstanceLoader(Context context, SurveyDbAdapter db, long surveyGroupId, 
             boolean isMonitored, String surveyedLocaleId) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;

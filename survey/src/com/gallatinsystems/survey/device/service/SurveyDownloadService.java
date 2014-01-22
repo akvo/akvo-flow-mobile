@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -37,7 +39,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.api.parser.csv.SurveyMetaParser;
@@ -246,7 +247,7 @@ public class SurveyDownloadService extends Service {
     
     private void syncSurveyGroups(List<Survey> surveys) {
         // First, form the groups
-        SparseArray<SurveyGroup> surveyGroups = new SparseArray<SurveyGroup>();
+        Map<Long, SurveyGroup> surveyGroups = new HashMap<Long, SurveyGroup>();
         for (Survey survey : surveys) {
             SurveyGroup group = survey.getSurveyGroup();
             if (group != null) {
@@ -255,9 +256,8 @@ public class SurveyDownloadService extends Service {
         }
         
         // Now, add them to the database
-        for (int i=0; i<surveyGroups.size(); i++) {
-            int id = surveyGroups.keyAt(i);
-            databaseAdaptor.addSurveyGroup(surveyGroups.get(id));
+        for (SurveyGroup surveyGroup : surveyGroups.values()) {
+            databaseAdaptor.addSurveyGroup(surveyGroup);
         }
     }
 

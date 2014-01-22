@@ -24,14 +24,14 @@ public class SurveyGroup implements Serializable {
      */
     private static final long serialVersionUID = -5146372662599353969L;
 
-    public static final int ID_NONE = -1;
+    public static final long ID_NONE = -1;
     
-    private int mId;
+    private long mId;
     private String mName;
     private boolean mMonitored;
     private String mRegisterSurveyId;
 
-    public SurveyGroup (int id, String name, String registerSurveyId, boolean monitored) {
+    public SurveyGroup (long id, String name, String registerSurveyId, boolean monitored) {
         mId = id;
         mName = name;
         mRegisterSurveyId = registerSurveyId;
@@ -42,7 +42,7 @@ public class SurveyGroup implements Serializable {
         return mRegisterSurveyId;
     }
     
-    public int getId() {
+    public long getId() {
         return mId;
     }
     

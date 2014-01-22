@@ -47,7 +47,7 @@ public class SurveyMetaParser {
         survey.setVersion(Double.parseDouble(touple[Attr.VERSION]));
         
         // Parse the SurveyGroup
-        int groupId = Integer.parseInt(touple[Attr.GROUP_ID]);
+        long groupId = Long.parseLong(touple[Attr.GROUP_ID]);
         String groupName = touple[Attr.GROUP_NAME];
         boolean monitored = Boolean.valueOf(touple[Attr.GROUP_MONITORED]);
         String registerSurveyId = touple[Attr.GROUP_REGISTRATION_SURVEY];

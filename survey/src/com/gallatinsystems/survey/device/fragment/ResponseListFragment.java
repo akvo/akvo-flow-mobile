@@ -242,7 +242,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY,
                 (Long) view.getTag(SubmittedSurveyReviewCursorAdaptor.RESP_ID_KEY));
         
-        i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
+        i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
         if (mSurveyGroup.isMonitored()) {
             i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
         }

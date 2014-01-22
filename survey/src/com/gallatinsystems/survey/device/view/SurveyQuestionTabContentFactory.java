@@ -19,8 +19,10 @@ package com.gallatinsystems.survey.device.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -33,7 +35,6 @@ import android.widget.TableRow;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionGroup;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
@@ -52,6 +53,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
 
     private HashMap<String, QuestionView> questionMap;
     private HashMap<String, QuestionResponse> responseMap;
+    private Map<String, String> sourceQuestionMap;
 
     private boolean readOnly;
 
@@ -72,6 +74,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         responseMap = null;
         questionGroup = qg;
         questionMap = new HashMap<String, QuestionView>();
+        sourceQuestionMap = new HashMap<String, String>();
         this.readOnly = readOnly;
     }
 
@@ -152,6 +155,10 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                         ViewGroup.LayoutParams.FILL_PARENT, 2));
             }
             table.addView(tr);
+            // If this question has a source question id, add it to the map
+            if (!TextUtils.isEmpty(q.getSourceQuestionId())) {
+                sourceQuestionMap.put(q.getSourceQuestionId(), q.getId());
+            }
         }
         // set up listeners for dependencies. Since the dependencies can span
         // groups, the parent needs to do this
@@ -265,6 +272,10 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         }
         return missingQuestions;
     }
+    
+    public HashMap<String, QuestionResponse> loadState(Long respondentId) {
+        return loadState(respondentId, false);
+    }
 
     /**
      * loads the state from the database using the respondentId passed in. It
@@ -273,7 +284,8 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
      * 
      * @param respondentId
      */
-    public HashMap<String, QuestionResponse> loadState(Long respondentId) {
+    public HashMap<String, QuestionResponse> loadState(Long respondentId,
+            boolean prefill) {
         if (responseMap == null) {
             responseMap = new HashMap<String, QuestionResponse>();
         }
@@ -304,12 +316,24 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                         resp.setStrength(responseCursor.getString(i));
                     }
                 }
+                if (prefill) {
+                    // Copying values from old instance; Get rid of its Id
+                    // Also, update the respondentId, matching the current one
+                    resp.setId(null);
+                    resp.setRespondentId(context.getRespondentId());
+                }
                 responseMap.put(resp.getQuestionId(), resp);
-                if (questionMap != null) {
-                    // update the question view to reflect the loaded data
-                    if (questionMap.get(resp.getQuestionId()) != null) {
-                        questionMap.get(resp.getQuestionId()).rehydrate(resp);
-                    }
+                
+                // Update the question view to reflect the loaded data
+                QuestionView questionView = questionMap.get(resp.getQuestionId());
+                if (questionView == null) {
+                    // Fill in the answer form the source question, if exists
+                    String questionId = sourceQuestionMap.get(resp.getQuestionId());
+                    questionView = questionId != null ? questionMap.get(questionId) : null;
+                }
+                
+                if (questionView != null) {
+                    questionView.rehydrate(resp);
                 }
             }
             responseCursor.close();

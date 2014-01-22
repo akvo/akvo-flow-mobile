@@ -54,6 +54,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
+import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
@@ -140,7 +141,7 @@ public class SurveyViewActivity extends TabActivity implements
     private HashSet<String> missingQuestions;
     private boolean hasAddedTabs;
     
-    private int mSurveyGroupId;
+    private SurveyGroup mSurveyGroup;
     private String mSurveyedLocaleId;
 
     @Override
@@ -208,13 +209,9 @@ public class SurveyViewActivity extends TabActivity implements
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
         }
         
-        mSurveyGroupId = extras != null ? 
-                extras.getInt(ConstantUtil.SURVEY_GROUP_ID)
-                : null;
-
-        mSurveyedLocaleId = extras != null ? 
-                extras.getString(ConstantUtil.SURVEYED_LOCALE_ID)
-                : null;
+        // We should ALWAYS get an extras Bundle
+        mSurveyGroup = (SurveyGroup)extras.getSerializable(ConstantUtil.SURVEY_GROUP);
+        mSurveyedLocaleId = extras.getString(ConstantUtil.SURVEYED_LOCALE_ID);
 
         if (eventQuestionSource == null && savedInstanceState != null) {
             eventSourceQuestionId = savedInstanceState
@@ -903,8 +900,7 @@ public class SurveyViewActivity extends TabActivity implements
         menu.add(0, SURVEY_LANG, 2, R.string.langoption);
         menu.add(0, CLEAR_SURVEY, 3, R.string.clearbutton);
         
-        SurveyGroup group = getSurveyGroup();
-        if (!readOnly && group != null && group.isMonitored()) {
+        if (!readOnly && mSurveyGroup != null && mSurveyGroup.isMonitored()) {
             menu.add(0, PREFILL_SURVEY, 4, "Prefill Answers");
         }
         
@@ -1021,15 +1017,25 @@ public class SurveyViewActivity extends TabActivity implements
                 }
                 return true;
             case PREFILL_SURVEY:
-                // Check for previous values in this record
+                // Check for previous values in this record.
+                // First, we'll try with the same survey, checking for existing responses
+                // If we don't have a previous response, use the registration survey response,
+                // if any.
                 if (mSurveyedLocaleId != null) {
                     Long lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId, 
                             Long.valueOf(surveyId));
+                    
+                    if (lastSurveyInstance == null) {
+                        // Try with the registration one
+                        lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId, 
+                                Long.valueOf(mSurveyGroup.getRegisterSurveyId()));
+                    }
+                    
                     if (lastSurveyInstance != null) {
                         // Load the state form the old survey instance
                         if (tabContentFactories != null) {
                             for (SurveyQuestionTabContentFactory tab : tabContentFactories) {
-                                tab.loadState(lastSurveyInstance);
+                                tab.loadState(lastSurveyInstance, true);
                             }
                             
                             saveAllResponses();
@@ -1054,8 +1060,7 @@ public class SurveyViewActivity extends TabActivity implements
             }
             
             // Save Locale meta-data, if applies
-            SurveyGroup group = getSurveyGroup();
-            if (group != null && surveyId.equals(group.getRegisterSurveyId())) {
+            if (surveyId.equals(mSurveyGroup.getRegisterSurveyId())) {
                 saveSurveyedLocaleMetadata();
             }
         }
@@ -1093,16 +1098,6 @@ public class SurveyViewActivity extends TabActivity implements
             }
         }
     }
-    
-    private SurveyGroup getSurveyGroup() {
-        SurveyGroup group = null;
-        Cursor cursor = databaseAdapter.getSurveyGroup(mSurveyGroupId);
-        if (cursor.moveToFirst()) {
-            group = SurveyDbAdapter.getSurveyGroup(cursor);
-        }
-        
-        return group;
-    }
 
     /**
      * creates a new response object/record and sets the id in the context then
@@ -1111,7 +1106,7 @@ public class SurveyViewActivity extends TabActivity implements
     private void startNewSurvey() {
         // create a new response object so we're ready for the next instance
         // Create new surveyed locale
-        mSurveyedLocaleId = databaseAdapter.createSurveyedLocale(mSurveyGroupId);
+        mSurveyedLocaleId = databaseAdapter.createSurveyedLocale(mSurveyGroup.getId());
         setRespondentId(databaseAdapter.createSurveyRespondent(surveyId, 
                 String.valueOf(userId), mSurveyedLocaleId));
         resetAllQuestions();
@@ -1224,7 +1219,8 @@ public class SurveyViewActivity extends TabActivity implements
 
             if (respondentId == null) {
                 respondentId = databaseAdapter.createOrLoadSurveyRespondent(
-                        surveyId.toString(), userId.toString(), mSurveyGroupId, mSurveyedLocaleId);
+                        surveyId.toString(), userId.toString(), mSurveyGroup.getId(), 
+                        mSurveyedLocaleId);
             }
 
             if (survey != null && !hasAddedTabs) {

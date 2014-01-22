@@ -203,7 +203,7 @@ public class RecordListActivity extends ActionBarActivity implements
         public Fragment getItem(int position) {
             Fragment fragment = null;
             Bundle extras = new Bundle();
-            extras.putInt(EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
+            extras.putLong(EXTRA_SURVEY_GROUP_ID, mSurveyGroup.getId());
             switch (position) {
                 case POSITION_LIST:
                     fragment =  new SurveyedLocaleListFragment();

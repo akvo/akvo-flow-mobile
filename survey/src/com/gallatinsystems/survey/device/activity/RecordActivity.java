@@ -148,7 +148,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             Intent i = new Intent(this, SurveyViewActivity.class);
             i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
             i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
-            i.putExtra(ConstantUtil.SURVEY_GROUP_ID, mSurveyGroup.getId());
+            i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
             if (mRecord != null) {
                 // The record will automatically be managed in non monitored groups
                 i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());

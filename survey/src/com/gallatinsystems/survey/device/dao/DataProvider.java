@@ -12,7 +12,6 @@ import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.DatabaseHelper;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.Tables;
-import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 public class DataProvider extends ContentProvider {
     
@@ -50,7 +49,7 @@ public class DataProvider extends ContentProvider {
             case SEARCH_SUGGEST:
                 // Suggestions search
                 // Adjust incoming query to become SQL text match
-                int surveyGroupId = FlowApp.getApp().getSurveyGroupId();
+                long surveyGroupId = FlowApp.getApp().getSurveyGroupId();
                 
                 final String term = selectionArgs[0] + "%";
                 projection = new String[] {

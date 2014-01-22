@@ -58,7 +58,7 @@ public class SurveyedLocaleParser {
     public SurveyedLocale parseSurveyedLocale(JSONObject jSurveyedLocale) {
         try {
             String id = jSurveyedLocale.getString(Attrs.ID);
-            int surveyGroupId = jSurveyedLocale.getInt(Attrs.SURVEY_GROUP_ID);
+            long surveyGroupId = jSurveyedLocale.getLong(Attrs.SURVEY_GROUP_ID);
             double latitude = jSurveyedLocale.optDouble(Attrs.LATITUDE, 0.0d);
             double longitude = jSurveyedLocale.optDouble(Attrs.LONGITUDE, 0.0d);
             String name = jSurveyedLocale.optString(Attrs.NAME, "Unknown");

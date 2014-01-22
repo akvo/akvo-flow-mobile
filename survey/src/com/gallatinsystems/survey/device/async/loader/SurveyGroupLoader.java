@@ -25,13 +25,13 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 
 public class SurveyGroupLoader extends DataLoader<Cursor> {
-    private int mSurveyGroupId;
+    private long mSurveyGroupId;
     
     public SurveyGroupLoader(Context context, SurveyDbAdapter db) {
         this(context, db, SurveyGroup.ID_NONE);
     }
     
-    public SurveyGroupLoader(Context context, SurveyDbAdapter db, int surveyGroupId) {
+    public SurveyGroupLoader(Context context, SurveyDbAdapter db, long surveyGroupId) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
     }

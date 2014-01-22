@@ -34,7 +34,7 @@ public class FlowApp extends Application {
     private static FlowApp app;// Singleton
     
     private User mUser;
-    private int mSurveyGroupId;// Hacky way of filtering the survey group in Record search
+    private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
 
     @Override
     public void onCreate() {
@@ -60,11 +60,11 @@ public class FlowApp extends Application {
         return mUser;
     }
     
-    public void setSurveyGroupId(int surveyGroupId) {
+    public void setSurveyGroupId(long surveyGroupId) {
         mSurveyGroupId = surveyGroupId;
     }
     
-    public int getSurveyGroupId() {
+    public long getSurveyGroupId() {
         return mSurveyGroupId;
     }
     

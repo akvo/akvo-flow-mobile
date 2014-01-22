@@ -48,7 +48,7 @@ public class SurveyedLocaleSyncService extends IntentService {
     
     @Override
     protected void onHandleIntent(Intent intent) {
-        final int surveyGroupId = intent.getIntExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
+        final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         int syncedRecords = 0;
         FlowApi api = new FlowApi();
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
@@ -75,7 +75,7 @@ public class SurveyedLocaleSyncService extends IntentService {
     }
         
     private int sync(SurveyDbAdapter database, FlowApi api, 
-            int surveyGroupId) throws IOException {
+            long surveyGroupId) throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         SurveyedLocalesResponse response = api.getSurveyedLocales(surveyGroupId, syncTime);

@@ -736,7 +736,7 @@ public class SurveyDbAdapter {
      * @param surveyId
      * @return
      */
-    public long createOrLoadSurveyRespondent(String surveyId, String userId, int surveyGroupId, String surveyedLocaleId) {
+    public long createOrLoadSurveyRespondent(String surveyId, String userId, long surveyGroupId, String surveyedLocaleId) {
         String where = SUBMITTED_FLAG_COL + "='false' and "
                 + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?";
         List<String> argList =  new ArrayList<String>();
@@ -1041,7 +1041,7 @@ public class SurveyDbAdapter {
                 new String[] {
                     survey.getId(),
                 }, null, null, null);
-        final int surveyGroupId = survey.getSurveyGroup() != null ? 
+        final long surveyGroupId = survey.getSurveyGroup() != null ? 
                 survey.getSurveyGroup().getId() 
                 : SurveyGroup.ID_NONE;
         
@@ -1168,7 +1168,7 @@ public class SurveyDbAdapter {
     /**
      * Lists all non-deleted surveys from the database
      */
-    public ArrayList<Survey> listSurveys(int surveyGroupId) {
+    public ArrayList<Survey> listSurveys(long surveyGroupId) {
         ArrayList<Survey> surveys = new ArrayList<Survey>();
         String whereClause = DELETED_COL + " <> ?";
         String[] whereParams = null;
@@ -1646,7 +1646,7 @@ public class SurveyDbAdapter {
         return cursor;
     }
     
-    public Cursor getSurveyGroup(int id) {
+    public Cursor getSurveyGroup(long id) {
         String where = null;
         String[] selectionArgs = null;
         
@@ -1663,7 +1663,7 @@ public class SurveyDbAdapter {
         return cursor;
     }
     
-    public String createSurveyedLocale(int surveyGroupId) {
+    public String createSurveyedLocale(long surveyGroupId) {
         String base32Id = Base32.base32Uuid();
         // Put dashes between the 4-5 and 8-9 positions to increase readability
         String id = base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
@@ -1683,14 +1683,14 @@ public class SurveyDbAdapter {
     
     public static SurveyedLocale getSurveyedLocale(Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.SURVEYED_LOCALE_ID));
-        int surveyGroupId = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.SURVEY_GROUP_ID));
+        long surveyGroupId = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.NAME));
         double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LATITUDE));
         double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyedLocaleAttrs.LONGITUDE));
         return new SurveyedLocale(id, name, surveyGroupId, latitude, longitude);
     }
     
-    public Cursor getSurveyedLocales(int surveyGroupId) {
+    public Cursor getSurveyedLocales(long surveyGroupId) {
         Cursor cursor = database.query(Tables.SURVEYED_LOCALE, 
                 new String[] {SurveyedLocaleAttrs.ID, SurveyedLocaleAttrs.SURVEYED_LOCALE_ID, SurveyedLocaleAttrs.SURVEY_GROUP_ID,
                         SurveyedLocaleAttrs.NAME, SurveyedLocaleAttrs.LATITUDE, SurveyedLocaleAttrs.LONGITUDE},
@@ -1731,7 +1731,7 @@ public class SurveyDbAdapter {
         return survey;
     }
 
-    public Cursor getSurveys(int surveyGroupId) {
+    public Cursor getSurveys(long surveyGroupId) {
         String whereClause = DELETED_COL + " <> ?";
         String[] whereParams = null;
         if (surveyGroupId > 0) {
@@ -1753,7 +1753,7 @@ public class SurveyDbAdapter {
                 whereClause, whereParams, null, null, null);
     }
     
-    public Cursor getSurveyInstances(int surveyGroupId) {
+    public Cursor getSurveyInstances(long surveyGroupId) {
         final String sortBy = 
             "case when " + DELIVERED_DATE_COL
                     + " is null then 0 else 1 end, " + DELIVERED_DATE_COL
@@ -1870,7 +1870,7 @@ public class SurveyDbAdapter {
     * @param nearbyRadius
     * @return
     */
-    public Cursor getFilteredSurveyedLocales(int surveyGroupId, Double latitude, Double longitude,
+    public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
                 Double nearbyRadius, int orderBy) {
         String queryString = "SELECT sl.*, MAX(r." + SUBMITTED_DATE_COL + ") as "+ SUBMITTED_DATE_COL + " FROM " 
                 + Tables.SURVEYED_LOCALE + " AS sl LEFT JOIN " + Tables.RESPONDENT + " AS r ON "
@@ -1895,7 +1895,7 @@ public class SurveyDbAdapter {
         return cursor;
     }
     
-    public int getSurveyedLocalesCount(int surveyGroupId) {
+    public int getSurveyedLocalesCount(long surveyGroupId) {
         Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM " + Tables.SURVEYED_LOCALE
                 + " WHERE " + SurveyedLocaleAttrs.SURVEY_GROUP_ID + " = ?",
                 new String[]{String.valueOf(surveyGroupId)});
@@ -1999,7 +1999,7 @@ public class SurveyDbAdapter {
      * @param surveyGroupId id of the SurveyGroup
      * @return time if exists for this key, null otherwise
      */
-    public String getSyncTime(int surveyGroupId) {
+    public String getSyncTime(long surveyGroupId) {
         Cursor cursor = database.query(Tables.SYNC_TIME, 
                 new String[] {SyncTimeAttrs.SURVEY_GROUP_ID, SyncTimeAttrs.TIME},
                 SyncTimeAttrs.SURVEY_GROUP_ID + "=?",
@@ -2019,7 +2019,7 @@ public class SurveyDbAdapter {
      * @param surveyGroupId id of the SurveyGroup
      * @param time String containing the timestamp
      */
-    public void setSyncTime(int surveyGroupId, String time) {
+    public void setSyncTime(long surveyGroupId, String time) {
         ContentValues values = new ContentValues();
         values.put(SyncTimeAttrs.SURVEY_GROUP_ID, surveyGroupId);
         values.put(SyncTimeAttrs.TIME, time);

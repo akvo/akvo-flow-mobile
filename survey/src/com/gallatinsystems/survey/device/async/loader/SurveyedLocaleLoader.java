@@ -24,14 +24,14 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
 public class SurveyedLocaleLoader extends DataLoader<Cursor> {
-    private int mSurveyGroupId;
+    private long mSurveyGroupId;
     private double mLatitude;
     private double mLongitude;
     private double mRadius;
     
     private int mOrderBy;
 
-    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, int surveyGroupId,
+    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, long surveyGroupId,
             double latitude, double longitude, double radius, int orderBy) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
@@ -41,7 +41,7 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
         mOrderBy = orderBy;
     }
     
-    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, int surveyGroupId, int orderBy) {
+    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, long surveyGroupId, int orderBy) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
         mOrderBy = orderBy;

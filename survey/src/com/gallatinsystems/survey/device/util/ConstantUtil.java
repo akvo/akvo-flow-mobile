@@ -185,7 +185,7 @@ public class ConstantUtil {
     public static final String POINTS_KEY = "points";
     public static final String QUESTION_ID_KEY = "questionId";
     public static final String QUESTION_TYPE_KEY = "questionType";
-    public static final String SURVEY_GROUP_ID = "survey_group_id";
+    public static final String SURVEY_GROUP = "survey_group";
     public static final String SURVEYED_LOCALE_ID = "surveyed_locale_id";
 
     /**

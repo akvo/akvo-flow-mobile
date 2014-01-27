@@ -16,7 +16,7 @@
 
 package com.gallatinsystems.survey.device.view;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -100,17 +100,10 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
 
         // get the list (across all tabs) of missing mandatory
         // responses
-        ArrayList<Question> missingQuestions = context.checkMandatory();
-        if (setMissing) {
-            getContext().setMissingQuestions(missingQuestions);
-        }
-        if (missingQuestions.size() == 0) {
-            table.addView(constructHeadingRow(context
-                    .getString(R.string.submittext)));
-            // display the "all ok" text and
-            toggleButtons(true);
-
-        } else {
+        List<Question> missingQuestions = context.checkMandatory();
+        List<Question> unmatchedQuestions = context.checkDoubleEntry();
+        
+        if (missingQuestions.size() > 0) {
             table.addView(constructHeadingRow(context
                     .getString(R.string.mandatorywarning)));
             for (int i = 0; i < missingQuestions.size(); i++) {
@@ -132,7 +125,44 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                 table.addView(tr);
             }
             toggleButtons(false);
+            
+            if (setMissing) {
+                getContext().setMissingQuestions(missingQuestions);
+            }
+        } else if (unmatchedQuestions.size() > 0) {
+            table.addView(constructHeadingRow(context
+                    .getString(R.string.unmatchedwarning)));
+            for (int i = 0; i < unmatchedQuestions.size(); i++) {
+                TableRow tr = new TableRow(context);
+                tr.setLayoutParams(new ViewGroup.LayoutParams(
+                        LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+                QuestionView qv = new QuestionView(context,
+                        unmatchedQuestions.get(i), getDefaultLang(),
+                        languageCodes, true);
+                qv.suppressHelp(true);
+                // force the view to be visible (if the question has
+                // dependencies, it'll be hidden by default)
+                qv.setVisibility(View.VISIBLE);
+                View ruler = new View(context);
+                ruler.setBackgroundColor(0xFFFFFFFF);
+                qv.addView(ruler, new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.FILL_PARENT, 2));
+                tr.addView(qv);
+                table.addView(tr);
+            }
+            toggleButtons(false);
+            
+            if (setMissing) {
+                getContext().setMissingQuestions(unmatchedQuestions);
+            }
+        } else {
+            // Good news! Everything worked fine
+            table.addView(constructHeadingRow(context
+                    .getString(R.string.submittext)));
+            // display the "all ok" text and
+            toggleButtons(true);
         }
+        
         TableRow row = new TableRow(context);
         row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
                 LayoutParams.WRAP_CONTENT));

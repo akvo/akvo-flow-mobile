@@ -70,6 +70,7 @@
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>
     <string name="mandatorywarning">Questions marked with a * are mandatory. You must answer the following questions before you can submit:</string>
+    <string name="unmatchedwarning">Questions with double entry must contain the same answer:</string>
     <string name="cannotsave">Cannot submit responses</string>
     <string name="description">Description</string>
     <string name="texthelpoption">View Help Text</string>
@@ -174,6 +175,7 @@
     <string name="clear_data_success">Data successfully deleted from the device</string>
     <string name="clear_data_error">Error deleting data from the device</string>
     <string name="configuring_languages">Configuring survey languages...</string>
+    <string name="repeat_answer">Please, repeate answer</string>
 
     <!-- Action to identify the BroadcastReceiver, notifying new surveys have been downloaded -->
     <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>

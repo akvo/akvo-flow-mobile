@@ -19,6 +19,7 @@ package com.gallatinsystems.survey.device.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import android.database.Cursor;
 import android.view.View;
@@ -225,6 +226,27 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                 view.updateSelectedLanguages(langCodes);
             }
         }
+    }
+
+    /**
+     * checks to make sure the double entry questions in this tab are satisfied
+     * 
+     * @return
+     */
+    public List<Question> checkDoubleQuestions() {
+        if (responseMap == null) {
+            loadState(context.getRespondentId());
+        }
+        List<Question> unmatchedQuestions = new ArrayList<Question>();
+        if (questionMap != null) {
+            for (QuestionView view : questionMap.values()) {
+                if (view instanceof FreetextQuestionView &&
+                        !((FreetextQuestionView)view).checkDoubleEntry()) {
+                    unmatchedQuestions.add(view.getQuestion());
+                }
+            }
+        }
+        return unmatchedQuestions;
     }
 
     /**

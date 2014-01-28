@@ -51,7 +51,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener {
     private static final String TAG = MapFragment.class.getSimpleName();
     
-    private int mSurveyGroupId;
+    private long mSurveyGroupId;
     private SurveyDbAdapter mDatabase;
     private SurveyedLocalesFragmentListener mListener;
     
@@ -60,7 +60,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getInt(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroupId = getArguments().getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
     }
     
     @Override

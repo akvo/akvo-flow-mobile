@@ -67,7 +67,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     private static final double RADIUS = 100000d;// Meters
     
     private int mOrderBy;
-    private int mSurveyGroupId;
+    private long mSurveyGroupId;
     private SurveyDbAdapter mDatabase;
     
     private SurveyedLocaleListAdapter mAdapter;
@@ -76,7 +76,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getInt(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroupId = getArguments().getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
         mOrderBy = ConstantUtil.ORDER_BY_DISTANCE;// Default case
         setHasOptionsMenu(true);
     }

@@ -117,8 +117,6 @@ public class DataSyncService extends Service {
     private static int counter = 0;
     private PropertyUtil props;
 
-    private boolean debugFailMedia = false;
-
     public IBinder onBind(Intent intent) {
         return null;
     }
@@ -278,8 +276,7 @@ public class DataSyncService extends Service {
                 databaseAdaptor.createTransmissionHistory(Long.valueOf(respondentID),
                         image, ConstantUtil.IN_PROGRESS_STATUS);
 
-                if (uploadImage(image) || !debugFailMedia) {// TODO: Get rid of
-                                                            // this flag
+                if (uploadImage(image)) {
                     databaseAdaptor.updateTransmissionHistory(
                             Long.valueOf(respondentID),
                             image, ConstantUtil.COMPLETE_STATUS);

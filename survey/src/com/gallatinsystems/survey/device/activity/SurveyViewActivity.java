@@ -51,7 +51,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
@@ -95,7 +94,6 @@ public class SurveyViewActivity extends TabActivity implements
     private static final int SURVEY_LANG = 3;
     private static final int SAVE_SURVEY = 4;
     private static final int CLEAR_SURVEY = 5;
-    private static final int PREFILL_SURVEY = 6;
     private static final String SUBMIT_TAB_TAG = "subtag";
 
     private static final float LARGE_TXT_SIZE = 22;
@@ -898,11 +896,6 @@ public class SurveyViewActivity extends TabActivity implements
         menu.add(0, SAVE_SURVEY, 1, R.string.savestartnew);
         menu.add(0, SURVEY_LANG, 2, R.string.langoption);
         menu.add(0, CLEAR_SURVEY, 3, R.string.clearbutton);
-        
-        if (!readOnly && mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            menu.add(0, PREFILL_SURVEY, 4, "Prefill Answers");
-        }
-        
         return true;
     }
 
@@ -1015,39 +1008,10 @@ public class SurveyViewActivity extends TabActivity implements
                             });
                 }
                 return true;
-            case PREFILL_SURVEY:
-                // Check for previous values in this record.
-                // First, we'll try with the same survey, checking for existing responses
-                // If we don't have a previous response, use the registration survey response,
-                // if any.
-                if (mSurveyedLocaleId != null) {
-                    Long lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId, 
-                            Long.valueOf(surveyId));
-                    
-                    if (lastSurveyInstance == null) {
-                        // Check for the source survey's last instance, if any
-                        lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId, 
-                                Long.valueOf(survey.getSourceSurveyId()));
-                    }
-                    
-                    if (lastSurveyInstance != null) {
-                        // Load the state form the old survey instance
-                        if (tabContentFactories != null) {
-                            for (SurveyQuestionTabContentFactory tab : tabContentFactories) {
-                                tab.loadState(lastSurveyInstance, true);
-                            }
-                            
-                            saveAllResponses();
-                        }
-                    } else {
-                        Toast.makeText(this, "No previous values for this record", 
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
-                return true;
         }
         return super.onMenuItemSelected(featureId, item);
     }
+    
 
     /**
      * saves all responses in all tabs
@@ -1288,6 +1252,18 @@ public class SurveyViewActivity extends TabActivity implements
                         tab.loadState(respondentId);
                     }
                 }
+                
+                final Long lastSurveyInstance = getPrefillSurveyInstance();
+                if (lastSurveyInstance != null) {
+                    ViewUtil.showConfirmDialog(R.string.prefill_title, R.string.prefill_text, 
+                            SurveyViewActivity.this, true, 
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    prefillSurvey(lastSurveyInstance);
+                                }
+                            });
+                }
             }
             if (survey != null && pendingRequestCode > 0) {
                 processActivityResult(pendingRequestCode,
@@ -1296,6 +1272,46 @@ public class SurveyViewActivity extends TabActivity implements
 
         } catch (Exception e) {
             Log.w(TAG, "Error while restoring", e);
+        }
+    }
+    
+    /**
+     * In monitored groups, check for previous values in this record.
+     * First, we'll try with the same survey, checking for existing responses.
+     * If we don't have a previous response, use the source survey response, if any.
+     * 
+     * @return The last respondent id for this survey/record pair, if any
+     */
+    private Long getPrefillSurveyInstance() {
+        Long lastSurveyInstance = null;
+        
+        if (!readOnly && mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+            boolean hasAnswers = databaseAdapter.fetchResponsesByRespondent(respondentId.toString()).getCount() > 0;
+            
+            if (!hasAnswers) {
+                lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId,
+                        Long.valueOf(surveyId));
+                
+                if (lastSurveyInstance == null && survey.getSourceSurveyId() != null) {
+                    // Check for the source survey's last instance, if any
+                    lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId, 
+                            Long.valueOf(survey.getSourceSurveyId()));
+                }
+            }
+            
+        }
+        
+        return lastSurveyInstance;
+    }
+    
+    private void prefillSurvey(Long lastSurveyInstance) {
+        // Load the state form the old survey instance
+        if (tabContentFactories != null) {
+            for (SurveyQuestionTabContentFactory tab : tabContentFactories) {
+                tab.loadState(lastSurveyInstance, true);
+            }
+                            
+            saveAllResponses();
         }
     }
 

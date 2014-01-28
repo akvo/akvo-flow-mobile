@@ -184,6 +184,8 @@
     <string name="network_error">Network Error</string>
     <string name="select_record">Please, select a Record</string>
     <string name="loading">Loading...</string>
+    <string name="prefill_title">Prefill Responses</string>
+    <string name="prefill_text">Prefill responses with previous values of the same questions</string>
     
     <!-- Activity Labels -->
     <string name="survey_groups_activity">Survey Groups</string>

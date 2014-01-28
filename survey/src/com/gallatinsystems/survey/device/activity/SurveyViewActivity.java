@@ -54,7 +54,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
-import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
@@ -1026,9 +1025,9 @@ public class SurveyViewActivity extends TabActivity implements
                             Long.valueOf(surveyId));
                     
                     if (lastSurveyInstance == null) {
-                        // Try with the registration one
+                        // Check for the source survey's last instance, if any
                         lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId, 
-                                Long.valueOf(mSurveyGroup.getRegisterSurveyId()));
+                                Long.valueOf(survey.getSourceSurveyId()));
                     }
                     
                     if (lastSurveyInstance != null) {

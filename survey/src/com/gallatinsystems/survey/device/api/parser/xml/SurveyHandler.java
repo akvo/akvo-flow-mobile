@@ -81,6 +81,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String LOCALE_NAME = "localeNameFlag";
     private static final String LOCALE_LOCATION = "localeLocationFlag";
     private static final String SOURCE_QUESTION_ID = "sourceId";
+    private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
 
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
@@ -224,6 +225,9 @@ public class SurveyHandler extends DefaultHandler {
                 survey.setLanguage(attributes.getValue(DEFAULT_LANG));
             } else {
                 survey.setLanguage(ConstantUtil.ENGLISH_CODE);
+            }
+            if (attributes.getValue(SOURCE_SURVEY_ID) != null) {
+                survey.setSourceSurveyId(attributes.getValue(SOURCE_SURVEY_ID));
             }
         } else if (localName.equalsIgnoreCase(QUESTION_GROUP)) {
             currentQuestionGroup = new QuestionGroup();

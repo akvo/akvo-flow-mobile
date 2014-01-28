@@ -38,6 +38,7 @@ public class Survey {
     private String fileName;
     private boolean helpDownloaded;
     private String language;
+    private String sourceSurveyId;// "Copied-from" survey Id
     
     public void setSurveyGroup(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
@@ -147,6 +148,14 @@ public class Survey {
 
     public void setQuestionGroups(List<QuestionGroup> questionGroups) {
         this.questionGroups = questionGroups;
+    }
+    
+    public void setSourceSurveyId(String sourceSurveyId) {
+        this.sourceSurveyId = sourceSurveyId;
+    }
+    
+    public String getSourceSurveyId() {
+        return this.sourceSurveyId;
     }
 
     /**

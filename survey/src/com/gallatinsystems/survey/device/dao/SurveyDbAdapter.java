@@ -1492,13 +1492,19 @@ public class SurveyDbAdapter {
      * submission will be updated. If id is null, ALL data will be marked as
      * unsent.
      */
-    public void markDataUnsent(Long id) {
-        if (id == null) {
-            executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null;");
-        } else {
-            executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where _id = "
-                    + id);
-        }
+    public void markDataUnsent(Long respondentId) {
+        executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where _id = "
+                + respondentId);
+    }
+    
+    public void markRecordUnsent(String recordId) {
+        executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where surveyed_locale_id = '"
+                + recordId + "'");
+    }
+    
+    public void markSurveyGroupUnsent(long surveyGroupId) {
+        executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where survey_id in "
+                + "(select _id from survey where survey_group_id = " + surveyGroupId + ")");
     }
 
     /**

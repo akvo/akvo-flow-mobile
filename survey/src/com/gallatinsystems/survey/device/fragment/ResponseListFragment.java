@@ -158,6 +158,27 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
         submenu.add(0, RESEND_ALL, 0, R.string.resendall);
     }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case RESEND_ALL:
+                resendAllResponses();
+                return true;
+        }
+        return false;
+    }
+    
+    private void resendAllResponses() {
+        if (mRecord != null) {
+            mDatabase.markRecordUnsent(mRecord.getId());
+        } else {
+            mDatabase.markSurveyGroupUnsent(mSurveyGroup.getId());
+        }
+        Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
+        getActivity().sendBroadcast(i);
+        refresh();
+    }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {

@@ -235,8 +235,8 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onListItemClick(list, view, position, id);
 
         Intent i = new Intent(view.getContext(), SurveyViewActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, ((Long) view
-                .getTag(SubmittedSurveyReviewCursorAdaptor.USER_ID_KEY)).toString());
+        i.putExtra(ConstantUtil.USER_ID_KEY, (Long) view
+                .getTag(SubmittedSurveyReviewCursorAdaptor.USER_ID_KEY));
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, ((Long) view
                 .getTag(SubmittedSurveyReviewCursorAdaptor.SURVEY_ID_KEY)).toString());
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY,

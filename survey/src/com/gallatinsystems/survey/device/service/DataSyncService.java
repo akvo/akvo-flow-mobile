@@ -101,6 +101,11 @@ public class DataSyncService extends Service {
     private static final int BUF_SIZE = 2048;
 
     private static final NumberFormat PCT_FORMAT = NumberFormat.getPercentInstance();
+    
+    /**
+     * Number of retries to upload a file to S3
+     */
+    private static final int FILE_UPLOAD_RETRIES = 2;
 
     private SurveyDbAdapter databaseAdaptor;
     
@@ -675,6 +680,11 @@ public class DataSyncService extends Service {
         } else
             return "";
     }
+    
+    private boolean sendFile(String fileAbsolutePath, String dir,
+            String policy, String sig, String contentType) {
+        return sendFile(fileAbsolutePath, dir, policy, sig, contentType, FILE_UPLOAD_RETRIES);
+    }
 
     /**
      * sends the zip file containing data/images to the server via an http
@@ -683,7 +693,7 @@ public class DataSyncService extends Service {
      * @param fileAbsolutePath
      */
     private boolean sendFile(String fileAbsolutePath, String dir,
-            String policy, String sig, String contentType) {
+            String policy, String sig, String contentType, int retries) {
 
         try {
             String fileName = fileAbsolutePath;
@@ -752,8 +762,13 @@ public class DataSyncService extends Service {
                         fileNameForNotification);
             } else {
                 Log.e(TAG, "Server returned a bad checksum after upload: " + checksum);
-                fireNotification(ConstantUtil.ERROR,
-                        getString(R.string.uploaderror) + " "
+                
+                if (retries > 0) {
+                    Log.i(TAG, "Retrying upload. Remaining attempts: " + retries);
+                    return sendFile(fileAbsolutePath, dir, policy, sig, contentType, --retries);
+                }
+                
+                fireNotification(ConstantUtil.ERROR, getString(R.string.uploaderror) + " "
                                 + fileNameForNotification);
                 return false;
             }

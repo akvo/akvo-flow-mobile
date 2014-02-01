@@ -106,6 +106,7 @@ public class SurveyDownloadService extends Service {
                                 ConstantUtil.SURVEY_ID_KEY);
                     }
                     checkAndDownload(surveyId);
+                    sendBroadcastNotification();
                 }
             }
         });
@@ -180,7 +181,6 @@ public class SurveyDownloadService extends Service {
                             }
                         }
                         if (updateCount > 0) {
-                            sendBroadcastNotification();
                             fireNotification(updateCount);
                         }
                     }

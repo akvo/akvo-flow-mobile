@@ -53,6 +53,7 @@ import android.util.Log;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.util.Base64;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
@@ -275,23 +276,47 @@ public class DataSyncService extends Service {
 
     private void sendImages(Map<String, List<String>> imagePaths) {
         for (Entry<String, List<String>> paths : imagePaths.entrySet()) {
-            final String respondentID = paths.getKey();
+            final Long respondentID = Long.valueOf(paths.getKey());
 
             for (String image : paths.getValue()) {
-                databaseAdaptor.createTransmissionHistory(Long.valueOf(respondentID),
+                // We might have successfully uploaded this file in previous attempts
+                if (isUploaded(respondentID, image)) {
+                    Log.d(TAG, "Image " + image + " was previously uploaded. Skipping...");
+                    continue;
+                }
+                databaseAdaptor.createTransmissionHistory(respondentID,
                         image, ConstantUtil.IN_PROGRESS_STATUS);
 
                 if (uploadImage(image)) {
-                    databaseAdaptor.updateTransmissionHistory(
-                            Long.valueOf(respondentID),
+                    Log.d(TAG, "Image " + image + " successfuly uploaded.");
+                    databaseAdaptor.updateTransmissionHistory(respondentID,
                             image, ConstantUtil.COMPLETE_STATUS);
                 } else {
-                    databaseAdaptor.updateTransmissionHistory(
-                            Long.valueOf(respondentID),
+                    Log.e(TAG, "Image " + image + " upload failed.");
+                    databaseAdaptor.updateTransmissionHistory(respondentID,
                             image, ConstantUtil.FAILED_STATUS);
                 }
             }
         }
+    }
+    
+    /**
+     * Check for previous attempts of uploading the given file.
+     * @param respondentId
+     * @param fileName
+     * @return true if the file has been previously uploaded, false otherwise.
+     */
+    private boolean isUploaded(Long respondentId, String fileName) {
+        List<FileTransmission> transmissionList = databaseAdaptor.listFileTransmission(respondentId,
+                fileName, false);
+        if (transmissionList != null) {
+            for (FileTransmission transmission : transmissionList) {
+                if (ConstantUtil.COMPLETE_STATUS.equals(transmission.getStatus())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private String getServerBase() {

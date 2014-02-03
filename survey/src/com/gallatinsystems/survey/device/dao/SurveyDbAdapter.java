@@ -159,7 +159,8 @@ public class SurveyDbAdapter {
 
     private static final int VER_LAUNCH = 75;// FLOW version <= 1.11.1
     private static final int VER_TIME_TRACK = 76;
-    private static final int DATABASE_VERSION = VER_TIME_TRACK;
+    private static final int VER_RETRY_FILES = 77;
+    private static final int DATABASE_VERSION = VER_RETRY_FILES;
 
     private final Context context;
 
@@ -210,6 +211,10 @@ public class SurveyDbAdapter {
                     // changes in version 76 - Time track
                     db.execSQL("ALTER TABLE survey_respondent ADD COLUMN survey_start INTEGER");
                     version = VER_TIME_TRACK;
+                case VER_TIME_TRACK:
+                    // changes in version 77 - Transmission history records retry
+                    createFilenameIndex(db);
+                    version = VER_RETRY_FILES;
             }
 
             if (version != DATABASE_VERSION) {
@@ -226,7 +231,12 @@ public class SurveyDbAdapter {
                 db.execSQL("DROP TABLE IF EXISTS " + TRANSMISSION_HISTORY_TABLE);
                 
                 onCreate(db);
+                createFilenameIndex(db);
             }
+        }
+        
+        private void createFilenameIndex(SQLiteDatabase db) {
+            db.execSQL("CREATE INDEX filename_idx ON transmission_history(filename)");
         }
 
         @Override
@@ -1281,11 +1291,10 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * updates the first matching transmission history record with the status
+     * Updates the matching transmission history records with the status
      * passed in. If the status == Completed, the completion date is updated. If
      * the status == In Progress, the start date is updated.
      * 
-     * @param respondId
      * @param fileName
      * @param status
      */

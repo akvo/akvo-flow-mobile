@@ -216,6 +216,11 @@ public class DataSyncService extends Service {
                     databaseAdaptor.markDataAsExported(zipFileData.respondentIDs);
                 }
             }
+            
+            // Failed images have a new opportunity to reach their destiny!
+            if (isAbleToRun(type, uploadIndex)) {
+                retryUnsentFiles();
+            }
         } catch (InterruptedException e) {
             Log.e(TAG, "Data sync interrupted", e);
             PersistentUncaughtExceptionHandler.recordException(e);
@@ -262,12 +267,22 @@ public class DataSyncService extends Service {
         }
     }
 
-    private boolean uploadImage(String image) {
-        return sendFile(image,
+    private void uploadImage(String image, boolean notifyServer) {
+        boolean ok = sendFile(image,
                 S3_IMAGE_FILE_PATH,
                 props.getProperty(ConstantUtil.IMAGE_S3_POLICY),
                 props.getProperty(ConstantUtil.IMAGE_S3_SIG),
                 IMAGE_CONTENT_TYPE);
+        
+        if (ok && notifyServer) {
+            // TODO: Notify GAE server before returning S3 operation's success.
+        }
+        
+        if (ok) {
+            databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.COMPLETE_STATUS);
+        } else {
+            databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.FAILED_STATUS);
+        }
     }
 
     private void sendImages(Map<String, List<String>> imagePaths) {
@@ -285,36 +300,11 @@ public class DataSyncService extends Service {
                     continue;
                 }
                 
-                if (uploadImage(image)) {
-                    Log.d(TAG, "Image " + image + " successfuly uploaded.");
-                    databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.COMPLETE_STATUS);
-                } else {
-                    Log.e(TAG, "Image " + image + " upload failed.");
-                    databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.FAILED_STATUS);
-                }
+                uploadImage(image, false);
             }
         }
     }
     
-    /**
-     * Check for previous attempts of uploading the given file.
-     * @param respondentId
-     * @param fileName
-     * @return true if the file has been previously uploaded, false otherwise.
-     */
-    private boolean isUploaded(Long respondentId, String fileName) {
-        List<FileTransmission> transmissionList = databaseAdaptor.listFileTransmission(respondentId,
-                fileName, false);
-        if (transmissionList != null) {
-            for (FileTransmission transmission : transmissionList) {
-                if (ConstantUtil.COMPLETE_STATUS.equals(transmission.getStatus())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     private String getServerBase() {
         final String serverBase = databaseAdaptor.findPreference(ConstantUtil.SERVER_SETTING_KEY);
         if (!TextUtils.isEmpty(serverBase)) {
@@ -789,6 +779,7 @@ public class DataSyncService extends Service {
                     return sendFile(fileAbsolutePath, dir, policy, sig, contentType, --retries);
                 }
                 
+                Log.e(TAG, "File " + fileName + " upload failed.");
                 fireNotification(ConstantUtil.ERROR, getString(R.string.uploaderror) + " "
                                 + fileNameForNotification);
                 return false;
@@ -799,6 +790,7 @@ public class DataSyncService extends Service {
             PersistentUncaughtExceptionHandler.recordException(e);
             return false;
         }
+        Log.e(TAG, "File " + fileAbsolutePath + " successfuly uploaded.");
         return true;
     }
 
@@ -843,6 +835,19 @@ public class DataSyncService extends Service {
             ok = true;
         }
         return ok;
+    }
+    
+    /**
+     * Retry to upload images that didn't make it to the server in previous attempts.
+     */
+    private void retryUnsentFiles() {
+        for (FileTransmission file : databaseAdaptor.listFailedTransmissions()) {
+            final String filename = file.getFileName();
+            // Skip zip files. TODO: This could potentially be used for zip files as well
+            if (!filename.endsWith(".zip")) {
+                uploadImage(filename, true);
+            }
+        }
     }
 
     /**

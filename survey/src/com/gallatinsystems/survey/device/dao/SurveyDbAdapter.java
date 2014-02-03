@@ -1298,42 +1298,18 @@ public class SurveyDbAdapter {
      * @param fileName
      * @param status
      */
-    public void updateTransmissionHistory(Long respondId, String fileName,
-            String status) {
-        List<FileTransmission> transList = listFileTransmission(respondId,
-                fileName, true);
-        Long idVal = null;
-        if (transList != null && transList.size() > 0) {
-            idVal = transList.get(0).getId();
-            if (idVal != null) {
-                ContentValues vals = new ContentValues();
-                vals.put(STATUS_COL, status);
-                if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
-                    vals.put(DELIVERED_DATE_COL, System.currentTimeMillis()
-                            + "");
-                } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
-                    vals.put(TRANS_START_COL, System.currentTimeMillis() + "");
-                }
-                database.update(TRANSMISSION_HISTORY_TABLE, vals, PK_ID_COL
-                        + " = ?", new String[] {
-                    idVal.toString()
-                });
-            }
-            else
-                // it should have been found
-                Log.e(TAG,
-                        "Could not update transmission history record for respondent_id "
-                                + respondId
-                                + " filename "
-                                + fileName);
+    public void updateTransmissionHistory(String fileName, String status) {
+        ContentValues vals = new ContentValues();
+        vals.put(STATUS_COL, status);
+        if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
+            vals.put(DELIVERED_DATE_COL, System.currentTimeMillis() + "");
+        } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
+            vals.put(TRANS_START_COL, System.currentTimeMillis() + "");
         }
-    }
-
-    public void updateTransmissionHistory(Set<String> respondentIDs, String fileName,
-            String status) {
-        for (String id : respondentIDs) {
-            updateTransmissionHistory(Long.valueOf(id), fileName, status);
-        }
+        
+        database.update(TRANSMISSION_HISTORY_TABLE, vals, 
+                FILENAME_COL + " = '?'",
+                new String[] {fileName});
     }
 
     /**
@@ -1403,6 +1379,68 @@ public class SurveyDbAdapter {
             cursor.close();
         }
         return transList;
+    }
+    
+    /**
+     * Return a file transmission for a particular filename/respondent pair.
+     * @param filename
+     * @return the transmission record, if exists, null otherwise
+     */
+    public FileTransmission getFileTransmission(Long respondentId, String filename) {
+        FileTransmission transmission = null;
+        Cursor cursor = database.query(TRANSMISSION_HISTORY_TABLE,
+                new String[] {
+                        PK_ID_COL, FILENAME_COL, STATUS_COL,
+                        TRANS_START_COL, DELIVERED_DATE_COL,
+                        SURVEY_RESPONDENT_ID_COL
+                }, 
+                FILENAME_COL + "='?' AND " + SURVEY_RESPONDENT_ID_COL + "='?'", 
+                new String[] {filename, String.valueOf(respondentId)},
+                null, null, null);
+        
+        if (cursor != null && cursor.moveToFirst()) {
+            transmission  = new FileTransmission();
+            transmission.setId(cursor.getLong(cursor.getColumnIndexOrThrow(PK_ID_COL)));
+            transmission.setRespondentId(cursor.getLong(cursor.getColumnIndexOrThrow(SURVEY_RESPONDENT_ID_COL)));
+            transmission.setFileName(cursor.getString(cursor.getColumnIndexOrThrow(FILENAME_COL)));
+            transmission.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(STATUS_COL)));
+            cursor.close();
+        }
+        
+        return transmission;
+    }
+    
+    public List<FileTransmission> listFailedTransmissions() {
+        List<FileTransmission> transmissions = new ArrayList<FileTransmission>();
+        Cursor cursor = database.query(TRANSMISSION_HISTORY_TABLE,
+                new String[] {
+                        PK_ID_COL, FILENAME_COL, STATUS_COL,
+                        TRANS_START_COL, DELIVERED_DATE_COL,
+                        SURVEY_RESPONDENT_ID_COL
+                }, 
+                STATUS_COL + "='?'", 
+                new String[] {ConstantUtil.FAILED_STATUS},
+                null, null, null);
+        
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                transmissions = new ArrayList<FileTransmission>();
+                do {
+                    FileTransmission trans = new FileTransmission();
+                    trans.setId(cursor.getLong(
+                            cursor.getColumnIndexOrThrow(PK_ID_COL)));
+                    trans.setRespondentId(cursor.getLong(
+                            cursor.getColumnIndexOrThrow(SURVEY_RESPONDENT_ID_COL)));
+                    trans.setFileName(cursor.getString(cursor
+                            .getColumnIndexOrThrow(FILENAME_COL)));
+                    trans.setStatus(cursor.getString(cursor
+                            .getColumnIndexOrThrow(STATUS_COL)));// FAILED_STATUS
+                    transmissions.add(trans);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return transmissions;
     }
 
     /**

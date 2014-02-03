@@ -234,8 +234,7 @@ public class DataSyncService extends Service {
 
     private void sendData(ZipFileData zipFileData, String fileName, String destName,
             String serverBase, int uploadIndex) {
-        databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                fileName, ConstantUtil.IN_PROGRESS_STATUS);
+        databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.IN_PROGRESS_STATUS);
         boolean isOk = sendFile(fileName, S3_DATA_FILE_PATH,
                 props.getProperty(ConstantUtil.DATA_S3_POLICY),
                 props.getProperty(ConstantUtil.DATA_S3_SIG),
@@ -246,8 +245,7 @@ public class DataSyncService extends Service {
                 // Mark everything completed
                 databaseAdaptor.markDataAsSent(zipFileData.respondentIDs, String.valueOf(true));
                 // update the transmission history records too
-                databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                        fileName, ConstantUtil.COMPLETE_STATUS);
+                databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.COMPLETE_STATUS);
 
                 databaseAdaptor.updatePlotStatus(zipFileData.regionIDs, ConstantUtil.SENT_STATUS);
                 fireNotification(ConstantUtil.SEND, destName);
@@ -256,13 +254,11 @@ public class DataSyncService extends Service {
                         "Could not update send status of data in the database. It will be resent on next execution of the service");
                 // Notification failed, update transmission history
                 // TODO: this could be a different "failed" status
-                databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                        fileName, ConstantUtil.FAILED_STATUS);
+                databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.FAILED_STATUS);
             }
         } else {
             // S3 upload failed, update transmission history
-            databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                    fileName, ConstantUtil.FAILED_STATUS);
+            databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.FAILED_STATUS);
         }
     }
 
@@ -279,22 +275,22 @@ public class DataSyncService extends Service {
             final Long respondentID = Long.valueOf(paths.getKey());
 
             for (String image : paths.getValue()) {
-                // We might have successfully uploaded this file in previous attempts
-                if (isUploaded(respondentID, image)) {
+                FileTransmission transmission = databaseAdaptor.getFileTransmission(respondentID, image);
+                if (transmission == null) {
+                    databaseAdaptor.createTransmissionHistory(respondentID, image,
+                            ConstantUtil.IN_PROGRESS_STATUS);
+                } else if (ConstantUtil.COMPLETE_STATUS.equals(transmission.getStatus())) {
+                    // Uploaded images don't need to be resent
                     Log.d(TAG, "Image " + image + " was previously uploaded. Skipping...");
                     continue;
                 }
-                databaseAdaptor.createTransmissionHistory(respondentID,
-                        image, ConstantUtil.IN_PROGRESS_STATUS);
-
+                
                 if (uploadImage(image)) {
                     Log.d(TAG, "Image " + image + " successfuly uploaded.");
-                    databaseAdaptor.updateTransmissionHistory(respondentID,
-                            image, ConstantUtil.COMPLETE_STATUS);
+                    databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.COMPLETE_STATUS);
                 } else {
                     Log.e(TAG, "Image " + image + " upload failed.");
-                    databaseAdaptor.updateTransmissionHistory(respondentID,
-                            image, ConstantUtil.FAILED_STATUS);
+                    databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.FAILED_STATUS);
                 }
             }
         }

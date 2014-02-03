@@ -528,7 +528,7 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(USER_TABLE, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, EMAIL_COL
-        }, PK_ID_COL + "=?",
+        }, PK_ID_COL + "= ?",
                 new String[] {
                     id.toString()
                 }, null, null, null);
@@ -557,7 +557,7 @@ public class SurveyDbAdapter {
         if (idVal == null) {
             idVal = database.insert(USER_TABLE, null, initialValues);
         } else {
-            if (database.update(USER_TABLE, initialValues, PK_ID_COL + "=?",
+            if (database.update(USER_TABLE, initialValues, PK_ID_COL + "= ?",
                     new String[] {
                         idVal.toString()
                     }) > 0) {
@@ -578,7 +578,7 @@ public class SurveyDbAdapter {
                 QUESTION_FK_COL, ANSWER_COL, ANSWER_TYPE_COL,
                 SURVEY_RESPONDENT_ID_COL, INCLUDE_FLAG_COL, SCORED_VAL_COL,
                 STRENGTH_COL
-        }, SURVEY_RESPONDENT_ID_COL + "=?",
+        }, SURVEY_RESPONDENT_ID_COL + "= ?",
                 new String[] {
                     respondentID
                 }, null, null, null);
@@ -598,8 +598,8 @@ public class SurveyDbAdapter {
                 RESP_ID_COL, QUESTION_FK_COL, ANSWER_COL, ANSWER_TYPE_COL,
                 SURVEY_RESPONDENT_ID_COL, INCLUDE_FLAG_COL, SCORED_VAL_COL,
                 STRENGTH_COL
-        }, SURVEY_RESPONDENT_ID_COL + "=? and "
-                + QUESTION_FK_COL + "=?",
+        }, SURVEY_RESPONDENT_ID_COL + "= ? and "
+                + QUESTION_FK_COL + "= ?",
                 new String[] {
                         respondentId.toString(), questionId
                 }, null,
@@ -662,7 +662,7 @@ public class SurveyDbAdapter {
             id = database.insert(RESPONSE_TABLE, null, initialValues);
         } else {
             if (database.update(RESPONSE_TABLE, initialValues, RESP_ID_COL
-                    + "=?", new String[] {
+                    + "= ?", new String[] {
                 responseToSave.getId().toString()
             }) > 0) {
                 id = responseToSave.getId();
@@ -684,7 +684,7 @@ public class SurveyDbAdapter {
         Cursor results = database.query(RESPONDENT_TABLE, new String[] {
             "max(" + PK_ID_COL + ")"
         }, SUBMITTED_FLAG_COL + "='false' and "
-                + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?", new String[] {
+                + SURVEY_FK_COL + "= ? and " + STATUS_COL + " = ?", new String[] {
                 surveyId, ConstantUtil.CURRENT_STATUS
         }, null, null, null);
         long id = -1;
@@ -772,7 +772,7 @@ public class SurveyDbAdapter {
                 PK_ID_COL,
                 DISP_NAME_COL, DESC_COL, CREATED_DATE_COL, STATUS_COL
         },
-                PK_ID_COL + "=?", new String[] {
+                PK_ID_COL + "= ?", new String[] {
                     id.toString()
                 }, null, null,
                 null);
@@ -804,7 +804,7 @@ public class SurveyDbAdapter {
         if (idVal == null) {
             idVal = database.insert(PLOT_TABLE, null, initialValues);
         } else {
-            if (database.update(PLOT_TABLE, initialValues, PK_ID_COL + "=?",
+            if (database.update(PLOT_TABLE, initialValues, PK_ID_COL + "= ?",
                     new String[] {
                         idVal.toString()
                     }) > 0) {
@@ -1227,7 +1227,7 @@ public class SurveyDbAdapter {
      * deletes all survey responses from the database for a specific respondent
      */
     public void deleteResponses(String respondentId) {
-        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "=?",
+        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "= ?",
                 new String[] {
                     respondentId
                 });
@@ -1240,7 +1240,7 @@ public class SurveyDbAdapter {
      */
     public void deleteRespondent(String respondentId) {
         deleteResponses(respondentId);
-        database.delete(RESPONDENT_TABLE, PK_ID_COL + "=?",
+        database.delete(RESPONDENT_TABLE, PK_ID_COL + "= ?",
                 new String[] {
                     respondentId
                 });
@@ -1253,8 +1253,8 @@ public class SurveyDbAdapter {
      * @param questionId
      */
     public void deleteResponse(String respondentId, String questionId) {
-        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "=? AND "
-                + QUESTION_FK_COL + "=?", new String[] {
+        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "= ? AND "
+                + QUESTION_FK_COL + "= ?", new String[] {
                 respondentId,
                 questionId
         });
@@ -1308,7 +1308,7 @@ public class SurveyDbAdapter {
         }
         
         database.update(TRANSMISSION_HISTORY_TABLE, vals, 
-                FILENAME_COL + " = '?'",
+                FILENAME_COL + " = ?",
                 new String[] {fileName});
     }
 
@@ -1325,7 +1325,7 @@ public class SurveyDbAdapter {
             String fileName, boolean incompleteOnly) {
         List<FileTransmission> transList = null;
 
-        String whereClause = SURVEY_RESPONDENT_ID_COL + "=?";
+        String whereClause = SURVEY_RESPONDENT_ID_COL + "= ?";
         if (incompleteOnly) {
             whereClause = whereClause + " AND " + STATUS_COL + " <> '"
                     + ConstantUtil.COMPLETE_STATUS + "'";
@@ -1394,7 +1394,7 @@ public class SurveyDbAdapter {
                         TRANS_START_COL, DELIVERED_DATE_COL,
                         SURVEY_RESPONDENT_ID_COL
                 }, 
-                FILENAME_COL + "='?' AND " + SURVEY_RESPONDENT_ID_COL + "='?'", 
+                FILENAME_COL + "= ? AND " + SURVEY_RESPONDENT_ID_COL + "= ?", 
                 new String[] {filename, String.valueOf(respondentId)},
                 null, null, null);
         
@@ -1418,7 +1418,7 @@ public class SurveyDbAdapter {
                         TRANS_START_COL, DELIVERED_DATE_COL,
                         SURVEY_RESPONDENT_ID_COL
                 }, 
-                STATUS_COL + "='?'", 
+                STATUS_COL + "= ?", 
                 new String[] {ConstantUtil.FAILED_STATUS},
                 null, null, null);
         

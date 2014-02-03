@@ -790,7 +790,7 @@ public class DataSyncService extends Service {
             PersistentUncaughtExceptionHandler.recordException(e);
             return false;
         }
-        Log.e(TAG, "File " + fileAbsolutePath + " successfuly uploaded.");
+        Log.d(TAG, "File " + fileAbsolutePath + " successfully uploaded.");
         return true;
     }
 

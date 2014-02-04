@@ -268,6 +268,7 @@ public class DataSyncService extends Service {
     }
 
     private void uploadImage(String image, boolean notifyServer) {
+        databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.IN_PROGRESS_STATUS);
         boolean ok = sendFile(image,
                 S3_IMAGE_FILE_PATH,
                 props.getProperty(ConstantUtil.IMAGE_S3_POLICY),
@@ -293,7 +294,7 @@ public class DataSyncService extends Service {
                 FileTransmission transmission = databaseAdaptor.getFileTransmission(respondentID, image);
                 if (transmission == null) {
                     databaseAdaptor.createTransmissionHistory(respondentID, image,
-                            ConstantUtil.IN_PROGRESS_STATUS);
+                            ConstantUtil.QUEUED_STATUS);// Initial status
                 } else if (ConstantUtil.COMPLETE_STATUS.equals(transmission.getStatus())) {
                     // Uploaded images don't need to be resent
                     Log.d(TAG, "Image " + image + " was previously uploaded. Skipping...");
@@ -442,7 +443,7 @@ public class DataSyncService extends Service {
                     // TODO: this does not always work!
                     for (String id : zipFileData.respondentIDs) {
                         databaseAdaptor.createTransmissionHistory(Long.valueOf(id),
-                                fileName, null);
+                                fileName, ConstantUtil.QUEUED_STATUS);// Initial status
                     }
                 }
 
@@ -772,7 +773,7 @@ public class DataSyncService extends Service {
                 fireNotification(ConstantUtil.FILE_COMPLETE,
                         fileNameForNotification);
             } else {
-                Log.e(TAG, "Server returned a bad checksum after upload: " + checksum);
+                Log.e(TAG, "Server returned a bad checksum after upload: " + etag);
                 
                 if (retries > 0) {
                     Log.i(TAG, "Retrying upload. Remaining attempts: " + retries);

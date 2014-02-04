@@ -13,9 +13,9 @@
         android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:textSize="14sp"
         android:gravity="center"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:text="@string/loading" />
+        android:text="@string/no_surveys_text" />
 
 </LinearLayout>

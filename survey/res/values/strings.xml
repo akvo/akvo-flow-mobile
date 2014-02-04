@@ -187,6 +187,10 @@
     <string name="prefill_title">Prefill Responses</string>
     <string name="prefill_text">Prefill responses with previous values of the same questions</string>
     
+    <!-- Empty Views -->
+    <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the FLOW dashboard</string>
+    <string name="no_records_text">You have no Records synced. To edit records, you need to sync them, or create new ones</string>
+    
     <!-- Activity Labels -->
     <string name="survey_groups_activity">Survey Groups</string>
     <string name="record_list_activity">Select Record</string>

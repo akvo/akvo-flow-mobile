@@ -43,7 +43,6 @@ import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.async.loader.SurveyGroupLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
-import com.gallatinsystems.survey.device.domain.User;
 import com.gallatinsystems.survey.device.service.BootstrapService;
 import com.gallatinsystems.survey.device.service.DataSyncService;
 import com.gallatinsystems.survey.device.service.ExceptionReportingService;
@@ -59,11 +58,11 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     // Loader IDs
     private static final int ID_SURVEY_GROUP_LIST = 0;
     
-    private User mUser;
     private SurveyGroupListAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
     
     private ListView mListView;
+    private TextView mEmptyView;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +74,13 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         mDatabase.open();
         
         mListView = (ListView) findViewById(R.id.list_view);
+        mEmptyView = (TextView) findViewById(android.R.id.empty);
         mAdapter = new SurveyGroupListAdapter(this, null);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(mAdapter);
-        mListView.setEmptyView(findViewById(android.R.id.empty));
+        mListView.setEmptyView(mEmptyView);
         
+        mEmptyView.setText(R.string.loading);// Be friendly
         init();// No external storage will finish the application
     }
     
@@ -87,7 +88,6 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     public void onResume() {
         super.onResume();
         mDatabase.open();
-        mUser = FlowApp.getApp().getUser();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }
@@ -246,7 +246,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
-            mListView.setEmptyView(null);
+            mEmptyView.setText(R.string.no_surveys_text);
             getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, SurveyGroupListActivity.this);
         }
     };

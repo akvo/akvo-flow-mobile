@@ -104,6 +104,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             mAdapter = new SurveyedLocaleListAdapter(getActivity());
             setListAdapter(mAdapter);
         }
+        setEmptyText(getString(R.string.no_records_text));
         getListView().setOnItemClickListener(this);
     }
     

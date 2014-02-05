@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.HttpStatus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Service;
 import android.content.Intent;
@@ -60,6 +64,7 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.MultipartStream;
+import com.gallatinsystems.survey.device.util.PlatformUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.StringUtil;
@@ -90,14 +95,19 @@ public class DataSyncService extends Service {
 
     private static final boolean INCLUDE_IMAGES_IN_ZIP = false;
 
+    private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification?";
     private static final String NOTIFICATION_PATH = "/processor?action=submit&fileName=";
     private static final String NOTIFICATION_PN_PARAM = "&phoneNumber=";
     private static final String CHECKSUM_PARAM = "&checksum=";
     private static final String IMEI_PARAM = "&imei=";
+    private static final String DEVICE_ID_PARAM = "&devId=";
+    private static final String VERSION_PARAM = "&ver=";
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String S3_DATA_FILE_PATH = "devicezip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
     private static final String S3_IMAGE_FILE_PATH = "images";
+    
+    private static final String UTF8 = "UTF-8";
 
     private static final int BUF_SIZE = 2048;
 
@@ -218,7 +228,8 @@ public class DataSyncService extends Service {
             }
             
             // Failed images have a new opportunity to reach their destiny!
-            if (isAbleToRun(type, uploadIndex)) {
+            if (isAbleToRun(ConstantUtil.SEND, uploadIndex)) {
+                checkMissingFiles(serverBase);
                 retryUnsentFiles();
             }
         } catch (InterruptedException e) {
@@ -839,7 +850,86 @@ public class DataSyncService extends Service {
     }
     
     /**
+     * Request missing files (images) in the datastore.
+     * The server will provide us with a list of missing images,
+     * so we can accordingly update their status in the database.
+     * This will help us fixing the Issue #55
+     * 
+     * Steps:
+     * 1- Request the list of files to the server
+     * 2- Update the status of those files in the local database
+     */
+    private void checkMissingFiles(String serverBase) {
+        try {
+            String response = getDeviceNotification(serverBase);
+            if (!TextUtils.isEmpty(response)) {
+                JSONObject jResponse = new JSONObject(response);
+                JSONArray jMissingFiles = jResponse.optJSONArray("missingFiles");
+                JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
+                
+                // Mark the status of the files as 'Failed'
+                for (String file : parseFiles(jMissingFiles)) {
+                    databaseAdaptor.updateTransmissionHistory(file, ConstantUtil.FAILED_STATUS);
+                }
+                
+                // TODO: Handle unknown files
+                // List<String> missingUnknown = parseFiles(jMissingUnknown);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not retrieve missing files", e);
+        }
+    }
+    
+    /**
+     * Request the notifications GAE has ready for us, like the list of missing files.
+     * @param serverBase
+     * @return String body of the HTTP response
+     * @throws Exception
+     */
+    private String getDeviceNotification(String serverBase) throws Exception {
+        String phoneNumber = StatusUtil.getPhoneNumber(this);
+        String imei = StatusUtil.getImei(this);
+        String deviceId = databaseAdaptor.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+        String version = PlatformUtil.getVersionName(this);
+            
+        String url = serverBase + DEVICE_NOTIFICATION_PATH
+                + (phoneNumber != null ? 
+                        NOTIFICATION_PN_PARAM.substring(1) + URLEncoder.encode(phoneNumber, UTF8)
+                        : "")
+                + (imei != null ?
+                        IMEI_PARAM + URLEncoder.encode(imei, UTF8)
+                        : "")
+                + (deviceId != null ?
+                        DEVICE_ID_PARAM + URLEncoder.encode(deviceId, UTF8)
+                        : "")
+                + VERSION_PARAM + URLEncoder.encode(version, UTF8);
+        return HttpUtil.httpGet(url);
+    }
+    
+    /**
+     * Given a json array, return the list of contained filenames,
+     * formatting the path to match the structure of the sdcard's files.
+     * @param jFiles
+     * @return
+     * @throws JSONException
+     */
+    private List<String> parseFiles(JSONArray jFiles) throws JSONException {
+        List<String> files = new ArrayList<String>();
+        if (jFiles != null) {
+            for (int i=0; i<jFiles.length(); i++) {
+                // Build the sdcard path for each image
+                String filename = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
+                        jFiles.getString(i), props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
+                files.add(filename);
+            }
+        }
+        return files;
+    }
+    
+    /**
      * Retry to upload images that didn't make it to the server in previous attempts.
+     * This retroactive way of sending files, will ensure files can reach the datastore,
+     * without requiring user interaction.
      */
     private void retryUnsentFiles() {
         for (FileTransmission file : databaseAdaptor.listFailedTransmissions()) {

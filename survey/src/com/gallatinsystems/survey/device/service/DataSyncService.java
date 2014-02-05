@@ -869,7 +869,11 @@ public class DataSyncService extends Service {
                 
                 // Mark the status of the files as 'Failed'
                 for (String file : parseFiles(jMissingFiles)) {
-                    databaseAdaptor.updateTransmissionHistory(file, ConstantUtil.FAILED_STATUS);
+                    int rows = databaseAdaptor.updateTransmissionHistory(file, ConstantUtil.FAILED_STATUS);
+                    if (rows == 0) {
+                        // Use a dummy "-1" as respondentId, as the database needs that attribute
+                        databaseAdaptor.createTransmissionHistory(Long.valueOf(-1), file, ConstantUtil.FAILED_STATUS);
+                    }
                 }
                 
                 // TODO: Handle unknown files

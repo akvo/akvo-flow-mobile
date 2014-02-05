@@ -1297,8 +1297,9 @@ public class SurveyDbAdapter {
      * 
      * @param fileName
      * @param status
+     * @return the number of rows affected
      */
-    public void updateTransmissionHistory(String fileName, String status) {
+    public int updateTransmissionHistory(String fileName, String status) {
         ContentValues vals = new ContentValues();
         vals.put(STATUS_COL, status);
         if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
@@ -1307,7 +1308,7 @@ public class SurveyDbAdapter {
             vals.put(TRANS_START_COL, System.currentTimeMillis() + "");
         }
         
-        database.update(TRANSMISSION_HISTORY_TABLE, vals, 
+        return database.update(TRANSMISSION_HISTORY_TABLE, vals, 
                 FILENAME_COL + " = ?",
                 new String[] {fileName});
     }

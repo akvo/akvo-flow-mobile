@@ -868,19 +868,29 @@ public class DataSyncService extends Service {
                 JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
                 
                 // Mark the status of the files as 'Failed'
-                for (String file : parseFiles(jMissingFiles)) {
-                    int rows = databaseAdaptor.updateTransmissionHistory(file, ConstantUtil.FAILED_STATUS);
-                    if (rows == 0) {
-                        // Use a dummy "-1" as respondentId, as the database needs that attribute
-                        databaseAdaptor.createTransmissionHistory(Long.valueOf(-1), file, ConstantUtil.FAILED_STATUS);
-                    }
+                for (String filename : parseFiles(jMissingFiles)) {
+                    setFileTransmissionFailed(filename);
                 }
                 
-                // TODO: Handle unknown files
-                // List<String> missingUnknown = parseFiles(jMissingUnknown);
+                // Handle unknown files. If an unknown file exists in the filesystem
+                // it will be marked as failed in the transmission history, so it can
+                // be handled and retried in the next sync attempt.
+                for (String filename : parseFiles(jMissingUnknown)) {
+                    if (new File(filename).exists()) {
+                        setFileTransmissionFailed(filename);
+                    }
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Could not retrieve missing files", e);
+        }
+    }
+    
+    private void setFileTransmissionFailed(String filename) {
+        int rows = databaseAdaptor.updateTransmissionHistory(filename, ConstantUtil.FAILED_STATUS);
+        if (rows == 0) {
+            // Use a dummy "-1" as respondentId, as the database needs that attribute
+            databaseAdaptor.createTransmissionHistory(Long.valueOf(-1), filename, ConstantUtil.FAILED_STATUS);
         }
     }
     

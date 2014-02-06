@@ -44,6 +44,7 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
+import com.gallatinsystems.survey.device.service.ApkUpdateService;
 import com.gallatinsystems.survey.device.service.BootstrapService;
 import com.gallatinsystems.survey.device.service.DataSyncService;
 import com.gallatinsystems.survey.device.service.ExceptionReportingService;
@@ -120,7 +121,11 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
             startService(LocationService.class);
             // startService(PrecacheService.class);
             startService(BootstrapService.class);
-            // startService(ApkUpdateService.class);
+            
+            Intent apkUpdateIntent = new Intent(this, ApkUpdateService.class);
+            apkUpdateIntent.putExtra(ApkUpdateService.EXTRA_MODE, ApkUpdateService.MODE_CHECK);
+            startService(apkUpdateIntent);
+            
             startService(ExceptionReportingService.class);
         }
     }

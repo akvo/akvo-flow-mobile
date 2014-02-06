@@ -235,7 +235,7 @@ public class ViewUtil {
     }
 
     public static void fireNotification(String headline, String body,
-            Context context, int id, Integer iconId, Intent notificationIntent,
+            Context context, int id, Integer iconId, PendingIntent pendingIntent,
             boolean includeSound) {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager notifcationMgr = (NotificationManager) context
@@ -247,11 +247,11 @@ public class ViewUtil {
         Notification notification = new Notification(icon, headline,
                 System.currentTimeMillis());
         notification.defaults |= Notification.DEFAULT_SOUND;
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-                notificationIntent, 0);
-        notification.setLatestEventInfo(context, headline, body, contentIntent);
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        notification.setLatestEventInfo(context, headline, body, pendingIntent);
         notifcationMgr.notify(id, notification);
     }
+    
 
     /**
      * cancels a previously fired notification

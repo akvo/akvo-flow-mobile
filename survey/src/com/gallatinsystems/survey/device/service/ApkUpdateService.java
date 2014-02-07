@@ -33,6 +33,7 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -48,6 +49,7 @@ import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.PlatformUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
+import com.gallatinsystems.survey.device.util.ViewUtil;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -59,13 +61,11 @@ import com.gallatinsystems.survey.device.util.StatusUtil;
  */
 public class ApkUpdateService extends IntentService {
     private static final String TAG = "APK_UPDATE_SERVICE";
-
     private static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=fieldSurvey";
     
     private static final NumberFormat PCT_FORMAT = NumberFormat.getPercentInstance();
     
     private static final int UPGRADE_NOTIFICATION = 101;
-    
     private static final int IO_BUFFER_SIZE = 8192;
     
     public static final String EXTRA_MODE     = "mode";
@@ -73,9 +73,9 @@ public class ApkUpdateService extends IntentService {
     public static final String EXTRA_VERSION  = "version";
     public static final String EXTRA_PATH     = "path";
     
-    public static final int MODE_CHECK    = 0;// Only check the version
-    public static final int MODE_DOWNLOAD = 1;// Download latest version
-    public static final int MODE_INSTALL  = 2;// Install latest version
+    public static final int MODE_CHECK    = 101;// Check latest version
+    public static final int MODE_DOWNLOAD = 102;// Download latest version
+    public static final int MODE_INSTALL  = 103;// Install latest version
 
     public ApkUpdateService() {
         super(TAG);
@@ -85,17 +85,20 @@ public class ApkUpdateService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
                 .getInstance());
-        if (!isAbleToRun()) {
-            Log.d(TAG, "No internet connection. Can't perform the requested operation");
-            return;
-        }
-        
         switch (intent.getIntExtra(EXTRA_MODE, MODE_CHECK)) {
             case MODE_CHECK:
-                checkUpgrade();
+                checkUpdates();
                 break;
             case MODE_DOWNLOAD:
-                downloadApk(intent.getStringExtra(EXTRA_LOCATION), intent.getStringExtra(EXTRA_VERSION));
+                String location = intent.getStringExtra(EXTRA_LOCATION);
+                String version = intent.getStringExtra(EXTRA_VERSION);
+                
+                // Create parent directories, and delete files, if necessary
+                String localPath = setupLocalPath(location, version);
+                
+                if (downloadApk(location, version, localPath)) {
+                    displayInstallNotification(localPath, version);
+                }
                 break;
             case MODE_INSTALL:
                 install(intent.getStringExtra(EXTRA_PATH), intent.getStringExtra(EXTRA_VERSION));
@@ -115,17 +118,63 @@ public class ApkUpdateService extends IntentService {
         return props.getProperty(ConstantUtil.SERVER_BASE);
     }
     
-    private void checkUpgrade() {
+    /**
+     * Check for the latest downloaded version. If old versions are found, delete them.
+     * 
+     * @return the path and version of a newer APK, if found, null otherwise
+     */
+    public static String[] checkDownloadedVersions(Context context) {
+        final String installedVer = PlatformUtil.getVersionName(context);
+        
+        String maxVersion = installedVer;
+        String apkPath = null;
+        
+        File appsLocation = new File(FileUtil.getStorageDirectory(ConstantUtil.APK_DIR, false));
+        if (appsLocation.exists()) {
+            File[] versions = appsLocation.listFiles();
+            if (versions != null) {
+                for (File version : versions) {
+                    File[] apks = version.listFiles();
+                    String versionName = version.getName();
+                    if (!PlatformUtil.isNewerVersion(maxVersion, versionName)) {
+                        // Delete old versions
+                        for (File apk : apks) {
+                            apk.delete();
+                        }
+                        version.delete();
+                    } else if (apks.length > 0){
+                        maxVersion = versionName;
+                        apkPath = apks[0].getAbsolutePath();// There should only be 1
+                    }
+                }
+            }
+        }
+        
+        if (apkPath != null && maxVersion != null) {
+            return new String[]{apkPath, maxVersion};
+        }
+        return null;
+    }
+    
+    /**
+     * Check if new FLOW versions are available to install. If a new version is available, 
+     * we display a notification, requesting the user to download it.
+     */
+    private void checkUpdates() {
+        if (!isAbleToRun()){
+            Log.d(TAG, "No internet connection. Can't perform the requested operation");
+            return;
+        }
+        
         try {
             String response = HttpUtil.httpGet(getServerBase() + APK_VERSION_SERVICE_PATH);
-
             if (!TextUtils.isEmpty(response)) {
                 JSONObject json = new JSONObject(response);
                 String ver = json.getString("version");
                 if (!TextUtils.isEmpty(ver) && !ver.equalsIgnoreCase("null")) {
-                    String installedVer = PlatformUtil.getVersionName(this);
                     String location = json.getString("fileName");
-                    if (PlatformUtil.isNewerVersion(installedVer, ver) && !TextUtils.isEmpty(location)) {
+                    if (PlatformUtil.isNewerVersion(PlatformUtil.getVersionName(this), ver) 
+                            && !TextUtils.isEmpty(location)) {
                         // there is a newer version
                         displayDownloadNotification(location, ver);
                     }
@@ -157,6 +206,25 @@ public class ApkUpdateService extends IntentService {
         
         return size;
     }
+    
+    private String setupLocalPath(String location, String version) {
+        String fileName = location.substring(location.lastIndexOf('/') + 1);
+        String dir = FileUtil.getStorageDirectory(ConstantUtil.APK_DIR + version, false);
+        
+        File directory = new File(dir);
+        // Empty the directory
+        if (directory.exists()) {
+            for (File f : directory.listFiles()) {
+                f.delete();
+            }
+        }
+        directory.delete();
+        directory.mkdirs();
+        
+        String localPath = dir + "/" + fileName;
+        
+        return localPath;
+    }
 
     /**
      * Downloads the apk file and stores it on the file system
@@ -166,19 +234,18 @@ public class ApkUpdateService extends IntentService {
      * @param remoteFile
      * @param surveyId
      */
-    private void downloadApk(String location, String version) {
-        InputStream in = null;
-        OutputStream out = null;
-        HttpURLConnection conn = null;
+    private boolean downloadApk(String location, String version, String localPath) {
+        if (!isAbleToRun()) {
+            Log.d(TAG, "No internet connection. Can't perform the requested operation");
+            return false;
+        }
         
         final int fileSize = fetchFileSize(location);
         Log.d(TAG, "APK size: " + fileSize);
         
-        String fileName = location.substring(location.lastIndexOf('/') + 1);
-        String dir = FileUtil.getStorageDirectory(ConstantUtil.APK_DIR + version, false);
-        new File(dir).mkdirs();
-        String localPath = dir + "/" + fileName;
-        
+        InputStream in = null;
+        OutputStream out = null;
+        HttpURLConnection conn = null;
         try {
             URL url = new URL(location);
             conn = (HttpURLConnection) url.openConnection();
@@ -200,7 +267,7 @@ public class ApkUpdateService extends IntentService {
 
             int status = conn.getResponseCode();
             if (status == 200) {
-                displayInstallNotification(localPath, version);
+                return true;
             } else {
                 Log.e(TAG, "Wrong status code: " + status);
             }
@@ -217,6 +284,8 @@ public class ApkUpdateService extends IntentService {
                 in.close();
             } catch (Exception ignored) {}
         }
+        
+        return false;//Oops
     }
 
     /**
@@ -232,11 +301,14 @@ public class ApkUpdateService extends IntentService {
     }
     
     private void install(String filePath, String version) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(filePath)),
-                "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        // Ensure the version is higher
+        if (PlatformUtil.isNewerVersion(PlatformUtil.getVersionName(this), version)) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(new File(filePath)),
+                    "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
     }
     
     /**
@@ -251,7 +323,7 @@ public class ApkUpdateService extends IntentService {
         intent.putExtra(EXTRA_LOCATION, location);
         intent.putExtra(EXTRA_VERSION, version);
         PendingIntent pendingIntent = PendingIntent.getService(this, 
-                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                MODE_DOWNLOAD, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.info)
@@ -280,7 +352,7 @@ public class ApkUpdateService extends IntentService {
         intent.putExtra(EXTRA_PATH, path);
         intent.putExtra(EXTRA_VERSION, version);
         PendingIntent pendingIntent = PendingIntent.getService(this, 
-                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                MODE_INSTALL, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.info)
@@ -295,6 +367,26 @@ public class ApkUpdateService extends IntentService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(UPGRADE_NOTIFICATION, mBuilder.build());
+    }
+    
+    /**
+     * In your face!
+     * 
+     * @param path
+     * @param version
+     */
+    public static void displayInstallDialog(final Context context, final String path, final String version) {
+       ViewUtil.showConfirmDialog(R.string.updatedownloaded, R.string.clicktoinstall, context, true, 
+               new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, ApkUpdateService.class);
+                    intent.putExtra(EXTRA_MODE, MODE_INSTALL);
+                    intent.putExtra(EXTRA_PATH, path);
+                    intent.putExtra(EXTRA_VERSION, version);
+                    context.startService(intent);
+                }
+            }); 
     }
     
     private void displayDownloadProgress(int bytesWritten, int totalBytes) {

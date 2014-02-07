@@ -48,7 +48,6 @@ import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.PlatformUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
-import com.gallatinsystems.survey.device.util.ViewUtil;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -251,10 +250,22 @@ public class ApkUpdateService extends IntentService {
         intent.putExtra(EXTRA_MODE, MODE_DOWNLOAD);
         intent.putExtra(EXTRA_LOCATION, location);
         intent.putExtra(EXTRA_VERSION, version);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 
+                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        ViewUtil.fireNotification(getString(R.string.updateavail), "Click to download", 
-                this, UPGRADE_NOTIFICATION, null, pendingIntent, true);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.info)
+                .setContentTitle(getString(R.string.updateavail))
+                .setContentText(getString(R.string.clicktodownload))
+                .setTicker(getString(R.string.updateavail))
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true);
+        
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(UPGRADE_NOTIFICATION, mBuilder.build());
     }
     
     /**
@@ -268,10 +279,22 @@ public class ApkUpdateService extends IntentService {
         intent.putExtra(EXTRA_MODE, MODE_INSTALL);
         intent.putExtra(EXTRA_PATH, path);
         intent.putExtra(EXTRA_VERSION, version);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 
+                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        ViewUtil.fireNotification(getString(R.string.updateavail), getString(R.string.clicktoinstall), 
-                this, UPGRADE_NOTIFICATION, null, pendingIntent, true);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.info)
+                .setContentTitle(getString(R.string.updatedownloaded))
+                .setContentText(getString(R.string.clicktoinstall))
+                .setTicker(getString(R.string.updatedownloaded))
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true);
+        
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(UPGRADE_NOTIFICATION, mBuilder.build());
     }
     
     private void displayDownloadProgress(int bytesWritten, int totalBytes) {
@@ -287,11 +310,11 @@ public class ApkUpdateService extends IntentService {
                 : android.R.drawable.stat_sys_download_done;
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(icon)
-                .setContentTitle("Downloading new FLOW version")
-                .setContentText("Completed: " + PCT_FORMAT.format(percentComplete))
-                .setTicker("Downloading new FLOW version");
-        
-        mBuilder.setAutoCancel(true);
+                .setContentTitle(getString(R.string.downloadingupdate))
+                .setContentText(getString(R.string.completed) + PCT_FORMAT.format(percentComplete))
+                .setTicker(getString(R.string.downloadingupdate))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setOngoing(true);
         
         // Progress will only be displayed in Android versions > 4.0
         if (percentComplete > 0.0) {

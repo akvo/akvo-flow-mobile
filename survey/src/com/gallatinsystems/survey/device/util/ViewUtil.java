@@ -240,7 +240,7 @@ public class ViewUtil {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager notifcationMgr = (NotificationManager) context
                 .getSystemService(ns);
-        int icon = android.R.drawable.ic_dialog_info;
+        int icon = R.drawable.info;
         if (iconId != null) {
             icon = iconId;
         }

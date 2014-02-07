@@ -53,7 +53,7 @@ public class PlatformUtil {
      */
     public static boolean isNewerVersion(String installedVersion, String newVersion) {
         // Ensure the Strings are properly formatted
-        final String regex = "^[1-9\\.]+$";// Just check for numbers and dots
+        final String regex = "^\\d+(\\.\\d+)*$";// Check dot-decimal notation
         if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {
             return false;
         }

@@ -126,26 +126,28 @@ public class ApkUpdateService extends IntentService {
     public static String[] checkDownloadedVersions(Context context) {
         final String installedVer = PlatformUtil.getVersionName(context);
         
-        String maxVersion = installedVer;
+        String maxVersion = installedVer;// Keep track of newest version available
         String apkPath = null;
         
         File appsLocation = new File(FileUtil.getStorageDirectory(ConstantUtil.APK_DIR, false));
-        if (appsLocation.exists()) {
-            File[] versions = appsLocation.listFiles();
-            if (versions != null) {
-                for (File version : versions) {
-                    File[] apks = version.listFiles();
-                    String versionName = version.getName();
-                    if (!PlatformUtil.isNewerVersion(maxVersion, versionName)) {
-                        // Delete old versions
-                        for (File apk : apks) {
-                            apk.delete();
-                        }
-                        version.delete();
-                    } else if (apks.length > 0){
-                        maxVersion = versionName;
-                        apkPath = apks[0].getAbsolutePath();// There should only be 1
+        File[] versions = appsLocation.listFiles();
+        if (versions != null) {
+            for (File version : versions) {
+                File[] apks = version.listFiles();
+                if (apks == null) {
+                    continue;// Nothing to see here
+                }
+                
+                String versionName = version.getName();
+                if (!PlatformUtil.isNewerVersion(maxVersion, versionName)) {
+                    // Delete old versions
+                    for (File apk : apks) {
+                        apk.delete();
                     }
+                    version.delete();
+                } else if (apks.length > 0){
+                    maxVersion = versionName;
+                    apkPath = apks[0].getAbsolutePath();// There should only be 1
                 }
             }
         }

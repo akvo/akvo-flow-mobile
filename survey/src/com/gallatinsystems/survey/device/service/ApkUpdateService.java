@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -188,27 +190,6 @@ public class ApkUpdateService extends IntentService {
         }
     }
     
-    private int fetchFileSize(String location) {
-        int size = -1;
-        HttpURLConnection conn = null;
-        try {
-            URL url = new URL(location);
-            conn = (HttpURLConnection)url.openConnection();
-            conn.setRequestMethod("HEAD");
-            conn.connect();
-            
-            size = conn.getContentLength();
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-        
-        return size;
-    }
-    
     private String setupLocalPath(String location, String version) {
         String fileName = location.substring(location.lastIndexOf('/') + 1);
         String dir = FileUtil.getStorageDirectory(ConstantUtil.APK_DIR + version, false);
@@ -242,9 +223,7 @@ public class ApkUpdateService extends IntentService {
             return false;
         }
         
-        final int fileSize = fetchFileSize(location);
-        Log.d(TAG, "APK size: " + fileSize);
-        
+        boolean ok = false;
         InputStream in = null;
         OutputStream out = null;
         HttpURLConnection conn = null;
@@ -258,20 +237,34 @@ public class ApkUpdateService extends IntentService {
             int bytesWritten = 0;
             byte[] b = new byte[IO_BUFFER_SIZE];
             
+            final int fileSize = conn.getContentLength();
+            Log.d(TAG, "APK size: " + fileSize);
+            
             int read;
             while ((read = in.read(b)) != -1) {
                 out.write(b, 0, read);
                 bytesWritten += read;
                 displayDownloadProgress(bytesWritten, fileSize);
             }
-            
             out.flush();
 
-            int status = conn.getResponseCode();
+            final int status = conn.getResponseCode();
+            
             if (status == 200) {
-                return true;
+                Map<String, List<String>> headers = conn.getHeaderFields();
+                String etag = headers != null ? getHeader(headers, "ETag") : null;
+                etag = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+                final String checksum = FileUtil.getMD5Checksum(localPath);
+                
+                if (etag != null && etag.equals(checksum)) {
+                    ok = true;
+                } else {
+                    Log.e(TAG, "ETag comparison failed. Remote: " + etag + " Local: " + checksum);
+                    ok = false;
+                }
             } else {
                 Log.e(TAG, "Wrong status code: " + status);
+                ok = false;
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
@@ -287,7 +280,7 @@ public class ApkUpdateService extends IntentService {
             } catch (Exception ignored) {}
         }
         
-        return false;//Oops
+        return ok;
     }
 
     /**
@@ -325,7 +318,7 @@ public class ApkUpdateService extends IntentService {
         intent.putExtra(EXTRA_LOCATION, location);
         intent.putExtra(EXTRA_VERSION, version);
         PendingIntent pendingIntent = PendingIntent.getService(this, 
-                MODE_DOWNLOAD, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                UPGRADE_NOTIFICATION, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.info)
@@ -354,7 +347,7 @@ public class ApkUpdateService extends IntentService {
         intent.putExtra(EXTRA_PATH, path);
         intent.putExtra(EXTRA_VERSION, version);
         PendingIntent pendingIntent = PendingIntent.getService(this, 
-                MODE_INSTALL, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                UPGRADE_NOTIFICATION, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.info)
@@ -424,6 +417,20 @@ public class ApkUpdateService extends IntentService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(UPGRADE_NOTIFICATION, mBuilder.build());
+    }
+    
+    /**
+     * Helper function to get a particular header field from the header map
+     * @param headers
+     * @param key
+     * @return header value, if found, false otherwise.
+     */
+    private String getHeader(Map<String, List<String>> headers, String key) {
+        List<String> values = headers.get(key);
+        if (values != null && values.size() > 0) {
+            return values.get(0);
+        }
+        return null;
     }
 
 }

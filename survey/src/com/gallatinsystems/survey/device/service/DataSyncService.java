@@ -932,9 +932,10 @@ public class DataSyncService extends Service {
         if (jFiles != null) {
             for (int i=0; i<jFiles.length(); i++) {
                 // Build the sdcard path for each image
-                String filename = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
-                        jFiles.getString(i), props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
-                files.add(filename);
+                String filename = jFiles.getString(i);
+                String directory = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
+                        filename, props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
+                files.add(directory + "/" + filename);
             }
         }
         return files;

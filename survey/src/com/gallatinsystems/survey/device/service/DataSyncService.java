@@ -96,7 +96,8 @@ public class DataSyncService extends Service {
     private static final boolean INCLUDE_IMAGES_IN_ZIP = false;
 
     private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification?";
-    private static final String NOTIFICATION_PATH = "/processor?action=submit&fileName=";
+    private static final String NOTIFICATION_PATH = "/processor?action=";
+    private static final String FILENAME_PARAM = "&fileName=";
     private static final String NOTIFICATION_PN_PARAM = "&phoneNumber=";
     private static final String CHECKSUM_PARAM = "&checksum=";
     private static final String IMEI_PARAM = "&imei=";
@@ -106,6 +107,9 @@ public class DataSyncService extends Service {
     private static final String S3_DATA_FILE_PATH = "devicezip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
     private static final String S3_IMAGE_FILE_PATH = "images";
+    
+    private static final String ACTION_SUBMIT = "submit";
+    private static final String ACTION_IMAGE  = "image";
     
     private static final String UTF8 = "UTF-8";
 
@@ -257,7 +261,7 @@ public class DataSyncService extends Service {
                 DATA_CONTENT_TYPE);
         if (isOk) {
             // Notify GAE back-end that data is available
-            if (sendProcessingNotification(serverBase, destName, zipFileData.checksum)) {
+            if (sendProcessingNotification(serverBase, ACTION_SUBMIT, destName, zipFileData.checksum)) {
                 // Mark everything completed
                 databaseAdaptor.markDataAsSent(zipFileData.respondentIDs, String.valueOf(true));
                 // update the transmission history records too
@@ -287,7 +291,9 @@ public class DataSyncService extends Service {
                 IMAGE_CONTENT_TYPE);
         
         if (ok && notifyServer) {
-            // TODO: Notify GAE server before returning S3 operation's success.
+            // Notify GAE of the image being upload, before marking it as uploaded
+            String filename = getDestName(image);
+            ok = sendProcessingNotification(getServerBase(), ACTION_IMAGE, filename, null);
         }
         
         if (ok) {
@@ -345,7 +351,7 @@ public class DataSyncService extends Service {
 
         return filename;
     }
-
+    
     /**
      * sends a message to the service with the file name that was just uploaded
      * so it can start processing the file
@@ -353,14 +359,17 @@ public class DataSyncService extends Service {
      * @param fileName
      * @return
      */
-    private boolean sendProcessingNotification(String serverBase,
+    private boolean sendProcessingNotification(String serverBase, String action,
             String fileName, String checksum) {
         boolean success = false;
+        
+        String url = serverBase + NOTIFICATION_PATH + action
+                + FILENAME_PARAM + fileName
+                + NOTIFICATION_PN_PARAM + StatusUtil.getPhoneNumber(this)
+                + IMEI_PARAM + StatusUtil.getImei(this)
+                + (checksum != null ? CHECKSUM_PARAM + checksum : "");
         try {
-            HttpUtil.httpGet(serverBase + NOTIFICATION_PATH + fileName
-                    + NOTIFICATION_PN_PARAM + StatusUtil.getPhoneNumber(this)
-                    + IMEI_PARAM + StatusUtil.getImei(this)
-                    + CHECKSUM_PARAM + checksum);
+            HttpUtil.httpGet(url);
             success = true;
         } catch (Exception e) {
             Log.e(TAG, "Could not send processing call", e);

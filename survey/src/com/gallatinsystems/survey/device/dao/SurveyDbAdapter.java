@@ -159,7 +159,8 @@ public class SurveyDbAdapter {
 
     private static final int VER_LAUNCH = 75;// FLOW version <= 1.11.1
     private static final int VER_TIME_TRACK = 76;
-    private static final int DATABASE_VERSION = VER_TIME_TRACK;
+    private static final int VER_RETRY_FILES = 77;
+    private static final int DATABASE_VERSION = VER_RETRY_FILES;
 
     private final Context context;
 
@@ -210,6 +211,10 @@ public class SurveyDbAdapter {
                     // changes in version 76 - Time track
                     db.execSQL("ALTER TABLE survey_respondent ADD COLUMN survey_start INTEGER");
                     version = VER_TIME_TRACK;
+                case VER_TIME_TRACK:
+                    // changes in version 77 - Transmission history records retry
+                    createFilenameIndex(db);
+                    version = VER_RETRY_FILES;
             }
 
             if (version != DATABASE_VERSION) {
@@ -226,7 +231,12 @@ public class SurveyDbAdapter {
                 db.execSQL("DROP TABLE IF EXISTS " + TRANSMISSION_HISTORY_TABLE);
                 
                 onCreate(db);
+                createFilenameIndex(db);
             }
+        }
+        
+        private void createFilenameIndex(SQLiteDatabase db) {
+            db.execSQL("CREATE INDEX filename_idx ON transmission_history(filename)");
         }
 
         @Override
@@ -518,7 +528,7 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(USER_TABLE, new String[] {
                 PK_ID_COL,
                 DISP_NAME_COL, EMAIL_COL
-        }, PK_ID_COL + "=?",
+        }, PK_ID_COL + "= ?",
                 new String[] {
                     id.toString()
                 }, null, null, null);
@@ -547,7 +557,7 @@ public class SurveyDbAdapter {
         if (idVal == null) {
             idVal = database.insert(USER_TABLE, null, initialValues);
         } else {
-            if (database.update(USER_TABLE, initialValues, PK_ID_COL + "=?",
+            if (database.update(USER_TABLE, initialValues, PK_ID_COL + "= ?",
                     new String[] {
                         idVal.toString()
                     }) > 0) {
@@ -568,7 +578,7 @@ public class SurveyDbAdapter {
                 QUESTION_FK_COL, ANSWER_COL, ANSWER_TYPE_COL,
                 SURVEY_RESPONDENT_ID_COL, INCLUDE_FLAG_COL, SCORED_VAL_COL,
                 STRENGTH_COL
-        }, SURVEY_RESPONDENT_ID_COL + "=?",
+        }, SURVEY_RESPONDENT_ID_COL + "= ?",
                 new String[] {
                     respondentID
                 }, null, null, null);
@@ -588,8 +598,8 @@ public class SurveyDbAdapter {
                 RESP_ID_COL, QUESTION_FK_COL, ANSWER_COL, ANSWER_TYPE_COL,
                 SURVEY_RESPONDENT_ID_COL, INCLUDE_FLAG_COL, SCORED_VAL_COL,
                 STRENGTH_COL
-        }, SURVEY_RESPONDENT_ID_COL + "=? and "
-                + QUESTION_FK_COL + "=?",
+        }, SURVEY_RESPONDENT_ID_COL + "= ? and "
+                + QUESTION_FK_COL + "= ?",
                 new String[] {
                         respondentId.toString(), questionId
                 }, null,
@@ -652,7 +662,7 @@ public class SurveyDbAdapter {
             id = database.insert(RESPONSE_TABLE, null, initialValues);
         } else {
             if (database.update(RESPONSE_TABLE, initialValues, RESP_ID_COL
-                    + "=?", new String[] {
+                    + "= ?", new String[] {
                 responseToSave.getId().toString()
             }) > 0) {
                 id = responseToSave.getId();
@@ -674,7 +684,7 @@ public class SurveyDbAdapter {
         Cursor results = database.query(RESPONDENT_TABLE, new String[] {
             "max(" + PK_ID_COL + ")"
         }, SUBMITTED_FLAG_COL + "='false' and "
-                + SURVEY_FK_COL + "=? and " + STATUS_COL + " =?", new String[] {
+                + SURVEY_FK_COL + "= ? and " + STATUS_COL + " = ?", new String[] {
                 surveyId, ConstantUtil.CURRENT_STATUS
         }, null, null, null);
         long id = -1;
@@ -762,7 +772,7 @@ public class SurveyDbAdapter {
                 PK_ID_COL,
                 DISP_NAME_COL, DESC_COL, CREATED_DATE_COL, STATUS_COL
         },
-                PK_ID_COL + "=?", new String[] {
+                PK_ID_COL + "= ?", new String[] {
                     id.toString()
                 }, null, null,
                 null);
@@ -794,7 +804,7 @@ public class SurveyDbAdapter {
         if (idVal == null) {
             idVal = database.insert(PLOT_TABLE, null, initialValues);
         } else {
-            if (database.update(PLOT_TABLE, initialValues, PK_ID_COL + "=?",
+            if (database.update(PLOT_TABLE, initialValues, PK_ID_COL + "= ?",
                     new String[] {
                         idVal.toString()
                     }) > 0) {
@@ -1217,7 +1227,7 @@ public class SurveyDbAdapter {
      * deletes all survey responses from the database for a specific respondent
      */
     public void deleteResponses(String respondentId) {
-        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "=?",
+        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "= ?",
                 new String[] {
                     respondentId
                 });
@@ -1230,7 +1240,7 @@ public class SurveyDbAdapter {
      */
     public void deleteRespondent(String respondentId) {
         deleteResponses(respondentId);
-        database.delete(RESPONDENT_TABLE, PK_ID_COL + "=?",
+        database.delete(RESPONDENT_TABLE, PK_ID_COL + "= ?",
                 new String[] {
                     respondentId
                 });
@@ -1243,8 +1253,8 @@ public class SurveyDbAdapter {
      * @param questionId
      */
     public void deleteResponse(String respondentId, String questionId) {
-        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "=? AND "
-                + QUESTION_FK_COL + "=?", new String[] {
+        database.delete(RESPONSE_TABLE, SURVEY_RESPONDENT_ID_COL + "= ? AND "
+                + QUESTION_FK_COL + "= ?", new String[] {
                 respondentId,
                 questionId
         });
@@ -1281,50 +1291,26 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * updates the first matching transmission history record with the status
+     * Updates the matching transmission history records with the status
      * passed in. If the status == Completed, the completion date is updated. If
      * the status == In Progress, the start date is updated.
      * 
-     * @param respondId
      * @param fileName
      * @param status
+     * @return the number of rows affected
      */
-    public void updateTransmissionHistory(Long respondId, String fileName,
-            String status) {
-        List<FileTransmission> transList = listFileTransmission(respondId,
-                fileName, true);
-        Long idVal = null;
-        if (transList != null && transList.size() > 0) {
-            idVal = transList.get(0).getId();
-            if (idVal != null) {
-                ContentValues vals = new ContentValues();
-                vals.put(STATUS_COL, status);
-                if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
-                    vals.put(DELIVERED_DATE_COL, System.currentTimeMillis()
-                            + "");
-                } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
-                    vals.put(TRANS_START_COL, System.currentTimeMillis() + "");
-                }
-                database.update(TRANSMISSION_HISTORY_TABLE, vals, PK_ID_COL
-                        + " = ?", new String[] {
-                    idVal.toString()
-                });
-            }
-            else
-                // it should have been found
-                Log.e(TAG,
-                        "Could not update transmission history record for respondent_id "
-                                + respondId
-                                + " filename "
-                                + fileName);
+    public int updateTransmissionHistory(String fileName, String status) {
+        ContentValues vals = new ContentValues();
+        vals.put(STATUS_COL, status);
+        if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
+            vals.put(DELIVERED_DATE_COL, System.currentTimeMillis() + "");
+        } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
+            vals.put(TRANS_START_COL, System.currentTimeMillis() + "");
         }
-    }
-
-    public void updateTransmissionHistory(Set<String> respondentIDs, String fileName,
-            String status) {
-        for (String id : respondentIDs) {
-            updateTransmissionHistory(Long.valueOf(id), fileName, status);
-        }
+        
+        return database.update(TRANSMISSION_HISTORY_TABLE, vals, 
+                FILENAME_COL + " = ?",
+                new String[] {fileName});
     }
 
     /**
@@ -1340,7 +1326,7 @@ public class SurveyDbAdapter {
             String fileName, boolean incompleteOnly) {
         List<FileTransmission> transList = null;
 
-        String whereClause = SURVEY_RESPONDENT_ID_COL + "=?";
+        String whereClause = SURVEY_RESPONDENT_ID_COL + "= ?";
         if (incompleteOnly) {
             whereClause = whereClause + " AND " + STATUS_COL + " <> '"
                     + ConstantUtil.COMPLETE_STATUS + "'";
@@ -1394,6 +1380,68 @@ public class SurveyDbAdapter {
             cursor.close();
         }
         return transList;
+    }
+    
+    /**
+     * Return a file transmission for a particular filename/respondent pair.
+     * @param filename
+     * @return the transmission record, if exists, null otherwise
+     */
+    public FileTransmission getFileTransmission(Long respondentId, String filename) {
+        FileTransmission transmission = null;
+        Cursor cursor = database.query(TRANSMISSION_HISTORY_TABLE,
+                new String[] {
+                        PK_ID_COL, FILENAME_COL, STATUS_COL,
+                        TRANS_START_COL, DELIVERED_DATE_COL,
+                        SURVEY_RESPONDENT_ID_COL
+                }, 
+                FILENAME_COL + "= ? AND " + SURVEY_RESPONDENT_ID_COL + "= ?", 
+                new String[] {filename, String.valueOf(respondentId)},
+                null, null, null);
+        
+        if (cursor != null && cursor.moveToFirst()) {
+            transmission  = new FileTransmission();
+            transmission.setId(cursor.getLong(cursor.getColumnIndexOrThrow(PK_ID_COL)));
+            transmission.setRespondentId(cursor.getLong(cursor.getColumnIndexOrThrow(SURVEY_RESPONDENT_ID_COL)));
+            transmission.setFileName(cursor.getString(cursor.getColumnIndexOrThrow(FILENAME_COL)));
+            transmission.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(STATUS_COL)));
+            cursor.close();
+        }
+        
+        return transmission;
+    }
+    
+    public List<FileTransmission> listFailedTransmissions() {
+        List<FileTransmission> transmissions = new ArrayList<FileTransmission>();
+        Cursor cursor = database.query(TRANSMISSION_HISTORY_TABLE,
+                new String[] {
+                        PK_ID_COL, FILENAME_COL, STATUS_COL,
+                        TRANS_START_COL, DELIVERED_DATE_COL,
+                        SURVEY_RESPONDENT_ID_COL
+                }, 
+                STATUS_COL + "= ?", 
+                new String[] {ConstantUtil.FAILED_STATUS},
+                null, null, null);
+        
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                transmissions = new ArrayList<FileTransmission>();
+                do {
+                    FileTransmission trans = new FileTransmission();
+                    trans.setId(cursor.getLong(
+                            cursor.getColumnIndexOrThrow(PK_ID_COL)));
+                    trans.setRespondentId(cursor.getLong(
+                            cursor.getColumnIndexOrThrow(SURVEY_RESPONDENT_ID_COL)));
+                    trans.setFileName(cursor.getString(cursor
+                            .getColumnIndexOrThrow(FILENAME_COL)));
+                    trans.setStatus(cursor.getString(cursor
+                            .getColumnIndexOrThrow(STATUS_COL)));// FAILED_STATUS
+                    transmissions.add(trans);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return transmissions;
     }
 
     /**

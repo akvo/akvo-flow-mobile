@@ -170,8 +170,12 @@
     <string name="pleasewaitforbootstrap">Please wait until the bootstrap file has finished processing.</string>
     <string name="surveychecklabel">Automatically Check for Survey Updates</string>
     <string name="uploaderrorlabel">Automatically Upload App Errors</string>
-    <string name="updateavail">Update Available</string>
-    <string name="clicktoinstall">Click to install</string>
+    <string name="updateavail">A new FLOW update is available</string>
+    <string name="updatedownloaded">FLOW update has been downloaded</string>
+    <string name="downloadingupdate">Downloading FLOW update</string>
+    <string name="completed">COmpleted: </string>
+    <string name="clicktoinstall">New version is downloaded. Click here to install it</string>
+    <string name="clicktodownload">Click here to download it</string>
     <string name="clear_data_success">Data successfully deleted from the device</string>
     <string name="clear_data_error">Error deleting data from the device</string>
     <string name="configuring_languages">Configuring survey languages...</string>

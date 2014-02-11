@@ -44,6 +44,7 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
+import com.gallatinsystems.survey.device.service.ApkUpdateService;
 import com.gallatinsystems.survey.device.service.BootstrapService;
 import com.gallatinsystems.survey.device.service.DataSyncService;
 import com.gallatinsystems.survey.device.service.ExceptionReportingService;
@@ -120,8 +121,25 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
             startService(LocationService.class);
             // startService(PrecacheService.class);
             startService(BootstrapService.class);
-            // startService(ApkUpdateService.class);
             startService(ExceptionReportingService.class);
+            checkApkUpdates();
+        }
+    }
+    
+    /**
+     * Check if new FLOW versions are available to install.
+     * First we check the local storage, to see if the version is already
+     * downloaded. If so, we display a dialog to request the user to install it.
+     * Otherwise, we trigger the ApkUpdateService to check for updates.
+     */
+    private void checkApkUpdates() {
+        String[] latestVersion = ApkUpdateService.checkDownloadedVersions(this);
+        if (latestVersion != null) {
+            ApkUpdateService.displayInstallDialog(this, latestVersion[0], latestVersion[1]);
+        } else {
+            Intent apkUpdateIntent = new Intent(this, ApkUpdateService.class);
+            apkUpdateIntent.putExtra(ApkUpdateService.EXTRA_MODE, ApkUpdateService.MODE_CHECK);
+            startService(apkUpdateIntent);
         }
     }
 

@@ -101,8 +101,6 @@ public class SurveyViewActivity extends TabActivity implements
     private static final String VIDEO_PREFIX = "file:////";
     private static final String HTTP_PREFIX = "http://";
     private static final String VIDEO_TYPE = "video/*";
-    private static final String IMAGE_SUFFIX = ".jpg";
-    private static final String VIDEO_SUFFIX = ".mp4";
 
     private static int pendingRequestCode;
     private static int pendingResultCode;
@@ -494,10 +492,10 @@ public class SurveyViewActivity extends TabActivity implements
                     String fileSuffix = null;
                     if (requestCode == PHOTO_ACTIVITY_REQUEST) {
                         filePrefix = TEMP_PHOTO_NAME_PREFIX;
-                        fileSuffix = IMAGE_SUFFIX;
+                        fileSuffix = ConstantUtil.IMAGE_SUFFIX;
                     } else {
                         filePrefix = TEMP_VIDEO_NAME_PREFIX;
-                        fileSuffix = VIDEO_SUFFIX;
+                        fileSuffix = ConstantUtil.VIDEO_SUFFIX;
                     }
 
                     File f = new File(Environment.getExternalStorageDirectory()
@@ -692,7 +690,7 @@ public class SurveyViewActivity extends TabActivity implements
             i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri
                     .fromFile(new File(Environment
                             .getExternalStorageDirectory().getAbsolutePath() + File.separator
-                            + TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX)));
+                            + TEMP_PHOTO_NAME_PREFIX + ConstantUtil.IMAGE_SUFFIX)));
             if (event.getSource() != null) {
                 eventQuestionSource = event.getSource();
             } else {
@@ -756,7 +754,7 @@ public class SurveyViewActivity extends TabActivity implements
             i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri
                     .fromFile(new File(Environment
                             .getExternalStorageDirectory().getAbsolutePath() + File.separator
-                            + TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX)));
+                            + TEMP_VIDEO_NAME_PREFIX + ConstantUtil.VIDEO_SUFFIX)));
             if (event.getSource() != null) {
                 eventQuestionSource = event.getSource();
             } else {

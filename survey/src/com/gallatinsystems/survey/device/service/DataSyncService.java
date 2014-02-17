@@ -106,6 +106,7 @@ public class DataSyncService extends Service {
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String S3_DATA_FILE_PATH = "devicezip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
+    private static final String VIDEO_CONTENT_TYPE = "video/mp4";
     private static final String S3_IMAGE_FILE_PATH = "images";
     
     private static final String ACTION_SUBMIT = "submit";
@@ -284,11 +285,16 @@ public class DataSyncService extends Service {
 
     private void uploadImage(String image, boolean notifyServer) {
         databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.IN_PROGRESS_STATUS);
+        
+        // 'image/jpeg' mime type, unless it contains the 'mp4' suffix.
+        String contentType = image.endsWith(ConstantUtil.VIDEO_SUFFIX) ? VIDEO_CONTENT_TYPE
+                : IMAGE_CONTENT_TYPE;
+        
         boolean ok = sendFile(image,
                 S3_IMAGE_FILE_PATH,
                 props.getProperty(ConstantUtil.IMAGE_S3_POLICY),
                 props.getProperty(ConstantUtil.IMAGE_S3_SIG),
-                IMAGE_CONTENT_TYPE);
+                contentType);
         
         if (ok && notifyServer) {
             // Notify GAE of the image being upload, before marking it as uploaded

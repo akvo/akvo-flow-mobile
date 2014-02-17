@@ -39,6 +39,8 @@ public class ConstantUtil {
     public static final String STACKTRACE_DIR = "fieldsurvey/stacktrace/";
     public static final String STACKTRACE_FILENAME = "err-";
     public static final String STACKTRACE_SUFFIX = ".stacktrace";
+    public static final String IMAGE_SUFFIX = ".jpg";
+    public static final String VIDEO_SUFFIX = ".mp4";
 
     /**
      * remote dirs

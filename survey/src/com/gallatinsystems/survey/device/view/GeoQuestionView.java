@@ -60,7 +60,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     private EditText latField;
     private TextView lonLabel;
     private EditText generatedCodeField;
-    private TextView generatedCodeLabel;
     private EditText lonField;
     private TextView elevationLabel;
     private EditText elevationField;
@@ -151,13 +150,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         addView(tr);
 
         if (generateCode) {
-            generatedCodeLabel = new TextView(context);
-            generatedCodeLabel.setText(R.string.generatedcode);
             generatedCodeField = new EditText(context);
             generatedCodeField.setWidth(DEFAULT_WIDTH);
-            tr = new TableRow(context);
-            tr.addView(generatedCodeLabel);
-            addView(tr);
             tr = new TableRow(context);
             tr.addView(generatedCodeField);
             tr.setVisibility(View.GONE);

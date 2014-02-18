@@ -183,5 +183,6 @@
 
     <!-- Action to identify the BroadcastReceiver, notifying new surveys have been downloaded -->
     <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
+    <string name="action_data_sync">fieldsurvey.ACTION_DATA_SYNC</string>
 
 </resources>

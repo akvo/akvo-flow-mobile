@@ -157,6 +157,7 @@ public class DataSyncService extends Service {
                     boolean forceFlag = extras != null ? extras.getBoolean(
                             ConstantUtil.FORCE_KEY, false) : false;
                     runSync(type, forceFlag);
+                    sendBroadcastNotification();
                 }
             }
         });
@@ -969,6 +970,14 @@ public class DataSyncService extends Service {
                 uploadImage(filename, true);
             }
         }
+    }
+
+    /**
+     * Dispatch a Broadcast notification to notify of data synchronization.
+     */
+    private void sendBroadcastNotification() {
+        Intent intentBroadcast = new Intent(getString(R.string.action_data_sync));
+        sendBroadcast(intentBroadcast);
     }
 
     /**

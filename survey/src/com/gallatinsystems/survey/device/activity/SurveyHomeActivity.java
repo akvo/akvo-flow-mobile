@@ -26,7 +26,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -45,13 +44,13 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
+import com.gallatinsystems.survey.device.service.ApkUpdateService;
 import com.gallatinsystems.survey.device.service.BootstrapService;
 import com.gallatinsystems.survey.device.service.DataSyncService;
 import com.gallatinsystems.survey.device.service.ExceptionReportingService;
 import com.gallatinsystems.survey.device.service.LocationService;
 import com.gallatinsystems.survey.device.service.SurveyDownloadService;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
-import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.adapter.HomeMenuViewAdapter;
@@ -78,30 +77,18 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
     private String currentName;
     private TextView userField;
     private HomeMenuViewAdapter menuViewAdapter;
-    private PropertyUtil props;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        props = new PropertyUtil(getResources());
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
                 .getInstance());
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.home);
 
-        boolean includeOptional = true;
-        String useOpt = props.getProperty(ConstantUtil.INCLUDE_OPTIONAL_ICONS);
-        if (useOpt != null) {
-            try {
-                includeOptional = Boolean.parseBoolean(useOpt.trim());
-            } catch (Exception e) {
-                Log.e(TAG, "include optional property is not a boolean: "
-                        + useOpt);
-            }
-        }
-        menuViewAdapter = new HomeMenuViewAdapter(this, includeOptional);
+        menuViewAdapter = new HomeMenuViewAdapter(this);
         userField = (TextView) findViewById(R.id.currentUserField);
 
         GridView grid = (GridView) findViewById(R.id.gridview);
@@ -134,8 +121,25 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
             startService(LocationService.class);
             // startService(PrecacheService.class);
             startService(BootstrapService.class);
-            // startService(ApkUpdateService.class);
             startService(ExceptionReportingService.class);
+            checkApkUpdates();
+        }
+    }
+    
+    /**
+     * Check if new FLOW versions are available to install.
+     * First we check the local storage, to see if the version is already
+     * downloaded. If so, we display a dialog to request the user to install it.
+     * Otherwise, we trigger the ApkUpdateService to check for updates.
+     */
+    private void checkApkUpdates() {
+        String[] latestVersion = ApkUpdateService.checkDownloadedVersions(this);
+        if (latestVersion != null) {
+            ApkUpdateService.displayInstallDialog(this, latestVersion[0], latestVersion[1]);
+        } else {
+            Intent apkUpdateIntent = new Intent(this, ApkUpdateService.class);
+            apkUpdateIntent.putExtra(ApkUpdateService.EXTRA_MODE, ApkUpdateService.MODE_CHECK);
+            startService(apkUpdateIntent);
         }
     }
 
@@ -247,24 +251,9 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
         } else if (selected.equals(ConstantUtil.CONF_OP)) {
             Intent i = new Intent(v.getContext(), SettingsActivity.class);
             startActivityForResult(i, SETTINGS_ACTIVITY);
-        } else if (selected.equals(ConstantUtil.PLOT_OP)) {
-            LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Intent i = new Intent(v.getContext(), ListPlotActivity.class);
-                startActivityForResult(i, PLOT_LIST_ACTIVITY);
-            } else {
-                ViewUtil.showGPSDialog(this);
-            }
-        } else if (selected.equals(ConstantUtil.NEARBY_OP)) {
-            Intent i = new Intent(v.getContext(), NearbyItemActivity.class);
-            startActivityForResult(i, NEARBY_ACTIVITY);
         } else if (selected.equals(ConstantUtil.REVIEW_OP)) {
             Intent i = new Intent(v.getContext(), SurveyStatusHomeActivity.class);
             startActivity(i); // No result
-        } else if (selected.equals(ConstantUtil.WATERFLOW_CALC_OP)) {
-            Intent i = new Intent(v.getContext(),
-                    WaterflowCalculatorActivity.class);
-            startActivityForResult(i, WF_CALC_ACTIVITY);
         } else { // Implicit SURVEY_OP
             if (currentUserId != null) {
                 if (!BootstrapService.isProcessing) {
@@ -331,19 +320,6 @@ public class SurveyHomeActivity extends Activity implements OnItemClickListener 
                         currentUserId = null;
                         currentName = null;
                         populateFields();
-                    }
-                }
-                break;
-            case PLOT_LIST_ACTIVITY:
-                if (resultCode == RESULT_OK) {
-                    Bundle bundle = intent.getExtras();
-                    if (bundle != null) {
-                        String plotId = bundle.getString(ConstantUtil.ID_KEY);
-                        String status = bundle.getString(ConstantUtil.STATUS_KEY);
-                        Intent i = new Intent(this, RegionPlotActivity.class);
-                        i.putExtra(ConstantUtil.PLOT_ID_KEY, plotId);
-                        i.putExtra(ConstantUtil.STATUS_KEY, status);
-                        startActivityForResult(i, PLOTTING_ACTIVITY);
                     }
                 }
                 break;

@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.HttpStatus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Service;
 import android.content.Intent;
@@ -53,12 +57,14 @@ import android.util.Log;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.util.Base64;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.MultipartStream;
+import com.gallatinsystems.survey.device.util.PlatformUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.StringUtil;
@@ -89,18 +95,33 @@ public class DataSyncService extends Service {
 
     private static final boolean INCLUDE_IMAGES_IN_ZIP = false;
 
-    private static final String NOTIFICATION_PATH = "/processor?action=submit&fileName=";
+    private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification?";
+    private static final String NOTIFICATION_PATH = "/processor?action=";
+    private static final String FILENAME_PARAM = "&fileName=";
     private static final String NOTIFICATION_PN_PARAM = "&phoneNumber=";
     private static final String CHECKSUM_PARAM = "&checksum=";
     private static final String IMEI_PARAM = "&imei=";
+    private static final String DEVICE_ID_PARAM = "&devId=";
+    private static final String VERSION_PARAM = "&ver=";
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String S3_DATA_FILE_PATH = "devicezip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
+    private static final String VIDEO_CONTENT_TYPE = "video/mp4";
     private static final String S3_IMAGE_FILE_PATH = "images";
+    
+    private static final String ACTION_SUBMIT = "submit";
+    private static final String ACTION_IMAGE  = "image";
+    
+    private static final String UTF8 = "UTF-8";
 
     private static final int BUF_SIZE = 2048;
 
     private static final NumberFormat PCT_FORMAT = NumberFormat.getPercentInstance();
+    
+    /**
+     * Number of retries to upload a file to S3
+     */
+    private static final int FILE_UPLOAD_RETRIES = 2;
 
     private SurveyDbAdapter databaseAdaptor;
     
@@ -116,8 +137,6 @@ public class DataSyncService extends Service {
     private static Semaphore lock = new Semaphore(1);
     private static int counter = 0;
     private PropertyUtil props;
-
-    private boolean debugFailMedia = false;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -138,6 +157,7 @@ public class DataSyncService extends Service {
                     boolean forceFlag = extras != null ? extras.getBoolean(
                             ConstantUtil.FORCE_KEY, false) : false;
                     runSync(type, forceFlag);
+                    sendBroadcastNotification();
                 }
             }
         });
@@ -212,6 +232,12 @@ public class DataSyncService extends Service {
                     databaseAdaptor.markDataAsExported(zipFileData.respondentIDs);
                 }
             }
+            
+            // Failed images have a new opportunity to reach their destiny!
+            if (isAbleToRun(ConstantUtil.SEND, uploadIndex)) {
+                checkMissingFiles(serverBase);
+                retryUnsentFiles();
+            }
         } catch (InterruptedException e) {
             Log.e(TAG, "Data sync interrupted", e);
             PersistentUncaughtExceptionHandler.recordException(e);
@@ -230,20 +256,18 @@ public class DataSyncService extends Service {
 
     private void sendData(ZipFileData zipFileData, String fileName, String destName,
             String serverBase, int uploadIndex) {
-        databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                fileName, ConstantUtil.IN_PROGRESS_STATUS);
+        databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.IN_PROGRESS_STATUS);
         boolean isOk = sendFile(fileName, S3_DATA_FILE_PATH,
                 props.getProperty(ConstantUtil.DATA_S3_POLICY),
                 props.getProperty(ConstantUtil.DATA_S3_SIG),
                 DATA_CONTENT_TYPE);
         if (isOk) {
             // Notify GAE back-end that data is available
-            if (sendProcessingNotification(serverBase, destName, zipFileData.checksum)) {
+            if (sendProcessingNotification(serverBase, ACTION_SUBMIT, destName, zipFileData.checksum)) {
                 // Mark everything completed
                 databaseAdaptor.markDataAsSent(zipFileData.respondentIDs, String.valueOf(true));
                 // update the transmission history records too
-                databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                        fileName, ConstantUtil.COMPLETE_STATUS);
+                databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.COMPLETE_STATUS);
 
                 databaseAdaptor.updatePlotStatus(zipFileData.regionIDs, ConstantUtil.SENT_STATUS);
                 fireNotification(ConstantUtil.SEND, destName);
@@ -252,46 +276,60 @@ public class DataSyncService extends Service {
                         "Could not update send status of data in the database. It will be resent on next execution of the service");
                 // Notification failed, update transmission history
                 // TODO: this could be a different "failed" status
-                databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                        fileName, ConstantUtil.FAILED_STATUS);
+                databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.FAILED_STATUS);
             }
         } else {
             // S3 upload failed, update transmission history
-            databaseAdaptor.updateTransmissionHistory(zipFileData.respondentIDs,
-                    fileName, ConstantUtil.FAILED_STATUS);
+            databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.FAILED_STATUS);
         }
     }
 
-    private boolean uploadImage(String image) {
-        return sendFile(image,
+    private void uploadImage(String image, boolean notifyServer) {
+        databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.IN_PROGRESS_STATUS);
+        
+        // 'image/jpeg' mime type, unless it contains the 'mp4' suffix.
+        String contentType = image.endsWith(ConstantUtil.VIDEO_SUFFIX) ? VIDEO_CONTENT_TYPE
+                : IMAGE_CONTENT_TYPE;
+        
+        boolean ok = sendFile(image,
                 S3_IMAGE_FILE_PATH,
                 props.getProperty(ConstantUtil.IMAGE_S3_POLICY),
                 props.getProperty(ConstantUtil.IMAGE_S3_SIG),
-                IMAGE_CONTENT_TYPE);
+                contentType);
+        
+        if (ok && notifyServer) {
+            // Notify GAE of the image being upload, before marking it as uploaded
+            String filename = getDestName(image);
+            ok = sendProcessingNotification(getServerBase(), ACTION_IMAGE, filename, null);
+        }
+        
+        if (ok) {
+            databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.COMPLETE_STATUS);
+        } else {
+            databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.FAILED_STATUS);
+        }
     }
 
     private void sendImages(Map<String, List<String>> imagePaths) {
         for (Entry<String, List<String>> paths : imagePaths.entrySet()) {
-            final String respondentID = paths.getKey();
+            final Long respondentID = Long.valueOf(paths.getKey());
 
             for (String image : paths.getValue()) {
-                databaseAdaptor.createTransmissionHistory(Long.valueOf(respondentID),
-                        image, ConstantUtil.IN_PROGRESS_STATUS);
-
-                if (uploadImage(image) || !debugFailMedia) {// TODO: Get rid of
-                                                            // this flag
-                    databaseAdaptor.updateTransmissionHistory(
-                            Long.valueOf(respondentID),
-                            image, ConstantUtil.COMPLETE_STATUS);
-                } else {
-                    databaseAdaptor.updateTransmissionHistory(
-                            Long.valueOf(respondentID),
-                            image, ConstantUtil.FAILED_STATUS);
+                FileTransmission transmission = databaseAdaptor.getFileTransmission(respondentID, image);
+                if (transmission == null) {
+                    databaseAdaptor.createTransmissionHistory(respondentID, image,
+                            ConstantUtil.QUEUED_STATUS);// Initial status
+                } else if (ConstantUtil.COMPLETE_STATUS.equals(transmission.getStatus())) {
+                    // Uploaded images don't need to be resent
+                    Log.d(TAG, "Image " + image + " was previously uploaded. Skipping...");
+                    continue;
                 }
+                
+                uploadImage(image, false);
             }
         }
     }
-
+    
     private String getServerBase() {
         final String serverBase = databaseAdaptor.findPreference(ConstantUtil.SERVER_SETTING_KEY);
         if (!TextUtils.isEmpty(serverBase)) {
@@ -320,7 +358,7 @@ public class DataSyncService extends Service {
 
         return filename;
     }
-
+    
     /**
      * sends a message to the service with the file name that was just uploaded
      * so it can start processing the file
@@ -328,14 +366,17 @@ public class DataSyncService extends Service {
      * @param fileName
      * @return
      */
-    private boolean sendProcessingNotification(String serverBase,
+    private boolean sendProcessingNotification(String serverBase, String action,
             String fileName, String checksum) {
         boolean success = false;
+        
+        String url = serverBase + NOTIFICATION_PATH + action
+                + FILENAME_PARAM + fileName
+                + NOTIFICATION_PN_PARAM + StatusUtil.getPhoneNumber(this)
+                + IMEI_PARAM + StatusUtil.getImei(this)
+                + (checksum != null ? CHECKSUM_PARAM + checksum : "");
         try {
-            HttpUtil.httpGet(serverBase + NOTIFICATION_PATH + fileName
-                    + NOTIFICATION_PN_PARAM + StatusUtil.getPhoneNumber(this)
-                    + IMEI_PARAM + StatusUtil.getImei(this)
-                    + CHECKSUM_PARAM + checksum);
+            HttpUtil.httpGet(url);
             success = true;
         } catch (Exception e) {
             Log.e(TAG, "Could not send processing call", e);
@@ -429,7 +470,7 @@ public class DataSyncService extends Service {
                     // TODO: this does not always work!
                     for (String id : zipFileData.respondentIDs) {
                         databaseAdaptor.createTransmissionHistory(Long.valueOf(id),
-                                fileName, null);
+                                fileName, ConstantUtil.QUEUED_STATUS);// Initial status
                     }
                 }
 
@@ -678,6 +719,11 @@ public class DataSyncService extends Service {
         } else
             return "";
     }
+    
+    private boolean sendFile(String fileAbsolutePath, String dir,
+            String policy, String sig, String contentType) {
+        return sendFile(fileAbsolutePath, dir, policy, sig, contentType, FILE_UPLOAD_RETRIES);
+    }
 
     /**
      * sends the zip file containing data/images to the server via an http
@@ -686,7 +732,7 @@ public class DataSyncService extends Service {
      * @param fileAbsolutePath
      */
     private boolean sendFile(String fileAbsolutePath, String dir,
-            String policy, String sig, String contentType) {
+            String policy, String sig, String contentType, int retries) {
 
         try {
             String fileName = fileAbsolutePath;
@@ -754,9 +800,15 @@ public class DataSyncService extends Service {
                 fireNotification(ConstantUtil.FILE_COMPLETE,
                         fileNameForNotification);
             } else {
-                Log.e(TAG, "Server returned a bad checksum after upload: " + checksum);
-                fireNotification(ConstantUtil.ERROR,
-                        getString(R.string.uploaderror) + " "
+                Log.e(TAG, "Server returned a bad checksum after upload: " + etag);
+                
+                if (retries > 0) {
+                    Log.i(TAG, "Retrying upload. Remaining attempts: " + retries);
+                    return sendFile(fileAbsolutePath, dir, policy, sig, contentType, --retries);
+                }
+                
+                Log.e(TAG, "File " + fileName + " upload failed.");
+                fireNotification(ConstantUtil.ERROR, getString(R.string.uploaderror) + " "
                                 + fileNameForNotification);
                 return false;
             }
@@ -766,6 +818,7 @@ public class DataSyncService extends Service {
             PersistentUncaughtExceptionHandler.recordException(e);
             return false;
         }
+        Log.d(TAG, "File " + fileAbsolutePath + " successfully uploaded.");
         return true;
     }
 
@@ -810,6 +863,121 @@ public class DataSyncService extends Service {
             ok = true;
         }
         return ok;
+    }
+    
+    /**
+     * Request missing files (images) in the datastore.
+     * The server will provide us with a list of missing images,
+     * so we can accordingly update their status in the database.
+     * This will help us fixing the Issue #55
+     * 
+     * Steps:
+     * 1- Request the list of files to the server
+     * 2- Update the status of those files in the local database
+     */
+    private void checkMissingFiles(String serverBase) {
+        try {
+            String response = getDeviceNotification(serverBase);
+            if (!TextUtils.isEmpty(response)) {
+                JSONObject jResponse = new JSONObject(response);
+                JSONArray jMissingFiles = jResponse.optJSONArray("missingFiles");
+                JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
+                
+                // Mark the status of the files as 'Failed'
+                for (String filename : parseFiles(jMissingFiles)) {
+                    setFileTransmissionFailed(filename);
+                }
+                
+                // Handle unknown files. If an unknown file exists in the filesystem
+                // it will be marked as failed in the transmission history, so it can
+                // be handled and retried in the next sync attempt.
+                for (String filename : parseFiles(jMissingUnknown)) {
+                    if (new File(filename).exists()) {
+                        setFileTransmissionFailed(filename);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not retrieve missing files", e);
+        }
+    }
+    
+    private void setFileTransmissionFailed(String filename) {
+        int rows = databaseAdaptor.updateTransmissionHistory(filename, ConstantUtil.FAILED_STATUS);
+        if (rows == 0) {
+            // Use a dummy "-1" as respondentId, as the database needs that attribute
+            databaseAdaptor.createTransmissionHistory(Long.valueOf(-1), filename, ConstantUtil.FAILED_STATUS);
+        }
+    }
+    
+    /**
+     * Request the notifications GAE has ready for us, like the list of missing files.
+     * @param serverBase
+     * @return String body of the HTTP response
+     * @throws Exception
+     */
+    private String getDeviceNotification(String serverBase) throws Exception {
+        String phoneNumber = StatusUtil.getPhoneNumber(this);
+        String imei = StatusUtil.getImei(this);
+        String deviceId = databaseAdaptor.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+        String version = PlatformUtil.getVersionName(this);
+            
+        String url = serverBase + DEVICE_NOTIFICATION_PATH
+                + (phoneNumber != null ? 
+                        NOTIFICATION_PN_PARAM.substring(1) + URLEncoder.encode(phoneNumber, UTF8)
+                        : "")
+                + (imei != null ?
+                        IMEI_PARAM + URLEncoder.encode(imei, UTF8)
+                        : "")
+                + (deviceId != null ?
+                        DEVICE_ID_PARAM + URLEncoder.encode(deviceId, UTF8)
+                        : "")
+                + VERSION_PARAM + URLEncoder.encode(version, UTF8);
+        return HttpUtil.httpGet(url);
+    }
+    
+    /**
+     * Given a json array, return the list of contained filenames,
+     * formatting the path to match the structure of the sdcard's files.
+     * @param jFiles
+     * @return
+     * @throws JSONException
+     */
+    private List<String> parseFiles(JSONArray jFiles) throws JSONException {
+        List<String> files = new ArrayList<String>();
+        if (jFiles != null) {
+            for (int i=0; i<jFiles.length(); i++) {
+                // Build the sdcard path for each image
+                String filename = jFiles.getString(i);
+                String directory = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
+                        filename, props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
+                files.add(directory + "/" + filename);
+            }
+        }
+        return files;
+    }
+    
+    /**
+     * Retry to upload images that didn't make it to the server in previous attempts.
+     * This retroactive way of sending files, will ensure files can reach the datastore,
+     * without requiring user interaction.
+     */
+    private void retryUnsentFiles() {
+        for (FileTransmission file : databaseAdaptor.listFailedTransmissions()) {
+            final String filename = file.getFileName();
+            // Skip zip files. TODO: This could potentially be used for zip files as well
+            if (!filename.endsWith(".zip")) {
+                uploadImage(filename, true);
+            }
+        }
+    }
+
+    /**
+     * Dispatch a Broadcast notification to notify of data synchronization.
+     */
+    private void sendBroadcastNotification() {
+        Intent intentBroadcast = new Intent(getString(R.string.action_data_sync));
+        sendBroadcast(intentBroadcast);
     }
 
     /**

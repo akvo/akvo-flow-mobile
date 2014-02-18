@@ -14,33 +14,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
-            <ImageButton
-                android:id="@+id/radiusbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:src="@android:drawable/arrow_down_float" />
-
-            <TextView
-                android:id="@+id/radiuslabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/radiusbutton"
-                android:text="@string/radiuslabel"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/radiusvalue"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/radiuslabel"
-                android:textSize="14sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
             <CheckBox
                 android:id="@+id/lastusercheckbox"
                 android:layout_width="wrap_content"
@@ -141,33 +114,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
-            <ImageButton
-                android:id="@+id/precachepointbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:src="@android:drawable/arrow_down_float" />
-
-            <TextView
-                android:id="@+id/cacheptcountrylabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/precachepointbutton"
-                android:text="@string/cacheptcountrylabel"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/cacheptcountryvalue"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/cacheptcountrylabel"
-                android:textSize="14sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
             <CheckBox
                 android:id="@+id/beaconcheckbox"
                 android:layout_width="wrap_content"
@@ -234,33 +180,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uploaderrorlabel"
-                android:textSize="14sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
-            <ImageButton
-                android:id="@+id/precachehelpbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:src="@android:drawable/arrow_down_float" />
-
-            <TextView
-                android:id="@+id/precachehelplabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/precachehelpbutton"
-                android:text="@string/precachehelplabel"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/precachehelpvalue"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/precachehelplabel"
                 android:textSize="14sp" />
         </RelativeLayout>
 

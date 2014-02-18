@@ -24,7 +24,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -38,7 +37,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.service.LocationService;
-import com.gallatinsystems.survey.device.util.ArrayPreferenceData;
 import com.gallatinsystems.survey.device.util.ArrayPreferenceUtil;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
@@ -63,13 +61,10 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private CheckBox shrinkPhotosCheckbox;
     private TextView uploadOptionTextView;
     private TextView languageTextView;
-    private TextView precacheHelpTextView;
-    private TextView precachePointsTextView;
     private TextView surveyUpdateTextView;
     private TextView uploadErrorTextView;
     private TextView serverTextView;
     private TextView identTextView;
-    private TextView radiusTextView;
     private SurveyDbAdapter database;
 
     private LangsPreferenceData langsPrefData;
@@ -77,8 +72,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private boolean[] langsSelectedBooleanArray;
     private int[] langsSelectedMasterIndexArray;
 
-    private String[] precacheCountryArray;
-    private boolean[] selectedPrecacheCountries;
     private String[] uploadArray;
     private String[] precacheHelpArray;
     private String[] serverArray;
@@ -97,14 +90,11 @@ public class PreferencesActivity extends Activity implements OnClickListener,
 
         uploadOptionTextView = (TextView) findViewById(R.id.uploadoptionvalue);
         languageTextView = (TextView) findViewById(R.id.surveylangvalue);
-        precachePointsTextView = (TextView) findViewById(R.id.cacheptcountryvalue);
-        precacheHelpTextView = (TextView) findViewById(R.id.precachehelpvalue);
 
         surveyUpdateTextView = (TextView) findViewById(R.id.surveycheckvalue);
         uploadErrorTextView = (TextView) findViewById(R.id.uploaderrorvalue);
         serverTextView = (TextView) findViewById(R.id.servervalue);
         identTextView = (TextView) findViewById(R.id.identvalue);
-        radiusTextView = (TextView) findViewById(R.id.radiusvalue);
 
         Resources res = getResources();
         props = new PropertyUtil(res);
@@ -162,21 +152,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                 langsPrefData.getLangsSelectedNameArray(),
                 langsPrefData.getLangsSelectedBooleanArray()));
 
-        val = settings.get(ConstantUtil.PRECACHE_POINT_COUNTRY_KEY);
-        ArrayPreferenceData precacheCountries = ArrayPreferenceUtil.loadArray(
-                this, val, R.array.countries);
-        precacheCountryArray = precacheCountries.getItems();
-        selectedPrecacheCountries = precacheCountries.getSelectedItems();
-        precachePointsTextView.setText(ArrayPreferenceUtil
-                .formSelectedItemString(precacheCountryArray,
-                        selectedPrecacheCountries));
-
-        val = settings.get(ConstantUtil.PRECACHE_SETTING_KEY);
-        if (val != null) {
-            precacheHelpTextView.setText(precacheHelpArray[Integer
-                    .parseInt(val)]);
-        }
-
         val = settings.get(ConstantUtil.CHECK_FOR_SURVEYS);
         if (val != null) {
             surveyUpdateTextView.setText(precacheHelpArray[Integer
@@ -201,11 +176,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             identTextView.setText(val);
         }
 
-        val = settings.get(ConstantUtil.NEARBY_RADIUS);
-        if (val != null) {
-            radiusTextView.setText(Double.parseDouble(val) / 1000.0 + " km");
-        }
-
     }
 
     /**
@@ -226,18 +196,12 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                 .setOnClickListener(this);
         ((ImageButton) findViewById(R.id.surveylangbutton))
                 .setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.precachepointbutton))
-                .setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.precachehelpbutton))
-                .setOnClickListener(this);
         ((ImageButton) findViewById(R.id.serverbutton))
                 .setOnClickListener(this);
         ((ImageButton) findViewById(R.id.identbutton)).setOnClickListener(this);
         ((ImageButton) findViewById(R.id.surveycheckbutton))
                 .setOnClickListener(this);
         ((ImageButton) findViewById(R.id.uploaderrorbutton))
-                .setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.radiusbutton))
                 .setOnClickListener(this);
     }
 
@@ -252,42 +216,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     @Override
     public void onClick(View v) {
-        if (R.id.radiusbutton == v.getId()) {
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-            alert.setTitle(R.string.radiuslabel);
-            alert.setMessage(R.string.radiusprompt);
-
-            // Set an EditText view to get user input
-            final EditText input = new EditText(this);
-            // make it accept numbers only; no negatives, decimals ok
-            input.setKeyListener(new DigitsKeyListener(false, true));
-            alert.setView(input);
-
-            alert.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    String radiusValue = input.getText().toString();
-                    try {// validate input
-                        Double nearbyRadius = Double.parseDouble(radiusValue) * 1000.0;
-                        // save to DB
-                        database.savePreference(ConstantUtil.NEARBY_RADIUS, nearbyRadius.toString());
-                        // Show it
-                        radiusTextView.setText(radiusValue + " km");
-                    }
-                    catch (NumberFormatException e) {
-                        /* could complain here */
-                    }
-                }
-            });
-
-            alert.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Canceled.
-                }
-            });
-
-            alert.show();
-        } else if (R.id.uploadoptionbutton == v.getId()) {
+        if (R.id.uploadoptionbutton == v.getId()) {
             showPreferenceDialog(R.string.uploadoptiondialogtitle,
                     R.array.celluploadoptions,
                     ConstantUtil.CELL_UPLOAD_SETTING_KEY, uploadArray,
@@ -318,13 +247,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                             }
                         }
                     });
-        } else if (R.id.precachehelpbutton == v.getId()) {
-            showPreferenceDialog(R.string.precachehelpdialogtitle,
-                    R.array.precachehelpoptions,
-                    ConstantUtil.PRECACHE_SETTING_KEY, precacheHelpArray,
-                    precacheHelpTextView,
-                    precacheHelpArray[ConstantUtil.PRECACHE_ALWAYS_IDX],
-                    ConstantUtil.PRECACHE_INTENT);
         } else if (R.id.surveycheckbutton == v.getId()) {
             ViewUtil.showAdminAuthDialog(this,
                     new ViewUtil.AdminAuthDialogListener() {
@@ -362,23 +284,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                         }
                     });
 
-        } else if (R.id.precachepointbutton == v.getId()) {
-            ViewUtil.displayCountrySelector(this, selectedPrecacheCountries,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int clicked) {
-                            database.savePreference(
-                                    ConstantUtil.PRECACHE_POINT_COUNTRY_KEY,
-                                    ArrayPreferenceUtil
-                                            .formPreferenceString(selectedPrecacheCountries));
-                            precachePointsTextView.setText(ArrayPreferenceUtil
-                                    .formSelectedItemString(
-                                            precacheCountryArray,
-                                            selectedPrecacheCountries));
-                            if (dialog != null) {
-                                dialog.dismiss();
-                            }
-                        }
-                    });
         } else if (R.id.identbutton == v.getId()) {
             ViewUtil.showAdminAuthDialog(this,
                     new ViewUtil.AdminAuthDialogListener() {

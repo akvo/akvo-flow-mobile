@@ -235,23 +235,23 @@ public class ViewUtil {
     }
 
     public static void fireNotification(String headline, String body,
-            Context context, int id, Integer iconId, Intent notificationIntent,
+            Context context, int id, Integer iconId, PendingIntent pendingIntent,
             boolean includeSound) {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager notifcationMgr = (NotificationManager) context
                 .getSystemService(ns);
-        int icon = android.R.drawable.ic_dialog_info;
+        int icon = R.drawable.info;
         if (iconId != null) {
             icon = iconId;
         }
         Notification notification = new Notification(icon, headline,
                 System.currentTimeMillis());
         notification.defaults |= Notification.DEFAULT_SOUND;
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-                notificationIntent, 0);
-        notification.setLatestEventInfo(context, headline, body, contentIntent);
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        notification.setLatestEventInfo(context, headline, body, pendingIntent);
         notifcationMgr.notify(id, notification);
     }
+    
 
     /**
      * cancels a previously fired notification
@@ -263,16 +263,6 @@ public class ViewUtil {
         NotificationManager notifcationMgr = (NotificationManager) context
                 .getSystemService(ns);
         notifcationMgr.cancel(id);
-    }
-
-    /**
-     * displays a dialog box for selection of one or more countries
-     */
-    public static void displayCountrySelector(final Context context,
-            final boolean[] selections,
-            final DialogInterface.OnClickListener listener) {
-        displaySelectionDialog(context, selections, listener,
-                R.string.cacheptcountrylabel, R.array.countries, false, 0, 0);
     }
 
     /**

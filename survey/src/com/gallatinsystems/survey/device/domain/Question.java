@@ -53,6 +53,7 @@ public class Question {
     private boolean useStrength;
     private int strengthMin;
     private int strengthMax;
+    private boolean doubleEntry;
 
     public void setUseStrength(boolean val) {
         useStrength = val;
@@ -232,9 +233,6 @@ public class Question {
         if (getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).size() > 0) {
             count++;
         }
-        if (getHelpByType(ConstantUtil.ACTIVITY_HELP_TYPE).size() > 0) {
-            count++;
-        }
         return count;
     }
 
@@ -267,4 +265,13 @@ public class Question {
     public String toString() {
         return text;
     }
+    
+    public void setDoubleEntry(boolean doubleEntry) {
+        this.doubleEntry = doubleEntry;
+    }
+    
+    public boolean isDoubleEntry() {
+        return doubleEntry;
+    }
+    
 }

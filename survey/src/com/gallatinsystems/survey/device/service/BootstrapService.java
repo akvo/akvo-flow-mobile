@@ -130,6 +130,7 @@ public class BootstrapService extends Service {
                     String endMessage = getString(R.string.bootstrapcomplete);
                     ViewUtil.fireNotification(endMessage, endMessage, this,
                             NOTIFICATION_ID, android.R.drawable.ic_dialog_info);
+                    sendBroadcastNotification();
                 } finally {
                     if (databaseAdapter != null) {
                         databaseAdapter.close();
@@ -349,6 +350,16 @@ public class BootstrapService extends Service {
         props = new PropertyUtil(getResources());
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
                 .getInstance());
+    }
+
+    /**
+     * Dispatch a Broadcast notification to notify of surveys synchronization.
+     * This notification will be received in SurveyHomeActivity, in order to
+     * refresh its data
+     */
+    private void sendBroadcastNotification() {
+        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
+        sendBroadcast(intentBroadcast);
     }
 
 }

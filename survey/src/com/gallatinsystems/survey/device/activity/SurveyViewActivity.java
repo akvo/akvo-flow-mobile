@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 
 import android.app.AlertDialog;
@@ -87,7 +88,6 @@ public class SurveyViewActivity extends TabActivity implements
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST = 3;
-    private static final int ACTIVITY_HELP_REQ = 4;
     private static final int TXT_SIZE = 1;
     private static final int SURVEY_LANG = 3;
     private static final int SAVE_SURVEY = 4;
@@ -101,8 +101,6 @@ public class SurveyViewActivity extends TabActivity implements
     private static final String VIDEO_PREFIX = "file:////";
     private static final String HTTP_PREFIX = "http://";
     private static final String VIDEO_TYPE = "video/*";
-    private static final String IMAGE_SUFFIX = ".jpg";
-    private static final String VIDEO_SUFFIX = ".mp4";
 
     private static int pendingRequestCode;
     private static int pendingResultCode;
@@ -494,10 +492,10 @@ public class SurveyViewActivity extends TabActivity implements
                     String fileSuffix = null;
                     if (requestCode == PHOTO_ACTIVITY_REQUEST) {
                         filePrefix = TEMP_PHOTO_NAME_PREFIX;
-                        fileSuffix = IMAGE_SUFFIX;
+                        fileSuffix = ConstantUtil.IMAGE_SUFFIX;
                     } else {
                         filePrefix = TEMP_VIDEO_NAME_PREFIX;
-                        fileSuffix = VIDEO_SUFFIX;
+                        fileSuffix = ConstantUtil.VIDEO_SUFFIX;
                     }
 
                     File f = new File(Environment.getExternalStorageDirectory()
@@ -568,17 +566,6 @@ public class SurveyViewActivity extends TabActivity implements
                         Log.e(ACTIVITY_NAME,
                                 "Both the source object and source question id are null");
                     }
-                }
-            } else if (requestCode == ACTIVITY_HELP_REQ) {
-                if (resultCode == RESULT_OK) {
-                    QuestionResponse resp = new QuestionResponse(null,
-                            respondentId, eventQuestionSource.getQuestion()
-                                    .getId(),
-                            data.getStringExtra(ConstantUtil.CALC_RESULT_KEY),
-                            ConstantUtil.VALUE_RESPONSE_TYPE, "true");
-
-                    resp = databaseAdapter.createOrUpdateSurveyResponse(resp);
-                    eventQuestionSource.setResponse(resp);
                 }
             }
         } catch (Exception e) {
@@ -673,7 +660,7 @@ public class SurveyViewActivity extends TabActivity implements
      * 
      * @param questions
      */
-    public void setMissingQuestions(ArrayList<Question> questions) {
+    public void setMissingQuestions(List<Question> questions) {
         missingQuestions.clear();
         if (questions != null) {
             for (int i = 0; i < questions.size(); i++) {
@@ -703,7 +690,7 @@ public class SurveyViewActivity extends TabActivity implements
             i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri
                     .fromFile(new File(Environment
                             .getExternalStorageDirectory().getAbsolutePath() + File.separator
-                            + TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX)));
+                            + TEMP_PHOTO_NAME_PREFIX + ConstantUtil.IMAGE_SUFFIX)));
             if (event.getSource() != null) {
                 eventQuestionSource = event.getSource();
             } else {
@@ -759,26 +746,6 @@ public class SurveyViewActivity extends TabActivity implements
             intent.putExtra(ConstantUtil.IMAGE_CAPTION_LIST_KEY, captions);
 
             startActivity(intent);
-        } else if (QuestionInteractionEvent.ACTIVITY_TIP_VIEW.equals(event
-                .getEventType())) {
-            if (event.getSource() != null) {
-                eventQuestionSource = event.getSource();
-            } else {
-                Log.e(ACTIVITY_NAME, "Question source was null in the event");
-            }
-            try {
-                Intent i = new Intent(this,
-                        ConstantUtil.HELP_ACTIVITIES.get(event.getSource()
-                                .getQuestion()
-                                .getHelpByType(ConstantUtil.ACTIVITY_HELP_TYPE)
-                                .get(0).getValue()));
-                i.putExtra(ConstantUtil.MODE_KEY,
-                        ConstantUtil.SURVEY_RESULT_MODE);
-
-                startActivityForResult(i, ACTIVITY_HELP_REQ);
-            } catch (Exception e) {
-                Log.e(TAG, "Could not start activity help", e);
-            }
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event
                 .getEventType())) {
             // fire off the intent
@@ -787,7 +754,7 @@ public class SurveyViewActivity extends TabActivity implements
             i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri
                     .fromFile(new File(Environment
                             .getExternalStorageDirectory().getAbsolutePath() + File.separator
-                            + TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX)));
+                            + TEMP_VIDEO_NAME_PREFIX + ConstantUtil.VIDEO_SUFFIX)));
             if (event.getSource() != null) {
                 eventQuestionSource = event.getSource();
             } else {
@@ -846,6 +813,22 @@ public class SurveyViewActivity extends TabActivity implements
 
     }
 
+    /**
+     * checks if all the double entry questions (on all tabs) are satisfied.
+     * 
+     * @return list of unsatisfied questions
+     */
+    public List<Question> checkDoubleEntry() {
+        List<Question> unmatchedQuestions = new ArrayList<Question>();
+        if (tabContentFactories != null) {
+            for (int i = 0; i < tabContentFactories.size(); i++) {
+                unmatchedQuestions.addAll(tabContentFactories.get(i)
+                        .checkDoubleQuestions());
+            }
+        }
+        return unmatchedQuestions;
+    }
+    
     /**
      * checks if all the mandatory questions (on all tabs) have responses
      * 
@@ -979,6 +962,10 @@ public class SurveyViewActivity extends TabActivity implements
                                     tabContentFactories.get(i)
                                             .updateQuestionLanguages(
                                                     selectedLanguageCodes);
+                                }
+                                // Also update the submit tab, if exists
+                                if (submissionTab != null) {
+                                    submissionTab.updateSelectedLanguages(selectedLanguageCodes);
                                 }
                             }
                         });

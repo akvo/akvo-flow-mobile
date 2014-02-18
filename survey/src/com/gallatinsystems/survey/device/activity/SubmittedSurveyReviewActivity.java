@@ -18,18 +18,21 @@ package com.gallatinsystems.survey.device.activity;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -69,6 +72,11 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
 
     private Handler mHandler = new Handler();
 
+    /**
+     * Task to refresh the UI. It does not take care of querying the
+     * database, it just notifies the observers that the underlying data
+     * has changed.
+     */
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             if (mSurveyAdapter != null) {
@@ -86,6 +94,10 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
         setContentView(R.layout.submittedsurveyreview);
         viewTypeLabel = (TextView) findViewById(R.id.viewtypelabel);
         databaseAdapter = new SurveyDbAdapter(this);
+        databaseAdapter.open();
+        
+        mSurveyAdapter = new SubmittedSurveyReviewCursorAdaptor(this, null);
+        setListAdapter(mSurveyAdapter);
 
         registerForContextMenu(getListView());
     }
@@ -95,17 +107,8 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
      * submitted surveys.
      */
     private void getData() {
-        try {
-            if (dataCursor != null) {
-                dataCursor.close();
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Could not close old cursor before reloading list", e);
-        }
         dataCursor = databaseAdapter.listSurveyRespondent(ConstantUtil.SUBMITTED_STATUS, true);
-
-        mSurveyAdapter = new SubmittedSurveyReviewCursorAdaptor(this, dataCursor);
-        setListAdapter(mSurveyAdapter);
+        mSurveyAdapter.changeCursor(dataCursor);// Swap the cursor
 
         String label = null;
         label = getString(R.string.submittedsurveyslabel);
@@ -126,29 +129,28 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
         menu.add(0, VIEW_HISTORY, 1, R.string.transmissionhist);
         menu.add(0, RESEND_ONE, 2, R.string.resendone);
     }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        unregisterReceiver(dataSyncReceiver);
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-        databaseAdapter.open();
         getData();
-        mHandler.removeCallbacks(mUpdateTimeTask);
-        mHandler.postDelayed(mUpdateTimeTask, UPDATE_INTERVAL_MS);
+        mHandler.post(mUpdateTimeTask);
+        registerReceiver(dataSyncReceiver,
+                new IntentFilter(getString(R.string.action_data_sync)));
     }
 
     @Override
     protected void onDestroy() {
-        if (mHandler != null) {
-            mHandler.removeCallbacks(mUpdateTimeTask);
-        }
+        databaseAdapter.close();
         if (dataCursor != null) {
-            try {
-                dataCursor.close();
-            } catch (Exception e) {
-            }
-        }
-        if (databaseAdapter != null) {
-            databaseAdapter.close();
+            dataCursor.close();
         }
         super.onDestroy();
     }
@@ -305,5 +307,17 @@ public class SubmittedSurveyReviewActivity extends ListActivity {
         // finish();
         startActivity(i);
     }
+
+    /**
+     * BroadcastReceiver to notify of data synchronisation. This should be
+     * fired from DataSyncService.
+     */
+    private BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "Data have been synchronised. Refreshing UI...");
+            getData();
+        }
+    };
 
 }

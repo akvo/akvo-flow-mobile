@@ -1,5 +1,22 @@
 Akvo FLOW Field Survey app 
-Last update 18 October 2013
+Last update 18 February 2014
+
+#ver 1.13.0
+
+New features & enhancements
+---------------------------
+
+* Implement Double Entry functionality (#40)
+* Handle app upgrade from within the app (#61)
+* Improve reliability of data transfer to S3 (#56)
+* Unused code and features clean up (#49 and #50)
+
+Bug fixes
+---------
+
+* Images were always marked as 'Sent' (#55)
+* Restrict the TEXT question length to 500 chars (#48)
+* Add the proper Mime Type depending on the file (#64)
 
 #ver 1.12.1
 

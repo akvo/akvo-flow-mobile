@@ -54,24 +54,13 @@
             android:label="@string/userlabel"/>
         <activity android:name=".activity.UserEditActivity" />
         <activity android:name=".activity.SettingsActivity" />
-        <activity android:name=".activity.ListPlotActivity" />
-        <activity android:name=".activity.PlotEditActivity" />
-        <activity android:name=".activity.RegionPlotActivity" />
         <activity android:name=".activity.PreferencesActivity" />
         <activity android:name=".activity.ImageBrowserActivity" />
-        <activity android:name=".activity.NearbyItemActivity" />
-        <activity android:name=".activity.NearbyItemDetailActivity" />
-        <activity android:name=".activity.SubmittedSurveyReviewActivity" />
-        <activity android:name=".activity.WaterflowCalculatorActivity" />
-        <activity android:name=".activity.PointOfInterestMapActivity" />
         <activity android:name=".activity.TransmissionHistoryActivity" />
 
         <service android:name=".service.DataSyncService" />
         <service android:name=".service.SurveyDownloadService" />
-        <service android:name=".service.RegionPlotService" />
         <service android:name=".service.LocationService" />
-        <service android:name=".service.GeoTrackService" />
-        <service android:name=".service.PrecacheService" />
         <service android:name=".service.BootstrapService" />
         <service android:name=".service.ExceptionReportingService" />
         <service android:name=".service.ApkUpdateService" />

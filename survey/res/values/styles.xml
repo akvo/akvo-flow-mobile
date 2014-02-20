@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools">
     
     <style name="FieldSurveyTheme" parent="@style/Theme.AppCompat">
-        <item name="android:actionBarStyle">@style/FlowActionBarStyle</item>
+        <item name="android:actionBarStyle" tools:targetApi="11">@style/FlowActionBarStyle</item>
         
         <!-- Support library compatibility -->
         <item name="actionBarStyle">@style/FlowActionBarStyle</item>

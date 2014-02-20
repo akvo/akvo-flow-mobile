@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import android.database.Cursor;
 import android.text.TextUtils;
@@ -53,6 +54,8 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
 
     private HashMap<String, QuestionView> questionMap;
     private HashMap<String, QuestionResponse> responseMap;
+
+    private Set<String> questionIds;
     private Map<String, String> sourceQuestionMap;
 
     private boolean readOnly;
@@ -74,8 +77,17 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         responseMap = null;
         questionGroup = qg;
         questionMap = new HashMap<String, QuestionView>();
+        questionIds = new HashSet<String>();
         sourceQuestionMap = new HashMap<String, String>();
         this.readOnly = readOnly;
+
+        for (Question q : questionGroup.getQuestions()) {
+            questionIds.add(q.getId());
+            if (!TextUtils.isEmpty(q.getSourceQuestionId())) {
+                // If this question has a source question id, add it to the map
+                sourceQuestionMap.put(q.getSourceQuestionId(), q.getId());
+            }
+        }
     }
 
     /**
@@ -155,10 +167,6 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                         ViewGroup.LayoutParams.FILL_PARENT, 2));
             }
             table.addView(tr);
-            // If this question has a source question id, add it to the map
-            if (!TextUtils.isEmpty(q.getSourceQuestionId())) {
-                sourceQuestionMap.put(q.getSourceQuestionId(), q.getId());
-            }
         }
         // set up listeners for dependencies. Since the dependencies can span
         // groups, the parent needs to do this
@@ -318,25 +326,31 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                 }
                 
                 String questionId = resp.getQuestionId();
-                QuestionView questionView = questionMap.get(questionId);
-                if (questionView == null) {
-                    // Fill in the answer form the source question, if exists
-                    questionId = sourceQuestionMap.get(resp.getQuestionId());
-                    questionView = questionId != null ? questionMap.get(questionId) : null;
-                    resp.setQuestionId(questionId);
+
+                if (!questionIds.contains(questionId) && sourceQuestionMap.get(questionId) != null) {
+                    questionId = sourceQuestionMap.get(questionId);
+                    resp.setQuestionId(questionId);// Update the value with the current questionId
                 }
-                
+
+                // If the questionId is not part of questionIds, skip this response
+                if (!questionIds.contains(questionId)) {
+                    continue;
+                }
+
                 if (prefill) {
                     // Copying values from old instance; Get rid of its Id
                     // Also, update the respondentId, matching the current one
                     resp.setId(null);
                     resp.setRespondentId(context.getRespondentId());
+
+                    databaseAdaptor.createOrUpdateSurveyResponse(resp);
                 }
-                
-                if (questionView != null) {
+
+                responseMap.put(questionId, resp);
+
+                if (questionMap.get(questionId) != null) {
                     // Update the question view to reflect the loaded data
-                    questionView.rehydrate(resp);
-                    responseMap.put(resp.getQuestionId(), resp);
+                    questionMap.get(questionId).rehydrate(resp);
                 }
             }
             responseCursor.close();

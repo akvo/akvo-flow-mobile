@@ -1847,11 +1847,12 @@ public class SurveyDbAdapter {
                     metaResponse.setQuestionId(ConstantUtil.QUESTION_LOCALE_NAME);
                     break;
                 case GEOLOCATION:
-                    String[] parts = response.split("\\|");
-                    if (parts.length >= 2) {
-                        surveyedLocaleValues.put(SurveyedLocaleAttrs.LATITUDE, Double.parseDouble(parts[0]));
-                        surveyedLocaleValues.put(SurveyedLocaleAttrs.LONGITUDE, Double.parseDouble(parts[1]));
+                    String[] parts = response != null ? response.split("\\|") : new String[]{};
+                    if (parts.length < 2) {
+                        return;// Wrong format
                     }
+                    surveyedLocaleValues.put(SurveyedLocaleAttrs.LATITUDE, Double.parseDouble(parts[0]));
+                    surveyedLocaleValues.put(SurveyedLocaleAttrs.LONGITUDE, Double.parseDouble(parts[1]));
                     metaResponse.setType("META_GEO");
                     metaResponse.setQuestionId(ConstantUtil.QUESTION_LOCALE_GEO);
                     break;

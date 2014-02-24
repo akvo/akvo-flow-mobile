@@ -26,6 +26,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -60,7 +61,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     private EditText latField;
     private TextView lonLabel;
     private EditText generatedCodeField;
-    private TextView generatedCodeLabel;
     private EditText lonField;
     private TextView elevationLabel;
     private EditText elevationField;
@@ -151,13 +151,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         addView(tr);
 
         if (generateCode) {
-            generatedCodeLabel = new TextView(context);
-            generatedCodeLabel.setText(R.string.generatedcode);
             generatedCodeField = new EditText(context);
             generatedCodeField.setWidth(DEFAULT_WIDTH);
-            tr = new TableRow(context);
-            tr.addView(generatedCodeLabel);
-            addView(tr);
             tr = new TableRow(context);
             tr.addView(generatedCodeField);
             tr.setVisibility(View.GONE);
@@ -365,13 +360,16 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     }
 
     private void setResponse() {
-        if (!generateCode) {
-            setResponse(new QuestionResponse(latField.getText() + DELIM
-                    + lonField.getText() + DELIM + elevationField.getText(),
+        final String lat = latField.getText().toString();
+        final String lon = lonField.getText().toString();
+
+        if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
+            setResponse(null);
+        } else if (!generateCode) {
+            setResponse(new QuestionResponse(lat + DELIM + lon + DELIM + elevationField.getText(),
                     ConstantUtil.GEO_RESPONSE_TYPE, getQuestion().getId()));
         } else {
-            setResponse(new QuestionResponse(latField.getText() + DELIM
-                    + lonField.getText() + DELIM + elevationField.getText()
+            setResponse(new QuestionResponse(lat + DELIM + lon + DELIM + elevationField.getText()
                     + DELIM + generatedCodeField.getText(),
                     ConstantUtil.GEO_RESPONSE_TYPE, getQuestion().getId()));
         }

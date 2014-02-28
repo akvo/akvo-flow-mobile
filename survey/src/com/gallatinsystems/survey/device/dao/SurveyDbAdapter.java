@@ -91,6 +91,7 @@ public class SurveyDbAdapter {
     public static final String TRANS_START_COL = "trans_start_date";
     public static final String EXPORTED_FLAG_COL = "exported_flag";
     public static final String UUID_COL = "uuid";
+    public static final String DURATION_COL = "duration";
 
     private static final String TAG = "SurveyDbAdapter";
     private DatabaseHelper databaseHelper;
@@ -218,7 +219,7 @@ public class SurveyDbAdapter {
                     version = VER_RETRY_FILES;
                 case VER_RETRY_FILES:
                     // changes in version 78 - Time track fix (stop time track when the app is not used)
-                    db.execSQL("ALTER TABLE survey_respondent ADD COLUMN duration INTEGER NOT NULL DEFAULT 0");
+                    db.execSQL("ALTER TABLE survey_respondent ADD COLUMN " + DURATION_COL + " INTEGER NOT NULL DEFAULT 0");
                     version = VER_TIME_TRACK_FIX;
             }
 
@@ -722,6 +723,21 @@ public class SurveyDbAdapter {
         initialValues.put(UUID_COL, UUID.randomUUID().toString());
         initialValues.put(SURVEY_START_COL, System.currentTimeMillis());
         return database.insert(RESPONDENT_TABLE, null, initialValues);
+    }
+    
+    /**
+     * Increment the duration of a particular respondent.
+     * The provided value will be added on top of the already stored one (default to 0).
+     * This will allow users to pause and resume a survey without considering that
+     * time as part of the survey duration.
+     * 
+     * @param sessionDuration time spent in the current session
+     */
+    public void addSurveyDuration(long respondentId, long sessionDuration) {
+        final String sql = "UPDATE " + RESPONDENT_TABLE
+                + " SET " + DURATION_COL + " = " + DURATION_COL + " + " + sessionDuration
+                + " WHERE " + PK_ID_COL + " = " + respondentId;
+        database.execSQL(sql);
     }
 
     /**

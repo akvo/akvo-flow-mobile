@@ -160,7 +160,8 @@ public class SurveyDbAdapter {
     private static final int VER_LAUNCH = 75;// FLOW version <= 1.11.1
     private static final int VER_TIME_TRACK = 76;
     private static final int VER_RETRY_FILES = 77;
-    private static final int DATABASE_VERSION = VER_RETRY_FILES;
+    private static final int VER_TIME_TRACK_FIX = 78;
+    private static final int DATABASE_VERSION = VER_TIME_TRACK_FIX;
 
     private final Context context;
 
@@ -215,6 +216,10 @@ public class SurveyDbAdapter {
                     // changes in version 77 - Transmission history records retry
                     createFilenameIndex(db);
                     version = VER_RETRY_FILES;
+                case VER_RETRY_FILES:
+                    // changes in version 78 - Time track fix (stop time track when the app is not used)
+                    db.execSQL("ALTER TABLE survey_respondent ADD COLUMN duration INTEGER NOT NULL DEFAULT 0");
+                    version = VER_TIME_TRACK_FIX;
             }
 
             if (version != DATABASE_VERSION) {

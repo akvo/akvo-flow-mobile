@@ -45,6 +45,22 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+
+    signingConfigs {
+
+        flowRelease {
+            storeFile file("/Users/ichinaski/akvo/keystore/fieldsurvey-release.keystore")
+            storePassword "F13ldsurvey"
+            keyAlias "fieldsurvey"
+            keyPassword "F13ldsurvey"
+        }
+
+        buildTypes {
+            release {
+                signingConfig signingConfigs.flowRelease
+            }
+        }
+    }
 }
 
 dependencies {

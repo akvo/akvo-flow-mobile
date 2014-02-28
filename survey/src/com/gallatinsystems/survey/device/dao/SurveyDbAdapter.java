@@ -105,7 +105,7 @@ public class SurveyDbAdapter {
 
     private static final String SURVEY_RESPONDENT_CREATE = "create table survey_respondent (_id integer primary key autoincrement, "
             + "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, "
-            + "status text, saved_date long, exported_flag text, uuid text, survey_start integer);";
+            + "status text, saved_date long, exported_flag text, uuid text, survey_start integer, duration integer not null default 0);";
 
     private static final String SURVEY_RESPONSE_CREATE = "create table survey_response (survey_response_id integer primary key autoincrement, "
             + " survey_respondent_id integer not null, question_id text not null, answer_value text not null, answer_type text not null, include_flag text not null, scored_val text, strength text);";
@@ -736,7 +736,8 @@ public class SurveyDbAdapter {
     public void addSurveyDuration(long respondentId, long sessionDuration) {
         final String sql = "UPDATE " + RESPONDENT_TABLE
                 + " SET " + DURATION_COL + " = " + DURATION_COL + " + " + sessionDuration
-                + " WHERE " + PK_ID_COL + " = " + respondentId;
+                + " WHERE " + PK_ID_COL + " = " + respondentId
+                + " AND " + SUBMITTED_FLAG_COL + " = 'false'";
         database.execSQL(sql);
     }
 

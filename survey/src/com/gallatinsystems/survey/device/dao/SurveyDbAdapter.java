@@ -372,7 +372,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL, SURVEY_START_COL
+                STRENGTH_COL, UUID_COL, DURATION_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND" + "(" + DELIVERED_DATE_COL
                 + " is null OR " + MEDIA_SENT_COL + " <> 'true')", null, null,
@@ -394,7 +394,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL, SURVEY_START_COL
+                STRENGTH_COL, UUID_COL, DURATION_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND " + EXPORTED_FLAG_COL
                 + " <> 'true' AND " + "(" + DELIVERED_DATE_COL + " is null OR "

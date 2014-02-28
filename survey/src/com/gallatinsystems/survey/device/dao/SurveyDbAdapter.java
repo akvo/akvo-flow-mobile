@@ -91,6 +91,7 @@ public class SurveyDbAdapter {
     public static final String TRANS_START_COL = "trans_start_date";
     public static final String EXPORTED_FLAG_COL = "exported_flag";
     public static final String UUID_COL = "uuid";
+    public static final String DURATION_COL = "duration";
 
     private static final String TAG = "SurveyDbAdapter";
     private DatabaseHelper databaseHelper;
@@ -104,7 +105,7 @@ public class SurveyDbAdapter {
 
     private static final String SURVEY_RESPONDENT_CREATE = "create table survey_respondent (_id integer primary key autoincrement, "
             + "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, "
-            + "status text, saved_date long, exported_flag text, uuid text, survey_start integer);";
+            + "status text, saved_date long, exported_flag text, uuid text, survey_start integer, duration integer not null default 0);";
 
     private static final String SURVEY_RESPONSE_CREATE = "create table survey_response (survey_response_id integer primary key autoincrement, "
             + " survey_respondent_id integer not null, question_id text not null, answer_value text not null, answer_type text not null, include_flag text not null, scored_val text, strength text);";
@@ -160,7 +161,8 @@ public class SurveyDbAdapter {
     private static final int VER_LAUNCH = 75;// FLOW version <= 1.11.1
     private static final int VER_TIME_TRACK = 76;
     private static final int VER_RETRY_FILES = 77;
-    private static final int DATABASE_VERSION = VER_RETRY_FILES;
+    private static final int VER_TIME_TRACK_FIX = 78;
+    private static final int DATABASE_VERSION = VER_TIME_TRACK_FIX;
 
     private final Context context;
 
@@ -215,6 +217,10 @@ public class SurveyDbAdapter {
                     // changes in version 77 - Transmission history records retry
                     createFilenameIndex(db);
                     version = VER_RETRY_FILES;
+                case VER_RETRY_FILES:
+                    // changes in version 78 - Time track fix (stop time track when the app is not used)
+                    db.execSQL("ALTER TABLE survey_respondent ADD COLUMN " + DURATION_COL + " INTEGER NOT NULL DEFAULT 0");
+                    version = VER_TIME_TRACK_FIX;
             }
 
             if (version != DATABASE_VERSION) {
@@ -366,7 +372,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL, SURVEY_START_COL
+                STRENGTH_COL, UUID_COL, DURATION_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND" + "(" + DELIVERED_DATE_COL
                 + " is null OR " + MEDIA_SENT_COL + " <> 'true')", null, null,
@@ -388,7 +394,7 @@ public class SurveyDbAdapter {
                 ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
                 DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
                 RESPONDENT_TABLE + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL, SURVEY_START_COL
+                STRENGTH_COL, UUID_COL, DURATION_COL
         }, SUBMITTED_FLAG_COL + "= 'true' AND "
                 + INCLUDE_FLAG_COL + "='true' AND " + EXPORTED_FLAG_COL
                 + " <> 'true' AND " + "(" + DELIVERED_DATE_COL + " is null OR "
@@ -717,6 +723,22 @@ public class SurveyDbAdapter {
         initialValues.put(UUID_COL, UUID.randomUUID().toString());
         initialValues.put(SURVEY_START_COL, System.currentTimeMillis());
         return database.insert(RESPONDENT_TABLE, null, initialValues);
+    }
+    
+    /**
+     * Increment the duration of a particular respondent.
+     * The provided value will be added on top of the already stored one (default to 0).
+     * This will allow users to pause and resume a survey without considering that
+     * time as part of the survey duration.
+     * 
+     * @param sessionDuration time spent in the current session
+     */
+    public void addSurveyDuration(long respondentId, long sessionDuration) {
+        final String sql = "UPDATE " + RESPONDENT_TABLE
+                + " SET " + DURATION_COL + " = " + DURATION_COL + " + " + sessionDuration
+                + " WHERE " + PK_ID_COL + " = " + respondentId
+                + " AND " + SUBMITTED_FLAG_COL + " = 'false'";
+        database.execSQL(sql);
     }
 
     /**

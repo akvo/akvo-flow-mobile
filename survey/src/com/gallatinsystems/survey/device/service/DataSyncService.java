@@ -639,7 +639,7 @@ public class DataSyncService extends Service {
                 int scored_val_col = data.getColumnIndexOrThrow(SurveyDbAdapter.SCORED_VAL_COL);
                 int strength_col = data.getColumnIndexOrThrow(SurveyDbAdapter.STRENGTH_COL);
                 int uuid_col = data.getColumnIndexOrThrow(SurveyDbAdapter.UUID_COL);
-                int survey_start_col = data.getColumnIndexOrThrow(SurveyDbAdapter.SURVEY_START_COL);
+                int duration_col = data.getColumnIndexOrThrow(SurveyDbAdapter.DURATION_COL);
 
                 do {
                     // Sanitize answer value. No newlines or tabs!
@@ -654,8 +654,7 @@ public class DataSyncService extends Service {
                         continue;
                     }
                     final long submitted_date = data.getLong(submitted_date_col);
-                    final long started_date = data.getLong(survey_start_col);
-                    final long surveyal_time = (submitted_date - started_date) / 1000;
+                    final long surveyal_time = (data.getLong(duration_col)) / 1000;
 
                     buf.append(data.getString(survey_fk_col));
                     String respId = data.getString(pk_id_col);

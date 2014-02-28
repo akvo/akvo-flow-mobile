@@ -133,6 +133,8 @@ public class SurveyViewActivity extends TabActivity implements
     private PropertyUtil props;
     private HashSet<String> missingQuestions;
     private boolean hasAddedTabs;
+    
+    private long sessionStartTime;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1077,9 +1079,28 @@ public class SurveyViewActivity extends TabActivity implements
             }
         }
     }
+    
+    /**
+     * Store the session time in the database.
+     * This will be called on:
+     * a) Activity's onPause method
+     * b) Survey submission (SubmitTabContentFactory)
+     * 
+     * Either way the duration will be the current time minus
+     * the Activity's onResume time, computing this way the whole
+     * 'SurveyInstance' session duration.
+     */
+    public void saveSessionDuration() {
+        final long sessionDuration = System.currentTimeMillis() - sessionStartTime;
+        databaseAdapter.addSurveyDuration(respondentId, sessionDuration);
+    }
 
     @Override
     protected void onPause() {
+        if (!readOnly) {
+            saveSessionDuration();
+        }
+        
         saveAllResponses();
         if (databaseAdapter != null) {
             databaseAdapter.close();
@@ -1089,6 +1110,7 @@ public class SurveyViewActivity extends TabActivity implements
 
     @Override
     protected void onResume() {
+        sessionStartTime = System.currentTimeMillis();
         try {
             super.onResume();
             databaseAdapter.open();

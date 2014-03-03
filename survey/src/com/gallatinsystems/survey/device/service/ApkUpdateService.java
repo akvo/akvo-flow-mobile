@@ -100,6 +100,10 @@ public class ApkUpdateService extends IntentService {
                 
                 if (downloadApk(location, version, localPath)) {
                     displayInstallNotification(localPath, version);
+                } else {
+                    // Clean up sd-card to ensure no corrupted file is leaked.
+                    setupLocalPath(location, version);
+                    displayErrorNotification();
                 }
                 break;
             case MODE_INSTALL:
@@ -411,6 +415,24 @@ public class ApkUpdateService extends IntentService {
         } else {
             mBuilder.setProgress(1, 1, true);
         }
+        
+        // Dummy intent. Do nothing when clicked
+        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        mBuilder.setContentIntent(intent);
+        
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(UPGRADE_NOTIFICATION, mBuilder.build());
+    }
+    
+    private void displayErrorNotification() {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.stat_notify_error)
+                .setContentTitle(getString(R.string.network_error))
+                .setContentText(getString(R.string.apk_upgrade_error))
+                .setTicker(getString(R.string.network_error))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setOngoing(false);
         
         // Dummy intent. Do nothing when clicked
         PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);

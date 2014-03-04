@@ -180,6 +180,8 @@
     <string name="clear_data_error">Error deleting data from the device</string>
     <string name="configuring_languages">Configuring survey languages...</string>
     <string name="repeat_answer">Please, repeate answer</string>
+    <string name="network_error">Network Error</string>
+    <string name="apk_upgrade_error">Error downloading FLOW update.</string>
 
     <!-- Action to identify the BroadcastReceiver, notifying new surveys have been downloaded -->
     <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>

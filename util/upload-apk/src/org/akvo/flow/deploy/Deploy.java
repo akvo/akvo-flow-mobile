@@ -35,27 +35,34 @@ import com.amazonaws.services.s3.model.PutObjectResult;
  * 
  */
 public class Deploy {
+    private static final int S3_ACCESS_KEY = 0;
+    private static final int S3_SECRET_KEY = 1;
+    private static final int INSTANCE_ID = 2;
+    private static final int APK_PATH = 3;
+    private static final int GAE_USERNAME = 4;
+    private static final int GAE_PASSWORD = 5;
 
     public static void main(String[] args) throws IOException {  
         String bucketName = "akvoflow";
         
         System.out.println("===========================================");
         
-        if (args.length != 4) {
-        	System.out.println("Missing argument, please provide S3 access key, S3 secret key, instanceId and apkPath");
+        if (args.length != 6) {
+        	System.out.println("Missing argument, please provide S3 access key, S3 secret key, "
+        	        + "instanceId , apkPath, GAE username and GAE password");
         	return;
         }
        
-    	BasicAWSCredentials credentials = new BasicAWSCredentials(args[0],args[1]);
+    	BasicAWSCredentials credentials = new BasicAWSCredentials(args[S3_ACCESS_KEY], args[S3_SECRET_KEY]);
     	AmazonS3 s3 = new AmazonS3Client(credentials);
         
-        File f = new File(args[3]);
+        File f = new File(args[APK_PATH]);
         if (!f.exists()) {
-        	System.out.println("Can't find apk at " + args[3]);
+        	System.out.println("Can't find apk at " + args[APK_PATH]);
         	return;
         }
         // the path and name under which the apk will be stored on s3
-        String s3Path = "apk/" + args[2] + "/" + f.getName();
+        String s3Path = "apk/" + args[INSTANCE_ID] + "/" + f.getName();
  
         try {
         	PutObjectRequest putRequest = new PutObjectRequest(bucketName, s3Path, f);

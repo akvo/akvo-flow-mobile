@@ -29,6 +29,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 
 import android.app.IntentService;
@@ -96,13 +97,13 @@ public class ApkUpdateService extends IntentService {
                 String version = intent.getStringExtra(EXTRA_VERSION);
                 
                 // Create parent directories, and delete files, if necessary
-                String localPath = setupLocalPath(location, version);
+                String localPath = cleanupDownloads(location, version);
                 
                 if (downloadApk(location, version, localPath)) {
                     displayInstallNotification(localPath, version);
                 } else {
                     // Clean up sd-card to ensure no corrupted file is leaked.
-                    setupLocalPath(location, version);
+                    cleanupDownloads(location, version);
                     displayErrorNotification();
                 }
                 break;
@@ -196,7 +197,7 @@ public class ApkUpdateService extends IntentService {
         }
     }
     
-    private String setupLocalPath(String location, String version) {
+    private String cleanupDownloads(String location, String version) {
         String fileName = location.substring(location.lastIndexOf('/') + 1);
         String dir = FileUtil.getStorageDirectory(ConstantUtil.APK_DIR + version, false);
         
@@ -256,7 +257,7 @@ public class ApkUpdateService extends IntentService {
 
             final int status = conn.getResponseCode();
             
-            if (status == 200) {
+            if (status == HttpStatus.SC_OK) {
                 Map<String, List<String>> headers = conn.getHeaderFields();
                 String etag = headers != null ? getHeader(headers, "ETag") : null;
                 etag = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes

@@ -1,4 +1,5 @@
 package org.akvo.flow.deploy;
+
 /*
  * Copyright 2010-2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -26,62 +27,63 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.tools.remoteapi.RemoteApiInstaller;
+import com.google.appengine.tools.remoteapi.RemoteApiOptions;
+
 /**
- * Uploads a single fieldsurvey apk to s3. There are four arguments:
- * accessKey - S3 access key
- * secretKey - S3 secret key
- * instanceId - name of the instance, for example 'akvoflow-1'
- * apkPath - the local path to the apk file to be uploaded
- * 
+ * Uploads a single Akvo FLOW APK to s3. 
+ * There are seven arguments: 
+ * - accessKey - S3 access key
+ * - secretKey - S3 secret key
+ * - instanceId - name of the instance,
+ * - apkPath - the local path to the APK file to be
+ * - version - APK version name
+ * - username - Google Account username
+ * - password - Google Account password
  */
 public class Deploy {
     private static final int S3_ACCESS_KEY = 0;
     private static final int S3_SECRET_KEY = 1;
     private static final int INSTANCE_ID = 2;
     private static final int APK_PATH = 3;
-    private static final int GAE_USERNAME = 4;
-    private static final int GAE_PASSWORD = 5;
+    private static final int VERSION = 4;
+    private static final int GAE_USERNAME = 5;
+    private static final int GAE_PASSWORD = 6;
 
-    public static void main(String[] args) throws IOException {  
-        String bucketName = "akvoflow";
-        
+    private static final String BUCKET_NAME = "akvoflow";
+
+    public static void main(String[] args) throws IOException {
         System.out.println("===========================================");
-        
-        if (args.length != 6) {
-        	System.out.println("Missing argument, please provide S3 access key, S3 secret key, "
-        	        + "instanceId , apkPath, GAE username and GAE password");
-        	return;
+
+        if (args.length != 7) {
+            System.out.println("Missing argument, please provide S3 access key, S3 secret key, "
+                    + "instanceId , apkPath, GAE host, GAE username and GAE password");
+            return;
         }
-       
-    	BasicAWSCredentials credentials = new BasicAWSCredentials(args[S3_ACCESS_KEY], args[S3_SECRET_KEY]);
-    	AmazonS3 s3 = new AmazonS3Client(credentials);
-        
-        File f = new File(args[APK_PATH]);
-        if (!f.exists()) {
-        	System.out.println("Can't find apk at " + args[APK_PATH]);
-        	return;
+
+        final String accessKey = args[S3_ACCESS_KEY];
+        final String secretKey = args[S3_SECRET_KEY];
+
+        File file = new File(args[APK_PATH]);
+        if (!file.exists()) {
+            System.out.println("Can't find apk at " + args[APK_PATH]);
+            return;
         }
-        // the path and name under which the apk will be stored on s3
-        String s3Path = "apk/" + args[INSTANCE_ID] + "/" + f.getName();
- 
+
+        final String instance = args[INSTANCE_ID];
+        final String s3Path = "apk/" + instance + "/" + file.getName();
+        final String s3Url = "http://akvoflow.s3.amazonaws.com/apk/" + instance + '/' + file.getName();
+        final String host = instance + ".appspot.com";
+        final String username = args[GAE_USERNAME];
+        final String password = args[GAE_PASSWORD];
+        final String version = args[VERSION];
+        
         try {
-        	PutObjectRequest putRequest = new PutObjectRequest(bucketName, s3Path, f);
-        	ObjectMetadata metadata = new ObjectMetadata();
-        	
-        	// set content type as android package file
-        	metadata.setContentType("application/vnd.android.package-archive");
-        	
-        	// set content length to length of file
-        	metadata.setContentLength(f.length());
-        	
-        	// set access to public
-        	putRequest.setMetadata(metadata);
-        	putRequest.setCannedAcl(CannedAccessControlList.PublicRead);
-        	
-        	// try to put the apk in S3
-        	PutObjectResult result = s3.putObject(putRequest);
-        	System.out.println("Apk uploaded successfully, with result ETag " + result.getETag());
-        	
+            uploadS3(accessKey, secretKey, s3Path, file);
+            updateVersion(host, username, password, s3Url, version);
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which means your request made it "
                     + "to Amazon S3, but was rejected with an error response for some reason.");
@@ -95,6 +97,54 @@ public class Deploy {
                     + "a serious internal problem while trying to communicate with S3, "
                     + "such as not being able to access the network.");
             System.out.println("Error Message: " + ace.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error updating APK version in GAE");
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void uploadS3(String accessKey, String secretKey, String s3Path, File file) 
+            throws AmazonServiceException, AmazonClientException {
+        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3 = new AmazonS3Client(credentials);
+
+        PutObjectRequest putRequest = new PutObjectRequest(BUCKET_NAME, s3Path, file);
+        ObjectMetadata metadata = new ObjectMetadata();
+
+        // set content type as android package file
+        metadata.setContentType("application/vnd.android.package-archive");
+
+        // set content length to length of file
+        metadata.setContentLength(file.length());
+
+        // set access to public
+        putRequest.setMetadata(metadata);
+        putRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+
+        // try to put the apk in S3
+        PutObjectResult result = s3.putObject(putRequest);
+        System.out.println("Apk uploaded successfully, with result ETag " + result.getETag());
+    }
+
+    private static void updateVersion(String host, String username, String password, String url, 
+            String version) throws IOException {
+        RemoteApiOptions options = new RemoteApiOptions().server(host, 443)
+                .credentials(username, password);
+        RemoteApiInstaller installer = new RemoteApiInstaller();
+        installer.install(options);
+        try {
+            DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+            
+            Entity e = new Entity("DeviceApplication");
+            e.setProperty("appCode", "fieldSurvey");
+            e.setProperty("deviceType", "androidPhone");
+            e.setProperty("version", version);
+            e.setProperty("fileName", url);
+            ds.put(e);
+        } finally {
+            installer.uninstall();
         }
     }
+
 }

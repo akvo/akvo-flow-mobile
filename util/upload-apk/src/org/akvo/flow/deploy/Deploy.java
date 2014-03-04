@@ -1,3 +1,4 @@
+package org.akvo.flow.deploy;
 /*
  * Copyright 2010-2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -33,7 +34,7 @@ import com.amazonaws.services.s3.model.PutObjectResult;
  * apkPath - the local path to the apk file to be uploaded
  * 
  */
-public class S3Sample {
+public class Deploy {
 
     public static void main(String[] args) throws IOException {  
         String bucketName = "akvoflow";

@@ -56,16 +56,11 @@ public class Deploy {
     private static final String BUCKET_NAME = "akvoflow";
 
     public static void main(String[] args) throws IOException {
-        System.out.println("===========================================");
-
         if (args.length != 7) {
             System.out.println("Missing argument, please provide S3 access key, S3 secret key, "
                     + "instanceId , apkPath, GAE host, GAE username and GAE password");
             return;
         }
-
-        final String accessKey = args[S3_ACCESS_KEY];
-        final String secretKey = args[S3_SECRET_KEY];
 
         File file = new File(args[APK_PATH]);
         if (!file.exists()) {
@@ -73,13 +68,16 @@ public class Deploy {
             return;
         }
 
+        final String accessKey = args[S3_ACCESS_KEY];
+        final String secretKey = args[S3_SECRET_KEY];
         final String instance = args[INSTANCE_ID];
-        final String s3Path = "apk/" + instance + "/" + file.getName();
-        final String s3Url = "http://akvoflow.s3.amazonaws.com/apk/" + instance + '/' + file.getName();
-        final String host = instance + ".appspot.com";
         final String username = args[GAE_USERNAME];
         final String password = args[GAE_PASSWORD];
         final String version = args[VERSION];
+        
+        final String s3Path = "apk/" + instance + "/" + file.getName();
+        final String s3Url = "http://akvoflow.s3.amazonaws.com/apk/" + instance + '/' + file.getName();
+        final String host = instance + ".appspot.com";
         
         try {
             uploadS3(accessKey, secretKey, s3Path, file);

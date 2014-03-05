@@ -21,26 +21,25 @@ GAE_PASSWORD=password
 
 VERSION=$(sed -n '/android:versionName="/{;s///;s/".*$//;p;d;}' AndroidManifest.xml | tr -d ' ')
 
-rm -r tmp;
-rm -r builds;
-mkdir tmp;
-mkdir builds;
+rm -r tmp
+rm -r builds
+mkdir tmp
+mkdir builds
 
 
 find $SERVER_CONFIG_PATH/ -name 'appengine-web.xml' -exec sed -n 's/\(.*\)<application>\(.*\)<\/application>\(.*\)/\2/p' {} \; | sort > tmp/instances.txt
 for i in $(cat tmp/instances.txt); do 
-    rm -r bin;
-    rm -r gen;
+    rm -r bin
+    rm -r gen
     echo '=================================================='
-    if [ -f $SERVER_CONFIG_PATH/$i/survey.properties ]
-    then
-        echo 'generating apk version' $VERSION 'for instance' $i;
-        ant flow-release -Dsurvey.properties=$SERVER_CONFIG_PATH/$i/survey.properties >> tmp/antout.txt;
-        mkdir -p builds/$i/$VERSION;
-        mv bin/fieldsurvey-*.apk builds/$i/$VERSION/; 
+    if [ -f $SERVER_CONFIG_PATH/$i/survey.properties ]; then
+        echo 'generating apk version' $VERSION 'for instance' $i
+        ant flow-release -Dsurvey.properties=$SERVER_CONFIG_PATH/$i/survey.properties >> tmp/antout.txt
+        mkdir -p builds/$i/$VERSION
+        mv bin/fieldsurvey-*.apk builds/$i/$VERSION/
         echo 'Deploying APK...'
         java -jar $UPLOAD_S3_PATH/deploy.jar $S3_ACCESS_KEY $S3_SECRET_KEY $i $APK_BUILD_DIR/$i/$VERSION/fieldsurvey-$VERSION.apk $VERSION $GAE_USERNAME $GAE_PASSWORD
     else
-        'Cannot find survey.properties file for instance' $i;
+        'Cannot find survey.properties file for instance' $i
     fi
-done;
+done

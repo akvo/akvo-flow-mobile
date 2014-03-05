@@ -1,5 +1,13 @@
 Akvo FLOW Field Survey app 
-Last update 18 February 2014
+Last update 05 March 2014
+
+#ver 1.13.2
+
+New Features & enhancements
+---------------------------
+
+* Accurately compute survey duration (#69)
+* Cleanup failed APK downloads (#71)
 
 #ver 1.13.0
 

@@ -57,14 +57,14 @@ public class Deploy {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 7) {
-            System.out.println("Missing argument, please provide S3 access key, S3 secret key, "
-                    + "instanceId , apkPath, GAE host, GAE username and GAE password");
+            System.err.println("Missing argument, please provide S3 access key, S3 secret key, "
+                    + "instanceId , apkPath, version, GAE username and GAE password");
             return;
         }
 
         File file = new File(args[APK_PATH]);
         if (!file.exists()) {
-            System.out.println("Can't find apk at " + args[APK_PATH]);
+            System.err.println("Can't find apk at " + args[APK_PATH]);
             return;
         }
 
@@ -83,20 +83,20 @@ public class Deploy {
             uploadS3(accessKey, secretKey, s3Path, file);
             updateVersion(host, username, password, s3Url, version);
         } catch (AmazonServiceException ase) {
-            System.out.println("Caught an AmazonServiceException, which means your request made it "
+            System.err.println("Caught an AmazonServiceException, which means your request made it "
                     + "to Amazon S3, but was rejected with an error response for some reason.");
-            System.out.println("Error Message:    " + ase.getMessage());
-            System.out.println("HTTP Status Code: " + ase.getStatusCode());
-            System.out.println("AWS Error Code:   " + ase.getErrorCode());
-            System.out.println("Error Type:       " + ase.getErrorType());
-            System.out.println("Request ID:       " + ase.getRequestId());
+            System.err.println("Error Message:    " + ase.getMessage());
+            System.err.println("HTTP Status Code: " + ase.getStatusCode());
+            System.err.println("AWS Error Code:   " + ase.getErrorCode());
+            System.err.println("Error Type:       " + ase.getErrorType());
+            System.err.println("Request ID:       " + ase.getRequestId());
         } catch (AmazonClientException ace) {
-            System.out.println("Caught an AmazonClientException, which means the client encountered "
+            System.err.println("Caught an AmazonClientException, which means the client encountered "
                     + "a serious internal problem while trying to communicate with S3, "
                     + "such as not being able to access the network.");
-            System.out.println("Error Message: " + ace.getMessage());
+            System.err.println("Error Message: " + ace.getMessage());
         } catch (IOException e) {
-            System.out.println("Error updating APK version in GAE");
+            System.err.println("Error updating APK version in GAE");
             e.printStackTrace();
         }
 

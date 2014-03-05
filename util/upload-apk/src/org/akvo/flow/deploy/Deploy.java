@@ -143,6 +143,7 @@ public class Deploy {
         } finally {
             installer.uninstall();
         }
+        System.out.println("New APK version successfully stored in GAE");
     }
 
 }

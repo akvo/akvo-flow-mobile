@@ -159,6 +159,11 @@ public class FreetextQuestionView extends QuestionView implements
         }
     }
     
+    @Override
+    public void resetQuestion(boolean fireEvent) {
+        resetQuestion(true, fireEvent);
+    }
+    
     private void resetQuestion(boolean clearFields, boolean fireEvent) {
         if (clearFields) {
             freetextEdit.setText("");

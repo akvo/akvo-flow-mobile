@@ -16,6 +16,7 @@ package org.akvo.flow.deploy;
  */
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -26,7 +27,6 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
-
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -139,6 +139,10 @@ public class Deploy {
             e.setProperty("deviceType", "androidPhone");
             e.setProperty("version", version);
             e.setProperty("fileName", url);
+            
+            final Date date = new Date();// use the same timestampt
+            e.setProperty("createdDateTime", date);
+            e.setProperty("lastUpdateDateTime", date);
             ds.put(e);
         } finally {
             installer.uninstall();

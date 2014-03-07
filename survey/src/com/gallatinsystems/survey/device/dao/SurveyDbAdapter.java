@@ -124,6 +124,10 @@ public class SurveyDbAdapter {
         String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
         String RECORD = "record";// Introduced in Point Updates
         String SYNC_TIME = "sync_time";// Introduced in Point Updates
+
+        String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
+                + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
+                + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
     }
 
     public interface SurveyGroupColumns {
@@ -157,6 +161,8 @@ public class SurveyDbAdapter {
         String SAVED_DATE = "saved_date";
         String SUBMITTED_DATE = "saved_date";
         String RECORD_ID = "surveyed_locale_id";
+        String EXPORTED_DATE = "exported_date";
+        String SENT_DATE = "sent_date";
         String STATUS = "status";// TODO: Is this needed?
     }
 
@@ -281,7 +287,7 @@ public class SurveyDbAdapter {
                     + SurveyColumns.LANGUAGE + " TEXT,"
                     + SurveyColumns.HELP_DOWNLOADED + " INTEGER NOT NULL DEFAULT 0,"
                     + SurveyColumns.DELETED + " INTEGER NOT NULL DEFAULT 0,"
-            + "UNIQUE (" + SurveyColumns.SURVEY_ID + ") ON CONFLICT REPLACE)");
+                    + "UNIQUE (" + SurveyColumns.SURVEY_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY_GROUP + " ("
                     + SurveyGroupColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -299,6 +305,8 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.SUBMITTED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.RECORD_ID + " TEXT,"
                     + SurveyInstanceColumns.STATUS + " TEXT,"
+                    + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
+                    + SurveyInstanceColumns.SENT_DATE + " INTEGER,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -543,7 +551,45 @@ public class SurveyDbAdapter {
         }
         return cursor;
     }
+
+    public Cursor getUnexportedSurveyInstances() {
+        return database.query(Tables.SURVEY_INSTANCE_JOIN_USER,
+                new String[] {
+                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
+                        SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.RECORD_ID,
+                        SurveyInstanceColumns.SUBMITTED_DATE, SurveyInstanceColumns.EXPORTED_DATE,
+                        SurveyInstanceColumns.UUID, UserColumns.NAME, UserColumns.EMAIL
+                },
+                SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL AND "
+                        + SurveyInstanceColumns.EXPORTED_DATE + " IS NULL",
+                null, null, null, null);
+    }
      */
+
+    public Cursor getUnexportedSurveyInstances() {
+        return database.query(Tables.SURVEY_INSTANCE,
+                new String[] {
+                        SurveyInstanceColumns.SURVEY_ID
+                },
+                SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL AND "
+                        + SurveyInstanceColumns.EXPORTED_DATE + " IS NULL",
+                null, null, null, null);
+    }
+
+    public Cursor getResponses(long surveyInstanceId) {
+        return database.query(Tables.SURVEY_INSTANCE_JOIN_RESPONSE_USER,
+                new String[] {
+                        SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.SUBMITTED_DATE,
+                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
+                        SurveyInstanceColumns.RECORD_ID, ResponseColumns.ANSWER,
+                        ResponseColumns.TYPE, ResponseColumns.QUESTION_ID, ResponseColumns.STRENGTH,
+                        ResponseColumns.SCORED_VAL, UserColumns.NAME, UserColumns.EMAIL
+                },
+                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.INCLUDE + " = 1",
+                new String[] {
+                        String.valueOf(surveyInstanceId)
+                }, null, null, null);
+    }
 
     /**
      * Get the amount of responses that have not been sent to the backend

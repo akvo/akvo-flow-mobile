@@ -99,6 +99,10 @@ public class SyncService extends IntentService {
         mDatabase.close();
     }
 
+    // ================================================================= //
+    // ============================ EXPORT ============================= //
+    // ================================================================= //
+
     private void exportSurveys() {
         int[] surveyInstanceIds = new int[0];// Avoid null cases
         Cursor cursor = mDatabase.getUnexportedSurveyInstances();
@@ -117,10 +121,10 @@ public class SyncService extends IntentService {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
                 // Create new entries in the transmission queue
-                // TODO: Add zip file entry
+                mDatabase.createTransmission(id, zipFileData.filename);
 
                 for (String image : zipFileData.imagePaths) {
-                    // TODO: Add image entries
+                    mDatabase.createTransmission(id, image);
                 }
             }
         }
@@ -317,6 +321,10 @@ public class SyncService extends IntentService {
 
         return dir + File.separator + fileName;
     }
+
+    // ================================================================= //
+    // ======================= SYNCHRONISATION ========================= //
+    // ================================================================= //
 
     /**
      * Helper class to wrap zip file's meta-data.<br>

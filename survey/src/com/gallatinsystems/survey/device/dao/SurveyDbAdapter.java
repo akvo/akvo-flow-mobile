@@ -1207,6 +1207,13 @@ public class SurveyDbAdapter {
         });
     }
 
+    public void createTransmission (long surveyInstanceId, String filename) {
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
+        values.put(TransmissionColumns.FILENAME, filename);
+        values.put(TransmissionColumns.STATUS, ConstantUtil.QUEUED_STATUS);
+        database.insert(Tables.TRANSMISSION, null, values);
+    }
 
     /**
      * inserts a transmissionHistory row into the db

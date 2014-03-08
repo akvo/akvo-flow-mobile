@@ -19,25 +19,37 @@ package com.gallatinsystems.survey.device.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.ResponseColumns;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.UserColumns;
+import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.util.Base64;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
+import com.gallatinsystems.survey.device.util.HttpUtil;
+import com.gallatinsystems.survey.device.util.MultipartStream;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
+import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.StringUtil;
+import com.gallatinsystems.survey.device.util.ViewUtil;
+
+import org.apache.http.HttpStatus;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Adler32;
@@ -78,6 +90,35 @@ public class SyncService extends IntentService {
     private static final String SURVEY_DATA_FILE = "data.txt";
     private static final String SIG_FILE_NAME = ".sig";
 
+    // Sync constants
+    //private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification?";
+    private static final String NOTIFICATION_PATH = "/processor?action=";
+    private static final String FILENAME_PARAM = "&fileName=";
+    private static final String NOTIFICATION_PN_PARAM = "&phoneNumber=";
+    private static final String CHECKSUM_PARAM = "&checksum=";
+    private static final String IMEI_PARAM = "&imei=";
+    //private static final String DEVICE_ID_PARAM = "&devId=";
+    //private static final String VERSION_PARAM = "&ver=";
+
+    private static final String DATA_CONTENT_TYPE = "application/zip";
+    private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
+    private static final String VIDEO_CONTENT_TYPE = "video/mp4";
+    private static final String S3_DATA_FILE_PATH = "devicezip";
+    private static final String S3_IMAGE_FILE_PATH = "images";
+
+    private static final int COMPLETE_ID = 1;// TODO: One ID per file will give more feedback
+    private static final int ID_NONE = -1;
+
+    private static final String ACTION_SUBMIT = "submit";
+    private static final String ACTION_IMAGE = "image";
+
+    /**
+     * Number of retries to upload a file to S3
+     */
+    private static final int FILE_UPLOAD_RETRIES = 2;
+
+    private static final NumberFormat PCT_FORMAT = NumberFormat.getPercentInstance();
+
     private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
 
@@ -87,14 +128,14 @@ public class SyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-                .getInstance());
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
 
         mProps = new PropertyUtil(getResources());
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
-        exportSurveys();
+        exportSurveys();// Create zip files, if necessary
+        syncFiles();// Sync everything
 
         mDatabase.close();
     }
@@ -118,7 +159,7 @@ public class SyncService extends IntentService {
         }
 
         for (int id : surveyInstanceIds) {
-            ZipFileData zipFileData = formZip(id);
+            ZipFileData zipFileData = formZip(id);// TODO: Display notification?
             if (zipFileData != null) {
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.filename);
@@ -151,12 +192,9 @@ public class SyncService extends IntentService {
             writeTextToZip(zos, surveyBuf.toString(), SURVEY_DATA_FILE);
             String signingKeyString = mProps.getProperty(SIGNING_KEY_PROP);
             if (!StringUtil.isNullOrEmpty(signingKeyString)) {
-                MessageDigest sha1Digest = MessageDigest
-                        .getInstance("SHA1");
-                byte[] digest = sha1Digest.digest(surveyBuf.toString()
-                        .getBytes("UTF-8"));
-                SecretKeySpec signingKey = new SecretKeySpec(
-                        signingKeyString.getBytes("UTF-8"),
+                MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
+                byte[] digest = sha1Digest.digest(surveyBuf.toString().getBytes("UTF-8"));
+                SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes("UTF-8"),
                         SIGNING_ALGORITHM);
                 Mac mac = Mac.getInstance(SIGNING_ALGORITHM);
                 mac.init(signingKey);
@@ -327,6 +365,239 @@ public class SyncService extends IntentService {
     // ================================================================= //
 
     /**
+     * Sync every file (zip file, images, etc) that has a non synced state. This refers to:
+     * - Queued transmissions
+     * - Failed transmissions
+     *
+     * Each transmission will be retried up to three times. If the transmission does
+     * not succeed in those attempts, it will be marked as failed, and retried in the next sync.
+     * Files are uploaded to S3 and the response's ETag is compared against a locally computed
+     * MD5 checksum. Only if these fields match the transmission will be considered successful.
+     */
+    private void syncFiles() {
+        if (isAbleToSync()) {
+            List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
+            for (FileTransmission transmission : transmissions) {
+                syncFile(transmission.getFileName(), transmission.getStatus());
+            }
+        }
+    }
+
+    private void syncFile(String filename, String status) {
+        String contentType, dir, policy, signature, action;
+        if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
+            contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
+                    : VIDEO_CONTENT_TYPE;
+            dir = S3_IMAGE_FILE_PATH;
+            policy = mProps.getProperty(ConstantUtil.IMAGE_S3_POLICY);
+            signature = mProps.getProperty(ConstantUtil.IMAGE_S3_SIG);
+            action = ConstantUtil.FAILED_STATUS.equals(status) ? ACTION_IMAGE : null;
+        } else {
+            contentType = DATA_CONTENT_TYPE;
+            dir = S3_DATA_FILE_PATH;
+            policy = mProps.getProperty(ConstantUtil.DATA_S3_POLICY);
+            signature = mProps.getProperty(ConstantUtil.DATA_S3_SIG);
+            action = ACTION_SUBMIT;
+        }
+
+        mDatabase.updateTransmissionHistory(filename, ConstantUtil.IN_PROGRESS_STATUS);
+
+        boolean ok = sendFile(filename, dir, policy, signature, contentType, FILE_UPLOAD_RETRIES);
+        final String destName = getDestName(filename);
+
+        if (ok && action != null) {
+            // If action is not null, notify GAE back-end that data is available
+            ok = sendProcessingNotification(getServerBase(), action, destName, null);// TODO: checksum
+        }
+
+        // Update database and display notification
+        // TODO: Ensure no Exception can be thrown from previous steps, to avoid leaking IN_PROGRESS status
+        if (ok) {
+            // Mark everything completed
+            // databaseAdaptor.markDataAsSent(zipFileData.respondentIDs, String.valueOf(true));
+            mDatabase.updateTransmissionHistory(filename, ConstantUtil.COMPLETE_STATUS);
+            fireNotification(ConstantUtil.SEND, destName);
+        } else {
+            mDatabase.updateTransmissionHistory(filename, ConstantUtil.FAILED_STATUS);
+            fireNotification(ConstantUtil.ERROR, destName);
+        }
+
+    }
+
+    private boolean sendFile(String fileAbsolutePath, String dir, String policy, String sig,
+            String contentType, int retries) {
+        try {
+            String fileName = fileAbsolutePath;
+            if (fileName.contains(File.separator)) {
+                fileName = fileName.substring(fileName.lastIndexOf(File.separator)); // TODO: Why show separator?
+            }
+            final String fileNameForNotification = fileName;
+            fireNotification(ConstantUtil.PROGRESS, fileName);
+
+            // Generate checksum, to be compared against response's ETag
+            final String checksum = FileUtil.getMD5Checksum(fileAbsolutePath);
+
+            MultipartStream stream = new MultipartStream(new URL(
+                    mProps.getProperty(ConstantUtil.DATA_UPLOAD_URL)));
+
+            stream.addFormField("key", dir + "/${filename}");
+            stream.addFormField("AWSAccessKeyId", mProps.getProperty(ConstantUtil.S3_ID));
+            stream.addFormField("acl", "public-read");
+            stream.addFormField("success_action_redirect", "http://www.gallatinsystems.com/SuccessUpload.html");
+            stream.addFormField("policy", policy);
+            stream.addFormField("signature", sig);
+            stream.addFormField("Content-Type", contentType);
+            stream.addFile("file", fileAbsolutePath, null);
+            int code = stream.execute(new MultipartStream.MultipartStreamStatusListner() {
+                @Override
+                public void uploadProgress(long bytesSent, long totalBytes) {
+                    double percentComplete = 0.0d;
+                    if (bytesSent > 0 && totalBytes > 0) {
+                        percentComplete = ((double) bytesSent)
+                                / ((double) totalBytes);
+                    }
+                    if (percentComplete > 1.0d) {
+                        percentComplete = 1.0d;
+                    }
+                    fireNotification(ConstantUtil.PROGRESS, PCT_FORMAT.format(percentComplete)
+                            + " - " + fileNameForNotification);
+                }
+            });
+
+            /*
+            * Determine if an upload to Amazon S3 is successful. The response
+            * headers should contain a redirection to a URL, in which query, a
+            * parameter called "etag" will be the md5 checksum of the uploaded
+            * file.
+            */
+            String etag = null;
+            if (code == HttpStatus.SC_SEE_OTHER) {
+                String location = stream.getResponseHeader("Location");
+                Uri uri = Uri.parse(location);
+                etag = uri.getQueryParameter("etag");
+                etag = etag.replaceAll("\"", "");// Remove quotes
+                Log.d(TAG, "ETag: " + etag);
+            } else {
+                Log.e(TAG, "Server returned a bad code after upload: " + code);
+            }
+
+            if (etag != null && etag.equals(checksum)) {
+                fireNotification(ConstantUtil.FILE_COMPLETE, fileNameForNotification);
+            } else {
+                Log.e(TAG, "Server returned a bad checksum after upload: " + etag);
+
+                if (retries > 0) {
+                    Log.i(TAG, "Retrying upload. Remaining attempts: " + retries);
+                    return sendFile(fileAbsolutePath, dir, policy, sig, contentType, --retries);
+                }
+
+                Log.e(TAG, "File " + fileName + " upload failed.");
+                fireNotification(ConstantUtil.ERROR, getString(R.string.uploaderror) + " "
+                        + fileNameForNotification);
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not send upload " + e.getMessage(), e);
+
+            PersistentUncaughtExceptionHandler.recordException(e);
+            return false;
+        }
+        Log.d(TAG, "File " + fileAbsolutePath + " successfully uploaded.");
+        return true;
+    }
+
+    /**
+     * sends a message to the service with the file name that was just uploaded
+     * so it can start processing the file
+     *
+     * @param fileName
+     * @return
+     */
+    private boolean sendProcessingNotification(String serverBase, String action, String fileName,
+            String checksum) {
+        boolean success = false;
+        String url = serverBase + NOTIFICATION_PATH + action
+                + FILENAME_PARAM + fileName
+                + NOTIFICATION_PN_PARAM + StatusUtil.getPhoneNumber(this)
+                + IMEI_PARAM + StatusUtil.getImei(this)
+                + (checksum != null ? CHECKSUM_PARAM + checksum : "");
+        try {
+            HttpUtil.httpGet(url);
+            success = true;
+        } catch (Exception e) {
+            Log.e(TAG, "GAE sync notification failed for file: " + fileName);
+        }
+        return success;
+    }
+
+    /**
+     * displays a notification in the system status bar indicating the
+     * completion of the export/save operation TODO: the notifications may not
+     * have room to display the entire error message. Clicking them should
+     * trigger display of the full error by the Survey app
+     *
+     * @param type
+     */
+    private void fireNotification(String type, String extraText) {
+        CharSequence tickerText = null;
+        if (ConstantUtil.SEND.equals(type)) {
+            tickerText = getResources().getText(R.string.uploadcomplete);
+        } else if (ConstantUtil.EXPORT.equals(type)) {
+            tickerText = getResources().getText(R.string.exportcomplete);
+        } else if (ConstantUtil.PROGRESS.equals(type)) {
+            tickerText = getResources().getText(R.string.uploadprogress);
+        } else if (ConstantUtil.FILE_COMPLETE.equals(type)) {
+            tickerText = getResources().getText(R.string.filecomplete);
+        } else if (ConstantUtil.ERROR.equals(type)) {
+            tickerText = getResources().getText(R.string.uploaderror);
+        } else {
+            // This  default  is  unclear  to  user
+            tickerText = getResources().getText(R.string.nothingtoexport);
+        }
+        ViewUtil.fireNotification(tickerText.toString(),
+                extraText != null ? extraText : "",
+                this,
+                COMPLETE_ID,
+                null);
+    }
+
+    private String getServerBase() {
+        final String serverBase = mDatabase.findPreference(ConstantUtil.SERVER_SETTING_KEY);
+        if (!TextUtils.isEmpty(serverBase)) {
+            return getResources().getStringArray(R.array.servers)[Integer.parseInt(serverBase)];
+        }
+
+        return mProps.getProperty(ConstantUtil.SERVER_BASE);
+    }
+
+    private int getUploadIndex() {
+        final String uploadOption = mDatabase.findPreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
+        if (!TextUtils.isEmpty(uploadOption)) {
+            return Integer.parseInt(uploadOption);
+        }
+
+        return ID_NONE;
+    }
+
+    private static String getDestName(String filename) {
+        if (filename.contains("/")) {
+            return filename.substring(filename.lastIndexOf("/") + 1);
+        } else if (filename.contains("\\")) {
+            filename = filename.substring(filename.lastIndexOf("\\") + 1);
+        }
+
+        return filename;
+    }
+
+    private boolean isAbleToSync() {
+        final int uploadModeIndex = getUploadIndex();
+        if (ConstantUtil.UPLOAD_NEVER_IDX == uploadModeIndex) {
+            return StatusUtil.hasDataConnection(this, true);// WiFi only
+        }
+        return StatusUtil.hasDataConnection(this, false);
+    }
+
+    /**
      * Helper class to wrap zip file's meta-data.<br>
      * It will contain:
      * <ul>
@@ -338,7 +609,7 @@ public class SyncService extends IntentService {
      */
     class ZipFileData {
         String filename = null;
-        String checksum = null;
+        String checksum = null;// TODO: We do not need this value in this wrapper
         List<String> imagePaths = new ArrayList<String>();
     }
 

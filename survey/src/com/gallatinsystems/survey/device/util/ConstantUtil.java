@@ -30,6 +30,8 @@ public class ConstantUtil {
     public static final String SURVEYAL_DIR = "fieldsurvey/surveyal";
     public static final String FILE_SURVEY_LOCATION_TYPE = "file";
     public static final String ARCHIVE_SUFFIX = ".zip";
+    public static final String IMAGE_SUFFIX = ".jpg";
+    public static final String VIDEO_SUFFIX = ".mp4";
     public static final String XML_SUFFIX = ".xml";
     public static final String BOOTSTRAP_DIR = "fieldsurvey/bootstrap";
     public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";

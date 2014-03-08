@@ -509,63 +509,6 @@ public class SurveyDbAdapter {
         return database.insert(Tables.SURVEY, null, initialValues);
     }
 
-    /**
-     * returns a cursor that lists all unsent (sentFlag = false) survey data
-     * 
-     * @return
-    public Cursor fetchUnsentData() {
-        Cursor cursor = database.query(RESPONSE_JOIN, new String[] {
-                Tables.RESPONDENT + "." + PK_ID_COL, RESP_ID_COL, ANSWER_COL,
-                ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
-                DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
-                Tables.RESPONDENT + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL, SURVEY_START_COL, SURVEYED_LOCALE_ID_COL
-        }, SUBMITTED_FLAG_COL + "= 'true' AND "
-                + INCLUDE_FLAG_COL + "='true' AND" + "(" + DELIVERED_DATE_COL
-                + " is null OR " + MEDIA_SENT_COL + " <> 'true')", null, null,
-                null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        return cursor;
-    }
-     */
-
-    /**
-     * returns a cursor that lists all unexported (sentFlag = false) survey data
-     * 
-     * @return
-    public Cursor fetchUnexportedData() {
-        Cursor cursor = database.query(RESPONSE_JOIN, new String[] {
-                Tables.RESPONDENT + "." + PK_ID_COL, RESP_ID_COL, ANSWER_COL,
-                ANSWER_TYPE_COL, QUESTION_FK_COL, DISP_NAME_COL, EMAIL_COL,
-                DELIVERED_DATE_COL, SUBMITTED_DATE_COL,
-                Tables.RESPONDENT + "." + SURVEY_FK_COL, SCORED_VAL_COL,
-                STRENGTH_COL, UUID_COL, SURVEY_START_COL, SURVEYED_LOCALE_ID_COL
-        }, SUBMITTED_FLAG_COL + "= 'true' AND "
-                + INCLUDE_FLAG_COL + "='true' AND " + EXPORTED_FLAG_COL
-                + " <> 'true' AND " + "(" + DELIVERED_DATE_COL + " is null OR "
-                + MEDIA_SENT_COL + " <> 'true')", null, null, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        return cursor;
-    }
-
-    public Cursor getUnexportedSurveyInstances() {
-        return database.query(Tables.SURVEY_INSTANCE_JOIN_USER,
-                new String[] {
-                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
-                        SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.RECORD_ID,
-                        SurveyInstanceColumns.SUBMITTED_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                        SurveyInstanceColumns.UUID, UserColumns.NAME, UserColumns.EMAIL
-                },
-                SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL AND "
-                        + SurveyInstanceColumns.EXPORTED_DATE + " IS NULL",
-                null, null, null, null);
-    }
-     */
-
     public Cursor getUnexportedSurveyInstances() {
         return database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
@@ -591,19 +534,6 @@ public class SurveyDbAdapter {
                 }, null, null, null);
     }
 
-    /**
-     * Get the amount of responses that have not been sent to the backend
-    public int unsentDataCount() {
-        return fetchUnsentData().getCount();
-    }
-     */
-
-    /**
-     * Get the amount of responses that have not been exported to the sd-card
-    public int unexportedDataCount() {
-        return fetchUnexportedData().getCount();
-    }
-     */
 
     /**
      * marks the data as submitted in the respondent table (submittedFlag =
@@ -1042,30 +972,6 @@ public class SurveyDbAdapter {
         return survey;
     }
 
-
-    /**
-     * count survey respondents by status
-     * 
-     * @param status
-     * @return
-     */
-    public int countSurveyRespondents(String status) {
-        String[] whereParams = {
-            status
-        };
-        int i = 0;
-        Cursor cursor = database.rawQuery(
-                "SELECT COUNT(*) as theCount FROM survey_respondent WHERE status = ?",
-                whereParams);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                i = cursor.getInt(0);
-            }
-            cursor.close();
-        }
-        return i;
-    }
-
     /**
      * Lists all non-deleted surveys from the database
      */
@@ -1213,6 +1119,66 @@ public class SurveyDbAdapter {
         values.put(TransmissionColumns.FILENAME, filename);
         values.put(TransmissionColumns.STATUS, ConstantUtil.QUEUED_STATUS);
         database.insert(Tables.TRANSMISSION, null, values);
+    }
+
+    /**
+     * Updates the matching transmission history records with the status
+     * passed in. If the status == Completed, the completion date is updated. If
+     * the status == In Progress, the start date is updated.
+     *
+     * @param fileName
+     * @param status
+     * @return the number of rows affected
+     */
+    public int updateTransmissionHistory(String fileName, String status) {
+        ContentValues vals = new ContentValues();
+        vals.put(TransmissionColumns.STATUS, status);
+        if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
+            vals.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
+        } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
+            vals.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
+        }
+
+        return database.update(Tables.TRANSMISSION, vals,
+                TransmissionColumns.FILENAME + " = ?",
+                new String[] {fileName});
+    }
+
+
+
+    /**
+     * Get the list of queued and failed transmissions
+     */
+    public List<FileTransmission> getUnsyncedTransmissions() {
+        List<FileTransmission> transmissions = new ArrayList<FileTransmission>();
+        Cursor cursor = database.query(Tables.TRANSMISSION,
+                new String[] {
+                        TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
+                        TransmissionColumns.STATUS, TransmissionColumns.SURVEY_INSTANCE_ID
+                },
+                TransmissionColumns.STATUS + " IN (?, ?)",
+                new String[] {ConstantUtil.FAILED_STATUS, ConstantUtil.QUEUED_STATUS},
+                null, null, null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                transmissions = new ArrayList<FileTransmission>();
+                do {
+                    FileTransmission trans = new FileTransmission();
+                    trans.setId(cursor.getLong(
+                            cursor.getColumnIndexOrThrow(TransmissionColumns._ID)));
+                    trans.setRespondentId(cursor.getLong(
+                            cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_INSTANCE_ID)));
+                    trans.setFileName(cursor.getString(cursor
+                            .getColumnIndexOrThrow(TransmissionColumns.FILENAME)));
+                    trans.setStatus(cursor.getString(cursor
+                            .getColumnIndexOrThrow(TransmissionColumns.STATUS)));
+                    transmissions.add(trans);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return transmissions;
     }
 
     /**

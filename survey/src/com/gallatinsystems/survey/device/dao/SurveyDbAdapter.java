@@ -243,14 +243,12 @@ public class SurveyDbAdapter {
 
     private static final String DATABASE_NAME = "surveydata";
 
-    private static final String RESPONSE_JOIN = "survey_instance LEFT OUTER JOIN survey_response ON (survey_instance._id = survey_response.survey_instance_id) LEFT OUTER JOIN user ON (user._id = survey_instance.user_id)";
     private static final String RESPONDENT_JOIN = "survey_instance LEFT OUTER JOIN survey ON (survey_instance.survey_id = survey._id)";
 
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
     private static final int DATABASE_VERSION = VER_LAUNCH;
 
     private final Context context;
-
 
     /**
      * Helper class for creating the database tables and loading reference data
@@ -418,9 +416,9 @@ public class SurveyDbAdapter {
         
         private void createIndexes(SQLiteDatabase db) {
             // Included in point updates
-            db.execSQL("CREATE INDEX response_idx ON " + Tables.RESPONSE
-                    + "(survey_respondent_id, question_id)");
-            db.execSQL("CREATE INDEX locale_name_idx ON " + Tables.RESPONSE
+            db.execSQL("CREATE INDEX response_idx ON " + Tables.RESPONSE + "("
+                    + ResponseColumns.SURVEY_INSTANCE_ID + ", " + ResponseColumns.QUESTION_ID + ")");
+            db.execSQL("CREATE INDEX record_name_idx ON " + Tables.RECORD
                     + "(" + RecordColumns.NAME +")");
         }
 
@@ -492,21 +490,6 @@ public class SurveyDbAdapter {
      */
     public void close() {
         databaseHelper.close();
-    }
-
-    /**
-     * Create a new survey using the title and body provided. If the survey is
-     * successfully created return the new id, otherwise return a -1 to indicate
-     * failure.
-     * 
-     * @param name survey name
-     * @return rowId or -1 if failed
-     */
-    public long createSurvey(String name) {
-        ContentValues initialValues = new ContentValues();
-        initialValues.put(SurveyColumns.NAME, name);
-        initialValues.put(SurveyColumns.HELP_DOWNLOADED, 0);
-        return database.insert(Tables.SURVEY, null, initialValues);
     }
 
     public Cursor getUnexportedSurveyInstances() {

@@ -35,17 +35,22 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.MultipartStream;
+import com.gallatinsystems.survey.device.util.PlatformUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.StringUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 
 import org.apache.http.HttpStatus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -91,14 +96,14 @@ public class SyncService extends IntentService {
     private static final String SIG_FILE_NAME = ".sig";
 
     // Sync constants
-    //private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification?";
+    private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification?";
     private static final String NOTIFICATION_PATH = "/processor?action=";
     private static final String FILENAME_PARAM = "&fileName=";
     private static final String NOTIFICATION_PN_PARAM = "&phoneNumber=";
     private static final String CHECKSUM_PARAM = "&checksum=";
     private static final String IMEI_PARAM = "&imei=";
-    //private static final String DEVICE_ID_PARAM = "&devId=";
-    //private static final String VERSION_PARAM = "&ver=";
+    private static final String DEVICE_ID_PARAM = "&devId=";
+    private static final String VERSION_PARAM = "&ver=";
 
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
@@ -111,6 +116,8 @@ public class SyncService extends IntentService {
 
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
+
+    private static final String UTF8 = "UTF-8";
 
     /**
      * Number of retries to upload a file to S3
@@ -375,15 +382,19 @@ public class SyncService extends IntentService {
      * MD5 checksum. Only if these fields match the transmission will be considered successful.
      */
     private void syncFiles() {
+        final String serverBase = getServerBase();
+        // Sync missing files. This will update the status of the transmissions if necessary
+        checkMissingFiles(serverBase);
+
         if (isAbleToSync()) {
             List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
             for (FileTransmission transmission : transmissions) {
-                syncFile(transmission.getFileName(), transmission.getStatus());
+                syncFile(transmission.getFileName(), transmission.getStatus(), serverBase);
             }
         }
     }
 
-    private void syncFile(String filename, String status) {
+    private void syncFile(String filename, String status, String serverBase) {
         String contentType, dir, policy, signature, action;
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
@@ -391,6 +402,7 @@ public class SyncService extends IntentService {
             dir = S3_IMAGE_FILE_PATH;
             policy = mProps.getProperty(ConstantUtil.IMAGE_S3_POLICY);
             signature = mProps.getProperty(ConstantUtil.IMAGE_S3_SIG);
+            // Only notify server if the previous attempts have failed
             action = ConstantUtil.FAILED_STATUS.equals(status) ? ACTION_IMAGE : null;
         } else {
             contentType = DATA_CONTENT_TYPE;
@@ -407,7 +419,7 @@ public class SyncService extends IntentService {
 
         if (ok && action != null) {
             // If action is not null, notify GAE back-end that data is available
-            ok = sendProcessingNotification(getServerBase(), action, destName, null);// TODO: checksum
+            ok = sendProcessingNotification(serverBase, action, destName, null);// TODO: checksum
         }
 
         // Update database and display notification
@@ -504,6 +516,97 @@ public class SyncService extends IntentService {
         }
         Log.d(TAG, "File " + fileAbsolutePath + " successfully uploaded.");
         return true;
+    }
+
+    /**
+     * Request missing files (images) in the datastore.
+     * The server will provide us with a list of missing images,
+     * so we can accordingly update their status in the database.
+     * This will help us fixing the Issue #55
+     *
+     * Steps:
+     * 1- Request the list of files to the server
+     * 2- Update the status of those files in the local database
+     */
+    private void checkMissingFiles(String serverBase) {
+        try {
+            String response = getDeviceNotification(serverBase);
+            if (!TextUtils.isEmpty(response)) {
+                JSONObject jResponse = new JSONObject(response);
+                JSONArray jMissingFiles = jResponse.optJSONArray("missingFiles");
+                JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
+
+                // Mark the status of the files as 'Failed'
+                for (String filename : parseFiles(jMissingFiles)) {
+                    setFileTransmissionFailed(filename);
+                }
+
+                // Handle unknown files. If an unknown file exists in the filesystem
+                // it will be marked as failed in the transmission history, so it can
+                // be handled and retried in the next sync attempt.
+                for (String filename : parseFiles(jMissingUnknown)) {
+                    if (new File(filename).exists()) {
+                        setFileTransmissionFailed(filename);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not retrieve missing files", e);
+        }
+    }
+
+    /**
+     * Given a json array, return the list of contained filenames,
+     * formatting the path to match the structure of the sdcard's files.
+     * @param jFiles
+     * @return
+     * @throws JSONException
+     */
+    private List<String> parseFiles(JSONArray jFiles) throws JSONException {
+        List<String> files = new ArrayList<String>();
+        if (jFiles != null) {
+            for (int i=0; i<jFiles.length(); i++) {
+                // Build the sdcard path for each image
+                String filename = jFiles.getString(i);
+                String dir = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR, filename, false);
+                files.add(dir + "/" + filename);
+            }
+        }
+        return files;
+    }
+
+    private void setFileTransmissionFailed(String filename) {
+        int rows = mDatabase.updateTransmissionHistory(filename, ConstantUtil.FAILED_STATUS);
+        if (rows == 0) {
+            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
+            mDatabase.createTransmission(-1, filename, ConstantUtil.FAILED_STATUS);
+        }
+    }
+
+    /**
+     * Request the notifications GAE has ready for us, like the list of missing files.
+     * @param serverBase
+     * @return String body of the HTTP response
+     * @throws Exception
+     */
+    private String getDeviceNotification(String serverBase) throws Exception {
+        String phoneNumber = StatusUtil.getPhoneNumber(this);
+        String imei = StatusUtil.getImei(this);
+        String deviceId = mDatabase.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+        String version = PlatformUtil.getVersionName(this);
+
+        String url = serverBase + DEVICE_NOTIFICATION_PATH
+                + (phoneNumber != null ?
+                NOTIFICATION_PN_PARAM.substring(1) + URLEncoder.encode(phoneNumber, UTF8)
+                : "")
+                + (imei != null ?
+                IMEI_PARAM + URLEncoder.encode(imei, UTF8)
+                : "")
+                + (deviceId != null ?
+                DEVICE_ID_PARAM + URLEncoder.encode(deviceId, UTF8)
+                : "")
+                + VERSION_PARAM + URLEncoder.encode(version, UTF8);
+        return HttpUtil.httpGet(url);
     }
 
     /**

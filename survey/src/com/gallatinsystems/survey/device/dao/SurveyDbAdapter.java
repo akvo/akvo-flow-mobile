@@ -1114,10 +1114,15 @@ public class SurveyDbAdapter {
     }
 
     public void createTransmission (long surveyInstanceId, String filename) {
+        createTransmission(surveyInstanceId, filename, ConstantUtil.QUEUED_STATUS);
+    }
+
+
+    public void createTransmission (long surveyInstanceId, String filename, String status) {
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
         values.put(TransmissionColumns.FILENAME, filename);
-        values.put(TransmissionColumns.STATUS, ConstantUtil.QUEUED_STATUS);
+        values.put(TransmissionColumns.STATUS, status);
         database.insert(Tables.TRANSMISSION, null, values);
     }
 

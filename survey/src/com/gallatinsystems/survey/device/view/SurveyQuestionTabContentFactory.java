@@ -36,6 +36,7 @@ import android.widget.TableRow;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.ResponseColumns;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionGroup;
 import com.gallatinsystems.survey.device.domain.QuestionResponse;
@@ -298,29 +299,28 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
             responseMap = new HashMap<String, QuestionResponse>();
         }
         if (respondentId != null) {
-            Cursor responseCursor = databaseAdaptor
-                    .fetchResponsesByRespondent(respondentId.toString());
+            Cursor responseCursor = databaseAdaptor.fetchResponses(respondentId);
 
             while (responseCursor.moveToNext()) {
                 String[] cols = responseCursor.getColumnNames();
                 QuestionResponse resp = new QuestionResponse();
+                // TODO: Use cursor.get.... functions instead of looping through the results
                 for (int i = 0; i < cols.length; i++) {
-                    if (cols[i].equals(SurveyDbAdapter.RESP_ID_COL)) {
+                    if (cols[i].equals(ResponseColumns._ID)) {
                         resp.setId(responseCursor.getLong(i));
-                    } else if (cols[i]
-                            .equals(SurveyDbAdapter.SURVEY_RESPONDENT_ID_COL)) {
+                    } else if (cols[i].equals(ResponseColumns.SURVEY_INSTANCE_ID)) {
                         resp.setRespondentId(responseCursor.getLong(i));
-                    } else if (cols[i].equals(SurveyDbAdapter.ANSWER_COL)) {
+                    } else if (cols[i].equals(ResponseColumns.ANSWER)) {
                         resp.setValue(responseCursor.getString(i));
-                    } else if (cols[i].equals(SurveyDbAdapter.ANSWER_TYPE_COL)) {
+                    } else if (cols[i].equals(ResponseColumns.TYPE)) {
                         resp.setType(responseCursor.getString(i));
-                    } else if (cols[i].equals(SurveyDbAdapter.QUESTION_FK_COL)) {
+                    } else if (cols[i].equals(ResponseColumns.QUESTION_ID)) {
                         resp.setQuestionId(responseCursor.getString(i));
-                    } else if (cols[i].equals(SurveyDbAdapter.INCLUDE_FLAG_COL)) {
+                    } else if (cols[i].equals(ResponseColumns.INCLUDE)) {
                         resp.setIncludeFlag(responseCursor.getString(i));
-                    } else if (cols[i].equals(SurveyDbAdapter.SCORED_VAL_COL)) {
+                    } else if (cols[i].equals(ResponseColumns.SCORED_VAL)) {
                         resp.setScoredValue(responseCursor.getString(i));
-                    } else if (cols[i].equals(SurveyDbAdapter.STRENGTH_COL)) {
+                    } else if (cols[i].equals(ResponseColumns.STRENGTH)) {
                         resp.setStrength(responseCursor.getString(i));
                     }
                 }

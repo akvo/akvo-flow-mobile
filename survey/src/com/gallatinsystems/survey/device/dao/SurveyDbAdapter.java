@@ -163,7 +163,7 @@ public class SurveyDbAdapter {
         String RECORD_ID = "surveyed_locale_id";
         String EXPORTED_DATE = "exported_date";
         String SENT_DATE = "sent_date";
-        String STATUS = "status";// TODO: Is this needed?
+        String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
     }
 
     public interface TransmissionColumns {
@@ -212,13 +212,18 @@ public class SurveyDbAdapter {
         String VALUE = "value";
     }
 
+    public interface SurveyInstanceStatus {
+        int CURRENT    = 0;
+        int SAVED      = 1;
+        int SUBMITTED  = 2;
+        int EXPORTED   = 3;
+        int SYNCED     = 4;
+        int DOWNLOADED = 5;
+    }
+
     private static final String TAG = "SurveyDbAdapter";
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
-
-    /**
-     * Database creation sql statement
-     */
 
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
@@ -302,7 +307,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.SAVED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SUBMITTED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.RECORD_ID + " TEXT,"
-                    + SurveyInstanceColumns.STATUS + " TEXT,"
+                    + SurveyInstanceColumns.STATUS + " INTEGER,"
                     + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SENT_DATE + " INTEGER,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
@@ -492,6 +497,7 @@ public class SurveyDbAdapter {
         databaseHelper.close();
     }
 
+    // TODO: Use denormaized status? --> WHERE status IS SurveyInstanceStatus.SUBMITTED
     public Cursor getUnexportedSurveyInstances() {
         return database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
@@ -517,20 +523,59 @@ public class SurveyDbAdapter {
                 }, null, null, null);
     }
 
-
     /**
      * marks the data as submitted in the respondent table (submittedFlag =
      * true) thereby making it ready for transmission
      * 
      * @param respondentId
      */
-    public void submitResponses(String respondentId) {
+    public void submitSurveyInstance(long surveyInstanceId) {
+        // TODO: DRY!
         ContentValues vals = new ContentValues();
         vals.put(SurveyInstanceColumns.SUBMITTED_DATE, System.currentTimeMillis());
-        vals.put(SurveyInstanceColumns.STATUS, ConstantUtil.SUBMITTED_STATUS);
+        vals.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SUBMITTED);
         database.update(Tables.SURVEY_INSTANCE, vals,
                 SurveyInstanceColumns._ID + "= ? ",
-                new String[] { respondentId });
+                new String[] { String.valueOf(surveyInstanceId) });
+    }
+
+    /**
+     * Mark a survey instance as saved, updating the saved time and the status.
+     * This values will only be changed if the survey is not submitted yet.
+     * @param surveyInstanceId
+     */
+    public void saveSurveyInstance(long surveyInstanceId) {
+        Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
+                new String[] {SurveyInstanceColumns.STATUS},
+                SurveyInstanceColumns._ID + " = ? AND " + SurveyInstanceColumns.SUBMITTED_DATE
+                        + " IS NULL",
+                new String[] {String.valueOf(surveyInstanceId)},
+                null, null, null);
+
+        boolean save = false;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                save = true;
+            }
+            cursor.close();
+        }
+
+        if (save) {
+            ContentValues vals = new ContentValues();
+            vals.put(SurveyInstanceColumns.SAVED_DATE, System.currentTimeMillis());
+            vals.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
+            database.update(Tables.SURVEY_INSTANCE, vals,
+                    SurveyInstanceColumns._ID + "= ?",
+                    new String[] { String.valueOf(surveyInstanceId) });
+        }
+    }
+
+    public void setSurveyInstanceExported(long surveyInstanceId) {
+        updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
+    }
+
+    public void setSurveyInstanceSynced(long surveyInstanceId) {
+        updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
     }
 
     /**
@@ -582,26 +627,25 @@ public class SurveyDbAdapter {
      */
 
     /**
-     * updates the status of a survey response to the string passed in
+     * updates the status of a survey instance to the status passed in.
+     * Status must be one of the 'SurveyInstanceStatus' one.
      * 
-     * @param surveyRespondentId
+     * @param surveyInstanceId
      * @param status
      */
-    public void updateSurveyStatus(String surveyRespondentId, String status) {
-        if (surveyRespondentId != null) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(SurveyInstanceColumns.STATUS, status);
-            updatedValues.put(SurveyInstanceColumns.SAVED_DATE, System.currentTimeMillis());
-            if (database.update(Tables.SURVEY_INSTANCE, updatedValues, SurveyInstanceColumns._ID
-                    + " = ?", new String[] {
-                surveyRespondentId
-            }) < 1) {
-                Log.e(TAG, "Could not update status for Survey_respondent_id "
-                        + surveyRespondentId);
-            }
+    private void updateSurveyStatus(long surveyInstanceId, int status) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyInstanceColumns.STATUS, status);
+        updatedValues.put(SurveyInstanceColumns.SAVED_DATE, System.currentTimeMillis());
 
+        final int rows = database.update(Tables.SURVEY_INSTANCE,
+                updatedValues,
+                SurveyInstanceColumns._ID + " = ?",
+                new String[] { String.valueOf(surveyInstanceId) });
+
+        if (rows < 1) {
+            Log.e(TAG, "Could not update status for Survey Instance: " + surveyInstanceId);
         }
-
     }
 
     /**
@@ -672,7 +716,7 @@ public class SurveyDbAdapter {
      * 
      * @return Cursor over all responses
      */
-    public Cursor fetchResponsesByRespondent(String respondentID) {
+    public Cursor fetchResponses(long surveyInstanceId) {
         return database.query(Tables.RESPONSE,
                 new String[] {
                     ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
@@ -680,7 +724,7 @@ public class SurveyDbAdapter {
                     ResponseColumns.INCLUDE, ResponseColumns.SCORED_VAL, ResponseColumns.STRENGTH
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ?",
-                new String[] { respondentID },
+                new String[] { String.valueOf(surveyInstanceId) },
                 null, null, null);
     }
 
@@ -779,7 +823,7 @@ public class SurveyDbAdapter {
                 + SurveyInstanceColumns.SURVEY_ID + "= ?  AND " + SurveyInstanceColumns.STATUS + " = ? ";
         List<String> argList =  new ArrayList<String>();
         argList.add(surveyId);
-        argList.add(ConstantUtil.CURRENT_STATUS);
+        argList.add(String.valueOf(SurveyInstanceStatus.CURRENT));
         
         if (surveyedLocaleId != null) {
             where += " AND " + SurveyInstanceColumns.RECORD_ID + " =  ?";
@@ -821,7 +865,7 @@ public class SurveyDbAdapter {
         ContentValues initialValues = new ContentValues();
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
         initialValues.put(SurveyInstanceColumns.USER_ID, userId);
-        initialValues.put(SurveyInstanceColumns.STATUS, ConstantUtil.CURRENT_STATUS);
+        initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.CURRENT);
         initialValues.put(SurveyInstanceColumns.UUID, UUID.randomUUID().toString());
         initialValues.put(SurveyInstanceColumns.START_DATE, System.currentTimeMillis());
         initialValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
@@ -1119,6 +1163,7 @@ public class SurveyDbAdapter {
      * @return the number of rows affected
      */
     public int updateTransmissionHistory(String fileName, String status) {
+        // TODO: Update Survey Instance STATUS as well
         ContentValues vals = new ContentValues();
         vals.put(TransmissionColumns.STATUS, status);
         if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
@@ -1131,8 +1176,6 @@ public class SurveyDbAdapter {
                 TransmissionColumns.FILENAME + " = ?",
                 new String[] {fileName});
     }
-
-
 
     /**
      * Get the list of queued and failed transmissions
@@ -1323,7 +1366,6 @@ public class SurveyDbAdapter {
      * marks submitted data as unsent. If an ID is passed in, only that
      * submission will be updated. If id is null, ALL data will be marked as
      * unsent.
-     */
     public void markDataUnsent(Long respondentId) {
         executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where _id = "
                 + respondentId);
@@ -1338,6 +1380,7 @@ public class SurveyDbAdapter {
         executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where survey_id in "
                 + "(select _id from survey where survey_group_id = " + surveyGroupId + ")");
     }
+     */
 
     /**
      * executes a single insert/update/delete DML or any DDL statement without
@@ -1376,9 +1419,9 @@ public class SurveyDbAdapter {
      * any response saved in the database, as well as the transmission history.
      */
     public void clearCollectedData() {
-        executeSql("delete from survey_respondent");
+        executeSql("delete from survey_instance");
         executeSql("delete from survey_response");
-        executeSql("delete from transmission_history");
+        executeSql("delete from transmission");
     }
 
     /**
@@ -1593,7 +1636,7 @@ public class SurveyDbAdapter {
                     Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID, SurveyColumns.NAME,
                     SurveyInstanceColumns.SAVED_DATE, SurveyInstanceColumns.SURVEY_ID,
                     SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                    SurveyInstanceColumns.UUID
+                    SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS
                 },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_GROUP_ID + "= ?",
                 new String[]{String.valueOf(surveyGroupId)},
@@ -1607,7 +1650,8 @@ public class SurveyDbAdapter {
                         Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID, SurveyColumns.NAME,
                         SurveyInstanceColumns.SAVED_DATE, SurveyInstanceColumns.SURVEY_ID,
                         SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.RECORD_ID
+                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.RECORD_ID,
+                        SurveyInstanceColumns.STATUS
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[]{String.valueOf(surveyedLocaleId)},
@@ -1798,7 +1842,7 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.getSurveyId());
             values.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getDate());
             values.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
-            values.put(SurveyInstanceColumns.STATUS, ConstantUtil.SUBMITTED_STATUS);// ???
+            values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
                 
             if (id != -1) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID

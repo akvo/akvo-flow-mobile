@@ -56,6 +56,7 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import com.gallatinsystems.survey.device.domain.Dependency;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionGroup;
@@ -989,8 +990,7 @@ public class SurveyViewActivity extends TabActivity implements
                 if (!readOnly) {
                     // make sure we don't lose anything that was already written
                     saveAllResponses();
-                    databaseAdapter.updateSurveyStatus(respondentId.toString(),
-                            ConstantUtil.SAVED_STATUS);
+                    databaseAdapter.saveSurveyInstance(respondentId);
                     ViewUtil.showConfirmDialog(R.string.savecompletetitle,
                             R.string.savecompletetext, this, false,
                             new DialogInterface.OnClickListener() {
@@ -1286,8 +1286,8 @@ public class SurveyViewActivity extends TabActivity implements
         Long lastSurveyInstance = null;
         
         if (!readOnly && mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            boolean hasAnswers = databaseAdapter.fetchResponsesByRespondent(respondentId.toString()).getCount() > 0;
-            
+            boolean hasAnswers = databaseAdapter.fetchResponses(respondentId).getCount() > 0;
+
             if (!hasAnswers) {
                 lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId,
                         Long.valueOf(surveyId));

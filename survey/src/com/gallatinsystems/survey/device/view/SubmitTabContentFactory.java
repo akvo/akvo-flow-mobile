@@ -73,8 +73,7 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                 new OnClickListener() {
                     public void onClick(View v) {
                         // if we have no missing responses, submit the survey
-                        databaseAdaptor.submitResponses(context
-                                .getRespondentId().toString());
+                        databaseAdaptor.submitSurveyInstance(context.getRespondentId());
                         // send a broadcast message indicating new data is
                         // available
                         Intent i = new Intent(

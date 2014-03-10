@@ -56,7 +56,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
@@ -170,6 +174,7 @@ public class SyncService extends IntentService {
             if (zipFileData != null) {
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.filename);
+                mDatabase.setSurveyInstanceExported(id);// update status
 
                 for (String image : zipFileData.imagePaths) {
                     mDatabase.createTransmission(id, image);
@@ -210,10 +215,9 @@ public class SyncService extends IntentService {
                 writeTextToZip(zos, encodedHmac, SIG_FILE_NAME);
             }
 
-            zipFileData.checksum = "" + checkedOutStream.getChecksum().getValue();
+            final String checksum = "" + checkedOutStream.getChecksum().getValue();
             zos.close();
-            Log.i(TAG, "Closed zip output stream for file: " + fileName
-                    + ". Checksum: " + zipFileData.checksum);
+            Log.i(TAG, "Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
         } catch (IOException e) {
             PersistentUncaughtExceptionHandler.recordException(e);
             Log.e(TAG, e.getMessage());
@@ -387,14 +391,34 @@ public class SyncService extends IntentService {
         checkMissingFiles(serverBase);
 
         if (isAbleToSync()) {
+            Set<Long> syncedFiles = new HashSet<Long>();// Successful transmissions
+            Set<Long> unsyncedFiles = new HashSet<Long>();// Unsuccessful transmissions
             List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
+
             for (FileTransmission transmission : transmissions) {
-                syncFile(transmission.getFileName(), transmission.getStatus(), serverBase);
+                final long surveyInstanceId = transmission.getRespondentId();
+                if (syncFile(transmission.getFileName(), transmission.getStatus(), serverBase)) {
+                    syncedFiles.add(surveyInstanceId);
+                } else {
+                    unsyncedFiles.add(surveyInstanceId);
+                }
+            }
+
+            // Retain successful survey instances, to mark them as SYNCED
+            syncedFiles.removeAll(unsyncedFiles);
+
+            for (long surveyInstanceId : syncedFiles) {
+                mDatabase.setSurveyInstanceSynced(surveyInstanceId);// update status
+            }
+
+            // Ensure the unsynced ones are just EXPORTED
+            for (long surveyInstanceId : unsyncedFiles) {
+                mDatabase.setSurveyInstanceExported(surveyInstanceId);// update status
             }
         }
     }
 
-    private void syncFile(String filename, String status, String serverBase) {
+    private boolean syncFile(String filename, String status, String serverBase) {
         String contentType, dir, policy, signature, action;
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
@@ -434,6 +458,7 @@ public class SyncService extends IntentService {
             fireNotification(ConstantUtil.ERROR, destName);
         }
 
+        return ok;
     }
 
     private boolean sendFile(String fileAbsolutePath, String dir, String policy, String sig,
@@ -704,15 +729,12 @@ public class SyncService extends IntentService {
      * Helper class to wrap zip file's meta-data.<br>
      * It will contain:
      * <ul>
-     * <li>Respondent IDs</li>
-     * <li>Region IDs</li>
-     * <li>File's checksum</li>
+     * <li>filename</li>
      * <li>Image Paths</li>
      * </ul>
      */
     class ZipFileData {
         String filename = null;
-        String checksum = null;// TODO: We do not need this value in this wrapper
         List<String> imagePaths = new ArrayList<String>();
     }
 

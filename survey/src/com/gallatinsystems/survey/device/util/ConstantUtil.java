@@ -68,7 +68,7 @@ public class ConstantUtil {
     public static final String IN_PROGRESS_STATUS = "In Progress";
     public static final String QUEUED_STATUS = "Queued";
     public static final String FAILED_STATUS = "Failed";
-    public static final String DOWNLOADED_STATUS = "Downloaded";
+    //public static final String DOWNLOADED_STATUS = "Downloaded";
 
     /**
      * deletion indicators
@@ -246,11 +246,11 @@ public class ConstantUtil {
 
     /**
      * survey respondent statuses
-     */
     public static final String SAVED_STATUS = "SAVED";
     public static final String DELETED_STATUS = "DELETED";
     public static final String SUBMITTED_STATUS = "SUBMITTED";
     public static final String CURRENT_STATUS = "CURRENT";
+     */
 
     /**
      * language codes

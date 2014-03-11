@@ -56,14 +56,10 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     // Loader id
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
     
-    // Menu items
-    private static final int RESEND_ALL = 0;
-    
     // Context menu items
-    private static final int DELETE_ONE = 0;
+    private static final int DELETE_ONE = 0;// TODO: Should we allow this? - Record might be synced
     private static final int VIEW_HISTORY = 1;
-    private static final int RESEND_ONE = 2;
-    
+
     private static final int UPDATE_INTERVAL_MS = 10000; // every ten seconds
     
     private SurveyGroup mSurveyGroup;
@@ -139,45 +135,13 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
         menu.add(0, VIEW_HISTORY, 0, R.string.transmissionhist);
-        menu.add(0, RESEND_ONE, 1, R.string.resendone);
-        
+
         // Allow deletion only for 'saved' responses
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         View itemView = info.targetView;
         if (!(Boolean)itemView.getTag(SubmittedSurveyReviewCursorAdaptor.FINISHED_KEY)) {
             menu.add(0, DELETE_ONE, 2, R.string.deleteresponse);
         }
-    }
-
-    /**
-     * Presents the survey options menu when the user presses the menu key
-     */
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Add this fragment's options to the 'more' submenu
-        SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
-        submenu.add(0, RESEND_ALL, 0, R.string.resendall);
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case RESEND_ALL:
-                resendAllResponses();
-                return true;
-        }
-        return false;
-    }
-    
-    private void resendAllResponses() {
-        if (mRecord != null) {
-            mDatabase.markRecordUnsent(mRecord.getId());
-        } else {
-            mDatabase.markSurveyGroupUnsent(mSurveyGroup.getId());
-        }
-        Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
-        getActivity().sendBroadcast(i);
-        refresh();
     }
 
     @Override
@@ -190,9 +154,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                 break;
             case VIEW_HISTORY:
                 viewSurveyInstanceHistory(surveyInstanceId);
-                break;
-            case RESEND_ONE:
-                resendSurveyInstance(surveyInstanceId);
                 break;
         }
         return true;
@@ -227,26 +188,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
         startActivity(i);
     }
-    
-    private void resendSurveyInstance(final long surveyInstanceId) {
-        ViewUtil.showAdminAuthDialog(getActivity(),
-                new ViewUtil.AdminAuthDialogListener() {
-                    @Override
-                    public void onAuthenticated() {
-                        SurveyDbAdapter db = new SurveyDbAdapter(getActivity()).open();
-                        db.markDataUnsent(surveyInstanceId);
-                        db.close();
-                        Intent dataIntent = new Intent(
-                                ConstantUtil.DATA_AVAILABLE_INTENT);
-                        getActivity().sendBroadcast(dataIntent);
-                        ViewUtil.showConfirmDialog(
-                                R.string.submitcompletetitle,
-                                R.string.submitcompletetext,
-                                getActivity());
-                    }
-                });
-    }
-    
+
     /**
      * when a list item is clicked, get the user id and name of the selected
      * item and open one-survey activity, readonly.

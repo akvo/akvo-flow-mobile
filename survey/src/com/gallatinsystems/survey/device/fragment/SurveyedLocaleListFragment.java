@@ -50,7 +50,8 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.RecordListActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyedLocaleLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.RecordColumns;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.fragment.OrderByDialogFragment.OrderByDialogListener;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
@@ -151,7 +152,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Cursor cursor = (Cursor) mAdapter.getItem(position);
         final String localeId = cursor.getString(cursor.getColumnIndexOrThrow(
-                SurveyedLocaleAttrs.SURVEYED_LOCALE_ID)); 
+                RecordColumns.RECORD_ID));
         
         mListener.onSurveyedLocaleSelected(localeId);// Notify the host activity
     }
@@ -288,7 +289,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             TextView dateView = (TextView) view.findViewById(R.id.last_modified);
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
             final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
-            Long time = c.getLong(c.getColumnIndexOrThrow(SurveyDbAdapter.SUBMITTED_DATE_COL));
+            Long time = c.getLong(c.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
 
             nameView.setText(surveyedLocale.getName());
             idView.setText(surveyedLocale.getId());

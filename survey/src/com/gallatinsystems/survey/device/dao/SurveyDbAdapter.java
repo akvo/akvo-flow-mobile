@@ -1185,19 +1185,8 @@ public class SurveyDbAdapter {
                 new String[] {fileName});
     }
 
-    /**
-     * Get the list of queued and failed transmissions
-     */
-    public List<FileTransmission> getUnsyncedTransmissions() {
+    public List<FileTransmission> getFileTransmissions(Cursor cursor) {
         List<FileTransmission> transmissions = new ArrayList<FileTransmission>();
-        Cursor cursor = database.query(Tables.TRANSMISSION,
-                new String[] {
-                        TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.SURVEY_INSTANCE_ID
-                },
-                TransmissionColumns.STATUS + " IN (?, ?)",
-                new String[] {ConstantUtil.FAILED_STATUS, ConstantUtil.QUEUED_STATUS},
-                null, null, null);
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -1217,7 +1206,37 @@ public class SurveyDbAdapter {
             }
             cursor.close();
         }
+
         return transmissions;
+    }
+
+    public List<FileTransmission> getFileTransmissions(long surveyInstanceId) {
+        Cursor cursor = database.query(Tables.TRANSMISSION,
+                new String[] {
+                        TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
+                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME
+                },
+                TransmissionColumns._ID + " = ?",
+                new String[] { String.valueOf(surveyInstanceId) },
+                null, null, null);
+
+        return getFileTransmissions(cursor);
+    }
+
+    /**
+     * Get the list of queued and failed transmissions
+     */
+    public List<FileTransmission> getUnsyncedTransmissions() {
+        Cursor cursor = database.query(Tables.TRANSMISSION,
+                new String[] {
+                        TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
+                        TransmissionColumns.STATUS, TransmissionColumns.SURVEY_INSTANCE_ID
+                },
+                TransmissionColumns.STATUS + " IN (?, ?)",
+                new String[] {ConstantUtil.FAILED_STATUS, ConstantUtil.QUEUED_STATUS},
+                null, null, null);
+
+        return getFileTransmissions(cursor);
     }
 
     /**

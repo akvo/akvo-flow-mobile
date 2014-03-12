@@ -26,6 +26,7 @@ import android.widget.EditText;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.UserColumns;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.StringUtil;
 
@@ -79,10 +80,8 @@ public class UserEditActivity extends Activity {
             Cursor user = databaseAdaptor.findUser(userId);
             startManagingCursor(user);
             if (user.getCount() > 0) {
-                displayName.setText(user.getString(user
-                        .getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL)));
-                emailAddr.setText(user.getString(user
-                        .getColumnIndexOrThrow(SurveyDbAdapter.EMAIL_COL)));
+                displayName.setText(user.getString(user.getColumnIndexOrThrow(UserColumns.NAME)));
+                emailAddr.setText(user.getString(user.getColumnIndexOrThrow(UserColumns.EMAIL)));
             }
         }
     }

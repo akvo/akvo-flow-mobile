@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.UserColumns;
 import com.gallatinsystems.survey.device.domain.User;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 
@@ -178,12 +179,9 @@ public class ListUserActivity extends ActionBarActivity {
         
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            long id = cursor.getLong(cursor.getColumnIndexOrThrow(
-                    SurveyDbAdapter.PK_ID_COL));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(
-                    SurveyDbAdapter.DISP_NAME_COL));
-            String email = cursor.getString(cursor.getColumnIndexOrThrow(
-                    SurveyDbAdapter.EMAIL_COL));
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserColumns._ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(UserColumns.NAME));
+            String email = cursor.getString(cursor.getColumnIndexOrThrow(UserColumns.EMAIL));
             
             final User user = new User(id, name, email);
             view.setTag(user);

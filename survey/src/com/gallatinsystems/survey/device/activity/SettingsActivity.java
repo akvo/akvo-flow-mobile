@@ -355,7 +355,7 @@ public class SettingsActivity extends ListActivity {
         SurveyDbAdapter db = new SurveyDbAdapter(this);
         try {
             db.open();
-            return db.unsentDataCount() > 0;
+            return db.getUnsyncedTransmissions().size() > 0;
         } finally {
             if (db != null) {
                 db.close();

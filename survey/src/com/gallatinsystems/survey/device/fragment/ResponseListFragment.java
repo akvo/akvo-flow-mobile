@@ -49,7 +49,6 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyColumns;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
-import com.gallatinsystems.survey.device.view.adapter.SubmittedSurveyReviewCursorAdaptor;
 
 import java.util.Date;
 
@@ -58,6 +57,11 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
     private static final String EXTRA_RECORD       = "record";
+
+    private static int SURVEY_ID_KEY          = R.integer.surveyidkey;
+    private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
+    private static int USER_ID_KEY            = R.integer.useridkey;
+    private static int FINISHED_KEY           = R.integer.finishedkey;
     
     // Loader id
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
@@ -145,7 +149,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         // Allow deletion only for 'saved' responses
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         View itemView = info.targetView;
-        if (!(Boolean)itemView.getTag(SubmittedSurveyReviewCursorAdaptor.FINISHED_KEY)) {
+        if (!(Boolean)itemView.getTag(FINISHED_KEY)) {
             menu.add(0, DELETE_ONE, 2, R.string.deleteresponse);
         }
     }
@@ -204,12 +208,9 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onListItemClick(list, view, position, id);
 
         Intent i = new Intent(view.getContext(), SurveyViewActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, (Long) view
-                .getTag(SubmittedSurveyReviewCursorAdaptor.USER_ID_KEY));
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, ((Long) view
-                .getTag(SubmittedSurveyReviewCursorAdaptor.SURVEY_ID_KEY)).toString());
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY,
-                (Long) view.getTag(SubmittedSurveyReviewCursorAdaptor.RESP_ID_KEY));
+        i.putExtra(ConstantUtil.USER_ID_KEY, (Long) view.getTag(USER_ID_KEY));
+        i.putExtra(ConstantUtil.SURVEY_ID_KEY, ((Long) view.getTag(SURVEY_ID_KEY)).toString());
+        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, (Long) view.getTag(SURVEY_INSTANCE_ID_KEY));
         
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
         if (mSurveyGroup.isMonitored()) {
@@ -217,7 +218,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         }
         
         // Read-only vs editable
-        if ((Boolean)view.getTag(SubmittedSurveyReviewCursorAdaptor.FINISHED_KEY)) {
+        if ((Boolean)view.getTag(FINISHED_KEY)) {
             i.putExtra(ConstantUtil.READONLY_KEY, true);
         } else {
             i.putExtra(ConstantUtil.SINGLE_SURVEY_KEY, true);

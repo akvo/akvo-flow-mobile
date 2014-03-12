@@ -10,7 +10,7 @@ import android.net.Uri;
 
 import com.gallatinsystems.survey.device.app.FlowApp;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.DatabaseHelper;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleAttrs;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.RecordColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.Tables;
 
 public class DataProvider extends ContentProvider {
@@ -19,9 +19,9 @@ public class DataProvider extends ContentProvider {
     
     private static final int SEARCH_SUGGEST = 1;
     
-    private static final String SUGGEST_SELECTION = SurveyedLocaleAttrs.SURVEY_GROUP_ID
-            + " = ? AND (" + SurveyedLocaleAttrs.SURVEYED_LOCALE_ID + " LIKE ? OR "
-            + SurveyedLocaleAttrs.NAME + " Like ?)";
+    private static final String SUGGEST_SELECTION = RecordColumns.SURVEY_GROUP_ID
+            + " = ? AND (" + RecordColumns.RECORD_ID + " LIKE ? OR "
+            + RecordColumns.NAME + " Like ?)";
     
     private static final UriMatcher sUriMatcher;
     
@@ -53,15 +53,15 @@ public class DataProvider extends ContentProvider {
                 
                 final String term = selectionArgs[0] + "%";
                 projection = new String[] {
-                        SurveyedLocaleAttrs.ID,
-                        SurveyedLocaleAttrs.SURVEYED_LOCALE_ID
+                        RecordColumns._ID,
+                        RecordColumns.RECORD_ID
                         + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-                        SurveyedLocaleAttrs.NAME
+                        RecordColumns.NAME
                         + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1,
-                        SurveyedLocaleAttrs.SURVEYED_LOCALE_ID
+                        RecordColumns.RECORD_ID
                         + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_2};
                 cursor = db.query(
-                    Tables.SURVEYED_LOCALE,
+                    Tables.RECORD,
                     projection,
                     SUGGEST_SELECTION,
                     new String[]{String.valueOf(surveyGroupId), term, term},

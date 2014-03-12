@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.UserColumns;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.User;
@@ -85,8 +86,8 @@ public class FlowApp extends Application {
                 long id = Long.valueOf(val);
                 Cursor cur = database.findUser(id);
                 if (cur != null) {
-                    String userName = cur.getString(cur.getColumnIndexOrThrow(SurveyDbAdapter.DISP_NAME_COL));
-                    String email = cur.getString(cur.getColumnIndexOrThrow(SurveyDbAdapter.EMAIL_COL));
+                    String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
+                    String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
                     mUser = new User(id, userName, email);
                     cur.close();
                 }

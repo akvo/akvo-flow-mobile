@@ -62,8 +62,7 @@ public class TransmissionHistoryActivity extends ListActivity {
     }
 
     private void getData() {
-        List<FileTransmission> transmissionList = databaseAdapter
-                .listFileTransmission(respondentId, null, false);
+        List<FileTransmission> transmissionList = databaseAdapter.getFileTransmissions(respondentId);
         FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
                 this, R.layout.transmissionrow,
                 transmissionList != null ? transmissionList

@@ -18,6 +18,7 @@ package com.gallatinsystems.survey.device.fragment;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -26,26 +27,32 @@ import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.activity.TransmissionHistoryActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyInstanceLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceColumns;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyColumns;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
-import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.adapter.SubmittedSurveyReviewCursorAdaptor;
+
+import java.util.Date;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
     //private static final String TAG = ResponseListFragment.class.getSimpleName();
@@ -64,7 +71,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     
     private SurveyGroup mSurveyGroup;
     private SurveyedLocale mRecord;
-    private SubmittedSurveyReviewCursorAdaptor mAdapter;
+    private ResponseListCursorAdapter mAdapter;
     
     private SurveyDbAdapter mDatabase;
     
@@ -121,7 +128,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         mDatabase.open();
 
         if(mAdapter == null) {
-            mAdapter = new SubmittedSurveyReviewCursorAdaptor(getActivity());// Cursor Adapter
+            mAdapter = new ResponseListCursorAdapter(getActivity());// Cursor Adapter
             setListAdapter(mAdapter);
         }
         registerForContextMenu(getListView());// Same implementation as before
@@ -244,5 +251,78 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
-    
+
+    class ResponseListCursorAdapter extends CursorAdapter {
+        final int SURVEY_ID_KEY = R.integer.surveyidkey;
+        final int RESP_ID_KEY = R.integer.respidkey;
+        final int USER_ID_KEY = R.integer.useridkey;
+        final int FINISHED_KEY = R.integer.finishedkey;
+
+        public ResponseListCursorAdapter(Context context) {
+            super(context, null, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            final int syncedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE);
+            final int exportedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE);
+            final int submittedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
+            final int savedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE);
+
+            String status = "";
+            int icon = R.drawable.redcircle;
+            boolean finished = false;
+            long displayDate = 0L;// Should never display this value;
+
+            // TODO: The STATUS can be determined with these values. No need for STATUS column?
+            if (cursor.isNull(syncedDateCol)) {
+                status = "Synced: ";
+                displayDate = cursor.getLong(syncedDateCol);
+                icon = R.drawable.checkmark2;
+                finished = true;
+            } else if (cursor.isNull(exportedDateCol)) {
+                status = "Exported: ";
+                displayDate = cursor.getLong(exportedDateCol);
+                icon = R.drawable.yellowcircle;
+                finished = true;
+            } else if (cursor.isNull(submittedDateCol)) {
+                status = "Submitted: ";
+                displayDate = cursor.getLong(submittedDateCol);
+                icon = R.drawable.yellowcircle;
+                finished = true;
+            } else if (cursor.isNull(savedDateCol)) {
+                status = "Saved: ";
+                icon = R.drawable.disk;
+                displayDate = cursor.getLong(savedDateCol);
+            }
+
+            // Format the date string
+            Date date = new Date(displayDate);
+            TextView dateView = (TextView) view.findViewById(R.id.text2);
+            dateView.setText(status
+                    + DateFormat.getLongDateFormat(context).format(date) + " "
+                    + DateFormat.getTimeFormat(context).format(date));
+            TextView headingView = (TextView) view.findViewById(R.id.text1);
+            headingView.setText(cursor.getString(cursor.getColumnIndex(SurveyColumns.NAME)));
+            view.setTag(SURVEY_ID_KEY, cursor.getLong(cursor
+                    .getColumnIndex(SurveyInstanceColumns.SURVEY_ID)));
+            view.setTag(RESP_ID_KEY, cursor.getLong(cursor
+                    .getColumnIndex(SurveyInstanceColumns._ID)));
+            view.setTag(USER_ID_KEY, cursor.getLong(cursor
+                    .getColumnIndex(SurveyInstanceColumns.USER_ID)));
+            view.setTag(FINISHED_KEY, finished);
+            ImageView stsIcon = (ImageView) view.findViewById(R.id.xmitstsicon);
+            stsIcon.setImageResource(icon);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.submittedrow, null);
+            bindView(view, context, cursor);
+            return view;
+        }
+
+    }
 }

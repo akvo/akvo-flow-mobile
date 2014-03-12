@@ -157,12 +157,12 @@ public class SurveyDbAdapter {
         String UUID = "uuid";
         String SURVEY_ID = "survey_id";
         String USER_ID = "user_id";
+        String RECORD_ID = "surveyed_locale_id";
         String START_DATE = "start_date";
         String SAVED_DATE = "saved_date";
         String SUBMITTED_DATE = "saved_date";
-        String RECORD_ID = "surveyed_locale_id";
         String EXPORTED_DATE = "exported_date";
-        String SENT_DATE = "sent_date";
+        String SYNC_DATE = "sync_date";
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
     }
 
@@ -309,7 +309,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.RECORD_ID + " TEXT,"
                     + SurveyInstanceColumns.STATUS + " INTEGER,"
                     + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
-                    + SurveyInstanceColumns.SENT_DATE + " INTEGER,"
+                    + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -524,22 +524,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * marks the data as submitted in the respondent table (submittedFlag =
-     * true) thereby making it ready for transmission
-     * 
-     * @param respondentId
-     */
-    public void submitSurveyInstance(long surveyInstanceId) {
-        // TODO: DRY!
-        ContentValues vals = new ContentValues();
-        vals.put(SurveyInstanceColumns.SUBMITTED_DATE, System.currentTimeMillis());
-        vals.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SUBMITTED);
-        database.update(Tables.SURVEY_INSTANCE, vals,
-                SurveyInstanceColumns._ID + "= ? ",
-                new String[] { String.valueOf(surveyInstanceId) });
-    }
-
-    /**
      * Mark a survey instance as saved, updating the saved time and the status.
      * This values will only be changed if the survey is not submitted yet.
      * @param surveyInstanceId
@@ -568,6 +552,16 @@ public class SurveyDbAdapter {
                     SurveyInstanceColumns._ID + "= ?",
                     new String[] { String.valueOf(surveyInstanceId) });
         }
+    }
+
+    /**
+     * marks the data as submitted in the respondent table (submittedFlag =
+     * true) thereby making it ready for transmission
+     *
+     * @param respondentId
+     */
+    public void setSurveyInstanceSubmitted(long surveyInstanceId) {
+        updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SUBMITTED);
     }
 
     public void setSurveyInstanceExported(long surveyInstanceId) {
@@ -634,9 +628,23 @@ public class SurveyDbAdapter {
      * @param status
      */
     private void updateSurveyStatus(long surveyInstanceId, int status) {
+        String dateColumn = SurveyInstanceColumns.SAVED_DATE;
+        switch (status) {
+            case SurveyInstanceStatus.DOWNLOADED:
+            case SurveyInstanceStatus.SYNCED:
+                dateColumn = SurveyInstanceColumns.SYNC_DATE;
+                break;
+            case SurveyInstanceStatus.EXPORTED:
+                dateColumn = SurveyInstanceColumns.EXPORTED_DATE;
+                break;
+            case SurveyInstanceStatus.SUBMITTED:
+                dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
+                break;
+        }
+
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyInstanceColumns.STATUS, status);
-        updatedValues.put(SurveyInstanceColumns.SAVED_DATE, System.currentTimeMillis());
+        updatedValues.put(dateColumn, System.currentTimeMillis());
 
         final int rows = database.update(Tables.SURVEY_INSTANCE,
                 updatedValues,
@@ -1636,7 +1644,8 @@ public class SurveyDbAdapter {
                     Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID, SurveyColumns.NAME,
                     SurveyInstanceColumns.SAVED_DATE, SurveyInstanceColumns.SURVEY_ID,
                     SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                    SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS
+                    SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
+                    SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE
                 },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_GROUP_ID + "= ?",
                 new String[]{String.valueOf(surveyGroupId)},
@@ -1651,6 +1660,7 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.SAVED_DATE, SurveyInstanceColumns.SURVEY_ID,
                         SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.RECORD_ID,
+                        SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
                         SurveyInstanceColumns.STATUS
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
@@ -1843,7 +1853,8 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getDate());
             values.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
             values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
-                
+            values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
+
             if (id != -1) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
                         + " = ?", new String[] { surveyInstance.getUuid()});

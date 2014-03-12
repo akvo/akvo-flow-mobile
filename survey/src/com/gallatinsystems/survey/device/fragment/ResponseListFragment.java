@@ -16,7 +16,6 @@
 
 package com.gallatinsystems.survey.device.fragment;
 
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;

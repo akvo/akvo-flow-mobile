@@ -189,7 +189,7 @@ public class SurveyDownloadService extends Service {
                 // now check if any previously downloaded surveys still need
                 // don't have their help media pre-cached
                 if (canDownload(precacheOption)) {
-                    surveys = databaseAdaptor.listSurveys(SurveyGroup.ID_NONE);
+                    surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
                     if (surveys != null) {
                         for (int i = 0; i < surveys.size(); i++) {
                             if (!surveys.get(i).isHelpDownloaded()) {
@@ -219,13 +219,13 @@ public class SurveyDownloadService extends Service {
     }
     
     private int getPrecacheOption() {
-        return Integer.parseInt(databaseAdaptor.findPreference(
+        return Integer.parseInt(databaseAdaptor.getPreference(
                 ConstantUtil.PRECACHE_SETTING_KEY));
     }
     
     private String getServerBase() {
         String serverBase = databaseAdaptor
-                .findPreference(ConstantUtil.SERVER_SETTING_KEY);
+                .getPreference(ConstantUtil.SERVER_SETTING_KEY);
         if (serverBase != null && serverBase.trim().length() > 0) {
             serverBase = getResources().getStringArray(R.array.servers)[Integer
                     .parseInt(serverBase)];
@@ -237,12 +237,12 @@ public class SurveyDownloadService extends Service {
     }
     
     private int getSurveyCheckOption() {
-        return Integer.parseInt(databaseAdaptor.findPreference(
+        return Integer.parseInt(databaseAdaptor.getPreference(
                 ConstantUtil.CHECK_FOR_SURVEYS));
     }
     
     private String getDeviceId() {
-        return databaseAdaptor.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+        return databaseAdaptor.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
     }
     
     private void syncSurveyGroups(List<Survey> surveys) {

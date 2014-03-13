@@ -205,7 +205,7 @@ public class BootstrapService extends Service {
                             surveyName = surveyName.substring(0,
                                     surveyName.indexOf("."));
                         }
-                        Survey survey = databaseAdapter.findSurvey(id);
+                        Survey survey = databaseAdapter.getSurvey(id);
                         if (survey == null) {
                             survey = new Survey();
                             survey.setId(id);

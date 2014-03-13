@@ -299,7 +299,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
             responseMap = new HashMap<String, QuestionResponse>();
         }
         if (respondentId != null) {
-            Cursor responseCursor = databaseAdaptor.fetchResponses(respondentId);
+            Cursor responseCursor = databaseAdaptor.getResponses(respondentId);
 
             while (responseCursor.moveToNext()) {
                 String[] cols = responseCursor.getColumnNames();

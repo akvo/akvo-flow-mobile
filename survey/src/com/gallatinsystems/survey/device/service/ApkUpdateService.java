@@ -90,9 +90,9 @@ public class ApkUpdateService extends Service {
             databaseAdaptor = new SurveyDbAdapter(this);
             databaseAdaptor.open();
             precacheOption = Integer.parseInt(databaseAdaptor
-                    .findPreference(ConstantUtil.PRECACHE_SETTING_KEY));
+                    .getPreference(ConstantUtil.PRECACHE_SETTING_KEY));
             serverBase = databaseAdaptor
-                    .findPreference(ConstantUtil.SERVER_SETTING_KEY);
+                    .getPreference(ConstantUtil.SERVER_SETTING_KEY);
         } finally {
             databaseAdaptor.close();
             databaseAdaptor = null;

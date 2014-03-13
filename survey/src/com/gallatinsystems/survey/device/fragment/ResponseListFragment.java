@@ -178,7 +178,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                             public void onClick(DialogInterface dialog,
                                     int id) {
                                 SurveyDbAdapter db = new SurveyDbAdapter(getActivity()).open();
-                                db.deleteRespondent(String.valueOf(surveyInstanceId));
+                                db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
                                 db.close();
                                 refresh();
                             }

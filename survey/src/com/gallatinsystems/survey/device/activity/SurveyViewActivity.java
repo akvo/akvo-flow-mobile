@@ -56,7 +56,6 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
-import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import com.gallatinsystems.survey.device.domain.Dependency;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionGroup;
@@ -334,7 +333,7 @@ public class SurveyViewActivity extends TabActivity implements
                             // question map for a response and use that to
                             // inform the child
                             QuestionResponse resp = databaseAdapter
-                                    .findSingleResponse(respondentId,
+                                    .getResponse(respondentId,
                                             dep.getQuestion());
                             if (resp != null) {
                                 depQ.handleDependencyParentResponse(dep, resp);
@@ -393,7 +392,7 @@ public class SurveyViewActivity extends TabActivity implements
     private void sizeReminder(long len) {
         // see if we need to complain about size
         if (len > ConstantUtil.BIG_PHOTO_FILE) {
-            String val = databaseAdapter.findPreference(ConstantUtil.PHOTO_SIZE_REMINDER_KEY);
+            String val = databaseAdapter.getPreference(ConstantUtil.PHOTO_SIZE_REMINDER_KEY);
             if (val != null && Boolean.parseBoolean(val)) {
                 // let user click a "stop bugging me" button
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -425,7 +424,7 @@ public class SurveyViewActivity extends TabActivity implements
      * if file was re
      */
     private boolean resizedToNewFile(File f, String outputFileName) {
-        String val = databaseAdapter.findPreference(ConstantUtil.SHRINK_PHOTOS_KEY);
+        String val = databaseAdapter.getPreference(ConstantUtil.SHRINK_PHOTOS_KEY);
         if (val != null && Boolean.parseBoolean(val)) {
             // Get image size
             BitmapFactory.Options bmo = new BitmapFactory.Options();
@@ -639,7 +638,7 @@ public class SurveyViewActivity extends TabActivity implements
      */
     private void saveQuestionResponse(String value, String type,
             String questionId) {
-        QuestionResponse resp = databaseAdapter.findSingleResponse(
+        QuestionResponse resp = databaseAdapter.getResponse(
                 respondentId, eventSourceQuestionId);
         if (resp == null) {
             resp = new QuestionResponse(value, type, eventSourceQuestionId);
@@ -1036,7 +1035,7 @@ public class SurveyViewActivity extends TabActivity implements
         // and concatenate them so it becomes the Locale name.
         if (localeNameQuestions.size() > 0) {
             for (int i=0; i<localeNameQuestions.size(); i++) {
-                QuestionResponse questionResponse = databaseAdapter.findSingleResponse(
+                QuestionResponse questionResponse = databaseAdapter.getResponse(
                         respondentId, localeNameQuestions.get(i));
                 
                 String answer = questionResponse != null ? questionResponse.getValue() : null;
@@ -1054,7 +1053,7 @@ public class SurveyViewActivity extends TabActivity implements
         // META_GEO
         String localeGeoQuestion = survey.getLocaleGeoQuestion();
         if (localeGeoQuestion != null) {
-            QuestionResponse response = databaseAdapter.findSingleResponse(
+            QuestionResponse response = databaseAdapter.getResponse(
                     respondentId, localeGeoQuestion);
             if (response != null) {
                 databaseAdapter.updateSurveyedLocale(respondentId, response.getValue(), SurveyedLocaleMeta.GEOLOCATION);
@@ -1132,9 +1131,9 @@ public class SurveyViewActivity extends TabActivity implements
             databaseAdapter.open();
 
             String langsSelection = databaseAdapter
-                    .findPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
+                    .getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
             String langsPresentIndexes = databaseAdapter
-                    .findPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
+                    .getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
             langsPrefData = LangsPreferenceUtil.createLangPrefData(this, langsSelection,
                     langsPresentIndexes);
             selectedLanguageCodes = LangsPreferenceUtil.getSelectedLangCodes(this,
@@ -1143,13 +1142,13 @@ public class SurveyViewActivity extends TabActivity implements
                     R.array.alllanguagecodes);
 
             String textSize = databaseAdapter
-                    .findPreference(ConstantUtil.SURVEY_TEXT_SIZE_KEY);
+                    .getPreference(ConstantUtil.SURVEY_TEXT_SIZE_KEY);
             if (ConstantUtil.LARGE_TXT.equalsIgnoreCase(textSize)) {
                 currentTextSize = LARGE_TXT_SIZE;
             }
 
             try {
-                Survey surveyFromDb = databaseAdapter.findSurvey(surveyId);
+                Survey surveyFromDb = databaseAdapter.getSurvey(surveyId);
                 InputStream in = null;
                 if (ConstantUtil.RESOURCE_LOCATION
                         .equalsIgnoreCase(surveyFromDb.getLocation())) {
@@ -1196,7 +1195,7 @@ public class SurveyViewActivity extends TabActivity implements
                 // question group
                 tabHost = getTabHost();
                 String screenOn = databaseAdapter
-                        .findPreference(ConstantUtil.SCREEN_ON_KEY);
+                        .getPreference(ConstantUtil.SCREEN_ON_KEY);
                 if (screenOn != null && Boolean.parseBoolean(screenOn.trim())) {
                     tabHost.setKeepScreenOn(true);
                 }
@@ -1286,7 +1285,7 @@ public class SurveyViewActivity extends TabActivity implements
         Long lastSurveyInstance = null;
         
         if (!readOnly && mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            boolean hasAnswers = databaseAdapter.fetchResponses(respondentId).getCount() > 0;
+            boolean hasAnswers = databaseAdapter.getResponses(respondentId).getCount() > 0;
 
             if (!hasAnswers) {
                 lastSurveyInstance = databaseAdapter.getLastSurveyInstance(mSurveyedLocaleId,

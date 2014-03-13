@@ -98,11 +98,11 @@ public class ExceptionReportingService extends Service {
         try {
             database = new SurveyDbAdapter(this);
             database.open();
-            deviceId = database.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+            deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
             Resources resources = getResources();
             version = PlatformUtil.getVersionName(this);
             String serverBase = database
-                    .findPreference(ConstantUtil.SERVER_SETTING_KEY);
+                    .getPreference(ConstantUtil.SERVER_SETTING_KEY);
             if (serverBase != null && serverBase.trim().length() > 0) {
                 serverBase = resources.getStringArray(R.array.servers)[Integer
                         .parseInt(serverBase)];
@@ -114,7 +114,7 @@ public class ExceptionReportingService extends Service {
             imei = StatusUtil.getImei(this);
             try {
                 uploadOption = Integer.parseInt(database
-                        .findPreference(ConstantUtil.UPLOAD_ERRORS));
+                        .getPreference(ConstantUtil.UPLOAD_ERRORS));
             } catch (Exception e) {
                 // no-op
                 uploadOption = 0;

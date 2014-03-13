@@ -18,12 +18,10 @@ package com.gallatinsystems.survey.device.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
@@ -54,66 +52,7 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class SurveyDbAdapter {
-    /*
-    public static final String QUESTION_FK_COL = "question_id";
-    public static final String ANSWER_COL = "answer_value";
-    public static final String ANSWER_TYPE_COL = "answer_type";
-    public static final String SURVEY_RESPONDENT_ID_COL = "survey_respondent_id";
-    public static final String RESP_ID_COL = "survey_response_id";
-    public static final String SURVEY_FK_COL = "survey_id";
-    public static final String PK_ID_COL = "_id";
-    public static final String USER_FK_COL = "user_id";
-    public static final String DISP_NAME_COL = "display_name";
-    public static final String EMAIL_COL = "email";
-    public static final String SUBMITTED_FLAG_COL = "submitted_flag";
-    public static final String SUBMITTED_DATE_COL = "submitted_date";
-    public static final String SURVEY_START_COL = "survey_start";
-    public static final String DELIVERED_DATE_COL = "delivered_date";
-    public static final String CREATED_DATE_COL = "created_date";
-    public static final String UPDATED_DATE_COL = "updated_date";
-    public static final String PLOT_FK_COL = "plot_id";
-    public static final String LAT_COL = "lat";
-    public static final String LON_COL = "lon";
-    public static final String ELEVATION_COL = "elevation";
-    public static final String DESC_COL = "description";
-    public static final String STATUS_COL = "status";
-    public static final String VERSION_COL = "version";
-    public static final String TYPE_COL = "type";
-    public static final String LOCATION_COL = "location";
-    public static final String FILENAME_COL = "filename";
-    public static final String KEY_COL = "key";
-    public static final String VALUE_COL = "value";
-    public static final String DELETED_COL = "deleted_flag";
-    public static final String MEDIA_SENT_COL = "media_sent_flag";
-    public static final String HELP_DOWNLOADED_COL = "help_downloaded_flag";
-    public static final String LANGUAGE_COL = "language";
-    public static final String SURVEY_GROUP_ID_COL = "survey_group_id";
-    public static final String SURVEYED_LOCALE_ID_COL = "surveyed_locale_id";
-    public static final String SAVED_DATE_COL = "saved_date";
-    public static final String INCLUDE_FLAG_COL = "include_flag";
-    public static final String SCORED_VAL_COL = "scored_val";
-    public static final String STRENGTH_COL = "strength";
-    public static final String TRANS_START_COL = "trans_start_date";
-    public static final String EXPORTED_FLAG_COL = "exported_flag";
-    public static final String UUID_COL = "uuid";
 
-    //private static final String USER_TABLE_CREATE = "create table user (_id integer primary key autoincrement, display_name text not null, email text not null, deleted_flag text);";
-
-    //private static final String SURVEY_TABLE_CREATE = "create table survey (_id integer primary key, display_name text not null, "
-    //+ "version real, type text, location text, filename text, language, help_downloaded_flag text, deleted_flag text, survey_group_id integer);";
-    //private static final String SURVEY_GROUP_TABLE_CREATE = "create table survey_group (_id integer primary key on conflict replace, name text, register_survey_id text, monitored integer);";
-    //private static final String SURVEY_RESPONDENT_CREATE = "create table survey_respondent (_id integer primary key autoincrement, "
-            //+ "survey_id integer not null, submitted_flag text, submitted_date text, delivered_date text, user_id integer, media_sent_flag text, "
-            //+ "status text, saved_date long, exported_flag text, uuid text, survey_start integer, surveyed_locale_id text);";
-    //private static final String SURVEY_RESPONSE_CREATE = "create table survey_response (survey_response_id integer primary key autoincrement, "
-            //+ " survey_respondent_id integer not null, question_id text not null, answer_value text not null, answer_type text not null, include_flag text not null, scored_val text, strength text);";
-    //private static final String SURVEYED_LOCALE_TABLE_CREATE = "create table surveyed_locale (_id integer primary key autoincrement, surveyed_locale_id text, survey_group_id integer, name text, latitude real, longitude real, "
-            //+ " UNIQUE(surveyed_locale_id) ON CONFLICT REPLACE);";
-    //private static final String TRANSMISSION_HISTORY_TABLE_CREATE = "create table transmission_history (_id integer primary key, survey_respondent_id integer not null, status text, filename text, trans_start_date long, delivered_date long);";
-    //private static final String PREFERENCES_TABLE_CREATE = "create table preferences (key text primary key, value text);";
-    //private static final String SYNC_TIME_TABLE_CREATE = "CREATE TABLE sync_time (_id INTEGER PRIMARY KEY AUTOINCREMENT, survey_group_id INTEGER, time TEXT, UNIQUE (survey_group_id) ON CONFLICT REPLACE);";
-    */
-    
     public interface Tables {
         String SURVEY = "survey";
         String SURVEY_INSTANCE = "survey_instance";
@@ -501,7 +440,7 @@ public class SurveyDbAdapter {
         databaseHelper.close();
     }
 
-    // TODO: Use denormaized status? --> WHERE status IS SurveyInstanceStatus.SUBMITTED
+    // TODO: Use denormalized status? --> WHERE status IS SurveyInstanceStatus.SUBMITTED
     public Cursor getUnexportedSurveyInstances() {
         return database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
@@ -512,7 +451,7 @@ public class SurveyDbAdapter {
                 null, null, null, null);
     }
 
-    public Cursor getResponses(long surveyInstanceId) {
+    public Cursor getResponsesData(long surveyInstanceId) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_RESPONSE_USER,
                 new String[] {
                         SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.SUBMITTED_DATE,
@@ -577,54 +516,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * updates the respondent table by recording the sent date stamp
-     * 
-     * @param idList
-    public void markDataAsSent(Set<String> idList, String mediaSentFlag) {
-        if (idList != null) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(DELIVERED_DATE_COL, System.currentTimeMillis()
-                    + "");
-            updatedValues.put(MEDIA_SENT_COL, mediaSentFlag);
-            // enhanced FOR ok here since we're dealing with an implicit
-            // iterator anyway
-            for (String id : idList) {
-                if (database.update(Tables.RESPONDENT, updatedValues, PK_ID_COL
-                        + " = ?", new String[] {
-                    id
-                }) < 1) {
-                    Log.e(TAG,
-                            "Could not update record for Survey_respondent_id "
-                                    + id);
-                }
-            }
-        }
-    }
-     */
-
-    /**
-     * updates the respondent table by recording the sent date stamp
-     * 
-     * @param idList
-    public void markDataAsExported(Set<String> idList) {
-        if (idList != null && idList.size() > 0) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(EXPORTED_FLAG_COL, "true");
-            // enhanced FOR ok here since we're dealing with an implicit
-            // iterator anyway
-            for (String id : idList) {
-                if (database.update(Tables.RESPONDENT, updatedValues, PK_ID_COL
-                        + " = ?", new String[] {
-                    id
-                }) < 1) {
-                    Log.e(TAG, "Could not update record for Survey_respondent_id " + id);
-                }
-            }
-        }
-    }
-     */
-
-    /**
      * updates the status of a survey instance to the status passed in.
      * Status must be one of the 'SurveyInstanceStatus' one.
      * 
@@ -665,7 +556,7 @@ public class SurveyDbAdapter {
      * 
      * @return
      */
-    public Cursor listUsers() {
+    public Cursor getUsers() {
         Cursor cursor = database.query(Tables.USER,
                 new String[] { UserColumns._ID, UserColumns.NAME, UserColumns.EMAIL },
                 UserColumns.DELETED + " <> ?",
@@ -683,7 +574,7 @@ public class SurveyDbAdapter {
      * @param id
      * @return
      */
-    public Cursor findUser(Long id) {
+    public Cursor getUser(Long id) {
         Cursor cursor = database.query(Tables.USER,
                 new String[] { UserColumns._ID, UserColumns.NAME, UserColumns.EMAIL },
                 UserColumns._ID + "=?",
@@ -728,7 +619,7 @@ public class SurveyDbAdapter {
      * 
      * @return Cursor over all responses
      */
-    public Cursor fetchResponses(long surveyInstanceId) {
+    public Cursor getResponses(long surveyInstanceId) {
         return database.query(Tables.RESPONSE,
                 new String[] {
                     ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
@@ -747,7 +638,7 @@ public class SurveyDbAdapter {
      * @param questionId
      * @return
      */
-    public QuestionResponse findSingleResponse(Long respondentId, String questionId) {
+    public QuestionResponse getResponse(Long surveyInstanceId, String questionId) {
         QuestionResponse resp = null;
         Cursor cursor = database.query(Tables.RESPONSE,
                 new String[] {
@@ -757,19 +648,18 @@ public class SurveyDbAdapter {
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                     + " =?",
-                new String[] { String.valueOf(respondentId), questionId },
+                new String[] { String.valueOf(surveyInstanceId), questionId },
                 null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             resp = new QuestionResponse();
             resp.setQuestionId(questionId);
-            resp.setRespondentId(respondentId);
+            resp.setRespondentId(surveyInstanceId);
             resp.setType(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE)));
             resp.setValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER)));
             resp.setId(cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID)));
             resp.setIncludeFlag(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)));
             resp.setScoredValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL)));
             resp.setStrength(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH)));
-
         }
 
         if (cursor != null) {
@@ -787,7 +677,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public QuestionResponse createOrUpdateSurveyResponse(QuestionResponse resp) {
-        QuestionResponse responseToSave = findSingleResponse(
+        QuestionResponse responseToSave = getResponse(
                 resp.getRespondentId(), resp.getQuestionId());
         if (responseToSave != null) {
             responseToSave.setValue(resp.getValue());
@@ -984,29 +874,21 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Gets a single survey from the db using its primary key
+     * Gets a single survey from the db using its survey id
      */
-    public Survey findSurvey(String surveyId) {
+    public Survey getSurvey(String surveyId) {
         Survey survey = null;
         Cursor cursor = database.query(Tables.SURVEY, new String[] {
                 SurveyColumns.SURVEY_ID, SurveyColumns.NAME, SurveyColumns.LOCATION,
                 SurveyColumns.FILENAME, SurveyColumns.TYPE, SurveyColumns.LANGUAGE,
-                SurveyColumns.HELP_DOWNLOADED
+                SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION
         }, SurveyColumns.SURVEY_ID + " = ?",
                 new String[] {
                     surveyId
                 }, null, null, null);
         if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                survey = new Survey();
-                survey.setId(surveyId);
-                survey.setName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.NAME)));
-                survey.setLocation(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LOCATION)));
-                survey.setFileName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.FILENAME)));
-                survey.setType(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.TYPE)));
-                survey.setHelpDownloaded(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED)));// TODO: Type conversion!
-                survey.setLanguage(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LANGUAGE)));
+            if (cursor.moveToFirst()) {
+                survey = getSurvey(cursor);
             }
             cursor.close();
         }
@@ -1015,75 +897,16 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Lists all non-deleted surveys from the database
-     */
-    public ArrayList<Survey> listSurveys(long surveyGroupId) {
-        ArrayList<Survey> surveys = new ArrayList<Survey>();
-        String whereClause = SurveyColumns.DELETED + " <> 1";
-        String[] whereParams = null;
-        if (surveyGroupId > 0) {
-            whereClause += " and " + SurveyColumns.SURVEY_GROUP_ID + " = ?";
-            whereParams = new String[] {
-                    String.valueOf(surveyGroupId)
-            };
-        }
-        Cursor cursor = database.query(Tables.SURVEY, new String[] {
-                SurveyColumns.SURVEY_ID, SurveyColumns.NAME, SurveyColumns.LOCATION, SurveyColumns.FILENAME,
-                SurveyColumns.TYPE, SurveyColumns.LANGUAGE, SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION
-        }, whereClause,
-                whereParams, null, null, null);
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                do {
-                    Survey survey = new Survey();
-                    survey.setId(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID)));
-                    survey.setName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.NAME)));
-                    survey.setLocation(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LOCATION)));
-                    survey.setFileName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.FILENAME)));
-                    survey.setType(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.TYPE)));
-                    survey.setHelpDownloaded(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED)));// TODO: Type conversion!
-                    survey.setLanguage(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LANGUAGE)));
-                    surveys.add(survey);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return surveys;
-    }
-
-    /**
-     * marks a survey record identified by the ID passed in as deleted.
-     * 
-     * @param surveyId
-     */
-    public void deleteSurvey(String surveyId, boolean physicalDelete) {
-        if (!physicalDelete) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(SurveyColumns.DELETED, 1);
-            database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                    new String[] {
-                        surveyId
-                    });
-        } else {
-            database.delete(Tables.SURVEY, SurveyColumns.SURVEY_ID + " = ? ",
-                    new String[] {
-                        surveyId
-                    });
-        }
-    }
-
-    /**
      * returns the value of a single setting identified by the key passed in
      */
-    public String findPreference(String key) {
+    public String getPreference(String key) {
         return databaseHelper.findPreference(database, key);
     }
 
     /**
      * Lists all settings from the database
      */
-    public HashMap<String, String> listPreferences() {
+    public HashMap<String, String> getPreferences () {
         HashMap<String, String> settings = new HashMap<String, String>();
         Cursor cursor = database.query(Tables.PREFERENCES, new String[] {
                 PreferencesColumns.KEY, PreferencesColumns.VALUE
@@ -1133,11 +956,11 @@ public class SurveyDbAdapter {
      * 
      * @param respondentId
      */
-    public void deleteRespondent(String respondentId) {
-        deleteResponses(respondentId);
+    public void deleteSurveyInstance(String surveyInstanceId) {
+        deleteResponses(surveyInstanceId);
         database.delete(Tables.SURVEY_INSTANCE, SurveyInstanceColumns._ID + "=?",
                 new String[] {
-                    respondentId
+                    surveyInstanceId
                 });
     }
 
@@ -1147,10 +970,10 @@ public class SurveyDbAdapter {
      * @param respondentId
      * @param questionId
      */
-    public void deleteResponse(String respondentId, String questionId) {
+    public void deleteResponse(String surveyInstanceId, String questionId) {
         database.delete(Tables.RESPONSE, ResponseColumns.SURVEY_INSTANCE_ID + "= ? AND "
                 + ResponseColumns.QUESTION_ID + "= ?", new String[] {
-                respondentId,
+                surveyInstanceId,
                 questionId
         });
     }
@@ -1245,176 +1068,6 @@ public class SurveyDbAdapter {
 
         return getFileTransmissions(cursor);
     }
-
-    /**
-     * inserts a transmissionHistory row into the db
-     * 
-     * @param respId
-     * @param fileName
-     * @param status
-     * @return uid of created record
-    public Long createTransmissionHistory(Long respId, String fileName,
-            String status) {
-        ContentValues initialValues = new ContentValues();
-        Long idVal = null;
-        initialValues.put(SURVEY_RESPONDENT_ID_COL, respId);
-        initialValues.put(FILENAME_COL, fileName);
-
-        if (status != null) {
-            final long time = System.currentTimeMillis();
-            initialValues.put(STATUS_COL, status);
-            if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
-                initialValues.put(TRANS_START_COL, time);
-            } else if (ConstantUtil.DOWNLOADED_STATUS.equals(status)) {
-                // Mark both columns with the same timestamp.
-                initialValues.put(TRANS_START_COL, time);
-                initialValues.put(DELIVERED_DATE_COL, time);
-            }
-        } else {
-            initialValues.put(TRANS_START_COL, (Long) null);
-            initialValues.put(STATUS_COL, ConstantUtil.QUEUED_STATUS);
-        }
-        idVal = database
-                .insert(Tables.TRANSMISSION_HISTORY, null, initialValues);
-        return idVal;
-    }
-     */
-
-    /**
-     * updates the first matching transmission history record with the status
-     * passed in. If the status == Completed, the completion date is updated. If
-     * the status == In Progress, the start date is updated.
-     * 
-     * @param respondId
-     * @param fileName
-     * @param status
-    public void updateTransmissionHistory(Long respondId, String fileName,
-            String status) {
-        List<FileTransmission> transList = listFileTransmission(respondId,
-                fileName, true);
-        Long idVal = null;
-        if (transList != null && transList.size() > 0) {
-            idVal = transList.get(0).getId();
-            if (idVal != null) {
-                ContentValues vals = new ContentValues();
-                vals.put(STATUS_COL, status);
-                if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
-                    vals.put(DELIVERED_DATE_COL, System.currentTimeMillis()
-                            + "");
-                } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
-                    vals.put(TRANS_START_COL, System.currentTimeMillis() + "");
-                }
-                database.update(Tables.TRANSMISSION_HISTORY, vals, PK_ID_COL
-                        + " = ?", new String[] {
-                    idVal.toString()
-                });
-            }
-            else
-                // it should have been found
-                Log.e(TAG,
-                        "Could not update transmission history record for respondent_id "
-                                + respondId
-                                + " filename "
-                                + fileName);
-        }
-    }
-
-    public void updateTransmissionHistory(Set<String> respondentIDs, String fileName,
-            String status) {
-        for (String id : respondentIDs) {
-            updateTransmissionHistory(Long.valueOf(id), fileName, status);
-        }
-    }
-     */
-
-    /**
-     * lists all the file transmissions for the values passed in.
-     * 
-     * @param respondentId - MANDATORY id of the survey respondent
-     * @param fileName - OPTIONAL file name
-     * @param incompleteOnly - if true, only rows without a complete status will
-     *            be returned
-     * @return
-    public List<FileTransmission> listFileTransmission(Long respondentId,
-            String fileName, boolean incompleteOnly) {
-        List<FileTransmission> transList = null;
-
-        String whereClause = SURVEY_RESPONDENT_ID_COL + "=?";
-        if (incompleteOnly) {
-            whereClause = whereClause + " AND " + STATUS_COL + " <> '"
-                    + ConstantUtil.COMPLETE_STATUS + "'";
-        }
-        String[] whereValues = null;
-
-        if (fileName != null && fileName.trim().length() > 0) {
-            whereClause = whereClause + " AND " + FILENAME_COL + " = ?";
-            whereValues = new String[2];
-            whereValues[0] = respondentId.toString();
-            whereValues[1] = fileName;
-
-        } else {
-            whereValues = new String[] {
-                respondentId.toString()
-            };
-        }
-
-        Cursor cursor = database.query(Tables.TRANSMISSION_HISTORY,
-                new String[] {
-                        PK_ID_COL, FILENAME_COL, STATUS_COL,
-                        TRANS_START_COL, DELIVERED_DATE_COL,
-                        SURVEY_RESPONDENT_ID_COL
-                }, whereClause, whereValues,
-                null, null, TRANS_START_COL + " desc");
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                transList = new ArrayList<FileTransmission>();
-                do {
-                    FileTransmission trans = new FileTransmission();
-                    trans.setId(cursor.getLong(cursor
-                            .getColumnIndexOrThrow(PK_ID_COL)));
-                    trans.setRespondentId(respondentId);
-                    trans.setFileName(cursor.getString(cursor
-                            .getColumnIndexOrThrow(FILENAME_COL)));
-                    Long startDateMillis = cursor.getLong(cursor
-                            .getColumnIndexOrThrow(TRANS_START_COL));
-                    if (startDateMillis != null && startDateMillis > 0) {
-                        trans.setStartDate(new Date(startDateMillis));
-                    }
-                    Long delivDateMillis = cursor.getLong(cursor
-                            .getColumnIndexOrThrow(DELIVERED_DATE_COL));
-                    if (delivDateMillis != null && delivDateMillis > 0) {
-                        trans.setEndDate(new Date(delivDateMillis));
-                    }
-                    trans.setStatus(cursor.getString(cursor
-                            .getColumnIndexOrThrow(STATUS_COL)));
-                    transList.add(trans);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return transList;
-    }
-     */
-
-    /**
-     * marks submitted data as unsent. If an ID is passed in, only that
-     * submission will be updated. If id is null, ALL data will be marked as
-     * unsent.
-    public void markDataUnsent(Long respondentId) {
-        executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where _id = "
-                + respondentId);
-    }
-    
-    public void markRecordUnsent(String recordId) {
-        executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where surveyed_locale_id = '"
-                + recordId + "'");
-    }
-    
-    public void markSurveyGroupUnsent(long surveyGroupId) {
-        executeSql("update survey_respondent set media_sent_flag = 'false', delivered_date = null where survey_id in "
-                + "(select _id from survey where survey_group_id = " + surveyGroupId + ")");
-    }
-     */
 
     /**
      * executes a single insert/update/delete DML or any DDL statement without
@@ -1513,8 +1166,8 @@ public class SurveyDbAdapter {
             }
         }
 
-        String langsSelection = findPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
-        String langsPresentIndexes = findPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
+        String langsSelection = getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
+        String langsPresentIndexes = getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
 
         HashSet<String> langsSelectionSet = stringToSet(langsSelection);
         HashSet<String> langsPresentIndexesSet = stringToSet(langsPresentIndexes);
@@ -1669,7 +1322,51 @@ public class SurveyDbAdapter {
                 },
                 whereClause, whereParams, null, null, null);
     }
-    
+
+    /**
+     * Convenience method to retrieve all non-deleted surveys, without the hassle of
+     * parsing the Cursor columns.
+     * To get the Cursor result, use getSurveys(surveyGroupId)
+     */
+    public List<Survey> getSurveyList (long surveyGroupId) {
+        // Reuse getSurveys() method
+        Cursor cursor = getSurveys(surveyGroupId);
+
+        ArrayList<Survey> surveys = new ArrayList<Survey>();
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    surveys.add(getSurvey(cursor));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return surveys;
+    }
+
+    /**
+     * marks a survey record identified by the ID passed in as deleted.
+     *
+     * @param surveyId
+     */
+    public void deleteSurvey(String surveyId, boolean physicalDelete) {
+        if (!physicalDelete) {
+            ContentValues updatedValues = new ContentValues();
+            updatedValues.put(SurveyColumns.DELETED, 1);
+            database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
+                    new String[] {
+                            surveyId
+                    });
+        } else {
+            database.delete(Tables.SURVEY, SurveyColumns.SURVEY_ID + " = ? ",
+                    new String[] {
+                            surveyId
+                    });
+        }
+    }
+
     public Cursor getSurveyInstances(long surveyGroupId) {
         Cursor cursor = database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 new String[] {
@@ -1683,7 +1380,7 @@ public class SurveyDbAdapter {
                 },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_GROUP_ID + "= ?",
                 new String[]{String.valueOf(surveyGroupId)},
-                null, null, SurveyInstanceColumns.SUBMITTED_DATE + " DESC");
+                null, null, SurveyInstanceColumns.START_DATE + " DESC");
         return cursor;
     }
     
@@ -1700,7 +1397,7 @@ public class SurveyDbAdapter {
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[]{String.valueOf(surveyedLocaleId)},
-                null, null, SurveyInstanceColumns.SUBMITTED_DATE + " DESC");
+                null, null, SurveyInstanceColumns.START_DATE + " DESC");
         return cursor;
     }
     
@@ -1824,19 +1521,7 @@ public class SurveyDbAdapter {
         
         return cursor;
     }
-    
-    public int getSurveyedLocalesCount(long surveyGroupId) {
-        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM " + Tables.RECORD
-                + " WHERE " + RecordColumns.SURVEY_GROUP_ID + " = ?",
-                new String[]{String.valueOf(surveyGroupId)});
-        
-        if (cursor.moveToFirst()) {
-            return cursor.getInt(0);
-        }
-        
-        return 0;
-    }
-    
+
     // ======================================================= //
     // =========== SurveyedLocales synchronization =========== //
     // ======================================================= //

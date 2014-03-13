@@ -127,7 +127,7 @@ public class FlowApi {
     private static String getBaseUrl(Context context) {
         SurveyDbAdapter db = new SurveyDbAdapter(context);
         db.open();
-        String serverBase = db.findPreference(ConstantUtil.SERVER_SETTING_KEY);
+        String serverBase = db.getPreference(ConstantUtil.SERVER_SETTING_KEY);
         db.close();
         if (serverBase != null && serverBase.trim().length() > 0) {
             serverBase = context.getResources().getStringArray(R.array.servers)[Integer

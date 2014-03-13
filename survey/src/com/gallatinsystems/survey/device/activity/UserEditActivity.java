@@ -77,7 +77,7 @@ public class UserEditActivity extends Activity {
      */
     private void populateFields() {
         if (userId != null) {
-            Cursor user = databaseAdaptor.findUser(userId);
+            Cursor user = databaseAdaptor.getUser(userId);
             startManagingCursor(user);
             if (user.getCount() > 0) {
                 displayName.setText(user.getString(user.getColumnIndexOrThrow(UserColumns.NAME)));

@@ -56,10 +56,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
@@ -265,12 +263,12 @@ public class DataSyncService extends IntentService {
      * @param imagePaths - IN param. After execution this will contain the list of photo paths to send
      */
     private void processSurveyData(long surveyInstanceId, StringBuilder buf, List<String> imagePaths) {
-        Cursor data = mDatabase.getResponses(surveyInstanceId);
+        Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
         if (data != null) {
             if (data.moveToFirst()) {
                 Log.i(TAG, "There is data to send. Forming contents");
-                String deviceIdentifier = mDatabase.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+                String deviceIdentifier = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
                 if (deviceIdentifier == null) {
                     deviceIdentifier = "unset";
                 } else {
@@ -619,7 +617,7 @@ public class DataSyncService extends IntentService {
     private String getDeviceNotification(String serverBase) throws Exception {
         String phoneNumber = StatusUtil.getPhoneNumber(this);
         String imei = StatusUtil.getImei(this);
-        String deviceId = mDatabase.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+        String deviceId = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
         String version = PlatformUtil.getVersionName(this);
 
         String url = serverBase + DEVICE_NOTIFICATION_PATH
@@ -692,7 +690,7 @@ public class DataSyncService extends IntentService {
     }
 
     private String getServerBase() {
-        final String serverBase = mDatabase.findPreference(ConstantUtil.SERVER_SETTING_KEY);
+        final String serverBase = mDatabase.getPreference(ConstantUtil.SERVER_SETTING_KEY);
         if (!TextUtils.isEmpty(serverBase)) {
             return getResources().getStringArray(R.array.servers)[Integer.parseInt(serverBase)];
         }
@@ -701,7 +699,7 @@ public class DataSyncService extends IntentService {
     }
 
     private int getUploadIndex() {
-        final String uploadOption = mDatabase.findPreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
+        final String uploadOption = mDatabase.getPreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
         if (!TextUtils.isEmpty(uploadOption)) {
             return Integer.parseInt(uploadOption);
         }

@@ -90,7 +90,7 @@ public class ListUserActivity extends ActionBarActivity {
     }
     
     private void display() {
-        Cursor cursor = mDatabase.listUsers();
+        Cursor cursor = mDatabase.getUsers();
         mAdapter.changeCursor(cursor);
     }
 
@@ -154,7 +154,7 @@ public class ListUserActivity extends ActionBarActivity {
     }
 
     private void handleDelete(long id) {
-        String savedId = mDatabase.findPreference(ConstantUtil.LAST_USER_SETTING_KEY);
+        String savedId = mDatabase.getPreference(ConstantUtil.LAST_USER_SETTING_KEY);
         mDatabase.deleteUser(id);
         if (savedId != null && savedId.equals(id)) {
             mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY, "");

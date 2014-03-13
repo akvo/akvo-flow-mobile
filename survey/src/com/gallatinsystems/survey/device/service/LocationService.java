@@ -85,15 +85,15 @@ public class LocationService extends Service {
 
             database.open();
             String val = database
-                    .findPreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY);
-            deviceId = database.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
+                    .getPreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY);
+            deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
             if (val != null) {
                 sendBeacon = Boolean.parseBoolean(val);
             }
             Resources resources = getResources();
             version = PlatformUtil.getVersionName(this);
             String serverBase = database
-                    .findPreference(ConstantUtil.SERVER_SETTING_KEY);
+                    .getPreference(ConstantUtil.SERVER_SETTING_KEY);
             if (serverBase != null && serverBase.trim().length() > 0) {
                 serverBase = resources.getStringArray(R.array.servers)[Integer
                         .parseInt(serverBase)];

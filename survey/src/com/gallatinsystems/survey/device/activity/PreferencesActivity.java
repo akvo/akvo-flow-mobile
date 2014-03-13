@@ -108,7 +108,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      * loads the preferences from the DB and sets their current value in the UI
      */
     private void populateFields() {
-        HashMap<String, String> settings = database.listPreferences();
+        HashMap<String, String> settings = database.getPreferences();
         String val = settings.get(ConstantUtil.USER_SAVE_SETTING_KEY);
         if (val != null && Boolean.parseBoolean(val)) {
             saveUserCheckbox.setChecked(true);

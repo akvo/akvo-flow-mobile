@@ -117,7 +117,7 @@ public class SurveyDbAdapter {
     public interface Tables {
         String SURVEY = "survey";
         String SURVEY_INSTANCE = "survey_instance";
-        String RESPONSE = "survey_response";
+        String RESPONSE = "response";
         String USER = "user";
         String PREFERENCES = "preferences";
         String TRANSMISSION = "transmission";
@@ -128,10 +128,14 @@ public class SurveyDbAdapter {
         String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
                 + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
                 + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
+
+        String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
+                + "LEFT OUTER JOIN survey ON (survey_instance.survey_id = survey.survey_id)";
     }
 
     public interface SurveyGroupColumns {
         String _ID                = "_id";
+        String SURVEY_GROUP_ID    = "survey_group_id";
         String NAME               = "name";
         String REGISTER_SURVEY_ID = "register_survey_id";
         String MONITORED          = "monitored";
@@ -160,7 +164,7 @@ public class SurveyDbAdapter {
         String RECORD_ID = "surveyed_locale_id";
         String START_DATE = "start_date";
         String SAVED_DATE = "saved_date";
-        String SUBMITTED_DATE = "saved_date";
+        String SUBMITTED_DATE = "submitted_date";
         String EXPORTED_DATE = "exported_date";
         String SYNC_DATE = "sync_date";
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
@@ -248,8 +252,6 @@ public class SurveyDbAdapter {
 
     private static final String DATABASE_NAME = "surveydata";
 
-    private static final String RESPONDENT_JOIN = "survey_instance LEFT OUTER JOIN survey ON (survey_instance.survey_id = survey._id)";
-
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
     private static final int DATABASE_VERSION = VER_LAUNCH;
 
@@ -280,7 +282,7 @@ public class SurveyDbAdapter {
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY + " ("
                     + SurveyColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + SurveyColumns.SURVEY_ID + " INTEGER NOT NULL,"
+                    + SurveyColumns.SURVEY_ID + " TEXT NOT NULL,"
                     + SurveyColumns.SURVEY_GROUP_ID + " INTEGER,"// REFERENCES ...
                     + SurveyColumns.NAME + " TEXT NOT NULL,"
                     + SurveyColumns.VERSION + " REAL,"
@@ -294,14 +296,16 @@ public class SurveyDbAdapter {
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY_GROUP + " ("
                     + SurveyGroupColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + SurveyGroupColumns.SURVEY_GROUP_ID + " INTEGER,"
                     + SurveyGroupColumns.NAME + " TEXT,"
                     + SurveyGroupColumns.REGISTER_SURVEY_ID + " TEXT,"
-                    + SurveyGroupColumns.MONITORED + " INTEGER NOT NULL DEFAULT 0)");
+                    + SurveyGroupColumns.MONITORED + " INTEGER NOT NULL DEFAULT 0,"
+                    + "UNIQUE (" + SurveyGroupColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY_INSTANCE + " ("
                     + SurveyInstanceColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + SurveyInstanceColumns.UUID + " TEXT,"
-                    + SurveyInstanceColumns.SURVEY_ID + " INTEGER NOT NULL,"// REFERENCES ...
+                    + SurveyInstanceColumns.SURVEY_ID + " TEXT NOT NULL,"// REFERENCES ...
                     + SurveyInstanceColumns.USER_ID + " INTEGER,"// REFERENCES? beware of the synced records
                     + SurveyInstanceColumns.START_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SAVED_DATE + " INTEGER,"
@@ -501,7 +505,7 @@ public class SurveyDbAdapter {
     public Cursor getUnexportedSurveyInstances() {
         return database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
-                        SurveyInstanceColumns.SURVEY_ID
+                        SurveyInstanceColumns._ID
                 },
                 SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL AND "
                         + SurveyInstanceColumns.EXPORTED_DATE + " IS NULL",
@@ -827,7 +831,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public long createOrLoadSurveyRespondent(String surveyId, String userId, long surveyGroupId, String surveyedLocaleId) {
-        String where = SurveyInstanceColumns.SUBMITTED_DATE + "IS NULL AND "
+        String where = SurveyInstanceColumns.SUBMITTED_DATE + " IS NULL AND "
                 + SurveyInstanceColumns.SURVEY_ID + "= ?  AND " + SurveyInstanceColumns.STATUS + " = ? ";
         List<String> argList =  new ArrayList<String>();
         argList.add(surveyId);
@@ -1230,7 +1234,7 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.SURVEY_INSTANCE_ID
+                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME
                 },
                 TransmissionColumns.STATUS + " IN (?, ?)",
                 new String[] {ConstantUtil.FAILED_STATUS, ConstantUtil.QUEUED_STATUS},
@@ -1447,7 +1451,7 @@ public class SurveyDbAdapter {
      */
     public void clearCollectedData() {
         executeSql("delete from survey_instance");
-        executeSql("delete from survey_response");
+        executeSql("delete from response");
         executeSql("delete from transmission");
     }
 
@@ -1531,7 +1535,7 @@ public class SurveyDbAdapter {
     
     public void addSurveyGroup(SurveyGroup surveyGroup) {
         ContentValues values = new ContentValues();
-        values.put(SurveyGroupColumns._ID, surveyGroup.getId());
+        values.put(SurveyGroupColumns.SURVEY_GROUP_ID, surveyGroup.getId());
         values.put(SurveyGroupColumns.NAME, surveyGroup.getName());
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
@@ -1539,7 +1543,7 @@ public class SurveyDbAdapter {
     }
     
     public static SurveyGroup getSurveyGroup(Cursor cursor) {
-        int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns._ID));
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.NAME));
         String registerSurveyId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.REGISTER_SURVEY_ID));
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.MONITORED)) > 0;
@@ -1548,7 +1552,10 @@ public class SurveyDbAdapter {
     
     public Cursor getSurveyGroups() {
         Cursor cursor = database.query(Tables.SURVEY_GROUP, 
-                new String[] {SurveyGroupColumns._ID, SurveyGroupColumns.NAME, SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED},
+                new String[] {
+                        SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
+                        SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
+                },
                 null, null, null, null, null);
         
         return cursor;
@@ -1559,12 +1566,15 @@ public class SurveyDbAdapter {
         String[] selectionArgs = null;
         
         if (id != SurveyGroup.ID_NONE) {
-            where = SurveyGroupColumns._ID + "= ?";
+            where = SurveyGroupColumns.SURVEY_GROUP_ID + "= ?";
             selectionArgs = new String[] {String.valueOf(id)};
         }
         
-        Cursor cursor = database.query(Tables.SURVEY_GROUP, 
-                new String[] {SurveyGroupColumns._ID, SurveyGroupColumns.NAME, SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED},
+        Cursor cursor = database.query(Tables.SURVEY_GROUP,
+                new String[] {
+                        SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
+                        SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
+                },
                 where, selectionArgs,
                 null, null, null);
         
@@ -1650,21 +1660,23 @@ public class SurveyDbAdapter {
         }
         
         return database.query(Tables.SURVEY, new String[] {
-                    SurveyColumns._ID, SurveyColumns.NAME, SurveyColumns.LOCATION,
+                    SurveyColumns._ID, SurveyColumns.SURVEY_ID, SurveyColumns.NAME,
                     SurveyColumns.FILENAME, SurveyColumns.TYPE, SurveyColumns.LANGUAGE,
-                    SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION
+                    SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION, SurveyColumns.LOCATION
                 },
                 whereClause, whereParams, null, null, null);
     }
     
     public Cursor getSurveyInstances(long surveyGroupId) {
-        Cursor cursor = database.query(RESPONDENT_JOIN,
+        Cursor cursor = database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 new String[] {
-                    Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID, SurveyColumns.NAME,
-                    SurveyInstanceColumns.SAVED_DATE, SurveyInstanceColumns.SURVEY_ID,
+                    Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
+                    Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
+                    SurveyColumns.NAME, SurveyInstanceColumns.SAVED_DATE,
                     SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                     SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
-                    SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE
+                    SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
+                    SurveyInstanceColumns.RECORD_ID
                 },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_GROUP_ID + "= ?",
                 new String[]{String.valueOf(surveyGroupId)},
@@ -1673,14 +1685,15 @@ public class SurveyDbAdapter {
     }
     
     public Cursor getSurveyInstances(String surveyedLocaleId) {
-        Cursor cursor = database.query(RESPONDENT_JOIN,
+        Cursor cursor = database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 new String[] {
-                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID, SurveyColumns.NAME,
-                        SurveyInstanceColumns.SAVED_DATE, SurveyInstanceColumns.SURVEY_ID,
+                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
+                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
+                        SurveyColumns.NAME, SurveyInstanceColumns.SAVED_DATE,
                         SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.RECORD_ID,
+                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
                         SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                        SurveyInstanceColumns.STATUS
+                        SurveyInstanceColumns.RECORD_ID
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[]{String.valueOf(surveyedLocaleId)},
@@ -1714,7 +1727,7 @@ public class SurveyDbAdapter {
     }
     
     public String getSurveyedLocaleId(long surveyInstanceId) {
-        Cursor cursor = database.query(RESPONDENT_JOIN,
+        Cursor cursor = database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 new String[] {
                     Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
                     SurveyInstanceColumns.RECORD_ID

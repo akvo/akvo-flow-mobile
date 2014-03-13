@@ -375,18 +375,18 @@ public class SurveyDbAdapter {
          */
         public String findPreference(SQLiteDatabase db, String key) {
             String value = null;
-            Cursor cursor = db.query(Tables.PREFERENCES, new String[] {
-                    PreferencesColumns.KEY,
-                    PreferencesColumns.VALUE
-            }, PreferencesColumns.KEY + " = ?", new String[] {
-                key
-            }, null,
-                    null, null);
+            Cursor cursor = db.query(Tables.PREFERENCES,
+                    new String[] {
+                        PreferencesColumns.KEY,
+                        PreferencesColumns.VALUE
+                    }, PreferencesColumns.KEY + " = ?",
+                    new String[] {
+                        key
+                    }, null, null, null);
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
-                    value = cursor.getString(cursor
-                            .getColumnIndexOrThrow(PreferencesColumns.VALUE));
+                    value = cursor.getString(cursor.getColumnIndexOrThrow(PreferencesColumns.VALUE));
                 }
                 cursor.close();
             }
@@ -402,9 +402,10 @@ public class SurveyDbAdapter {
             ContentValues updatedValues = new ContentValues();
             updatedValues.put(PreferencesColumns.VALUE, value);
             int updated = db.update(Tables.PREFERENCES, updatedValues, PreferencesColumns.KEY
-                    + " = ?", new String[] {
-                key
-            });
+                    + " = ?",
+                    new String[] {
+                        key
+                    });
             if (updated <= 0) {
                 updatedValues.put(PreferencesColumns.KEY, key);
                 db.insert(Tables.PREFERENCES, null, updatedValues);
@@ -498,10 +499,10 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * marks the data as submitted in the respondent table (submittedFlag =
+     * marks the data as submitted in the surveyInstanceId table (submittedFlag =
      * true) thereby making it ready for transmission
      *
-     * @param respondentId
+     * @param surveyInstanceId
      */
     public void setSurveyInstanceSubmitted(long surveyInstanceId) {
         updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SUBMITTED);
@@ -634,7 +635,7 @@ public class SurveyDbAdapter {
     /**
      * loads a single question response
      * 
-     * @param respondentId
+     * @param surveyInstanceId
      * @param questionId
      * @return
      */
@@ -714,8 +715,8 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * this method will get the max survey respondent ID that has an unsubmitted
-     * survey or, if none exists, will create a new respondent
+     * this method will get the max survey instance ID that has an unsubmitted
+     * survey or, if none exists, will create a new survey instance
      * 
      * @param surveyId
      * @return
@@ -758,7 +759,7 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * creates a new unsubmitted survey respondent record
+     * creates a new unsubmitted survey instance
      * 
      * @param surveyId
      * @return
@@ -942,19 +943,19 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * deletes all survey responses from the database for a specific respondent
+     * deletes all survey responses from the database for a specific survey instance
      */
-    public void deleteResponses(String respondentId) {
+    public void deleteResponses(String surveyInstanceId) {
         database.delete(Tables.RESPONSE, ResponseColumns.SURVEY_INSTANCE_ID + "= ?",
                 new String[] {
-                    respondentId
+                    surveyInstanceId
                 });
     }
 
     /**
-     * deletes the respondent record and any responses it contains
+     * deletes the surveyInstanceId record and any responses it contains
      * 
-     * @param respondentId
+     * @param surveyInstanceId
      */
     public void deleteSurveyInstance(String surveyInstanceId) {
         deleteResponses(surveyInstanceId);
@@ -967,7 +968,7 @@ public class SurveyDbAdapter {
     /**
      * deletes a single response
      * 
-     * @param respondentId
+     * @param surveyInstanceId
      * @param questionId
      */
     public void deleteResponse(String surveyInstanceId, String questionId) {
@@ -1528,9 +1529,10 @@ public class SurveyDbAdapter {
     
     public void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
         for (QuestionResponse response : responses) {
-            Cursor cursor = database.query(Tables.RESPONSE, new String[] {
-                    "survey_respondent_id, question_id"},
-                    "survey_respondent_id = ? AND question_id = ?",
+            Cursor cursor = database.query(Tables.RESPONSE,
+                    new String[] { ResponseColumns.SURVEY_INSTANCE_ID, ResponseColumns.QUESTION_ID },
+                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                        + ResponseColumns.QUESTION_ID + " = ?",
                     new String[] { String.valueOf(surveyInstanceId), response.getQuestionId()},
                     null, null, null);
                 
@@ -1545,8 +1547,9 @@ public class SurveyDbAdapter {
             values.put(ResponseColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
                 
             if (exists) {
-                database.update(Tables.RESPONSE, values, 
-                        "survey_respondent_id = ? AND question_id = ?",
+                database.update(Tables.RESPONSE, values,
+                        ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                                + ResponseColumns.QUESTION_ID + " = ?",
                         new String[] { String.valueOf(surveyInstanceId), response.getQuestionId()});
             } else {
                 database.insert(Tables.RESPONSE, null, values);

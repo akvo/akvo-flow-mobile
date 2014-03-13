@@ -275,22 +275,22 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             long displayDate = 0L;// Should never display this value;
 
             // TODO: The STATUS can be determined with these values. No need for STATUS column?
-            if (cursor.isNull(syncedDateCol)) {
+            if (!cursor.isNull(syncedDateCol)) {
                 status = "Synced: ";
                 displayDate = cursor.getLong(syncedDateCol);
                 icon = R.drawable.checkmark2;
                 finished = true;
-            } else if (cursor.isNull(exportedDateCol)) {
+            } else if (!cursor.isNull(exportedDateCol)) {
                 status = "Exported: ";
                 displayDate = cursor.getLong(exportedDateCol);
                 icon = R.drawable.yellowcircle;
                 finished = true;
-            } else if (cursor.isNull(submittedDateCol)) {
+            } else if (!cursor.isNull(submittedDateCol)) {
                 status = "Submitted: ";
                 displayDate = cursor.getLong(submittedDateCol);
                 icon = R.drawable.yellowcircle;
                 finished = true;
-            } else if (cursor.isNull(savedDateCol)) {
+            } else if (!cursor.isNull(savedDateCol)) {
                 status = "Saved: ";
                 icon = R.drawable.disk;
                 displayDate = cursor.getLong(savedDateCol);

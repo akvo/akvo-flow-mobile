@@ -874,12 +874,15 @@ public class SurveyDbAdapter {
      * @return
      */
     public long createSurveyRespondent(String surveyId, String userId, String surveyedLocaleId) {
+        final long time = System.currentTimeMillis();
+
         ContentValues initialValues = new ContentValues();
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
         initialValues.put(SurveyInstanceColumns.USER_ID, userId);
         initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.CURRENT);
         initialValues.put(SurveyInstanceColumns.UUID, UUID.randomUUID().toString());
-        initialValues.put(SurveyInstanceColumns.START_DATE, System.currentTimeMillis());
+        initialValues.put(SurveyInstanceColumns.START_DATE, time);
+        initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME
         initialValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
         return database.insert(Tables.SURVEY_INSTANCE, null, initialValues);
     }

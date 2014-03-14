@@ -125,10 +125,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             startService(new Intent(this, LocationService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
-            
-            Intent i = new Intent(this, DataSyncService.class);
-            i.putExtra(ConstantUtil.OP_TYPE_KEY, ConstantUtil.SEND);
-            startService(i);
+            startService(new Intent(this, DataSyncService.class));
             
             getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, this);
         }

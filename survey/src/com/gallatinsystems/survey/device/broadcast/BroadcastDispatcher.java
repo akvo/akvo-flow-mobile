@@ -39,9 +39,7 @@ public class BroadcastDispatcher extends BroadcastReceiver {
 
         if (ConstantUtil.DATA_AVAILABLE_INTENT.equals(intent.getAction())) {
             // launch the service telling it to SEND data to the server
-            Intent i = new Intent(context, DataSyncService.class);
-            i.putExtra(ConstantUtil.OP_TYPE_KEY, ConstantUtil.SEND);
-            context.startService(i);
+            context.startService(new Intent(context, DataSyncService.class));
         } else if (ConstantUtil.PRECACHE_INTENT.equals(intent.getAction())) {
             context.startService(new Intent(context,
                     SurveyDownloadService.class));

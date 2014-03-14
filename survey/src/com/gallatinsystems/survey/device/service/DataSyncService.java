@@ -28,6 +28,7 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.ResponseColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.UserColumns;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.TransmissionStatus;
 import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.util.Base64;
@@ -122,6 +123,8 @@ public class DataSyncService extends IntentService {
     private static final String ACTION_IMAGE = "image";
 
     private static final String UTF8 = "UTF-8";
+
+    private enum NotificationType { PROGRESS, EXPORT, SYNC, ERROR };
 
     /**
      * Number of retries to upload a file to S3
@@ -418,7 +421,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(String filename, String status, String serverBase) {
+    private boolean syncFile(String filename, int status, String serverBase) {
         String contentType, dir, policy, signature, action;
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
@@ -427,7 +430,7 @@ public class DataSyncService extends IntentService {
             policy = mProps.getProperty(ConstantUtil.IMAGE_S3_POLICY);
             signature = mProps.getProperty(ConstantUtil.IMAGE_S3_SIG);
             // Only notify server if the previous attempts have failed
-            action = ConstantUtil.FAILED_STATUS.equals(status) ? ACTION_IMAGE : null;
+            action = TransmissionStatus.FAILED == status ? ACTION_IMAGE : null;
         } else {
             contentType = DATA_CONTENT_TYPE;
             dir = S3_DATA_FILE_PATH;
@@ -436,7 +439,7 @@ public class DataSyncService extends IntentService {
             action = ACTION_SUBMIT;
         }
 
-        mDatabase.updateTransmissionHistory(filename, ConstantUtil.IN_PROGRESS_STATUS);
+        mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
 
         boolean ok = sendFile(filename, dir, policy, signature, contentType, FILE_UPLOAD_RETRIES);
         final String destName = getDestName(filename);
@@ -451,11 +454,11 @@ public class DataSyncService extends IntentService {
         if (ok) {
             // Mark everything completed
             // databaseAdaptor.markDataAsSent(zipFileData.respondentIDs, String.valueOf(true));
-            mDatabase.updateTransmissionHistory(filename, ConstantUtil.COMPLETE_STATUS);
-            fireNotification(ConstantUtil.SEND, destName);
+            mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
+            fireNotification(NotificationType.SYNC, destName);
         } else {
-            mDatabase.updateTransmissionHistory(filename, ConstantUtil.FAILED_STATUS);
-            fireNotification(ConstantUtil.ERROR, destName);
+            mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+            fireNotification(NotificationType.ERROR, destName);
         }
 
         return ok;
@@ -469,7 +472,7 @@ public class DataSyncService extends IntentService {
                 fileName = fileName.substring(fileName.lastIndexOf(File.separator)); // TODO: Why show separator?
             }
             final String fileNameForNotification = fileName;
-            fireNotification(ConstantUtil.PROGRESS, fileName);
+            fireNotification(NotificationType.PROGRESS, fileName);
 
             // Generate checksum, to be compared against response's ETag
             final String checksum = FileUtil.getMD5Checksum(fileAbsolutePath);
@@ -496,7 +499,7 @@ public class DataSyncService extends IntentService {
                     if (percentComplete > 1.0d) {
                         percentComplete = 1.0d;
                     }
-                    fireNotification(ConstantUtil.PROGRESS, PCT_FORMAT.format(percentComplete)
+                    fireNotification(NotificationType.PROGRESS, PCT_FORMAT.format(percentComplete)
                             + " - " + fileNameForNotification);
                 }
             });
@@ -519,7 +522,8 @@ public class DataSyncService extends IntentService {
             }
 
             if (etag != null && etag.equals(checksum)) {
-                fireNotification(ConstantUtil.FILE_COMPLETE, fileNameForNotification);
+                Log.d(TAG, "File uploaded successfully to datastore : " + fileName);
+                return true;
             } else {
                 Log.e(TAG, "Server returned a bad checksum after upload: " + etag);
 
@@ -529,18 +533,13 @@ public class DataSyncService extends IntentService {
                 }
 
                 Log.e(TAG, "File " + fileName + " upload failed.");
-                fireNotification(ConstantUtil.ERROR, getString(R.string.uploaderror) + " "
-                        + fileNameForNotification);
                 return false;
             }
         } catch (Exception e) {
             Log.e(TAG, "Could not send upload " + e.getMessage(), e);
-
             PersistentUncaughtExceptionHandler.recordException(e);
             return false;
         }
-        Log.d(TAG, "File " + fileAbsolutePath + " successfully uploaded.");
-        return true;
     }
 
     /**
@@ -601,10 +600,10 @@ public class DataSyncService extends IntentService {
     }
 
     private void setFileTransmissionFailed(String filename) {
-        int rows = mDatabase.updateTransmissionHistory(filename, ConstantUtil.FAILED_STATUS);
+        int rows = mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
         if (rows == 0) {
             // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            mDatabase.createTransmission(-1, filename, ConstantUtil.FAILED_STATUS);
+            mDatabase.createTransmission(-1, filename, TransmissionStatus.FAILED);
         }
     }
 
@@ -666,27 +665,28 @@ public class DataSyncService extends IntentService {
      *
      * @param type
      */
-    private void fireNotification(String type, String extraText) {
-        CharSequence tickerText = null;
-        if (ConstantUtil.SEND.equals(type)) {
-            tickerText = getResources().getText(R.string.uploadcomplete);
-        } else if (ConstantUtil.EXPORT.equals(type)) {
-            tickerText = getResources().getText(R.string.exportcomplete);
-        } else if (ConstantUtil.PROGRESS.equals(type)) {
-            tickerText = getResources().getText(R.string.uploadprogress);
-        } else if (ConstantUtil.FILE_COMPLETE.equals(type)) {
-            tickerText = getResources().getText(R.string.filecomplete);
-        } else if (ConstantUtil.ERROR.equals(type)) {
-            tickerText = getResources().getText(R.string.uploaderror);
-        } else {
-            // This  default  is  unclear  to  user
-            tickerText = getResources().getText(R.string.nothingtoexport);
+    private void fireNotification(NotificationType type, String extraText) {
+        String text = "";
+        switch (type) {
+            case EXPORT:
+                text = getString(R.string.exportcomplete);
+                break;
+            case SYNC:
+                text = getString(R.string.uploadcomplete);
+                break;
+            case PROGRESS:
+                text = getString(R.string.uploadprogress);
+                break;
+            case ERROR:
+                text = getString(R.string.uploaderror);
+                break;
         }
-        ViewUtil.fireNotification(tickerText.toString(),
-                extraText != null ? extraText : "",
-                this,
-                COMPLETE_ID,
-                null);
+
+        if (extraText == null) {
+            extraText = "";
+        }
+
+        ViewUtil.fireNotification(text, extraText, this, COMPLETE_ID, null);
     }
 
     private String getServerBase() {

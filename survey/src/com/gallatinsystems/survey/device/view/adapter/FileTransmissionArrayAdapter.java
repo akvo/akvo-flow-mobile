@@ -31,14 +31,14 @@ import android.widget.TextView;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.TransmissionStatus;
 
 /**
  * Adapter that converts FileTransmission objects for display in a list view.
  * 
  * @author Christopher Fagiani
  */
-public class FileTransmissionArrayAdapter extends
-        ArrayAdapter<FileTransmission> {
+public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission> {
     private DateFormat dateFormat;
     private int layoutId;
 
@@ -52,15 +52,22 @@ public class FileTransmissionArrayAdapter extends
 
     private void bindView(View view, FileTransmission trans) {
         ImageView imageView = (ImageView) view.findViewById(R.id.statusicon);
-        if (ConstantUtil.IN_PROGRESS_STATUS.equals(trans.getStatus())) {
-            imageView.setImageResource(R.drawable.blueuparrow);
-        } else if (ConstantUtil.QUEUED_STATUS.equals(trans.getStatus())) {
-            imageView.setImageResource(R.drawable.yellowcircle);
-        } else if (ConstantUtil.COMPLETE_STATUS.equals(trans.getStatus())) {
-            imageView.setImageResource(R.drawable.greencircle);
-        } else if (ConstantUtil.FAILED_STATUS.equals(trans.getStatus())) {
-            imageView.setImageResource(R.drawable.redcircle);
+
+        switch (trans.getStatus()) {
+            case TransmissionStatus.QUEUED:
+                imageView.setImageResource(R.drawable.yellowcircle);
+                break;
+            case TransmissionStatus.IN_PROGRESS:
+                imageView.setImageResource(R.drawable.blueuparrow);
+                break;
+            case TransmissionStatus.SYNCED:
+                imageView.setImageResource(R.drawable.greencircle);
+                break;
+            case TransmissionStatus.FAILED:
+                imageView.setImageResource(R.drawable.redcircle);
+                break;
         }
+
         TextView statusLabel = (TextView) view.findViewById(R.id.statustext);
         statusLabel.setText(trans.getStatus());
         TextView startDate = (TextView) view.findViewById(R.id.startdate);

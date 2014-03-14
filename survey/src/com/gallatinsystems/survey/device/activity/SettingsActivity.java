@@ -338,12 +338,6 @@ public class SettingsActivity extends ListActivity {
                 dialog.show();
             } else {
                 Intent i = new Intent(view.getContext(), DataSyncService.class);
-                if (resources.getString(R.string.sendoptlabel).equals(val)) {
-                    i.putExtra(ConstantUtil.OP_TYPE_KEY, ConstantUtil.SEND);
-                } else {
-                    i.putExtra(ConstantUtil.OP_TYPE_KEY, ConstantUtil.EXPORT);
-                }
-                i.putExtra(ConstantUtil.FORCE_KEY, true);
                 getApplicationContext().startService(i);
                 // terminate this activity
                 finish();

@@ -164,6 +164,13 @@ public class SurveyDbAdapter {
         int DOWNLOADED = 5;
     }
 
+    public interface TransmissionStatus {
+        int QUEUED      = 0;
+        int IN_PROGRESS = 1;
+        int SYNCED      = 2;
+        int FAILED      = 3;
+    }
+
     private static final String TAG = "SurveyDbAdapter";
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
@@ -448,7 +455,8 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns._ID
                 },
                 SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL AND "
-                        + SurveyInstanceColumns.EXPORTED_DATE + " IS NULL",
+                        + SurveyInstanceColumns.EXPORTED_DATE + " IS NULL AND "
+                        + SurveyInstanceColumns.SYNC_DATE + " IS NULL",
                 null, null, null, null);
     }
 
@@ -980,11 +988,11 @@ public class SurveyDbAdapter {
     }
 
     public void createTransmission (long surveyInstanceId, String filename) {
-        createTransmission(surveyInstanceId, filename, ConstantUtil.QUEUED_STATUS);
+        createTransmission(surveyInstanceId, filename, TransmissionStatus.QUEUED);
     }
 
 
-    public void createTransmission (long surveyInstanceId, String filename, String status) {
+    public void createTransmission (long surveyInstanceId, String filename, int status) {
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
         values.put(TransmissionColumns.FILENAME, filename);
@@ -1001,13 +1009,13 @@ public class SurveyDbAdapter {
      * @param status
      * @return the number of rows affected
      */
-    public int updateTransmissionHistory(String fileName, String status) {
+    public int updateTransmissionHistory(String fileName, int status) {
         // TODO: Update Survey Instance STATUS as well
         ContentValues vals = new ContentValues();
         vals.put(TransmissionColumns.STATUS, status);
-        if (ConstantUtil.COMPLETE_STATUS.equals(status)) {
+        if (TransmissionStatus.SYNCED == status) {
             vals.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
-        } else if (ConstantUtil.IN_PROGRESS_STATUS.equals(status)) {
+        } else if (TransmissionStatus.IN_PROGRESS == status) {
             vals.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
         }
 
@@ -1030,7 +1038,7 @@ public class SurveyDbAdapter {
                             cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_INSTANCE_ID)));
                     trans.setFileName(cursor.getString(cursor
                             .getColumnIndexOrThrow(TransmissionColumns.FILENAME)));
-                    trans.setStatus(cursor.getString(cursor
+                    trans.setStatus(cursor.getInt(cursor
                             .getColumnIndexOrThrow(TransmissionColumns.STATUS)));
                     transmissions.add(trans);
                 } while (cursor.moveToNext());
@@ -1064,8 +1072,10 @@ public class SurveyDbAdapter {
                         TransmissionColumns.STATUS, TransmissionColumns.FILENAME
                 },
                 TransmissionColumns.STATUS + " IN (?, ?)",
-                new String[] {ConstantUtil.FAILED_STATUS, ConstantUtil.QUEUED_STATUS},
-                null, null, null);
+                new String[] {
+                        String.valueOf(TransmissionStatus.FAILED),
+                        String.valueOf(TransmissionStatus.QUEUED)
+                }, null, null, null);
 
         return getFileTransmissions(cursor);
     }

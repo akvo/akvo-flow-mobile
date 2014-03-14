@@ -150,7 +150,10 @@ public class DataSyncService extends IntentService {
         mDatabase.open();
 
         exportSurveys();// Create zip files, if necessary
-        syncFiles();// Sync everything
+
+        if (isAbleToSync()) {
+            syncFiles();// Sync everything
+        }
 
         mDatabase.close();
     }
@@ -394,31 +397,29 @@ public class DataSyncService extends IntentService {
         // Sync missing files. This will update the status of the transmissions if necessary
         checkMissingFiles(serverBase);
 
-        if (isAbleToSync()) {
-            Set<Long> syncedFiles = new HashSet<Long>();// Successful transmissions
-            Set<Long> unsyncedFiles = new HashSet<Long>();// Unsuccessful transmissions
-            List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
+        Set<Long> syncedFiles = new HashSet<Long>();// Successful transmissions
+        Set<Long> unsyncedFiles = new HashSet<Long>();// Unsuccessful transmissions
+        List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
 
-            for (FileTransmission transmission : transmissions) {
-                final long surveyInstanceId = transmission.getRespondentId();
-                if (syncFile(transmission.getFileName(), transmission.getStatus(), serverBase)) {
-                    syncedFiles.add(surveyInstanceId);
-                } else {
-                    unsyncedFiles.add(surveyInstanceId);
-                }
+        for (FileTransmission transmission : transmissions) {
+            final long surveyInstanceId = transmission.getRespondentId();
+            if (syncFile(transmission.getFileName(), transmission.getStatus(), serverBase)) {
+                syncedFiles.add(surveyInstanceId);
+            } else {
+                unsyncedFiles.add(surveyInstanceId);
             }
+        }
 
-            // Retain successful survey instances, to mark them as SYNCED
-            syncedFiles.removeAll(unsyncedFiles);
+        // Retain successful survey instances, to mark them as SYNCED
+        syncedFiles.removeAll(unsyncedFiles);
 
-            for (long surveyInstanceId : syncedFiles) {
-                mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
-            }
+        for (long surveyInstanceId : syncedFiles) {
+            mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
+        }
 
-            // Ensure the unsynced ones are just EXPORTED
-            for (long surveyInstanceId : unsyncedFiles) {
-                mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
-            }
+        // Ensure the unsynced ones are just EXPORTED
+        for (long surveyInstanceId : unsyncedFiles) {
+            mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
         }
     }
 

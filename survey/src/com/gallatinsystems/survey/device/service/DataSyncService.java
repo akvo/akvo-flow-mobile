@@ -156,20 +156,20 @@ public class DataSyncService extends IntentService {
     // ================================================================= //
 
     private void exportSurveys() {
-        int[] surveyInstanceIds = new int[0];// Avoid null cases
+        long[] surveyInstanceIds = new long[0];// Avoid null cases
         Cursor cursor = mDatabase.getUnexportedSurveyInstances();
         if (cursor != null) {
-            surveyInstanceIds = new int[cursor.getCount()];
+            surveyInstanceIds = new long[cursor.getCount()];
             if (cursor.moveToFirst()) {
                 do {
-                    surveyInstanceIds[cursor.getPosition()] = cursor.getInt(
+                    surveyInstanceIds[cursor.getPosition()] = cursor.getLong(
                             cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
                 } while (cursor.moveToNext());
             }
             cursor.close();
         }
 
-        for (int id : surveyInstanceIds) {
+        for (long id : surveyInstanceIds) {
             ZipFileData zipFileData = formZip(id);// TODO: Display notification?
             if (zipFileData != null) {
                 // Create new entries in the transmission queue

@@ -55,6 +55,7 @@ import android.widget.TextView;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyedLocaleMeta;
 import com.gallatinsystems.survey.device.domain.Dependency;
 import com.gallatinsystems.survey.device.domain.Question;
@@ -989,7 +990,7 @@ public class SurveyViewActivity extends TabActivity implements
                 if (!readOnly) {
                     // make sure we don't lose anything that was already written
                     saveAllResponses();
-                    databaseAdapter.saveSurveyInstance(respondentId);
+                    databaseAdapter.updateSurveyStatus(respondentId, SurveyInstanceStatus.SAVED);
                     ViewUtil.showConfirmDialog(R.string.savecompletetitle,
                             R.string.savecompletetext, this, false,
                             new DialogInterface.OnClickListener() {

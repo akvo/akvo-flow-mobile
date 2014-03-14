@@ -175,6 +175,9 @@ public class SurveyDbAdapter {
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
+    /**
+     * TODO: Double check this inserts, and use Constants!
+     */
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
             "INSERT INTO preferences VALUES('survey.languagespresent','')",
@@ -448,16 +451,12 @@ public class SurveyDbAdapter {
         databaseHelper.close();
     }
 
-    // TODO: Use denormalized status? --> WHERE status IS SurveyInstanceStatus.SUBMITTED
     public Cursor getUnexportedSurveyInstances() {
         return database.query(Tables.SURVEY_INSTANCE,
-                new String[] {
-                        SurveyInstanceColumns._ID
-                },
-                SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL AND "
-                        + SurveyInstanceColumns.EXPORTED_DATE + " IS NULL AND "
-                        + SurveyInstanceColumns.SYNC_DATE + " IS NULL",
-                null, null, null, null);
+                new String[] { SurveyInstanceColumns._ID },
+                SurveyInstanceColumns.STATUS + " = ?",
+                new String[] { String.valueOf(SurveyInstanceStatus.SUBMITTED) },
+                null, null, null);
     }
 
     public Cursor getResponsesData(long surveyInstanceId) {
@@ -476,63 +475,15 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Mark a survey instance as saved, updating the saved time and the status.
-     * This values will only be changed if the survey is not submitted yet.
-     * @param surveyInstanceId
-     */
-    public void saveSurveyInstance(long surveyInstanceId) {
-        Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
-                new String[] {SurveyInstanceColumns.STATUS},
-                SurveyInstanceColumns._ID + " = ? AND " + SurveyInstanceColumns.SUBMITTED_DATE
-                        + " IS NULL",
-                new String[] {String.valueOf(surveyInstanceId)},
-                null, null, null);
-
-        boolean save = false;
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                save = true;
-            }
-            cursor.close();
-        }
-
-        if (save) {
-            ContentValues vals = new ContentValues();
-            vals.put(SurveyInstanceColumns.SAVED_DATE, System.currentTimeMillis());
-            vals.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
-            database.update(Tables.SURVEY_INSTANCE, vals,
-                    SurveyInstanceColumns._ID + "= ?",
-                    new String[] { String.valueOf(surveyInstanceId) });
-        }
-    }
-
-    /**
-     * marks the data as submitted in the surveyInstanceId table (submittedFlag =
-     * true) thereby making it ready for transmission
-     *
-     * @param surveyInstanceId
-     */
-    public void setSurveyInstanceSubmitted(long surveyInstanceId) {
-        updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SUBMITTED);
-    }
-
-    public void setSurveyInstanceExported(long surveyInstanceId) {
-        updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
-    }
-
-    public void setSurveyInstanceSynced(long surveyInstanceId) {
-        updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
-    }
-
-    /**
      * updates the status of a survey instance to the status passed in.
-     * Status must be one of the 'SurveyInstanceStatus' one.
+     * Status must be one of the 'SurveyInstanceStatus' one. The corresponding
+     * Date column will be updated with the current timestamp.
      * 
      * @param surveyInstanceId
      * @param status
      */
-    private void updateSurveyStatus(long surveyInstanceId, int status) {
-        String dateColumn = SurveyInstanceColumns.SAVED_DATE;
+    public void updateSurveyStatus(long surveyInstanceId, int status) {
+        String dateColumn;
         switch (status) {
             case SurveyInstanceStatus.DOWNLOADED:
             case SurveyInstanceStatus.SYNCED:
@@ -544,6 +495,11 @@ public class SurveyDbAdapter {
             case SurveyInstanceStatus.SUBMITTED:
                 dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
                 break;
+            case SurveyInstanceStatus.SAVED:
+                dateColumn = SurveyInstanceColumns.SAVED_DATE;
+                break;
+            default:
+                return;// Nothing to see here, buddy
         }
 
         ContentValues updatedValues = new ContentValues();

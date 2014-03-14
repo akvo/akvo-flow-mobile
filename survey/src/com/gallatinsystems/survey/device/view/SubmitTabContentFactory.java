@@ -34,6 +34,7 @@ import android.widget.TextView.BufferType;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.activity.SurveyViewActivity;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
@@ -73,7 +74,8 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                 new OnClickListener() {
                     public void onClick(View v) {
                         // if we have no missing responses, submit the survey
-                        databaseAdaptor.setSurveyInstanceSubmitted(context.getRespondentId());
+                        databaseAdaptor.updateSurveyStatus(context.getRespondentId(),
+                                SurveyInstanceStatus.SUBMITTED);
                         // send a broadcast message indicating new data is
                         // available
                         Intent i = new Intent(

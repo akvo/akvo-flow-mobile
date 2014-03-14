@@ -29,6 +29,7 @@ import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.ResponseColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.UserColumns;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.TransmissionStatus;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import com.gallatinsystems.survey.device.domain.FileTransmission;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
 import com.gallatinsystems.survey.device.util.Base64;
@@ -177,7 +178,7 @@ public class DataSyncService extends IntentService {
             if (zipFileData != null) {
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.filename);
-                mDatabase.setSurveyInstanceExported(id);// update status
+                mDatabase.updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
 
                 for (String image : zipFileData.imagePaths) {
                     mDatabase.createTransmission(id, image);
@@ -411,12 +412,12 @@ public class DataSyncService extends IntentService {
             syncedFiles.removeAll(unsyncedFiles);
 
             for (long surveyInstanceId : syncedFiles) {
-                mDatabase.setSurveyInstanceSynced(surveyInstanceId);// update status
+                mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
             }
 
             // Ensure the unsynced ones are just EXPORTED
             for (long surveyInstanceId : unsyncedFiles) {
-                mDatabase.setSurveyInstanceExported(surveyInstanceId);// update status
+                mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
             }
         }
     }

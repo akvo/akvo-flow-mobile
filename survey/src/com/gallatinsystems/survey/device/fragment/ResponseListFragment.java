@@ -45,6 +45,7 @@ import com.gallatinsystems.survey.device.activity.TransmissionHistoryActivity;
 import com.gallatinsystems.survey.device.async.loader.SurveyInstanceLoader;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceColumns;
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.SurveyColumns;
 import com.gallatinsystems.survey.device.domain.SurveyGroup;
 import com.gallatinsystems.survey.device.domain.SurveyedLocale;
@@ -264,42 +265,44 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            final int syncedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE);
-            final int exportedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE);
-            final int submittedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
-            final int savedDateCol = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE);
+            final int status = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
 
-            String status = "";
+            // This default values should NEVER be displayed
+            String statusText = "";
             int icon = R.drawable.redcircle;
             boolean finished = false;
-            long displayDate = 0L;// Should never display this value;
-
-            // TODO: The STATUS can be determined with these values. No need for STATUS column?
-            if (!cursor.isNull(syncedDateCol)) {
-                status = "Synced: ";
-                displayDate = cursor.getLong(syncedDateCol);
-                icon = R.drawable.checkmark2;
-                finished = true;
-            } else if (!cursor.isNull(exportedDateCol)) {
-                status = "Exported: ";
-                displayDate = cursor.getLong(exportedDateCol);
-                icon = R.drawable.yellowcircle;
-                finished = true;
-            } else if (!cursor.isNull(submittedDateCol)) {
-                status = "Submitted: ";
-                displayDate = cursor.getLong(submittedDateCol);
-                icon = R.drawable.yellowcircle;
-                finished = true;
-            } else if (!cursor.isNull(savedDateCol)) {
-                status = "Saved: ";
-                icon = R.drawable.disk;
-                displayDate = cursor.getLong(savedDateCol);
+            long displayDate = 0L;
+            switch (status) {
+                case SurveyInstanceStatus.SAVED:
+                    statusText = "Saved: ";
+                    icon = R.drawable.disk;
+                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE));
+                    break;
+                case SurveyInstanceStatus.SUBMITTED:
+                    statusText = "Submitted: ";
+                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
+                    icon = R.drawable.yellowcircle;
+                    finished = true;
+                    break;
+                case SurveyInstanceStatus.EXPORTED:
+                    statusText = "Exported: ";
+                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE));
+                    icon = R.drawable.yellowcircle;
+                    finished = true;
+                    break;
+                case SurveyInstanceStatus.SYNCED:
+                case SurveyInstanceStatus.DOWNLOADED:
+                    statusText = "Synced: ";
+                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE));
+                    icon = R.drawable.checkmark2;
+                    finished = true;
+                    break;
             }
 
             // Format the date string
             Date date = new Date(displayDate);
             TextView dateView = (TextView) view.findViewById(R.id.text2);
-            dateView.setText(status
+            dateView.setText(statusText
                     + DateFormat.getLongDateFormat(context).format(date) + " "
                     + DateFormat.getTimeFormat(context).format(date));
             TextView headingView = (TextView) view.findViewById(R.id.text1);

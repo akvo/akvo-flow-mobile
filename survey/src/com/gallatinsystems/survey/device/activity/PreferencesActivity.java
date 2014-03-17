@@ -30,7 +30,6 @@ import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
@@ -59,10 +58,8 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private CheckBox screenOnCheckbox;
     private CheckBox photoSizeReminderCheckbox;
     private CheckBox shrinkPhotosCheckbox;
-    private TextView uploadOptionTextView;
+    private CheckBox mobileDataCheckbox;
     private TextView languageTextView;
-    private TextView surveyUpdateTextView;
-    private TextView uploadErrorTextView;
     private TextView serverTextView;
     private TextView identTextView;
     private SurveyDbAdapter database;
@@ -72,8 +69,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private boolean[] langsSelectedBooleanArray;
     private int[] langsSelectedMasterIndexArray;
 
-    private String[] uploadArray;
-    private String[] precacheHelpArray;
     private String[] serverArray;
     private PropertyUtil props;
 
@@ -87,20 +82,14 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
         photoSizeReminderCheckbox = (CheckBox) findViewById(R.id.photosizeremindercheckbox);
         shrinkPhotosCheckbox = (CheckBox) findViewById(R.id.shrinkphotoscheckbox);
-
-        uploadOptionTextView = (TextView) findViewById(R.id.uploadoptionvalue);
+        mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
         languageTextView = (TextView) findViewById(R.id.surveylangvalue);
-
-        surveyUpdateTextView = (TextView) findViewById(R.id.surveycheckvalue);
-        uploadErrorTextView = (TextView) findViewById(R.id.uploaderrorvalue);
         serverTextView = (TextView) findViewById(R.id.servervalue);
         identTextView = (TextView) findViewById(R.id.identvalue);
 
         Resources res = getResources();
         props = new PropertyUtil(res);
 
-        uploadArray = res.getStringArray(R.array.celluploadoptions);
-        precacheHelpArray = res.getStringArray(R.array.precachehelpoptions);
         serverArray = res.getStringArray(R.array.servers);
     }
 
@@ -137,12 +126,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         shrinkPhotosCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
 
         val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
-        if (val != null) {
-            final int intVal = Integer.parseInt(val);
-            if (intVal < uploadArray.length) {
-                uploadOptionTextView.setText(uploadArray[intVal]);
-            }
-        }
+        mobileDataCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
 
         val = settings.get(ConstantUtil.SURVEY_LANG_SETTING_KEY);
         String langsPresentIndexes = settings.get(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
@@ -151,18 +135,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         languageTextView.setText(ArrayPreferenceUtil.formSelectedItemString(
                 langsPrefData.getLangsSelectedNameArray(),
                 langsPrefData.getLangsSelectedBooleanArray()));
-
-        val = settings.get(ConstantUtil.CHECK_FOR_SURVEYS);
-        if (val != null) {
-            surveyUpdateTextView.setText(precacheHelpArray[Integer
-                    .parseInt(val)]);
-        }
-
-        val = settings.get(ConstantUtil.UPLOAD_ERRORS);
-        if (val != null) {
-            uploadErrorTextView
-                    .setText(precacheHelpArray[Integer.parseInt(val)]);
-        }
 
         val = settings.get(ConstantUtil.SERVER_SETTING_KEY);
         if (val != null && val.trim().length() > 0) {
@@ -187,22 +159,16 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         database = new SurveyDbAdapter(this);
         database.open();
         populateFields();
+        // TODO: this listeners assignations should be moved to onCreate()
         saveUserCheckbox.setOnCheckedChangeListener(this);
         beaconCheckbox.setOnCheckedChangeListener(this);
         screenOnCheckbox.setOnCheckedChangeListener(this);
         photoSizeReminderCheckbox.setOnCheckedChangeListener(this);
         shrinkPhotosCheckbox.setOnCheckedChangeListener(this);
-        ((ImageButton) findViewById(R.id.uploadoptionbutton))
-                .setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.surveylangbutton))
-                .setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.serverbutton))
-                .setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.identbutton)).setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.surveycheckbutton))
-                .setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.uploaderrorbutton))
-                .setOnClickListener(this);
+        mobileDataCheckbox.setOnCheckedChangeListener(this);
+        findViewById(R.id.surveylangbutton).setOnClickListener(this);
+        findViewById(R.id.serverbutton).setOnClickListener(this);
+        findViewById(R.id.identbutton).setOnClickListener(this);
     }
 
     public void onPause() {
@@ -216,15 +182,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     @Override
     public void onClick(View v) {
-        if (R.id.uploadoptionbutton == v.getId()) {
-            showPreferenceDialog(R.string.uploadoptiondialogtitle,
-                    R.array.celluploadoptions,
-                    ConstantUtil.CELL_UPLOAD_SETTING_KEY, uploadArray,
-                    uploadOptionTextView,
-                    uploadArray[ConstantUtil.UPLOAD_DATA_ALLWAYS_IDX],
-                    ConstantUtil.DATA_AVAILABLE_INTENT);
-        } else if (R.id.surveylangbutton == v.getId()) {
-
+        if (R.id.surveylangbutton == v.getId()) {
             langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
             langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
             langsSelectedMasterIndexArray = langsPrefData.getLangsSelectedMasterIndexArray();
@@ -247,30 +205,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                             }
                         }
                     });
-        } else if (R.id.surveycheckbutton == v.getId()) {
-            ViewUtil.showAdminAuthDialog(this,
-                    new ViewUtil.AdminAuthDialogListener() {
-                        @Override
-                        public void onAuthenticated() {
-                            showPreferenceDialog(R.string.surveychecklabel,
-                                    R.array.precachehelpoptions,
-                                    ConstantUtil.CHECK_FOR_SURVEYS,
-                                    precacheHelpArray, surveyUpdateTextView,
-                                    null, null);
-                        }
-                    });
-        } else if (R.id.uploaderrorbutton == v.getId()) {
-            ViewUtil.showAdminAuthDialog(this,
-                    new ViewUtil.AdminAuthDialogListener() {
-                        @Override
-                        public void onAuthenticated() {
-                            showPreferenceDialog(R.string.uploaderrorlabel,
-                                    R.array.precachehelpoptions,
-                                    ConstantUtil.UPLOAD_ERRORS,
-                                    precacheHelpArray, uploadErrorTextView,
-                                    null, null);
-                        }
-                    });
         } else if (R.id.serverbutton == v.getId()) {
             ViewUtil.showAdminAuthDialog(this,
                     new ViewUtil.AdminAuthDialogListener() {
@@ -283,14 +217,12 @@ public class PreferencesActivity extends Activity implements OnClickListener,
 
                         }
                     });
-
         } else if (R.id.identbutton == v.getId()) {
             ViewUtil.showAdminAuthDialog(this,
                     new ViewUtil.AdminAuthDialogListener() {
                         @Override
                         public void onAuthenticated() {
-                            final EditText inputView = new EditText(
-                                    PreferencesActivity.this);
+                            final EditText inputView = new EditText(PreferencesActivity.this);
                             // one line only
                             inputView.setSingleLine();
                             ViewUtil.ShowTextInputDialog(
@@ -299,59 +231,19 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                                     R.string.setidentlabel, inputView,
                                     new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onClick(
-                                                DialogInterface dialog,
-                                                int which) {
+                                        public void onClick(DialogInterface dialog, int which) {
                                             String s = StringUtil.ControlToSPace(inputView
                                                     .getText().toString());
                                             // drop any control chars,
                                             // especially tabs
                                             identTextView.setText(s);
                                             database.savePreference(
-                                                    ConstantUtil.DEVICE_IDENT_KEY,
-                                                    s);
+                                                    ConstantUtil.DEVICE_IDENT_KEY, s);
                                         }
                                     });
                         }
                     });
         }
-    }
-
-    /**
-     * displays a dialog that allows the user to choose a setting from a string
-     * array
-     * 
-     * @param titleId - resource id of dialog title
-     * @param listId - resource id of item array
-     * @param settingKey - key of setting to edit
-     * @param valueArray - string array containing values
-     * @param currentValView - view to update with value selected
-     * @param actionValue - if the selected value matches this, then fire an
-     *            intent with the value of actionIntent
-     * @param actionIntent - intent to fire if actionValue matches the selection
-     */
-    private void showPreferenceDialog(int titleId, int listId,
-            final String settingKey, final String[] valueArray,
-            final TextView currentValView, final String actionValue,
-            final String actionIntent) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(titleId).setItems(listId,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        database.savePreference(settingKey, which + "");
-                        currentValView.setText(valueArray[which]);
-                        if (actionValue != null && actionIntent != null) {
-                            if (valueArray[which].equals(actionValue)) {
-                                sendBroadcast(new Intent(actionIntent));
-                            }
-                        }
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
-                    }
-                });
-        builder.show();
     }
 
     /**
@@ -399,11 +291,9 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             database.savePreference(ConstantUtil.USER_SAVE_SETTING_KEY, ""
                     + isChecked);
         } else if (buttonView == beaconCheckbox) {
-            database.savePreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY,
-                    "" + isChecked);
+            database.savePreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY, "" + isChecked);
             if (isChecked) {
-                // if the option changed, kick the service so it reflects the
-                // change
+                // if the option changed, kick the service so it reflects the change
                 startService(new Intent(this, LocationService.class));
             } else {
                 stopService(new Intent(this, LocationService.class));
@@ -414,6 +304,8 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             database.savePreference(ConstantUtil.PHOTO_SIZE_REMINDER_KEY, "" + isChecked);
         } else if (buttonView == shrinkPhotosCheckbox) {
             database.savePreference(ConstantUtil.SHRINK_PHOTOS_KEY, "" + isChecked);
+        } else if (buttonView == mobileDataCheckbox) {
+            database.savePreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY, "" + isChecked);
         }
     }
 }

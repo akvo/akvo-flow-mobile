@@ -60,18 +60,17 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
-            <ImageButton
-                android:id="@+id/uploadoptionbutton"
+            <CheckBox
+                android:id="@+id/uploadoptioncheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:src="@android:drawable/arrow_down_float" />
+                android:layout_alignParentRight="true" />
 
             <TextView
                 android:id="@+id/uploadoptionlabel"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/uploadoptionbutton"
+                android:layout_toLeftOf="@id/uploadoptioncheckbox"
                 android:text="@string/uploadoptionlabel"
                 android:textSize="20sp" />
 
@@ -127,60 +126,6 @@
                 android:layout_toLeftOf="@id/beaconcheckbox"
                 android:text="@string/beaconlabel"
                 android:textSize="20sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
-            <ImageButton
-                android:id="@+id/surveycheckbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:src="@android:drawable/arrow_down_float" />
-
-            <TextView
-                android:id="@+id/surveychecklabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/surveycheckbutton"
-                android:text="@string/surveychecklabel"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/surveycheckvalue"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/surveychecklabel"
-                android:textSize="14sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
-            <ImageButton
-                android:id="@+id/uploaderrorbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:src="@android:drawable/arrow_down_float" />
-
-            <TextView
-                android:id="@+id/uploaderrorlabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/uploaderrorbutton"
-                android:text="@string/uploaderrorlabel"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/uploaderrorvalue"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/uploaderrorlabel"
-                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout

@@ -143,13 +143,10 @@ public class ConstantUtil {
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
     public static final String LAST_USER_SETTING_KEY = "user.lastuser.id";
     public static final String LOCATION_BEACON_SETTING_KEY = "location.sendbeacon";
-    public static final String PRECACHE_SETTING_KEY = "survey.precachehelp";
     public static final String SERVER_SETTING_KEY = "backend.server";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String SURVEY_TEXT_SIZE_KEY = "survey.textsize";
-    public static final String CHECK_FOR_SURVEYS = "survey.checkforupdates";
-    public static final String UPLOAD_ERRORS = "remoteexception.upload";
     public static final String PHOTO_SIZE_REMINDER_KEY = "survey.media.photo.sizereminder";
     public static final String SHRINK_PHOTOS_KEY = "survey.media.photo.shrink";
 
@@ -161,11 +158,9 @@ public class ConstantUtil {
 
     /**
      * index values into string arrays
-     */
     public static final int UPLOAD_DATA_ALLWAYS_IDX = 0;
     public static final int UPLOAD_NEVER_IDX = 1;
-
-    public static final int PRECACHE_WIFI_ONLY_IDX = 1;
+     */
 
     /**
      * intents

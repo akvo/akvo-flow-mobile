@@ -78,7 +78,6 @@ public class ExceptionReportingService extends Service {
     private PropertyUtil props;
     private String phoneNumber;
     private String imei;
-    private static volatile int uploadOption = 0;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -112,14 +111,6 @@ public class ExceptionReportingService extends Service {
             server = serverBase;
             phoneNumber = StatusUtil.getPhoneNumber(this);
             imei = StatusUtil.getImei(this);
-            try {
-                uploadOption = Integer.parseInt(database
-                        .getPreference(ConstantUtil.UPLOAD_ERRORS));
-            } catch (Exception e) {
-                // no-op
-                uploadOption = 0;
-            }
-
         } finally {
             if (database != null) {
                 database.close();
@@ -134,8 +125,7 @@ public class ExceptionReportingService extends Service {
 
                 @Override
                 public void run() {
-                    if (StatusUtil.hasDataConnection(
-                            ExceptionReportingService.this, false)) {
+                    if (StatusUtil.hasDataConnection(ExceptionReportingService.this)) {
                         submitStackTraces(finalServer);
                     }
                 }
@@ -180,7 +170,7 @@ public class ExceptionReportingService extends Service {
      * the server and, on success, delete the file.
      */
     public void submitStackTraces(String server) {
-        if (canUpload(uploadOption)) {
+        if (StatusUtil.hasDataConnection(this)) {
             try {
                 if (server != null) {
                     String dirString = null;
@@ -223,25 +213,6 @@ public class ExceptionReportingService extends Service {
                 Log.e(TAG, "Could not send exception", e);
             }
         }
-    }
-
-    /**
-     * this method checks if the service can send exception files based on the
-     * user preference and the type of network connection currently held
-     * 
-     * @param type
-     * @return
-     */
-    private boolean canUpload(int optionIndex) {
-        boolean ok = false;
-        if (optionIndex > -1
-                && ConstantUtil.PRECACHE_WIFI_ONLY_IDX == optionIndex) {
-
-            ok = StatusUtil.hasDataConnection(this, true);
-        } else {
-            ok = StatusUtil.hasDataConnection(this, false);
-        }
-        return ok;
     }
 
 }

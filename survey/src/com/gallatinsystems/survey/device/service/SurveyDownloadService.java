@@ -130,15 +130,13 @@ public class SurveyDownloadService extends Service {
      * on the device, the survey will be replaced with the new one.
      */
     private void checkAndDownload(String surveyId) {
-        if (isAbleToRun()) {
+        if (StatusUtil.hasDataConnection(this)) {
             try {
                 lock.acquire();
                 databaseAdaptor = new SurveyDbAdapter(this);
                 databaseAdaptor.open();
                 
                 // Load preferences
-                final int precacheOption = getPrecacheOption();
-                final int surveyCheckOption = getSurveyCheckOption();
                 final String serverBase = getServerBase();
                 final String deviceId = getDeviceId();
                 
@@ -150,9 +148,7 @@ public class SurveyDownloadService extends Service {
                         databaseAdaptor.deleteSurvey(surveyId.trim(), true);
                     }
                 } else {
-                    if (canDownload(surveyCheckOption)) {
-                        surveys = checkForSurveys(serverBase, deviceId);
-                    }
+                    surveys = checkForSurveys(serverBase, deviceId);
                 }
                 if (surveys != null && surveys.size() > 0) {
                     // First, sync the SurveyGroups
@@ -171,7 +167,7 @@ public class SurveyDownloadService extends Service {
                                     String[] langs = LangsPreferenceUtil.determineLanguages(this,
                                             survey);
                                     databaseAdaptor.addLanguages(langs);
-                                    downloadHelp(survey, precacheOption);
+                                    downloadHelp(survey);
                                     updateCount++;
                                 }
                             } catch (Exception e) {
@@ -188,12 +184,12 @@ public class SurveyDownloadService extends Service {
 
                 // now check if any previously downloaded surveys still need
                 // don't have their help media pre-cached
-                if (canDownload(precacheOption)) {
+                if (StatusUtil.hasDataConnection(this)) {
                     surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
                     if (surveys != null) {
                         for (int i = 0; i < surveys.size(); i++) {
                             if (!surveys.get(i).isHelpDownloaded()) {
-                                downloadHelp(surveys.get(i), precacheOption);
+                                downloadHelp(surveys.get(i));
                             }
                         }
                     }
@@ -217,12 +213,7 @@ public class SurveyDownloadService extends Service {
         }
         stopSelf();
     }
-    
-    private int getPrecacheOption() {
-        return Integer.parseInt(databaseAdaptor.getPreference(
-                ConstantUtil.PRECACHE_SETTING_KEY));
-    }
-    
+
     private String getServerBase() {
         String serverBase = databaseAdaptor
                 .getPreference(ConstantUtil.SERVER_SETTING_KEY);
@@ -235,12 +226,7 @@ public class SurveyDownloadService extends Service {
         
         return serverBase;
     }
-    
-    private int getSurveyCheckOption() {
-        return Integer.parseInt(databaseAdaptor.getPreference(
-                ConstantUtil.CHECK_FOR_SURVEYS));
-    }
-    
+
     private String getDeviceId() {
         return databaseAdaptor.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
     }
@@ -338,9 +324,9 @@ public class SurveyDownloadService extends Service {
      * 
      * @param survey
      */
-    private void downloadHelp(Survey survey, int precacheOption) {
+    private void downloadHelp(Survey survey) {
         // first, see if we should even bother trying to download
-        if (canDownload(precacheOption)) {
+        if (StatusUtil.hasDataConnection(this)) {
             try {
                 InputStream in = null;
                 if (ConstantUtil.RESOURCE_LOCATION.equalsIgnoreCase(survey
@@ -523,37 +509,6 @@ public class SurveyDownloadService extends Service {
     private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
         sendBroadcast(intentBroadcast);
-    }
-
-    /**
-     * this method checks if the service can perform the requested operation. If
-     * there is no connectivity, this will return false, otherwise it will
-     * return true
-     * 
-     * @param type
-     * @return
-     */
-    private boolean isAbleToRun() {
-        return StatusUtil.hasDataConnection(this, false);
-    }
-
-    /**
-     * this method checks if the service can precache media files based on the
-     * user preference and the type of network connection currently held
-     * 
-     * @param type
-     * @return
-     */
-    private boolean canDownload(int precacheOptionIndex) {
-        boolean ok = false;
-        if (precacheOptionIndex > -1
-                && ConstantUtil.PRECACHE_WIFI_ONLY_IDX == precacheOptionIndex) {
-
-            ok = StatusUtil.hasDataConnection(this, true);
-        } else {
-            ok = StatusUtil.hasDataConnection(this, false);
-        }
-        return ok;
     }
 
 }

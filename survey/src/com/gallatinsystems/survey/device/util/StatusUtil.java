@@ -24,6 +24,8 @@ import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
+
 /**
  * utilities for checking system state
  * 
@@ -37,26 +39,22 @@ public class StatusUtil {
      * @param context
      * @return
      */
-    public static boolean hasDataConnection(Context context, boolean wifiOnly) {
+    public static boolean hasDataConnection(Context context) {
         ConnectivityManager connMgr = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connMgr != null) {
             NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
             if (infoArr != null) {
                 for (int i = 0; i < infoArr.length; i++) {
-                    if (!wifiOnly) {
-                        // if we don't care what KIND of
-                        // connection we have, just that there is one
-                        if (NetworkInfo.State.CONNECTED == infoArr[i]
-                                .getState()) {
+                    if (StatusUtil.syncOver3G(context)) {
+                        // if we don't care what KIND of connection we have, just that there is one
+                        if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
                             return true;
                         }
                     } else {
-                        // if we only want to use wifi, we need to check the
-                        // type
+                        // if we only want to use wifi, we need to check the type
                         if (infoArr[i].getType() == ConnectivityManager.TYPE_WIFI
-                                && NetworkInfo.State.CONNECTED == infoArr[i]
-                                        .getState()) {
+                                && NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
                             return true;
                         }
                     }
@@ -130,6 +128,23 @@ public class StatusUtil {
     
     public static boolean hasExternalStorage() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+    }
+
+    /**
+     * syncOver3G checks the value of 'Sync over 3G' setting
+     * @param context
+     * @return true if the flag is enabled, false otherwise
+     */
+    private static boolean syncOver3G(Context context) {
+        SurveyDbAdapter db = new SurveyDbAdapter(context);
+        db.open();
+
+        String value = db.getPreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
+        boolean use3G = value != null && Boolean.valueOf(value);
+
+        db.close();
+
+        return use3G;
     }
     
 }

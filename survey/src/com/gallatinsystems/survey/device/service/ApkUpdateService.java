@@ -56,7 +56,6 @@ public class ApkUpdateService extends Service {
     private PropertyUtil props;
     private Thread thread;
     private SurveyDbAdapter databaseAdaptor;
-    private static Semaphore lock = new Semaphore(1);
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -85,20 +84,15 @@ public class ApkUpdateService extends Service {
 
     private void checkAndDownload(int startId) {
         String serverBase = null;
-        int precacheOption = -1;
         try {
             databaseAdaptor = new SurveyDbAdapter(this);
             databaseAdaptor.open();
-            precacheOption = Integer.parseInt(databaseAdaptor
-                    .getPreference(ConstantUtil.PRECACHE_SETTING_KEY));
-            serverBase = databaseAdaptor
-                    .getPreference(ConstantUtil.SERVER_SETTING_KEY);
+            serverBase = databaseAdaptor.getPreference(ConstantUtil.SERVER_SETTING_KEY);
         } finally {
             databaseAdaptor.close();
             databaseAdaptor = null;
         }
-        if (isAbleToRun(precacheOption)) {
-
+        if (StatusUtil.hasDataConnection(this)) {
             if (serverBase != null && serverBase.trim().length() > 0) {
                 serverBase = getResources().getStringArray(R.array.servers)[Integer
                         .parseInt(serverBase)];
@@ -178,33 +172,6 @@ public class ApkUpdateService extends Service {
         } catch (Exception e) {
             Log.e(TAG, "Could not download apk file", e);
         }
-    }
-
-    /**
-     * this method checks if the service can perform the requested operation. If
-     * there is no connectivity, this will return false, otherwise it will
-     * return true
-     * 
-     * @param type
-     * @return
-     */
-    private boolean isAbleToRun(int precacheOption) {
-        try {
-            lock.acquire();
-
-            if (precacheOption > -1
-                    && ConstantUtil.PRECACHE_WIFI_ONLY_IDX == precacheOption) {
-                return StatusUtil.hasDataConnection(this, true);
-            } else {
-                return StatusUtil.hasDataConnection(this, false);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Could not check connectivity", e);
-        } finally {
-
-            lock.release();
-        }
-        return false;
     }
 
     /**

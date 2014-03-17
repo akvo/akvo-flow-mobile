@@ -151,7 +151,7 @@ public class DataSyncService extends IntentService {
 
         exportSurveys();// Create zip files, if necessary
 
-        if (isAbleToSync()) {
+        if (StatusUtil.hasDataConnection(this)) {
             syncFiles();// Sync everything
         }
 
@@ -717,14 +717,6 @@ public class DataSyncService extends IntentService {
         }
 
         return filename;
-    }
-
-    private boolean isAbleToSync() {
-        final int uploadModeIndex = getUploadIndex();
-        if (ConstantUtil.UPLOAD_NEVER_IDX == uploadModeIndex) {
-            return StatusUtil.hasDataConnection(this, true);// WiFi only
-        }
-        return StatusUtil.hasDataConnection(this, false);
     }
 
     /**

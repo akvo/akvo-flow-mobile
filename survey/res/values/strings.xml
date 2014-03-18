@@ -81,8 +81,7 @@
     <string name="deleteresponse">Delete Response</string>
     <string name="othertext">Other...</string>
     <string name="savelastuserlabel">Keep the last selected user logged-in between sessions</string>
-    <string name="uploadoptionlabel">Upload data over cellular network</string>
-    <string name="uploadoptiondialogtitle">Upload via cellular</string>
+    <string name="uploadoptionlabel">Sync data over mobile network</string>
     <string name="surveylanglabel">Survey Languages</string>
     <string name="beaconlabel">Send Location Beacons</string>
     <string name="scanbarcode">Scan Barcode</string>

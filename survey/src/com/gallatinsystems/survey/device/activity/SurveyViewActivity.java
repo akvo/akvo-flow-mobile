@@ -51,6 +51,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDao;
@@ -68,6 +69,7 @@ import com.gallatinsystems.survey.device.event.QuestionInteractionEvent;
 import com.gallatinsystems.survey.device.event.QuestionInteractionListener;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
+import com.gallatinsystems.survey.device.util.ImageUtil;
 import com.gallatinsystems.survey.device.util.LangsPreferenceData;
 import com.gallatinsystems.survey.device.util.LangsPreferenceUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
@@ -524,17 +526,24 @@ public class SurveyViewActivity extends TabActivity implements
                     FileUtil.findOrCreateDir(newPath);
                     String absoluteFile = newPath + File.separator + newFilename;
 
-                    if (resizedToNewFile(f, absoluteFile)) {
-                        if (!f.delete()) { // must check return value to know if
-                                           // it failed
+                    int maxImgSize = ConstantUtil.IMAGE_SIZE_320_240;
+                    String maxImgSizePref = databaseAdapter.getPreference(ConstantUtil.MAX_IMG_SIZE);
+                    if (!TextUtils.isEmpty(maxImgSizePref)) {
+                        maxImgSize = Integer.valueOf(maxImgSizePref);
+                    }
+
+                    String sizeTxt = getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize];
+
+                    if (ImageUtil.resizeImage(f.getAbsolutePath(), absoluteFile, maxImgSize)) {
+                        Toast.makeText(this, "Image resized to " + sizeTxt, Toast.LENGTH_LONG).show();
+                        if (!f.delete()) { // must check return value to know if it failed
                             Log.e(ACTIVITY_NAME, "Media file delete failed");
                         }
-                    } else {// just move it to the correct place
-                        if (!f.renameTo(new File(absoluteFile))) {
-                            // must check  return  value to  know if it  failed!
-                            Log.e(ACTIVITY_NAME, "Media file rename failed");
-                        }
+                    } else if (!f.renameTo(new File(absoluteFile))) {
+                        // must check  return  value to  know if it  failed!
+                        Log.e(ACTIVITY_NAME, "Media file rename failed");
                     }
+
                     try {
                         Bundle photoData = new Bundle();
                         photoData.putString(ConstantUtil.MEDIA_FILE_KEY, absoluteFile);

@@ -219,6 +219,33 @@
                 android:text="@string/shrinkphotoslabel"
                 android:textSize="20sp" />
         </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageButton
+                android:id="@+id/max_img_size_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@android:drawable/arrow_down_float" />
+
+            <TextView
+                android:id="@+id/max_img_size_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/max_img_size_btn"
+                android:text="Resize large images to:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/max_img_size_txt"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/max_img_size_title"
+                android:textSize="16sp" />
+        </RelativeLayout>
     </LinearLayout>
 
 </ScrollView>

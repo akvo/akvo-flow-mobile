@@ -62,6 +62,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private TextView languageTextView;
     private TextView serverTextView;
     private TextView identTextView;
+    private TextView maxImgSizeTextView;
     private SurveyDbAdapter database;
 
     private LangsPreferenceData langsPrefData;
@@ -70,6 +71,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private int[] langsSelectedMasterIndexArray;
 
     private String[] serverArray;
+    private String[] maxImgSizes;
     private PropertyUtil props;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -86,11 +88,13 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         languageTextView = (TextView) findViewById(R.id.surveylangvalue);
         serverTextView = (TextView) findViewById(R.id.servervalue);
         identTextView = (TextView) findViewById(R.id.identvalue);
+        maxImgSizeTextView = (TextView) findViewById(R.id.max_img_size_txt);
 
         Resources res = getResources();
         props = new PropertyUtil(res);
 
         serverArray = res.getStringArray(R.array.servers);
+        maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
     }
 
     /**
@@ -143,6 +147,13 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             serverTextView.setText(props.getProperty(ConstantUtil.SERVER_BASE));
         }
 
+        val = settings.get(ConstantUtil.MAX_IMG_SIZE);
+        if (val != null && val.trim().length() > 0) {
+            maxImgSizeTextView.setText(maxImgSizes[Integer.parseInt(val)]);
+        } else {
+            maxImgSizeTextView.setText(maxImgSizes[0]);
+        }
+
         val = settings.get(ConstantUtil.DEVICE_IDENT_KEY);
         if (val != null) {
             identTextView.setText(val);
@@ -169,6 +180,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         findViewById(R.id.surveylangbutton).setOnClickListener(this);
         findViewById(R.id.serverbutton).setOnClickListener(this);
         findViewById(R.id.identbutton).setOnClickListener(this);
+        findViewById(R.id.max_img_size_btn).setOnClickListener(this);
     }
 
     public void onPause() {
@@ -210,10 +222,19 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                     new ViewUtil.AdminAuthDialogListener() {
                         @Override
                         public void onAuthenticated() {
+                            // We'll show a first options containing the default server,
+                            // but it's value will be an empty string "".
+                            String[] keys = new String[serverArray.length + 1];
+                            String[] values = new String[serverArray.length + 1];
+                            keys[0] = "";
+                            values[0] = props.getProperty(ConstantUtil.SERVER_BASE);
+                            for (int i=0; i<serverArray.length; i++) {
+                                keys[i+1] = String.valueOf(i);// DB value
+                                values[i+1] = serverArray[i];// Text to show
+                            }
                             showPreferenceDialogBase(R.string.serverlabel,
-                                    props.getProperty(ConstantUtil.SERVER_BASE),
                                     ConstantUtil.SERVER_SETTING_KEY,
-                                    serverArray, serverTextView);
+                                    keys, values, serverTextView);
 
                         }
                     });
@@ -243,6 +264,14 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                                     });
                         }
                     });
+        } else if (R.id.max_img_size_btn == v.getId()) {
+            String[] keys = new String[maxImgSizes.length];
+            for (int i = 0; i < maxImgSizes.length; i++) {
+                keys[i] = String.valueOf(i);
+            }
+            showPreferenceDialogBase(R.string.shrinkphotoslabel,// TODO: change string
+                    ConstantUtil.MAX_IMG_SIZE,
+                    keys, maxImgSizes, maxImgSizeTextView);
         }
     }
 
@@ -251,29 +280,20 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      * array
      * 
      * @param titleId - resource id of dialog title
-     * @param baseValue - Value resulting in empty setting value
      * @param settingKey - key of setting to edit
-     * @param valueArray - string array containing values
+     * @param keys - string array containing keys (to be stored in the DB)
+     * @param values - string array containing values (text mapping of the key)
      * @param currentValView - view to update with value selected
      */
-    private void showPreferenceDialogBase(int titleId, String baseValue,
-            final String settingKey, final String[] valueArray,
-            final TextView currentValView) {
+    private void showPreferenceDialogBase(int titleId,  final String settingKey,
+            final String[] keys, final String[] values, final TextView currentValView) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final String[] extraValueArray = new String[valueArray.length + 1];
-        extraValueArray[0] = baseValue;
-        for (int i = 0; i < valueArray.length; i++) {
-            extraValueArray[i + 1] = valueArray[i];
-        }
-        builder.setTitle(titleId).setItems(extraValueArray,
+        builder.setTitle(titleId).setItems(values,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0)
-                            database.savePreference(settingKey, "");
-                        else
-                            database.savePreference(settingKey, (which - 1) + "");
-                        currentValView.setText(extraValueArray[which]);
+                        database.savePreference(settingKey, keys[which]);
+                        currentValView.setText(values[which]);
                         if (dialog != null) {
                             dialog.dismiss();
                         }

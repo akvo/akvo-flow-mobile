@@ -149,6 +149,7 @@ public class ConstantUtil {
     public static final String SURVEY_TEXT_SIZE_KEY = "survey.textsize";
     public static final String PHOTO_SIZE_REMINDER_KEY = "survey.media.photo.sizereminder";
     public static final String SHRINK_PHOTOS_KEY = "survey.media.photo.shrink";
+    public static final String MAX_IMG_SIZE = "media.img.maxsize";
 
     /**
      * settings values
@@ -226,6 +227,15 @@ public class ConstantUtil {
     public static final int ORDER_BY_NONE     = -1;
     public static final int ORDER_BY_DATE     = 0;
     public static final int ORDER_BY_DISTANCE = 1;
+
+    /**
+     * Max picture size
+     * Values must match the ones set in arrays.
+     * TODO: Preferences should be managed with SharedPreferences api, to avoid this error prone references
+     */
+    public static final int IMAGE_SIZE_320_240  = 0;
+    public static final int IMAGE_SIZE_640_480  = 1;
+    public static final int IMAGE_SIZE_1280_960 = 2;
 
     /**
      * prevent instantiation

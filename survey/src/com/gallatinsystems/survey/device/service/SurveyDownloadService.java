@@ -154,8 +154,7 @@ public class SurveyDownloadService extends Service {
                     // First, sync the SurveyGroups
                     syncSurveyGroups(surveys);
                     
-                    // if there are surveys for this device, see if we need
-                    // them
+                    // if there are surveys for this device, see if we need them
                     surveys = databaseAdaptor.checkSurveyVersions(surveys);
                     int updateCount = 0;
                     if (surveys != null && surveys.size() > 0) {
@@ -389,8 +388,7 @@ public class SurveyDownloadService extends Service {
                     for (String file : fileSet) {
                         downloadBinary(file, survey.getId());
                     }
-                    databaseAdaptor.markSurveyHelpDownloaded(survey.getId(),
-                            true);
+                    databaseAdaptor.markSurveyHelpDownloaded(survey.getId(), true);
                 }
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "Could not parse survey survey file", e);

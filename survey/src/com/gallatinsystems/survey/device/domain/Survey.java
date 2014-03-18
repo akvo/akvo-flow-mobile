@@ -64,19 +64,6 @@ public class Survey {
         this.helpDownloaded = helpDownloaded;
     }
 
-    public void setHelpDownloaded(String flagVal) {
-        if (flagVal != null) {
-            if (flagVal.trim().equalsIgnoreCase("Y")
-                    || flagVal.trim().equalsIgnoreCase("true")) {
-                helpDownloaded = true;
-            } else {
-                helpDownloaded = false;
-            }
-        } else {
-            helpDownloaded = false;
-        }
-    }
-
     public String getType() {
         return type;
     }

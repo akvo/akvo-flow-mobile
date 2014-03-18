@@ -748,9 +748,9 @@ public class SurveyDbAdapter {
         for (int i = 0; i < surveys.size(); i++) {
             Cursor cursor = database.query(Tables.SURVEY,
                     new String[] {
-                        SurveyColumns._ID
+                        SurveyColumns.SURVEY_ID
                     },
-                    SurveyColumns._ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
+                    SurveyColumns.SURVEY_ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
                             + SurveyColumns.DELETED + " = ?)", new String[] {
                             surveys.get(i).getId(),
                             surveys.get(i).getVersion() + "",
@@ -776,7 +776,7 @@ public class SurveyDbAdapter {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, isDownloaded ? 1 : 0);
 
-        if (database.update(Tables.SURVEY, updatedValues, SurveyColumns._ID + " = ?",
+        if (database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
                 new String[] {
                     surveyId
                 }) < 1) {
@@ -812,8 +812,7 @@ public class SurveyDbAdapter {
         updatedValues.put(SurveyColumns.LANGUAGE, survey.getLanguage() != null ? survey
                 .getLanguage().toLowerCase() : ConstantUtil.ENGLISH_CODE);
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, surveyGroupId);
-        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, survey.isHelpDownloaded() ? "Y"
-                : "N");
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, survey.isHelpDownloaded() ? 1 : 0);
         //updatedValues.put(SurveyColumns., ConstantUtil.NOT_DELETED);
 
         if (cursor != null && cursor.getCount() > 0) {
@@ -1259,9 +1258,11 @@ public class SurveyDbAdapter {
         survey.setLocation(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LOCATION)));
         survey.setFileName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.FILENAME)));
         survey.setType(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.TYPE)));
-        survey.setHelpDownloaded(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED)));
         survey.setLanguage(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LANGUAGE)));
         survey.setVersion(cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyColumns.VERSION)));
+
+        int helpDownloaded = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED));
+        survey.setHelpDownloaded(helpDownloaded == 1 ? true : false);
         return survey;
     }
 

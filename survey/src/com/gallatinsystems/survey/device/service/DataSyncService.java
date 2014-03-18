@@ -118,7 +118,6 @@ public class DataSyncService extends IntentService {
     private static final String S3_IMAGE_FILE_PATH = "images";
 
     private static final int COMPLETE_ID = 1;// TODO: One ID per file will give more feedback
-    private static final int ID_NONE = -1;
 
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
@@ -455,7 +454,6 @@ public class DataSyncService extends IntentService {
         // TODO: Ensure no Exception can be thrown from previous steps, to avoid leaking IN_PROGRESS status
         if (ok) {
             // Mark everything completed
-            // databaseAdaptor.markDataAsSent(zipFileData.respondentIDs, String.valueOf(true));
             mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
             fireNotification(NotificationType.SYNC, destName);
         } else {
@@ -698,15 +696,6 @@ public class DataSyncService extends IntentService {
         }
 
         return mProps.getProperty(ConstantUtil.SERVER_BASE);
-    }
-
-    private int getUploadIndex() {
-        final String uploadOption = mDatabase.getPreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
-        if (!TextUtils.isEmpty(uploadOption)) {
-            return Integer.parseInt(uploadOption);
-        }
-
-        return ID_NONE;
     }
 
     private static String getDestName(String filename) {

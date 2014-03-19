@@ -264,10 +264,9 @@ public class SurveyViewActivity extends TabActivity implements
             return;
         }
 
-        // just issue a warning if we just descended to or past a number on the
-        // list
+        // just issue a warning if we just descended to or past a number on the list
         if (megaAvailable < lastMegaAvailable) {
-            for (long l = megaAvailable; l < lastMegaAvailable; l++)
+            for (long l = megaAvailable; l < lastMegaAvailable; l++) {
                 if (ConstantUtil.SPACE_WARNING_MB_LEVELS.contains(Long.toString(l))) {
                     // display how much space is left
                     String s = getResources().getString(R.string.lowcardspacedialog);
@@ -289,6 +288,7 @@ public class SurveyViewActivity extends TabActivity implements
                     return; // only one warning per survey, even of we passed >1
                             // limit
                 }
+            }
         }
     }
 
@@ -392,81 +392,6 @@ public class SurveyViewActivity extends TabActivity implements
         pendingResultCode = resultCode;
     }
 
-    private void sizeReminder(long len) {
-        // see if we need to complain about size
-        if (len > ConstantUtil.BIG_PHOTO_FILE) {
-            String val = databaseAdapter.getPreference(ConstantUtil.PHOTO_SIZE_REMINDER_KEY);
-            if (val != null && Boolean.parseBoolean(val)) {
-                // let user click a "stop bugging me" button
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(R.string.tooBigPhotoMsg)
-                        .setCancelable(true)
-                        .setPositiveButton(R.string.okbutton,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                })
-                        .setNegativeButton(R.string.giveitarestbutton,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        // now clear the setting in the db
-                                        databaseAdapter.savePreference(
-                                                ConstantUtil.PHOTO_SIZE_REMINDER_KEY, Boolean
-                                                        .valueOf(false).toString());
-                                        dialog.cancel();
-                                    }
-                                });
-                builder.show();
-            }
-        }
-    }
-
-    /**
-     * this handles resizing a too-large image file from the camera return true
-     * if file was re
-     */
-    private boolean resizedToNewFile(File f, String outputFileName) {
-        String val = databaseAdapter.getPreference(ConstantUtil.SHRINK_PHOTOS_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            // Get image size
-            BitmapFactory.Options bmo = new BitmapFactory.Options();
-            bmo.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(f.getAbsolutePath(), bmo);
-            // If file is unreadable both are -1
-            if (Math.max(bmo.outWidth, bmo.outHeight) > 320) {
-                bmo.inJustDecodeBounds = false;
-                
-                // 6 for a 3MP image; will be rounded down to to 4
-                bmo.inSampleSize = Math.max(bmo.outWidth, bmo.outHeight) / 320; 
-                Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath(), bmo);
-                // sometimes  get  bm  width  and  height  as  -1
-                if (bm != null && bm.getHeight() > 0 && bm.getWidth() > 0) {
-                    try {
-                        OutputStream out = null;
-                        try {
-                            out = new BufferedOutputStream(new FileOutputStream(outputFileName));
-                            // out = new FileOutputStream(f);
-                            if (bm.compress(CompressFormat.JPEG, 75, out)) {
-                                Log.i(ACTIVITY_NAME, "Media file resized");
-                                return true;
-                            }
-                        } finally {
-                            if (out != null) {
-                                out.close();
-                            }
-                        }
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                    }
-
-                }
-
-            }
-        }
-        return false;
-    }
-
     /**
      * this handles the data returned from other activities. Right now the only
      * activity we care about is the media (photo/video/audio) activity (when
@@ -516,8 +441,6 @@ public class SurveyViewActivity extends TabActivity implements
 
                     // Ensure no image is saved in the DCIM folder
                     cleanDCIM(f.getAbsolutePath());
-
-                    sizeReminder(f.length());
 
                     String newFilename = filePrefix + System.nanoTime() + fileSuffix;
                     String newPath = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,

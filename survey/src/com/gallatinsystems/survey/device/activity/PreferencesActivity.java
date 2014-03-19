@@ -56,8 +56,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private CheckBox saveUserCheckbox;
     private CheckBox beaconCheckbox;
     private CheckBox screenOnCheckbox;
-    private CheckBox photoSizeReminderCheckbox;
-    private CheckBox shrinkPhotosCheckbox;
     private CheckBox mobileDataCheckbox;
     private TextView languageTextView;
     private TextView serverTextView;
@@ -82,8 +80,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         saveUserCheckbox = (CheckBox) findViewById(R.id.lastusercheckbox);
         beaconCheckbox = (CheckBox) findViewById(R.id.beaconcheckbox);
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
-        photoSizeReminderCheckbox = (CheckBox) findViewById(R.id.photosizeremindercheckbox);
-        shrinkPhotosCheckbox = (CheckBox) findViewById(R.id.shrinkphotoscheckbox);
         mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
         languageTextView = (TextView) findViewById(R.id.surveylangvalue);
         serverTextView = (TextView) findViewById(R.id.servervalue);
@@ -122,12 +118,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         } else {
             beaconCheckbox.setChecked(false);
         }
-
-        val = settings.get(ConstantUtil.PHOTO_SIZE_REMINDER_KEY);
-        photoSizeReminderCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
-
-        val = settings.get(ConstantUtil.SHRINK_PHOTOS_KEY);
-        shrinkPhotosCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
 
         val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
         mobileDataCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
@@ -174,8 +164,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         saveUserCheckbox.setOnCheckedChangeListener(this);
         beaconCheckbox.setOnCheckedChangeListener(this);
         screenOnCheckbox.setOnCheckedChangeListener(this);
-        photoSizeReminderCheckbox.setOnCheckedChangeListener(this);
-        shrinkPhotosCheckbox.setOnCheckedChangeListener(this);
         mobileDataCheckbox.setOnCheckedChangeListener(this);
         findViewById(R.id.surveylangbutton).setOnClickListener(this);
         findViewById(R.id.serverbutton).setOnClickListener(this);
@@ -269,7 +257,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             for (int i = 0; i < maxImgSizes.length; i++) {
                 keys[i] = String.valueOf(i);
             }
-            showPreferenceDialogBase(R.string.shrinkphotoslabel,// TODO: change string
+            showPreferenceDialogBase(R.string.resize_large_images,// TODO: change string
                     ConstantUtil.MAX_IMG_SIZE,
                     keys, maxImgSizes, maxImgSizeTextView);
         }
@@ -320,10 +308,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             }
         } else if (buttonView == screenOnCheckbox) {
             database.savePreference(ConstantUtil.SCREEN_ON_KEY, "" + isChecked);
-        } else if (buttonView == photoSizeReminderCheckbox) {
-            database.savePreference(ConstantUtil.PHOTO_SIZE_REMINDER_KEY, "" + isChecked);
-        } else if (buttonView == shrinkPhotosCheckbox) {
-            database.savePreference(ConstantUtil.SHRINK_PHOTOS_KEY, "" + isChecked);
         } else if (buttonView == mobileDataCheckbox) {
             database.savePreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY, "" + isChecked);
         }

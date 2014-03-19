@@ -61,6 +61,8 @@ public class ImageUtil {
             reqWidth = tmp;
         }
 
+        Log.d(TAG, "Orig Image size: " + options.outWidth + "x" + options.outHeight);
+
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
@@ -69,6 +71,7 @@ public class ImageUtil {
         Bitmap bitmap = BitmapFactory.decodeFile(origFilename, options);
 
         if (bitmap != null) {
+            Log.d(TAG, "Resized Image size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
             return saveImage(bitmap, outFilename);
         }
         return false;

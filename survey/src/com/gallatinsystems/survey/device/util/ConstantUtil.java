@@ -147,8 +147,6 @@ public class ConstantUtil {
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String SURVEY_TEXT_SIZE_KEY = "survey.textsize";
-    public static final String PHOTO_SIZE_REMINDER_KEY = "survey.media.photo.sizereminder";
-    public static final String SHRINK_PHOTOS_KEY = "survey.media.photo.shrink";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
 
     /**

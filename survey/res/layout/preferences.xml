@@ -186,44 +186,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
-            <CheckBox
-                android:id="@+id/photosizeremindercheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true" />
-
-            <TextView
-                android:id="@+id/photosizereminderlabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/photosizeremindercheckbox"
-                android:text="@string/photosizereminderlabel"
-                android:textSize="20sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
-            <CheckBox
-                android:id="@+id/shrinkphotoscheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true" />
-
-            <TextView
-                android:id="@+id/shrinkphotoslabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/shrinkphotoscheckbox"
-                android:text="@string/shrinkphotoslabel"
-                android:textSize="20sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
             <ImageButton
                 android:id="@+id/max_img_size_btn"
                 android:layout_width="wrap_content"
@@ -236,7 +198,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/max_img_size_btn"
-                android:text="Resize large images to:"
+                android:text="@string/resize_large_images"
                 android:textSize="20sp" />
 
             <TextView

@@ -188,8 +188,8 @@ public class SurveyDbAdapter {
             "INSERT INTO preferences VALUES('backend.server','')",
             "INSERT INTO preferences VALUES('screen.keepon','true')",
             "INSERT INTO preferences VALUES('survey.textsize','LARGE')",
-            "INSERT INTO preferences VALUES('survey.media.photo.shrink','true')",
-            "INSERT INTO preferences VALUES('survey.media.photo.sizereminder','true')"
+            "INSERT INTO preferences VALUES('" + ConstantUtil.MAX_IMG_SIZE + "',"
+                    + String.valueOf(ConstantUtil.IMAGE_SIZE_320_240) + ")"
     };
 
     private static final String DATABASE_NAME = "surveydata";

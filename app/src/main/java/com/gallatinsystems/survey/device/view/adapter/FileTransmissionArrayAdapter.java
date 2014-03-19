@@ -30,7 +30,6 @@ import android.widget.TextView;
 
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.domain.FileTransmission;
-import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter.TransmissionStatus;
 
 /**

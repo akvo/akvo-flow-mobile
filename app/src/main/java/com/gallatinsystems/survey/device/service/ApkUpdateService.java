@@ -19,7 +19,6 @@ package com.gallatinsystems.survey.device.service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.concurrent.Semaphore;
 
 import org.json.JSONObject;
 

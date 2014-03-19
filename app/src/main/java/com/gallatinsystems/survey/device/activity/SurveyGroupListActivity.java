@@ -48,7 +48,6 @@ import com.gallatinsystems.survey.device.service.DataSyncService;
 import com.gallatinsystems.survey.device.service.ExceptionReportingService;
 import com.gallatinsystems.survey.device.service.LocationService;
 import com.gallatinsystems.survey.device.service.SurveyDownloadService;
-import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 

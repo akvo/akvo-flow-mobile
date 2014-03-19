@@ -176,8 +176,11 @@ public class DataSyncService extends IntentService {
         }
 
         for (long id : surveyInstanceIds) {
-            ZipFileData zipFileData = formZip(id);// TODO: Display notification?
+            ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
+                fireNotification(NotificationType.EXPORT, getDestName(zipFileData.filename));
+                // Be nice and give some feedback
+
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.filename);
                 mDatabase.updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);

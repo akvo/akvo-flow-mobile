@@ -26,7 +26,7 @@
 
 package com.jayway.test;
 
-import com.gallatinsystems.survey.device.activity.SurveyHomeActivity;
+import org.akvo.flow.activity.SurveyHomeActivity;
 import com.jayway.android.robotium.solo.Solo;
 
 import android.app.Activity;
@@ -36,10 +36,6 @@ import android.test.suitebuilder.annotation.Smoke;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Button;
-import java.util.ArrayList;
-
-import java.util.TreeMap;
-
 
 
 public class SurveyTest extends ActivityInstrumentationTestCase2<SurveyHomeActivity>{
@@ -205,20 +201,20 @@ public class SurveyTest extends ActivityInstrumentationTestCase2<SurveyHomeActiv
 		solo.goBack();
 		
 		//start app
-		launchActivity("com.gallatinsystems.survey.device","com.gallatinsystems.survey.device.activity.SurveyHomeActivity");
+		launchActivity("com.gallatinsystems.survey.device","org.akvo.flow.activity.SurveyHomeActivity");
 		solo=new Solo(getInstrumentation());
 		solo.sleep(1000);
 		//start app again
 		solo.goBack();
 		solo.goBack();
-		launchActivity("com.gallatinsystems.survey.device","com.gallatinsystems.survey.device.activity.SurveyHomeActivity");
+		launchActivity("com.gallatinsystems.survey.device","org.akvo.flow.activity.SurveyHomeActivity");
 		solo=new Solo(getInstrumentation());
 		
 		solo.sleep(1000);
 		//start app again
 		solo.goBack();
 		solo.goBack();
-		launchActivity("com.gallatinsystems.survey.device","com.gallatinsystems.survey.device.activity.SurveyHomeActivity");
+		launchActivity("com.gallatinsystems.survey.device","org.akvo.flow.activity.SurveyHomeActivity");
 		solo=new Solo(getInstrumentation());
 		
 		// check if expected surveys are there now
@@ -245,13 +241,13 @@ public class SurveyTest extends ActivityInstrumentationTestCase2<SurveyHomeActiv
 		
 		solo.goBack();
 		solo.goBack();
-		launchActivity("com.gallatinsystems.survey.device","com.gallatinsystems.survey.device.activity.SurveyHomeActivity");
+		launchActivity("com.gallatinsystems.survey.device","org.akvo.flow.activity.SurveyHomeActivity");
 		solo=new Solo(getInstrumentation());
 		
 		solo.sleep(1000);
 		solo.goBack();
 		solo.goBack();
-		launchActivity("com.gallatinsystems.survey.device","com.gallatinsystems.survey.device.activity.SurveyHomeActivity");
+		launchActivity("com.gallatinsystems.survey.device","org.akvo.flow.activity.SurveyHomeActivity");
 		solo=new Solo(getInstrumentation());
 		
 		
@@ -383,7 +379,7 @@ public class SurveyTest extends ActivityInstrumentationTestCase2<SurveyHomeActiv
 		solo.goBack();
 		
 		//start app
-		launchActivity("com.gallatinsystems.survey.device","com.gallatinsystems.survey.device.activity.SurveyHomeActivity");
+		launchActivity("com.gallatinsystems.survey.device","org.akvo.flow.activity.SurveyHomeActivity");
 		solo=new Solo(getInstrumentation());
 		
 		// User should be gone now.
@@ -404,7 +400,7 @@ public class SurveyTest extends ActivityInstrumentationTestCase2<SurveyHomeActiv
 		solo.goBack();
 				
 		//start app
-		launchActivity("com.gallatinsystems.survey.device","com.gallatinsystems.survey.device.activity.SurveyHomeActivity");
+		launchActivity("com.gallatinsystems.survey.device","org.akvo.flow.activity.SurveyHomeActivity");
 		solo=new Solo(getInstrumentation());
 				
 		// User should be selected now.

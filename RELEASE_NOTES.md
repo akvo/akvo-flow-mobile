@@ -1,5 +1,15 @@
 Akvo FLOW Field Survey app 
-Last update 05 March 2014
+Last update 19 March 2014
+
+#ver 1.13.3
+
+New Features & enhancements
+---------------------------
+* Add 'Quiche' language support (#75)
+
+Bug fixes
+---------
+* Fix 'Clear' menu option within a survey response (#74)
 
 #ver 1.13.2
 

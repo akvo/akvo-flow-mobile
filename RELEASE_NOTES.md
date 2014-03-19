@@ -1,5 +1,50 @@
 Akvo FLOW Field Survey app 
-Last update 17 September 2013
+Last update 19 March 2014
+
+#ver 1.13.3
+
+New Features & enhancements
+---------------------------
+* Add 'Quiche' language support (#75)
+
+Bug fixes
+---------
+* Fix 'Clear' menu option within a survey response (#74)
+
+#ver 1.13.2
+
+New Features & enhancements
+---------------------------
+
+* Accurately compute survey duration (#69)
+* Cleanup failed APK downloads (#71)
+
+#ver 1.13.0
+
+New features & enhancements
+---------------------------
+
+* Implement Double Entry functionality (#40)
+* Handle app upgrade from within the app (#61)
+* Improve reliability of data transfer to S3 (#56)
+* Unused code and features clean up (#49 and #50)
+
+Bug fixes
+---------
+
+* Images were always marked as 'Sent' (#55)
+* Restrict the TEXT question length to 500 chars (#48)
+* Add the proper Mime Type depending on the file (#64)
+
+#ver 1.12.1
+
+New features & enhancements
+---------------------------
+* Recompute survey langauges when upgrading from an old version (Issue #34)
+
+Bug fixes
+---------
+* Fix memory leak in Dialogs (Issue #33)
 
 #ver 1.12.0
 

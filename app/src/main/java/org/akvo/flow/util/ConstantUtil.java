@@ -165,7 +165,6 @@ public class ConstantUtil {
      * intents
      */
     public static final String DATA_AVAILABLE_INTENT = "org.akvo.flow.DATA_SUBMITTED";
-    public static final String PRECACHE_INTENT = "org.akvo.flow.PRECACHE";
     public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
     public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 

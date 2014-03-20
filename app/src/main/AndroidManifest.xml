@@ -68,7 +68,6 @@
 
         <receiver android:name="org.akvo.flow.broadcast.BroadcastDispatcher" >
             <intent-filter>
-                <action android:name="org.akvo.flow.PRECACHE" />
                 <action android:name="org.akvo.flow.DATA_SUBMITTED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

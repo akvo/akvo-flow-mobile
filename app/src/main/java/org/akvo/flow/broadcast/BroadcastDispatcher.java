@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.akvo.flow.service.DataSyncService;
-import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ConstantUtil;
 
 /**
@@ -38,11 +37,8 @@ public class BroadcastDispatcher extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         if (ConstantUtil.DATA_AVAILABLE_INTENT.equals(intent.getAction())) {
-            // launch the service telling it to SEND data to the server
+            // Launch Sync Service
             context.startService(new Intent(context, DataSyncService.class));
-        } else if (ConstantUtil.PRECACHE_INTENT.equals(intent.getAction())) {
-            context.startService(new Intent(context,
-                    SurveyDownloadService.class));
         }
     }
 }

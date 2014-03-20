@@ -107,6 +107,7 @@ public class SurveyDbAdapter {
         String EXPORTED_DATE = "exported_date";
         String SYNC_DATE = "sync_date";
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
+        String DURATION = "duration";
     }
 
     public interface TransmissionColumns {
@@ -256,6 +257,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.STATUS + " INTEGER,"
                     + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
+                    + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -457,9 +459,9 @@ public class SurveyDbAdapter {
                 new String[] {
                         SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
-                        SurveyInstanceColumns.RECORD_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.QUESTION_ID, ResponseColumns.STRENGTH,
-                        ResponseColumns.SCORED_VAL, UserColumns.NAME, UserColumns.EMAIL
+                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.DURATION,
+                        ResponseColumns.ANSWER, ResponseColumns.TYPE, ResponseColumns.QUESTION_ID,
+                        ResponseColumns.STRENGTH, ResponseColumns.SCORED_VAL, UserColumns.NAME, UserColumns.EMAIL
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.INCLUDE + " = 1",
                 new String[] {
@@ -507,6 +509,23 @@ public class SurveyDbAdapter {
         if (rows < 1) {
             Log.e(TAG, "Could not update status for Survey Instance: " + surveyInstanceId);
         }
+    }
+
+    /**
+     * Increment the duration of a particular respondent.
+     * The provided value will be added on top of the already stored one (default to 0).
+     * This will allow users to pause and resume a survey without considering that
+     * time as part of the survey duration.
+     *
+     * @param sessionDuration time spent in the current session
+     */
+    public void addSurveyDuration(long respondentId, long sessionDuration) {
+        final String sql = "UPDATE " + Tables.SURVEY_INSTANCE
+                + " SET " + SurveyInstanceColumns.DURATION + " = "
+                        + SurveyInstanceColumns.DURATION + " + " + sessionDuration
+                + " WHERE " + SurveyInstanceColumns._ID + " = " + respondentId
+                + " AND " + SurveyInstanceColumns.SUBMITTED_DATE + " IS NULL";
+        database.execSQL(sql);
     }
 
     /**

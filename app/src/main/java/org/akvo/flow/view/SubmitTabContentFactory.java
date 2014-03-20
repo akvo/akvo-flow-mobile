@@ -73,6 +73,8 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
         submitButton = configureActionButton(R.string.submitbutton,
                 new OnClickListener() {
                     public void onClick(View v) {
+                        context.saveSessionDuration();
+
                         // if we have no missing responses, submit the survey
                         databaseAdaptor.updateSurveyStatus(context.getRespondentId(),
                                 SurveyInstanceStatus.SUBMITTED);

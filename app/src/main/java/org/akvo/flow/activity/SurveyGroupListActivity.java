@@ -43,6 +43,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyGroupLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
@@ -125,8 +126,26 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
             startService(new Intent(this, DataSyncService.class));
+            //checkApkUpdates();
             
             getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, this);
+        }
+    }
+
+    /**
+     * Check if new FLOW versions are available to install.
+     * First we check the local storage, to see if the version is already
+     * downloaded. If so, we display a dialog to request the user to install it.
+     * Otherwise, we trigger the ApkUpdateService to check for updates.
+     */
+    private void checkApkUpdates() {
+        String[] latestVersion = ApkUpdateService.checkDownloadedVersions(this);
+        if (latestVersion != null) {
+            ApkUpdateService.displayInstallDialog(this, latestVersion[0], latestVersion[1]);
+        } else {
+            Intent apkUpdateIntent = new Intent(this, ApkUpdateService.class);
+            apkUpdateIntent.putExtra(ApkUpdateService.EXTRA_MODE, ApkUpdateService.MODE_CHECK);
+            startService(apkUpdateIntent);
         }
     }
 

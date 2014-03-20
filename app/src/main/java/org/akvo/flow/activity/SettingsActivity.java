@@ -72,8 +72,6 @@ public class SettingsActivity extends ListActivity {
                 resources.getString(R.string.prefoptdesc)));
         list.add(createMap(resources.getString(R.string.sendoptlabel),
                 resources.getString(R.string.sendoptdesc)));
-        list.add(createMap(resources.getString(R.string.exportoptlabel),
-                resources.getString(R.string.exportoptdesc)));
         list.add(createMap(resources.getString(R.string.reloadsurveyslabel),
                 resources.getString(R.string.reloadsurveysdesc)));
         list.add(createMap(resources.getString(R.string.downloadsurveylabel),

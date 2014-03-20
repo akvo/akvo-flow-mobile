@@ -183,7 +183,7 @@ public class DataSyncService extends IntentService {
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.filename);
-                mDatabase.updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+                updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
 
                 for (String image : zipFileData.imagePaths) {
                     mDatabase.createTransmission(id, image);
@@ -415,12 +415,12 @@ public class DataSyncService extends IntentService {
         syncedFiles.removeAll(unsyncedFiles);
 
         for (long surveyInstanceId : syncedFiles) {
-            mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
+            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
         }
 
         // Ensure the unsynced ones are just EXPORTED
         for (long surveyInstanceId : unsyncedFiles) {
-            mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
+            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
         }
     }
 
@@ -709,6 +709,20 @@ public class DataSyncService extends IntentService {
 
         return filename;
     }
+
+    /**
+     *
+     */
+    private void updateSurveyStatus(long surveyInstanceId, int status) {
+        // First off, update the status
+        mDatabase.updateSurveyStatus(surveyInstanceId, status);
+
+        // Dispatch a Broadcast notification to notify of survey instances status change
+        Intent intentBroadcast = new Intent(getString(R.string.action_data_sync));
+        sendBroadcast(intentBroadcast);
+    }
+
+
 
     /**
      * Helper class to wrap zip file's meta-data.<br>

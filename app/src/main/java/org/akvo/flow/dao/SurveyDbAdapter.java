@@ -18,6 +18,7 @@ package org.akvo.flow.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1007,6 +1008,18 @@ public class SurveyDbAdapter {
                             .getColumnIndexOrThrow(TransmissionColumns.FILENAME)));
                     trans.setStatus(cursor.getInt(cursor
                             .getColumnIndexOrThrow(TransmissionColumns.STATUS)));
+
+                    // Start and End date. Handle null cases
+                    Long startDate = cursor.getLong(
+                            cursor.getColumnIndexOrThrow(TransmissionColumns.START_DATE));
+                    Long endDate = cursor.getLong(
+                            cursor.getColumnIndexOrThrow(TransmissionColumns.END_DATE));
+                    if (startDate != null && startDate > 0) {
+                        trans.setStartDate(new Date(startDate));
+                    }
+                    if (endDate != null && endDate > 0) {
+                        trans.setEndDate(new Date(endDate));
+                    }
                     transmissions.add(trans);
                 } while (cursor.moveToNext());
             }
@@ -1020,7 +1033,8 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME
+                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
+                        TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
                 },
                 TransmissionColumns._ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },

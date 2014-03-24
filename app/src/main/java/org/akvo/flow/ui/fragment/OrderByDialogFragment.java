@@ -1,5 +1,5 @@
 
-package org.akvo.flow.fragment;
+package org.akvo.flow.ui.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

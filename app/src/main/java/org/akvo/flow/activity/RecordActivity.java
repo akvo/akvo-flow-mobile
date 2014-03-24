@@ -41,9 +41,9 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.fragment.ResponseListFragment;
-import org.akvo.flow.fragment.SurveyListFragment;
-import org.akvo.flow.fragment.SurveyListFragment.SurveyListListener;
+import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.ui.fragment.SurveyListFragment;
+import org.akvo.flow.ui.fragment.SurveyListFragment.SurveyListListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.util.ConstantUtil;
 

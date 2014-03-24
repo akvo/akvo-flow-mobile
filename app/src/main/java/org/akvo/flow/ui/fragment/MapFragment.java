@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.fragment;
+package org.akvo.flow.ui.fragment;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -28,7 +28,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -47,9 +46,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
-    protected static final int DEFAULT_WIDTH = 290;
-    protected static String[] colors = null;
-    public static int screenWidth;
+    protected static String[] sColors = null;
 
     protected Question mQuestion;
     private QuestionResponse mResponse;
@@ -69,17 +66,20 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mDefaultLang = defaultLangauge;
         mReadOnly = readOnly;
         mLangs = langs;
-        if (colors == null) {
+        if (sColors == null) {
             // must have enough colors for all enabled languages
-            colors = context.getResources().getStringArray(R.array.colors);
+            sColors = context.getResources().getStringArray(R.array.colors);
         }
+    }
 
-        // TODO: move initialization to init()
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.question_view, this, true);// Attach to root
-
+    protected void setupQuestion() {
         mQuestionText = (TextView)findViewById(R.id.question_tv);
         mTipImage = (ImageButton)findViewById(R.id.tip_ib);
+
+        if (mQuestionText == null || mTipImage == null) {
+            throw new RuntimeException(
+                    "Subclasses must inflate the common question header before calling this method.");
+        }
 
         mQuestionText.setText(formText(), BufferType.SPANNABLE);
 
@@ -115,7 +115,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                 @Override
                 public boolean onLongClick(View v) {
                     ViewUtil.showConfirmDialog(R.string.clearquestion,
-                            R.string.clearquestiondesc, context, true,
+                            R.string.clearquestiondesc, getContext(), true,
                             new DialogInterface.OnClickListener() {
 
                                 @Override
@@ -161,7 +161,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     } else {
                         isFirst = false;
                     }
-                    text.append("<font color='").append(colors[i]).append("'>")
+                    text.append("<font color='").append(sColors[i]).append("'>")
                             .append(txt.getText()).append("</font>");
                 }
             }
@@ -263,7 +263,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                                 isFirst = false;
                             }
 
-                            textBuilder.append("<font color='").append(colors[j]).append("'>")
+                            textBuilder.append("<font color='").append(sColors[j]).append("'>")
                                     .append(aText.getText()).append("</font>");
                         }
                     }
@@ -503,20 +503,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public void suppressHelp(boolean isSuppress) {
         mTipImage.setVisibility(isSuppress ? View.GONE : View.VISIBLE);
-    }
-
-    /**
-     * gets the maximum width to use for the first component in the table row
-     * (used to ensure the help image icon is on the screen)
-     *
-     * @return
-     */
-    protected int getMaxTextWidth() {
-        if (getQuestion().getHelpTypeCount() > 0) {
-            return (screenWidth - 90);
-        } else {
-            return screenWidth;
-        }
     }
 
     public String getDefaultLang() {

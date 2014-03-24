@@ -1050,7 +1050,8 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME
+                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
+                        TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
                 },
                 TransmissionColumns.STATUS + " IN (?, ?)",
                 new String[] {

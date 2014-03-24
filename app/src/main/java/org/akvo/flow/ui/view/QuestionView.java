@@ -368,13 +368,11 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         if (dep.getAnswer() != null
                 && resp != null
                 && dep.isMatch(resp.getValue())
-                && (resp.getIncludeFlag() == null || "true"
-                .equalsIgnoreCase(resp.getIncludeFlag()))) {
+                && resp.getIncludeFlag()) {
             isMatch = true;
         } else if (dep.getAnswer() != null
                 && resp != null
-                && (resp.getIncludeFlag() == null || "true"
-                .equalsIgnoreCase(resp.getIncludeFlag()))) {
+                && resp.getIncludeFlag()) {
             if (resp.getValue() != null) {
                 StringTokenizer strTok = new StringTokenizer(resp.getValue(),
                         "|");
@@ -393,12 +391,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         if (isMatch) {
             setVisibility(View.VISIBLE);
             if (mResponse != null) {
-                mResponse.setIncludeFlag("true");
+                mResponse.setIncludeFlag(true);
             }
             setVisible = true;
         } else {
             if (mResponse != null) {
-                mResponse.setIncludeFlag("false");
+                mResponse.setIncludeFlag(false);
             }
             setVisibility(View.GONE);
         }

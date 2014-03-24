@@ -387,13 +387,11 @@ public class QuestionView extends TableLayout implements
         if (dep.getAnswer() != null
                 && resp != null
                 && dep.isMatch(resp.getValue())
-                && (resp.getIncludeFlag() == null || "true"
-                        .equalsIgnoreCase(resp.getIncludeFlag()))) {
+                && resp.getIncludeFlag()) {
             isMatch = true;
         } else if (dep.getAnswer() != null
                 && resp != null
-                && (resp.getIncludeFlag() == null || "true"
-                        .equalsIgnoreCase(resp.getIncludeFlag()))) {
+                && resp.getIncludeFlag()) {
             if (resp.getValue() != null) {
                 StringTokenizer strTok = new StringTokenizer(resp.getValue(),
                         "|");
@@ -412,12 +410,12 @@ public class QuestionView extends TableLayout implements
         if (isMatch) {
             setVisibility(View.VISIBLE);
             if (response != null) {
-                response.setIncludeFlag("true");
+                response.setIncludeFlag(true);
             }
             setVisible = true;
         } else {
             if (response != null) {
-                response.setIncludeFlag("false");
+                response.setIncludeFlag(false);
             }
             setVisibility(View.GONE);
         }

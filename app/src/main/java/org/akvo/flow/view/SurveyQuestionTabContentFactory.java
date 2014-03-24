@@ -317,7 +317,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                     } else if (cols[i].equals(ResponseColumns.QUESTION_ID)) {
                         resp.setQuestionId(responseCursor.getString(i));
                     } else if (cols[i].equals(ResponseColumns.INCLUDE)) {
-                        resp.setIncludeFlag(responseCursor.getString(i));
+                        resp.setIncludeFlag(responseCursor.getInt(i) == 1);
                     } else if (cols[i].equals(ResponseColumns.SCORED_VAL)) {
                         resp.setScoredValue(responseCursor.getString(i));
                     } else if (cols[i].equals(ResponseColumns.STRENGTH)) {

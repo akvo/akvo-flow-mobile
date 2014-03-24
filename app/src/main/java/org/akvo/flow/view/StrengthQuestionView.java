@@ -108,7 +108,7 @@ public class StrengthQuestionView extends OptionQuestionView {
             resp.setStrength(val);
         } else {
             setResponse(new QuestionResponse(null, null, getQuestion().getId(),
-                    "", ConstantUtil.VALUE_RESPONSE_TYPE, "true", val));
+                    "", ConstantUtil.VALUE_RESPONSE_TYPE, true, val));
         }
     }
 

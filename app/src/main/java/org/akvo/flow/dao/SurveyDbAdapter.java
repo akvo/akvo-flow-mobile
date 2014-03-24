@@ -267,7 +267,7 @@ public class SurveyDbAdapter {
                     + ResponseColumns.QUESTION_ID + " TEXT NOT NULL,"
                     + ResponseColumns.ANSWER + " TEXT NOT NULL,"
                     + ResponseColumns.TYPE + " TEXT NOT NULL,"
-                    + ResponseColumns.INCLUDE + " INTEGER NOT NULL,"
+                    + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"
                     + ResponseColumns.SCORED_VAL + " TEXT,"
                     + ResponseColumns.STRENGTH + " TEXT)");
 
@@ -635,9 +635,11 @@ public class SurveyDbAdapter {
             resp.setType(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE)));
             resp.setValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER)));
             resp.setId(cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID)));
-            resp.setIncludeFlag(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)));
             resp.setScoredValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL)));
             resp.setStrength(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH)));
+
+            boolean include = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
+            resp.setIncludeFlag(include);
         }
 
         if (cursor != null) {
@@ -674,7 +676,7 @@ public class SurveyDbAdapter {
         initialValues.put(ResponseColumns.QUESTION_ID, responseToSave.getQuestionId());
         initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getRespondentId());
         initialValues.put(ResponseColumns.SCORED_VAL, responseToSave.getScoredValue());
-        initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag());
+        initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag() ? 1: 0);
         initialValues.put(ResponseColumns.STRENGTH, responseToSave.getStrength());
         if (responseToSave.getId() == null) {
             id = database.insert(Tables.RESPONSE, null, initialValues);
@@ -1452,7 +1454,7 @@ public class SurveyDbAdapter {
             QuestionResponse metaResponse = new QuestionResponse();
             metaResponse.setRespondentId(surveyInstanceId);
             metaResponse.setValue(response);
-            metaResponse.setIncludeFlag("true");
+            metaResponse.setIncludeFlag(true);
             
             switch (type) {
                 case NAME:

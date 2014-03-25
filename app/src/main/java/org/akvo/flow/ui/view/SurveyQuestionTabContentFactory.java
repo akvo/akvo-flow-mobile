@@ -155,8 +155,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                 questionView = new DateQuestionView(context, q,
                         getDefaultLang(), languageCodes, readOnly);
             } else {
-                // TODO: The base class should *NOT* be instantiated!
-                questionView = new QuestionView(context, q, getDefaultLang(),
+                questionView = new QuestionHeaderView(context, q, getDefaultLang(),
                         languageCodes, readOnly);
             }
             questionView.setTextSize(defaultTextSize);

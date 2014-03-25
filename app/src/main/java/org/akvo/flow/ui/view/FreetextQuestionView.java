@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
@@ -45,12 +44,11 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
     public FreetextQuestionView(Context context, Question q, String defaultLang,
             String[] langCodes, boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
+        init();
     }
 
-    @Override
-    protected void init() {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.freetext_question_view, this, true);
+    private void init() {
+        setQuestionView(R.layout.freetext_question_view);
 
         mEditText = (EditText)findViewById(R.id.input_et);
 

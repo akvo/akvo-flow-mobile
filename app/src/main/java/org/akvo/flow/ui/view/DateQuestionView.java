@@ -19,7 +19,6 @@ package org.akvo.flow.ui.view;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -63,12 +62,11 @@ public class DateQuestionView extends QuestionView {
         mMonth = mCalendar.get(Calendar.MONTH);
         mDay = mCalendar.get(Calendar.DAY_OF_MONTH);
         mDateFormat = SimpleDateFormat.getDateInstance();
+        init();
     }
 
-    @Override
-    protected void init() {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.date_question_view, this, true);
+    private void init() {
+        setQuestionView(R.layout.date_question_view);
 
         mDateTextEdit = (EditText)findViewById(R.id.date_et);
         mPickButton = (Button)findViewById(R.id.date_btn);

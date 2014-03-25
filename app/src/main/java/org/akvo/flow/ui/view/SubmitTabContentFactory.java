@@ -107,8 +107,8 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
             toggleButtons(true);
         } else {
             for (int i = 0; i < missingQuestions.size(); i++) {
-                QuestionView qv = new QuestionView(context, missingQuestions.get(i), getDefaultLang(),
-                        languageCodes, true);
+                QuestionView qv = new QuestionHeaderView(context, missingQuestions.get(i),
+                        getDefaultLang(), languageCodes, true);
                 qv.suppressHelp(true);
                 // force the view to be visible (if the question has
                 // dependencies, it'll be hidden by default)

@@ -46,7 +46,7 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public class QuestionView extends LinearLayout implements QuestionInteractionListener {
+public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
     protected static String[] sColors = null;
 
     protected Question mQuestion;
@@ -72,22 +72,21 @@ public class QuestionView extends LinearLayout implements QuestionInteractionLis
             // must have enough colors for all enabled languages
             sColors = context.getResources().getStringArray(R.array.colors);
         }
-
-        init();
-        setupQuestion();
     }
 
     /**
-     * Subclasses must override this method to provide custom layouts
-     * Every subclass should include R.layout.question_header in its View
+     * Inflate the appropriate layout file, and retrieve the references to the common resources.
+     * Subclasses' layout files should ALWAYS contain the question_header view.
+     *
+     * Inflated layout will be attached to the View's root, thus all the elements within it
+     * will be accessible by calling findViewById(int)
+     *
+     * @param layoutRes resource containing the layout for the question.
      */
-    protected void init() {
+    protected void setQuestionView(int layoutRes) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.question_header, this, true);
-        setupQuestion();
-    }
+        inflater.inflate(layoutRes, this, true);
 
-    private void setupQuestion() {
         mQuestionText = (TextView)findViewById(R.id.question_tv);
         mTipImage = (ImageButton)findViewById(R.id.tip_ib);
 

@@ -21,7 +21,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -48,12 +47,11 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             String[] langCodes, boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
         mMediaType = type;
+        init();
     }
 
-    @Override
-    protected void init() {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.media_question_view, this, true);
+    private void init() {
+        setQuestionView(R.layout.media_question_view);
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
         mCompleteIcon = (ImageView)findViewById(R.id.completed_iv);

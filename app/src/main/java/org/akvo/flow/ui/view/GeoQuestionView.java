@@ -23,7 +23,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -64,12 +63,11 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     public GeoQuestionView(Context context, Question q, String defaultLang, String[] langCodes,
             boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
+        init();
     }
 
-    @Override
-    protected void init() {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.geo_question_view, this, true);
+    private void init() {
+        setQuestionView(R.layout.geo_question_view);
 
         mLatField = (EditText)findViewById(R.id.lat_et);
         mLonField = (EditText)findViewById(R.id.lon_et);

@@ -19,7 +19,6 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -46,12 +45,11 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
     public BarcodeQuestionView(Context context, Question q, String defaultLanguage,
             String[] langCodes, boolean readOnly) {
         super(context, q, defaultLanguage, langCodes, readOnly);
+        init();
     }
 
-    @Override
-    protected void init() {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.barcode_question_view, this, true);
+    private void init() {
+        setQuestionView(R.layout.barcode_question_view);
 
         mBarcodeButton = (Button)findViewById(R.id.scan_btn);
         mBarcodeText = (EditText)findViewById(R.id.barcode_et);

@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view.adapter;
+package org.akvo.flow.ui.adapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

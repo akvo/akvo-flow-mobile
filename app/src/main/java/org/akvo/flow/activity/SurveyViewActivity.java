@@ -67,10 +67,10 @@ import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.ViewUtil;
-import org.akvo.flow.view.OptionQuestionView;
-import org.akvo.flow.view.QuestionView;
-import org.akvo.flow.view.SubmitTabContentFactory;
-import org.akvo.flow.view.SurveyQuestionTabContentFactory;
+import org.akvo.flow.ui.view.OptionQuestionView;
+import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.SubmitTabContentFactory;
+import org.akvo.flow.ui.view.SurveyQuestionTabContentFactory;
 
 /**
  * main activity for the Field Survey application. It will read in the current
@@ -165,8 +165,6 @@ public class SurveyViewActivity extends TabActivity implements
             }
         }
         OptionQuestionView.promptOnChange = promptOnChange;
-        QuestionView.screenWidth = getWindowManager().getDefaultDisplay()
-                .getWidth();
 
         Bundle extras = getIntent().getExtras();
         userId = extras != null ? extras.getLong(ConstantUtil.USER_ID_KEY)

@@ -27,7 +27,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.view.adapter.FileTransmissionArrayAdapter;
+import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
 
 /**
  * Activity to show the transmission history of all files in a survey submission

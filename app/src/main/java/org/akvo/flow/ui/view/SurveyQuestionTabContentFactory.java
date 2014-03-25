@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view;
+package org.akvo.flow.ui.view;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -99,20 +100,17 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
     public View createTabContent(String tag) {
         ScrollView scrollView = createSurveyTabContent();
 
-        TableLayout table = new TableLayout(context);
-        table.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
+        LinearLayout ll = new LinearLayout(context);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
-        scrollView.addView(table);
+        scrollView.addView(ll);
 
         ArrayList<Question> questions = questionGroup.getQuestions();
 
         for (int i = 0; i < questions.size(); i++) {
             QuestionView questionView = null;
             Question q = questions.get(i);
-            TableRow tr = new TableRow(context);
-            tr.setLayoutParams(new ViewGroup.LayoutParams(
-                    LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new OptionQuestionView(context, q,
@@ -142,32 +140,35 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                         getDefaultLang(), languageCodes, readOnly);
             } else if (ConstantUtil.STRENGTH_QUESTION_TYPE.equalsIgnoreCase(q
                     .getType())) {
+                /*
                 questionView = new StrengthQuestionView(context, q,
                         getDefaultLang(), languageCodes, readOnly);
+                        */
             } else if (ConstantUtil.HEADING_QUESTION_TYPE.equalsIgnoreCase(q
                     .getType())) {
+                /*
                 questionView = new CompassQuestionView(context, q,
                         getDefaultLang(), languageCodes, readOnly);
+                        */
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q
                     .getType())) {
                 questionView = new DateQuestionView(context, q,
                         getDefaultLang(), languageCodes, readOnly);
             } else {
+                // TODO: The base class should *NOT* be instantiated!
                 questionView = new QuestionView(context, q, getDefaultLang(),
                         languageCodes, readOnly);
             }
             questionView.setTextSize(defaultTextSize);
             questionMap.put(q.getId(), questionView);
-            questionView
-                    .addQuestionInteractionListener((SurveyViewActivity) context);
-            tr.addView(questionView);
+            questionView.addQuestionInteractionListener((SurveyViewActivity) context);
+            ll.addView(questionView);
             if (i < questions.size() - 1) {
                 View ruler = new View(context);
+                ruler.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2));
                 ruler.setBackgroundColor(0xFFFFFFFF);
-                questionView.addView(ruler, new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.FILL_PARENT, 2));
+                questionView.addView(ruler);
             }
-            table.addView(tr);
         }
         // set up listeners for dependencies. Since the dependencies can span
         // groups, the parent needs to do this
@@ -177,18 +178,17 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         TableRow buttonRow = new TableRow(context);
         LinearLayout group = new LinearLayout(context);
 
-        group.addView(configureActionButton(R.string.nextbutton,
+        Button nextButton = configureActionButton(R.string.nextbutton,
                 new OnClickListener() {
                     public void onClick(View v) {
                         context.advanceTab();
                     }
-                }));
+                });
         if (readOnly) {
             toggleButtons(false);
         }
 
-        buttonRow.addView(group);
-        table.addView(buttonRow);
+        ll.addView(buttonRow);
 
         loadState(context.getRespondentId());
         return scrollView;

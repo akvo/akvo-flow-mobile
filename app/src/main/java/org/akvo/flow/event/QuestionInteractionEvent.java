@@ -16,7 +16,7 @@
 
 package org.akvo.flow.event;
 
-import org.akvo.flow.view.QuestionView;
+import org.akvo.flow.ui.view.QuestionView;
 
 /**
  * event to be fired when the user interacts with a question in a significant

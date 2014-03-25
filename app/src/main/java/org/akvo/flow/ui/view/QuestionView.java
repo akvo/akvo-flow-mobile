@@ -45,7 +45,7 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
+public class QuestionView extends LinearLayout implements QuestionInteractionListener {
     protected static String[] sColors = null;
 
     protected Question mQuestion;

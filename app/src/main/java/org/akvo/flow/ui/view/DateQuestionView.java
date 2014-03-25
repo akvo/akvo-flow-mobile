@@ -68,7 +68,7 @@ public class DateQuestionView extends QuestionView {
 
     protected void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.barcode_question_view, this, true);
+        inflater.inflate(R.layout.date_question_view, this, true);
 
         setupQuestion();
 

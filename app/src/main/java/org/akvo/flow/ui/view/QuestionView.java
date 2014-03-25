@@ -62,6 +62,7 @@ public class QuestionView extends LinearLayout implements QuestionInteractionLis
     public QuestionView(final Context context, Question q, String defaultLangauge, String[] langs,
             boolean readOnly) {
         super(context);
+        setOrientation(VERTICAL);
         mQuestion = q;
         mDefaultLang = defaultLangauge;
         mReadOnly = readOnly;

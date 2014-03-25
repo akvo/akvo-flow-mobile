@@ -175,9 +175,6 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         context.establishDependencies(questionGroup);
 
         // create save/clear buttons
-        TableRow buttonRow = new TableRow(context);
-        LinearLayout group = new LinearLayout(context);
-
         Button nextButton = configureActionButton(R.string.nextbutton,
                 new OnClickListener() {
                     public void onClick(View v) {
@@ -188,7 +185,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
             toggleButtons(false);
         }
 
-        ll.addView(buttonRow);
+        ll.addView(nextButton);
 
         loadState(context.getRespondentId());
         return scrollView;

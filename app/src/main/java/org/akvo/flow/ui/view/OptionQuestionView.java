@@ -173,7 +173,8 @@ public class OptionQuestionView extends QuestionView {
             });
         for (Option o : mQuestion.getOptions()) {
             RadioButton rb = new RadioButton(getContext());
-            rb.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            rb.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
             rb.setLongClickable(true);
             rb.setOnLongClickListener(new OnLongClickListener() {
                 @Override
@@ -199,7 +200,8 @@ public class OptionQuestionView extends QuestionView {
         }
         if (mQuestion.isAllowOther()) {
             RadioButton rb = new RadioButton(getContext());
-            rb.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            rb.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
             rb.setText(OTHER_TEXT);
             mOptionGroup.addView(rb);
             mIdToValueMap.put(rb.getId(), OTHER_TEXT);
@@ -269,7 +271,8 @@ public class OptionQuestionView extends QuestionView {
                 for (int i = 0; i < mCheckBoxes.size(); i++) {
                     // make sure we have a corresponding option (i.e. not the OTHER option)
                     if (i < options.size()) {
-                        mCheckBoxes.get(i).setText(formOptionText(options.get(i)), BufferType.SPANNABLE);
+                        mCheckBoxes.get(i).setText(formOptionText(options.get(i)),
+                                BufferType.SPANNABLE);
                     }
                 }
             } else {
@@ -590,7 +593,7 @@ public class OptionQuestionView extends QuestionView {
 
             }
             if (mSpinner != null && resp.getValue() != null) {
-                ArrayList<Option> options = mQuestion.getOptions();
+                List<Option> options = mQuestion.getOptions();
                 if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType())) {
                     // since OTHER is the last option and the response is of
                     // OTHER type, select the last option in the spinner which

@@ -18,7 +18,9 @@ package org.akvo.flow.util;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.util.Log;
+import android.util.TypedValue;
 
 /**
  * Utilities class to provide Android related functionalities
@@ -75,6 +77,11 @@ public class PlatformUtil {
         }
 
         return false;// Same version
+    }
+
+    public static float dp2Pixel(Context context, int dp) {
+        Resources r = context.getResources();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
 }

@@ -166,7 +166,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                 View ruler = new View(context);
                 ruler.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2));
                 ruler.setBackgroundColor(0xFFFFFFFF);
-                questionView.addView(ruler);
+                ll.addView(ruler);
             }
         }
         // set up listeners for dependencies. Since the dependencies can span

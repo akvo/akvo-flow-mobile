@@ -80,7 +80,8 @@ public class OptionQuestionView extends QuestionView {
     }
 
     private void init() {
-        setQuestionView(R.layout.option_question_view);
+        // Just inflate the header. Options will be added dynamically
+        setQuestionView(R.layout.question_header);
 
         mIdToValueMap = new HashMap<Integer, String>();
         mSuppressListeners = true;

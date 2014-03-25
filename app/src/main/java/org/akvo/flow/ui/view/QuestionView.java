@@ -44,9 +44,11 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
+    private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
 
     protected Question mQuestion;
@@ -64,6 +66,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             boolean readOnly) {
         super(context);
         setOrientation(VERTICAL);
+        final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
+        setPadding(padding, padding, padding, padding);
         mQuestion = q;
         mDefaultLang = defaultLangauge;
         mReadOnly = readOnly;

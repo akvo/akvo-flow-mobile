@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -115,8 +114,8 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                 qv.setVisibility(View.VISIBLE);
                 View ruler = new View(context);
                 ruler.setBackgroundColor(0xFFFFFFFF);
-                qv.addView(ruler, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, 2));
                 mandatoryContainer.addView(qv);
+                mandatoryContainer.addView(ruler, new LayoutParams(LayoutParams.MATCH_PARENT, 2));
             }
 
             mandatoryContainer.setVisibility(View.VISIBLE);

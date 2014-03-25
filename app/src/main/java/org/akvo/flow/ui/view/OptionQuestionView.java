@@ -76,13 +76,12 @@ public class OptionQuestionView extends QuestionView {
             boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
         OTHER_TEXT = getResources().getString(R.string.othertext);
-        init();
     }
 
-    private void init() {
+    @Override
+    protected void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.option_question_view, this, true);
-        setupQuestion();
 
         mIdToValueMap = new HashMap<Integer, String>();
         mSuppressListeners = true;

@@ -48,14 +48,12 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             String[] langCodes, boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
         mMediaType = type;
-        init();
     }
 
+    @Override
     protected void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.media_question_view, this, true);
-
-        setupQuestion();
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
         mCompleteIcon = (ImageView)findViewById(R.id.completed_iv);

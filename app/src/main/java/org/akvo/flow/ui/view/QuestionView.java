@@ -28,6 +28,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -71,9 +72,22 @@ public class QuestionView extends LinearLayout implements QuestionInteractionLis
             // must have enough colors for all enabled languages
             sColors = context.getResources().getStringArray(R.array.colors);
         }
+
+        init();
+        setupQuestion();
     }
 
-    protected void setupQuestion() {
+    /**
+     * Subclasses must override this method to provide custom layouts
+     * Every subclass should include R.layout.question_header in its View
+     */
+    protected void init() {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        inflater.inflate(R.layout.question_header, this, true);
+        setupQuestion();
+    }
+
+    private void setupQuestion() {
         mQuestionText = (TextView)findViewById(R.id.question_tv);
         mTipImage = (ImageButton)findViewById(R.id.tip_ib);
 

@@ -63,14 +63,12 @@ public class DateQuestionView extends QuestionView {
         mMonth = mCalendar.get(Calendar.MONTH);
         mDay = mCalendar.get(Calendar.DAY_OF_MONTH);
         mDateFormat = SimpleDateFormat.getDateInstance();
-        init();
     }
 
+    @Override
     protected void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.date_question_view, this, true);
-
-        setupQuestion();
 
         mDateTextEdit = (EditText)findViewById(R.id.date_et);
         mPickButton = (Button)findViewById(R.id.date_btn);

@@ -64,15 +64,12 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     public GeoQuestionView(Context context, Question q, String defaultLang, String[] langCodes,
             boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
-        // TODO: parameterize (add to Question ?)
-        init();
     }
 
+    @Override
     protected void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.geo_question_view, this, true);
-
-        setupQuestion();
 
         mLatField = (EditText)findViewById(R.id.lat_et);
         mLonField = (EditText)findViewById(R.id.lon_et);

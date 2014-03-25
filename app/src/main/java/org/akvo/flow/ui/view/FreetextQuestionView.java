@@ -45,14 +45,12 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
     public FreetextQuestionView(Context context, Question q, String defaultLang,
             String[] langCodes, boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
-        init();
     }
 
-    private void init() {
+    @Override
+    protected void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.freetext_question_view, this, true);
-
-        setupQuestion();
 
         mEditText = (EditText)findViewById(R.id.input_et);
 

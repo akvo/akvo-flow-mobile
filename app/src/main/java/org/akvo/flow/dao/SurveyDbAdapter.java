@@ -1038,7 +1038,7 @@ public class SurveyDbAdapter {
                         TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
                         TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
                 },
-                TransmissionColumns._ID + " = ?",
+                TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
                 null, null, null);
 

@@ -14,17 +14,16 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view;
+package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TableRow;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -38,45 +37,37 @@ import org.akvo.flow.util.ConstantUtil;
  * 
  * @author Christopher Fagiani
  */
-public class BarcodeQuestionView extends QuestionView implements
-        OnClickListener, OnFocusChangeListener {
-    private Button barcodeButton;
-    private EditText barcodeText;
+public class BarcodeQuestionView extends QuestionView implements OnClickListener,
+        OnFocusChangeListener {
+    private Button mBarcodeButton;
+    private EditText mBarcodeText;
 
-    public BarcodeQuestionView(Context context, Question q,
-            String defaultLanguage, String[] langCodes, boolean readOnly) {
+    public BarcodeQuestionView(Context context, Question q, String defaultLanguage,
+            String[] langCodes, boolean readOnly) {
         super(context, q, defaultLanguage, langCodes, readOnly);
         init();
     }
 
-    protected void init() {
-        Context context = getContext();
-        TableRow tr = new TableRow(context);
-        barcodeButton = new Button(context);
-        barcodeText = new EditText(context);
-        barcodeText.setWidth(DEFAULT_WIDTH);
-        barcodeText.setOnFocusChangeListener(this);
-        barcodeButton.setText(R.string.scanbarcode);
+    private void init() {
+        setQuestionView(R.layout.barcode_question_view);
 
-        barcodeButton.setOnClickListener(this);
-        if (readOnly) {
-            barcodeButton.setEnabled(false);
-            barcodeText.setEnabled(false);
+        mBarcodeButton = (Button)findViewById(R.id.scan_btn);
+        mBarcodeText = (EditText)findViewById(R.id.barcode_et);
+
+        mBarcodeText.setOnFocusChangeListener(this);
+        mBarcodeButton.setOnClickListener(this);
+
+        if (mReadOnly) {
+            mBarcodeButton.setEnabled(false);
+            mBarcodeText.setEnabled(false);
         }
         // Barcode scanning crashes API 7 app, at least on Emulator
         // ECLAIR_MR1 has code 7, but as we build against 6, it does not know
         // this name yet
         if (Build.VERSION.SDK_INT <= 7) {
             // Maybe change button text as well?
-            barcodeButton.setEnabled(false);
+            mBarcodeButton.setEnabled(false);
         }
-
-        tr.addView(barcodeButton);
-        addView(tr);
-        tr = new TableRow(context);
-        tr.addView(barcodeText);
-
-        addView(tr);
     }
 
     /**
@@ -89,8 +80,7 @@ public class BarcodeQuestionView extends QuestionView implements
     @Override
     public void questionComplete(Bundle barcodeData) {
         if (barcodeData != null) {
-            barcodeText.setText(barcodeData
-                    .getString(ConstantUtil.BARCODE_CONTENT));
+            mBarcodeText.setText(barcodeData.getString(ConstantUtil.BARCODE_CONTENT));
             setResponse(new QuestionResponse(
                     barcodeData.getString(ConstantUtil.BARCODE_CONTENT),
                     ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()));
@@ -104,11 +94,8 @@ public class BarcodeQuestionView extends QuestionView implements
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        if (resp != null) {
-            if (resp.getValue() != null) {
-                barcodeText.setText(resp.getValue());
-            }
-
+        if (resp != null && resp.getValue() != null) {
+            mBarcodeText.setText(resp.getValue());
         }
     }
 
@@ -118,7 +105,7 @@ public class BarcodeQuestionView extends QuestionView implements
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        barcodeText.setText("");
+        mBarcodeText.setText("");
     }
 
     /**
@@ -138,7 +125,7 @@ public class BarcodeQuestionView extends QuestionView implements
      * possibly suppressing listeners
      */
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(barcodeText.getText().toString(),
+        setResponse(new QuestionResponse(mBarcodeText.getText().toString(),
                 ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
                 suppressListeners);
     }

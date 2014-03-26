@@ -14,12 +14,13 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view;
+package org.akvo.flow.ui.view;
 
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TabHost.TabContentFactory;
 
@@ -57,7 +58,7 @@ public abstract class SurveyTabContentFactory implements TabContentFactory {
 
     public Button configureActionButton(int text, OnClickListener handler) {
         actionButton = new Button(context);
-        actionButton.setWidth(BUTTON_WIDTH);
+        //actionButton.setWidth(BUTTON_WIDTH);
         actionButton.setText(text);
         actionButton.setOnClickListener(handler);
         return actionButton;

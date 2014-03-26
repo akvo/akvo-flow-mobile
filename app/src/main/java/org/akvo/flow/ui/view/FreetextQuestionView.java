@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -14,18 +14,16 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view;
+package org.akvo.flow.ui.view;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputFilter;
-import android.text.InputType;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -40,24 +38,22 @@ import org.akvo.flow.util.ConstantUtil;
  * 
  * @author Christopher Fagiani
  */
-public class FreetextQuestionView extends QuestionView implements
-        OnFocusChangeListener {
-    private EditText freetextEdit;
+public class FreetextQuestionView extends QuestionView implements OnFocusChangeListener {
+    private EditText mEditText;
 
-    public FreetextQuestionView(Context context, Question q,
-            String defaultLang, String[] langCodes, boolean readOnly) {
+    public FreetextQuestionView(Context context, Question q, String defaultLang,
+            String[] langCodes, boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
         init();
     }
 
-    protected void init() {
-        Context context = getContext();
-        TableRow tr = new TableRow(context);
-        freetextEdit = new EditText(context);
-        freetextEdit.setWidth(DEFAULT_WIDTH);
-        freetextEdit.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        if (readOnly) {
-            freetextEdit.setFocusable(false);
+    private void init() {
+        setQuestionView(R.layout.freetext_question_view);
+
+        mEditText = (EditText)findViewById(R.id.input_et);
+
+        if (mReadOnly) {
+            mEditText.setFocusable(false);
         }
         
         int maxLength = ValidationRule.DEFAULT_MAX_LENGTH;
@@ -72,19 +68,15 @@ public class FreetextQuestionView extends QuestionView implements
                     .getValidationType())) {
                 DigitsKeyListener MyDigitKeyListener = new DigitsKeyListener(
                         rule.getAllowSigned(), rule.getAllowDecimal());
-                freetextEdit.setKeyListener(MyDigitKeyListener);
+                mEditText.setKeyListener(MyDigitKeyListener);
             }
         }
         
         InputFilter[] FilterArray = new InputFilter[1];
         FilterArray[0] = new InputFilter.LengthFilter(maxLength);
-        freetextEdit.setFilters(FilterArray);
+        mEditText.setFilters(FilterArray);
         
-        freetextEdit.setOnFocusChangeListener(this);
-        freetextEdit.setWidth(screenWidth - 50);
-
-        tr.addView(freetextEdit);
-        addView(tr);
+        mEditText.setOnFocusChangeListener(this);
     }
 
     /**
@@ -97,8 +89,8 @@ public class FreetextQuestionView extends QuestionView implements
 
     @Override
     public void setResponse(QuestionResponse resp) {
-        if (resp != null && freetextEdit != null) {
-            freetextEdit.setText(resp.getValue());
+        if (resp != null) {
+            mEditText.setText(resp.getValue());
         }
         super.setResponse(resp);
     }
@@ -108,7 +100,7 @@ public class FreetextQuestionView extends QuestionView implements
      * possibly suppressing listeners
      */
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(freetextEdit.getText().toString(),
+        setResponse(new QuestionResponse(mEditText.getText().toString(),
                 ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
                 suppressListeners);
     }
@@ -117,14 +109,14 @@ public class FreetextQuestionView extends QuestionView implements
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
         if (resp != null) {
-            freetextEdit.setText(resp.getValue());
+            mEditText.setText(resp.getValue());
         }
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        freetextEdit.setText("");
+        mEditText.setText("");
     }
 
     /**

@@ -14,22 +14,18 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view;
+package org.akvo.flow.ui.view;
 
 import java.util.ArrayList;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.TextView.BufferType;
+import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyViewActivity;
@@ -47,9 +43,6 @@ import org.akvo.flow.util.ViewUtil;
  */
 public class SubmitTabContentFactory extends SurveyTabContentFactory {
     private Button submitButton;
-    private static final int DEFAULT_WIDTH = 200;
-    private static final int HEADING_TEXT_SIZE = 20;
-    private static final String HEADING_COLOR = "red";
 
     public SubmitTabContentFactory(SurveyViewActivity c,
             SurveyDbAdapter dbAdaptor, float textSize, String defaultLang,
@@ -68,18 +61,24 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
      * @return
      */
     public View refreshView(boolean setMissing) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LinearLayout ll = (LinearLayout)inflater.inflate(R.layout.submit_tab_view, null);
+
+        LinearLayout mandatoryContainer = (LinearLayout)ll.findViewById(R.id.mandatory_container);
+        View submitText = ll.findViewById(R.id.submit_text);
+
         // first, re-save all questions to make sure we didn't miss anything
         context.saveAllResponses();
         submitButton = configureActionButton(R.string.submitbutton,
                 new OnClickListener() {
                     public void onClick(View v) {
+                        context.saveSessionDuration();
+
                         // if we have no missing responses, submit the survey
                         databaseAdaptor.updateSurveyStatus(context.getRespondentId(),
                                 SurveyInstanceStatus.SUBMITTED);
-                        // send a broadcast message indicating new data is
-                        // available
-                        Intent i = new Intent(
-                                ConstantUtil.DATA_AVAILABLE_INTENT);
+                        // send a broadcast message indicating new data is available
+                        Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
                         context.sendBroadcast(i);
                         
                         ViewUtil.showConfirmDialog(
@@ -95,71 +94,38 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                                 });
                     }
                 });
-        TableLayout table = new TableLayout(context);
-        table.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
 
-        // get the list (across all tabs) of missing mandatory
-        // responses
+        // get the list (across all tabs) of missing mandatory responses
         ArrayList<Question> missingQuestions = context.checkMandatory();
         if (setMissing) {
             getContext().setMissingQuestions(missingQuestions);
         }
         if (missingQuestions.size() == 0) {
-            table.addView(constructHeadingRow(context
-                    .getString(R.string.submittext)));
-            // display the "all ok" text and
+            mandatoryContainer.setVisibility(View.GONE);
+            submitText.setVisibility(View.VISIBLE);
             toggleButtons(true);
-
         } else {
-            table.addView(constructHeadingRow(context
-                    .getString(R.string.mandatorywarning)));
             for (int i = 0; i < missingQuestions.size(); i++) {
-                TableRow tr = new TableRow(context);
-                tr.setLayoutParams(new ViewGroup.LayoutParams(
-                        LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-                QuestionView qv = new QuestionView(context,
-                        missingQuestions.get(i), getDefaultLang(),
-                        languageCodes, true);
+                QuestionView qv = new QuestionHeaderView(context, missingQuestions.get(i),
+                        getDefaultLang(), languageCodes, true);
                 qv.suppressHelp(true);
                 // force the view to be visible (if the question has
                 // dependencies, it'll be hidden by default)
                 qv.setVisibility(View.VISIBLE);
                 View ruler = new View(context);
                 ruler.setBackgroundColor(0xFFFFFFFF);
-                qv.addView(ruler, new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.FILL_PARENT, 2));
-                tr.addView(qv);
-                table.addView(tr);
+                mandatoryContainer.addView(qv);
+                mandatoryContainer.addView(ruler, new LayoutParams(LayoutParams.MATCH_PARENT, 2));
             }
+
+            mandatoryContainer.setVisibility(View.VISIBLE);
+            submitText.setVisibility(View.GONE);
             toggleButtons(false);
         }
-        TableRow row = new TableRow(context);
-        row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
 
-        row.addView(submitButton);
-        table.addView(row);
-        return replaceViewContent(table);
-    }
+        ll.addView(submitButton);
 
-    /**
-     * constructs a row in the table consisting of a single text view
-     * initialized with the text passed in
-     * 
-     * @param text
-     * @return
-     */
-    private TableRow constructHeadingRow(String text) {
-        TableRow tr = new TableRow(context);
-        TextView heading = new TextView(context);
-        heading.setWidth(DEFAULT_WIDTH);
-        heading.setTextSize(HEADING_TEXT_SIZE);
-        heading.setText(
-                Html.fromHtml("<font color='" + HEADING_COLOR + "'>" + text
-                        + "</font>"), BufferType.SPANNABLE);
-        tr.addView(heading);
-        return tr;
+        return replaceViewContent(ll);
     }
 
 }

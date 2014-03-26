@@ -14,20 +14,22 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.fragment;
+package org.akvo.flow.ui.fragment;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -54,8 +56,8 @@ import org.akvo.flow.util.ConstantUtil;
 import java.util.Date;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
-    //private static final String TAG = ResponseListFragment.class.getSimpleName();
-    
+    private static final String TAG = ResponseListFragment.class.getSimpleName();
+
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
     private static final String EXTRA_RECORD       = "record";
 
@@ -63,30 +65,20 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
     private static int USER_ID_KEY            = R.integer.useridkey;
     private static int FINISHED_KEY           = R.integer.finishedkey;
-    
+
     // Loader id
     private static final int ID_SURVEY_INSTANCE_LIST = 0;
-    
+
     // Context menu items
     private static final int DELETE_ONE = 0;// TODO: Should we allow this? - Record might be synced
     private static final int VIEW_HISTORY = 1;
 
-    private static final int UPDATE_INTERVAL_MS = 10000; // every ten seconds
-    
     private SurveyGroup mSurveyGroup;
     private SurveyedLocale mRecord;
     private ResponseListCursorAdapter mAdapter;
-    
+
     private SurveyDbAdapter mDatabase;
-    
-    private Handler mHandler = new Handler();
-    private Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {
-            refresh();
-            mHandler.postDelayed(this, UPDATE_INTERVAL_MS);
-        }
-    };
-    
+
     public static ResponseListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
         ResponseListFragment fragment = new ResponseListFragment();
         Bundle args = new Bundle();
@@ -95,41 +87,47 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         fragment.setArguments(args);
         return fragment;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
         mRecord = (SurveyedLocale) getArguments().getSerializable(EXTRA_RECORD);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
-        mHandler.post(mUpdateTimeTask);
+        refresh();
+        getActivity().registerReceiver(dataSyncReceiver,
+                new IntentFilter(getString(R.string.action_data_sync)));
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
-        mHandler.removeCallbacks(mUpdateTimeTask);
+        getActivity().unregisterReceiver(dataSyncReceiver);
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         mDatabase.close();
+        mDatabase = null;
     }
-    
+
     private void refresh() {
         getLoaderManager().restartLoader(ID_SURVEY_INSTANCE_LIST, null, ResponseListFragment.this);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mDatabase = new SurveyDbAdapter(getActivity());
-        mDatabase.open();
+
+        if (mDatabase == null) {
+            mDatabase = new SurveyDbAdapter(getActivity());
+            mDatabase.open();
+        }
 
         if(mAdapter == null) {
             mAdapter = new ResponseListCursorAdapter(getActivity());// Cursor Adapter
@@ -137,8 +135,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         }
         registerForContextMenu(getListView());// Same implementation as before
         setHasOptionsMenu(true);
-        
-        refresh();
     }
 
     @Override
@@ -169,7 +165,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         }
         return true;
     }
-    
+
     private void deleteSurveyInstance(final long surveyInstanceId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.deleteonewarning)
@@ -193,7 +189,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                         });
         builder.show();
     }
-    
+
     private void viewSurveyInstanceHistory(long surveyInstanceId) {
         Intent i = new Intent(getActivity(), TransmissionHistoryActivity.class);
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
@@ -212,19 +208,18 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         i.putExtra(ConstantUtil.USER_ID_KEY, (Long) view.getTag(USER_ID_KEY));
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, ((Long) view.getTag(SURVEY_ID_KEY)).toString());
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, (Long) view.getTag(SURVEY_INSTANCE_ID_KEY));
-        
+
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
         if (mSurveyGroup.isMonitored()) {
             i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
         }
-        
+
         // Read-only vs editable
         if ((Boolean)view.getTag(FINISHED_KEY)) {
             i.putExtra(ConstantUtil.READONLY_KEY, true);
         } else {
             i.putExtra(ConstantUtil.SINGLE_SURVEY_KEY, true);
         }
-        
 
         startActivity(i);
     }
@@ -233,8 +228,8 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_SURVEY_INSTANCE_LIST:
-                return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroup.getId(), 
-                        mSurveyGroup.isMonitored(), 
+                return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroup.getId(),
+                        mSurveyGroup.isMonitored(),
                         mRecord != null ? mRecord.getId() : null);
         }
         return null;
@@ -252,6 +247,18 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
+
+    /**
+     * BroadcastReceiver to notify of data synchronisation. This should be
+     * fired from DataSyncService.
+     */
+    private BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "Survey Instance status has changed. Refreshing UI...");
+            refresh();
+        }
+    };
 
     class ResponseListCursorAdapter extends CursorAdapter {
         final int SURVEY_ID_KEY = R.integer.surveyidkey;

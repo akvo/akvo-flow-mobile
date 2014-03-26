@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Field Survey</string>
+    <string name="app_name">Akvo FLOW</string>
     <string name="accuracy">Acc</string>
     <string name="searching">Searching...</string>
     <string name="ready">Ready</string>
@@ -154,8 +154,6 @@
     <string name="pleasewaitforbootstrap">Please wait until the bootstrap file has finished processing.</string>
     <string name="surveychecklabel">Automatically Check for Survey Updates</string>
     <string name="uploaderrorlabel">Automatically Upload App Errors</string>
-    <string name="updateavail">Update Available</string>
-    <string name="clicktoinstall">Click to install</string>
     <string name="clear_data_success">Data successfully deleted from the device</string>
     <string name="clear_data_error">Error deleting data from the device</string>
     
@@ -192,8 +190,18 @@
     <string name="search_name">@string/app_name</string>
     <string name="search_hint">Search Record</string>
 
+    <!-- APK update -->
+    <string name="updateavail">A new FLOW update is available</string>
+    <string name="updatedownloaded">FLOW update has been downloaded</string>
+    <string name="downloadingupdate">Downloading FLOW update</string>
+    <string name="completed">Completed: </string>
+    <string name="clicktoinstall">New version is downloaded. Click here to install it</string>
+    <string name="clicktodownload">Click here to download it</string>
+    <string name="apk_upgrade_error">Error downloading FLOW update.</string>
+
     <!-- Action to identify the BroadcastReceiver, notifying new surveys/locales have been downloaded -->
     <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
     <string name="action_locales_sync">fieldsurvey.ACTION_LOCALES_SYNC</string>
+    <string name="action_data_sync">fieldsurvey.ACTION_DATA_SYNC</string>
 
 </resources>

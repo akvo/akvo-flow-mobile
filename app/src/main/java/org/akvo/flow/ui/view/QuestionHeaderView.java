@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -14,16 +14,23 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.fragment;
+package org.akvo.flow.ui.view;
 
-/**
- * Interface to be implemented by the Activity holding Surveyed Locale
- * results. This will allow the delegation of click listeners to the
- * hosting Activity.
- *
- */
-public interface SurveyedLocalesFragmentListener {
-    
-    public void onSurveyedLocaleSelected(String surveyedLocaleId);
+import android.content.Context;
+
+import org.akvo.flow.R;
+import org.akvo.flow.domain.Question;
+
+public class QuestionHeaderView extends QuestionView {
+
+    public QuestionHeaderView(Context context, Question q, String defaultLang,
+                              String[] langCodes, boolean readOnly) {
+        super(context, q, defaultLang, langCodes, readOnly);
+        init();
+    }
+
+    private void init() {
+        setQuestionView(R.layout.question_header);
+    }
 
 }

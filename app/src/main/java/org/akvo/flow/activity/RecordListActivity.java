@@ -38,9 +38,9 @@ import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.fragment.MapFragment;
-import org.akvo.flow.fragment.SurveyedLocaleListFragment;
-import org.akvo.flow.fragment.SurveyedLocalesFragmentListener;
+import org.akvo.flow.ui.fragment.MapFragment;
+import org.akvo.flow.ui.fragment.SurveyedLocaleListFragment;
+import org.akvo.flow.ui.fragment.SurveyedLocalesFragmentListener;
 import org.akvo.flow.service.SurveyedLocaleSyncService;
 
 public class RecordListActivity extends ActionBarActivity implements 

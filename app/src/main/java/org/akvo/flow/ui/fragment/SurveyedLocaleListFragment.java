@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.fragment;
+package org.akvo.flow.ui.fragment;
 
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -53,7 +53,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.fragment.OrderByDialogFragment.OrderByDialogListener;
+import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleListFragment extends ListFragment implements LocationListener, 

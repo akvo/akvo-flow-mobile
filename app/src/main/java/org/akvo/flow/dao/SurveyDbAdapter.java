@@ -18,6 +18,7 @@ package org.akvo.flow.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -107,6 +108,7 @@ public class SurveyDbAdapter {
         String EXPORTED_DATE = "exported_date";
         String SYNC_DATE = "sync_date";
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
+        String DURATION = "duration";
     }
 
     public interface TransmissionColumns {
@@ -256,6 +258,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.STATUS + " INTEGER,"
                     + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
+                    + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -264,7 +267,7 @@ public class SurveyDbAdapter {
                     + ResponseColumns.QUESTION_ID + " TEXT NOT NULL,"
                     + ResponseColumns.ANSWER + " TEXT NOT NULL,"
                     + ResponseColumns.TYPE + " TEXT NOT NULL,"
-                    + ResponseColumns.INCLUDE + " INTEGER NOT NULL,"
+                    + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"
                     + ResponseColumns.SCORED_VAL + " TEXT,"
                     + ResponseColumns.STRENGTH + " TEXT)");
 
@@ -457,9 +460,9 @@ public class SurveyDbAdapter {
                 new String[] {
                         SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
-                        SurveyInstanceColumns.RECORD_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.QUESTION_ID, ResponseColumns.STRENGTH,
-                        ResponseColumns.SCORED_VAL, UserColumns.NAME, UserColumns.EMAIL
+                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.DURATION,
+                        ResponseColumns.ANSWER, ResponseColumns.TYPE, ResponseColumns.QUESTION_ID,
+                        ResponseColumns.STRENGTH, ResponseColumns.SCORED_VAL, UserColumns.NAME, UserColumns.EMAIL
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.INCLUDE + " = 1",
                 new String[] {
@@ -507,6 +510,23 @@ public class SurveyDbAdapter {
         if (rows < 1) {
             Log.e(TAG, "Could not update status for Survey Instance: " + surveyInstanceId);
         }
+    }
+
+    /**
+     * Increment the duration of a particular respondent.
+     * The provided value will be added on top of the already stored one (default to 0).
+     * This will allow users to pause and resume a survey without considering that
+     * time as part of the survey duration.
+     *
+     * @param sessionDuration time spent in the current session
+     */
+    public void addSurveyDuration(long respondentId, long sessionDuration) {
+        final String sql = "UPDATE " + Tables.SURVEY_INSTANCE
+                + " SET " + SurveyInstanceColumns.DURATION + " = "
+                        + SurveyInstanceColumns.DURATION + " + " + sessionDuration
+                + " WHERE " + SurveyInstanceColumns._ID + " = " + respondentId
+                + " AND " + SurveyInstanceColumns.SUBMITTED_DATE + " IS NULL";
+        database.execSQL(sql);
     }
 
     /**
@@ -615,9 +635,11 @@ public class SurveyDbAdapter {
             resp.setType(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE)));
             resp.setValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER)));
             resp.setId(cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID)));
-            resp.setIncludeFlag(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)));
             resp.setScoredValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL)));
             resp.setStrength(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH)));
+
+            boolean include = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
+            resp.setIncludeFlag(include);
         }
 
         if (cursor != null) {
@@ -654,7 +676,7 @@ public class SurveyDbAdapter {
         initialValues.put(ResponseColumns.QUESTION_ID, responseToSave.getQuestionId());
         initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getRespondentId());
         initialValues.put(ResponseColumns.SCORED_VAL, responseToSave.getScoredValue());
-        initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag());
+        initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag() ? 1: 0);
         initialValues.put(ResponseColumns.STRENGTH, responseToSave.getStrength());
         if (responseToSave.getId() == null) {
             id = database.insert(Tables.RESPONSE, null, initialValues);
@@ -988,6 +1010,18 @@ public class SurveyDbAdapter {
                             .getColumnIndexOrThrow(TransmissionColumns.FILENAME)));
                     trans.setStatus(cursor.getInt(cursor
                             .getColumnIndexOrThrow(TransmissionColumns.STATUS)));
+
+                    // Start and End date. Handle null cases
+                    Long startDate = cursor.getLong(
+                            cursor.getColumnIndexOrThrow(TransmissionColumns.START_DATE));
+                    Long endDate = cursor.getLong(
+                            cursor.getColumnIndexOrThrow(TransmissionColumns.END_DATE));
+                    if (startDate != null && startDate > 0) {
+                        trans.setStartDate(new Date(startDate));
+                    }
+                    if (endDate != null && endDate > 0) {
+                        trans.setEndDate(new Date(endDate));
+                    }
                     transmissions.add(trans);
                 } while (cursor.moveToNext());
             }
@@ -1001,9 +1035,10 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME
+                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
+                        TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
                 },
-                TransmissionColumns._ID + " = ?",
+                TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
                 null, null, null);
 
@@ -1017,7 +1052,8 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME
+                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
+                        TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
                 },
                 TransmissionColumns.STATUS + " IN (?, ?)",
                 new String[] {
@@ -1418,7 +1454,7 @@ public class SurveyDbAdapter {
             QuestionResponse metaResponse = new QuestionResponse();
             metaResponse.setRespondentId(surveyInstanceId);
             metaResponse.setValue(response);
-            metaResponse.setIncludeFlag("true");
+            metaResponse.setIncludeFlag(true);
             
             switch (type) {
                 case NAME:

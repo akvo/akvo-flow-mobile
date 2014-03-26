@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -14,9 +14,10 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view;
+package org.akvo.flow.ui.view;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import android.app.AlertDialog;
@@ -27,10 +28,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TableLayout;
-import android.widget.TableRow;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
@@ -43,96 +44,80 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
-/**
- * basic question view. This just displays the question text. It also provides a
- * mechanism to register/notify QuestionInteractionListeners when a
- * QuestionInteractionEvent occurs. It is unlikely anyone will ever use this
- * class directly (a subclass should be used).
- * 
- * @author Christopher Fagiani
- */
-public class QuestionView extends TableLayout implements
-        QuestionInteractionListener {
-    protected static final int DEFAULT_WIDTH = 290;
-    private TextView questionText;
+public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
+    private static final int PADDING_DIP = 8;
+    protected static String[] sColors = null;
 
-    protected Question question;
-    private QuestionResponse response;
-    private ArrayList<QuestionInteractionListener> listeners;
-    private ImageButton tipImage;
-    protected String[] langs = null;
-    protected static String[] colors = null;
-    protected boolean readOnly;
-    public static int screenWidth;
-    protected String defaultLang;
+    protected Question mQuestion;
+    private QuestionResponse mResponse;
+
+    private List<QuestionInteractionListener> mListeners;
+    protected String[] mLangs = null;
+    protected String mDefaultLang;
+    protected boolean mReadOnly;
+
+    private TextView mQuestionText;
+    private ImageButton mTipImage;
+
+    public QuestionView(final Context context, Question q, String defaultLangauge, String[] langs,
+            boolean readOnly) {
+        super(context);
+        setOrientation(VERTICAL);
+        final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
+        setPadding(padding, padding, padding, padding);
+        mQuestion = q;
+        mDefaultLang = defaultLangauge;
+        mReadOnly = readOnly;
+        mLangs = langs;
+        if (sColors == null) {
+            // must have enough colors for all enabled languages
+            sColors = context.getResources().getStringArray(R.array.colors);
+        }
+    }
 
     /**
-     * install a single tableRow containing a textView with the question text
-     * 
-     * @param context
-     * @param q
+     * Inflate the appropriate layout file, and retrieve the references to the common resources.
+     * Subclasses' layout files should ALWAYS contain the question_header view.
+     *
+     * Inflated layout will be attached to the View's root, thus all the elements within it
+     * will be accessible by calling findViewById(int)
+     *
+     * @param layoutRes resource containing the layout for the question.
      */
-    public QuestionView(final Context context, Question q,
-            String defaultLangauge, String[] langs, boolean readOnly) {
-        super(context);
-        question = q;
-        this.defaultLang = defaultLangauge;
-        this.langs = langs;
-        if (colors == null) {
-            // must have enough colors for all enabled languages
-            colors = context.getResources().getStringArray(R.array.colors);
+    protected void setQuestionView(int layoutRes) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        inflater.inflate(layoutRes, this, true);
+
+        mQuestionText = (TextView)findViewById(R.id.question_tv);
+        mTipImage = (ImageButton)findViewById(R.id.tip_ib);
+
+        if (mQuestionText == null || mTipImage == null) {
+            throw new RuntimeException(
+                    "Subclasses must inflate the common question header before calling this method.");
         }
-        TableRow tr = new TableRow(context);
-        questionText = new TextView(context);
 
-        questionText.setWidth(getMaxTextWidth());
+        mQuestionText.setText(formText(), BufferType.SPANNABLE);
 
-        this.readOnly = readOnly;
-        if (!readOnly) {
-            questionText.setLongClickable(true);
-            questionText.setOnLongClickListener(new OnLongClickListener() {
-
-                @Override
-                public boolean onLongClick(View v) {
-                    ViewUtil.showConfirmDialog(R.string.clearquestion,
-                            R.string.clearquestiondesc, context, true,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                        int which) {
-                                    resetQuestion(true);
-                                }
-                            });
-                    return true;
-                }
-            });
-        }
-        questionText.setText(formText(), BufferType.SPANNABLE);
-        tr.addView(questionText);
-
-        // if there is a tip for this question, construct an alert dialog box
-        // with the data
-        final int tips = question.getHelpTypeCount();
+        // if there is a tip for this question, construct an alert dialog box with the data
+        final int tips = mQuestion.getHelpTypeCount();
         if (tips > 0) {
-            tipImage = new ImageButton(context);
-            tipImage.setImageResource(android.R.drawable.ic_dialog_info);
-            tr.addView(tipImage);
-            tipImage.setOnClickListener(new OnClickListener() {
+            mTipImage.setVisibility(View.VISIBLE);// GONE by default
+            mTipImage.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (tips > 1) {
                         displayHelpChoices();
                     } else {
-                        if (question.getHelpByType(ConstantUtil.TIP_HELP_TYPE)
+                        if (mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE)
                                 .size() > 0) {
                             displayHelp(ConstantUtil.TIP_HELP_TYPE);
-                        } else if (question.getHelpByType(
+                        } else if (mQuestion.getHelpByType(
                                 ConstantUtil.VIDEO_HELP_TYPE).size() > 0) {
                             displayHelp(ConstantUtil.VIDEO_HELP_TYPE);
-                        } else if (question.getHelpByType(
+                        } else if (mQuestion.getHelpByType(
                                 ConstantUtil.IMAGE_HELP_TYPE).size() > 0) {
                             displayHelp(ConstantUtil.IMAGE_HELP_TYPE);
                         }
@@ -140,48 +125,66 @@ public class QuestionView extends TableLayout implements
                 }
             });
         }
-        addView(tr);
-        // if this question has 1 or more dependencies, then it needs to be
-        // invisible initially
-        if (question.getDependencies() != null
-                && question.getDependencies().size() > 0) {
+
+        if (!mReadOnly) {
+            mQuestionText.setLongClickable(true);
+            mQuestionText.setOnLongClickListener(new OnLongClickListener() {
+
+                @Override
+                public boolean onLongClick(View v) {
+                    ViewUtil.showConfirmDialog(R.string.clearquestion,
+                            R.string.clearquestiondesc, getContext(), true,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    resetQuestion(true);
+                                }
+                            });
+                    return true;
+                }
+            });
+        }
+
+        // if this question has 1 or more dependencies, then it needs to be invisible initially
+        if (mQuestion.getDependencies() != null && mQuestion.getDependencies().size() > 0) {
             setVisibility(View.GONE);
         }
     }
 
     /**
      * forms the question text based on the selected languages
-     * 
+     *
      * @return
      */
     private Spanned formText() {
         boolean isFirst = true;
         StringBuilder text = new StringBuilder();
-        if (question.isMandatory()) {
+        if (mQuestion.isMandatory()) {
             text.append("<i><b>");
         }
-        for (int i = 0; i < langs.length; i++) {
-            if (defaultLang.equalsIgnoreCase(langs[i])) {
+        for (int i = 0; i < mLangs.length; i++) {
+            if (mDefaultLang.equalsIgnoreCase(mLangs[i])) {
                 if (!isFirst) {
                     text.append(" / ");
                 } else {
                     isFirst = false;
                 }
-                text.append(question.getText());
+                text.append(mQuestion.getText());
             } else {
-                AltText txt = question.getAltText(langs[i]);
+                AltText txt = mQuestion.getAltText(mLangs[i]);
                 if (txt != null) {
                     if (!isFirst) {
                         text.append(" / ");
                     } else {
                         isFirst = false;
                     }
-                    text.append("<font color='").append(colors[i]).append("'>")
+                    text.append("<font color='").append(sColors[i]).append("'>")
                             .append(txt.getText()).append("</font>");
                 }
             }
         }
-        if (question.isMandatory()) {
+        if (mQuestion.isMandatory()) {
             text = text.append("*</b></i>");
         }
         return Html.fromHtml(text.toString());
@@ -189,12 +192,12 @@ public class QuestionView extends TableLayout implements
 
     /**
      * updates the question's visible languages
-     * 
+     *
      * @param languageCodes
      */
     public void updateSelectedLanguages(String[] languageCodes) {
-        langs = languageCodes;
-        questionText.setText(formText());
+        mLangs = languageCodes;
+        mQuestionText.setText(formText());
     }
 
     /**
@@ -205,21 +208,21 @@ public class QuestionView extends TableLayout implements
     private void displayHelpChoices() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.helpheading);
-        final CharSequence[] items = new CharSequence[question
+        final CharSequence[] items = new CharSequence[mQuestion
                 .getHelpTypeCount()];
         final Resources resources = getResources();
         int itemIndex = 0;
-        ArrayList tempList = question
+        ArrayList tempList = mQuestion
                 .getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
 
         if (tempList != null && tempList.size() > 0) {
             items[itemIndex++] = resources.getString(R.string.photohelpoption);
         }
-        tempList = question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE);
+        tempList = mQuestion.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE);
         if (tempList != null && tempList.size() > 0) {
             items[itemIndex++] = resources.getString(R.string.videohelpoption);
         }
-        tempList = question.getHelpByType(ConstantUtil.TIP_HELP_TYPE);
+        tempList = mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE);
         if (tempList != null && tempList.size() > 0) {
             items[itemIndex++] = resources.getString(R.string.texthelpoption);
         }
@@ -246,7 +249,7 @@ public class QuestionView extends TableLayout implements
 
     /**
      * displays the selected help type
-     * 
+     *
      * @param type
      */
     private void displayHelp(String type) {
@@ -256,7 +259,7 @@ public class QuestionView extends TableLayout implements
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             TextView tipText = new TextView(getContext());
             StringBuilder textBuilder = new StringBuilder();
-            ArrayList<QuestionHelp> helpItems = question.getHelpByType(type);
+            ArrayList<QuestionHelp> helpItems = mQuestion.getHelpByType(type);
             boolean isFirst = true;
             if (helpItems != null) {
                 for (int i = 0; i < helpItems.size(); i++) {
@@ -264,13 +267,13 @@ public class QuestionView extends TableLayout implements
                         textBuilder.append("<br>");
                     }
 
-                    for (int j = 0; j < langs.length; j++) {
-                        if (defaultLang.equalsIgnoreCase(langs[j])) {
+                    for (int j = 0; j < mLangs.length; j++) {
+                        if (mDefaultLang.equalsIgnoreCase(mLangs[j])) {
                             textBuilder.append(helpItems.get(i).getText());
                             isFirst = false;
                         }
 
-                        AltText aText = helpItems.get(i).getAltText(langs[j]);
+                        AltText aText = helpItems.get(i).getAltText(mLangs[j]);
                         if (aText != null) {
                             if (!isFirst) {
                                 textBuilder.append(" / ");
@@ -278,7 +281,7 @@ public class QuestionView extends TableLayout implements
                                 isFirst = false;
                             }
 
-                            textBuilder.append("<font color='").append(colors[j]).append("'>")
+                            textBuilder.append("<font color='").append(sColors[j]).append("'>")
                                     .append(aText.getText()).append("</font>");
                         }
                     }
@@ -303,32 +306,30 @@ public class QuestionView extends TableLayout implements
     /**
      * adds a listener to the internal list of clients to be notified on an
      * event
-     * 
+     *
      * @param listener
      */
     public void addQuestionInteractionListener(
             QuestionInteractionListener listener) {
-        if (listeners == null) {
-            listeners = new ArrayList<QuestionInteractionListener>();
+        if (mListeners == null) {
+            mListeners = new ArrayList<QuestionInteractionListener>();
         }
-        if (listener != null && !listeners.contains(listener)
-                && listener != this) {
-            listeners.add(listener);
+        if (listener != null && !mListeners.contains(listener) && listener != this) {
+            mListeners.add(listener);
         }
     }
 
     /**
      * notifies each QuestionInteractionListener registered with this question.
      * This is done serially on the calling thread.
-     * 
+     *
      * @param type
      */
     protected void notifyQuestionListeners(String type) {
-        if (listeners != null) {
-            QuestionInteractionEvent event = new QuestionInteractionEvent(type,
-                    this);
-            for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onQuestionInteraction(event);
+        if (mListeners != null) {
+            QuestionInteractionEvent event = new QuestionInteractionEvent(type, this);
+            for (int i = 0; i < mListeners.size(); i++) {
+                mListeners.get(i).onQuestionInteraction(event);
             }
         }
     }
@@ -352,18 +353,17 @@ public class QuestionView extends TableLayout implements
         }
     }
 
+    @Override
     public void onQuestionInteraction(QuestionInteractionEvent event) {
-        if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event
-                .getEventType())) {
+        if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
             // if this question is dependent, see if it has been satisfied
-            ArrayList<Dependency> dependencies = question.getDependencies();
+            List<Dependency> dependencies = mQuestion.getDependencies();
             if (dependencies != null) {
                 for (int i = 0; i < dependencies.size(); i++) {
                     Dependency d = dependencies.get(i);
                     if (d.getQuestion().equalsIgnoreCase(
                             event.getSource().getQuestion().getId())) {
-                        if (handleDependencyParentResponse(d, event.getSource()
-                                .getResponse(true))) {
+                        if (handleDependencyParentResponse(d, event.getSource().getResponse(true))) {
                             break;
                         }
                     }
@@ -376,24 +376,21 @@ public class QuestionView extends TableLayout implements
      * updates the state of this question view based on the value in the
      * dependency parent response. This method returns true if there is a value
      * match and false otherwise.
-     * 
+     *
      * @param dep
      * @param resp
      * @return
      */
-    public boolean handleDependencyParentResponse(Dependency dep,
-            QuestionResponse resp) {
+    public boolean handleDependencyParentResponse(Dependency dep, QuestionResponse resp) {
         boolean isMatch = false;
         if (dep.getAnswer() != null
                 && resp != null
                 && dep.isMatch(resp.getValue())
-                && (resp.getIncludeFlag() == null || "true"
-                        .equalsIgnoreCase(resp.getIncludeFlag()))) {
+                && resp.getIncludeFlag()) {
             isMatch = true;
         } else if (dep.getAnswer() != null
                 && resp != null
-                && (resp.getIncludeFlag() == null || "true"
-                        .equalsIgnoreCase(resp.getIncludeFlag()))) {
+                && resp.getIncludeFlag()) {
             if (resp.getValue() != null) {
                 StringTokenizer strTok = new StringTokenizer(resp.getValue(),
                         "|");
@@ -411,13 +408,13 @@ public class QuestionView extends TableLayout implements
         // one we are looking for
         if (isMatch) {
             setVisibility(View.VISIBLE);
-            if (response != null) {
-                response.setIncludeFlag("true");
+            if (mResponse != null) {
+                mResponse.setIncludeFlag(true);
             }
             setVisible = true;
         } else {
-            if (response != null) {
-                response.setIncludeFlag("false");
+            if (mResponse != null) {
+                mResponse.setIncludeFlag(false);
             }
             setVisibility(View.GONE);
         }
@@ -449,7 +446,7 @@ public class QuestionView extends TableLayout implements
     /**
      * this method should be overridden by subclasses so they can manage the UI
      * changes when resetting the value
-     * 
+     *
      * @param resp
      */
     public void rehydrate(QuestionResponse resp) {
@@ -468,13 +465,13 @@ public class QuestionView extends TableLayout implements
     }
 
     public QuestionResponse getResponse(boolean suppressListeners) {
-        if (response == null
-                || (ConstantUtil.VALUE_RESPONSE_TYPE.equals(response.getType()) && (response
-                        .getValue() == null || response.getValue().trim()
-                        .length() == 0))) {
+        if (mResponse == null
+                || (ConstantUtil.VALUE_RESPONSE_TYPE.equals(mResponse.getType()) && (mResponse
+                .getValue() == null || mResponse.getValue().trim()
+                .length() == 0))) {
             captureResponse(suppressListeners);
         }
-        return response;
+        return mResponse;
     }
 
     public QuestionResponse getResponse() {
@@ -487,20 +484,20 @@ public class QuestionView extends TableLayout implements
 
     public void setResponse(QuestionResponse response, boolean suppressListeners) {
         if (response != null) {
-            if (question != null) {
-                response.setScoredValue(question.getResponseScore(response
+            if (mQuestion != null) {
+                response.setScoredValue(mQuestion.getResponseScore(response
                         .getValue()));
             }
-            if (this.response == null) {
-                this.response = response;
+            if (this.mResponse == null) {
+                this.mResponse = response;
             } else {
                 // we need to preserve the ID so we don't get duplicates in the
                 // db
-                this.response.setType(response.getType());
-                this.response.setValue(response.getValue());
+                this.mResponse.setType(response.getType());
+                this.mResponse.setValue(response.getValue());
             }
         } else {
-            this.response = response;
+            this.mResponse = response;
         }
         if (!suppressListeners) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
@@ -508,63 +505,42 @@ public class QuestionView extends TableLayout implements
     }
 
     public Question getQuestion() {
-        return question;
+        return mQuestion;
     }
 
     public void setTextSize(float size) {
-        questionText.setTextSize(size);
+        mQuestionText.setTextSize(size);
     }
 
     /**
      * hides or shows the tips button
-     * 
+     *
      * @param isSuppress
      */
     public void suppressHelp(boolean isSuppress) {
-        if (isSuppress) {
-            if (tipImage != null) {
-                tipImage.setVisibility(View.GONE);
-            }
-        } else {
-            if (tipImage != null) {
-                tipImage.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    /**
-     * gets the maximum width to use for the first component in the table row
-     * (used to ensure the help image icon is on the screen)
-     * 
-     * @return
-     */
-    protected int getMaxTextWidth() {
-        if (getQuestion().getHelpTypeCount() > 0) {
-            return (screenWidth - 90);
-        } else {
-            return screenWidth;
-        }
+        mTipImage.setVisibility(isSuppress ? View.GONE : View.VISIBLE);
     }
 
     public String getDefaultLang() {
-        return defaultLang;
+        return mDefaultLang;
     }
 
     public void setDefaultLang(String defaultLang) {
-        this.defaultLang = defaultLang;
+        mDefaultLang = defaultLang;
     }
 
     /**
      * turns highlighting on/off
-     * 
+     *
      * @param useHighlight
      */
     public void highlight(boolean useHighlight) {
         if (useHighlight) {
-            questionText.setBackgroundColor(0x55CC99CC);
+            mQuestionText.setBackgroundColor(0x55CC99CC);
         } else {
-            questionText.setBackgroundColor(Color.TRANSPARENT);
+            mQuestionText.setBackgroundColor(Color.TRANSPARENT);
         }
     }
-    
+
 }
+

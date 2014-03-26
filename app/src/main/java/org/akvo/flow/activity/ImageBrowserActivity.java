@@ -33,7 +33,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.PropertyUtil;
-import org.akvo.flow.view.adapter.HelpImageBrowserAdapter;
+import org.akvo.flow.ui.adapter.HelpImageBrowserAdapter;
 
 /**
  * Activity to show image help files with their captions. Clicking an item in

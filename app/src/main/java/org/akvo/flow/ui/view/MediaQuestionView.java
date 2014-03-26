@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view;
+package org.akvo.flow.ui.view;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -25,8 +25,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TableRow;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -41,53 +39,42 @@ import org.akvo.flow.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class MediaQuestionView extends QuestionView implements OnClickListener {
-    private Button mediaButton;
-    private ImageView completeIcon;
-    private String mediaType;
+    private Button mMediaButton;
+    private ImageView mCompleteIcon;
+    private String mMediaType;
 
-    public MediaQuestionView(Context context, Question q, String type,
-            String defaultLang, String[] langCodes, boolean readOnly) {
+    public MediaQuestionView(Context context, Question q, String type, String defaultLang,
+            String[] langCodes, boolean readOnly) {
         super(context, q, defaultLang, langCodes, readOnly);
-        init(type);
+        mMediaType = type;
+        init();
     }
 
-    protected void init(String type) {
-        Context context = getContext();
-        mediaType = type;
-        TableRow tr = new TableRow(context);
-        mediaButton = new Button(context);
+    private void init() {
+        setQuestionView(R.layout.media_question_view);
 
-        if (ConstantUtil.PHOTO_QUESTION_TYPE.equals(type)) {
-            mediaButton.setText(R.string.takephoto);
+        mMediaButton = (Button)findViewById(R.id.media_btn);
+        mCompleteIcon = (ImageView)findViewById(R.id.completed_iv);
+
+        if (ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType)) {
+            mMediaButton.setText(R.string.takephoto);
         } else {
-            mediaButton.setText(R.string.takevideo);
+            mMediaButton.setText(R.string.takevideo);
         }
-        mediaButton.setOnClickListener(this);
-        if (readOnly) {
-            mediaButton.setEnabled(false);
+        mMediaButton.setOnClickListener(this);
+        if (mReadOnly) {
+            mMediaButton.setEnabled(false);
         }
 
-        completeIcon = new ImageView(context);
-        completeIcon.setImageResource(R.drawable.checkmark);
-        completeIcon.setClickable(true);
-        completeIcon.setOnClickListener(this);
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-        mediaButton.setWidth(DEFAULT_WIDTH);
-        completeIcon.setMinimumWidth(50);
-        layout.addView(mediaButton);
-        layout.addView(completeIcon);
-        tr.addView(layout);
-        addView(tr);
-        completeIcon.setVisibility(View.INVISIBLE);
+        mCompleteIcon.setOnClickListener(this);
+        mCompleteIcon.setVisibility(View.INVISIBLE);
     }
 
     /**
      * handle the action button click
      */
     public void onClick(View v) {
-        if (v == completeIcon
-                && ConstantUtil.PHOTO_QUESTION_TYPE.equals(mediaType)) {
+        if (v == mCompleteIcon && ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType)) {
             Dialog dia = new Dialog(getContext());
             ImageView imageView = new ImageView(getContext());
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -98,8 +85,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             dia.setContentView(imageView, new LayoutParams(
                     LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
             dia.show();
-        } else if (v == mediaButton) {
-            if (ConstantUtil.PHOTO_QUESTION_TYPE.equals(mediaType)) {
+        } else if (v == mMediaButton) {
+            if (ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType)) {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
             } else {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
@@ -114,12 +101,13 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void questionComplete(Bundle mediaData) {
         if (mediaData != null) {
-            completeIcon.setVisibility(View.VISIBLE);
+            mCompleteIcon.setVisibility(View.VISIBLE);
             setResponse(new QuestionResponse(
                     mediaData.getString(ConstantUtil.MEDIA_FILE_KEY),
-                    ConstantUtil.PHOTO_QUESTION_TYPE.equals(mediaType) ? ConstantUtil.IMAGE_RESPONSE_TYPE
-                            : ConstantUtil.VIDEO_RESPONSE_TYPE, getQuestion()
-                            .getId()));
+                    ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType) ?
+                            ConstantUtil.IMAGE_RESPONSE_TYPE
+                            : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                    getQuestion().getId()));
         }
     }
 
@@ -130,11 +118,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        if (resp != null) {
-            if (resp.getValue() != null) {
-                completeIcon.setVisibility(View.VISIBLE);
-            }
-
+        if (resp != null && resp.getValue() != null) {
+            mCompleteIcon.setVisibility(View.VISIBLE);
         }
     }
 
@@ -144,7 +129,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        completeIcon.setVisibility(View.INVISIBLE);
+        mCompleteIcon.setVisibility(View.INVISIBLE);
     }
     
 }

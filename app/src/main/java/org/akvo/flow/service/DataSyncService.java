@@ -183,7 +183,7 @@ public class DataSyncService extends IntentService {
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.filename);
-                mDatabase.updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+                updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
 
                 for (String image : zipFileData.imagePaths) {
                     mDatabase.createTransmission(id, image);
@@ -294,7 +294,7 @@ public class DataSyncService extends IntentService {
                 int scored_val_col = data.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL);
                 int strength_col = data.getColumnIndexOrThrow(ResponseColumns.STRENGTH);
                 int uuid_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.UUID);
-                int survey_start_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.START_DATE);
+                int duration_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.DURATION);
                 int localeId_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.RECORD_ID);
                 // Note: No need to query the surveyInstanceId, we already have that value
 
@@ -311,8 +311,7 @@ public class DataSyncService extends IntentService {
                         continue;
                     }
                     final long submitted_date = data.getLong(submitted_date_col);
-                    final long started_date = data.getLong(survey_start_col);
-                    final long surveyal_time = (submitted_date - started_date) / 1000;
+                    final long surveyal_time = (data.getLong(duration_col)) / 1000;
 
                     buf.append(data.getString(survey_fk_col));
                     buf.append(DELIMITER).append(String.valueOf(surveyInstanceId));
@@ -416,12 +415,12 @@ public class DataSyncService extends IntentService {
         syncedFiles.removeAll(unsyncedFiles);
 
         for (long surveyInstanceId : syncedFiles) {
-            mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
+            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
         }
 
         // Ensure the unsynced ones are just EXPORTED
         for (long surveyInstanceId : unsyncedFiles) {
-            mDatabase.updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
+            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
         }
     }
 
@@ -710,6 +709,20 @@ public class DataSyncService extends IntentService {
 
         return filename;
     }
+
+    /**
+     *
+     */
+    private void updateSurveyStatus(long surveyInstanceId, int status) {
+        // First off, update the status
+        mDatabase.updateSurveyStatus(surveyInstanceId, status);
+
+        // Dispatch a Broadcast notification to notify of survey instances status change
+        Intent intentBroadcast = new Intent(getString(R.string.action_data_sync));
+        sendBroadcast(intentBroadcast);
+    }
+
+
 
     /**
      * Helper class to wrap zip file's meta-data.<br>

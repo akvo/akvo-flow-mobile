@@ -26,21 +26,21 @@ public class QuestionResponse {
     private Long id;
     private Long respondentId;
     private String questionId;
-    private String includeFlag;
+    private boolean includeFlag;
     private String scoredValue;
     private String strength;
 
     public QuestionResponse(Long id, Long respondentId, String qId, String val,
-            String t, String includeFlag) {
+            String t, boolean includeFlag) {
         this(id, respondentId, qId, val, t, includeFlag, null);
     }
 
     public QuestionResponse(String val, String t, String questionId) {
-        this(null, null, questionId, val, t, "true");
+        this(null, null, questionId, val, t, true);
     }
 
     public QuestionResponse(Long id, Long respondentId, String qId, String val,
-            String t, String includeFlag, String strength) {
+            String t, boolean includeFlag, String strength) {
         this.id = id;
         value = val;
         type = t;
@@ -56,7 +56,7 @@ public class QuestionResponse {
         value = null;
         respondentId = null;
         questionId = null;
-        includeFlag = "true";
+        includeFlag = true;
         strength = null;
     }
 
@@ -68,11 +68,11 @@ public class QuestionResponse {
         this.strength = strength;
     }
 
-    public String getIncludeFlag() {
+    public boolean getIncludeFlag() {
         return includeFlag;
     }
 
-    public void setIncludeFlag(String includeFlag) {
+    public void setIncludeFlag(boolean includeFlag) {
         this.includeFlag = includeFlag;
     }
 

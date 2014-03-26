@@ -67,10 +67,10 @@ import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.ViewUtil;
-import org.akvo.flow.view.OptionQuestionView;
-import org.akvo.flow.view.QuestionView;
-import org.akvo.flow.view.SubmitTabContentFactory;
-import org.akvo.flow.view.SurveyQuestionTabContentFactory;
+import org.akvo.flow.ui.view.OptionQuestionView;
+import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.SubmitTabContentFactory;
+import org.akvo.flow.ui.view.SurveyQuestionTabContentFactory;
 
 /**
  * main activity for the Field Survey application. It will read in the current
@@ -133,6 +133,7 @@ public class SurveyViewActivity extends TabActivity implements
     private PropertyUtil props;
     private HashSet<String> missingQuestions;
     private boolean hasAddedTabs;
+    private long sessionStartTime;
     
     private SurveyGroup mSurveyGroup;
     private String mSurveyedLocaleId;
@@ -164,8 +165,6 @@ public class SurveyViewActivity extends TabActivity implements
             }
         }
         OptionQuestionView.promptOnChange = promptOnChange;
-        QuestionView.screenWidth = getWindowManager().getDefaultDisplay()
-                .getWidth();
 
         Bundle extras = getIntent().getExtras();
         userId = extras != null ? extras.getLong(ConstantUtil.USER_ID_KEY)
@@ -804,7 +803,7 @@ public class SurveyViewActivity extends TabActivity implements
             QuestionResponse resp = responses.get(dep.getQuestion());
             if (resp != null && resp.hasValue()
                     && dep.isMatch(resp.getValue())
-                    && "true".equalsIgnoreCase(resp.getIncludeFlag())) {
+                    && resp.getIncludeFlag()) {
 
                 isSatisfied = true;
             }
@@ -1042,6 +1041,7 @@ public class SurveyViewActivity extends TabActivity implements
     @Override
     protected void onPause() {
         if (!readOnly) {
+            saveSessionDuration();
             saveAllResponses();
         }
         if (databaseAdapter != null) {
@@ -1052,6 +1052,7 @@ public class SurveyViewActivity extends TabActivity implements
 
     @Override
     protected void onResume() {
+        sessionStartTime = System.currentTimeMillis();
         try {
             super.onResume();
             databaseAdapter.open();
@@ -1247,6 +1248,21 @@ public class SurveyViewActivity extends TabActivity implements
         }
 
         super.onDestroy();
+    }
+
+    /**
+     * Store the session time in the database.
+     * This will be called on:
+     * a) Activity's onPause method
+     * b) Survey submission (SubmitTabContentFactory)
+     *
+     * Either way the duration will be the current time minus
+     * the Activity's onResume time, computing this way the whole
+     * 'SurveyInstance' session duration.
+     */
+    public void saveSessionDuration() {
+        final long sessionDuration = System.currentTimeMillis() - sessionStartTime;
+        databaseAdapter.addSurveyDuration(respondentId, sessionDuration);
     }
 
     public String getSurveyId() {

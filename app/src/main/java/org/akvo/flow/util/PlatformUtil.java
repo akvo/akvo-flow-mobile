@@ -18,7 +18,9 @@ package org.akvo.flow.util;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.util.Log;
+import android.util.TypedValue;
 
 /**
  * Utilities class to provide Android related functionalities
@@ -40,6 +42,46 @@ public class PlatformUtil {
             Log.e(TAG, e.getMessage());
             return "";
         }
+    }
+
+    /**
+     * Check if a given version is newer than the current one.
+     * Versions are expected to be formatted in a dot-decimal notation: X.Y.Z,
+     * being X, Y, and Z integers, and each number separated by a full stop (dot).
+     *
+     * @param installedVersion
+     * @param newVersion
+     * @return true if the second version is newer than the first one, false otherwise
+     */
+    public static boolean isNewerVersion(String installedVersion, String newVersion) {
+        // Ensure the Strings are properly formatted
+        final String regex = "^\\d+(\\.\\d+)*$";// Check dot-decimal notation
+        if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {
+            return false;
+        }
+
+        String[] currentParts = installedVersion.split("\\.");
+        String[] newPartsParts = newVersion.split("\\.");
+        int length = Math.max(currentParts.length, newPartsParts.length);
+        for (int i=0; i< length; i++) {
+            int currentPart = i < currentParts.length ?
+                    Integer.parseInt(currentParts[i]) : 0;
+            int newPart = i < newPartsParts.length ?
+                    Integer.parseInt(newPartsParts[i]) : 0;
+
+            if (currentPart < newPart) {
+                return true;// Newer version
+            } else if (newPart < currentPart) {
+                return false;// Older version
+            }
+        }
+
+        return false;// Same version
+    }
+
+    public static float dp2Pixel(Context context, int dp) {
+        Resources r = context.getResources();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
 }

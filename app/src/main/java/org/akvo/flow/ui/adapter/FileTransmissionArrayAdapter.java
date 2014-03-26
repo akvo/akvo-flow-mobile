@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.view.adapter;
+package org.akvo.flow.ui.adapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -52,23 +52,27 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
     private void bindView(View view, FileTransmission trans) {
         ImageView imageView = (ImageView) view.findViewById(R.id.statusicon);
 
+        String statusText = "Unknown";//TODO: Hey buddy, you can do this way better...
         switch (trans.getStatus()) {
             case TransmissionStatus.QUEUED:
+                statusText = "Queued";
                 imageView.setImageResource(R.drawable.yellowcircle);
                 break;
             case TransmissionStatus.IN_PROGRESS:
+                statusText = "In Progress";
                 imageView.setImageResource(R.drawable.blueuparrow);
                 break;
             case TransmissionStatus.SYNCED:
+                statusText = "Synced";
                 imageView.setImageResource(R.drawable.greencircle);
                 break;
             case TransmissionStatus.FAILED:
+                statusText = "Failed";
                 imageView.setImageResource(R.drawable.redcircle);
                 break;
         }
 
-        TextView statusLabel = (TextView) view.findViewById(R.id.statustext);
-        statusLabel.setText(trans.getStatus());
+        ((TextView)view.findViewById(R.id.statustext)).setText(statusText);
         TextView startDate = (TextView) view.findViewById(R.id.startdate);
         if (trans.getStartDate() != null) {
             startDate.setText(dateFormat.format(trans.getStartDate()));
@@ -90,5 +94,5 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
         bindView(view, getItem(position));
         return view;
     }
-    
+
 }

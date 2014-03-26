@@ -192,8 +192,18 @@
     <string name="search_name">@string/app_name</string>
     <string name="search_hint">Buscar Registro</string>
 
+    <!-- APK update -->
+    <string name="updateavail">Hay una nueva version de FLOW disponible</string>
+    <string name="updatedownloaded">La nueva versión de FLOW ha sido descargada</string>
+    <string name="downloadingupdate">Descargando actualización de FLOW</string>
+    <string name="completed">Completado: </string>
+    <string name="clicktoinstall">La nueva versión de FLOW ha sido descargada. Haga clic aquí para instalarla</string>
+    <string name="clicktodownload">Haga clic aquí para descargarla</string>
+    <string name="apk_upgrade_error">Error descargando la actualización de FLOW</string>
+
     <!-- Action to identify the BroadcastReceiver, notifying new surveys/locales have been downloaded -->
     <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
     <string name="action_locales_sync">fieldsurvey.ACTION_LOCALES_SYNC</string>
+    <string name="action_data_sync">fieldsurvey.ACTION_DATA_SYNC</string>
 
 </resources>

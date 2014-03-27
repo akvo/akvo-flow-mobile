@@ -16,6 +16,16 @@
         <item>Distance</item>
     </string-array>
 
+    <!-- App languages -->
+    <string-array name="app_languages">
+        <item>English</item>
+        <item>Español</item>
+    </string-array>
+    <string-array name="app_language_codes">
+        <item>en</item>
+        <item>es</item>
+    </string-array>
+
     <string-array name="languages">
         <item>English</item>
         <item>French</item>

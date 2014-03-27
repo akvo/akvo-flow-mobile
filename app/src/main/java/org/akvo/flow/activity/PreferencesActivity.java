@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
@@ -61,6 +62,9 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private TextView serverTextView;
     private TextView identTextView;
     private TextView maxImgSizeTextView;
+    private View prefLocaleView;
+    private TextView localeTextView;
+
     private SurveyDbAdapter database;
 
     private LangsPreferenceData langsPrefData;
@@ -85,6 +89,8 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         serverTextView = (TextView) findViewById(R.id.servervalue);
         identTextView = (TextView) findViewById(R.id.identvalue);
         maxImgSizeTextView = (TextView) findViewById(R.id.max_img_size_txt);
+        prefLocaleView = findViewById(R.id.pref_locale);
+        localeTextView = (TextView) prefLocaleView.findViewById(R.id.locale_name);
 
         Resources res = getResources();
         props = new PropertyUtil(res);
@@ -149,6 +155,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             identTextView.setText(val);
         }
 
+        localeTextView.setText(FlowApp.getApp().getAppDisplayLanguage());
     }
 
     /**
@@ -169,6 +176,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         findViewById(R.id.serverbutton).setOnClickListener(this);
         findViewById(R.id.identbutton).setOnClickListener(this);
         findViewById(R.id.max_img_size_btn).setOnClickListener(this);
+        prefLocaleView.setOnClickListener(this);
     }
 
     public void onPause() {
@@ -205,6 +213,8 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                             }
                         }
                     });
+        } else if (R.id.pref_locale == v.getId()) {
+            showLanguageDialog();
         } else if (R.id.serverbutton == v.getId()) {
             ViewUtil.showAdminAuthDialog(this,
                     new ViewUtil.AdminAuthDialogListener() {
@@ -249,9 +259,11 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                                             database.savePreference(
                                                     ConstantUtil.DEVICE_IDENT_KEY, s);
                                         }
-                                    });
+                                    }
+                            );
                         }
-                    });
+                    }
+            );
         } else if (R.id.max_img_size_btn == v.getId()) {
             String[] keys = new String[maxImgSizes.length];
             for (int i = 0; i < maxImgSizes.length; i++) {
@@ -312,4 +324,18 @@ public class PreferencesActivity extends Activity implements OnClickListener,
             database.savePreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY, "" + isChecked);
         }
     }
+
+    private void showLanguageDialog() {
+        final String[] languageCodes = getResources().getStringArray(R.array.app_language_codes);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.app_language).setItems(R.array.app_languages,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FlowApp.getApp().setAppLanguage(languageCodes[which], true);
+                    }
+                });
+        builder.show();
+    }
+
 }

@@ -138,18 +138,6 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                     .getType())) {
                 questionView = new BarcodeQuestionView(context, q,
                         getDefaultLang(), languageCodes, readOnly);
-            } else if (ConstantUtil.STRENGTH_QUESTION_TYPE.equalsIgnoreCase(q
-                    .getType())) {
-                /*
-                questionView = new StrengthQuestionView(context, q,
-                        getDefaultLang(), languageCodes, readOnly);
-                        */
-            } else if (ConstantUtil.HEADING_QUESTION_TYPE.equalsIgnoreCase(q
-                    .getType())) {
-                /*
-                questionView = new CompassQuestionView(context, q,
-                        getDefaultLang(), languageCodes, readOnly);
-                        */
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q
                     .getType())) {
                 questionView = new DateQuestionView(context, q,
@@ -160,11 +148,11 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
             }
             questionView.setTextSize(defaultTextSize);
             questionMap.put(q.getId(), questionView);
-            questionView.addQuestionInteractionListener((SurveyViewActivity) context);
+            questionView.addQuestionInteractionListener(context);
             ll.addView(questionView);
             if (i < questions.size() - 1) {
                 View ruler = new View(context);
-                ruler.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2));
+                ruler.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 2));
                 ruler.setBackgroundColor(0xFFFFFFFF);
                 ll.addView(ruler);
             }

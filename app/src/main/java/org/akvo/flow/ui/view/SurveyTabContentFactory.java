@@ -28,8 +28,6 @@ import org.akvo.flow.activity.SurveyViewActivity;
 import org.akvo.flow.dao.SurveyDbAdapter;
 
 public abstract class SurveyTabContentFactory implements TabContentFactory {
-    private static final int BUTTON_WIDTH = 150;
-
     private Button actionButton;
     private ScrollView scrollView;
     private String defaultLang;
@@ -58,7 +56,7 @@ public abstract class SurveyTabContentFactory implements TabContentFactory {
 
     public Button configureActionButton(int text, OnClickListener handler) {
         actionButton = new Button(context);
-        //actionButton.setWidth(BUTTON_WIDTH);
+        // TODO: explicitly set LayoutParams
         actionButton.setText(text);
         actionButton.setOnClickListener(handler);
         return actionButton;

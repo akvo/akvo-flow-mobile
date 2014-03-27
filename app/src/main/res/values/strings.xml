@@ -190,7 +190,6 @@
     <string name="more">More</string>
     
     <!-- Search -->
-    <string name="search_name">@string/app_name</string>
     <string name="search_hint">Search Record</string>
 
     <!-- APK update -->
@@ -202,7 +201,7 @@
     <string name="clicktodownload">Click here to download it</string>
     <string name="apk_upgrade_error">Error downloading FLOW update.</string>
 
-    <!-- Action to identify the BroadcastReceiver, notifying new surveys/locales have been downloaded -->
+    <!-- Intent Actions. Do not translate this strings -->
     <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
     <string name="action_locales_sync">fieldsurvey.ACTION_LOCALES_SYNC</string>
     <string name="action_data_sync">fieldsurvey.ACTION_DATA_SYNC</string>

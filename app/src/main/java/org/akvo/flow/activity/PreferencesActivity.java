@@ -62,7 +62,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private TextView serverTextView;
     private TextView identTextView;
     private TextView maxImgSizeTextView;
-    private View prefLocaleView;
     private TextView localeTextView;
 
     private SurveyDbAdapter database;
@@ -89,8 +88,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         serverTextView = (TextView) findViewById(R.id.servervalue);
         identTextView = (TextView) findViewById(R.id.identvalue);
         maxImgSizeTextView = (TextView) findViewById(R.id.max_img_size_txt);
-        prefLocaleView = findViewById(R.id.pref_locale);
-        localeTextView = (TextView) prefLocaleView.findViewById(R.id.locale_name);
+        localeTextView = (TextView) findViewById(R.id.locale_name);
 
         Resources res = getResources();
         props = new PropertyUtil(res);
@@ -176,7 +174,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         findViewById(R.id.serverbutton).setOnClickListener(this);
         findViewById(R.id.identbutton).setOnClickListener(this);
         findViewById(R.id.max_img_size_btn).setOnClickListener(this);
-        prefLocaleView.setOnClickListener(this);
+        findViewById(R.id.pref_locale).setOnClickListener(this);
     }
 
     public void onPause() {

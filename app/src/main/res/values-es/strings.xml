@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Field Survey</string>
+    <string name="app_name">Akvo FLOW</string>
     <string name="accuracy">Prec</string>
     <string name="searching">Buscando...</string>
     <string name="ready">Listo</string>

@@ -66,7 +66,7 @@
     <string name="helpheading">Opciones de ayuda</string>
     <string name="plotsettings">Ajustes</string>
     <string name="surveysupdated">Las encuestas instaladas han sido actualizadas</string>
-    <string name="deletesurvey">Eliminar encuesta</string>
+    <string name="deleteresponse">Eliminar respuesta</string>
     <string name="othertext">Otros...</string>
     <string name="savelastuserlabel">Mantener entre sesiones el último usuario activo </string>
     <string name="uploadoptionlabel">Enviar datos mediante red móvil</string>
@@ -154,8 +154,6 @@
     <string name="pleasewaitforbootstrap">Por favor, espere a que el fichero bootstrap haya sido procesado.</string>
     <string name="surveychecklabel">Buscar automáticamente nuevas encuentas.</string>
     <string name="uploaderrorlabel">Envío automático de errores de la aplicación.</string>
-    <string name="updateavail">Actualización disponible</string>
-    <string name="clicktoinstall">Pulse para instalar</string>
     <string name="clear_data_success">Los datos han sido correctamente eliminados del dispositivo</string>
     <string name="clear_data_error">Ha ocurrido un error borrando los datos</string>
     

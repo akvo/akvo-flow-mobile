@@ -7,10 +7,10 @@
     <string name="ready">Listo</string>
     <string name="nocardspacetitle">No hay espacio de almacenamiento</string>
     <string name="lowcardspacetitle">Poco espacio de almacenamiento</string>
-    <string name="nocardspacedialog">La tarjeta sd está llena y no se pueden recopilar mas datos. Debe liberar espacio Para poder continuar.</string>
-    <string name="lowcardspacedialog">Dispone de %%% MB de almacenamiento en la tarjeta sd. Una vez llena, no podrá seguir recopilando datos.</string>
+    <string name="nocardspacedialog">La tarjeta SD está llena y no se pueden recopilar más datos. Debe liberar espacio para poder continuar.</string>
+    <string name="lowcardspacedialog">Dispone de %%% MB de almacenamiento en la tarjeta SD. Una vez llena, no podrá seguir recopilando datos.</string>
     <string name="takephoto">Sacar foto</string>
-    <string name="takevideo">Sacar vídeo</string>
+    <string name="takevideo">Sacar video</string>
     <string name="getgeo">Buscar geolocalización</string>
     <string name="lat">Lat</string>
     <string name="lon">Lon</string>
@@ -21,7 +21,7 @@
     <string name="geodialog">Para realizar esta acción el GPS debe estar activado. Pulse OK para ir a sección de ajustes. Seleccione Satélites GPS y regrese a la aplicación. Una vez activado el GPS, vuelva a intentar la búsqueda.</string>
     <string name="currentuser">Usuario activo:</string>
     <string name="lastsync">Última sincronización:</string>
-    <string name="userlabel">Organizar Usuarios</string>
+    <string name="userlabel">Organizar usuarios</string>
     <string name="resize_large_images">Reducir imágenes grandes</string>
     <string name="settingslabel">Ajustes</string>
     <string name="unknown">desconocido</string>
@@ -32,9 +32,9 @@
     <string name="userinstructions">Seleccione el usuario que desea usar. Para crear nuevos usuarios, seleccione Añadir usuario en el menú. Haga una pulsación larga para editar un usuario.</string>
     <string name="editmenu">Editar usuario</string>
     <string name="deleteusermenu">Borrar usuario</string>
-    <string name="mustselectuser">Seleccione Organizar Usuarios y elija un usuario para continuar.</string>
+    <string name="mustselectuser">Seleccione Organizar usuarios y elija un usuario para continuar.</string>
     <string name="syncinprogress">Sincronizando...</string>
-    <string name="exportcomplete">Los datos han sido exportados a la tarjeta sd</string>
+    <string name="exportcomplete">Los datos han sido exportados a la tarjeta SD</string>
     <string name="uploadcomplete">Todos los datos han sido enviados al servidor</string>
     <string name="uploadprogress">Enviando los datos al servidor</string>
     <string name="filecomplete">Fichero subido satisfactóriamente</string>
@@ -49,19 +49,19 @@
     <string name="screenoptdesc">Evitar que la pantalla se apague durante la introducción de datos. Asegúrese de apagar la pantalla (o cerrar la aplicación) cuando no esté en uso, para reducir el consumo de batería.</string>
     <string name="aboutlabel">Acerca de</string>
     <string name="aboutdesc">Muestra información sobre la versión actual</string>
-    <string name="abouttitle">Acerca de - FieldSurvey</string>
-    <string name="abouttext">FieldSurvey\nDesarrollado por: Akvo Foundation\nCopyright © 2010-2013 Stichting Akvo\nVersion </string>
+    <string name="abouttitle">Acerca de - Akvo FLOW</string>
+    <string name="abouttext">Akvo FLOW\nDesarrollado por: Akvo Foundation\nCopyright © 2010-2013 Stichting Akvo\nVersion </string>
     <string name="gpsstatuslabel">Estado del GPS</string>
     <string name="gpsstatusdesc">Abrir la aplicación GPS Status si la tiene instalada en este dispositivo.</string>
     <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instálela a través de Play Store.</string>
     <string name="otherinstructions">Por favor, introduzca una descripción</string>
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancelar</string>
-    <string name="mandatorywarning">Las preguntas marcadas con un asterisco * son obligatorias. Ha de responderlas antes de poder enviar los datos:</string>
+    <string name="mandatorywarning">Las preguntas marcadas con un asterisco * son obligatorias. Ud. tiene que responderlas antes de poder enviar los datos:</string>
     <string name="cannotsave">Las respuestas no han podido ser enviadas</string>
     <string name="description">Descripción</string>
     <string name="texthelpoption">Ver ayuda texto</string>
-    <string name="videohelpoption">Ver ayuda vídeo</string>
+    <string name="videohelpoption">Ver ayuda video</string>
     <string name="photohelpoption">Ver ayuda imágenes</string>
     <string name="helpheading">Opciones de ayuda</string>
     <string name="plotsettings">Ajustes</string>
@@ -108,7 +108,7 @@
     <string name="downloadsurveyinstr">Introduzca el identificador de la encuesta que desea descargar.</string>
     <string name="deleteallwarning">Esta acción borrará todas las respuestas (guardadas y enviadas) en el dispositivo. Pulse OK para continuar o Cancelar para salir.</string>
     <string name="deletealldatawarning">Esta acción borrará permanentemente todos los datos (encuestas, respuestas, imágenes y usuarios) en el dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
-    <string name="delete_responses_warning">Esta acción borrará permanentemente las respuestas, imágenes y ficheros zip del dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
+    <string name="delete_responses_warning">Esta acción borrará permanentemente las respuestas, imágenes y archivos zip del dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
     <string name="unsentdatawarning">Algunas respuestas no han sido enviadas. Asegúrese de exportarlas antes de borrarlas. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
     <string name="deleteonewarning">Esta acción borrará permanentemente esta respuesta. Pulse OK para continuar o Cancelar para salir.</string>
     <string name="savestartnew">Guardar y comenzar nuevo</string>
@@ -127,9 +127,9 @@
     <string name="identlabel">Identificador de dispositivo</string>
     <string name="setidentlabel">Establecer identificador de dispositivo</string>
     <string name="strengthtext">Fuerza de preferencia</string>
-    <string name="bootstrapstart">Cargando datos de la encuesta desde la tarjeta sd</string>
-    <string name="bootstrapcomplete">Datos cargados desde la tarjeta sd</string>
-    <string name="bootstraperror">Ha ocurrido un error procesando el fichero zip bootstrap</string>
+    <string name="bootstrapstart">Cargando datos de la encuesta desde la tarjeta SD</string>
+    <string name="bootstrapcomplete">Datos cargados desde la tarjeta SD</string>
+    <string name="bootstraperror">Ha ocurrido un error procesando el archivo zip bootstrap</string>
     <string name="transmissionhist">Historial de transmisión</string>
     <string name="transstartdate">Transmisión comenzada:</string>
     <string name="transenddate">Transmisión terminada:</string>
@@ -141,9 +141,9 @@
     <string name="uploaderror">Ha ocurrido un error al enviar los datos</string>
     <string name="captureheading">Captura de título</string>
     <string name="resetall">Borrar todo (usuarios, encuestas, y todos los datos recolectados)</string>
-    <string name="resetalldesc">Borrar permanentemente todas las encuentas, respuestas (incluyendo imágenes y ficheros zip exportados) y usuarios</string>
+    <string name="resetalldesc">Borrar permanentemente todas las encuentas, respuestas (incluyendo imágenes y archivos zip exportados) y usuarios</string>
     <string name="reset_responses">Borrar datos recolectados e imágenes</string>
-    <string name="reset_responses_desc">Borrar permanentemente todas las respuestas (incluyendo imágenes y ficheros zip exportados)</string>
+    <string name="reset_responses_desc">Borrar permanentemente todas las respuestas (incluyendo imágenes y archivos zip exportados)</string>
     <string name="checksd">Estado de la tarjeta SD</string>
     <string name="checksddesc">Chequea el estado de la tarjeta SD para ver si está correctamente montada y muestra el espacio disponible.</string>
     <string name="sdmissing">La tarjeta SD no está montada correctamente. Asegúrese de haber desactivado la opción "Copia de archivos USB"</string>
@@ -151,17 +151,17 @@
     <string name="sdcardspace">Espacio disponible (MB):</string>
     <string name="pickdate">Seleccione fecha</string>
     <string name="cannotupdate">La encuesta no ha podido ser descargada. Podría no esta publicada o su tarjeta SD podría estar configurada para transferir archivos mediante USB.</string>
-    <string name="pleasewaitforbootstrap">Por favor, espere a que el fichero bootstrap haya sido procesado.</string>
+    <string name="pleasewaitforbootstrap">Por favor, espere a que el archivo bootstrap haya sido procesado.</string>
     <string name="surveychecklabel">Buscar automáticamente nuevas encuentas.</string>
     <string name="uploaderrorlabel">Envío automático de errores de la aplicación.</string>
     <string name="clear_data_success">Los datos han sido correctamente eliminados del dispositivo</string>
     <string name="clear_data_error">Ha ocurrido un error borrando los datos</string>
     
     <string name="configuring_languages">Configurando los idiomas de las encuestas...</string>
-    <string name="new_record">Nuevo Registro</string>
-    <string name="sync_records">Sincronizar Registros</string>
+    <string name="new_record">Nuevo registro</string>
+    <string name="sync_records">Sincronizar registros</string>
     <string name="order_by">Ordenar por</string>
-    <string name="syncing_records">Sincronizando Registros...</string>
+    <string name="syncing_records">Sincronizando registros...</string>
     <string name="sync_finished">Los registros han sido sincronizados</string>
     <string name="synced_records">%1$d registros sincronizados</string>
     <string name="sync_error">Sincronización de registros fallida</string>
@@ -180,14 +180,14 @@
     <string name="no_records_text">No tiene registros sincronizados. Para editar un registro, ha de sincronizarlos primero, o crear registros nuevos</string>
     
     <!-- Activity Labels -->
-    <string name="survey_groups_activity">Grupos de Encuestas</string>
-    <string name="record_list_activity">Seleccionar Registro</string>
+    <string name="survey_groups_activity">Grupos de encuestas</string>
+    <string name="record_list_activity">Seleccionar registro</string>
     
     <!-- ActionBar -->
     <string name="more">Más</string>
     
     <!-- Search -->
-    <string name="search_hint">Buscar Registro</string>
+    <string name="search_hint">Buscar registro</string>
 
     <!-- APK update -->
     <string name="updateavail">Hay una nueva version de FLOW disponible</string>

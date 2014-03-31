@@ -50,7 +50,7 @@
     <string name="aboutlabel">A propos</string>
     <string name="aboutdesc">Information sur les versions.</string>
     <string name="abouttitle">A propos de - FieldSurvey</string>
-    <string name="abouttext">FieldSurvey\nDevelopée par: Akvo Foundation\nCopyright © 2010-2013 Stichting Akvo\nVersion </string>
+    <string name="abouttext">FieldSurvey\nDevelopée par: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion </string>
     <string name="gpsstatuslabel">Etat du GPS</string>
     <string name="gpsstatusdesc">Démarre l\'application de GPS Status si elle est installée sur cet appareil.</string>
     <string name="nogpsstatus">GPS Status n\'est pas installé sur cet appareil. Veuillez l\'installer en utilisant Android Market.</string>

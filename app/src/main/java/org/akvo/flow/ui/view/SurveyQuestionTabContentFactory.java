@@ -379,7 +379,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                         && curResponse.getId() > 0) {
                     // if we don't have a value BUT there is an ID, we need to
                     // remove it since the user blanked out their response
-                    databaseAdaptor.deleteResponse(respondentId.toString(), q
+                    databaseAdaptor.deleteResponse(respondentId, q
                             .getQuestion().getId());
                     responseMap.remove(curResponse.getQuestionId());
                 } else if (curResponse != null) {

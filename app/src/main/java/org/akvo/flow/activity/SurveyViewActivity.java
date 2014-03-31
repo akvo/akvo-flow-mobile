@@ -728,7 +728,7 @@ public class SurveyViewActivity extends TabActivity implements
             toggleTabButtons(true);
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event
                 .getEventType())) {
-            databaseAdapter.deleteResponse(respondentId.toString(), event
+            databaseAdapter.deleteResponse(respondentId, event
                     .getSource().getQuestion().getId());
         }
     }

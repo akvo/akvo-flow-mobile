@@ -949,10 +949,10 @@ public class SurveyDbAdapter {
      * @param surveyInstanceId
      * @param questionId
      */
-    public void deleteResponse(String surveyInstanceId, String questionId) {
+    public void deleteResponse(long surveyInstanceId, String questionId) {
         database.delete(Tables.RESPONSE, ResponseColumns.SURVEY_INSTANCE_ID + "= ? AND "
                 + ResponseColumns.QUESTION_ID + "= ?", new String[] {
-                surveyInstanceId,
+                String.valueOf(surveyInstanceId),
                 questionId
         });
     }

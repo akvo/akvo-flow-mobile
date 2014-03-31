@@ -57,6 +57,7 @@
         <activity android:name="org.akvo.flow.activity.PreferencesActivity" />
         <activity android:name="org.akvo.flow.activity.ImageBrowserActivity" />
         <activity android:name="org.akvo.flow.activity.TransmissionHistoryActivity" />
+        <activity android:name="org.akvo.flow.activity.SurveyActivity" />
 
         <service android:name="org.akvo.flow.service.DataSyncService" />
         <service android:name="org.akvo.flow.service.SurveyDownloadService" />

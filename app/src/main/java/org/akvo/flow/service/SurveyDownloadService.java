@@ -102,8 +102,7 @@ public class SurveyDownloadService extends Service {
                 if (intent != null) {
                     String surveyId = null;
                     if (intent.getExtras() != null) {
-                        surveyId = intent.getExtras().getString(
-                                ConstantUtil.SURVEY_ID_KEY);
+                        surveyId = intent.getExtras().getString(ConstantUtil.SURVEY_ID_KEY);
                     }
                     checkAndDownload(surveyId);
                     sendBroadcastNotification();
@@ -144,6 +143,14 @@ public class SurveyDownloadService extends Service {
                 if (surveyId != null && surveyId.trim().length() > 0) {
                     surveys = getSurveyHeader(serverBase, surveyId, deviceId);
                     if (surveys != null && surveys.size() > 0) {
+                        // Monitored surveys cannot be downloaded without assignments
+                        if (surveys.get(0).getSurveyGroup().isMonitored()) {
+                            final String title = getString(R.string.error_assignment_title);
+                            final String text = getString(R.string.error_assignment_text);
+                            ViewUtil.fireNotification(title, text, this, FAIL_ID, null);
+                            return;
+                        }
+
                         // if we already have the survey, delete it first
                         databaseAdaptor.deleteSurvey(surveyId.trim(), true);
                     }

@@ -88,6 +88,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     public void onResume() {
         super.onResume();
         mDatabase.open();
+        getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, this);
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }
@@ -126,9 +127,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
             startService(new Intent(this, DataSyncService.class));
-            //checkApkUpdates();
-            
-            getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, this);
+            checkApkUpdates();
         }
     }
 

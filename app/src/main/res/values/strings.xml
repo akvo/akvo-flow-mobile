@@ -170,6 +170,8 @@
     <string name="loading">Loading...</string>
     <string name="prefill_title">Prefill Responses</string>
     <string name="prefill_text">Prefill responses with previous values of the same questions</string>
+    <string name="error_assignment_title">Survey could not be downloaded</string>
+    <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
 
     <!-- Localization -->
     <string name="app_language">App Language</string>

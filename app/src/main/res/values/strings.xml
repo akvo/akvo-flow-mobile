@@ -173,6 +173,10 @@
     <string name="error_assignment_title">Survey could not be downloaded</string>
     <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
 
+    <!-- Survey Groups Activity -->
+    <string name="monitored_group">Monitored Group</string>
+    <string name="regular_group">Regular Group</string>
+
     <!-- Localization -->
     <string name="app_language">App Language</string>
     <string name="please_restart">Please, restart the app</string>

@@ -221,9 +221,9 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             TextView text2 = (TextView) view.findViewById(R.id.text2);
             text1.setText(surveyGroup.getName());
             if (surveyGroup.isMonitored()) {
-                text2.setText("Monitored Group");
+                text2.setText(R.string.monitored_group);
             } else {
-                text2.setText("Regular Group");
+                text2.setText(R.string.regular_group);
             }
             view.setTag(surveyGroup);
         }

@@ -171,6 +171,10 @@
     <string name="prefill_title">Pré-remplir les réponses</string>
     <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
 
+    <!-- Survey Groups Activity -->
+    <string name="monitored_group">Groupe surveillé</string>
+    <string name="regular_group">Groupe normal</string>
+
     <!-- Localization -->
     <string name="app_language">Langue de l\'application</string>
     <string name="please_restart">Veuillez redémarrer l\'application</string>

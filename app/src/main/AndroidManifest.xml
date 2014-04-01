@@ -73,11 +73,9 @@
             </intent-filter>
         </receiver>
 
-        <uses-library android:name="com.google.android.maps" />
-        
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDDJOA8o5lG8Ua48r8pffPDqS71F2bfG98"/>
+            android:value="AIzaSyBPyguWZrQi2xcqs49WajwQ6FYeSHpaEFQ"/>
         
         <provider
             android:name="org.akvo.flow.dao.DataProvider"

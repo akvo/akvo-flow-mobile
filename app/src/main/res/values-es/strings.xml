@@ -29,7 +29,7 @@
     <string name="nouser">¡No hay usuarios!</string>
     <string name="displayname">Nombre</string>
     <string name="email">Correo electrónico</string>
-    <string name="userinstructions">Seleccione el usuario que desea usar. Para crear nuevos usuarios, seleccione Añadir usuario en el menú. Haga una pulsación larga para editar un usuario.</string>
+    <string name="userinstructions">Seleccione el usuario que desea usar. Para crear nuevos usuarios, pulse el botón '+'. Haga una pulsación larga para editar un usuario.</string>
     <string name="editmenu">Editar usuario</string>
     <string name="deleteusermenu">Borrar usuario</string>
     <string name="mustselectuser">Seleccione Organizar usuarios y elija un usuario para continuar.</string>

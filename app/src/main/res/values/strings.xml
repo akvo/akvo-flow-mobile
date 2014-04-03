@@ -29,7 +29,7 @@
     <string name="nouser">No Users!</string>
     <string name="displayname">Display Name</string>
     <string name="email">Email Address</string>
-    <string name="userinstructions">Select the current user by clicking. To create a new user, press the Menu button and select Add User. Long-click to edit a user.</string>
+    <string name="userinstructions">Select the current user by clicking. To create a new user, press the '+' icon. Long-click to edit a user.</string>
     <string name="editmenu">Edit User</string>
     <string name="deleteusermenu">Delete User</string>
     <string name="mustselectuser">Please click the Manage Users icon and choose a user before continuing.</string>

@@ -260,6 +260,8 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
                     if (resp == null || !resp.isValid()) {
                         missingQuestions.add(view.getQuestion());
                     }
+                } else if (!view.isValid()) {
+                    missingQuestions.add(view.getQuestion());
                 }
             }
         }

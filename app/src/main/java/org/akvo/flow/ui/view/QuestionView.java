@@ -62,20 +62,28 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     private TextView mQuestionText;
     private ImageButton mTipImage;
 
+    /**
+     * mIsValid stores the presence of non-acceptable responses.
+     * Subclasses will determine when to enable this flag.
+     * By default any response will be valid, unless explicitly modified.
+     */
+    private boolean mIsValid;
+
     public QuestionView(final Context context, Question q, String defaultLangauge, String[] langs,
             boolean readOnly) {
         super(context);
         setOrientation(VERTICAL);
         final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
         setPadding(padding, padding, padding, padding);
-        mQuestion = q;
-        mDefaultLang = defaultLangauge;
-        mReadOnly = readOnly;
-        mLangs = langs;
         if (sColors == null) {
             // must have enough colors for all enabled languages
             sColors = context.getResources().getStringArray(R.array.colors);
         }
+        mQuestion = q;
+        mDefaultLang = defaultLangauge;
+        mReadOnly = readOnly;
+        mLangs = langs;
+        mIsValid = true;// so far so good.
     }
 
     /**
@@ -309,8 +317,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      *
      * @param listener
      */
-    public void addQuestionInteractionListener(
-            QuestionInteractionListener listener) {
+    public void addQuestionInteractionListener(QuestionInteractionListener listener) {
         if (mListeners == null) {
             mListeners = new ArrayList<QuestionInteractionListener>();
         }
@@ -427,21 +434,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         return setVisible;
     }
 
-    /**
-     * this method should be overridden by subclasses so they can record input
-     * in a QuestionResponse object
-     */
-    public void captureResponse() {
-        // NO OP
+    public final void captureResponse() {
+        captureResponse(false);
     }
 
     /**
      * this method should be overridden by subclasses so they can record input
      * in a QuestionResponse object
      */
-    public void captureResponse(boolean suppressListeners) {
-        // NO OP
-    }
+    public abstract void captureResponse(boolean suppressListeners);
 
     /**
      * this method should be overridden by subclasses so they can manage the UI
@@ -540,6 +541,14 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         } else {
             mQuestionText.setBackgroundColor(Color.TRANSPARENT);
         }
+    }
+
+    public void setIsValid (boolean isValid) {
+        mIsValid = isValid;
+    }
+
+    public boolean isValid() {
+        return mIsValid;
     }
 
 }

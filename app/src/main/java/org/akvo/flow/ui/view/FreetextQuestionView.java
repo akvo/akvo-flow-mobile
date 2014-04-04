@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -64,8 +65,7 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
                 maxLength = Math.min(rule.getMaxLength(), ValidationRule.DEFAULT_MAX_LENGTH);
             }
             // if the type is numeric, add numeric-specific rules
-            if (ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(rule
-                    .getValidationType())) {
+            if (ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(rule.getValidationType())) {
                 DigitsKeyListener MyDigitKeyListener = new DigitsKeyListener(
                         rule.getAllowSigned(), rule.getAllowDecimal());
                 mEditText.setKeyListener(MyDigitKeyListener);
@@ -77,14 +77,6 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
         mEditText.setFilters(FilterArray);
         
         mEditText.setOnFocusChangeListener(this);
-    }
-
-    /**
-     * pulls the data out of the fields and saves it as a response object
-     */
-    @Override
-    public void captureResponse() {
-        captureResponse(false);
     }
 
     @Override
@@ -99,10 +91,16 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
      * pulls the data out of the fields and saves it as a response object,
      * possibly suppressing listeners
      */
+    @Override
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(mEditText.getText().toString(),
-                ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
-                suppressListeners);
+        if (validateText()) {
+            setResponse(new QuestionResponse(mEditText.getText().toString(),
+                    ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
+                    suppressListeners);
+            setIsValid(true);
+        } else {
+            setIsValid(false);
+        }
     }
 
     @Override
@@ -119,65 +117,41 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
         mEditText.setText("");
     }
 
+    private boolean validateText() {
+        ValidationRule currentRule = getQuestion().getValidationRule();
+        final String answer = mEditText.getText().toString();
+        if (!TextUtils.isEmpty(answer) && currentRule != null) {
+            try {
+                String validatedText = currentRule.performValidation(answer);
+                mEditText.setText(validatedText);
+            } catch (ValidationException e) {
+                // if we failed validation, display a message to the user
+                String error;
+                if (ValidationException.TOO_LARGE.equals(e.getType())) {
+                    error = getResources().getString(R.string.toolargeerr)
+                            + currentRule.getMaxValString();
+                } else if (ValidationException.TOO_SMALL.equals(e.getType())) {
+                    error = getResources().getString(R.string.toosmallerr)
+                            + currentRule.getMinValString();
+                } else {
+                    error = getResources().getString(R.string.baddatatypeerr);
+                }
+                mEditText.setError(error);
+                return false;
+            }
+        }
+        mEditText.setError(null);
+        return true;
+    }
+
     /**
      * captures the response and runs validation on loss of focus
      */
     @Override
     public void onFocusChange(View view, boolean hasFocus) {
-        // we need to listen to loss of focus
-        // and make sure input is valid
+        // we need to listen to loss of focus and make sure input is valid
         if (!hasFocus) {
-            ValidationRule currentRule = getQuestion().getValidationRule();
-            EditText textEdit = (EditText) view;
-            if (textEdit.getText() != null
-                    && textEdit.getText().toString().trim().length() > 0) {
-                if (currentRule != null) {
-                    try {
-                        String validatedText = currentRule
-                                .performValidation(textEdit.getText()
-                                        .toString());
-                        textEdit.setText(validatedText);
-                        // now capture the response
-                        captureResponse();
-                    } catch (ValidationException e) {
-                        // if we failed validation, display
-                        // a message to the user
-                        AlertDialog.Builder builder = new AlertDialog.Builder(
-                                getContext());
-                        builder.setTitle(R.string.validationerrtitle);
-                        TextView tipText = new TextView(getContext());
-                        if (ValidationException.TOO_LARGE.equals(e.getType())) {
-                            String baseText = getResources().getString(
-                                    R.string.toolargeerr);
-                            tipText.setText(baseText
-                                    + currentRule.getMaxValString());
-                        } else if (ValidationException.TOO_SMALL.equals(e
-                                .getType())) {
-                            String baseText = getResources().getString(
-                                    R.string.toosmallerr);
-                            tipText.setText(baseText
-                                    + currentRule.getMinValString());
-                        } else {
-                            tipText.setText(R.string.baddatatypeerr);
-                        }
-                        builder.setView(tipText);
-                        builder.setPositiveButton(R.string.okbutton,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,
-                                            int id) {
-                                        if (dialog != null) {
-                                            dialog.dismiss();
-                                        }
-                                    }
-                                });
-                        builder.show();
-                        resetQuestion(false); // Enforce validation by clearing
-                                              // field
-                    }
-                } else {
-                    captureResponse();
-                }
-            }
+            captureResponse();
         }
     }
     

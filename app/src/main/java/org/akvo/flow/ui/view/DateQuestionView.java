@@ -94,14 +94,6 @@ public class DateQuestionView extends QuestionView {
         });
     }
 
-    /**
-     * pulls the data out of the fields and saves it as a response object
-     */
-    @Override
-    public void captureResponse() {
-        captureResponse(false);
-    }
-
     @Override
     public void setResponse(QuestionResponse resp) {
         if (resp != null && mDateTextEdit != null) {

@@ -131,5 +131,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         super.resetQuestion(fireEvent);
         mCompleteIcon.setVisibility(View.INVISIBLE);
     }
-    
+
+    @Override
+    public void captureResponse(boolean suppressListeners) {
+    }
+
 }

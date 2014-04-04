@@ -764,6 +764,8 @@ public class SurveyViewActivity extends TabActivity implements
 
             // now make sure that the candidate missing questions are really
             // missing by seeing if their dependencies are fulfilled
+            // TODO: Do not reload state, invalid question might be overriden!!
+            // TODO: Why are we loading only first tab???
             HashMap<String, QuestionResponse> responseMap = tabContentFactories
                     .get(0).loadState(getRespondentId());
             for (int i = 0; i < candidateMissingQuestions.size(); i++) {

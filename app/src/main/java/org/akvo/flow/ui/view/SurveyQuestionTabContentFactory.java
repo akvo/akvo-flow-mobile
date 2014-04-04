@@ -66,6 +66,17 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         return questionMap;
     }
 
+    public Map<String, QuestionResponse> getResponses() {
+        Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
+        if (questionMap != null) {
+            for (QuestionView q : questionMap.values()) {
+                responses.put(q.getQuestion().getId(), q.getResponse(true));
+            }
+        }
+
+        return responses;
+    }
+
     /**
      * stores the context and questionGroup to member fields
      * 

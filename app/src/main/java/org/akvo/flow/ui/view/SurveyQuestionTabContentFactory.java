@@ -258,25 +258,16 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         // created until the tab is clicked the first time
         if (questionMap == null || questionMap.size() == 0) {
             // add all the mandatory questions
-            ArrayList<Question> uninitializedQuesitons = questionGroup
-                    .getQuestions();
-            for (int i = 0; i < uninitializedQuesitons.size(); i++) {
-                if (uninitializedQuesitons.get(i).isMandatory()) {
-                    QuestionResponse resp = responseMap
-                            .get(uninitializedQuesitons.get(i).getId());
-                    if (resp == null || !resp.isValid()) {
-                        missingQuestions.add(uninitializedQuesitons.get(i));
-                    }
+            ArrayList<Question> uninitializedQuestions = questionGroup.getQuestions();
+            for (Question q : uninitializedQuestions) {
+                QuestionResponse response = responseMap.get(q.getId());
+                if (q.isMandatory() && (response == null || !response.isValid())) {
+                    missingQuestions.add(q);
                 }
             }
         } else {
             for (QuestionView view : questionMap.values()) {
-                if (view.getQuestion().isMandatory()) {
-                    QuestionResponse resp = view.getResponse();
-                    if (resp == null || !resp.isValid()) {
-                        missingQuestions.add(view.getQuestion());
-                    }
-                } else if (!view.isValid()) {
+                if (!view.isValid()) {
                     missingQuestions.add(view.getQuestion());
                 }
             }

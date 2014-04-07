@@ -132,7 +132,8 @@ public class SurveyViewActivity extends TabActivity implements
     private int tabCount;
     private String eventSourceQuestionId;
     private PropertyUtil props;
-    private HashSet<String> missingQuestions;
+    // TODO: In the refactor of this Activity, use invalidQuestions to store all the invalid questions
+    //private HashSet<String> missingQuestions;
     private boolean hasAddedTabs;
     private long sessionStartTime;
     
@@ -143,7 +144,6 @@ public class SurveyViewActivity extends TabActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         currentTextSize = NORMAL_TXT_SIZE;
-        missingQuestions = new HashSet<String>();
         readOnly = false;
         single = false;
         hasAddedTabs = false;
@@ -581,7 +581,6 @@ public class SurveyViewActivity extends TabActivity implements
      * questions
      */
     public void resetAllQuestions() {
-        missingQuestions.clear();
         for (int i = 0; i < tabContentFactories.size(); i++) {
             tabContentFactories.get(i).resetTabQuestions();
         }
@@ -598,13 +597,13 @@ public class SurveyViewActivity extends TabActivity implements
      * @param questions
      */
     public void setMissingQuestions(ArrayList<Question> questions) {
-        missingQuestions.clear();
         if (questions != null) {
-            for (int i = 0; i < questions.size(); i++) {
-                missingQuestions.add(questions.get(i).getId());
+            HashSet<String> invalidQuestions = new HashSet<String>();
+            for (Question q : questions) {
+                invalidQuestions.add(q.getId());
             }
             for (SurveyQuestionTabContentFactory factory : tabContentFactories) {
-                factory.highlightMissingQuestions(missingQuestions);
+                factory.highlightMissingQuestions(invalidQuestions);
             }
         }
     }

@@ -537,14 +537,31 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * displayError will give visual feedback of non-valid responses.
      * By default, we display the message in the question text, although subclasses may
      * override the method and display it elsewhere (i.e. within an EditText)
-     * @param error
+     *
+     * @param error Error text
      */
     public void displayError(String error) {
         mQuestionText.setError(error);
     }
 
+    /**
+     * isValid determines if the QuestionView contains a valid status.
+     * An invalid status can be set either explicitly with setError(String),
+     * or it can be automatically deducted if the question is mandatory and no response is set.
+     *
+     * @return true if the status is valid, false otherwise
+     */
     public boolean isValid() {
-        return mError == null;
+        if (mError != null) {
+            return false;// No discussion. This question is explicitly marked as erroneous.
+        }
+
+        if (mQuestion.isMandatory()) {
+            // Mandatory questions must have a response
+            return mResponse != null && mResponse.isValid();
+        }
+
+        return true;// Non mandatory questions with no explicit error.
     }
 
 }

@@ -61,7 +61,7 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
      * @return
      */
     public View refreshView(boolean setMissing) {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LayoutInflater inflater = LayoutInflater.from(context);
         LinearLayout ll = (LinearLayout)inflater.inflate(R.layout.submit_tab_view, null);
 
         LinearLayout mandatoryContainer = (LinearLayout)ll.findViewById(R.id.mandatory_container);
@@ -96,17 +96,20 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                 });
 
         // get the list (across all tabs) of missing mandatory responses
-        ArrayList<Question> missingQuestions = context.checkMandatory();
+        // TODO: Do not request the invalid questions, and then set them, as it will loop through
+        // TODO: every single question twice! Loop instead once, setting the errors and just returning
+        // TODO: true/false if errors were found.
+        ArrayList<Question> invalidQuestions = context.checkMandatory();
         if (setMissing) {
-            getContext().setMissingQuestions(missingQuestions);
+            context.setMissingQuestions(invalidQuestions);
         }
-        if (missingQuestions.size() == 0) {
+        if (invalidQuestions.size() == 0) {
             mandatoryContainer.setVisibility(View.GONE);
             submitText.setVisibility(View.VISIBLE);
             toggleButtons(true);
         } else {
-            for (int i = 0; i < missingQuestions.size(); i++) {
-                QuestionView qv = new QuestionHeaderView(context, missingQuestions.get(i),
+            for (int i = 0; i < invalidQuestions.size(); i++) {
+                QuestionView qv = new QuestionHeaderView(context, invalidQuestions.get(i),
                         getDefaultLang(), languageCodes, true);
                 qv.suppressHelp(true);
                 // force the view to be visible (if the question has

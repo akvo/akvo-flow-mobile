@@ -16,16 +16,13 @@
 
 package org.akvo.flow.ui.view;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -93,14 +90,33 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
      */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        if (validateText()) {
-            setResponse(new QuestionResponse(mEditText.getText().toString(),
-                    ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
-                    suppressListeners);
-            setIsValid(true);
-        } else {
-            setIsValid(false);
+        ValidationRule rule = getQuestion().getValidationRule();
+        try {
+            validateText(rule);
+        } catch (ValidationException e) {
+            // if we failed validation, display a message to the user
+            String error;
+            if (ValidationException.TOO_LARGE.equals(e.getType())) {
+                error = getResources().getString(R.string.toolargeerr) + rule.getMaxValString();
+            } else if (ValidationException.TOO_SMALL.equals(e.getType())) {
+                error = getResources().getString(R.string.toosmallerr) + rule.getMinValString();
+            } else {
+                error = getResources().getString(R.string.baddatatypeerr);
+            }
+            setError(error);
+            return;// Die early. Don't store the value.
         }
+
+        if (TextUtils.isEmpty(mEditText.getText().toString()) && getQuestion().isMandatory()) {
+            // Mandatory question must be answered
+            setError(getResources().getString(R.string.error_question_mandatory));
+        } else {
+            setError(null);
+        }
+
+        setResponse(new QuestionResponse(mEditText.getText().toString(),
+                ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
+                suppressListeners);
     }
 
     @Override
@@ -117,31 +133,17 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
         mEditText.setText("");
     }
 
-    private boolean validateText() {
-        ValidationRule currentRule = getQuestion().getValidationRule();
-        final String answer = mEditText.getText().toString();
-        if (!TextUtils.isEmpty(answer) && currentRule != null) {
-            try {
-                String validatedText = currentRule.performValidation(answer);
-                mEditText.setText(validatedText);
-            } catch (ValidationException e) {
-                // if we failed validation, display a message to the user
-                String error;
-                if (ValidationException.TOO_LARGE.equals(e.getType())) {
-                    error = getResources().getString(R.string.toolargeerr)
-                            + currentRule.getMaxValString();
-                } else if (ValidationException.TOO_SMALL.equals(e.getType())) {
-                    error = getResources().getString(R.string.toosmallerr)
-                            + currentRule.getMinValString();
-                } else {
-                    error = getResources().getString(R.string.baddatatypeerr);
-                }
-                mEditText.setError(error);
-                return false;
-            }
+    @Override
+    public void displayError(String error) {
+        // Display the error within the EditText (instead of question text)
+        mEditText.setError(error);
+    }
+
+    private void validateText(ValidationRule rule) throws ValidationException {
+        if (rule != null) {
+            String validatedText = rule.performValidation(mEditText.getText().toString());
+            mEditText.setText(validatedText);
         }
-        mEditText.setError(null);
-        return true;
     }
 
     /**

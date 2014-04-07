@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/mandatorywarning"
+            android:text="@string/error_responses"
             android:textColor="#ff0000"
             android:textSize="20sp"/>
 

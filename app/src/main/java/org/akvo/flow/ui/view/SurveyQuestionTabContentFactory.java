@@ -66,6 +66,11 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         return questionMap;
     }
 
+    /**
+     * Get the *current* UI responses in this tab. Note that this are not the same as stored
+     * responses, as we are not loading the state from the DB, just retrieven the current values.
+     * TODO: Cache. We should not loop through the QuestionViews each time the responses are requested.
+     */
     public Map<String, QuestionResponse> getResponses() {
         Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
         if (questionMap != null) {
@@ -217,9 +222,9 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         if (questionMap != null && questions != null) {
             for (QuestionView view : questionMap.values()) {
                 if (questions.contains(view.getQuestion().getId())) {
-                    view.highlight(true);
+                    view.setError(context.getString(R.string.error_question_mandatory));
                 } else {
-                    view.highlight(false);
+                    view.setError(null);
                 }
             }
         }

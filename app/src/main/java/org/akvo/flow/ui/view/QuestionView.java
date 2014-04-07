@@ -24,7 +24,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -63,11 +62,10 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     private ImageButton mTipImage;
 
     /**
-     * mIsValid stores the presence of non-acceptable responses.
-     * Subclasses will determine when to enable this flag.
-     * By default any response will be valid, unless explicitly modified.
+     * mError stores the presence of non-acceptable responses.
+     * Any non-null value will be considered as an invalid response.
      */
-    private boolean mIsValid;
+    private String mError;
 
     public QuestionView(final Context context, Question q, String defaultLangauge, String[] langs,
             boolean readOnly) {
@@ -83,7 +81,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mDefaultLang = defaultLangauge;
         mReadOnly = readOnly;
         mLangs = langs;
-        mIsValid = true;// so far so good.
+        mError = null;// so far so good.
     }
 
     /**
@@ -354,7 +352,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public void resetQuestion(boolean fireEvent) {
         setResponse(null, false);
-        highlight(false);
+        setError(null);
         if (fireEvent) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_CLEAR_EVENT);
         }
@@ -530,25 +528,23 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mDefaultLang = defaultLang;
     }
 
-    /**
-     * turns highlighting on/off
-     *
-     * @param useHighlight
-     */
-    public void highlight(boolean useHighlight) {
-        if (useHighlight) {
-            mQuestionText.setBackgroundColor(0x55CC99CC);
-        } else {
-            mQuestionText.setBackgroundColor(Color.TRANSPARENT);
-        }
+    public void setError(String error) {
+        mError = error;
+        displayError(mError);
     }
 
-    public void setIsValid (boolean isValid) {
-        mIsValid = isValid;
+    /**
+     * displayError will give visual feedback of non-valid responses.
+     * By default, we display the message in the question text, although subclasses may
+     * override the method and display it elsewhere (i.e. within an EditText)
+     * @param error
+     */
+    public void displayError(String error) {
+        mQuestionText.setError(error);
     }
 
     public boolean isValid() {
-        return mIsValid;
+        return mError == null;
     }
 
 }

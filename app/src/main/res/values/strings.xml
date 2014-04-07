@@ -195,6 +195,10 @@
     <!-- Search -->
     <string name="search_hint">Search Record</string>
 
+    <!-- Survey Activity -->
+    <string name="error_responses">Some responses contain errors. You must review the following questions before you can submit:</string>
+    <string name="error_question_mandatory">This response is required</string>
+
     <!-- APK update -->
     <string name="updateavail">A new FLOW update is available</string>
     <string name="updatedownloaded">FLOW update has been downloaded</string>

@@ -792,11 +792,9 @@ public class SurveyViewActivity extends TabActivity implements
         if (dependencies != null) {
             for (Dependency dependency : dependencies) {
                 QuestionResponse resp = responses.get(dependency.getQuestion());
-                if (resp != null && resp.hasValue()
-                        && dependency.isMatch(resp.getValue())
-                        && resp.getIncludeFlag()) {
-                    continue;
-                } else {
+                if (resp == null || !resp.hasValue()
+                        || !dependency.isMatch(resp.getValue())
+                        || !resp.getIncludeFlag()) {
                     return false;
                 }
             }

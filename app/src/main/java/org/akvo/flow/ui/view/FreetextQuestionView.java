@@ -107,7 +107,10 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
     public void captureResponse(boolean suppressListeners) {
         ValidationRule rule = getQuestion().getValidationRule();
         try {
-            validateText(rule);
+            if (!TextUtils.isEmpty(mEditText.getText().toString())) {
+                // Do not validate void answers
+                validateText(rule);
+            }
         } catch (ValidationException e) {
             // if we failed validation, display a message to the user
             String error;

@@ -17,6 +17,7 @@
 package org.akvo.flow.ui.view;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,7 +43,6 @@ import org.akvo.flow.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class SubmitTabContentFactory extends SurveyTabContentFactory {
-    private Button submitButton;
 
     public SubmitTabContentFactory(SurveyViewActivity c,
             SurveyDbAdapter dbAdaptor, float textSize, String defaultLang,
@@ -69,7 +69,7 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
 
         // first, re-save all questions to make sure we didn't miss anything
         context.saveAllResponses();
-        submitButton = configureActionButton(R.string.submitbutton,
+        Button submitButton = configureActionButton(R.string.submitbutton,
                 new OnClickListener() {
                     public void onClick(View v) {
                         context.saveSessionDuration();
@@ -95,28 +95,27 @@ public class SubmitTabContentFactory extends SurveyTabContentFactory {
                     }
                 });
 
-        // get the list (across all tabs) of missing mandatory responses
-        // TODO: Do not request the invalid questions, and then set them, as it will loop through
-        // TODO: every single question twice! Loop instead once, setting the errors and just returning
-        // TODO: true/false if errors were found.
-        ArrayList<Question> invalidQuestions = context.checkMandatory();
+        List<Question> invalidQuestions = new ArrayList<Question>();
         if (setMissing) {
-            context.setMissingQuestions(invalidQuestions);
+            // Checking questions will force them to display any error status they contain.
+            // Missing mandatory questions will also be marked as invalid.
+            // Non-populated questions will only check for void mandatory responses.
+            invalidQuestions = context.checkInvalidQuestions();
         }
-        if (invalidQuestions.size() == 0) {
+        if (invalidQuestions.isEmpty()) {
             mandatoryContainer.setVisibility(View.GONE);
             submitText.setVisibility(View.VISIBLE);
             toggleButtons(true);
         } else {
-            for (int i = 0; i < invalidQuestions.size(); i++) {
-                QuestionView qv = new QuestionHeaderView(context, invalidQuestions.get(i),
-                        getDefaultLang(), languageCodes, true);
+            for (Question q : invalidQuestions) {
+                QuestionView qv = new QuestionHeaderView(context, q, getDefaultLang(),
+                        languageCodes, true);
                 qv.suppressHelp(true);
                 // force the view to be visible (if the question has
                 // dependencies, it'll be hidden by default)
                 qv.setVisibility(View.VISIBLE);
                 View ruler = new View(context);
-                ruler.setBackgroundColor(0xFFFFFFFF);
+                ruler.setBackgroundColor(0xFFFFFFFF);// TODO: Externalize this color resource
                 mandatoryContainer.addView(qv);
                 mandatoryContainer.addView(ruler, new LayoutParams(LayoutParams.MATCH_PARENT, 2));
             }

@@ -19,6 +19,7 @@ package org.akvo.flow.ui.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,13 +27,10 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyViewActivity;
@@ -249,7 +247,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
      * 
      * @return
      */
-    public ArrayList<Question> checkMandatoryQuestions() {
+    public List<Question> checkInvalidQuestions() {
         if (responseMap == null) {
             loadState(context.getRespondentId());
         }

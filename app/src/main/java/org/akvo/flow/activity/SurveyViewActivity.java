@@ -754,29 +754,29 @@ public class SurveyViewActivity extends TabActivity implements
      * 
      * @return
      */
-    public ArrayList<Question> checkMandatory() {
+    public List<Question> checkInvalidQuestions() {
         Map<String, QuestionResponse> responseMap = new HashMap<String, QuestionResponse>();
-        ArrayList<Question> missingQuestions = new ArrayList<Question>();
+        ArrayList<Question> invalidQuestions = new ArrayList<Question>();
         if (tabContentFactories != null) {
-            ArrayList<Question> candidateMissingQuestions = new ArrayList<Question>();
+            ArrayList<Question> candidateInvalidQuestions = new ArrayList<Question>();
             for (int i = 0; i < tabContentFactories.size(); i++) {
                 // Add this tab's responses to the map.
                 Map<String, QuestionResponse> responses = tabContentFactories.get(i).getResponses();
                 responseMap.putAll(responses);
-                candidateMissingQuestions.addAll(tabContentFactories.get(i).checkMandatoryQuestions());
+                candidateInvalidQuestions.addAll(tabContentFactories.get(i).checkInvalidQuestions());
             }
 
             // now make sure that the candidate missing questions are really
             // missing by seeing if their dependencies are fulfilled
             // TODO: tabs might not been populated!
-            for (Question q : candidateMissingQuestions) {
+            for (Question q : candidateInvalidQuestions) {
                 if (areDependenciesSatisfied(q, responseMap)) {
-                    missingQuestions.add(q);
+                    invalidQuestions.add(q);
                 }
             }
         }
 
-        return missingQuestions;
+        return invalidQuestions;
     }
 
     /**

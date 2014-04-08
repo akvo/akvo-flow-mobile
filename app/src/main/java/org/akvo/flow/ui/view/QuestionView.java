@@ -564,5 +564,9 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         return true;// Non mandatory questions with no explicit error.
     }
 
+    public boolean isDoubleEntry() {
+        return mQuestion != null ? mQuestion.isDoubleEntry() : false;// Avoid NPE
+    }
+
 }
 

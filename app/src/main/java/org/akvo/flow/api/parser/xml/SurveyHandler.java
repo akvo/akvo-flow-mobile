@@ -82,6 +82,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String LOCALE_LOCATION = "localeLocationFlag";
     private static final String SOURCE_QUESTION_ID = "sourceId";
     private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
+    private static final String DOUBLE_ENTRY = "requireDoubleEntry";
 
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
@@ -265,6 +266,14 @@ public class SurveyHandler extends DefaultHandler {
                         .getValue(LOCKED)));
             } else {
                 currentQuestion.setLocked(false);
+            }
+
+            // Double Entry flag
+            if (attributes.getValue(DOUBLE_ENTRY) != null) {
+                currentQuestion.setIsDoubleEntry(Boolean.parseBoolean(attributes
+                        .getValue(DOUBLE_ENTRY)));
+            } else {
+                currentQuestion.setIsDoubleEntry(false);
             }
 
             currentQuestion.setType(attributes.getValue(TYPE));

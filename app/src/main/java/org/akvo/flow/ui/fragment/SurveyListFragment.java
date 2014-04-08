@@ -40,6 +40,8 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.async.loader.SurveyListLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -116,12 +118,24 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     public void refresh() {
         // Calculate if this locale is not registered yet
         if (mSurveyGroup.isMonitored() && mRecord != null) {
-            mRegistered = mDatabase.getSurveyInstances(mRecord.getId()).getCount() > 0;
+            mRegistered = false;
+            Cursor cursor = mDatabase.getSurveyInstances(mRecord.getId());
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    final int col = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
+                    do {
+                        if (!cursor.isNull(col)) {
+                            mRegistered = true;
+                        }
+                    } while (cursor.moveToNext() && !mRegistered);
+                }
+                cursor.close();
+            }
         }
         
         getLoaderManager().restartLoader(0, null, this);
     }
-    
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Survey survey = mAdapter.getItem(position);

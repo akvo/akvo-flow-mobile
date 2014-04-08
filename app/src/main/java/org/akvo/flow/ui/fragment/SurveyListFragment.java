@@ -41,7 +41,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.async.loader.SurveyListLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -170,13 +169,9 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             if (mSurveyGroup.isMonitored()) {
                 boolean isRegistrationForm = survey.getId().equals(
                         mSurveyGroup.getRegisterSurveyId());
-                if (mRegistered) {
-                    // Disable only registration survey
-                    return !isRegistrationForm;
-                } else {
-                    // Enable only registration survey
-                    return isRegistrationForm;
-                }
+
+                return mRegistered ? true// All items are enabled
+                        : isRegistrationForm;// Only registration form is enabled
             }
             
             return true;// Not monitored. All surveys are enabled

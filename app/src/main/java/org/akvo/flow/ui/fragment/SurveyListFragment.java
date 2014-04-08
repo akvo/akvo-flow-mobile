@@ -21,6 +21,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -44,6 +45,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.util.ViewUtil;
 
 public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>, OnItemClickListener {
     private static final String TAG = SurveyListFragment.class.getSimpleName();
@@ -137,8 +139,23 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Survey survey = mAdapter.getItem(position);
-        mListener.startSurvey(survey);
+        final Survey survey = mAdapter.getItem(position);
+        if (mSurveyGroup.isMonitored() && mRegistered &&
+                survey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
+            // Attempting to answer the registration form multiple times displays a warning
+            ViewUtil.showConfirmDialog(R.string.reg_form_warning_title,
+                    R.string.reg_form_warning_text,
+                    getActivity(),
+                    true,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mListener.startSurvey(survey);
+                        }
+                    });
+        } else {
+            mListener.startSurvey(survey);
+        }
     }
     
     @Override

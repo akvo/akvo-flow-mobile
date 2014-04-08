@@ -200,6 +200,8 @@
     <string name="error_question_mandatory">This response is required</string>
     <string name="repeat_answer">Please, repeat answer</string>
     <string name="error_answer_match">Answers do not match</string>
+    <string name="reg_form_warning_title">Registration Survey</string>
+    <string name="reg_form_warning_text">This Record already contains a response for this survey. Any new response will override previous values. Do you want to continue?</string>
 
     <!-- APK update -->
     <string name="updateavail">A new FLOW update is available</string>

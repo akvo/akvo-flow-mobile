@@ -195,6 +195,13 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
     public void onFocusChange(View view, boolean hasFocus) {
         // we need to listen to loss of focus and make sure input is valid
         if (!hasFocus) {
+            if (isDoubleEntry() && view.getId() == R.id.input_et &&
+                    TextUtils.isEmpty(mDoubleEntryText.getText().toString())) {
+                // On double entry questions, do not attempt to capture the response if:
+                // 1) the focus lost is happening in the first field and,
+                // 2) second field contains no answer yet
+                return;
+            }
             captureResponse();
         }
     }

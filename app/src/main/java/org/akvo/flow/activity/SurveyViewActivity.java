@@ -936,8 +936,10 @@ public class SurveyViewActivity extends TabActivity implements
                 tabContentFactories.get(i).saveState(respondentId);
             }
             
-            // Save Locale meta-data, if applies
-            saveSurveyedLocaleMetadata();
+            if (surveyId.equals(mSurveyGroup.getRegisterSurveyId())) {
+                // Save Locale meta-data, if applies
+                saveSurveyedLocaleMetadata();
+            }
         }
     }
     

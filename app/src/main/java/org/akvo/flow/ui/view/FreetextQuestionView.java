@@ -23,6 +23,7 @@ import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -38,6 +39,8 @@ import org.akvo.flow.util.ConstantUtil;
  */
 public class FreetextQuestionView extends QuestionView implements OnFocusChangeListener {
     private EditText mEditText;
+    private EditText mDoubleEntryText;
+    private TextView mDoubleEntryTitle;
 
     public FreetextQuestionView(Context context, Question q, String defaultLang,
             String[] langCodes, boolean readOnly) {
@@ -49,6 +52,12 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
         setQuestionView(R.layout.freetext_question_view);
 
         mEditText = (EditText)findViewById(R.id.input_et);
+        mDoubleEntryText = (EditText)findViewById(R.id.double_entry_et);
+        mDoubleEntryTitle = (TextView)findViewById(R.id.double_entry_title);
+
+        // Show/Hide double entry title & EditText
+        mDoubleEntryTitle.setVisibility(isDoubleEntry() ? VISIBLE : GONE);
+        mDoubleEntryText.setVisibility(isDoubleEntry() ? VISIBLE : GONE);
 
         if (mReadOnly) {
             mEditText.setFocusable(false);
@@ -66,20 +75,26 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
                 DigitsKeyListener MyDigitKeyListener = new DigitsKeyListener(
                         rule.getAllowSigned(), rule.getAllowDecimal());
                 mEditText.setKeyListener(MyDigitKeyListener);
+                mDoubleEntryText.setKeyListener(MyDigitKeyListener);
             }
         }
-        
-        InputFilter[] FilterArray = new InputFilter[1];
-        FilterArray[0] = new InputFilter.LengthFilter(maxLength);
-        mEditText.setFilters(FilterArray);
-        
+
+        InputFilter[] filters = { new InputFilter.LengthFilter(maxLength) };
+
+        mEditText.setFilters(filters);
+        mDoubleEntryText.setFilters(filters);
+
         mEditText.setOnFocusChangeListener(this);
+        mDoubleEntryText.setOnFocusChangeListener(this);
     }
 
     @Override
     public void setResponse(QuestionResponse resp) {
         if (resp != null) {
             mEditText.setText(resp.getValue());
+            if (isDoubleEntry()) {
+                mDoubleEntryText.setText(resp.getValue());
+            }
         }
         super.setResponse(resp);
     }
@@ -107,6 +122,11 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
             return;// Die early. Don't store the value.
         }
 
+        if (!checkDoubleEntry()) {
+            setError(getResources().getString(R.string.error_answer_match));
+            return;// Die early. Don't store the value.
+        }
+
         if (TextUtils.isEmpty(mEditText.getText().toString()) && getQuestion().isMandatory()) {
             // Mandatory question must be answered
             setError(getResources().getString(R.string.error_question_mandatory));
@@ -119,11 +139,23 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
                 suppressListeners);
     }
 
+    private boolean checkDoubleEntry() {
+        if (!isDoubleEntry()) {
+            return true;// No double entry required. Return true;
+        }
+        String text1 = mEditText.getText().toString();
+        String text2 = mDoubleEntryText.getText().toString();
+        return text1.equals(text2);
+    }
+
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
         if (resp != null) {
             mEditText.setText(resp.getValue());
+            if (isDoubleEntry()) {
+                mDoubleEntryText.setText(resp.getValue());
+            }
         }
     }
 
@@ -131,18 +163,28 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mEditText.setText("");
+        if (isDoubleEntry()) {
+            mDoubleEntryText.setText("");
+        }
     }
 
     @Override
     public void displayError(String error) {
         // Display the error within the EditText (instead of question text)
         mEditText.setError(error);
+        if (isDoubleEntry()) {
+            mDoubleEntryText.setError(error);
+        }
     }
 
     private void validateText(ValidationRule rule) throws ValidationException {
         if (rule != null) {
             String validatedText = rule.performValidation(mEditText.getText().toString());
             mEditText.setText(validatedText);
+            if (isDoubleEntry()) {
+                validatedText = rule.performValidation(mDoubleEntryText.getText().toString());
+                mDoubleEntryText.setText(validatedText);
+            }
         }
     }
 

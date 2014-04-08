@@ -198,6 +198,8 @@
     <!-- Survey Activity -->
     <string name="error_responses">Some responses contain errors. You must review the following questions before you can submit:</string>
     <string name="error_question_mandatory">This response is required</string>
+    <string name="repeat_answer">Please, repeat answer</string>
+    <string name="error_answer_match">Answers do not match</string>
 
     <!-- APK update -->
     <string name="updateavail">A new FLOW update is available</string>

@@ -49,7 +49,7 @@
         <activity android:name="org.akvo.flow.activity.RecordActivity" />
         <activity
             android:name="org.akvo.flow.activity.SurveyViewActivity"
-            android:configChanges="keyboardHidden|orientation" />
+            android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity android:name="org.akvo.flow.activity.ListUserActivity"
             android:label="@string/userlabel"/>
         <activity android:name="org.akvo.flow.activity.UserEditActivity" />

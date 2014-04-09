@@ -22,7 +22,9 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -182,16 +184,17 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         }
         
         private boolean isEnabled(Survey survey) {
-            // If the group is monitored, we need to disable some surveys
             if (mSurveyGroup.isMonitored()) {
-                boolean isRegistrationForm = survey.getId().equals(
-                        mSurveyGroup.getRegisterSurveyId());
-
+                // If the group is monitored, we need to disable some surveys
                 return mRegistered ? true// All items are enabled
-                        : isRegistrationForm;// Only registration form is enabled
+                        : isRegistrationSurvey(survey);// Only registration form is enabled
             }
             
             return true;// Not monitored. All surveys are enabled
+        }
+
+        private boolean isRegistrationSurvey(Survey survey) {
+            return survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
         }
 
         @Override
@@ -208,12 +211,23 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             TextView surveyVersionView = (TextView)listItem.findViewById(R.id.text2);
             surveyNameView.setText(survey.getName());
             surveyVersionView.setText("v" + survey.getVersion());
-            
-            boolean enabled = isEnabled(survey);
+
+            // Restore default colors
+            ColorStateList colors = getResources().getColorStateList(android.R.color.secondary_text_dark);
+            surveyNameView.setTextColor(colors);
+            surveyVersionView.setTextColor(colors);
+
+            final boolean enabled = isEnabled(survey);
             listItem.setEnabled(enabled);
             surveyNameView.setEnabled(enabled);
             surveyVersionView.setEnabled(enabled);
-            
+
+            // make it clear the registration survey is special
+            if (mSurveyGroup.isMonitored() && isRegistrationSurvey(survey)) {
+                surveyNameView.setTextColor(Color.RED);
+                surveyVersionView.setTextColor(Color.RED);
+            }
+
             return listItem;
         }
         

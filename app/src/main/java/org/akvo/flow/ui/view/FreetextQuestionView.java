@@ -17,11 +17,11 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
-import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -37,7 +37,7 @@ import org.akvo.flow.util.ConstantUtil;
  * 
  * @author Christopher Fagiani
  */
-public class FreetextQuestionView extends QuestionView implements OnFocusChangeListener {
+public class FreetextQuestionView extends QuestionView {
     private EditText mEditText;
     private EditText mDoubleEntryText;
     private TextView mDoubleEntryTitle;
@@ -84,8 +84,8 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
         mEditText.setFilters(filters);
         mDoubleEntryText.setFilters(filters);
 
-        mEditText.setOnFocusChangeListener(this);
-        mDoubleEntryText.setOnFocusChangeListener(this);
+        mEditText.addTextChangedListener(new ResponseTextWatcher(mEditText));
+        mDoubleEntryText.addTextChangedListener(new ResponseTextWatcher(mDoubleEntryText));
     }
 
     @Override
@@ -109,7 +109,10 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
         try {
             if (!TextUtils.isEmpty(mEditText.getText().toString())) {
                 // Do not validate void answers
-                validateText(rule);
+                validateText(rule, mEditText);
+                if (isDoubleEntry()) {
+                    validateText(rule, mDoubleEntryText);
+                }
             }
         } catch (ValidationException e) {
             // if we failed validation, display a message to the user
@@ -180,25 +183,35 @@ public class FreetextQuestionView extends QuestionView implements OnFocusChangeL
         }
     }
 
-    private void validateText(ValidationRule rule) throws ValidationException {
+    private void validateText(ValidationRule rule, EditText view) throws ValidationException {
         if (rule != null) {
-            String validatedText = rule.performValidation(mEditText.getText().toString());
-            mEditText.setText(validatedText);
-            if (isDoubleEntry()) {
-                validatedText = rule.performValidation(mDoubleEntryText.getText().toString());
-                mDoubleEntryText.setText(validatedText);
+            final String text = view.getText().toString();
+            final String validatedText = rule.performValidation(text);
+            if (!text.equals(validatedText)) {
+                view.setText(validatedText);// This action will trigger captureResponse again
             }
         }
     }
 
-    /**
-     * captures the response and runs validation on loss of focus
-     */
-    @Override
-    public void onFocusChange(View view, boolean hasFocus) {
-        // we need to listen to loss of focus and make sure input is valid
-        if (!hasFocus) {
-            if (isDoubleEntry() && view.getId() == R.id.input_et &&
+    class ResponseTextWatcher implements TextWatcher {
+
+        EditText mView;
+
+        ResponseTextWatcher(EditText view) {
+            mView = view;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (isDoubleEntry() && mView.getId() == R.id.input_et &&
                     TextUtils.isEmpty(mDoubleEntryText.getText().toString())) {
                 // On double entry questions, do not attempt to capture the response if:
                 // 1) the focus lost is happening in the first field and,

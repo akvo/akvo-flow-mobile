@@ -8,6 +8,7 @@
         android:id="@+id/date_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:enabled="false"
         android:inputType="textNoSuggestions" />
 
     <Button

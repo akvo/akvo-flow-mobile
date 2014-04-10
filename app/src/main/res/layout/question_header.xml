@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:visibility="gone"
+        android:background="@android:color/transparent"
         android:src="@android:drawable/ic_dialog_info"/>
 
 </LinearLayout>

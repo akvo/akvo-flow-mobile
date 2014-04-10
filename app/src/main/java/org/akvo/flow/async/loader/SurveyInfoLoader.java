@@ -45,17 +45,17 @@ public class SurveyInfoLoader extends DataLoader<Cursor> {
 
     @Override
     protected Cursor loadData(SurveyDbAdapter database) {
-        String where = SurveyColumns.DELETED + " <> 1 AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?";
-        List<String> argList =  new ArrayList<String>();
-        argList.add(String.valueOf(mSurveyGroupId));
+        String table = Tables.SURVEY_JOIN_SURVEY_INSTANCE;
         if (mRecordId != null) {
-            where += " OR " + SurveyInstanceColumns.RECORD_ID + " = ?";
-            argList.add(mRecordId);
+            // Add record id to the join condition. If put in the where, the left join won't work
+            table +=  " AND " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID
+                    + "='" + mRecordId + "'";
         }
 
-        return database.query(Tables.SURVEY_JOIN_SURVEY_INSTANCE,
+        return database.query(table,
                 SurveyQuery.PROJECTION,
-                where, argList.toArray(new String[argList.size()]),
+                SurveyColumns.DELETED + " <> 1 AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?",
+                new String[] { String.valueOf(mSurveyGroupId) },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
                 null,
                 SurveyInstanceColumns.SUBMITTED_DATE + " DESC");

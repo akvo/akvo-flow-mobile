@@ -204,8 +204,8 @@
 
     <!-- Record Activity -->
     <string name="unknown">Unknown</string>
-    <string name="last_modified">Last Modified: </string>
-    <string name="last_response">Last Response: </string>
+    <string name="last_modified">Last Modified:</string>
+    <string name="last_response">Last Response:</string>
 
     <!-- APK update -->
     <string name="updateavail">A new FLOW update is available</string>

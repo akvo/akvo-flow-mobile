@@ -220,25 +220,29 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             surveyVersionView.setEnabled(enabled);
 
             int iconRes = R.drawable.survey_icon;
+            boolean showLastSubmission = false;
             if (mSurveyGroup.isMonitored()) {
                 if (surveyInfo.mLastSubmission != null) {
+                    showLastSubmission = true;
                     iconRes = isRegistrationSurvey(surveyInfo.mId) ?
                             R.drawable.register_survey_done_icon
                             : R.drawable.survey_done_icon;
 
-                    String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
-                    lastSubmissionView.setText(time);
-                    lastSubmissionTitle.setVisibility(View.VISIBLE);
-                    lastSubmissionView.setVisibility(View.VISIBLE);
-                } else {
-                    if (isRegistrationSurvey(surveyInfo.mId)) {
-                        iconRes = R.drawable.register_survey_icon;
-                    }
-                    lastSubmissionTitle.setVisibility(View.GONE);
-                    lastSubmissionView.setVisibility(View.GONE);
+                } else if (isRegistrationSurvey(surveyInfo.mId)) {
+                    iconRes = R.drawable.register_survey_icon;
                 }
             }
             icon.setImageResource(iconRes);
+
+            if (showLastSubmission) {
+                String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
+                lastSubmissionView.setText(time);
+                lastSubmissionTitle.setVisibility(View.VISIBLE);
+                lastSubmissionView.setVisibility(View.VISIBLE);
+            } else {
+                lastSubmissionTitle.setVisibility(View.GONE);
+                lastSubmissionView.setVisibility(View.GONE);
+            }
 
             return listItem;
         }
@@ -264,7 +268,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 SurveyInfo s = new SurveyInfo();
                 s.mId = cursor.getString(SurveyQuery.SURVEY_ID);
                 s.mName = cursor.getString(SurveyQuery.NAME);
-                s.mVersion = String.valueOf(cursor.getLong(SurveyQuery.VERSION));
+                s.mVersion = String.valueOf(cursor.getFloat(SurveyQuery.VERSION));
                 if (!cursor.isNull(SurveyQuery.SUBMITTED)) {
                     s.mLastSubmission = cursor.getLong(SurveyQuery.SUBMITTED);
                 }

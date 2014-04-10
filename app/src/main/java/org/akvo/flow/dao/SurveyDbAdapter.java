@@ -71,6 +71,9 @@ public class SurveyDbAdapter {
 
         String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
                 + "LEFT OUTER JOIN survey ON (survey_instance.survey_id = survey.survey_id)";
+
+        String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
+                + "survey.survey_id=survey_instance.survey_id";
     }
 
     public interface SurveyGroupColumns {
@@ -1229,9 +1232,10 @@ public class SurveyDbAdapter {
         String base32Id = Base32.base32Uuid();
         // Put dashes between the 4-5 and 8-9 positions to increase readability
         String id = base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
-        String name = "Unknown";// TODO
-        double lat = 0.0d;// TODO
-        double lon = 0.0d;// TODO
+        // TODO: Don not initialize the values here
+        String name = context.getString(R.string.unknown);
+        double lat = 0.0d;
+        double lon = 0.0d;
         ContentValues values = new ContentValues();
         values.put(RecordColumns.RECORD_ID, id);
         values.put(RecordColumns.SURVEY_GROUP_ID, surveyGroupId);
@@ -1623,6 +1627,14 @@ public class SurveyDbAdapter {
         values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
         values.put(SyncTimeColumns.TIME, time);
         database.insert(Tables.SYNC_TIME, null, values);
+    }
+
+    /**
+     * Query the given table, returning a Cursor over the result set.
+     */
+    public Cursor query(String table, String[] columns, String selection, String[] selectionArgs,
+        String groupBy, String having, String orderBy) {
+        return database.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
     }
 
 }

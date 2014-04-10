@@ -140,7 +140,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     }
 
     @Override
-    public void startSurvey(Survey survey) {
+    public void startSurvey(String surveyId) {
         if (BootstrapService.isProcessing) {
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
         } else if (mUser == null) {
@@ -149,7 +149,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         } else {
             Intent i = new Intent(this, SurveyViewActivity.class);
             i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
-            i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
+            i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
             i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
             if (mRecord != null) {
                 // The record will automatically be managed in non monitored groups

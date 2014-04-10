@@ -22,9 +22,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -38,6 +36,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -206,7 +205,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             }
 
             final SurveyInfo surveyInfo = getItem(position);
-            
+
+            ImageView icon = (ImageView)listItem.findViewById(R.id.survey_icon);
             TextView surveyNameView = (TextView)listItem.findViewById(R.id.text1);
             TextView surveyVersionView = (TextView)listItem.findViewById(R.id.text2);
             TextView lastSubmissionTitle = (TextView)listItem.findViewById(R.id.date_label);
@@ -214,31 +214,31 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             surveyNameView.setText(surveyInfo.mName);
             surveyVersionView.setText("v" + surveyInfo.mVersion);
 
-            if (mSurveyGroup.isMonitored() && surveyInfo.mLastSubmission != null) {
-                String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
-                lastSubmissionView.setText(time);
-                lastSubmissionTitle.setVisibility(View.VISIBLE);
-                lastSubmissionView.setVisibility(View.VISIBLE);
-            } else {
-                lastSubmissionTitle.setVisibility(View.GONE);
-                lastSubmissionView.setVisibility(View.GONE);
-            }
-
-            // Restore default colors
-            ColorStateList colors = getResources().getColorStateList(android.R.color.secondary_text_dark);
-            surveyNameView.setTextColor(colors);
-            surveyVersionView.setTextColor(colors);
-
             final boolean enabled = isEnabled(surveyInfo.mId);
             listItem.setEnabled(enabled);
             surveyNameView.setEnabled(enabled);
             surveyVersionView.setEnabled(enabled);
 
-            // make it clear the registration survey is special
-            if (mSurveyGroup.isMonitored() && isRegistrationSurvey(surveyInfo.mId)) {
-                surveyNameView.setTextColor(Color.RED);
-                surveyVersionView.setTextColor(Color.RED);
+            int iconRes = R.drawable.survey_icon;
+            if (mSurveyGroup.isMonitored()) {
+                if (surveyInfo.mLastSubmission != null) {
+                    iconRes = isRegistrationSurvey(surveyInfo.mId) ?
+                            R.drawable.register_survey_done_icon
+                            : R.drawable.survey_done_icon;
+
+                    String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
+                    lastSubmissionView.setText(time);
+                    lastSubmissionTitle.setVisibility(View.VISIBLE);
+                    lastSubmissionView.setVisibility(View.VISIBLE);
+                } else {
+                    if (isRegistrationSurvey(surveyInfo.mId)) {
+                        iconRes = R.drawable.register_survey_icon;
+                    }
+                    lastSubmissionTitle.setVisibility(View.GONE);
+                    lastSubmissionView.setVisibility(View.GONE);
+                }
             }
+            icon.setImageResource(iconRes);
 
             return listItem;
         }

@@ -166,6 +166,10 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         menu.removeItem(R.id.more_submenu);
     }
 
+    private boolean isRegistrationSurvey(Survey survey) {
+        return survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
+    }
+
     class SurveyAdapter extends ArrayAdapter<Survey> {
         static final int LAYOUT_RES = R.layout.survey_item;
 
@@ -191,10 +195,6 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             }
             
             return true;// Not monitored. All surveys are enabled
-        }
-
-        private boolean isRegistrationSurvey(Survey survey) {
-            return survey.getId().equals(mSurveyGroup.getRegisterSurveyId());
         }
 
         @Override
@@ -244,11 +244,16 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             Log.e(TAG, "onFinished() - Loader returned no data");
             return;
         }
-        
+
         mAdapter.clear();
         if (cursor.moveToFirst()) {
             do {
-                mAdapter.add(SurveyDbAdapter.getSurvey(cursor));
+                Survey s = SurveyDbAdapter.getSurvey(cursor);
+                if (mSurveyGroup.isMonitored() && isRegistrationSurvey(s)) {
+                    mAdapter.insert(s, 0);// Make sure registration survey is at the top
+                } else {
+                    mAdapter.add(s);
+                }
             } while (cursor.moveToNext());
         }
     }

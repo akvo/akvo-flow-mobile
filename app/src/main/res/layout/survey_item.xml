@@ -36,7 +36,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/text1"
         android:textSize="14sp"
-        android:textColor="#00ff00" />
+        android:textColor="#8D943F" />
 
     <TextView
         android:id="@+id/date_label"
@@ -46,7 +46,7 @@
         android:layout_below="@id/text1"
         android:layout_marginRight="5dp"
         android:textSize="14sp"
-        android:textColor="#00ff00"
+        android:textColor="#8D943F"
         android:text="@string/last_response"/>
 
 </RelativeLayout>

@@ -22,6 +22,7 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -84,8 +85,13 @@ public class FreetextQuestionView extends QuestionView {
         mEditText.setFilters(filters);
         mDoubleEntryText.setFilters(filters);
 
-        mEditText.addTextChangedListener(new ResponseTextWatcher(mEditText));
-        mDoubleEntryText.addTextChangedListener(new ResponseTextWatcher(mDoubleEntryText));
+        // ResponseListener will handle both onFocusChange and TextChanged
+        ResponseListener inputListener = new ResponseListener(mEditText);
+        ResponseListener extraListener = new ResponseListener(mDoubleEntryText);
+        mEditText.addTextChangedListener(inputListener);
+        mEditText.setOnFocusChangeListener(inputListener);
+        mDoubleEntryText.addTextChangedListener(extraListener);
+        mDoubleEntryText.setOnFocusChangeListener(extraListener);
     }
 
     @Override
@@ -193,12 +199,23 @@ public class FreetextQuestionView extends QuestionView {
         }
     }
 
-    class ResponseTextWatcher implements TextWatcher {
+    class ResponseListener implements TextWatcher, OnFocusChangeListener {
 
         EditText mView;
 
-        ResponseTextWatcher(EditText view) {
+        ResponseListener(EditText view) {
             mView = view;
+        }
+
+        boolean capture() {
+            if (isDoubleEntry() && mView.getId() == R.id.input_et &&
+                    TextUtils.isEmpty(mDoubleEntryText.getText().toString())) {
+                // On double entry questions, do not attempt to capture the response if:
+                // 1) the focus lost is happening in the first field and,
+                // 2) second field contains no answer yet
+                return false;
+            }
+            return true;
         }
 
         @Override
@@ -211,14 +228,16 @@ public class FreetextQuestionView extends QuestionView {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (isDoubleEntry() && mView.getId() == R.id.input_et &&
-                    TextUtils.isEmpty(mDoubleEntryText.getText().toString())) {
-                // On double entry questions, do not attempt to capture the response if:
-                // 1) the focus lost is happening in the first field and,
-                // 2) second field contains no answer yet
-                return;
+            if (capture()) {
+                captureResponse();
             }
-            captureResponse();
+        }
+
+        @Override
+        public void onFocusChange(View view, boolean hasFocus) {
+            if (!hasFocus && capture()) {
+                captureResponse();
+            }
         }
     }
     

@@ -56,6 +56,7 @@ public class Question {
     private boolean localeName = false;
     private boolean localeLocation = false;
     private String sourceQuestionId;// "Copied-from" question Id
+    private boolean isDoubleEntry;
     
     public void setIsLocaleName(boolean localeName) {
         this.localeName = localeName;
@@ -290,5 +291,13 @@ public class Question {
 
     public String toString() {
         return text;
+    }
+
+    public void setIsDoubleEntry(boolean isdoubleEntry) {
+        this.isDoubleEntry = isdoubleEntry;
+    }
+
+    public boolean isDoubleEntry() {
+        return isDoubleEntry;
     }
 }

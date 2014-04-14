@@ -23,17 +23,12 @@
     <string name="lastsync">Last Sync:</string>
     <string name="userlabel">Manage Users</string>
     <string name="resize_large_images">Resize large images</string>
-    <string name="wplabel">Community Waterpoint Survey</string>
-    <string name="hhlabel">Household Survey</string>
-    <string name="publabel">Public Institution Survey</string>
     <string name="settingslabel">Settings</string>
-    <string name="maplabel">Mapping</string>
-    <string name="unknown">unknown</string>
     <string name="adduser">Add User</string>
     <string name="nouser">No Users!</string>
     <string name="displayname">Display Name</string>
     <string name="email">Email Address</string>
-    <string name="userinstructions">Select the current user by clicking. To create a new user, press the Menu button and select Add User. Long-click to edit a user.</string>
+    <string name="userinstructions">Select the current user by clicking. To create a new user, press the \'+\' icon. Long-click to edit a user.</string>
     <string name="editmenu">Edit User</string>
     <string name="deleteusermenu">Delete User</string>
     <string name="mustselectuser">Please click the Manage Users icon and choose a user before continuing.</string>
@@ -45,10 +40,8 @@
     <string name="nothingtoexport">There is no unsent data</string>
     <string name="prefoptlabel">Preferences</string>
     <string name="prefoptdesc">Set default survey language and other preference data</string>
-    <string name="exportoptlabel">Export Data</string>
-    <string name="exportoptdesc">Exports survey data to a zip file on the device\'s SD card</string>
-    <string name="sendoptlabel">Send Data</string>
-    <string name="sendoptdesc">Sends survey data to server. You must have data access (cellular or wi-fi) to perform this operation.</string>
+    <string name="sendoptlabel">Sync Data</string>
+    <string name="sendoptdesc">Syncs survey data. You must have data access (mobile or wi-fi) to perform this operation.</string>
     <string name="poweroptlabel">Power Management</string>
     <string name="poweroptdesc">Toggles Wi-Fi to better manage battery life.</string>
     <string name="screenoptlabel">Keep Screen on During Survey Input</string>
@@ -56,7 +49,7 @@
     <string name="aboutlabel">About</string>
     <string name="aboutdesc">Displays version information.</string>
     <string name="abouttitle">About - FieldSurvey</string>
-    <string name="abouttext">FieldSurvey\nDeveloped By: Akvo Foundation\nCopyright © 2010-2013 Stichting Akvo\nVersion </string>
+    <string name="abouttext">FieldSurvey\nDeveloped By: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion </string>
     <string name="gpsstatuslabel">GPS Status</string>
     <string name="gpsstatusdesc">Launches the GPS Status application if you have it installed on this device.</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Android Market.</string>
@@ -112,7 +105,6 @@
     <string name="downloadsurveylabel">Download Survey</string>
     <string name="downloadsurveydesc">Downloads arbitrary surveys (only run if instructed)</string>
     <string name="downloadsurveyinstr">Enter the survey id you wish to download.</string>
-    <string name="submittedsurveysmenu">Submitted Surveys</string>
     <string name="deleteallwarning">This will permanently delete all survey responses (saved AND submitted) on the device. Click OK to proceed or cancel to abort.</string>
     <string name="deletealldatawarning">This will permanently delete all data (surveys, responses, images, and users) on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="delete_responses_warning">This will permanently delete responses, images, and zip files on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
@@ -177,6 +169,16 @@
     <string name="loading">Loading...</string>
     <string name="prefill_title">Prefill Responses</string>
     <string name="prefill_text">Prefill responses with previous values of the same questions</string>
+    <string name="error_assignment_title">Survey could not be downloaded</string>
+    <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
+
+    <!-- Survey Groups Activity -->
+    <string name="monitored_group">Monitored Group</string>
+    <string name="regular_group">Regular Group</string>
+
+    <!-- Localization -->
+    <string name="app_language">App Language</string>
+    <string name="please_restart">Please, restart the app</string>
     
     <!-- Empty Views -->
     <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the FLOW dashboard</string>
@@ -191,6 +193,19 @@
     
     <!-- Search -->
     <string name="search_hint">Search Record</string>
+
+    <!-- Survey Activity -->
+    <string name="error_responses">Some responses contain errors. You must review the following questions before you can submit:</string>
+    <string name="error_question_mandatory">This response is required</string>
+    <string name="repeat_answer">Please, repeat answer</string>
+    <string name="error_answer_match">Answers do not match</string>
+    <string name="reg_form_warning_title">Registration Survey</string>
+    <string name="reg_form_warning_text">This Record already contains a response for this survey. Any new response will override previous values. Do you want to continue?</string>
+
+    <!-- Record Activity -->
+    <string name="unknown">Unknown</string>
+    <string name="last_modified">Last Modified:</string>
+    <string name="last_response">Last Response:</string>
 
     <!-- APK update -->
     <string name="updateavail">A new FLOW update is available</string>

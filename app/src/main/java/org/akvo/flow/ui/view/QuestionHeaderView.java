@@ -33,4 +33,7 @@ public class QuestionHeaderView extends QuestionView {
         setQuestionView(R.layout.question_header);
     }
 
+    @Override
+    public void captureResponse(boolean suppressListeners) {
+    }
 }

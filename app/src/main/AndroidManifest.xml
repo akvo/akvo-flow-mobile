@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.flow"
     android:versionCode="1"
-    android:versionName="1.14.0" >
+    android:versionName="1.14.4" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -49,7 +49,7 @@
         <activity android:name="org.akvo.flow.activity.RecordActivity" />
         <activity
             android:name="org.akvo.flow.activity.SurveyViewActivity"
-            android:configChanges="keyboardHidden|orientation" />
+            android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity android:name="org.akvo.flow.activity.ListUserActivity"
             android:label="@string/userlabel"/>
         <activity android:name="org.akvo.flow.activity.UserEditActivity" />
@@ -74,11 +74,9 @@
             </intent-filter>
         </receiver>
 
-        <uses-library android:name="com.google.android.maps" />
-        
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDDJOA8o5lG8Ua48r8pffPDqS71F2bfG98"/>
+            android:value="AIzaSyBPyguWZrQi2xcqs49WajwQ6FYeSHpaEFQ"/>
         
         <provider
             android:name="org.akvo.flow.dao.DataProvider"

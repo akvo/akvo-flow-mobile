@@ -115,8 +115,4 @@ public abstract class SurveyTabContentFactory implements TabContentFactory {
         return defaultLang;
     }
 
-    protected SurveyViewActivity getContext() {
-        return context;
-    }
-
 }

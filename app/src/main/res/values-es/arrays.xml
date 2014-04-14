@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="records_activity_tabs">
+        <item>REGISTROS</item>
+        <item>MAPA</item>
+    </string-array>
+    
+    <string-array name="record_tabs">
+        <item>ENCUESTAS</item>
+        <item>RESPUESTAS</item>
+    </string-array>
+    
+    <string-array name="order_by">
+        <item>Fecha</item>
+        <item>Distancia</item>
+    </string-array>
+
+</resources>

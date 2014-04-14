@@ -268,14 +268,14 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 double dist = distance * factor;
                 builder.append(df.format(dist)).append(" ").append(unit);
             } else {
-                builder.append("Unknown");
+                builder.append(getString(R.string.unknown));
             }
             
             return builder.toString();
         }
         
         private String getDateText(Long time) {
-            String text = "Last Modified: ";
+            String text = getString(R.string.last_modified);
             if (time != null && time > 0) {
                 text += new PrettyTime().format(new Date(time));
             }

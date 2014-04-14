@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import android.app.AlertDialog;
@@ -131,7 +132,8 @@ public class SurveyViewActivity extends TabActivity implements
     private int tabCount;
     private String eventSourceQuestionId;
     private PropertyUtil props;
-    private HashSet<String> missingQuestions;
+    // TODO: In the refactor of this Activity, use invalidQuestions to store all the invalid questions
+    //private HashSet<String> missingQuestions;
     private boolean hasAddedTabs;
     private long sessionStartTime;
     
@@ -142,7 +144,6 @@ public class SurveyViewActivity extends TabActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         currentTextSize = NORMAL_TXT_SIZE;
-        missingQuestions = new HashSet<String>();
         readOnly = false;
         single = false;
         hasAddedTabs = false;
@@ -522,13 +523,14 @@ public class SurveyViewActivity extends TabActivity implements
     private void cleanDCIM(String filepath) {
         Cursor cursor = getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] {
+                new String[]{
                         MediaStore.Images.ImageColumns.DATA,
                         MediaStore.Images.ImageColumns.DATE_TAKEN
                 },
                 null,
                 null,
-                MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+                MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
+        );
 
         if (cursor.moveToFirst()) {
             final String lastImagePath = cursor.getString(cursor
@@ -579,7 +581,6 @@ public class SurveyViewActivity extends TabActivity implements
      * questions
      */
     public void resetAllQuestions() {
-        missingQuestions.clear();
         for (int i = 0; i < tabContentFactories.size(); i++) {
             tabContentFactories.get(i).resetTabQuestions();
         }
@@ -596,13 +597,13 @@ public class SurveyViewActivity extends TabActivity implements
      * @param questions
      */
     public void setMissingQuestions(ArrayList<Question> questions) {
-        missingQuestions.clear();
         if (questions != null) {
-            for (int i = 0; i < questions.size(); i++) {
-                missingQuestions.add(questions.get(i).getId());
+            HashSet<String> invalidQuestions = new HashSet<String>();
+            for (Question q : questions) {
+                invalidQuestions.add(q.getId());
             }
             for (SurveyQuestionTabContentFactory factory : tabContentFactories) {
-                factory.highlightMissingQuestions(missingQuestions);
+                factory.highlightMissingQuestions(invalidQuestions);
             }
         }
     }
@@ -753,62 +754,51 @@ public class SurveyViewActivity extends TabActivity implements
      * 
      * @return
      */
-    public ArrayList<Question> checkMandatory() {
-        ArrayList<Question> missingQuestions = new ArrayList<Question>();
+    public List<Question> checkInvalidQuestions() {
+        Map<String, QuestionResponse> responseMap = new HashMap<String, QuestionResponse>();
+        ArrayList<Question> invalidQuestions = new ArrayList<Question>();
         if (tabContentFactories != null) {
-            ArrayList<Question> candidateMissingQuestions = new ArrayList<Question>();
+            ArrayList<Question> candidateInvalidQuestions = new ArrayList<Question>();
             for (int i = 0; i < tabContentFactories.size(); i++) {
-                candidateMissingQuestions.addAll(tabContentFactories.get(i)
-                        .checkMandatoryQuestions());
+                // Add this tab's responses to the map.
+                Map<String, QuestionResponse> responses = tabContentFactories.get(i).getResponses();
+                responseMap.putAll(responses);
+                candidateInvalidQuestions.addAll(tabContentFactories.get(i).checkInvalidQuestions());
             }
 
             // now make sure that the candidate missing questions are really
             // missing by seeing if their dependencies are fulfilled
-            HashMap<String, QuestionResponse> responseMap = tabContentFactories
-                    .get(0).loadState(getRespondentId());
-            for (int i = 0; i < candidateMissingQuestions.size(); i++) {
-                ArrayList<Dependency> dependencies = candidateMissingQuestions
-                        .get(i).getDependencies();
-                if (dependencies != null) {
-                    int satisfiedCount = 0;
-                    for (int j = 0; j < dependencies.size(); j++) {
-                        if (isDependencySatisfied(dependencies.get(j),
-                                responseMap)) {
-                            satisfiedCount++;
-                        }
-                    }
-                    if (satisfiedCount == dependencies.size()) {
-                        missingQuestions.add(candidateMissingQuestions.get(i));
-                    }
-
-                } else {
-                    missingQuestions.add(candidateMissingQuestions.get(i));
+            // TODO: tabs might not been populated!
+            for (Question q : candidateInvalidQuestions) {
+                if (areDependenciesSatisfied(q, responseMap)) {
+                    invalidQuestions.add(q);
                 }
             }
         }
-        return missingQuestions;
+
+        return invalidQuestions;
     }
 
     /**
-     * checks if the dependency passed in is satisfied (i.e. if a question view
-     * exists with the id and answer that match the dependency values)
-     * 
-     * @param dep
-     * @return
+     * Checks if the dependencies for the question passed in are satisfied
+     *
+     * @param q Question to check dependencies for
+     * @param responses All the responses for this survey
+     * @return true if no dependency is broken, false otherwise
      */
-    protected boolean isDependencySatisfied(Dependency dep,
-            HashMap<String, QuestionResponse> responses) {
-        boolean isSatisfied = false;
-        if (responses != null) {
-            QuestionResponse resp = responses.get(dep.getQuestion());
-            if (resp != null && resp.hasValue()
-                    && dep.isMatch(resp.getValue())
-                    && resp.getIncludeFlag()) {
-
-                isSatisfied = true;
+    private boolean areDependenciesSatisfied(Question q, Map<String, QuestionResponse> responses) {
+        List<Dependency> dependencies = q.getDependencies();
+        if (dependencies != null) {
+            for (Dependency dependency : dependencies) {
+                QuestionResponse resp = responses.get(dependency.getQuestion());
+                if (resp == null || !resp.hasValue()
+                        || !dependency.isMatch(resp.getValue())
+                        || !resp.getIncludeFlag()) {
+                    return false;
+                }
             }
         }
-        return isSatisfied;
+        return true;
     }
 
     /**
@@ -946,8 +936,10 @@ public class SurveyViewActivity extends TabActivity implements
                 tabContentFactories.get(i).saveState(respondentId);
             }
             
-            // Save Locale meta-data, if applies
-            saveSurveyedLocaleMetadata();
+            if (surveyId.equals(mSurveyGroup.getRegisterSurveyId())) {
+                // Save Locale meta-data, if applies
+                saveSurveyedLocaleMetadata();
+            }
         }
     }
     

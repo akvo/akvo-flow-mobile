@@ -24,7 +24,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -62,20 +61,27 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     private TextView mQuestionText;
     private ImageButton mTipImage;
 
+    /**
+     * mError stores the presence of non-acceptable responses.
+     * Any non-null value will be considered as an invalid response.
+     */
+    private String mError;
+
     public QuestionView(final Context context, Question q, String defaultLangauge, String[] langs,
             boolean readOnly) {
         super(context);
         setOrientation(VERTICAL);
         final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
         setPadding(padding, padding, padding, padding);
-        mQuestion = q;
-        mDefaultLang = defaultLangauge;
-        mReadOnly = readOnly;
-        mLangs = langs;
         if (sColors == null) {
             // must have enough colors for all enabled languages
             sColors = context.getResources().getStringArray(R.array.colors);
         }
+        mQuestion = q;
+        mDefaultLang = defaultLangauge;
+        mReadOnly = readOnly;
+        mLangs = langs;
+        mError = null;// so far so good.
     }
 
     /**
@@ -309,8 +315,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      *
      * @param listener
      */
-    public void addQuestionInteractionListener(
-            QuestionInteractionListener listener) {
+    public void addQuestionInteractionListener(QuestionInteractionListener listener) {
         if (mListeners == null) {
             mListeners = new ArrayList<QuestionInteractionListener>();
         }
@@ -347,7 +352,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public void resetQuestion(boolean fireEvent) {
         setResponse(null, false);
-        highlight(false);
+        setError(null);
         if (fireEvent) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_CLEAR_EVENT);
         }
@@ -427,21 +432,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         return setVisible;
     }
 
-    /**
-     * this method should be overridden by subclasses so they can record input
-     * in a QuestionResponse object
-     */
-    public void captureResponse() {
-        // NO OP
+    public final void captureResponse() {
+        captureResponse(false);
     }
 
     /**
      * this method should be overridden by subclasses so they can record input
      * in a QuestionResponse object
      */
-    public void captureResponse(boolean suppressListeners) {
-        // NO OP
-    }
+    public abstract void captureResponse(boolean suppressListeners);
 
     /**
      * this method should be overridden by subclasses so they can manage the UI
@@ -529,17 +528,44 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mDefaultLang = defaultLang;
     }
 
+    public void setError(String error) {
+        mError = error;
+        displayError(mError);
+    }
+
     /**
-     * turns highlighting on/off
+     * displayError will give visual feedback of non-valid responses.
+     * By default, we display the message in the question text, although subclasses may
+     * override the method and display it elsewhere (i.e. within an EditText)
      *
-     * @param useHighlight
+     * @param error Error text
      */
-    public void highlight(boolean useHighlight) {
-        if (useHighlight) {
-            mQuestionText.setBackgroundColor(0x55CC99CC);
-        } else {
-            mQuestionText.setBackgroundColor(Color.TRANSPARENT);
+    public void displayError(String error) {
+        mQuestionText.setError(error);
+    }
+
+    /**
+     * isValid determines if the QuestionView contains a valid status.
+     * An invalid status can be set either explicitly with setError(String),
+     * or it can be automatically deducted if the question is mandatory and no response is set.
+     *
+     * @return true if the status is valid, false otherwise
+     */
+    public boolean isValid() {
+        if (mError != null) {
+            return false;// No discussion. This question is explicitly marked as erroneous.
         }
+
+        if (mQuestion.isMandatory()) {
+            // Mandatory questions must have a response
+            return mResponse != null && mResponse.isValid();
+        }
+
+        return true;// Non mandatory questions with no explicit error.
+    }
+
+    public boolean isDoubleEntry() {
+        return mQuestion != null ? mQuestion.isDoubleEntry() : false;// Avoid NPE
     }
 
 }

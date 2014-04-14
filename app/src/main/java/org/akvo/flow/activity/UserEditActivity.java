@@ -59,8 +59,7 @@ public class UserEditActivity extends Activity {
                 .getLong(ConstantUtil.ID_KEY) : null;
         if (userId == null || userId == 0L) {
             Bundle extras = getIntent().getExtras();
-            userId = extras != null ? Long.valueOf(extras
-                    .getString(ConstantUtil.ID_KEY)) : null;
+            userId = extras != null ? extras.getLong(ConstantUtil.ID_KEY) : null;
         }
 
         saveButton.setOnClickListener(new View.OnClickListener() {

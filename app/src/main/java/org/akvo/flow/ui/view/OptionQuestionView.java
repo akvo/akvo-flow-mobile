@@ -659,5 +659,9 @@ public class OptionQuestionView extends QuestionView {
             }
         }
     }
-    
+
+    @Override
+    public void captureResponse(boolean suppressListeners) {
+    }
+
 }

@@ -165,7 +165,7 @@ public class RecordListActivity extends ActionBarActivity implements
         Intent intent = new Intent(this, RecordActivity.class);
         Bundle extras = new Bundle();
         extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
-        extras.putSerializable(RecordActivity.EXTRA_RECORD, record);
+        extras.putString(RecordActivity.EXTRA_RECORD_ID, record.getId());
         intent.putExtras(extras);
         startActivity(intent);
     }

@@ -49,7 +49,7 @@ import org.akvo.flow.util.ConstantUtil;
 
 public class RecordActivity extends ActionBarActivity implements SurveyListListener, TabListener {
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
-    public static final String EXTRA_RECORD = "record";
+    public static final String EXTRA_RECORD_ID = "record";
     
     //private static final String TAG = RecordActivity.class.getSimpleName();
     
@@ -90,11 +90,9 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         mDatabase = new SurveyDbAdapter(this);
         
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(EXTRA_SURVEY_GROUP);
-        mRecord = (SurveyedLocale) getIntent().getSerializableExtra(EXTRA_RECORD);
         setTitle(mSurveyGroup.getName());
         
         setupActionBar();
-        displayRecord();
     }
     
     private void setupActionBar() {
@@ -118,6 +116,10 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         super.onResume();
         mDatabase.open();
         mUser = FlowApp.getApp().getUser();
+        // Record might have changed while answering a registration survey
+        String recordId = getIntent().getStringExtra(EXTRA_RECORD_ID);
+        mRecord = mDatabase.getSurveyedLocale(recordId);
+        displayRecord();
         mAdapter.refresh();
     }
 
@@ -138,7 +140,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     }
 
     @Override
-    public void startSurvey(Survey survey) {
+    public void startSurvey(String surveyId) {
         if (BootstrapService.isProcessing) {
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
         } else if (mUser == null) {
@@ -148,7 +150,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             //Intent i = new Intent(this, SurveyViewActivity.class);
             Intent i = new Intent(this, SurveyActivity.class);
             i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
-            i.putExtra(ConstantUtil.SURVEY_ID_KEY, survey.getId());
+            i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
             i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
             if (mRecord != null) {
                 // The record will automatically be managed in non monitored groups

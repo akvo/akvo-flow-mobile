@@ -290,4 +290,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         mSearchingIndicator.setText("");
     }
 
+    @Override
+    public void captureResponse(boolean suppressListeners) {
+    }
+
 }

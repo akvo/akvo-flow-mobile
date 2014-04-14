@@ -19,6 +19,7 @@ package org.akvo.flow.ui.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,13 +27,10 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyViewActivity;
@@ -64,6 +62,22 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
 
     public HashMap<String, QuestionView> getQuestionMap() {
         return questionMap;
+    }
+
+    /**
+     * Get the *current* UI responses in this tab. Note that this are not the same as stored
+     * responses, as we are not loading the state from the DB, just retrieven the current values.
+     * TODO: Cache. We should not loop through the QuestionViews each time the responses are requested.
+     */
+    public Map<String, QuestionResponse> getResponses() {
+        Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
+        if (questionMap != null) {
+            for (QuestionView q : questionMap.values()) {
+                responses.put(q.getQuestion().getId(), q.getResponse(true));
+            }
+        }
+
+        return responses;
     }
 
     /**
@@ -206,9 +220,9 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         if (questionMap != null && questions != null) {
             for (QuestionView view : questionMap.values()) {
                 if (questions.contains(view.getQuestion().getId())) {
-                    view.highlight(true);
+                    view.setError(context.getString(R.string.error_question_mandatory));
                 } else {
-                    view.highlight(false);
+                    view.setError(null);
                 }
             }
         }
@@ -233,7 +247,7 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
      * 
      * @return
      */
-    public ArrayList<Question> checkMandatoryQuestions() {
+    public List<Question> checkInvalidQuestions() {
         if (responseMap == null) {
             loadState(context.getRespondentId());
         }
@@ -242,24 +256,17 @@ public class SurveyQuestionTabContentFactory extends SurveyTabContentFactory {
         // created until the tab is clicked the first time
         if (questionMap == null || questionMap.size() == 0) {
             // add all the mandatory questions
-            ArrayList<Question> uninitializedQuesitons = questionGroup
-                    .getQuestions();
-            for (int i = 0; i < uninitializedQuesitons.size(); i++) {
-                if (uninitializedQuesitons.get(i).isMandatory()) {
-                    QuestionResponse resp = responseMap
-                            .get(uninitializedQuesitons.get(i).getId());
-                    if (resp == null || !resp.isValid()) {
-                        missingQuestions.add(uninitializedQuesitons.get(i));
-                    }
+            ArrayList<Question> uninitializedQuestions = questionGroup.getQuestions();
+            for (Question q : uninitializedQuestions) {
+                QuestionResponse response = responseMap.get(q.getId());
+                if (q.isMandatory() && (response == null || !response.isValid())) {
+                    missingQuestions.add(q);
                 }
             }
         } else {
             for (QuestionView view : questionMap.values()) {
-                if (view.getQuestion().isMandatory()) {
-                    QuestionResponse resp = view.getResponse();
-                    if (resp == null || !resp.isValid()) {
-                        missingQuestions.add(view.getQuestion());
-                    }
+                if (!view.isValid()) {
+                    missingQuestions.add(view.getQuestion());
                 }
             }
         }

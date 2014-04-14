@@ -3,16 +3,11 @@ package org.akvo.flow.ui.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.BaseAdapter;
 
-import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.ui.view.BarcodeQuestionView;
@@ -27,7 +22,7 @@ import org.akvo.flow.util.ConstantUtil;
 
 import java.util.List;
 
-public class QuestionGroupFragment extends Fragment {
+public class QuestionGroupFragment extends ListFragment {
     private static final String ARG_POSITION = "position";
 
     private int mPosition;
@@ -35,6 +30,7 @@ public class QuestionGroupFragment extends Fragment {
     private long mSurveyInstanceId;
     private QuestionGroup mQuestionGroup;
 
+    private QuestionListAdapter mAdapter;
     private OnFragmentInteractionListener mListener;
 
     public static QuestionGroupFragment newInstance(int position) {
@@ -77,29 +73,64 @@ public class QuestionGroupFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        Log.i("QuestionGroupFragment", "onCreateView()");
-        //View v = inflater.inflate(R.layout.fragment_question_group, container, false);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
 
-        final Context context = getActivity();
-        final String language = mListener.getDefaultLang();
-        final String[] languages = mListener.getLanguages();
-        final boolean readOnly = false;
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
 
-        // TODO: Inflate view from layout file
-        ScrollView scrollView = new ScrollView(context);
-        scrollView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setRetainInstance(true);
 
-        LinearLayout ll = new LinearLayout(context);
-        ll.setOrientation(LinearLayout.VERTICAL);
-        ll.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        if(mAdapter == null) {
+            mAdapter = new QuestionListAdapter(mQuestionGroup.getQuestions());
+            setListAdapter(mAdapter);
+        }
 
-        List<Question> questions = mQuestionGroup.getQuestions();
+    }
 
-        for (int i = 0; i < questions.size(); i++) {
-            Question q = questions.get(i);
+    class QuestionListAdapter extends BaseAdapter {
+        private List<Question> mQuestions;
+
+        public QuestionListAdapter(List<Question> questions) {
+            mQuestions = questions;
+        }
+
+        @Override
+        public int getCount() {
+            return mQuestions.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mQuestions.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            final Context context = getActivity();
+            final String language = mListener.getDefaultLang();
+            final String[] languages = mListener.getLanguages();
+            final boolean readOnly = false;
+
+            Question q = mQuestions.get(position);
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new OptionQuestionView(context, q,
@@ -121,34 +152,10 @@ public class QuestionGroupFragment extends Fragment {
             } else {
                 questionView = new QuestionHeaderView(context, q, language, languages, readOnly);
             }
-            ll.addView(questionView);
-            if (i < questions.size() - 1) {
-                View ruler = new View(context);
-                ruler.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 2));
-                ruler.setBackgroundColor(0xFFFFFFFF);
-                ll.addView(ruler);
-            }
+
+            return questionView;
         }
 
-        scrollView.addView(ll);
-        return scrollView;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     public interface OnFragmentInteractionListener {

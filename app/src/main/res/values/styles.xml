@@ -7,6 +7,8 @@
         
         <!-- Support library compatibility -->
         <item name="actionBarStyle">@style/FlowActionBarStyle</item>
+
+        <item name="android:textColor">@color/text_color</item>
     </style>
 
     <style name="FlowActionBarStyle" parent="@style/Widget.AppCompat.ActionBar.Solid">

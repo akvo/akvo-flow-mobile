@@ -96,8 +96,7 @@ public class SettingsActivity extends ListActivity {
                 R.id.optionLabel, R.id.optionDesc
         };
 
-        setListAdapter(new SimpleAdapter(this.getApplicationContext(), list,
-                R.layout.settingsdetail, fromKeys, toIds));
+        setListAdapter(new SimpleAdapter(this, list, R.layout.settingsdetail, fromKeys, toIds));
     }
 
     /**

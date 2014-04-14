@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="default_underline_indicator_selected_color">#FF33B5E5</color>
+
+    <color name="text_primary">#ffffff</color>
+    <color name="text_disabled">#80ffffff</color>
 </resources>

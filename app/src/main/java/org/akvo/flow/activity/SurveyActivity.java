@@ -20,13 +20,16 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StatFs;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
@@ -36,6 +39,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
@@ -49,11 +54,14 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SurveyActivity extends ActionBarActivity implements TabListener,
         QuestionInteractionListener, QuestionGroupFragment.OnFragmentInteractionListener {
@@ -79,18 +87,20 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
     private ViewPager mPager;
     private TabsAdapter mAdapter;
 
+    private boolean mReadOnly;
     private long mSurveyInstanceId;// TODO: Load/Create survey instance
     private Survey mSurvey;
     private SurveyDbAdapter mDatabase;
 
     private String[] mLanguages;
 
+    private List<QuestionGroupFragment> mQuestionFragments;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
 
-        mAdapter = new TabsAdapter(getSupportFragmentManager());
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -104,9 +114,13 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
             finish();
         }
 
+        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
+
         // Set the survey name as Activity title
         setTitle(mSurvey.getName());
         mPager = (ViewPager)findViewById(R.id.pager);
+        mAdapter = new TabsAdapter();
+        mAdapter.load();// Instantiate tabs. TODO: Consider doing this op. in a background thread.
         mPager.setAdapter(mAdapter);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -115,6 +129,16 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
             }
         });
         setupActionBar();
+
+    }
+
+    private void setupFragments() {
+        mQuestionFragments = new ArrayList<QuestionGroupFragment>();
+
+        for (QuestionGroup group : mSurvey.getQuestionGroups()) {
+
+        }
+
     }
 
     private void loadSurvey(String surveyId) {
@@ -164,8 +188,8 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
     }
 
     @Override
-    public QuestionGroup getQuestionGroup(int position) {
-        return mSurvey.getQuestionGroups().get(position);
+    public boolean isReadOnly() {
+        return mReadOnly;
     }
 
     @Override
@@ -264,27 +288,132 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         }
     }
 
-    class TabsAdapter extends FragmentPagerAdapter {
+    /*
+     * Check SD card space. Warn by dialog popup if it is getting low. Return to
+     * home screen if completely full.
+     */
+    public void spaceLeftOnCard() {
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            // TODO: more specific warning if card not mounted?
+        }
+        // compute space left
+        StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+        double sdAvailSize = (double) stat.getAvailableBlocks()
+                * (double) stat.getBlockSize();
+        // One binary gigabyte equals 1,073,741,824 bytes.
+        // double gigaAvailable = sdAvailSize / 1073741824;
+        // One binary megabyte equals 1 048 576 bytes.
+        long megaAvailable = (long) Math.floor(sdAvailSize / 1048576.0);
+
+        // keep track of changes
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        // assume we had space before
+        long lastMegaAvailable = settings.getLong("cardMBAvaliable", 101L);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("cardMBAvaliable", megaAvailable);
+        // Commit the edits!
+        editor.commit();
+
+        if (megaAvailable <= 0L) {// All out, OR media not mounted
+            // Bounce user
+            ViewUtil.showConfirmDialog(R.string.nocardspacetitle,
+                    R.string.nocardspacedialog, this, false,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (dialog != null) {
+                                dialog.dismiss();
+                            }
+                            finish();
+                        }
+                    }
+            );
+            return;
+        }
+
+        // just issue a warning if we just descended to or past a number on the list
+        if (megaAvailable < lastMegaAvailable) {
+            for (long l = megaAvailable; l < lastMegaAvailable; l++) {
+                if (ConstantUtil.SPACE_WARNING_MB_LEVELS.contains(Long.toString(l))) {
+                    // display how much space is left
+                    String s = getResources().getString(R.string.lowcardspacedialog);
+                    s = s.replace("%%%", Long.toString(megaAvailable));
+                    ViewUtil.showConfirmDialog(
+                            R.string.lowcardspacetitle,
+                            s,
+                            this,
+                            false,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (dialog != null) {
+                                        dialog.dismiss();
+                                    }
+                                }
+                            },
+                            null);
+                    return; // only one warning per survey, even of we passed >1
+                    // limit
+                }
+            }
+        }
+    }
+
+    /**
+     * sets up question dependencies across question groups and registers
+     * questionInteractionListeners on the dependent views. This should be
+     * called each time a new tab is hydrated. It will iterate over all
+     * questions in the survey and install dependencies and the
+     * questionInteractionListeners. After installation, it will check to see if
+     * the parent question contains a response. If so, it will fire a
+     * questionInteractionEvent to ensure dependent questions are put into the
+     * correct state
+     *
+     * @param group
+     */
+    public void establishDependencies(QuestionGroup group) {
+        // TODO
+    }
+
+    class TabsAdapter extends PagerAdapter {
+        private List<QuestionGroup> mQuestionGroups;
+        private List<QuestionGroupFragment> mQuestionListViews;
         
-        public TabsAdapter(FragmentManager fm) {
-            super(fm);
+        public TabsAdapter() {
+            mQuestionGroups = mSurvey.getQuestionGroups();
+            mQuestionListViews = new ArrayList<QuestionGroupFragment>();
+        }
+
+        public void load() {
+            for (QuestionGroup group : mQuestionGroups) {
+                QuestionGroupFragment questionListView = new QuestionGroupFragment(SurveyActivity.this,
+                        SurveyActivity.this, group, mDatabase);
+
+                mQuestionListViews.add(questionListView);
+            }
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            View view = mQuestionListViews.get(position);// Already instantiated
+
+            container.addView(view, 0);
+            return view;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object view) {
+            container.removeView((QuestionGroupFragment) view);
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
         }
 
         @Override
         public int getCount() {
-            return mSurvey.getQuestionGroups().size();
-        }
-        
-        private Fragment getFragment(int pos){
-            // Hell of a hack. This should be changed for a more reliable method
-            String tag = "android:switcher:" + R.id.pager + ":" + pos;
-            return getSupportFragmentManager().findFragmentByTag(tag);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment = QuestionGroupFragment.newInstance(position);
-            return fragment;
+            return mQuestionGroups.size();
         }
         
         @Override

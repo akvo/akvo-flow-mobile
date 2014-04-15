@@ -129,9 +129,9 @@ public class QuestionListView extends ListView {
     /**
      * persists the current question responses in this tab to the database
      *
-     * @param respondentId
+     * @param surveyInstanceId
      */
-    public void saveState(Long respondentId) {
+    public void saveState(long surveyInstanceId) {
         if (mQuestionResponses == null) {
             mQuestionResponses = new HashMap<String, QuestionResponse>();
         }
@@ -139,14 +139,14 @@ public class QuestionListView extends ListView {
         for (QuestionView q : mQuestionViews) {
             QuestionResponse curResponse = q.getResponse(true);
             if (curResponse != null && curResponse.hasValue()) {
-                curResponse.setRespondentId(respondentId);
+                curResponse.setRespondentId(surveyInstanceId);
                 mDatabase.createOrUpdateSurveyResponse(curResponse);
                 mQuestionResponses.put(curResponse.getQuestionId(), curResponse);
             } else if (curResponse != null && curResponse.getId() != null
                     && curResponse.getId() > 0) {
                 // if we don't have a value BUT there is an ID, we need to
                 // remove it since the user blanked out their response
-                mDatabase.deleteResponse(respondentId, q.getQuestion().getId());
+                mDatabase.deleteResponse(surveyInstanceId, q.getQuestion().getId());
                 mQuestionResponses.remove(curResponse.getQuestionId());
             } else if (curResponse != null) {
                 // if we're here, the response is blank but hasn't been

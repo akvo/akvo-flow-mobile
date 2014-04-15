@@ -47,6 +47,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.ui.view.QuestionListView;
@@ -91,6 +92,9 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
     private boolean mReadOnly;
     private long mSurveyInstanceId;// TODO: Load/Create survey instance
+    private long mUserId;
+    private String mRecordId;
+    private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
     private SurveyDbAdapter mDatabase;
 
@@ -115,6 +119,17 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         }
 
         mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
+        mUserId = getIntent().getLongExtra(ConstantUtil.USER_ID_KEY, 0);
+        mSurveyInstanceId = getIntent().getLongExtra(ConstantUtil.RESPONDENT_ID_KEY, 0);
+        mSurveyGroup = (SurveyGroup)getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
+        mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
+
+        if (mSurveyInstanceId == 0) {
+            // If no survey instance is passed in, we need to create one
+            // TODO: Ensure is not recreated upon rotation.
+            mSurveyInstanceId = mDatabase.createOrLoadSurveyRespondent(surveyId,
+                    String.valueOf(mUserId), mSurveyGroup.getId(), mRecordId);
+        }
 
         // Set the survey name as Activity title
         setTitle(mSurvey.getName());
@@ -122,14 +137,10 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         mAdapter = new TabsAdapter();
         mAdapter.load();// Instantiate tabs. TODO: Consider doing this op. in a background thread.
         mPager.setAdapter(mAdapter);
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                getSupportActionBar().setSelectedNavigationItem(position);
-            }
-        });
-        setupActionBar();
+        mPager.setOnPageChangeListener(mAdapter);
 
+        setupActionBar();
+        loadState(false);// TODO: Implement prefill functionality
     }
 
     private void loadSurvey(String surveyId) {
@@ -183,7 +194,17 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
         mAdapter.loadState(responses, prefill);
     }
-    
+
+    private void saveState() {
+        mAdapter.saveState(mSurveyInstanceId);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveState();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -400,7 +421,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         // TODO
     }
 
-    class TabsAdapter extends PagerAdapter {
+    class TabsAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener {
         private List<QuestionGroup> mQuestionGroups;
         private List<QuestionListView> mQuestionListViews;
         
@@ -421,6 +442,12 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
             for (QuestionListView questionListView : mQuestionListViews) {
                 questionListView.loadState(responses, prefill);
+            }
+        }
+
+        public void saveState(long surveyInstanceId) {
+            for (QuestionListView questionListView : mQuestionListViews) {
+                questionListView.saveState(surveyInstanceId);
             }
         }
 
@@ -451,7 +478,20 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         public CharSequence getPageTitle(int position) {
             return mQuestionGroups.get(position).getHeading();
         }
-        
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            // Select the corresponding tab
+            getSupportActionBar().setSelectedNavigationItem(position);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+        }
     }
 
     @Override

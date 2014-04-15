@@ -1,4 +1,4 @@
-package org.akvo.flow.ui.fragment;
+package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.view.View;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QuestionGroupFragment extends ListView {
+public class QuestionListView extends ListView {
     private QuestionGroup mQuestionGroup;
 
     private QuestionListAdapter mAdapter;
@@ -35,7 +35,7 @@ public class QuestionGroupFragment extends ListView {
     private List<QuestionView> mQuestionViews;
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
 
-    public QuestionGroupFragment (Context context, OnFragmentInteractionListener listener,
+    public QuestionListView(Context context, OnFragmentInteractionListener listener,
             QuestionGroup group, SurveyDbAdapter database) {
         super(context);
         mQuestionGroup = group;

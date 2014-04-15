@@ -25,9 +25,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -49,7 +46,7 @@ import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
-import org.akvo.flow.ui.fragment.QuestionGroupFragment;
+import org.akvo.flow.ui.view.QuestionListView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.LangsPreferenceData;
@@ -64,7 +61,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SurveyActivity extends ActionBarActivity implements TabListener,
-        QuestionInteractionListener, QuestionGroupFragment.OnFragmentInteractionListener {
+        QuestionInteractionListener, QuestionListView.OnFragmentInteractionListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
@@ -94,7 +91,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
     private String[] mLanguages;
 
-    private List<QuestionGroupFragment> mQuestionFragments;
+    private List<QuestionListView> mQuestionFragments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +130,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
     }
 
     private void setupFragments() {
-        mQuestionFragments = new ArrayList<QuestionGroupFragment>();
+        mQuestionFragments = new ArrayList<QuestionListView>();
 
         for (QuestionGroup group : mSurvey.getQuestionGroups()) {
 
@@ -377,16 +374,16 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
     class TabsAdapter extends PagerAdapter {
         private List<QuestionGroup> mQuestionGroups;
-        private List<QuestionGroupFragment> mQuestionListViews;
+        private List<QuestionListView> mQuestionListViews;
         
         public TabsAdapter() {
             mQuestionGroups = mSurvey.getQuestionGroups();
-            mQuestionListViews = new ArrayList<QuestionGroupFragment>();
+            mQuestionListViews = new ArrayList<QuestionListView>();
         }
 
         public void load() {
             for (QuestionGroup group : mQuestionGroups) {
-                QuestionGroupFragment questionListView = new QuestionGroupFragment(SurveyActivity.this,
+                QuestionListView questionListView = new QuestionListView(SurveyActivity.this,
                         SurveyActivity.this, group, mDatabase);
 
                 mQuestionListViews.add(questionListView);
@@ -403,7 +400,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object view) {
-            container.removeView((QuestionGroupFragment) view);
+            container.removeView((QuestionListView) view);
         }
 
         @Override

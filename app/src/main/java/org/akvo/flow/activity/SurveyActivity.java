@@ -45,6 +45,8 @@ import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
+import org.akvo.flow.domain.Dependency;
+import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -52,6 +54,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.ui.view.QuestionListView;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
@@ -496,9 +499,12 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
             for (QuestionGroup group : mQuestionGroups) {
                 QuestionListView questionListView = new QuestionListView(SurveyActivity.this, group,
                         SurveyActivity.this, SurveyActivity.this, mDatabase);
-
+                questionListView.load();
                 mQuestionListViews.add(questionListView);
             }
+
+            // Now that all the tabs are populated, we setup the dependencies
+            setupDependencies();
         }
 
         public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
@@ -519,10 +525,51 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
             }
         }
 
+        private QuestionView getQuestionView(String questionId) {
+            QuestionView questionView = null;
+            for (QuestionListView questionListView : mQuestionListViews) {
+                questionView = questionListView.getQuestionView(questionId);
+                if (questionView != null) {
+                    break;
+                }
+            }
+            return questionView;
+        }
+
+        private void setupDependencies() {
+            for (QuestionGroup group : mQuestionGroups) {
+                for (Question question : group.getQuestions()) {// TODO: Add getQuestions() to Survey
+                    setupDependencies(question);
+                }
+            }
+        }
+
+        private void setupDependencies(Question question) {
+            final List<Dependency> dependencies = question.getDependencies();
+
+            if (dependencies == null) {
+                return;// No dependencies for this question
+            }
+
+            for (Dependency dependency : dependencies) {
+                QuestionView parentQ = getQuestionView(dependency.getQuestion());
+                QuestionView depQ = getQuestionView(question.getId());
+                if (depQ != null && parentQ != null && depQ != parentQ) {
+                    parentQ.addQuestionInteractionListener(depQ);
+
+                    if (parentQ.getResponse(true) != null && parentQ.getResponse(true).hasValue()) {
+                        // Trigger event, the parent already contains a response
+                        QuestionInteractionEvent event = new QuestionInteractionEvent(
+                                QuestionInteractionEvent.QUESTION_ANSWER_EVENT, parentQ);
+                        depQ.onQuestionInteraction(event);
+                    }
+                }
+            }
+        }
+
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             View view = mQuestionListViews.get(position);// Already instantiated
-
             container.addView(view, 0);
             return view;
         }

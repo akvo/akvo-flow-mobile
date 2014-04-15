@@ -41,7 +41,6 @@ public class QuestionListView extends ListView {
         mQuestionResponses = new HashMap<String, QuestionResponse>();
 
         mAdapter = new QuestionListAdapter(mQuestionGroup.getQuestions());
-        mAdapter.load();
         setAdapter(mAdapter);
     }
 
@@ -128,6 +127,15 @@ public class QuestionListView extends ListView {
         }
     }
 
+    public QuestionView getQuestionView(String questionId) {
+        for (QuestionView questionView : mQuestionViews) {
+            if (questionId.equals(questionView.getQuestion().getId())) {
+                return questionView;
+            }
+        }
+        return null;
+    }
+
     /**
      * updates text size of all questions in this tab
      *
@@ -173,53 +181,53 @@ public class QuestionListView extends ListView {
         }
     }
 
+    /**
+     * Pre-load all the QuestionViews in memory. getView() will simply
+     * retrieve them from the corresponding position in mQuestionViews.
+     */
+    public void load() {
+        for (Question q : mQuestionGroup.getQuestions()) {
+            final Context context = getContext();
+            final String language = mListener.getDefaultLang();
+            final String[] languages = mListener.getLanguages();
+            final boolean readOnly = false;
+
+            QuestionView questionView;
+            if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new OptionQuestionView(context, q,
+                        language, languages, readOnly);
+            } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new FreetextQuestionView(context, q, language, languages, readOnly);
+            } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new MediaQuestionView(context, q, ConstantUtil.PHOTO_QUESTION_TYPE,
+                        language, languages, readOnly);
+            } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new MediaQuestionView(context, q, ConstantUtil.VIDEO_QUESTION_TYPE,
+                        language, languages, readOnly);
+            } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new GeoQuestionView(context, q,language, languages, readOnly);
+            } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new BarcodeQuestionView(context, q, language, languages, readOnly);
+            } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new DateQuestionView(context, q, language, languages, readOnly);
+            } else {
+                questionView = new QuestionHeaderView(context, q, language, languages, readOnly);
+            }
+
+            // Add question interaction listener
+            questionView.addQuestionInteractionListener(mQuestionListener);
+
+            // Store the reference to the View
+            mQuestionViews.add(questionView);
+        }
+
+    }
+
     class QuestionListAdapter extends BaseAdapter {
         private List<Question> mQuestions;
 
         public QuestionListAdapter(List<Question> questions) {
             mQuestions = questions;
-        }
-
-        /**
-         * Pre-load all the QuestionViews in memory. getView() will simply
-         * retrieve them from the corresponding position in mQuestionViews.
-         */
-        public void load() {
-            for (Question q : mQuestions) {
-                final Context context = getContext();
-                final String language = mListener.getDefaultLang();
-                final String[] languages = mListener.getLanguages();
-                final boolean readOnly = false;
-
-                QuestionView questionView;
-                if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                    questionView = new OptionQuestionView(context, q,
-                            language, languages, readOnly);
-                } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                    questionView = new FreetextQuestionView(context, q, language, languages, readOnly);
-                } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                    questionView = new MediaQuestionView(context, q, ConstantUtil.PHOTO_QUESTION_TYPE,
-                            language, languages, readOnly);
-                } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                    questionView = new MediaQuestionView(context, q, ConstantUtil.VIDEO_QUESTION_TYPE,
-                            language, languages, readOnly);
-                } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                    questionView = new GeoQuestionView(context, q,language, languages, readOnly);
-                } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                    questionView = new BarcodeQuestionView(context, q, language, languages, readOnly);
-                } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                    questionView = new DateQuestionView(context, q, language, languages, readOnly);
-                } else {
-                    questionView = new QuestionHeaderView(context, q, language, languages, readOnly);
-                }
-
-                // Add question interaction listener
-                questionView.addQuestionInteractionListener(mQuestionListener);
-
-                // Store the reference to the View
-                mQuestionViews.add(questionView);
-            }
-
         }
 
         @Override
@@ -239,7 +247,7 @@ public class QuestionListView extends ListView {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            return mQuestionViews.get(position);
+            return mQuestionViews.get(position);// Already instantiated
         }
 
     }

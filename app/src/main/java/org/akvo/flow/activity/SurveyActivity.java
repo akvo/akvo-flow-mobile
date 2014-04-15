@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
@@ -53,6 +54,7 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.ui.view.QuestionListView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -67,7 +69,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SurveyActivity extends ActionBarActivity implements TabListener,
-        QuestionInteractionListener, QuestionListView.OnFragmentInteractionListener {
+        QuestionInteractionListener, QuestionListView.TabInteractionListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
@@ -232,6 +234,66 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (mRequestQuestionId == null) {
+            return;// Move along, nothing to see here
+        }
+
+        if (requestCode == PHOTO_ACTIVITY_REQUEST || requestCode == VIDEO_ACTIVITY_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                String filePrefix, fileSuffix;
+                if (requestCode == PHOTO_ACTIVITY_REQUEST) {
+                    filePrefix = TEMP_PHOTO_NAME_PREFIX;
+                    fileSuffix = IMAGE_SUFFIX;
+                } else {
+                    filePrefix = TEMP_VIDEO_NAME_PREFIX;
+                    fileSuffix = VIDEO_SUFFIX;
+                }
+
+                File f = new File(Environment.getExternalStorageDirectory()
+                        .getAbsolutePath() + File.separator + filePrefix + fileSuffix);
+
+                // Ensure no image is saved in the DCIM folder
+                FileUtil.cleanDCIM(this, f.getAbsolutePath());
+
+                String newFilename = filePrefix + System.nanoTime() + fileSuffix;
+                String newPath = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
+                        newFilename, false);
+                FileUtil.findOrCreateDir(newPath);
+                String absoluteFile = newPath + File.separator + newFilename;
+
+                int maxImgSize = ConstantUtil.IMAGE_SIZE_320_240;
+                String maxImgSizePref = mDatabase.getPreference(ConstantUtil.MAX_IMG_SIZE);
+                if (!TextUtils.isEmpty(maxImgSizePref)) {
+                    maxImgSize = Integer.valueOf(maxImgSizePref);
+                }
+
+                String sizeTxt = getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize];
+
+                if (ImageUtil.resizeImage(f.getAbsolutePath(), absoluteFile, maxImgSize)) {
+                    Toast.makeText(this, "Image resized to " + sizeTxt, Toast.LENGTH_LONG).show();
+                    if (!f.delete()) { // must check return value to know if it failed
+                        Log.e(TAG, "Media file delete failed");
+                    }
+                } else if (!f.renameTo(new File(absoluteFile))) {
+                    // must check  return  value to  know if it  failed!
+                    Log.e(TAG, "Media file rename failed");
+                }
+
+                Bundle photoData = new Bundle();
+                photoData.putString(ConstantUtil.MEDIA_FILE_KEY, absoluteFile);
+                mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
+            } else {
+                Log.e(TAG, "Result of camera op was not ok: " + resultCode);
+            }
+        } else if (requestCode == SCAN_ACTIVITY_REQUEST && resultCode == RESULT_OK) {
+            mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+        }
+
+        mRequestQuestionId = null;// Reset the tmp reference
     }
 
     @Override
@@ -432,8 +494,8 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
         public void load() {
             for (QuestionGroup group : mQuestionGroups) {
-                QuestionListView questionListView = new QuestionListView(SurveyActivity.this,
-                        SurveyActivity.this, group, mDatabase);
+                QuestionListView questionListView = new QuestionListView(SurveyActivity.this, group,
+                        SurveyActivity.this, SurveyActivity.this, mDatabase);
 
                 mQuestionListViews.add(questionListView);
             }
@@ -448,6 +510,12 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         public void saveState(long surveyInstanceId) {
             for (QuestionListView questionListView : mQuestionListViews) {
                 questionListView.saveState(surveyInstanceId);
+            }
+        }
+
+        public void onQuestionComplete(String questionId, Bundle data) {
+            for (QuestionListView questionListView : mQuestionListViews) {
+                questionListView.onQuestionComplete(questionId, data);
             }
         }
 

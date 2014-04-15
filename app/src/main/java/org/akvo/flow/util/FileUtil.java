@@ -32,8 +32,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.media.ExifInterface;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -447,6 +449,50 @@ public class FileUtil {
         }
 
         return false;
+    }
+
+    /**
+     * Some manufacturers will duplicate the image saving a copy in the DCIM
+     * folder. This method will try to spot those situations and remove the
+     * duplicated image.
+     *
+     * @param context Context
+     * @param filepath The absolute path to the original image
+     */
+    public static void cleanDCIM(Context context, String filepath) {
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                new String[]{
+                        MediaStore.Images.ImageColumns.DATA,
+                        MediaStore.Images.ImageColumns.DATE_TAKEN
+                },
+                null,
+                null,
+                MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
+        );
+
+        if (cursor.moveToFirst()) {
+            final String lastImagePath = cursor.getString(cursor
+                    .getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+
+            if ((!filepath.equals(lastImagePath))
+                    && (FileUtil.compareImages(filepath, lastImagePath))) {
+                final int result = context.getContentResolver().delete(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        MediaStore.Images.ImageColumns.DATA + " = ?",
+                        new String[] {
+                                lastImagePath
+                        });
+
+                if (result == 1) {
+                    Log.i(TAG, "Duplicated file successfully removed: " + lastImagePath);
+                } else {
+                    Log.e(TAG, "Error removing duplicated image:" + lastImagePath);
+                }
+            }
+        }
+
+        cursor.close();
     }
 
 }

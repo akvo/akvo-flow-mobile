@@ -1,6 +1,7 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,6 +11,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -21,17 +23,19 @@ public class QuestionListView extends ListView {
     private QuestionGroup mQuestionGroup;
 
     private QuestionListAdapter mAdapter;
-    private OnFragmentInteractionListener mListener;
+    private TabInteractionListener mListener;
+    private QuestionInteractionListener mQuestionListener;
     private SurveyDbAdapter mDatabase;
 
     private List<QuestionView> mQuestionViews;
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
 
-    public QuestionListView(Context context, OnFragmentInteractionListener listener,
-            QuestionGroup group, SurveyDbAdapter database) {
+    public QuestionListView(Context context, QuestionGroup group, TabInteractionListener listener,
+            QuestionInteractionListener questionListener,  SurveyDbAdapter database) {
         super(context);
         mQuestionGroup = group;
         mListener = listener;
+        mQuestionListener = questionListener;
         mDatabase = database;
         mQuestionViews = new ArrayList<QuestionView>();
         mQuestionResponses = new HashMap<String, QuestionResponse>();
@@ -52,6 +56,15 @@ public class QuestionListView extends ListView {
     public void updateQuestionLanguages(String[] langCodes) {
         for (QuestionView view : mQuestionViews) {
             view.updateSelectedLanguages(langCodes);
+        }
+    }
+
+    public void onQuestionComplete(String questionId, Bundle data) {
+        for (QuestionView view : mQuestionViews) {
+            if (questionId.equals(view.getQuestion().getId())) {
+                // TODO: Optimize this lookup (Map)
+                view.questionComplete(data);
+            }
         }
     }
 
@@ -200,6 +213,9 @@ public class QuestionListView extends ListView {
                     questionView = new QuestionHeaderView(context, q, language, languages, readOnly);
                 }
 
+                // Add question interaction listener
+                questionView.addQuestionInteractionListener(mQuestionListener);
+
                 // Store the reference to the View
                 mQuestionViews.add(questionView);
             }
@@ -228,7 +244,7 @@ public class QuestionListView extends ListView {
 
     }
 
-    public interface OnFragmentInteractionListener {
+    public interface TabInteractionListener {
         public String getSurveyId();
         public long getSurveyInstanceId();
         public String getDefaultLang();

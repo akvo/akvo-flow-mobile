@@ -21,6 +21,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,7 +43,9 @@ import android.view.ViewGroup;
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.domain.QuestionGroup;
+import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
@@ -58,7 +61,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SurveyActivity extends ActionBarActivity implements TabListener,
         QuestionInteractionListener, QuestionListView.OnFragmentInteractionListener {
@@ -90,8 +95,6 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
     private SurveyDbAdapter mDatabase;
 
     private String[] mLanguages;
-
-    private List<QuestionListView> mQuestionFragments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,15 +132,6 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
     }
 
-    private void setupFragments() {
-        mQuestionFragments = new ArrayList<QuestionListView>();
-
-        for (QuestionGroup group : mSurvey.getQuestionGroups()) {
-
-        }
-
-    }
-
     private void loadSurvey(String surveyId) {
         Survey surveyMeta = mDatabase.getSurvey(surveyId);
         InputStream in = null;
@@ -153,6 +147,41 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
                 try { in.close(); } catch (IOException e) {}
             }
         }
+    }
+
+    private void loadState(boolean prefill) {
+        Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
+
+        Cursor cursor = mDatabase.getResponses(mSurveyInstanceId);
+
+        if (cursor != null) {
+            int idCol = cursor.getColumnIndexOrThrow(ResponseColumns._ID);
+            int answerCol = cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER);
+            int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
+            int qidCol = cursor.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
+            int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
+            int scoreCol = cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL);
+            int strengthCol = cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    QuestionResponse response = new QuestionResponse();
+                    response.setId(cursor.getLong(idCol));
+                    response.setRespondentId(mSurveyInstanceId);// No need to read the cursor
+                    response.setValue(cursor.getString(answerCol));
+                    response.setType(cursor.getString(typeCol));
+                    response.setQuestionId(cursor.getString(qidCol));
+                    response.setIncludeFlag(cursor.getInt(includeCol) == 1);
+                    response.setScoredValue(cursor.getString(scoreCol));
+                    response.setStrength(cursor.getString(strengthCol));
+
+                    responses.put(response.getQuestionId(), response);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+
+        mAdapter.loadState(responses, prefill);
     }
     
     @Override
@@ -349,8 +378,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
                                 }
                             },
                             null);
-                    return; // only one warning per survey, even of we passed >1
-                    // limit
+                    return; // only one warning per survey, even of we passed >1 limit
                 }
             }
         }
@@ -390,6 +418,12 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
             }
         }
 
+        public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
+            for (QuestionListView questionListView : mQuestionListViews) {
+                questionListView.loadState(responses, prefill);
+            }
+        }
+
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             View view = mQuestionListViews.get(position);// Already instantiated
@@ -415,7 +449,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         
         @Override
         public CharSequence getPageTitle(int position) {
-            return mSurvey.getQuestionGroups().get(position).getHeading();
+            return mQuestionGroups.get(position).getHeading();
         }
         
     }

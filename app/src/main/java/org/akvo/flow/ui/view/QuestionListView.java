@@ -10,14 +10,6 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.ui.view.BarcodeQuestionView;
-import org.akvo.flow.ui.view.DateQuestionView;
-import org.akvo.flow.ui.view.FreetextQuestionView;
-import org.akvo.flow.ui.view.GeoQuestionView;
-import org.akvo.flow.ui.view.MediaQuestionView;
-import org.akvo.flow.ui.view.OptionQuestionView;
-import org.akvo.flow.ui.view.QuestionHeaderView;
-import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;

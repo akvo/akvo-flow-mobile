@@ -12,6 +12,7 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -29,21 +30,14 @@ public class QuestionListView extends ListView {
     private List<QuestionView> mQuestionViews;
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
 
-    private long mSurveyInstanceId;
-    private String mLanguage;
-    private String[] mLanguages;
-    private boolean mReadOnly;
+    private SurveyListener mSurveyListener;
 
-    public QuestionListView(Context context, long surveyInstanceId, String defaultLang,
-            String[] languages, QuestionGroup group, boolean readOnly, SurveyDbAdapter database,
-            QuestionInteractionListener questionListener) {
+    public QuestionListView(Context context, QuestionGroup group, SurveyDbAdapter database,
+            SurveyListener surveyListener, QuestionInteractionListener questionListener) {
         super(context);
-        mSurveyInstanceId = surveyInstanceId;
-        mLanguage = defaultLang;
-        mLanguages = languages;
         mQuestionGroup = group;
-        mReadOnly = readOnly;
         mDatabase = database;
+        mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
         mQuestionViews = new ArrayList<QuestionView>();
         mQuestionResponses = new HashMap<String, QuestionResponse>();
@@ -60,10 +54,9 @@ public class QuestionListView extends ListView {
         setSelection(0);
     }
 
-    public void updateQuestionLanguages(String[] langCodes) {
-        mLanguages = langCodes;
+    public void notifyOptionsChanged() {
         for (QuestionView view : mQuestionViews) {
-            view.updateSelectedLanguages(mLanguages);
+            view.notifyOptionsChanged();
         }
     }
 
@@ -105,10 +98,6 @@ public class QuestionListView extends ListView {
         return responses;
     }
 
-    public void loadState(Map<String, QuestionResponse> responses) {
-        loadState(responses, false);
-    }
-
     public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
         if (mQuestionResponses == null) {
             mQuestionResponses = new HashMap<String, QuestionResponse>();
@@ -123,7 +112,7 @@ public class QuestionListView extends ListView {
                     // Copying values from old instance; Get rid of its Id
                     // Also, update the SurveyInstance Id, matching the current one
                     response.setId(null);
-                    response.setRespondentId(mSurveyInstanceId);
+                    response.setRespondentId(mSurveyListener.getSurveyInstanceId());
 
                     mDatabase.createOrUpdateSurveyResponse(response);
                 }
@@ -143,17 +132,6 @@ public class QuestionListView extends ListView {
             }
         }
         return null;
-    }
-
-    /**
-     * updates text size of all questions in this tab
-     *
-     * @param size
-     */
-    public void updateTextSize(float size) {
-        for (QuestionView qv : mQuestionViews) {
-            qv.setTextSize(size);
-        }
     }
 
     /**
@@ -200,23 +178,23 @@ public class QuestionListView extends ListView {
 
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new OptionQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
+                questionView = new OptionQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new FreetextQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
+                questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, ConstantUtil.PHOTO_QUESTION_TYPE,
-                        mLanguage, mLanguages, mReadOnly);
+                questionView = new MediaQuestionView(context, q, mSurveyListener,
+                        ConstantUtil.PHOTO_QUESTION_TYPE);
             } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, ConstantUtil.VIDEO_QUESTION_TYPE,
-                        mLanguage, mLanguages, mReadOnly);
+                questionView = new MediaQuestionView(context, q, mSurveyListener,
+                        ConstantUtil.VIDEO_QUESTION_TYPE);
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new GeoQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
+                questionView = new GeoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new BarcodeQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
+                questionView = new BarcodeQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new DateQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
+                questionView = new DateQuestionView(context, q, mSurveyListener);
             } else {
-                questionView = new QuestionHeaderView(context, q, mLanguage, mLanguages, mReadOnly);
+                questionView = new QuestionHeaderView(context, q, mSurveyListener);
             }
 
             // Add question interaction listener

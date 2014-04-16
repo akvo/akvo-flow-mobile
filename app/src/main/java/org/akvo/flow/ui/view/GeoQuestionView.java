@@ -33,6 +33,7 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -60,9 +61,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     private float mLastAccuracy;
     private boolean mNeedUpdate = false;
 
-    public GeoQuestionView(Context context, Question q, String defaultLang, String[] langCodes,
-            boolean readOnly) {
-        super(context, q, defaultLang, langCodes, readOnly);
+    public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
+        super(context, q, surveyListener);
         init();
     }
 
@@ -86,7 +86,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         mElevationField.setOnFocusChangeListener(this);
         mGeoButton.setOnClickListener(this);
 
-        if (mReadOnly) {
+        if (isReadOnly()) {
             mLatField.setFocusable(false);
             mLonField.setFocusable(false);
             mElevationField.setFocusable(false);

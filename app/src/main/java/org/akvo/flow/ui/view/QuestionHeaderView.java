@@ -20,12 +20,12 @@ import android.content.Context;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
+import org.akvo.flow.event.SurveyListener;
 
 public class QuestionHeaderView extends QuestionView {
 
-    public QuestionHeaderView(Context context, Question q, String defaultLang,
-                              String[] langCodes, boolean readOnly) {
-        super(context, q, defaultLang, langCodes, readOnly);
+    public QuestionHeaderView(Context context, Question q, SurveyListener surveyListener) {
+        super(context, q, surveyListener);
         init();
     }
 

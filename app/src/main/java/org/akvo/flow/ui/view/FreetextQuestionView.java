@@ -30,6 +30,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.ValidationRule;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.exception.ValidationException;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -43,9 +44,8 @@ public class FreetextQuestionView extends QuestionView {
     private EditText mDoubleEntryText;
     private TextView mDoubleEntryTitle;
 
-    public FreetextQuestionView(Context context, Question q, String defaultLang,
-            String[] langCodes, boolean readOnly) {
-        super(context, q, defaultLang, langCodes, readOnly);
+    public FreetextQuestionView(Context context, Question q, SurveyListener surveyListener) {
+        super(context, q, surveyListener);
         init();
     }
 
@@ -60,7 +60,7 @@ public class FreetextQuestionView extends QuestionView {
         mDoubleEntryTitle.setVisibility(isDoubleEntry() ? VISIBLE : GONE);
         mDoubleEntryText.setVisibility(isDoubleEntry() ? VISIBLE : GONE);
 
-        if (mReadOnly) {
+        if (isReadOnly()) {
             mEditText.setFocusable(false);
         }
         

@@ -45,6 +45,7 @@ import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -72,9 +73,8 @@ public class OptionQuestionView extends QuestionView {
     private volatile boolean mSuppressListeners = false;
     private String mLatestOtherText;
 
-    public OptionQuestionView(Context context, Question q, String defaultLang, String[] langCodes,
-            boolean readOnly) {
-        super(context, q, defaultLang, langCodes, readOnly);
+    public OptionQuestionView(Context context, Question q, SurveyListener surveyListener) {
+        super(context, q, surveyListener);
         OTHER_TEXT = getResources().getString(R.string.othertext);
         init();
     }
@@ -157,7 +157,7 @@ public class OptionQuestionView extends QuestionView {
             }
         });
         addView(mSpinner);
-        if (mReadOnly) {
+        if (isReadOnly()) {
             mSpinner.setEnabled(false);
         }
     }
@@ -206,7 +206,7 @@ public class OptionQuestionView extends QuestionView {
             mIdToValueMap.put(rb.getId(), OTHER_TEXT);
         }
         addView(mOptionGroup);
-        if (mReadOnly) {
+        if (isReadOnly()) {
             for (int j = 0; j < mOptionGroup.getChildCount(); j++) {
                 mOptionGroup.getChildAt(j).setEnabled(false);
             }
@@ -246,21 +246,17 @@ public class OptionQuestionView extends QuestionView {
             mIdToValueMap.put(box.getId(), OTHER_TEXT);
             addView(box);
         }
-        if (mReadOnly) {
+        if (isReadOnly()) {
             for (int i = 0; i < mCheckBoxes.size(); i++) {
                 mCheckBoxes.get(i).setEnabled(false);
             }
         }
     }
 
-    /**
-     * updates the question's visible languages
-     * 
-     * @param languageCodes
-     */
     @Override
-    public void updateSelectedLanguages(String[] languageCodes) {
-        super.updateSelectedLanguages(languageCodes);
+    public void notifyOptionsChanged() {
+        super.notifyOptionsChanged();
+
         if (ConstantUtil.SPINNER_RENDER_MODE.equalsIgnoreCase(mQuestion.getRenderType())) {
             initializeSpinnerOptions();
             rehydrate(getResponse(true));
@@ -320,8 +316,9 @@ public class OptionQuestionView extends QuestionView {
     private Spanned formOptionText(Option opt) {
         boolean isFirst = true;
         StringBuilder text = new StringBuilder();
-        for (int i = 0; i < mLangs.length; i++) {
-            if (getDefaultLang().equalsIgnoreCase(mLangs[i])) {
+        final String[] langs = getLanguages();
+        for (int i = 0; i < langs.length; i++) {
+            if (getDefaultLang().equalsIgnoreCase(langs[i])) {
                 if (!isFirst) {
                     text.append(" / ");
                 } else {
@@ -330,7 +327,7 @@ public class OptionQuestionView extends QuestionView {
                 text.append(TextUtils.htmlEncode(opt.getText()));
 
             } else {
-                AltText txt = opt.getAltText(mLangs[i]);
+                AltText txt = opt.getAltText(langs[i]);
                 if (txt != null) {
                     if (!isFirst) {
                         text.append(" / ");

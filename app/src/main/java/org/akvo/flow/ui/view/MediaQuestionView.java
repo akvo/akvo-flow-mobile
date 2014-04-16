@@ -30,6 +30,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 /**
@@ -43,9 +44,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     private ImageView mCompleteIcon;
     private String mMediaType;
 
-    public MediaQuestionView(Context context, Question q, String type, String defaultLang,
-            String[] langCodes, boolean readOnly) {
-        super(context, q, defaultLang, langCodes, readOnly);
+    public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
+            String type) {
+        super(context, q, surveyListener);
         mMediaType = type;
         init();
     }
@@ -62,7 +63,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             mMediaButton.setText(R.string.takevideo);
         }
         mMediaButton.setOnClickListener(this);
-        if (mReadOnly) {
+        if (isReadOnly()) {
             mMediaButton.setEnabled(false);
         }
 

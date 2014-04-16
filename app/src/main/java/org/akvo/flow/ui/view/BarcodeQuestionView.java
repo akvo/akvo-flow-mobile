@@ -29,6 +29,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 /**
@@ -42,9 +43,8 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
     private Button mBarcodeButton;
     private EditText mBarcodeText;
 
-    public BarcodeQuestionView(Context context, Question q, String defaultLanguage,
-            String[] langCodes, boolean readOnly) {
-        super(context, q, defaultLanguage, langCodes, readOnly);
+    public BarcodeQuestionView(Context context, Question q, SurveyListener surveyListener) {
+        super(context, q, surveyListener);
         init();
     }
 
@@ -57,7 +57,7 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         mBarcodeText.setOnFocusChangeListener(this);
         mBarcodeButton.setOnClickListener(this);
 
-        if (mReadOnly) {
+        if (isReadOnly()) {
             mBarcodeButton.setEnabled(false);
             mBarcodeText.setEnabled(false);
         }

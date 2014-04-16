@@ -27,6 +27,7 @@ import android.widget.EditText;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.text.DateFormat;
@@ -54,9 +55,8 @@ public class DateQuestionView extends QuestionView {
     private Date mSelectedDate;
     private Calendar mCalendar;
 
-    public DateQuestionView(Context context, Question q, String defaultLang, String[] langCodes,
-            boolean readOnly) {
-        super(context, q, defaultLang, langCodes, readOnly);
+    public DateQuestionView(Context context, Question q, SurveyListener surveyListener) {
+        super(context, q, surveyListener);
         mCalendar = Calendar.getInstance();
         mYear = mCalendar.get(Calendar.YEAR);
         mMonth = mCalendar.get(Calendar.MONTH);

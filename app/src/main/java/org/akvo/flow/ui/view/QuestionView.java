@@ -40,8 +40,10 @@ import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.ScoringRule;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
+import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -54,9 +56,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     private QuestionResponse mResponse;
 
     private List<QuestionInteractionListener> mListeners;
-    protected String[] mLangs = null;
-    protected String mDefaultLang;
-    protected boolean mReadOnly;
+    private SurveyListener mSurveyListener;
 
     private TextView mQuestionText;
     private ImageButton mTipImage;
@@ -67,8 +67,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     private String mError;
 
-    public QuestionView(final Context context, Question q, String defaultLangauge, String[] langs,
-            boolean readOnly) {
+    public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
         final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
@@ -78,9 +77,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             sColors = context.getResources().getStringArray(R.array.colors);
         }
         mQuestion = q;
-        mDefaultLang = defaultLangauge;
-        mReadOnly = readOnly;
-        mLangs = langs;
+        mSurveyListener = surveyListener;
         mError = null;// so far so good.
     }
 
@@ -132,7 +129,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             });
         }
 
-        if (!mReadOnly) {
+        if (!isReadOnly()) {
             mQuestionText.setLongClickable(true);
             mQuestionText.setOnLongClickListener(new OnLongClickListener() {
 
@@ -169,8 +166,11 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         if (mQuestion.isMandatory()) {
             text.append("<i><b>");
         }
-        for (int i = 0; i < mLangs.length; i++) {
-            if (mDefaultLang.equalsIgnoreCase(mLangs[i])) {
+        final String[] langs = getLanguages();
+        final String language = getDefaultLang();
+
+        for (int i = 0; i < langs.length; i++) {
+            if (language.equalsIgnoreCase(langs[i])) {
                 if (!isFirst) {
                     text.append(" / ");
                 } else {
@@ -178,7 +178,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                 }
                 text.append(mQuestion.getText());
             } else {
-                AltText txt = mQuestion.getAltText(mLangs[i]);
+                AltText txt = mQuestion.getAltText(langs[i]);
                 if (txt != null) {
                     if (!isFirst) {
                         text.append(" / ");
@@ -196,14 +196,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         return Html.fromHtml(text.toString());
     }
 
-    /**
-     * updates the question's visible languages
-     *
-     * @param languageCodes
-     */
-    public void updateSelectedLanguages(String[] languageCodes) {
-        mLangs = languageCodes;
-        mQuestionText.setText(formText());
+    public void notifyOptionsChanged() {
+        mQuestionText.setText(formText(), BufferType.SPANNABLE);
     }
 
     /**
@@ -267,19 +261,21 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             StringBuilder textBuilder = new StringBuilder();
             ArrayList<QuestionHelp> helpItems = mQuestion.getHelpByType(type);
             boolean isFirst = true;
+            String[] langs = getLanguages();
+            String language = getDefaultLang();
             if (helpItems != null) {
                 for (int i = 0; i < helpItems.size(); i++) {
                     if (i > 0) {
                         textBuilder.append("<br>");
                     }
 
-                    for (int j = 0; j < mLangs.length; j++) {
-                        if (mDefaultLang.equalsIgnoreCase(mLangs[j])) {
+                    for (int j = 0; j < langs.length; j++) {
+                        if (language.equalsIgnoreCase(langs[j])) {
                             textBuilder.append(helpItems.get(i).getText());
                             isFirst = false;
                         }
 
-                        AltText aText = helpItems.get(i).getAltText(mLangs[j]);
+                        AltText aText = helpItems.get(i).getAltText(langs[j]);
                         if (aText != null) {
                             if (!isFirst) {
                                 textBuilder.append(" / ");
@@ -520,12 +516,16 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mTipImage.setVisibility(isSuppress ? View.GONE : View.VISIBLE);
     }
 
-    public String getDefaultLang() {
-        return mDefaultLang;
+    protected String getDefaultLang() {
+        return mSurveyListener.getDefaultLanguage();
     }
 
-    public void setDefaultLang(String defaultLang) {
-        mDefaultLang = defaultLang;
+    protected String[] getLanguages() {
+        return mSurveyListener.getLanguages();
+    }
+
+    protected boolean isReadOnly() {
+        return mSurveyListener.isReadOnly();
     }
 
     public void setError(String error) {

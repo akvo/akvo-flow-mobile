@@ -17,49 +17,32 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.activity.SurveyViewActivity;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.Question;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.event.SurveyListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SubmitTab extends ListView implements OnClickListener {
-    private long mSurveyInstanceId;
-    private String mLanguage;
-    private String[] mLanguages;
-    private SurveyDbAdapter mDatabase;
+    private SurveyListener mListener;
 
     private TextView mHeaderView;
     private Button mSubmitButton;
 
-    public SubmitTab(Context context, long surveyInstanceId, String defaultLang, String[] languages,
-            SurveyDbAdapter database) {
+    public SubmitTab(Context context, SurveyListener listener) {
         super(context);
 
-        mSurveyInstanceId = surveyInstanceId;
-        mLanguage = defaultLang;
-        mLanguages = languages;
-        mDatabase = database;
+        mListener = listener;
 
         mHeaderView = new TextView(context);
         mHeaderView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
@@ -92,26 +75,7 @@ public class SubmitTab extends ListView implements OnClickListener {
     }
 
     public void onClick(View v) {
-        // TODO: This a temporary (and dreadful) hack. Provide a SurveyListener interface instead
-        final SurveyActivity activity = (SurveyActivity)getContext();
-
-        //activity.saveSessionDuration();
-
-        // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMITTED);
-        // send a broadcast message indicating new data is available
-        Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
-        getContext().sendBroadcast(i);
-
-        ViewUtil.showConfirmDialog(R.string.submitcompletetitle, R.string.submitcompletetext,
-                getContext(), false,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (dialog != null) {
-                            activity.finish();
-                        }
-                    }
-                });
+        mListener.onSurveySubmit();
     }
 
     class QuestionListAdapter extends BaseAdapter {
@@ -139,7 +103,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             QuestionView qv = new QuestionHeaderView(getContext(), mQuestions.get(position),
-                    mLanguage, mLanguages, true);
+                    mListener);
             // force the view to be visible (if the question has
             // dependencies, it'll be hidden by default)
             qv.setVisibility(View.VISIBLE);

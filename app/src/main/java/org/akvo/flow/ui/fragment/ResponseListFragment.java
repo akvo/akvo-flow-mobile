@@ -43,7 +43,6 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.activity.SurveyViewActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.async.loader.SurveyInstanceLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;

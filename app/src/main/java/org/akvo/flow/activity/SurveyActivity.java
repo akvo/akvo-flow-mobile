@@ -72,7 +72,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SurveyActivity extends ActionBarActivity implements TabListener,
-        QuestionInteractionListener, QuestionListView.TabInteractionListener {
+        QuestionInteractionListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
@@ -299,33 +299,12 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         mRequestQuestionId = null;// Reset the tmp reference
     }
 
-    @Override
-    public boolean isReadOnly() {
-        return mReadOnly;
-    }
-
-    @Override
-    public String getSurveyId() {
-        return mSurvey.getId();
-    }
-
-    @Override
-    public long getSurveyInstanceId () {
-        return mSurveyInstanceId;
-    }
-
-    @Override
-    public String getDefaultLang() {
+    private String getDefaultLang() {
         String lang = mSurvey.getLanguage();
         if (TextUtils.isEmpty(lang)) {
             lang = ConstantUtil.ENGLISH_CODE;
         }
         return lang;
-    }
-
-    @Override
-    public String[] getLanguages() {
-        return mLanguages;
     }
 
     private void loadLanguages() {
@@ -496,9 +475,11 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         }
 
         public void load() {
+            final String language = getDefaultLang();
             for (QuestionGroup group : mQuestionGroups) {
-                QuestionListView questionListView = new QuestionListView(SurveyActivity.this, group,
-                        SurveyActivity.this, SurveyActivity.this, mDatabase);
+                QuestionListView questionListView = new QuestionListView(SurveyActivity.this,
+                        mSurveyInstanceId, language, mLanguages, group, mReadOnly, mDatabase,
+                        SurveyActivity.this);
                 questionListView.load();
                 mQuestionListViews.add(questionListView);
             }

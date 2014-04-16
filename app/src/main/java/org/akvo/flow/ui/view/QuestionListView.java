@@ -23,20 +23,28 @@ public class QuestionListView extends ListView {
     private QuestionGroup mQuestionGroup;
 
     private QuestionListAdapter mAdapter;
-    private TabInteractionListener mListener;
     private QuestionInteractionListener mQuestionListener;
     private SurveyDbAdapter mDatabase;
 
     private List<QuestionView> mQuestionViews;
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
 
-    public QuestionListView(Context context, QuestionGroup group, TabInteractionListener listener,
-            QuestionInteractionListener questionListener,  SurveyDbAdapter database) {
+    private long mSurveyInstanceId;
+    private String mLanguage;
+    private String[] mLanguages;
+    private boolean mReadOnly;
+
+    public QuestionListView(Context context, long surveyInstanceId, String defaultLang,
+            String[] languages, QuestionGroup group, boolean readOnly, SurveyDbAdapter database,
+            QuestionInteractionListener questionListener) {
         super(context);
+        mSurveyInstanceId = surveyInstanceId;
+        mLanguage = defaultLang;
+        mLanguages = languages;
         mQuestionGroup = group;
-        mListener = listener;
-        mQuestionListener = questionListener;
+        mReadOnly = readOnly;
         mDatabase = database;
+        mQuestionListener = questionListener;
         mQuestionViews = new ArrayList<QuestionView>();
         mQuestionResponses = new HashMap<String, QuestionResponse>();
 
@@ -53,8 +61,9 @@ public class QuestionListView extends ListView {
     }
 
     public void updateQuestionLanguages(String[] langCodes) {
+        mLanguages = langCodes;
         for (QuestionView view : mQuestionViews) {
-            view.updateSelectedLanguages(langCodes);
+            view.updateSelectedLanguages(mLanguages);
         }
     }
 
@@ -114,7 +123,7 @@ public class QuestionListView extends ListView {
                     // Copying values from old instance; Get rid of its Id
                     // Also, update the SurveyInstance Id, matching the current one
                     response.setId(null);
-                    response.setRespondentId(mListener.getSurveyInstanceId());
+                    response.setRespondentId(mSurveyInstanceId);
 
                     mDatabase.createOrUpdateSurveyResponse(response);
                 }
@@ -188,30 +197,26 @@ public class QuestionListView extends ListView {
     public void load() {
         for (Question q : mQuestionGroup.getQuestions()) {
             final Context context = getContext();
-            final String language = mListener.getDefaultLang();
-            final String[] languages = mListener.getLanguages();
-            final boolean readOnly = false;
 
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new OptionQuestionView(context, q,
-                        language, languages, readOnly);
+                questionView = new OptionQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new FreetextQuestionView(context, q, language, languages, readOnly);
+                questionView = new FreetextQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new MediaQuestionView(context, q, ConstantUtil.PHOTO_QUESTION_TYPE,
-                        language, languages, readOnly);
+                        mLanguage, mLanguages, mReadOnly);
             } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new MediaQuestionView(context, q, ConstantUtil.VIDEO_QUESTION_TYPE,
-                        language, languages, readOnly);
+                        mLanguage, mLanguages, mReadOnly);
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new GeoQuestionView(context, q,language, languages, readOnly);
+                questionView = new GeoQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new BarcodeQuestionView(context, q, language, languages, readOnly);
+                questionView = new BarcodeQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new DateQuestionView(context, q, language, languages, readOnly);
+                questionView = new DateQuestionView(context, q, mLanguage, mLanguages, mReadOnly);
             } else {
-                questionView = new QuestionHeaderView(context, q, language, languages, readOnly);
+                questionView = new QuestionHeaderView(context, q, mLanguage, mLanguages, mReadOnly);
             }
 
             // Add question interaction listener
@@ -250,15 +255,6 @@ public class QuestionListView extends ListView {
             return mQuestionViews.get(position);// Already instantiated
         }
 
-    }
-
-    public interface TabInteractionListener {
-        public String getSurveyId();
-        public long getSurveyInstanceId();
-        public String getDefaultLang();
-        public String[] getLanguages();
-        public boolean isReadOnly();
-        //public void establishDependencies(QuestionGroup group);
     }
 
 }

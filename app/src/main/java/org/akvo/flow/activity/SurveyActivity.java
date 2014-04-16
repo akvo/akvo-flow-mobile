@@ -55,6 +55,7 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.ui.view.QuestionListView;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.SubmitTab;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
@@ -71,8 +72,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SurveyActivity extends ActionBarActivity implements TabListener,
-        QuestionInteractionListener {
+public class SurveyActivity extends ActionBarActivity implements QuestionInteractionListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
@@ -88,7 +88,6 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
      * When a request is done to perform photo, video, barcode scan, etc
      * we store the question id, so we can notify later the status of such
      * operation.
-     * TODO: Design how to notify the result back. Broadcast notification?
      */
     private String mRequestQuestionId;
 
@@ -96,7 +95,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
     private TabsAdapter mAdapter;
 
     private boolean mReadOnly;
-    private long mSurveyInstanceId;// TODO: Load/Create survey instance
+    private long mSurveyInstanceId;
     private long mUserId;
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
@@ -140,11 +139,10 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         setTitle(mSurvey.getName());
         mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new TabsAdapter();
-        mAdapter.load();// Instantiate tabs. TODO: Consider doing this op. in a background thread.
+        mAdapter.load();// Instantiate tabs and views. TODO: Consider doing this op. in a background thread.
         mPager.setAdapter(mAdapter);
         mPager.setOnPageChangeListener(mAdapter);
 
-        setupActionBar();
         loadState(false);// TODO: Implement prefill functionality
     }
 
@@ -214,18 +212,6 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
     public void onDestroy() {
         super.onDestroy();
         mDatabase.close();
-    }
-
-    private void setupActionBar() {
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        for (QuestionGroup group : mSurvey.getQuestionGroups()) {
-            actionBar.addTab(actionBar.newTab()
-                    .setText(group.getHeading())
-                    .setTabListener(this));
-        }
     }
 
     @Override
@@ -449,25 +435,10 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         }
     }
 
-    /**
-     * sets up question dependencies across question groups and registers
-     * questionInteractionListeners on the dependent views. This should be
-     * called each time a new tab is hydrated. It will iterate over all
-     * questions in the survey and install dependencies and the
-     * questionInteractionListeners. After installation, it will check to see if
-     * the parent question contains a response. If so, it will fire a
-     * questionInteractionEvent to ensure dependent questions are put into the
-     * correct state
-     *
-     * @param group
-     */
-    public void establishDependencies(QuestionGroup group) {
-        // TODO
-    }
-
-    class TabsAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener {
+    class TabsAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener, TabListener {
         private List<QuestionGroup> mQuestionGroups;
         private List<QuestionListView> mQuestionListViews;
+        private SubmitTab mSubmitTab;
         
         public TabsAdapter() {
             mQuestionGroups = mSurvey.getQuestionGroups();
@@ -486,6 +457,27 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
             // Now that all the tabs are populated, we setup the dependencies
             setupDependencies();
+
+            mSubmitTab = new SubmitTab(SurveyActivity.this, mSurveyInstanceId, language, mLanguages,
+                    mDatabase);
+
+            setupActionBar();
+        }
+
+        private void setupActionBar() {
+            final ActionBar actionBar = getSupportActionBar();
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
+            for (QuestionGroup group : mSurvey.getQuestionGroups()) {
+                actionBar.addTab(actionBar.newTab()
+                        .setText(group.getHeading())
+                        .setTabListener(this));
+            }
+
+            actionBar.addTab(actionBar.newTab()
+                    .setText("Submit")
+                    .setTabListener(this));
         }
 
         public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
@@ -517,6 +509,16 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
             return questionView;
         }
 
+        /**
+         * Sets up question dependencies across question groups and registers
+         * questionInteractionListeners on the dependent views. This should be
+         * called each time a new tab is hydrated. It will iterate over all
+         * questions in the survey and install dependencies and the
+         * questionInteractionListeners. After installation, it will check to see if
+         * the parent question contains a response. If so, it will fire a
+         * questionInteractionEvent to ensure dependent questions are put into the
+         * correct state
+         */
         private void setupDependencies() {
             for (QuestionGroup group : mQuestionGroups) {
                 for (Question question : group.getQuestions()) {// TODO: Add getQuestions() to Survey
@@ -550,14 +552,19 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View view = mQuestionListViews.get(position);// Already instantiated
+            View view;
+            if (position < mQuestionListViews.size()) {
+                view = mQuestionListViews.get(position);// Already instantiated
+            } else {
+                view = mSubmitTab;
+            }
             container.addView(view, 0);
             return view;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object view) {
-            container.removeView((QuestionListView) view);
+            container.removeView((View) view);
         }
 
         @Override
@@ -567,12 +574,7 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
 
         @Override
         public int getCount() {
-            return mQuestionGroups.size();
-        }
-        
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mQuestionGroups.get(position).getHeading();
+            return mQuestionGroups.size() + 1;// Do not forget the submit tab
         }
 
         @Override
@@ -588,19 +590,73 @@ public class SurveyActivity extends ActionBarActivity implements TabListener,
         @Override
         public void onPageScrollStateChanged(int state) {
         }
+
+        @Override
+        public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
+        }
+
+        @Override
+        public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
+            final int position = tab.getPosition();
+            if (position == mQuestionListViews.size()) {
+                mSubmitTab.refresh(checkInvalidQuestions());
+            }
+            mPager.setCurrentItem(position);
+        }
+
+        @Override
+        public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
+        }
+
+        /**
+         * checks if all the mandatory questions (on all tabs) have responses
+         *
+         * @return
+         */
+        private List<Question> checkInvalidQuestions() {
+            Map<String, QuestionResponse> responseMap = new HashMap<String, QuestionResponse>();
+            ArrayList<Question> invalidQuestions = new ArrayList<Question>();
+            List<Question> candidateInvalidQuestions = new ArrayList<Question>();
+            for (QuestionListView questionListView : mQuestionListViews) {
+                // Add this tab's responses to the map.
+                Map<String, QuestionResponse> responses = questionListView.getResponses();
+                responseMap.putAll(responses);
+                candidateInvalidQuestions.addAll(questionListView.checkInvalidQuestions());
+            }
+
+            // now make sure that the candidate missing questions are really
+            // missing by seeing if their dependencies are fulfilled
+            for (Question q : candidateInvalidQuestions) {
+                if (areDependenciesSatisfied(q, responseMap)) {
+                    invalidQuestions.add(q);
+                }
+            }
+
+            return invalidQuestions;
+        }
+
+        /**
+         * Checks if the dependencies for the question passed in are satisfied
+         *
+         * @param q Question to check dependencies for
+         * @param responses All the responses for this survey
+         * @return true if no dependency is broken, false otherwise
+         */
+        private boolean areDependenciesSatisfied(Question q, Map<String, QuestionResponse> responses) {
+            List<Dependency> dependencies = q.getDependencies();
+            if (dependencies != null) {
+                for (Dependency dependency : dependencies) {
+                    QuestionResponse resp = responses.get(dependency.getQuestion());
+                    if (resp == null || !resp.hasValue()
+                            || !dependency.isMatch(resp.getValue())
+                            || !resp.getIncludeFlag()) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
     }
 
-    @Override
-    public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        mPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-    
 }

@@ -26,27 +26,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
-import android.support.v7.app.ActionBar.TabListener;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.SubMenu;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
-import org.akvo.flow.domain.Dependency;
-import org.akvo.flow.domain.Question;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -55,9 +48,6 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
-import org.akvo.flow.ui.view.QuestionListView;
-import org.akvo.flow.ui.view.QuestionView;
-import org.akvo.flow.ui.view.SubmitTab;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
@@ -69,7 +59,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,6 +144,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             in = FileUtil.getFileInputStream(surveyMeta.getFileName(),
                     ConstantUtil.DATA_DIR, false, this);
             mSurvey = SurveyDao.loadSurvey(surveyMeta, in);
+            mSurvey.setId(surveyId);
         } catch (FileNotFoundException e) {
             Log.e(TAG, "Could not load survey xml file");
         } finally {
@@ -218,6 +208,11 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.survey_activity, menu);
+        if (isReadOnly()) {
+            SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
+            subMenu.removeItem(R.id.new_survey);
+            subMenu.removeItem(R.id.clear);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -225,7 +220,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_survey:
-                // TODO
+                saveAndStartNew();
                 return true;
             case R.id.edit_lang:
                 displayLanguagesDialog();
@@ -238,16 +233,33 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     private void clearSurvey() {
-        if (!isReadOnly()) {
-            ViewUtil.showConfirmDialog(R.string.cleartitle, R.string.cleardesc, this, true,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
-                            loadState(false);
-                        }
-                    });
-        }
+        ViewUtil.showConfirmDialog(R.string.cleartitle, R.string.cleardesc, this, true,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
+                        loadState(false);
+                    }
+                });
+    }
+
+    private void saveAndStartNew() {
+        saveState();// make sure we don't lose anything that was already written
+        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
+        ViewUtil.showConfirmDialog(R.string.savecompletetitle,
+                R.string.savecompletetext, this, false,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Create record, if necessary (non-monitored group)
+                        String recordId = mSurveyGroup.isMonitored() ?
+                                mRecordId
+                                : mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+                        mSurveyInstanceId = mDatabase.createSurveyRespondent(mSurvey.getId(),
+                                String.valueOf(mUserId), recordId);
+                        loadState(false);
+                    }
+                });
     }
 
     private void displayLanguagesDialog() {

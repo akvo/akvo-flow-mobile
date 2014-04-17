@@ -217,12 +217,23 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.records_activity, menu);
+        getMenuInflater().inflate(R.menu.survey_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.new_survey:
+                // TODO
+                return true;
+            case R.id.edit_lang:
+                // TODO
+                return true;
+            case R.id.clear:
+                // TODO
+                return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

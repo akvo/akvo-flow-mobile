@@ -99,10 +99,6 @@ public class QuestionListView extends ListView {
     }
 
     public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
-        if (mQuestionResponses == null) {
-            mQuestionResponses = new HashMap<String, QuestionResponse>();
-        }
-
         for (QuestionView questionView : mQuestionViews) {
             final String questionId = questionView.getQuestion().getId();
             if (responses.containsKey(questionId)) {
@@ -114,7 +110,7 @@ public class QuestionListView extends ListView {
                     response.setId(null);
                     response.setRespondentId(mSurveyListener.getSurveyInstanceId());
 
-                    mDatabase.createOrUpdateSurveyResponse(response);
+                    //mDatabase.createOrUpdateSurveyResponse(response);
                 }
 
                 mQuestionResponses.put(questionId, response);
@@ -140,10 +136,6 @@ public class QuestionListView extends ListView {
      * @param surveyInstanceId
      */
     public void saveState(long surveyInstanceId) {
-        if (mQuestionResponses == null) {
-            mQuestionResponses = new HashMap<String, QuestionResponse>();
-        }
-
         for (QuestionView q : mQuestionViews) {
             QuestionResponse curResponse = q.getResponse(true);
             if (curResponse != null && curResponse.hasValue()) {

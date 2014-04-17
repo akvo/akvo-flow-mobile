@@ -231,10 +231,23 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 displayLanguagesDialog();
                 return true;
             case R.id.clear:
-                // TODO
+                clearSurvey();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void clearSurvey() {
+        if (!isReadOnly()) {
+            ViewUtil.showConfirmDialog(R.string.cleartitle, R.string.cleardesc, this, true,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
+                            loadState(false);
+                        }
+                    });
+        }
     }
 
     private void displayLanguagesDialog() {

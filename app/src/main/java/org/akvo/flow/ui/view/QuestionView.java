@@ -142,6 +142,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     resetQuestion(true);
+                                    checkMandatory();
                                 }
                             });
                     return true;
@@ -486,8 +487,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             if (this.mResponse == null) {
                 this.mResponse = response;
             } else {
-                // we need to preserve the ID so we don't get duplicates in the
-                // db
+                // we need to preserve the ID so we don't get duplicates in the db
                 this.mResponse.setType(response.getType());
                 this.mResponse.setValue(response.getValue());
             }
@@ -497,6 +497,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         if (!suppressListeners) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
         }
+        setError(null);// Reset any error status
     }
 
     public Question getQuestion() {
@@ -544,6 +545,14 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mQuestionText.setError(error);
     }
 
+    public void checkMandatory() {
+        if (mError == null && mQuestion.isMandatory() &&
+                (mResponse == null || !mResponse.isValid())) {
+            // Mandatory questions must have a response
+            setError(getResources().getString(R.string.error_question_mandatory));
+        }
+    }
+
     /**
      * isValid determines if the QuestionView contains a valid status.
      * An invalid status can be set either explicitly with setError(String),
@@ -552,16 +561,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * @return true if the status is valid, false otherwise
      */
     public boolean isValid() {
-        if (mError != null) {
-            return false;// No discussion. This question is explicitly marked as erroneous.
-        }
-
-        if (mQuestion.isMandatory()) {
-            // Mandatory questions must have a response
-            return mResponse != null && mResponse.isValid();
-        }
-
-        return true;// Non mandatory questions with no explicit error.
+        return mError == null;
     }
 
     public boolean isDoubleEntry() {

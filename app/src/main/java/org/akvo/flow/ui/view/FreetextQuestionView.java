@@ -139,16 +139,11 @@ public class FreetextQuestionView extends QuestionView {
             return;// Die early. Don't store the value.
         }
 
-        if (TextUtils.isEmpty(mEditText.getText().toString()) && getQuestion().isMandatory()) {
-            // Mandatory question must be answered
-            setError(getResources().getString(R.string.error_question_mandatory));
-        } else {
-            setError(null);
-        }
-
         setResponse(new QuestionResponse(mEditText.getText().toString(),
                 ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
                 suppressListeners);
+
+        checkMandatory();// Mandatory question must be answered
     }
 
     private boolean checkDoubleEntry() {
@@ -173,11 +168,11 @@ public class FreetextQuestionView extends QuestionView {
 
     @Override
     public void resetQuestion(boolean fireEvent) {
-        super.resetQuestion(fireEvent);
         mEditText.setText("");
         if (isDoubleEntry()) {
             mDoubleEntryText.setText("");
         }
+        super.resetQuestion(fireEvent);
     }
 
     @Override

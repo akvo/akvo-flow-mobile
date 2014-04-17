@@ -44,6 +44,9 @@ public class QuestionListView extends ListView {
 
         mAdapter = new QuestionListAdapter(mQuestionGroup.getQuestions());
         setAdapter(mAdapter);
+
+        setFocusable(false);
+        setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
     }
 
     public void resetQuestions() {
@@ -77,6 +80,7 @@ public class QuestionListView extends ListView {
     public List<Question> checkInvalidQuestions() {
         List<Question> missingQuestions = new ArrayList<Question>();
         for (QuestionView view : mQuestionViews) {
+            view.checkMandatory();
             if (!view.isValid()) {
                 missingQuestions.add(view.getQuestion());
             }
@@ -99,7 +103,9 @@ public class QuestionListView extends ListView {
     }
 
     public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
+        mQuestionResponses.clear();
         for (QuestionView questionView : mQuestionViews) {
+            questionView.resetQuestion(false);// Clean start
             final String questionId = questionView.getQuestion().getId();
             if (responses.containsKey(questionId)) {
                 final QuestionResponse response = responses.get(questionId);

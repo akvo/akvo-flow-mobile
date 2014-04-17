@@ -53,6 +53,12 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mQuestionListViews = new ArrayList<QuestionListView>();
     }
 
+    public void notifyOptionsChanged() {
+        for (QuestionListView questionListView : mQuestionListViews) {
+            questionListView.notifyOptionsChanged();// Spread the word
+        }
+    }
+
     public void load() {
         for (QuestionGroup group : mQuestionGroups) {
             QuestionListView questionListView = new QuestionListView(mContext, group, mDatabase,

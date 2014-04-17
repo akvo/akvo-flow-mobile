@@ -228,13 +228,42 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 // TODO
                 return true;
             case R.id.edit_lang:
-                // TODO
+                displayLanguagesDialog();
                 return true;
             case R.id.clear:
                 // TODO
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void displayLanguagesDialog() {
+        // TODO: language management should be simplified
+        LangsPreferenceData langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
+                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY),
+                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY));
+
+        final String[] langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
+        final boolean[] langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
+        final int[] langsSelectedMasterIndexArray = langsPrefData.getLangsSelectedMasterIndexArray();
+
+        ViewUtil.displayLanguageSelector(this, langsSelectedNameArray,
+                langsSelectedBooleanArray,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int clicked) {
+                        if (dialog != null) {
+                            dialog.dismiss();
+                        }
+
+                        mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
+                                LangsPreferenceUtil.formLangPreferenceString(
+                                        langsSelectedBooleanArray,
+                                        langsSelectedMasterIndexArray));
+
+                        loadLanguages();
+                        mAdapter.notifyOptionsChanged();
+                    }
+                });
     }
 
     @Override

@@ -134,6 +134,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         pager.setAdapter(mAdapter);
 
         loadState(false);// TODO: Implement prefill functionality
+        spaceLeftOnCard();
     }
 
     private void loadSurvey(String surveyId) {
@@ -239,6 +240,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     public void onClick(DialogInterface dialog, int which) {
                         mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
                         loadState(false);
+                        spaceLeftOnCard();
                     }
                 });
     }

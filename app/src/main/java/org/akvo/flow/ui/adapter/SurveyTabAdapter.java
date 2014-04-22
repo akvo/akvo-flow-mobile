@@ -70,7 +70,9 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         // Now that all the tabs are populated, we setup the dependencies
         setupDependencies();
 
-        mSubmitTab = new SubmitTab(mContext, mSurveyListener);
+        if (!mSurveyListener.isReadOnly()) {
+            mSubmitTab = new SubmitTab(mContext, mSurveyListener);
+        }
 
         // Setup the tabs in the action bar
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -82,9 +84,11 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
                     .setTabListener(this));
         }
 
-        mActionBar.addTab(mActionBar.newTab()
-                .setText("Submit")// TODO: Externalize string
-                .setTabListener(this));
+        if (mSubmitTab != null) {
+            mActionBar.addTab(mActionBar.newTab()
+                    .setText("Submit")// TODO: Externalize string
+                    .setTabListener(this));
+        }
 
         mPager.setOnPageChangeListener(this);
     }
@@ -183,7 +187,10 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     @Override
     public int getCount() {
-        return mQuestionGroups.size() + 1;// Do not forget the submit tab
+        if (mSubmitTab != null) {
+            return mQuestionGroups.size() + 1;// Do not forget the submit tab
+        }
+        return mQuestionGroups.size();
     }
 
     @Override
@@ -192,7 +199,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     @Override
     public void onPageSelected(int position) {
-        if (position == mQuestionListViews.size()) {
+        if (position == mQuestionListViews.size() && mSubmitTab != null) {
             mSubmitTab.refresh(checkInvalidQuestions());
         }
 
@@ -210,11 +217,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        final int position = tab.getPosition();
-        if (position == mQuestionListViews.size()) {
-            mSubmitTab.refresh(checkInvalidQuestions());
-        }
-        mPager.setCurrentItem(position);
+        mPager.setCurrentItem(tab.getPosition());
     }
 
     @Override

@@ -21,7 +21,6 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,7 +37,6 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
@@ -59,7 +57,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,8 +118,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
 
         if (mSurveyInstanceId == 0) {
-            // If no survey instance is passed in, we need to create one
-            // TODO: Ensure is not recreated upon rotation.
+            // If no survey instance is passed in, we need to create(or load) one
             mSurveyInstanceId = mDatabase.createOrLoadSurveyRespondent(surveyId,
                     String.valueOf(mUserId), mSurveyGroup.getId(), mRecordId);
         }
@@ -134,8 +130,48 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         mAdapter.load();// Instantiate tabs and views. TODO: Consider doing this op. in a background thread.
         pager.setAdapter(mAdapter);
 
-        loadState(false);// TODO: Implement prefill functionality
+        Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
+        if (responses.isEmpty()) {
+            displayPrefillDialog();
+        } else {
+            loadState(responses);
+        }
+
         spaceLeftOnCard();
+    }
+
+    /**
+     * Display prefill option dialog, if applies. This feature is only available
+     * for monitored groups, when a new survey instance is created, allowing users
+     * to 'clone' responses from the previous response.
+     */
+    private void displayPrefillDialog() {
+        if (!mSurveyGroup.isMonitored()) {
+            return;// Do nothing, as prefill option is not available in the current context
+        }
+
+        final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId());
+        if (lastSurveyInstance != null) {
+            ViewUtil.showConfirmDialog(R.string.prefill_title, R.string.prefill_text,
+                    SurveyActivity.this, true,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            prefillSurvey(lastSurveyInstance);
+                        }
+                    });
+        }
+    }
+
+    private void prefillSurvey(long prefillSurveyInstance) {
+        Map<String, QuestionResponse> responses = mDatabase.getResponses(prefillSurveyInstance);
+        for (QuestionResponse response : responses.values()) {
+            // Adapt(clone) responses for the current survey instance:
+            // Get rid of its Id and update the SurveyInstance Id
+            response.setId(null);
+            response.setRespondentId(mSurveyInstanceId);
+        }
+        loadState(responses);
     }
 
     private void loadSurvey(String surveyId) {
@@ -156,39 +192,19 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         }
     }
 
-    private void loadState(boolean prefill) {
-        Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
+    /**
+     * Load state for the current survey instance
+     */
+    private void loadState() {
+        Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
+        loadState(responses);
+    }
 
-        Cursor cursor = mDatabase.getResponses(mSurveyInstanceId);
-
-        if (cursor != null) {
-            int idCol = cursor.getColumnIndexOrThrow(ResponseColumns._ID);
-            int answerCol = cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER);
-            int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
-            int qidCol = cursor.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
-            int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
-            int scoreCol = cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL);
-            int strengthCol = cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH);
-
-            if (cursor.moveToFirst()) {
-                do {
-                    QuestionResponse response = new QuestionResponse();
-                    response.setId(cursor.getLong(idCol));
-                    response.setRespondentId(mSurveyInstanceId);// No need to read the cursor
-                    response.setValue(cursor.getString(answerCol));
-                    response.setType(cursor.getString(typeCol));
-                    response.setQuestionId(cursor.getString(qidCol));
-                    response.setIncludeFlag(cursor.getInt(includeCol) == 1);
-                    response.setScoredValue(cursor.getString(scoreCol));
-                    response.setStrength(cursor.getString(strengthCol));
-
-                    responses.put(response.getQuestionId(), response);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-
-        mAdapter.loadState(responses, prefill);
+    /**
+     * Load state with the provided responses map
+     */
+    private void loadState(Map<String, QuestionResponse> responses) {
+        mAdapter.loadState(responses);
     }
 
     /**
@@ -271,7 +287,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
-                        loadState(false);
+                        loadState();
                         spaceLeftOnCard();
                     }
                 });
@@ -291,7 +307,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                                 : mDatabase.createSurveyedLocale(mSurveyGroup.getId());
                         mSurveyInstanceId = mDatabase.createSurveyRespondent(mSurvey.getId(),
                                 String.valueOf(mUserId), recordId);
-                        loadState(false);
+                        loadState();
                     }
                 });
     }

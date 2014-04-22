@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
@@ -587,26 +588,52 @@ public class SurveyDbAdapter {
             idVal = database.insert(Tables.USER, null, initialValues);
         } else {
             database.update(Tables.USER, initialValues, UserColumns._ID + "=?",
-                    new String[]{ idVal.toString() });
+                    new String[]{idVal.toString()});
         }
         return idVal;
     }
 
-    /**
-     * Return a Cursor over the list of all responses for a particular survey instance
-     * 
-     * @return Cursor over all responses
-     */
-    public Cursor getResponses(long surveyInstanceId) {
-        return database.query(Tables.RESPONSE,
+    public Map<String, QuestionResponse> getResponses(long surveyInstanceId) {
+        Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
+
+        Cursor cursor = database.query(Tables.RESPONSE,
                 new String[] {
-                    ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
-                    ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                    ResponseColumns.INCLUDE, ResponseColumns.SCORED_VAL, ResponseColumns.STRENGTH
+                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
+                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
+                        ResponseColumns.INCLUDE, ResponseColumns.SCORED_VAL, ResponseColumns.STRENGTH
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
                 null, null, null);
+
+        if (cursor != null) {
+            int idCol = cursor.getColumnIndexOrThrow(ResponseColumns._ID);
+            int answerCol = cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER);
+            int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
+            int qidCol = cursor.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
+            int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
+            int scoreCol = cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL);
+            int strengthCol = cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    QuestionResponse response = new QuestionResponse();
+                    response.setId(cursor.getLong(idCol));
+                    response.setRespondentId(surveyInstanceId);// No need to read the cursor
+                    response.setValue(cursor.getString(answerCol));
+                    response.setType(cursor.getString(typeCol));
+                    response.setQuestionId(cursor.getString(qidCol));
+                    response.setIncludeFlag(cursor.getInt(includeCol) == 1);
+                    response.setScoredValue(cursor.getString(scoreCol));
+                    response.setStrength(cursor.getString(strengthCol));
+
+                    responses.put(response.getQuestionId(), response);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+
+        return responses;
     }
 
     /**
@@ -1394,7 +1421,7 @@ public class SurveyDbAdapter {
      * @param surveyId
      * @return last surveyInstance with those attributes
      */
-    public Long getLastSurveyInstance(String surveyedLocaleId, long surveyId) {
+    public Long getLastSurveyInstance(String surveyedLocaleId, String surveyId) {
         Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
                     SurveyInstanceColumns._ID, SurveyInstanceColumns.RECORD_ID,
@@ -1402,7 +1429,7 @@ public class SurveyDbAdapter {
                 },
                 SurveyInstanceColumns.RECORD_ID + "= ? AND " + SurveyInstanceColumns.SURVEY_ID
                         + "= ? AND " + SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL",
-                new String[]{surveyedLocaleId, String.valueOf(surveyId)},
+                new String[]{surveyedLocaleId, surveyId},
                 null, null,
                 SurveyInstanceColumns.SUBMITTED_DATE + " DESC");
         if (cursor != null && cursor.moveToFirst()) {

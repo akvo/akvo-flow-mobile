@@ -89,9 +89,9 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mPager.setOnPageChangeListener(this);
     }
 
-    public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
+    public void loadState(Map<String, QuestionResponse> responses) {
         for (QuestionListView questionListView : mQuestionListViews) {
-            questionListView.loadState(responses, prefill);
+            questionListView.loadState(responses);
         }
     }
 

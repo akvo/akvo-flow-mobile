@@ -102,25 +102,14 @@ public class QuestionListView extends ListView {
         return responses;
     }
 
-    public void loadState(Map<String, QuestionResponse> responses, boolean prefill) {
+    public void loadState(Map<String, QuestionResponse> responses) {
         mQuestionResponses.clear();
         for (QuestionView questionView : mQuestionViews) {
             questionView.resetQuestion(false);// Clean start
             final String questionId = questionView.getQuestion().getId();
             if (responses.containsKey(questionId)) {
                 final QuestionResponse response = responses.get(questionId);
-
-                if (prefill) {
-                    // Copying values from old instance; Get rid of its Id
-                    // Also, update the SurveyInstance Id, matching the current one
-                    response.setId(null);
-                    response.setRespondentId(mSurveyListener.getSurveyInstanceId());
-
-                    //mDatabase.createOrUpdateSurveyResponse(response);
-                }
-
                 mQuestionResponses.put(questionId, response);
-
                 // Update the question view to reflect the loaded data
                 questionView.rehydrate(response);
             }

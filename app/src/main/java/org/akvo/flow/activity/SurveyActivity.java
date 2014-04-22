@@ -88,6 +88,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private boolean mReadOnly;
     private long mSurveyInstanceId;
     private long mUserId;
+    private long mSessionStartTime;
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
@@ -190,13 +191,44 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         mAdapter.loadState(responses, prefill);
     }
 
+    /**
+     * Handle survey session duration. Only 'active' survey time will be consider, that is,
+     * the time range between onResume() and onPause() callbacks. Survey submission will also
+     * stop the recording. This feature is only used if the mReadOnly flag is not active.
+     *
+     * @param start true if the call is to start recording, false to stop and save the duration.
+     */
+    private void recordDuration(boolean start) {
+        if (mReadOnly) {
+            return;
+        }
+
+        final long time = System.currentTimeMillis();
+
+        if (start) {
+            mSessionStartTime = time;
+        } else {
+            mDatabase.addSurveyDuration(mSurveyInstanceId, time - mSessionStartTime);
+            // Restart the current session timer, in case we receive subsequent calls
+            // to record the time, w/o setting up the timer first.
+            mSessionStartTime = time;
+        }
+    }
+
     private void saveState() {
         mAdapter.saveState(mSurveyInstanceId);
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        recordDuration(true);// Keep track of this session's duration.
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
+        recordDuration(false);
         saveState();
     }
 
@@ -400,7 +432,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
     @Override
     public void onSurveySubmit() {
-        //activity.saveSessionDuration();
+        recordDuration(false);
         saveState();
 
         // if we have no missing responses, submit the survey

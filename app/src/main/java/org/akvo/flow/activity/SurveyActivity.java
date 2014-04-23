@@ -57,6 +57,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,11 +94,14 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
     private String[] mLanguages;
 
+    private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
 
+        mQuestionResponses = new HashMap<String, QuestionResponse>();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -126,7 +130,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         // Set the survey name as Activity title
         setTitle(mSurvey.getName());
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
-        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), pager, mDatabase, this, this);
+        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), pager, this, this);
         mAdapter.load();// Instantiate tabs and views. TODO: Consider doing this op. in a background thread.
         pager.setAdapter(mAdapter);
 
@@ -204,7 +208,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
      * Load state with the provided responses map
      */
     private void loadState(Map<String, QuestionResponse> responses) {
-        mAdapter.loadState(responses);
+        mQuestionResponses = responses;
+        mAdapter.loadState();
     }
 
     /**
@@ -232,7 +237,20 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     private void saveState() {
-        mAdapter.saveState(mSurveyInstanceId);
+        if (!mReadOnly) {
+            for (QuestionResponse response : mQuestionResponses.values()) {
+                // Store the response if it contains a value. Otherwise, delete it
+                if (response.hasValue()) {
+                    response.setRespondentId(mSurveyInstanceId);
+                    mDatabase.createOrUpdateSurveyResponse(response);
+                } else if (response.getId() != null && response.getId() > 0) {
+                    // if we don't have a value BUT there is an ID, we need to
+                    // remove it since the user blanked out their response
+                    mDatabase.deleteResponse(mSurveyInstanceId, response.getQuestionId());
+                }
+            }
+            mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
+        }
     }
 
     @Override
@@ -244,6 +262,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     public void onPause() {
         super.onPause();
+        mAdapter.onPause();
         recordDuration(false);
         saveState();
     }
@@ -295,7 +314,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
     private void saveAndStartNew() {
         saveState();// make sure we don't lose anything that was already written
-        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
         ViewUtil.showConfirmDialog(R.string.savecompletetitle,
                 R.string.savecompletetext, this, false,
                 new DialogInterface.OnClickListener() {
@@ -426,8 +444,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     @Override
-    public long getSurveyInstanceId() {
-        return mSurveyInstanceId;
+    public Map<String, QuestionResponse> getResponses() {
+        return mQuestionResponses;
     }
 
     @Override
@@ -453,6 +471,10 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
         // if we have no missing responses, submit the survey
         mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyDbAdapter.SurveyInstanceStatus.SUBMITTED);
+
+        // Make the current survey immutable
+        mReadOnly = true;
+
         // send a broadcast message indicating new data is available
         Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
         sendBroadcast(i);
@@ -525,7 +547,18 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 builder.show();
             }
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event.getEventType())) {
-            mDatabase.deleteResponse(mSurveyInstanceId, event.getSource().getQuestion().getId());
+            String questionId = event.getSource().getQuestion().getId();
+            mQuestionResponses.remove(questionId);
+            mDatabase.deleteResponse(mSurveyInstanceId, questionId);
+        } else if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
+            String questionId = event.getSource().getQuestion().getId();
+            QuestionResponse response = event.getSource().getResponse();
+            if (response != null) {
+                mQuestionResponses.put(questionId, response);
+            } else {
+                mQuestionResponses.remove(questionId);
+            }
+            // TODO: Should we save this Response to the DB straightaway?
         }
     }
 

@@ -119,7 +119,7 @@ public class OptionQuestionView extends QuestionView {
             @SuppressWarnings("rawtypes")
             public void onItemSelected(AdapterView parent, View view, int position, long id) {
                 if (!mSuppressListeners) {
-                    mSpinner.requestFocus();
+                    //mSpinner.requestFocus();
                     // if position is greater than the size of the array then OTHER is selected
                     if (position > mQuestion.getOptions().size()) {
                         // only display the dialog if OTHER isn't
@@ -166,7 +166,7 @@ public class OptionQuestionView extends QuestionView {
         mOptionGroup = new RadioGroup(getContext());
         mOptionGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    mOptionGroup.requestChildFocus(mOptionGroup.findViewById(checkedId), mOptionGroup);
+                    //mOptionGroup.requestChildFocus(mOptionGroup.findViewById(checkedId), mOptionGroup);
                     handleSelection(checkedId, true);
                 }
             });
@@ -259,7 +259,7 @@ public class OptionQuestionView extends QuestionView {
 
         if (ConstantUtil.SPINNER_RENDER_MODE.equalsIgnoreCase(mQuestion.getRenderType())) {
             initializeSpinnerOptions();
-            rehydrate(getResponse(true));
+            rehydrate(getResponse());
         } else {
             List<Option> options = mQuestion.getOptions();
             if (mQuestion.isAllowMultiple()) {
@@ -362,7 +362,7 @@ public class OptionQuestionView extends QuestionView {
      */
     private void handleSelection(final int checkedId, final boolean isChecked) {
         if (!mSuppressListeners) {
-            QuestionResponse r = getResponse(true);
+            QuestionResponse r = getResponse();
             if (r != null && r.getValue() != null
                     && r.getValue().trim().length() > 0 && promptOnChange) {
                 ViewUtil.showConfirmDialog(R.string.confirmchangetitle,
@@ -378,7 +378,7 @@ public class OptionQuestionView extends QuestionView {
                             public void onClick(DialogInterface dialog,
                                     int which) {
                                 // if they select "Cancel", then undo the change
-                                rehydrate(getResponse(true));
+                                rehydrate(getResponse());
                             }
                         });
             } else {
@@ -540,9 +540,9 @@ public class OptionQuestionView extends QuestionView {
      */
     @Override
     public void rehydrate(QuestionResponse resp) {
-        mSuppressListeners = true;
         super.rehydrate(resp);
 
+        mSuppressListeners = true;
         if (resp != null) {
             if (mOptionGroup != null) {
                 // the enhanced for loop is ok here
@@ -618,8 +618,6 @@ public class OptionQuestionView extends QuestionView {
             }
         }
         mSuppressListeners = false;
-        // this is just to trigger listeners now that the view is updated
-        setResponse(resp);
     }
 
     /**

@@ -18,6 +18,7 @@ package org.akvo.flow.ui.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import android.app.AlertDialog;
@@ -348,10 +349,18 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * method that should be overridden by sub classes to clear current value
      */
     public void resetQuestion(boolean fireEvent) {
-        setResponse(null, false);
+        boolean suppressListeners = !fireEvent;
+        setResponse(null, suppressListeners);
         setError(null);
         if (fireEvent) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_CLEAR_EVENT);
+        }
+
+        // Show/Hide the Question, according to the dependencies
+        if (areDependenciesSatisfied()) {
+            setVisibility(View.VISIBLE);
+        } else {
+            setVisibility(View.GONE);
         }
     }
 
@@ -365,7 +374,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     Dependency d = dependencies.get(i);
                     if (d.getQuestion().equalsIgnoreCase(
                             event.getSource().getQuestion().getId())) {
-                        if (handleDependencyParentResponse(d, event.getSource().getResponse(true))) {
+                        if (handleDependencyParentResponse(d, event.getSource().getResponse())) {
                             break;
                         }
                     }
@@ -424,7 +433,9 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         // now notify our own listeners to make sure we correctly toggle
         // nested dependencies (i.e. if A -> B -> C and C changes, A needs to
         // know too).
-        notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
+        if (mResponse != null) {
+            notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
+        }
 
         return setVisible;
     }
@@ -446,7 +457,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * @param resp
      */
     public void rehydrate(QuestionResponse resp) {
-        setResponse(resp, true);
+        setResponse(resp);
     }
 
     /**
@@ -460,18 +471,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public void releaseResources() {
     }
 
-    public QuestionResponse getResponse(boolean suppressListeners) {
-        if (mResponse == null
-                || (ConstantUtil.VALUE_RESPONSE_TYPE.equals(mResponse.getType()) && (mResponse
-                .getValue() == null || mResponse.getValue().trim()
-                .length() == 0))) {
-            captureResponse(suppressListeners);
-        }
-        return mResponse;
-    }
-
     public QuestionResponse getResponse() {
-        return getResponse(false);
+        return mResponse;
     }
 
     public void setResponse(QuestionResponse response) {
@@ -481,8 +482,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public void setResponse(QuestionResponse response, boolean suppressListeners) {
         if (response != null) {
             if (mQuestion != null) {
-                response.setScoredValue(mQuestion.getResponseScore(response
-                        .getValue()));
+                response.setScoredValue(mQuestion.getResponseScore(response.getValue()));
             }
             if (this.mResponse == null) {
                 this.mResponse = response;
@@ -566,6 +566,29 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     public boolean isDoubleEntry() {
         return mQuestion != null ? mQuestion.isDoubleEntry() : false;// Avoid NPE
+    }
+
+    /**
+     * Checks if the dependencies for the question passed in are satisfied
+     *
+     * @param q Question to check dependencies for
+     * @param responses All the responses for this survey
+     * @return true if no dependency is broken, false otherwise
+     */
+    public boolean areDependenciesSatisfied() {
+        List<Dependency> dependencies = getQuestion().getDependencies();
+        if (dependencies != null) {
+            Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
+            for (Dependency dependency : dependencies) {
+                QuestionResponse resp = responses.get(dependency.getQuestion());
+                if (resp == null || !resp.hasValue()
+                        || !dependency.isMatch(resp.getValue())
+                        || !resp.getIncludeFlag()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }

@@ -9,11 +9,9 @@ import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
@@ -22,16 +20,13 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.SubmitTab;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener,
         ActionBar.TabListener {
     private Context mContext;
     private SurveyListener mSurveyListener;
     private QuestionInteractionListener mQuestionListener;
-    private SurveyDbAdapter mDatabase;
 
     private ActionBar mActionBar;
     private ViewPager mPager;
@@ -40,10 +35,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private SubmitTab mSubmitTab;
 
     public SurveyTabAdapter(Context context, ActionBar actionBar, ViewPager pager,
-            SurveyDbAdapter database, SurveyListener surveyListener,
-            QuestionInteractionListener questionListener) {
+            SurveyListener surveyListener, QuestionInteractionListener questionListener) {
         mContext = context;
-        mDatabase = database;
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
         mActionBar = actionBar;
@@ -61,7 +54,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     public void load() {
         for (QuestionGroup group : mQuestionGroups) {
-            QuestionGroupTab questionGroupTab = new QuestionGroupTab(mContext, group, mDatabase,
+            QuestionGroupTab questionGroupTab = new QuestionGroupTab(mContext, group,
                     mSurveyListener, mQuestionListener);
             questionGroupTab.load();
             mQuestionGroupTabs.add(questionGroupTab);
@@ -93,15 +86,15 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mPager.setOnPageChangeListener(this);
     }
 
-    public void loadState(Map<String, QuestionResponse> responses) {
+    public void loadState() {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.loadState(responses);
+            questionGroupTab.loadState();
         }
     }
 
-    public void saveState(long surveyInstanceId) {
+    public void onPause() {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.saveState(surveyInstanceId);
+            questionGroupTab.onPause();
         }
     }
 
@@ -152,13 +145,6 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
             QuestionView depQ = getQuestionView(question.getId());
             if (depQ != null && parentQ != null && depQ != parentQ) {
                 parentQ.addQuestionInteractionListener(depQ);
-
-                if (parentQ.getResponse(true) != null && parentQ.getResponse(true).hasValue()) {
-                    // Trigger event, the parent already contains a response
-                    QuestionInteractionEvent event = new QuestionInteractionEvent(
-                            QuestionInteractionEvent.QUESTION_ANSWER_EVENT, parentQ);
-                    depQ.onQuestionInteraction(event);
-                }
             }
         }
     }
@@ -230,47 +216,13 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
      * @return
      */
     private List<Question> checkInvalidQuestions() {
-        Map<String, QuestionResponse> responseMap = new HashMap<String, QuestionResponse>();
-        ArrayList<Question> invalidQuestions = new ArrayList<Question>();
-        List<Question> candidateInvalidQuestions = new ArrayList<Question>();
+        List<Question> invalidQuestions = new ArrayList<Question>();
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            // Add this tab's responses to the map.
-            Map<String, QuestionResponse> responses = questionGroupTab.getResponses();
-            responseMap.putAll(responses);
-            candidateInvalidQuestions.addAll(questionGroupTab.checkInvalidQuestions());
-        }
-
-        // now make sure that the candidate missing questions are really
-        // missing by seeing if their dependencies are fulfilled
-        for (Question q : candidateInvalidQuestions) {
-            if (areDependenciesSatisfied(q, responseMap)) {
-                invalidQuestions.add(q);
-            }
+            invalidQuestions.addAll(questionGroupTab.checkInvalidQuestions());
         }
 
         return invalidQuestions;
     }
 
-    /**
-     * Checks if the dependencies for the question passed in are satisfied
-     *
-     * @param q Question to check dependencies for
-     * @param responses All the responses for this survey
-     * @return true if no dependency is broken, false otherwise
-     */
-    private boolean areDependenciesSatisfied(Question q, Map<String, QuestionResponse> responses) {
-        List<Dependency> dependencies = q.getDependencies();
-        if (dependencies != null) {
-            for (Dependency dependency : dependencies) {
-                QuestionResponse resp = responses.get(dependency.getQuestion());
-                if (resp == null || !resp.hasValue()
-                        || !dependency.isMatch(resp.getValue())
-                        || !resp.getIncludeFlag()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
 }

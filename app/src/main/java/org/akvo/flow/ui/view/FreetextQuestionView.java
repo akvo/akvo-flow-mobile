@@ -44,6 +44,8 @@ public class FreetextQuestionView extends QuestionView {
     private EditText mDoubleEntryText;
     private TextView mDoubleEntryTitle;
 
+    private boolean mCaptureResponse;
+
     public FreetextQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
         init();
@@ -86,6 +88,7 @@ public class FreetextQuestionView extends QuestionView {
         mDoubleEntryText.setFilters(filters);
 
         // ResponseListener will handle both onFocusChange and TextChanged
+        mCaptureResponse = true;
         ResponseListener inputListener = new ResponseListener(mEditText);
         ResponseListener extraListener = new ResponseListener(mDoubleEntryText);
         mEditText.addTextChangedListener(inputListener);
@@ -97,10 +100,12 @@ public class FreetextQuestionView extends QuestionView {
     @Override
     public void setResponse(QuestionResponse resp) {
         if (resp != null) {
+            mCaptureResponse = false;
             mEditText.setText(resp.getValue());
             if (isDoubleEntry()) {
                 mDoubleEntryText.setText(resp.getValue());
             }
+            mCaptureResponse = true;
         }
         super.setResponse(resp);
     }
@@ -159,19 +164,23 @@ public class FreetextQuestionView extends QuestionView {
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
         if (resp != null) {
+            mCaptureResponse = false;
             mEditText.setText(resp.getValue());
             if (isDoubleEntry()) {
                 mDoubleEntryText.setText(resp.getValue());
             }
+            mCaptureResponse = true;
         }
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
+        mCaptureResponse = false;
         mEditText.setText("");
         if (isDoubleEntry()) {
             mDoubleEntryText.setText("");
         }
+        mCaptureResponse = true;
         super.resetQuestion(fireEvent);
     }
 
@@ -203,6 +212,10 @@ public class FreetextQuestionView extends QuestionView {
         }
 
         boolean capture() {
+            if (!mCaptureResponse) {
+                return false;// Explicitly disabled
+            }
+
             if (isDoubleEntry() && mView.getId() == R.id.input_et &&
                     TextUtils.isEmpty(mDoubleEntryText.getText().toString())) {
                 // On double entry questions, do not attempt to capture the response if:

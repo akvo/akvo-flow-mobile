@@ -280,7 +280,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             boolean finished = false;
             long displayDate = 0L;
             switch (status) {
-                case SurveyInstanceStatus.CURRENT:
                 case SurveyInstanceStatus.SAVED:
                     statusText = "Saved: ";
                     icon = R.drawable.disk;

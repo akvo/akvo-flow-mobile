@@ -162,12 +162,11 @@ public class SurveyDbAdapter {
     }
 
     public interface SurveyInstanceStatus {
-        int CURRENT    = 0;
-        int SAVED      = 1;
-        int SUBMITTED  = 2;
-        int EXPORTED   = 3;
-        int SYNCED     = 4;
-        int DOWNLOADED = 5;
+        int SAVED      = 0;
+        int SUBMITTED  = 1;
+        int EXPORTED   = 2;
+        int SYNCED     = 3;
+        int DOWNLOADED = 4;
     }
 
     public interface TransmissionStatus {
@@ -732,7 +731,7 @@ public class SurveyDbAdapter {
                 + SurveyInstanceColumns.SURVEY_ID + "= ?  AND " + SurveyInstanceColumns.STATUS + " = ? ";
         List<String> argList =  new ArrayList<String>();
         argList.add(surveyId);
-        argList.add(String.valueOf(SurveyInstanceStatus.CURRENT));
+        argList.add(String.valueOf(SurveyInstanceStatus.SAVED));
         
         if (surveyedLocaleId != null) {
             where += " AND " + SurveyInstanceColumns.RECORD_ID + " =  ?";
@@ -776,7 +775,7 @@ public class SurveyDbAdapter {
         ContentValues initialValues = new ContentValues();
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
         initialValues.put(SurveyInstanceColumns.USER_ID, userId);
-        initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.CURRENT);
+        initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
         initialValues.put(SurveyInstanceColumns.UUID, UUID.randomUUID().toString());
         initialValues.put(SurveyInstanceColumns.START_DATE, time);
         initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME

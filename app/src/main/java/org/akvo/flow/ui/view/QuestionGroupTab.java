@@ -2,11 +2,11 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
+import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
@@ -20,19 +20,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QuestionListView extends ListView {
+public class QuestionGroupTab extends ScrollView {
     private QuestionGroup mQuestionGroup;
-
-    private QuestionListAdapter mAdapter;
     private QuestionInteractionListener mQuestionListener;
     private SurveyDbAdapter mDatabase;
+    private SurveyListener mSurveyListener;
 
     private List<QuestionView> mQuestionViews;
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
+    private LinearLayout mContainer;
 
-    private SurveyListener mSurveyListener;
-
-    public QuestionListView(Context context, QuestionGroup group, SurveyDbAdapter database,
+    public QuestionGroupTab(Context context, QuestionGroup group, SurveyDbAdapter database,
             SurveyListener surveyListener, QuestionInteractionListener questionListener) {
         super(context);
         mQuestionGroup = group;
@@ -41,20 +39,16 @@ public class QuestionListView extends ListView {
         mQuestionListener = questionListener;
         mQuestionViews = new ArrayList<QuestionView>();
         mQuestionResponses = new HashMap<String, QuestionResponse>();
-
-        mAdapter = new QuestionListAdapter(mQuestionGroup.getQuestions());
-        setAdapter(mAdapter);
-
-        setFocusable(false);
-        setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
+        init();
     }
 
-    public void resetQuestions() {
-        for (QuestionView view : mQuestionViews) {
-            view.resetQuestion(false);
-        }
-        mQuestionResponses.clear();
-        setSelection(0);
+    private void init() {
+        // Instantiate LinearLayout container and set it as ScrollView's child
+        mContainer = new LinearLayout(getContext());
+        mContainer.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT));
+        mContainer.setOrientation(LinearLayout.VERTICAL);
+        addView(mContainer);
     }
 
     public void notifyOptionsChanged() {
@@ -90,7 +84,7 @@ public class QuestionListView extends ListView {
 
     /**
      * Get the *current* UI responses in this tab. Note that this are not the same as stored
-     * responses, as we are not loading the state from the DB, just retrieven the current values.
+     * responses, as we are not loading the state from the DB, just retrieving the current values.
      * TODO: Cache. We should not loop through the QuestionViews each time the responses are requested.
      */
     public Map<String, QuestionResponse> getResponses() {
@@ -160,9 +154,9 @@ public class QuestionListView extends ListView {
      * retrieve them from the corresponding position in mQuestionViews.
      */
     public void load() {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
-            final Context context = getContext();
-
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new OptionQuestionView(context, q, mSurveyListener);
@@ -187,39 +181,11 @@ public class QuestionListView extends ListView {
             // Add question interaction listener
             questionView.addQuestionInteractionListener(mQuestionListener);
 
-            // Store the reference to the View
-            mQuestionViews.add(questionView);
+            mQuestionViews.add(questionView);// Store the reference to the View
+
+            mContainer.addView(questionView);
+            inflater.inflate(R.layout.divider, mContainer);// Add divider
         }
-
-    }
-
-    class QuestionListAdapter extends BaseAdapter {
-        private List<Question> mQuestions;
-
-        public QuestionListAdapter(List<Question> questions) {
-            mQuestions = questions;
-        }
-
-        @Override
-        public int getCount() {
-            return mQuestions.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mQuestions.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            return mQuestionViews.get(position);// Already instantiated
-        }
-
     }
 
 }

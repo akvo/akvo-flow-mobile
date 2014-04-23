@@ -17,7 +17,7 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.ui.view.QuestionListView;
+import org.akvo.flow.ui.view.QuestionGroupTab;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.SubmitTab;
 
@@ -36,7 +36,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private ActionBar mActionBar;
     private ViewPager mPager;
     private List<QuestionGroup> mQuestionGroups;
-    private List<QuestionListView> mQuestionListViews;
+    private List<QuestionGroupTab> mQuestionGroupTabs;
     private SubmitTab mSubmitTab;
 
     public SurveyTabAdapter(Context context, ActionBar actionBar, ViewPager pager,
@@ -50,21 +50,21 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mPager = pager;
 
         mQuestionGroups = mSurveyListener.getQuestionGroups();
-        mQuestionListViews = new ArrayList<QuestionListView>();
+        mQuestionGroupTabs = new ArrayList<QuestionGroupTab>();
     }
 
     public void notifyOptionsChanged() {
-        for (QuestionListView questionListView : mQuestionListViews) {
-            questionListView.notifyOptionsChanged();// Spread the word
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.notifyOptionsChanged();// Spread the word
         }
     }
 
     public void load() {
         for (QuestionGroup group : mQuestionGroups) {
-            QuestionListView questionListView = new QuestionListView(mContext, group, mDatabase,
+            QuestionGroupTab questionGroupTab = new QuestionGroupTab(mContext, group, mDatabase,
                     mSurveyListener, mQuestionListener);
-            questionListView.load();
-            mQuestionListViews.add(questionListView);
+            questionGroupTab.load();
+            mQuestionGroupTabs.add(questionGroupTab);
         }
 
         // Now that all the tabs are populated, we setup the dependencies
@@ -94,27 +94,27 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     }
 
     public void loadState(Map<String, QuestionResponse> responses) {
-        for (QuestionListView questionListView : mQuestionListViews) {
-            questionListView.loadState(responses);
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.loadState(responses);
         }
     }
 
     public void saveState(long surveyInstanceId) {
-        for (QuestionListView questionListView : mQuestionListViews) {
-            questionListView.saveState(surveyInstanceId);
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.saveState(surveyInstanceId);
         }
     }
 
     public void onQuestionComplete(String questionId, Bundle data) {
-        for (QuestionListView questionListView : mQuestionListViews) {
-            questionListView.onQuestionComplete(questionId, data);
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.onQuestionComplete(questionId, data);
         }
     }
 
     private QuestionView getQuestionView(String questionId) {
         QuestionView questionView = null;
-        for (QuestionListView questionListView : mQuestionListViews) {
-            questionView = questionListView.getQuestionView(questionId);
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionView = questionGroupTab.getQuestionView(questionId);
             if (questionView != null) {
                 break;
             }
@@ -166,8 +166,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         View view;
-        if (position < mQuestionListViews.size()) {
-            view = mQuestionListViews.get(position);// Already instantiated
+        if (position < mQuestionGroupTabs.size()) {
+            view = mQuestionGroupTabs.get(position);// Already instantiated
         } else {
             view = mSubmitTab;
         }
@@ -199,7 +199,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     @Override
     public void onPageSelected(int position) {
-        if (position == mQuestionListViews.size() && mSubmitTab != null) {
+        if (position == mQuestionGroupTabs.size() && mSubmitTab != null) {
             mSubmitTab.refresh(checkInvalidQuestions());
         }
 
@@ -233,11 +233,11 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         Map<String, QuestionResponse> responseMap = new HashMap<String, QuestionResponse>();
         ArrayList<Question> invalidQuestions = new ArrayList<Question>();
         List<Question> candidateInvalidQuestions = new ArrayList<Question>();
-        for (QuestionListView questionListView : mQuestionListViews) {
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             // Add this tab's responses to the map.
-            Map<String, QuestionResponse> responses = questionListView.getResponses();
+            Map<String, QuestionResponse> responses = questionGroupTab.getResponses();
             responseMap.putAll(responses);
-            candidateInvalidQuestions.addAll(questionListView.checkInvalidQuestions());
+            candidateInvalidQuestions.addAll(questionGroupTab.checkInvalidQuestions());
         }
 
         // now make sure that the candidate missing questions are really

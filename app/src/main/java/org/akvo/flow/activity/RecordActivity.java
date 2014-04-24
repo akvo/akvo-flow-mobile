@@ -115,6 +115,10 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     public void onResume() {
         super.onResume();
         mDatabase.open();
+
+        // Delete empty SurveyInstances, if any
+        mDatabase.deleteEmptySurveyInstances();
+
         mUser = FlowApp.getApp().getUser();
         // Record might have changed while answering a registration survey
         String recordId = getIntent().getStringExtra(EXTRA_RECORD_ID);
@@ -126,9 +130,9 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     @Override
     protected void onPause() {
         super.onPause();
-        mDatabase.open();
+        mDatabase.close();
     }
-    
+
     private void displayRecord() {
         // Display/Hide monitoring features
         if (mSurveyGroup.isMonitored() && mRecord != null) {

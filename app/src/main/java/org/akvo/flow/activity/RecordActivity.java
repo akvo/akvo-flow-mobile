@@ -147,9 +147,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     public void startSurvey(String surveyId) {
         if (BootstrapService.isProcessing) {
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
-        } else if (mUser == null) {
-            // if the current user is null, we can't enter survey mode
-            Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
         } else {
             Intent i = new Intent(this, SurveyActivity.class);
             i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());

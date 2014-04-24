@@ -37,6 +37,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -230,6 +231,13 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Ensure user is logged in
+            if (FlowApp.getApp().getUser() == null) {
+                Toast.makeText(SurveyGroupListActivity.this, R.string.mustselectuser,
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
             // If the group is monitored, we need to trigger record selection Activity.
             // Otherwise, go directly to RecordActivity
             final SurveyGroup group = (SurveyGroup) view.getTag();

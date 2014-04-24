@@ -91,6 +91,8 @@ public class RecordListActivity extends ActionBarActivity implements
     public void onResume() {
         super.onResume();
         mDatabase.open();
+        // Delete empty Records, if any
+        mDatabase.deleteEmptyRecords();
         registerReceiver(surveyedLocalesSyncReceiver,
                 new IntentFilter(getString(R.string.action_locales_sync)));
     }

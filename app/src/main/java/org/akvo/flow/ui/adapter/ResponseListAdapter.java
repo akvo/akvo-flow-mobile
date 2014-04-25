@@ -86,9 +86,7 @@ public class ResponseListAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.submittedrow, null);
-        bindView(view, context, cursor);
-        return view;
+        return inflater.inflate(R.layout.submittedrow, parent, false);
     }
 
 }

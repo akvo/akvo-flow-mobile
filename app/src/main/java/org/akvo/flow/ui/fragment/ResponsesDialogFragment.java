@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
@@ -102,12 +105,17 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mAdapter = new ResponseListAdapter(getActivity());
-        View view = inflater.inflate(R.layout.responses_dialog_fragment, container, false);
-        ListView listView = (ListView) view.findViewById(R.id.list_view);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(this);
 
-        view.findViewById(R.id.new_survey).setOnClickListener(new View.OnClickListener() {
+        ListView listView = new ListView(getActivity());
+        listView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        Button button = new Button(getActivity());
+        button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
+                ListView.LayoutParams.WRAP_CONTENT));
+        button.setGravity(Gravity.CENTER);
+        button.setText("Start New Response");
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mListener.onNewResponse(mSurveyId);
@@ -115,10 +123,13 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
             }
         });
 
-        // Request no title. Should we instead show a "Choose Response" title?
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        listView.addFooterView(button);
+        listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(this);
 
-        return view;
+        getDialog().setTitle("Choose Response");
+
+        return listView;
     }
 
     @Override
@@ -135,10 +146,6 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor != null && cursor.getCount() == 0) {
-            // No saved Responses. Create new
-            mListener.onNewResponse(mSurveyId);
-        }
         mAdapter.changeCursor(cursor);
     }
 

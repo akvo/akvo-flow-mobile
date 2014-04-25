@@ -17,6 +17,7 @@
 package org.akvo.flow.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,7 +38,7 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
@@ -153,10 +154,25 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             return;
         }
 
-        // Check if there's any non-submitted Response for this Survey
-        ResponsesDialogFragment dialogFragment = ResponsesDialogFragment.instantiate(
-                mSurveyGroup, surveyId, mRecord != null ? mRecord.getId() : null);
-        dialogFragment.show(getSupportFragmentManager(), "responses");
+        final String recordId = mRecord != null ? mRecord.getId() : null;
+
+        // Check if there are ongoing (non-submitted) responses for this Survey
+        boolean createNew = true;
+        Cursor c =  mDatabase.getSurveyInstances(recordId, surveyId, SurveyInstanceStatus.SAVED);
+        if (c != null) {
+            createNew = c.getCount() == 0;
+            c.close();
+        }
+
+        if (createNew) {
+            // TODO: Create the SurveyInstance here
+            startSurvey(surveyId, -1);
+        } else {
+            // Display ResponsesDialogFragment
+            ResponsesDialogFragment dialogFragment = ResponsesDialogFragment.instantiate(
+                    mSurveyGroup, surveyId, recordId);
+            dialogFragment.show(getSupportFragmentManager(), "responses");
+        }
     }
 
     private void startSurvey(String surveyId, long surveyInstanceId) {

@@ -764,6 +764,44 @@ public class SurveyDbAdapter {
     }
 
     /**
+     * Get the latest non-submitted survey, if any
+     * @param surveyId
+     * @param surveyGroupId
+     * @param surveyedLocaleId
+     * @return the id of the most recent saved SurveyInstance, if exists. null otherwise
+     */
+    public Long getSavedSurveyInstance(String surveyId, long surveyGroupId, String surveyedLocaleId) {
+        String where = SurveyInstanceColumns.SUBMITTED_DATE + " IS NULL AND "
+                + SurveyInstanceColumns.SURVEY_ID + "= ?  AND " + SurveyInstanceColumns.STATUS + " = ? ";
+        List<String> argList =  new ArrayList<String>();
+        argList.add(surveyId);
+        argList.add(String.valueOf(SurveyInstanceStatus.SAVED));
+
+        if (surveyedLocaleId != null) {
+            where += " AND " + SurveyInstanceColumns.RECORD_ID + " =  ?";
+            argList.add(surveyedLocaleId);
+        }
+
+        Cursor results = database.query(Tables.SURVEY_INSTANCE,
+                new String[] {
+                        SurveyInstanceColumns._ID
+                },
+                where, argList.toArray(new String[argList.size()]),
+                null, null, SurveyInstanceColumns.SAVED_DATE + " DESC", "1");
+
+        Long id = null;
+        if (results != null && results.getCount() > 0) {
+            results.moveToFirst();
+            id = results.getLong(0);
+        }
+        if (results != null) {
+            results.close();
+        }
+
+        return id;
+    }
+
+    /**
      * creates a new unsubmitted survey instance
      * 
      * @param surveyId
@@ -1381,23 +1419,44 @@ public class SurveyDbAdapter {
         }
     }
 
-    public Cursor getSurveyInstances(long surveyGroupId) {
-        return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
-                new String[] {
-                    Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
-                    Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
-                    SurveyColumns.NAME, SurveyInstanceColumns.SAVED_DATE,
-                    SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                    SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
-                    SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                    SurveyInstanceColumns.RECORD_ID
-                },
-                Tables.SURVEY + "." + SurveyColumns.SURVEY_GROUP_ID + "= ?",
-                new String[]{String.valueOf(surveyGroupId)},
-                null, null, SurveyInstanceColumns.START_DATE + " DESC");
+    /**
+     * Get all the SurveyInstances for a particular Record
+     */
+    public Cursor getSurveyInstances(String recordId) {
+        return getSurveyInstances(
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
+                new String[] { recordId });
     }
-    
-    public Cursor getSurveyInstances(String surveyedLocaleId) {
+
+    /**
+     * Get all the SurveyInstances for a particular SurveyGroup
+     */
+    public Cursor getSurveyInstances(long surveyGroupId) {
+        return getSurveyInstances(
+                Tables.SURVEY + "." + SurveyColumns.SURVEY_GROUP_ID + "= ?",
+                new String[] { String.valueOf(surveyGroupId) });
+    }
+
+    /**
+     * Get SurveyInstances with a particular status.
+     * If the recordId is not null, results will be filtered by Record.
+     */
+    public Cursor getSurveyInstances(String recordId, String surveyId, int status) {
+        String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
+                " AND " + SurveyInstanceColumns.STATUS + "= ?";
+        List<String> args = new ArrayList<String>();
+        args.add(surveyId);
+        args.add(String.valueOf(status));
+        if (recordId != null) {
+            // filter by Record
+            where += " AND "  + SurveyInstanceColumns.RECORD_ID + "= ?";
+            args.add(recordId);
+        }
+
+        return getSurveyInstances(where, args.toArray(new String[args.size()]));
+    }
+
+    private Cursor getSurveyInstances(String where, String[] args) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 new String[] {
                         Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
@@ -1408,11 +1467,9 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
                         SurveyInstanceColumns.RECORD_ID
                 },
-                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
-                new String[]{String.valueOf(surveyedLocaleId)},
-                null, null, SurveyInstanceColumns.START_DATE + " DESC");
+                where, args, null, null, SurveyInstanceColumns.START_DATE + " DESC");
     }
-    
+
     /**
      * Given a particular surveyedLocale and one of its surveys,
      * retrieves the ID of the last surveyInstance matching that criteria

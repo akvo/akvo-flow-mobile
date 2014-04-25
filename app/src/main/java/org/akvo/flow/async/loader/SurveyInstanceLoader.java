@@ -24,20 +24,25 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 
 public class SurveyInstanceLoader extends DataLoader<Cursor> {
     private long mSurveyGroupId;
-    private boolean mIsMonitored;
     private String mSurveyedLocaleId;
+    private String mSurveyId;
+    private int mStatus;
 
     public SurveyInstanceLoader(Context context, SurveyDbAdapter db, long surveyGroupId, 
-            boolean isMonitored, String surveyedLocaleId) {
+            String surveyedLocaleId, String surveyId, int status) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
-        mIsMonitored = isMonitored;
         mSurveyedLocaleId = surveyedLocaleId;
+        mSurveyId = surveyId;
+        mStatus = status;
     }
 
     @Override
     public Cursor loadData(SurveyDbAdapter database) {
-        if (mIsMonitored) {
+        if (mSurveyId != null) {
+            // Specific Survey with a particular Status
+            return database.getSurveyInstances(mSurveyedLocaleId, mSurveyId, mStatus);
+        } else if (mSurveyedLocaleId != null) {
             // Monitored
             return database.getSurveyInstances(mSurveyedLocaleId);
         }

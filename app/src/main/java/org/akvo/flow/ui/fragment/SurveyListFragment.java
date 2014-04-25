@@ -57,7 +57,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     private static final String EXTRA_RECORD       = "record";
     
     public interface SurveyListListener {
-        public void startSurvey(String surveyId);
+        public void onSurveyClick(String surveyId);
     }
     
     private SurveyGroup mSurveyGroup;
@@ -153,11 +153,11 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            mListener.startSurvey(surveyId);
+                            mListener.onSurveyClick(surveyId);
                         }
                     });
         } else {
-            mListener.startSurvey(surveyId);
+            mListener.onSurveyClick(surveyId);
         }
     }
     

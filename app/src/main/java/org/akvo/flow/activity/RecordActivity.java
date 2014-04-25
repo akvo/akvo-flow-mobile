@@ -42,12 +42,15 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.ui.fragment.ResponsesDialogFragment;
+import org.akvo.flow.ui.fragment.ResponsesDialogFragment.ResponsesDialogListener;
 import org.akvo.flow.ui.fragment.SurveyListFragment;
 import org.akvo.flow.ui.fragment.SurveyListFragment.SurveyListListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.util.ConstantUtil;
 
-public class RecordActivity extends ActionBarActivity implements SurveyListListener, TabListener {
+public class RecordActivity extends ActionBarActivity implements SurveyListListener, TabListener,
+        ResponsesDialogListener{
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_RECORD_ID = "record";
     
@@ -144,22 +147,49 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     }
 
     @Override
-    public void startSurvey(String surveyId) {
+    public void onSurveyClick(String surveyId) {
         if (BootstrapService.isProcessing) {
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
-        } else {
-            Intent i = new Intent(this, SurveyActivity.class);
-            i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
-            i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
-            i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-            if (mRecord != null) {
-                // The record will automatically be managed in non monitored groups
-                i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
-            }
-            startActivity(i);
+            return;
         }
+
+        // Check if there's any non-submitted Response for this Survey
+        ResponsesDialogFragment dialogFragment = ResponsesDialogFragment.instantiate(
+                mSurveyGroup, surveyId, mRecord != null ? mRecord.getId() : null);
+        dialogFragment.show(getSupportFragmentManager(), "responses");
     }
-    
+
+    private void startSurvey(String surveyId, long surveyInstanceId) {
+        Intent i = new Intent(this, SurveyActivity.class);
+        i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
+        i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
+        i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
+        if (mRecord != null) {
+            // The record will automatically be managed in non monitored groups
+            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
+        }
+        if (surveyInstanceId != -1) {
+            i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
+        }
+        // TODO: Create the new survey instance ourselves, and pass it in the Bundle
+
+        startActivity(i);
+    }
+
+    // **************************** //
+    // * DialogFragment callbacks * //
+    // **************************** //
+
+    @Override
+    public void onResponseClick(String surveyId, long surveyInstanceId) {
+        startSurvey(surveyId, surveyInstanceId);
+    }
+
+    @Override
+    public void onNewResponse(String surveyId) {
+        startSurvey(surveyId, -1);
+    }
+
     class TabsAdapter extends FragmentPagerAdapter {
         
         public TabsAdapter(FragmentManager fm) {

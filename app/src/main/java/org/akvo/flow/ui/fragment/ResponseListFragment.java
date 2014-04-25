@@ -27,33 +27,23 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.async.loader.SurveyInstanceLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyColumns;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.ui.adapter.ResponseListAdapter;
 import org.akvo.flow.util.ConstantUtil;
-
-import java.util.Date;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
     private static final String TAG = ResponseListFragment.class.getSimpleName();
@@ -75,7 +65,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     private SurveyGroup mSurveyGroup;
     private SurveyedLocale mRecord;
-    private ResponseListCursorAdapter mAdapter;
+    private ResponseListAdapter mAdapter;
 
     private SurveyDbAdapter mDatabase;
 
@@ -130,7 +120,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         }
 
         if(mAdapter == null) {
-            mAdapter = new ResponseListCursorAdapter(getActivity());// Cursor Adapter
+            mAdapter = new ResponseListAdapter(getActivity());// Cursor Adapter
             setListAdapter(mAdapter);
         }
         registerForContextMenu(getListView());// Same implementation as before
@@ -229,8 +219,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         switch (id) {
             case ID_SURVEY_INSTANCE_LIST:
                 return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroup.getId(),
-                        mSurveyGroup.isMonitored(),
-                        mRecord != null ? mRecord.getId() : null);
+                        mRecord != null ? mRecord.getId() : null, null, -1);
         }
         return null;
     }
@@ -260,79 +249,4 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         }
     };
 
-    class ResponseListCursorAdapter extends CursorAdapter {
-        final int SURVEY_ID_KEY = R.integer.surveyidkey;
-        final int RESP_ID_KEY = R.integer.respidkey;
-        final int USER_ID_KEY = R.integer.useridkey;
-        final int FINISHED_KEY = R.integer.finishedkey;
-
-        public ResponseListCursorAdapter(Context context) {
-            super(context, null, false);
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            final int status = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
-
-            // This default values should NEVER be displayed
-            String statusText = "";
-            int icon = R.drawable.redcircle;
-            boolean finished = false;
-            long displayDate = 0L;
-            switch (status) {
-                case SurveyInstanceStatus.SAVED:
-                    statusText = "Saved: ";
-                    icon = R.drawable.disk;
-                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE));
-                    break;
-                case SurveyInstanceStatus.SUBMITTED:
-                    statusText = "Submitted: ";
-                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
-                    icon = R.drawable.yellowcircle;
-                    finished = true;
-                    break;
-                case SurveyInstanceStatus.EXPORTED:
-                    statusText = "Exported: ";
-                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE));
-                    icon = R.drawable.yellowcircle;
-                    finished = true;
-                    break;
-                case SurveyInstanceStatus.SYNCED:
-                case SurveyInstanceStatus.DOWNLOADED:
-                    statusText = "Synced: ";
-                    displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE));
-                    icon = R.drawable.checkmark2;
-                    finished = true;
-                    break;
-            }
-
-            // Format the date string
-            Date date = new Date(displayDate);
-            TextView dateView = (TextView) view.findViewById(R.id.text2);
-            dateView.setText(statusText
-                    + DateFormat.getLongDateFormat(context).format(date) + " "
-                    + DateFormat.getTimeFormat(context).format(date));
-            TextView headingView = (TextView) view.findViewById(R.id.text1);
-            headingView.setText(cursor.getString(cursor.getColumnIndex(SurveyColumns.NAME)));
-            view.setTag(SURVEY_ID_KEY, cursor.getLong(cursor
-                    .getColumnIndex(SurveyInstanceColumns.SURVEY_ID)));
-            view.setTag(RESP_ID_KEY, cursor.getLong(cursor
-                    .getColumnIndex(SurveyInstanceColumns._ID)));
-            view.setTag(USER_ID_KEY, cursor.getLong(cursor
-                    .getColumnIndex(SurveyInstanceColumns.USER_ID)));
-            view.setTag(FINISHED_KEY, finished);
-            ImageView stsIcon = (ImageView) view.findViewById(R.id.xmitstsicon);
-            stsIcon.setImageResource(icon);
-        }
-
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.submittedrow, null);
-            bindView(view, context, cursor);
-            return view;
-        }
-
-    }
 }

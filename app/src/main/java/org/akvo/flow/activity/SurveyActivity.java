@@ -122,9 +122,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
 
         if (mSurveyInstanceId == 0) {
-            // If no survey instance is passed in, we need to create(or load) one
-            mSurveyInstanceId = mDatabase.createOrLoadSurveyRespondent(surveyId,
-                    String.valueOf(mUserId), mSurveyGroup.getId(), mRecordId);
+            Log.e(TAG, "Survey Instance is null. Finishing the Activity...");
+            finish();
         }
 
         // Set the survey name as Activity title
@@ -287,9 +286,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.new_survey:
-                saveAndStartNew();
-                return true;
             case R.id.edit_lang:
                 displayLanguagesDialog();
                 return true;
@@ -308,24 +304,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                         mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
                         loadState();
                         spaceLeftOnCard();
-                    }
-                });
-    }
-
-    private void saveAndStartNew() {
-        saveState();// make sure we don't lose anything that was already written
-        ViewUtil.showConfirmDialog(R.string.savecompletetitle,
-                R.string.savecompletetext, this, false,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Create record, if necessary (non-monitored group)
-                        String recordId = mSurveyGroup.isMonitored() ?
-                                mRecordId
-                                : mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-                        mSurveyInstanceId = mDatabase.createSurveyRespondent(mSurvey.getId(),
-                                String.valueOf(mUserId), recordId);
-                        loadState();
                     }
                 });
     }

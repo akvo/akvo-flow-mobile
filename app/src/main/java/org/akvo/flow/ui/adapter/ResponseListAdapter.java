@@ -22,6 +22,7 @@ public class ResponseListAdapter extends CursorAdapter {
     public static final int RESP_ID_KEY = R.integer.respidkey;
     public static final int USER_ID_KEY = R.integer.useridkey;
     public static final int FINISHED_KEY = R.integer.finishedkey;
+    public static final int RECORD_KEY = R.integer.recordkey;
 
     public ResponseListAdapter(Context context) {
         super(context, null, false);
@@ -77,6 +78,8 @@ public class ResponseListAdapter extends CursorAdapter {
                 .getColumnIndex(SurveyInstanceColumns._ID)));
         view.setTag(USER_ID_KEY, cursor.getLong(cursor
                 .getColumnIndex(SurveyInstanceColumns.USER_ID)));
+        view.setTag(RECORD_KEY, cursor.getString(cursor
+                .getColumnIndex(SurveyInstanceColumns.RECORD_ID)));
         view.setTag(FINISHED_KEY, finished);
         ImageView stsIcon = (ImageView) view.findViewById(R.id.xmitstsicon);
         stsIcon.setImageResource(icon);

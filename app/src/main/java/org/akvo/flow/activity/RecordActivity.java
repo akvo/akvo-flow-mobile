@@ -165,8 +165,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         }
 
         if (createNew) {
-            // TODO: Create the SurveyInstance here
-            startSurvey(surveyId, -1);
+            startSurvey(surveyId);
         } else {
             // Display ResponsesDialogFragment
             ResponsesDialogFragment dialogFragment = ResponsesDialogFragment.instantiate(
@@ -175,20 +174,25 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         }
     }
 
-    private void startSurvey(String surveyId, long surveyInstanceId) {
+    private void startSurvey(String surveyId) {
+        String recordId = mRecord != null ? mRecord.getId() : null;
+        if (recordId == null) {
+            // Non-monitored group. Create a new Record for the locale
+            recordId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+        }
+        long surveyInstanceId = mDatabase.createSurveyRespondent(surveyId,
+                String.valueOf(mUser.getId()), recordId);
+
+        startSurvey(surveyId, recordId, surveyInstanceId);
+    }
+
+    private void startSurvey(String surveyId, String recordId, long surveyInstanceId) {
         Intent i = new Intent(this, SurveyActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        if (mRecord != null) {
-            // The record will automatically be managed in non monitored groups
-            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
-        }
-        if (surveyInstanceId != -1) {
-            i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
-        }
-        // TODO: Create the new survey instance ourselves, and pass it in the Bundle
-
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId);
+        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
         startActivity(i);
     }
 
@@ -197,13 +201,13 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     // **************************** //
 
     @Override
-    public void onResponseClick(String surveyId, long surveyInstanceId) {
-        startSurvey(surveyId, surveyInstanceId);
+    public void onResponseClick(String surveyId, String recordId, long surveyInstanceId) {
+        startSurvey(surveyId, recordId, surveyInstanceId);
     }
 
     @Override
     public void onNewResponse(String surveyId) {
-        startSurvey(surveyId, -1);
+        startSurvey(surveyId);
     }
 
     class TabsAdapter extends FragmentPagerAdapter {

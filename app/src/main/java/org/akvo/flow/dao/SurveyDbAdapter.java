@@ -720,50 +720,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * this method will get the max survey instance ID that has an unsubmitted
-     * survey or, if none exists, will create a new survey instance
-     * 
-     * @param surveyId
-     * @return
-     */
-    public long createOrLoadSurveyRespondent(String surveyId, String userId, long surveyGroupId, String surveyedLocaleId) {
-        String where = SurveyInstanceColumns.SUBMITTED_DATE + " IS NULL AND "
-                + SurveyInstanceColumns.SURVEY_ID + "= ?  AND " + SurveyInstanceColumns.STATUS + " = ? ";
-        List<String> argList =  new ArrayList<String>();
-        argList.add(surveyId);
-        argList.add(String.valueOf(SurveyInstanceStatus.SAVED));
-        
-        if (surveyedLocaleId != null) {
-            where += " AND " + SurveyInstanceColumns.RECORD_ID + " =  ?";
-            argList.add(surveyedLocaleId);
-        }
-        
-        Cursor results = database.query(Tables.SURVEY_INSTANCE,
-                new String[] {
-                    "max(" + SurveyInstanceColumns._ID + ")"
-                },
-                where,
-                argList.toArray(new String[argList.size()]),
-                null, null, null);
-        
-        long id = -1;
-        if (results != null && results.getCount() > 0) {
-            results.moveToFirst();
-            id = results.getLong(0);
-        }
-        if (results != null) {
-            results.close();
-        }
-        if (id <= 0) {
-            if (surveyedLocaleId == null) {
-                surveyedLocaleId = createSurveyedLocale(surveyGroupId);
-            }
-            id = createSurveyRespondent(surveyId, userId, surveyedLocaleId);
-        }
-        return id;
-    }
-
-    /**
      * Get the latest non-submitted survey, if any
      * @param surveyId
      * @param surveyGroupId

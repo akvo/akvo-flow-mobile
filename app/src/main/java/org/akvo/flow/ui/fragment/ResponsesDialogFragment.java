@@ -10,14 +10,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 
-import org.akvo.flow.R;
 import org.akvo.flow.async.loader.SurveyInstanceLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
@@ -45,7 +42,7 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
     private SurveyDbAdapter mDatabase;
 
     public interface ResponsesDialogListener {
-        public void onResponseClick(String surveyId, long surveyInstanceId);
+        public void onResponseClick(String surveyId, String recordId, long surveyInstanceId);
         public void onNewResponse(String surveyId);
     }
 
@@ -134,7 +131,9 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mListener.onResponseClick(mSurveyId, (Long)view.getTag(ResponseListAdapter.RESP_ID_KEY));
+        String recordId = (String)view.getTag(ResponseListAdapter.RECORD_KEY);
+        long surveyInstanceId = (Long)view.getTag(ResponseListAdapter.RESP_ID_KEY);
+        mListener.onResponseClick(mSurveyId, recordId, surveyInstanceId);
         dismiss();
     }
 

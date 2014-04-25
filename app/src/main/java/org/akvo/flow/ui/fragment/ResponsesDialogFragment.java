@@ -15,6 +15,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.akvo.flow.R;
 import org.akvo.flow.async.loader.SurveyInstanceLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
@@ -111,7 +112,7 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
         button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
                 ListView.LayoutParams.WRAP_CONTENT));
         button.setGravity(Gravity.CENTER);
-        button.setText("Start New Response");
+        button.setText(R.string.start_new_response);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,7 +125,7 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
 
-        getDialog().setTitle("Choose Response");
+        getDialog().setTitle(R.string.choose_response);
 
         return listView;
     }

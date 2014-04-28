@@ -121,6 +121,8 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         mDatabase.open();
 
         // Delete empty SurveyInstances, if any
+        // TODO: For a more efficient cleanup, attempt to wipe ONLY the latest SurveyInstance,
+        // TODO: providing the id to SurveyActivity, and reading it back on onActivityResult(...)
         mDatabase.deleteEmptySurveyInstances();
 
         mUser = FlowApp.getApp().getUser();

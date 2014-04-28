@@ -92,6 +92,8 @@ public class RecordListActivity extends ActionBarActivity implements
         super.onResume();
         mDatabase.open();
         // Delete empty Records, if any
+        // TODO: For a more efficient cleanup, attempt to wipe ONLY the latest Record,
+        // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
         mDatabase.deleteEmptyRecords();
         registerReceiver(surveyedLocalesSyncReceiver,
                 new IntentFilter(getString(R.string.action_locales_sync)));

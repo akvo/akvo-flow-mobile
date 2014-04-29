@@ -15,6 +15,9 @@
     </style>
 
     <style name="FlowActionBarStyle" parent="@style/Widget.AppCompat.ActionBar.Solid">
+        <item name="android:backgroundStacked" tools:targetApi="14">@drawable/ab_stacked_solid</item>
+        <!-- Support library compatibility -->
+        <item name="backgroundStacked">@drawable/ab_stacked_solid</item>
     </style>
 
     <style name="FlowActionBarTabs" parent="@style/Widget.AppCompat.ActionBar.TabView">

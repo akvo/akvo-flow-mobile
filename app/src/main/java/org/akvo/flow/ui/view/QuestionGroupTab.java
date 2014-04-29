@@ -49,6 +49,46 @@ public class QuestionGroupTab extends ScrollView {
         setFocusableInTouchMode(true);
     }
 
+    /**
+     * Pre-load all the QuestionViews in memory. getView() will simply
+     * retrieve them from the corresponding position in mQuestionViews.
+     */
+    public void load() {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        final Context context = getContext();
+        for (Question q : mQuestionGroup.getQuestions()) {
+            QuestionView questionView;
+            if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new OptionQuestionView(context, q, mSurveyListener);
+            } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new FreetextQuestionView(context, q, mSurveyListener);
+            } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new MediaQuestionView(context, q, mSurveyListener,
+                        ConstantUtil.PHOTO_QUESTION_TYPE);
+            } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new MediaQuestionView(context, q, mSurveyListener,
+                        ConstantUtil.VIDEO_QUESTION_TYPE);
+            } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new GeoQuestionView(context, q, mSurveyListener);
+            } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new BarcodeQuestionView(context, q, mSurveyListener);
+            } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new DateQuestionView(context, q, mSurveyListener);
+            } else {
+                questionView = new QuestionHeaderView(context, q, mSurveyListener);
+            }
+
+            // Add question interaction listener
+            questionView.addQuestionInteractionListener(mQuestionListener);
+
+            mQuestionViews.add(questionView);// Store the reference to the View
+
+            // Add divider (within the View)
+            inflater.inflate(R.layout.divider, questionView);
+            mContainer.addView(questionView);
+        }
+    }
+
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         // We set the ScrollView focusable in order to catch the focus when scrolling.
@@ -124,46 +164,6 @@ public class QuestionGroupTab extends ScrollView {
         for (QuestionView q : mQuestionViews) {
             // Notify the View so it can release any system resource (i.e. Location updates)
             q.releaseResources();
-        }
-    }
-
-    /**
-     * Pre-load all the QuestionViews in memory. getView() will simply
-     * retrieve them from the corresponding position in mQuestionViews.
-     */
-    public void load() {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        final Context context = getContext();
-        for (Question q : mQuestionGroup.getQuestions()) {
-            QuestionView questionView;
-            if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new OptionQuestionView(context, q, mSurveyListener);
-            } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new FreetextQuestionView(context, q, mSurveyListener);
-            } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener,
-                        ConstantUtil.PHOTO_QUESTION_TYPE);
-            } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener,
-                        ConstantUtil.VIDEO_QUESTION_TYPE);
-            } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new GeoQuestionView(context, q, mSurveyListener);
-            } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new BarcodeQuestionView(context, q, mSurveyListener);
-            } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new DateQuestionView(context, q, mSurveyListener);
-            } else {
-                questionView = new QuestionHeaderView(context, q, mSurveyListener);
-            }
-
-            // Add question interaction listener
-            questionView.addQuestionInteractionListener(mQuestionListener);
-
-            mQuestionViews.add(questionView);// Store the reference to the View
-
-            // Add divider (within the View)
-            inflater.inflate(R.layout.divider, questionView);
-            mContainer.addView(questionView);
         }
     }
 

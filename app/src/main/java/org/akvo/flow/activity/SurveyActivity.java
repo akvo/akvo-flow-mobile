@@ -32,6 +32,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -75,17 +77,17 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private static final String VIDEO_SUFFIX = ".mp4";
 
     /**
-     * When a request is done to perform photo, video, barcode scan, etc
-     * we store the question id, so we can notify later the status of such
-     * operation.
+     * When a request is done to perform photo, video, barcode scan, etc we store
+     * the question id, so we can notify later the result of such operation.
      */
     private String mRequestQuestionId;
 
+    private ViewPager mPager;
+    private ProgressBar mProgressBar;
     private SurveyTabAdapter mAdapter;
 
-    private boolean mReadOnly;
+    private boolean mReadOnly;//flag to represent whether the Survey can be edited or not
     private long mSurveyInstanceId;
-    private long mUserId;
     private long mSessionStartTime;
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
@@ -100,14 +102,23 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
+        mPager = (ViewPager)findViewById(R.id.pager);
+        mProgressBar = (ProgressBar)findViewById(R.id.progress_bar);
+
+        setLoading(true);
+
+        // Read all the params. Note that the survey instance id is now mandatory
+        final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
+        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
+        mSurveyInstanceId = getIntent().getLongExtra(ConstantUtil.RESPONDENT_ID_KEY, 0);
+        mSurveyGroup = (SurveyGroup)getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
+        mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
 
         mQuestionResponses = new HashMap<String, QuestionResponse>();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
-        // Load survey
-        final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
-        loadSurvey(surveyId);
+        loadSurvey(surveyId);// Load Survey. This task would be better off if executed in a worker thread
         loadLanguages();
 
         if (mSurvey == null) {
@@ -115,23 +126,36 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             finish();
         }
 
-        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
-        mUserId = getIntent().getLongExtra(ConstantUtil.USER_ID_KEY, 0);
-        mSurveyInstanceId = getIntent().getLongExtra(ConstantUtil.RESPONDENT_ID_KEY, 0);
-        mSurveyGroup = (SurveyGroup)getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
-        mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
-
-        if (mSurveyInstanceId == 0) {
-            Log.e(TAG, "Survey Instance is null. Finishing the Activity...");
-            finish();
-        }
-
         // Set the survey name as Activity title
         setTitle(mSurvey.getName());
-        ViewPager pager = (ViewPager)findViewById(R.id.pager);
-        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), pager, this, this);
-        mAdapter.load();// Instantiate tabs and views. TODO: Consider doing this op. in a background thread.
-        pager.setAdapter(mAdapter);
+        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
+
+        // As QuestionViews are instantiated upfront (not ideal, we should consider a better
+        // approach), we need to move this task off the UI thread. SurveyLoader will take
+        // care of loading all the tabs content, and will call onAdapterLoaded() once it has
+        // finished, returning the control flow to the UI thread.
+        new SurveyLoader().start();
+    }
+
+    /**
+     * Toggle progress bar, showing/hiding the content.
+     * Progress bar should only be shown when the content is being loaded (worker thread)
+     * @param isLoading true to show the ProgressBar and hide the ViewPager.
+     */
+    private void setLoading(boolean isLoading) {
+        if (isLoading) {
+            mPager.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            mPager.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void onAdapterLoaded() {
+        setLoading(false);
+
+        mPager.setAdapter(mAdapter);// Attach the adapter once its been loaded
 
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
         if (responses.isEmpty()) {
@@ -441,7 +465,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         return mReadOnly;
     }
 
-
     @Override
     public void onSurveySubmit() {
         recordDuration(false);
@@ -607,6 +630,27 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     return; // only one warning per survey, even of we passed >1 limit
                 }
             }
+        }
+    }
+
+    /**
+     * Worker thread that loads the ViewPager tabs content.
+     */
+    class SurveyLoader extends Thread {
+
+        @Override
+        public void run() {
+            // Instantiate tabs and views. Depending on the survey,
+            // this operation can be very expensive
+            mAdapter.load();
+
+            // Return the execution to the main thread
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onAdapterLoaded();
+                }
+            });
         }
     }
 

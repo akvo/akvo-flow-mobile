@@ -41,27 +41,18 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mQuestionListener = questionListener;
         mActionBar = actionBar;
         mPager = pager;
+        init();
+    }
 
+    private void init() {
         mQuestionGroups = mSurveyListener.getQuestionGroups();
         mQuestionGroupTabs = new ArrayList<QuestionGroupTab>();
-    }
 
-    public void notifyOptionsChanged() {
-        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.notifyOptionsChanged();// Spread the word
-        }
-    }
-
-    public void load() {
         for (QuestionGroup group : mQuestionGroups) {
             QuestionGroupTab questionGroupTab = new QuestionGroupTab(mContext, group,
                     mSurveyListener, mQuestionListener);
-            questionGroupTab.load();
             mQuestionGroupTabs.add(questionGroupTab);
         }
-
-        // Now that all the tabs are populated, we setup the dependencies
-        setupDependencies();
 
         if (!mSurveyListener.isReadOnly()) {
             mSubmitTab = new SubmitTab(mContext, mSurveyListener);
@@ -84,6 +75,21 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
 
         mPager.setOnPageChangeListener(this);
+    }
+
+    public void load() {
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.load();
+        }
+
+        // Now that all the tabs are populated, we setup the dependencies
+        setupDependencies();
+    }
+
+    public void notifyOptionsChanged() {
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.notifyOptionsChanged();// Spread the word
+        }
     }
 
     public void loadState() {

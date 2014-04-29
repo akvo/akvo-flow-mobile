@@ -4,15 +4,25 @@
     
     <style name="FieldSurveyTheme" parent="@style/Theme.AppCompat">
         <item name="android:actionBarStyle" tools:targetApi="11">@style/FlowActionBarStyle</item>
-        
         <!-- Support library compatibility -->
         <item name="actionBarStyle">@style/FlowActionBarStyle</item>
 
-        <item name="android:textColor">@color/text_color</item>
+        <item name="android:actionBarTabStyle" tools:targetApi="11">@style/FlowActionBarTabs</item>
+        <!-- Support library compatibility -->
+        <item name="actionBarTabStyle">@style/FlowActionBarTabs</item>
+
+        <item name="android:textColorSecondary">@color/text_color</item>
     </style>
 
     <style name="FlowActionBarStyle" parent="@style/Widget.AppCompat.ActionBar.Solid">
     </style>
-    
+
+    <style name="FlowActionBarTabs" parent="@style/Widget.AppCompat.ActionBar.TabView">
+        <!-- tab indicator -->
+        <item name="android:background">@drawable/tab_indicator_ab</item>
+
+        <!-- Support library compatibility -->
+        <item name="background">@drawable/tab_indicator_ab</item>
+    </style>
 
 </resources>

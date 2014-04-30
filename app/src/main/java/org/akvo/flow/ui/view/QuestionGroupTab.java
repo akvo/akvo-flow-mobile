@@ -141,14 +141,6 @@ public class QuestionGroupTab extends ScrollView {
                 questionView.rehydrate(response);
             }
         }
-
-        post(new Runnable() {
-            @Override
-            public void run() {
-                // Reset scroll position
-                fullScroll(FOCUS_UP);
-            }
-        });
     }
 
     public QuestionView getQuestionView(String questionId) {

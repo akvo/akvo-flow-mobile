@@ -42,6 +42,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 
 /**
  * This activity will list all the users in the database and present them in
@@ -164,9 +165,12 @@ public class ListUserActivity extends ActionBarActivity {
     }
     
     class UserListAdapter extends CursorAdapter implements OnItemClickListener {
-        
+        final int regularColor, selectedColor;
+
         public UserListAdapter(Context context, Cursor cursor) {
             super(context, cursor, 0);
+            regularColor = PlatformUtil.getResource(context, R.attr.textColorPrimary);
+            selectedColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
         }
         
         @Override
@@ -188,14 +192,13 @@ public class ListUserActivity extends ActionBarActivity {
             
             TextView nameView = (TextView) view.findViewById(R.id.itemheader);
             nameView.setText(name);
-            
-            int leftDrawable = 0;
-            if (FlowApp.getApp().getUser() != null) {
-                if (FlowApp.getApp().getUser().getId() == id) {
-                    leftDrawable = R.drawable.ic_menu_allfriends;
-                }
+
+            int colorRes = regularColor;
+            final User loggedUser = FlowApp.getApp().getUser();
+            if (loggedUser != null && loggedUser.getId() == id) {
+                colorRes = selectedColor;
             }
-            nameView.setCompoundDrawablesWithIntrinsicBounds(leftDrawable, 0, 0, 0);
+            nameView.setTextColor(getResources().getColorStateList(colorRes));
         }
 
         @Override

@@ -207,7 +207,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         public SurveyGroupListAdapter(Context context, Cursor cursor) {
             super(context, cursor, 0);
             regularColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
-            monitoredColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
+            monitoredColor = PlatformUtil.getResource(context, R.attr.textColorTertiary);
         }
         
         @Override

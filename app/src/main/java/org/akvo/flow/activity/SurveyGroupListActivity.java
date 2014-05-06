@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -201,9 +202,14 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     }
     
     class SurveyGroupListAdapter extends CursorAdapter implements OnItemClickListener {
+        final int regularColor, monitoredColor;
         
         public SurveyGroupListAdapter(Context context, Cursor cursor) {
             super(context, cursor, 0);
+
+            TypedArray a = getTheme().obtainStyledAttributes(new int[]{R.attr.textColorSecondary, R.attr.textColorTertiary});
+            regularColor = a.getResourceId(0, R.color.text_color_black);
+            monitoredColor = a.getResourceId(1, R.color.text_color_black);
         }
         
         @Override
@@ -221,9 +227,14 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             TextView text1 = (TextView) view.findViewById(R.id.text1);
             TextView text2 = (TextView) view.findViewById(R.id.text2);
             text1.setText(surveyGroup.getName());
+
             if (surveyGroup.isMonitored()) {
+                text1.setTextColor(getResources().getColorStateList(monitoredColor));
+                text2.setTextColor(getResources().getColorStateList(monitoredColor));
                 text2.setText(R.string.monitored_group);
             } else {
+                text1.setTextColor(getResources().getColorStateList(regularColor));
+                text2.setTextColor(getResources().getColorStateList(regularColor));
                 text2.setText(R.string.regular_group);
             }
             view.setTag(surveyGroup);

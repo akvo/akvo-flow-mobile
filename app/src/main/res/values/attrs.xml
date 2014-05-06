@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FlowTheme">
+
+        <!-- TEXT -->
+        <attr name="textColorPrimary" format="reference|color" />
+        <attr name="textColorSecondary" format="reference|color" />
+        <attr name="textColorTertiary" format="reference|color" />
+    </declare-styleable>
+</resources>

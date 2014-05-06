@@ -3,9 +3,15 @@
     <color name="default_underline_indicator_selected_color">#FF33B5E5</color>
 
     <color name="white">#ffffff</color>
-    <color name="background_main">#dee1de</color>
-    <color name="orange_main">#e17e26</color>
 
-    <color name="text_primary">#000000</color>
-    <color name="text_disabled">#8c8f8f</color>
+    <color name="background_main">#fef2e7</color>
+
+    <color name="black_main">#000000</color>
+    <color name="black_diabled">#8f8f8f</color>
+
+    <color name="orange_main">#e17e26</color>
+    <color name="orange_disabled">#80e17e26</color>
+
+    <color name="blue_main">#2bb5e6</color>
+    <color name="blue_disabled">#802bb5e6</color>
 </resources>

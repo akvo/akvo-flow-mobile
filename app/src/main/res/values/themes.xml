@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Light Theme -->
+    <style name="Flow.Theme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionBarStyle" tools:targetApi="11">@style/Flow.ActionBar</item>
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/Flow.ActionBar</item>
+
+        <item name="android:actionBarTabStyle" tools:targetApi="11">@style/Flow.ActionBar.Tabs</item>
+        <!-- Support library compatibility -->
+        <item name="actionBarTabStyle">@style/Flow.ActionBar.Tabs</item>
+
+        <item name="android:actionBarTabTextStyle" tools:targetApi="14">@style/Flow.ActionBar.TabText</item>
+        <item name="actionBarTabTextStyle">@style/Flow.ActionBar.TabText</item>
+
+        <item name="android:windowBackground">@color/background_main</item>
+        <!-- <item name="android:textColorSecondary">@color/text_color_black</item> -->
+
+        <!-- Text -->
+        <item name="textColorPrimary">@color/text_color_black</item>
+        <item name="textColorSecondary">@color/text_color_orange</item>
+        <item name="textColorTertiary">@color/text_color_blue</item>
+    </style>
+
+</resources>

@@ -2,30 +2,45 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
            xmlns:tools="http://schemas.android.com/tools">
     
-    <style name="FieldSurveyTheme" parent="@style/Theme.AppCompat">
-        <item name="android:actionBarStyle" tools:targetApi="11">@style/FlowActionBarStyle</item>
+    <style name="Flow.Theme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionBarStyle" tools:targetApi="11">@style/Flow.Theme.ActionBar</item>
         <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/FlowActionBarStyle</item>
+        <item name="actionBarStyle">@style/Flow.Theme.ActionBar</item>
 
-        <item name="android:actionBarTabStyle" tools:targetApi="11">@style/FlowActionBarTabs</item>
+        <item name="android:actionBarTabStyle" tools:targetApi="11">@style/Flow.Theme.ActionBar.Tabs</item>
         <!-- Support library compatibility -->
-        <item name="actionBarTabStyle">@style/FlowActionBarTabs</item>
+        <item name="actionBarTabStyle">@style/Flow.Theme.ActionBar.Tabs</item>
 
+        <item name="android:actionBarTabTextStyle" tools:targetApi="14">@style/Flow.Theme.ActionBar.TabText</item>
+        <item name="actionBarTabTextStyle">@style/Flow.Theme.ActionBar.TabText</item>
+
+        <item name="android:colorBackground">@color/background_main</item>
         <item name="android:textColorSecondary">@color/text_color</item>
     </style>
 
-    <style name="FlowActionBarStyle" parent="@style/Widget.AppCompat.ActionBar.Solid">
+    <style name="Flow.Theme.ActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
         <item name="android:backgroundStacked" tools:targetApi="14">@drawable/ab_stacked_solid</item>
         <!-- Support library compatibility -->
         <item name="backgroundStacked">@drawable/ab_stacked_solid</item>
+
+        <item name="android:titleTextStyle" tools:targetApi="11">@style/Flow.Theme.ActionBar.Text</item>
+        <item name="titleTextStyle">@style/Flow.Theme.ActionBar.Text</item>
     </style>
 
-    <style name="FlowActionBarTabs" parent="@style/Widget.AppCompat.ActionBar.TabView">
+    <style name="Flow.Theme.ActionBar.Tabs" parent="@style/Widget.AppCompat.ActionBar.TabView">
         <!-- tab indicator -->
         <item name="android:background">@drawable/tab_indicator_ab</item>
-
         <!-- Support library compatibility -->
         <item name="background">@drawable/tab_indicator_ab</item>
     </style>
+
+    <style name="Flow.Theme.ActionBar.Text" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/orange_main</item>
+    </style>
+
+    <style name="Flow.Theme.ActionBar.TabText" parent="@style/Widget.AppCompat.ActionBar.TabText">
+        <item name="android:textColor">@color/tab_text_color</item>
+    </style>
+
 
 </resources>

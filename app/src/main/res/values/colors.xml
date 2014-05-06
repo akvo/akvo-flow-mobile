@@ -2,6 +2,10 @@
 <resources>
     <color name="default_underline_indicator_selected_color">#FF33B5E5</color>
 
-    <color name="text_primary">#ffffff</color>
-    <color name="text_disabled">#80ffffff</color>
+    <color name="white">#ffffff</color>
+    <color name="background_main">#dee1de</color>
+    <color name="orange_main">#e17e26</color>
+
+    <color name="text_primary">#000000</color>
+    <color name="text_disabled">#8c8f8f</color>
 </resources>

@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -51,6 +50,7 @@ import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -206,10 +206,8 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         
         public SurveyGroupListAdapter(Context context, Cursor cursor) {
             super(context, cursor, 0);
-
-            TypedArray a = getTheme().obtainStyledAttributes(new int[]{R.attr.textColorSecondary, R.attr.textColorTertiary});
-            regularColor = a.getResourceId(0, R.color.text_color_black);
-            monitoredColor = a.getResourceId(1, R.color.text_color_black);
+            regularColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
+            monitoredColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
         }
         
         @Override

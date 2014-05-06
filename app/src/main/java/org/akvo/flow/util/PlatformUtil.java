@@ -19,6 +19,7 @@ package org.akvo.flow.util;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -82,6 +83,11 @@ public class PlatformUtil {
     public static float dp2Pixel(Context context, int dp) {
         Resources r = context.getResources();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+    }
+
+    public static int getResource(Context context, int attr) {
+        TypedArray a = context.getTheme().obtainStyledAttributes(new int[]{attr});
+        return a.getResourceId(0, 0);
     }
 
 }

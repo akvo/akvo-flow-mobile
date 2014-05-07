@@ -16,6 +16,7 @@
         <item name="actionBarTabTextStyle">@style/Flow.ActionBar.TabText</item>
 
         <item name="android:windowBackground">@color/background_main</item>
+        <item name="android:listViewStyle">@style/Flow.ListView</item>
         <!-- <item name="android:textColorSecondary">@color/text_color_black</item> -->
 
         <!-- Text -->

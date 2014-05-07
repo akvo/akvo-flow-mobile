@@ -27,6 +27,10 @@
         <item name="android:textColor">@color/tab_text_color</item>
     </style>
 
+    <style name="Flow.ListView" parent="@android:style/Widget.ListView">
+        <item name="android:cacheColorHint">@android:color/transparent</item>
+    </style>
+
     <!-- Dark Styles -->
     <!-- TODO -->
 

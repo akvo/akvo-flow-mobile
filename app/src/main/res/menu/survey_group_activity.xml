@@ -5,13 +5,13 @@
     <item
         android:id="@+id/users"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_menu_allfriends"
+        android:icon="@drawable/ic_action_users"
         android:title="@string/userlabel"
         flowapp:showAsAction="always" />
     <item
         android:id="@+id/settings"
         android:orderInCategory="101"
-        android:icon="@drawable/ic_menu_preferences"
+        android:icon="@drawable/ic_action_settings"
         android:title="@string/settingslabel"
         flowapp:showAsAction="always" />
 

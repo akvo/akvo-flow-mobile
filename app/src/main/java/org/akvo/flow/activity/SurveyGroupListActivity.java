@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -222,18 +223,21 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         public void bindView(View view, Context context, Cursor cursor) {
             final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
             
-            TextView text1 = (TextView) view.findViewById(R.id.text1);
-            TextView text2 = (TextView) view.findViewById(R.id.text2);
+            TextView text1 = (TextView)view.findViewById(R.id.text1);
+            TextView text2 = (TextView)view.findViewById(R.id.text2);
+            ImageView img = (ImageView)view.findViewById(R.id.surveys_img);
             text1.setText(surveyGroup.getName());
 
             if (surveyGroup.isMonitored()) {
                 text1.setTextColor(getResources().getColorStateList(monitoredColor));
                 text2.setTextColor(getResources().getColorStateList(monitoredColor));
                 text2.setText(R.string.monitored_group);
+                img.setImageResource(R.drawable.survey_group_m);
             } else {
                 text1.setTextColor(getResources().getColorStateList(regularColor));
                 text2.setTextColor(getResources().getColorStateList(regularColor));
                 text2.setText(R.string.regular_group);
+                img.setImageResource(R.drawable.survey_group);
             }
             view.setTag(surveyGroup);
         }

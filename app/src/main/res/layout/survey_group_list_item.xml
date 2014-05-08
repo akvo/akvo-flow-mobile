@@ -4,7 +4,16 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:padding="8dp">
-    
+
+    <ImageView
+        android:id="@+id/surveys_img"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:adjustViewBounds="true" />
+
     <ImageView 
         android:id="@+id/right_caret"
         android:layout_alignParentRight="true"
@@ -17,6 +26,7 @@
     <TextView
         android:id="@+id/text1"
         android:layout_toLeftOf="@id/right_caret"
+        android:layout_toRightOf="@id/surveys_img"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
@@ -26,6 +36,7 @@
         android:id="@+id/text2"
         android:layout_below="@id/text1"
         android:layout_toLeftOf="@id/right_caret"
+        android:layout_toRightOf="@id/surveys_img"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp" />

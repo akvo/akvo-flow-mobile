@@ -19,6 +19,7 @@ package org.akvo.flow.ui.fragment;
 import java.text.DecimalFormat;
 import java.util.Date;
 
+import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import android.app.Activity;
@@ -295,6 +296,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             idView.setText(surveyedLocale.getId());
             dateView.setText(getDateText(time));
             distanceView.setText(getDistanceText(surveyedLocale));
+
+            // Alternate background
+            int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+            final int res= PlatformUtil.getResource(context, attr);
+            view.setBackgroundResource(res);
         }
 
         @Override

@@ -46,6 +46,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -243,6 +244,11 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 lastSubmissionTitle.setVisibility(View.GONE);
                 lastSubmissionView.setVisibility(View.GONE);
             }
+
+            // Alternate background
+            int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+            final int res= PlatformUtil.getResource(getContext(), attr);
+            listItem.setBackgroundResource(res);
 
             return listItem;
         }

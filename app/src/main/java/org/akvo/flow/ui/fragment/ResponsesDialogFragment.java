@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.adapter.ResponseListAdapter;
+import org.akvo.flow.util.PlatformUtil;
 
 /**
  * Dialog presented to the user when non-submitted Responses exist for
@@ -102,13 +105,15 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mAdapter = new ResponseListAdapter(getActivity());
+        ContextThemeWrapper context = new ContextThemeWrapper(getActivity(), R.style.Flow_Dialog);
 
-        ListView listView = new ListView(getActivity());
+        mAdapter = new ResponseListAdapter(context);
+
+        ListView listView = new ListView(context);
         listView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        Button button = new Button(getActivity());
+        Button button = new Button(context);
         button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
                 ListView.LayoutParams.WRAP_CONTENT));
         button.setGravity(Gravity.CENTER);

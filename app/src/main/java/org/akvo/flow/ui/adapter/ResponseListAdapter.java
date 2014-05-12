@@ -14,6 +14,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
+import org.akvo.flow.util.PlatformUtil;
 
 import java.util.Date;
 
@@ -83,6 +84,12 @@ public class ResponseListAdapter extends CursorAdapter {
         view.setTag(FINISHED_KEY, finished);
         ImageView stsIcon = (ImageView) view.findViewById(R.id.xmitstsicon);
         stsIcon.setImageResource(icon);
+
+        // Alternate background
+        int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1
+                : R.attr.listitem_bg2;
+        final int res= PlatformUtil.getResource(context, attr);
+        view.setBackgroundResource(res);
     }
 
     @Override

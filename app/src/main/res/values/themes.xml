@@ -17,7 +17,6 @@
 
         <item name="android:windowBackground">@color/background_main</item>
         <item name="android:listViewStyle">@style/Flow.ListView</item>
-        <!-- <item name="android:textColorSecondary">@color/text_color_black</item> -->
 
         <!-- Text -->
         <item name="textColorPrimary">@color/text_color_black</item>
@@ -27,6 +26,12 @@
         <!-- Background -->
         <item name="listitem_bg1">@drawable/listitem_row_1</item>
         <item name="listitem_bg2">@drawable/listitem_row_2</item>
+    </style>
+
+    <style name="Flow.Dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@color/background_main</item>
+        <item name="android:textColor">@color/text_color_black</item>
+        <item name="android:listViewStyle">@style/Flow.ListView</item>
     </style>
 
 </resources>

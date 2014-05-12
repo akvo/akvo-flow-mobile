@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/add_user"
-        android:icon="@drawable/ic_menu_add"
+        android:icon="@drawable/ic_action_add_user"
         android:orderInCategory="100"
         android:title="@string/adduser"
         flowapp:showAsAction="always"/>

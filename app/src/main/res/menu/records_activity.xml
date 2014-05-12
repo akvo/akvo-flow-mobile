@@ -4,14 +4,14 @@
 
     <item
         android:id="@+id/search"
-        android:icon="@drawable/ic_menu_search"
+        android:icon="@drawable/ic_action_search"
         android:orderInCategory="100"
         android:title="@string/search_hint"
         flowapp:showAsAction="always"/>
 
     <item
         android:id="@+id/new_record"
-        android:icon="@drawable/ic_menu_add"
+        android:icon="@drawable/ic_action_content_new"
         android:orderInCategory="101"
         android:title="@string/new_record"
         flowapp:showAsAction="always"/>
@@ -20,7 +20,7 @@
     <item
         android:id="@+id/more_submenu"
         android:title="@string/more"
-        android:icon="@drawable/ic_menu_moreoverflow_normal_holo_dark"
+        android:icon="@drawable/ic_action_overflow"
         android:orderInCategory="102"
         flowapp:showAsAction="always">
         

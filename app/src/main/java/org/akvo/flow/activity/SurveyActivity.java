@@ -32,8 +32,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -82,8 +80,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
      */
     private String mRequestQuestionId;
 
-    private ViewPager mPager;
-    private ProgressBar mProgressBar;
     private SurveyTabAdapter mAdapter;
 
     private boolean mReadOnly;//flag to represent whether the Survey can be edited or not
@@ -102,10 +98,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
-        mPager = (ViewPager)findViewById(R.id.pager);
-        mProgressBar = (ProgressBar)findViewById(R.id.progress_bar);
-
-        setLoading(true);
 
         // Read all the params. Note that the survey instance id is now mandatory
         final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
@@ -128,35 +120,12 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
         // Set the survey name as Activity title
         setTitle(mSurvey.getName());
-        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
+        ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), pager, this, this);
+        mAdapter.load();// Instantiate tabs and views. TODO: Lazy loading with fragments!
+        pager.setAdapter(mAdapter);
 
-        // As QuestionViews are instantiated upfront (not ideal, we should consider a better
-        // approach), we need to move this task off the UI thread. SurveyLoader will take
-        // care of loading all the tabs content, and will call onAdapterLoaded() once it has
-        // finished, returning the control flow to the UI thread.
-        new SurveyLoader().start();
-    }
-
-    /**
-     * Toggle progress bar, showing/hiding the content.
-     * Progress bar should only be shown when the content is being loaded (worker thread)
-     * @param isLoading true to show the ProgressBar and hide the ViewPager.
-     */
-    private void setLoading(boolean isLoading) {
-        if (isLoading) {
-            mPager.setVisibility(View.GONE);
-            mProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            mPager.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.GONE);
-        }
-    }
-
-    private void onAdapterLoaded() {
-        setLoading(false);
-
-        mPager.setAdapter(mAdapter);// Attach the adapter once its been loaded
-
+        // Initialize new survey or load previous responses
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
         if (responses.isEmpty()) {
             displayPrefillDialog();
@@ -630,27 +599,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     return; // only one warning per survey, even of we passed >1 limit
                 }
             }
-        }
-    }
-
-    /**
-     * Worker thread that loads the ViewPager tabs content.
-     */
-    class SurveyLoader extends Thread {
-
-        @Override
-        public void run() {
-            // Instantiate tabs and views. Depending on the survey,
-            // this operation can be very expensive
-            mAdapter.load();
-
-            // Return the execution to the main thread
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    onAdapterLoaded();
-                }
-            });
         }
     }
 

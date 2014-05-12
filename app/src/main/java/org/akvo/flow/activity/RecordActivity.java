@@ -266,7 +266,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         if (mRecord == null) {
             menu.removeItem(R.id.map_icon);
         }
-        
+
         return super.onCreateOptionsMenu(menu);
     }
 

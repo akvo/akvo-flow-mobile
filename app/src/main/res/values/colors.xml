@@ -4,7 +4,8 @@
 
     <color name="white">#ffffff</color>
 
-    <color name="background_main">#fef2e7</color>
+    <color name="background_main">#fffef2e7</color>
+    <color name="background_alternate">#f1eae4</color>
 
     <color name="black_main">#000000</color>
     <color name="black_diabled">#8f8f8f</color>

@@ -29,6 +29,7 @@
 
     <style name="Flow.ListView" parent="@android:style/Widget.ListView">
         <item name="android:cacheColorHint">@android:color/transparent</item>
+        <item name="android:divider">@color/white</item>
     </style>
 
     <!-- Dark Styles -->

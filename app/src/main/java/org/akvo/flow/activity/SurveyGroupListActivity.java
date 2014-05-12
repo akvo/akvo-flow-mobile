@@ -239,6 +239,13 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
                 text2.setText(R.string.regular_group);
                 img.setImageResource(R.drawable.survey_group);
             }
+
+            // Alternate background
+            int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1
+                    : R.attr.listitem_bg2;
+            final int res= PlatformUtil.getResource(context, attr);
+            view.setBackgroundResource(res);
+
             view.setTag(surveyGroup);
         }
 

@@ -242,6 +242,21 @@ public class SurveyDownloadService extends Service {
         Map<Long, SurveyGroup> surveyGroups = new HashMap<Long, SurveyGroup>();
         for (Survey survey : surveys) {
             SurveyGroup group = survey.getSurveyGroup();
+
+            // Temporary hack to support the concept of 'Project', where a non-monitored
+            // project (current SurveyGroup) can only hold one survey.
+            // See https://github.com/akvo/akvo-flow-mobile/issues/100
+            if (!group.isMonitored()) {
+                // TODO: Use String for SurveyGroup ids
+                try {
+                    long id = Long.valueOf(survey.getId());
+                    group = new SurveyGroup(id, survey.getName(), null, false);
+                    survey.setSurveyGroup(group);
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+
             if (group != null) {
                 surveyGroups.put(group.getId(), group);
             }

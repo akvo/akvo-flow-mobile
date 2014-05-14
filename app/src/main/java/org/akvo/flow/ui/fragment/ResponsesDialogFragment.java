@@ -11,7 +11,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -23,7 +22,6 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.adapter.ResponseListAdapter;
-import org.akvo.flow.util.PlatformUtil;
 
 /**
  * Dialog presented to the user when non-submitted Responses exist for
@@ -113,20 +111,22 @@ public class ResponsesDialogFragment extends DialogFragment implements OnItemCli
         listView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        Button button = new Button(context);
-        button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
-                ListView.LayoutParams.WRAP_CONTENT));
-        button.setGravity(Gravity.CENTER);
-        button.setText(R.string.start_new_response);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onNewResponse(mSurveyId);
-                dismiss();
-            }
-        });
+        if (mSurveyGroup.isMonitored()) {
+            Button button = new Button(context);
+            button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
+                    ListView.LayoutParams.WRAP_CONTENT));
+            button.setGravity(Gravity.CENTER);
+            button.setText(R.string.start_new_response);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onNewResponse(mSurveyId);
+                    dismiss();
+                }
+            });
+            listView.addFooterView(button);
+        }
 
-        listView.addFooterView(button);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
 

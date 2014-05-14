@@ -250,7 +250,7 @@ public class SurveyDownloadService extends Service {
                 // TODO: Use String for SurveyGroup ids
                 try {
                     long id = Long.valueOf(survey.getId());
-                    group = new SurveyGroup(id, survey.getName(), null, false);
+                    group = new SurveyGroup(id, survey.getName(), survey.getId(), false);
                     survey.setSurveyGroup(group);
                 } catch (NumberFormatException e) {
                     Log.e(TAG, e.getMessage());

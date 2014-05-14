@@ -38,6 +38,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -242,6 +243,48 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 }
             }
             mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
+
+            // Record meta-data, if applies
+            if (mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
+                saveRecordMetaData();
+            }
+
+        }
+    }
+
+    private void saveRecordMetaData() {
+        // META_NAME
+        StringBuilder builder = new StringBuilder();
+        List<String> localeNameQuestions = mSurvey.getLocaleNameQuestions();
+
+        // Check the responses given to these questions (marked as name)
+        // and concatenate them so it becomes the Locale name.
+        if (localeNameQuestions.size() > 0) {
+            for (int i=0; i<localeNameQuestions.size(); i++) {
+                QuestionResponse questionResponse = mDatabase.getResponse(mSurveyInstanceId,
+                        localeNameQuestions.get(i));
+
+                String answer = questionResponse != null ? questionResponse.getValue() : null;
+
+                if (!TextUtils.isEmpty(answer)) {
+                    if (i > 0) {
+                        builder.append(" - ");
+                    }
+                    builder.append(answer);
+                }
+            }
+            mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
+                    SurveyedLocaleMeta.NAME);
+        }
+
+        // META_GEO
+        String localeGeoQuestion = mSurvey.getLocaleGeoQuestion();
+        if (localeGeoQuestion != null) {
+            QuestionResponse response = mDatabase.getResponse(mSurveyInstanceId, localeGeoQuestion);
+            if (response != null) {
+                mDatabase.updateSurveyedLocale(mSurveyInstanceId, response.getValue(),
+                        SurveyedLocaleMeta.GEOLOCATION);
+            }
         }
     }
 

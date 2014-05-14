@@ -27,18 +27,10 @@
         android:id="@+id/text1"
         android:layout_toLeftOf="@id/right_caret"
         android:layout_toRightOf="@id/surveys_img"
+        android:layout_centerVertical="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/text2"
-        android:layout_below="@id/text1"
-        android:layout_toLeftOf="@id/right_caret"
-        android:layout_toRightOf="@id/surveys_img"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp" />
 
 </RelativeLayout>

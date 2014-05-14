@@ -203,12 +203,11 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     }
     
     class SurveyGroupListAdapter extends CursorAdapter implements OnItemClickListener {
-        final int regularColor, monitoredColor;
+        final int mTextColor;
         
         public SurveyGroupListAdapter(Context context, Cursor cursor) {
             super(context, cursor, 0);
-            regularColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
-            monitoredColor = PlatformUtil.getResource(context, R.attr.textColorTertiary);
+            mTextColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
         }
         
         @Override
@@ -224,25 +223,13 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
             
             TextView text1 = (TextView)view.findViewById(R.id.text1);
-            TextView text2 = (TextView)view.findViewById(R.id.text2);
             ImageView img = (ImageView)view.findViewById(R.id.surveys_img);
             text1.setText(surveyGroup.getName());
-
-            if (surveyGroup.isMonitored()) {
-                text1.setTextColor(getResources().getColorStateList(monitoredColor));
-                text2.setTextColor(getResources().getColorStateList(monitoredColor));
-                text2.setText(R.string.monitored_group);
-                img.setImageResource(R.drawable.survey_group_m);
-            } else {
-                text1.setTextColor(getResources().getColorStateList(regularColor));
-                text2.setTextColor(getResources().getColorStateList(regularColor));
-                text2.setText(R.string.regular_group);
-                img.setImageResource(R.drawable.survey_group);
-            }
+            text1.setTextColor(getResources().getColorStateList(mTextColor));
+            img.setImageResource(R.drawable.survey_group);
 
             // Alternate background
-            int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1
-                    : R.attr.listitem_bg2;
+            int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
             final int res= PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
 

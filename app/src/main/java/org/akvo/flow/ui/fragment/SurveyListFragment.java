@@ -220,16 +220,14 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
 
             int iconRes = R.drawable.survey_icon;
             boolean showLastSubmission = false;
-            if (mSurveyGroup.isMonitored()) {
-                if (surveyInfo.mLastSubmission != null) {
-                    showLastSubmission = true;
-                    iconRes = isRegistrationSurvey(surveyInfo.mId) ?
-                            R.drawable.register_survey_done_icon
-                            : R.drawable.survey_done_icon;
+            if (surveyInfo.mLastSubmission != null) {
+                showLastSubmission = true;
+                iconRes = isRegistrationSurvey(surveyInfo.mId) ?
+                        R.drawable.register_survey_done_icon
+                        : R.drawable.survey_done_icon;
 
-                } else if (isRegistrationSurvey(surveyInfo.mId)) {
-                    iconRes = R.drawable.register_survey_icon;
-                }
+            } else if (isRegistrationSurvey(surveyInfo.mId)) {
+                iconRes = R.drawable.register_survey_icon;
             }
             icon.setImageResource(iconRes);
 

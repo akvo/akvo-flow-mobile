@@ -255,8 +255,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String recordId = mRecord != null ? mRecord.getId() : null;
-        return new SurveyInfoLoader(getActivity(), mDatabase, mSurveyGroup.getId(), recordId);
+        return new SurveyInfoLoader(getActivity(), mDatabase, mSurveyGroup.getId(), mRecord.getId());
     }
 
     @Override

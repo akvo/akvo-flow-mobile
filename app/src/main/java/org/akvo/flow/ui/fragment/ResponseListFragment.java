@@ -219,7 +219,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         switch (id) {
             case ID_SURVEY_INSTANCE_LIST:
                 return new SurveyInstanceLoader(getActivity(), mDatabase, mSurveyGroup.getId(),
-                        mRecord != null ? mRecord.getId() : null, null, -1);
+                        mRecord.getId(), null, -1);
         }
         return null;
     }

@@ -77,9 +77,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         mStatusIndicator = (TextView)findViewById(R.id.acc_tv);
 
         mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
-        mStatusIndicator.setTextColor(Color.WHITE);
         mSearchingIndicator.setText("");
-        mSearchingIndicator.setTextColor(Color.WHITE);
 
         mLatField.setOnFocusChangeListener(this);
         mLonField.setOnFocusChangeListener(this);
@@ -108,7 +106,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
                 .getSystemService(Context.LOCATION_SERVICE);
         if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
-            mStatusIndicator.setTextColor(Color.WHITE);
 
             mLatField.setText("");
             mLonField.setText("");
@@ -176,7 +173,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         mCode = "";
         mSearchingIndicator.setText("");
         mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
-        mStatusIndicator.setTextColor(Color.WHITE);
     }
 
     /**

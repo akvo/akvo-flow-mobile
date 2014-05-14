@@ -31,7 +31,6 @@ import android.support.v7.app.ActionBar.TabListener;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,7 +66,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     
     private ViewPager mPager;
     private TabsAdapter mAdapter;
-    private View mRecordView;
     private TextView mRecordTextView;
     
     private String[] mTabs;
@@ -79,7 +77,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         
         mTabs = getResources().getStringArray(R.array.record_tabs);
         
-        mRecordView = findViewById(R.id.record_view);
         mRecordTextView = (TextView) findViewById(R.id.record_text);
         mAdapter = new TabsAdapter(getSupportFragmentManager());
         mPager = (ViewPager)findViewById(R.id.pager);
@@ -141,7 +138,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
 
     private void displayRecord() {
         // TODO: Externalize string
-        mRecordTextView.setText("Record: " + mRecord.getName() + ", " + mRecord.getId());
+        mRecordTextView.setText("Data Point: " + mRecord.getName() + ", " + mRecord.getId());
     }
 
     @Override

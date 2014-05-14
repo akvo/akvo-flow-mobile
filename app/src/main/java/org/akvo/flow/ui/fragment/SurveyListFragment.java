@@ -121,23 +121,21 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     }
     
     public void refresh() {
-        // Calculate if this locale is not registered yet
-        if (mSurveyGroup.isMonitored() && mRecord != null) {
-            mRegistered = false;
-            Cursor cursor = mDatabase.getSurveyInstances(mRecord.getId());
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    final int col = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
-                    do {
-                        if (!cursor.isNull(col)) {
-                            mRegistered = true;
-                        }
-                    } while (cursor.moveToNext() && !mRegistered);
-                }
-                cursor.close();
+        // Calculate if this record is not registered yet
+        mRegistered = false;
+        Cursor cursor = mDatabase.getSurveyInstances(mRecord.getId());
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                final int col = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
+                do {
+                    if (!cursor.isNull(col)) {
+                        mRegistered = true;
+                    }
+                } while (cursor.moveToNext() && !mRegistered);
             }
+            cursor.close();
         }
-        
+
         getLoaderManager().restartLoader(0, null, this);
     }
 
@@ -194,7 +192,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 return mRegistered || isRegistrationSurvey(surveyId);
             }
             
-            return true;// Not monitored. All surveys are enabled
+            return !mRegistered;// Not monitored. Only one response allowed
         }
 
         @Override

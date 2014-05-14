@@ -32,6 +32,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -134,6 +135,11 @@ public class RecordListActivity extends ActionBarActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.records_activity, menu);
+        if (!mSurveyGroup.isMonitored()) {
+            SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
+            subMenu.removeItem(R.id.sync_records);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 

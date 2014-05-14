@@ -157,15 +157,15 @@
     <string name="clear_data_error">Error deleting data from the device</string>
     
     <string name="configuring_languages">Configuring survey languages...</string>
-    <string name="new_record">New Record</string>
-    <string name="sync_records">Sync Records</string>
+    <string name="new_record">New Data Point</string>
+    <string name="sync_records">Sync Data Points</string>
     <string name="order_by">Order By</string>
-    <string name="syncing_records">Syncing Records...</string>
-    <string name="sync_finished">Records Sync finished</string>
-    <string name="synced_records">Synced %1$d Records</string>
-    <string name="sync_error">Records Sync failed</string>
+    <string name="syncing_records">Syncing Data Points...</string>
+    <string name="sync_finished">Data Points Sync finished</string>
+    <string name="synced_records">Synced %1$d Data Points</string>
+    <string name="sync_error">Data Points Sync failed</string>
     <string name="network_error">Network Error</string>
-    <string name="select_record">Please, select a Record</string>
+    <string name="select_record">Please, select a Data Point</string>
     <string name="loading">Loading...</string>
     <string name="prefill_title">Prefill Responses</string>
     <string name="prefill_text">Prefill responses with previous values of the same questions</string>
@@ -173,8 +173,8 @@
     <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
 
     <!-- Survey Groups Activity -->
-    <string name="monitored_group">Monitored Group</string>
-    <string name="regular_group">Regular Group</string>
+    <string name="monitored_group">Monitored Project</string>
+    <string name="regular_group">Regular Project</string>
 
     <!-- Localization -->
     <string name="app_language">App Language</string>
@@ -185,8 +185,8 @@
     <string name="no_records_text">You have no Records synced. To edit records, you need to sync them, or create new ones</string>
     
     <!-- Activity Labels -->
-    <string name="survey_groups_activity">Survey Groups</string>
-    <string name="record_list_activity">Select Record</string>
+    <string name="survey_groups_activity">Projects</string>
+    <string name="record_list_activity">Select Data Point</string>
     
     <!-- ActionBar -->
     <string name="more">More</string>
@@ -200,7 +200,7 @@
     <string name="repeat_answer">Please, repeat answer</string>
     <string name="error_answer_match">Answers do not match</string>
     <string name="reg_form_warning_title">Registration Survey</string>
-    <string name="reg_form_warning_text">This Record already contains a response for this survey. Any new response will override previous values. Do you want to continue?</string>
+    <string name="reg_form_warning_text">This Data Point already contains a response for this survey. Any new response will override previous values. Do you want to continue?</string>
 
     <!-- Record Activity -->
     <string name="unknown">Unknown</string>

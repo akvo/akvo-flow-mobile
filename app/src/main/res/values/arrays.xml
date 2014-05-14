@@ -2,13 +2,13 @@
 <resources>
     
     <string-array name="records_activity_tabs">
-        <item>RECORDS</item>
+        <item>DATA POINTS</item>
         <item>MAP</item>
     </string-array>
     
     <string-array name="record_tabs">
-        <item>SURVEYS</item>
-        <item>RESPONSES</item>
+        <item>FORMS</item>
+        <item>HISTORY</item>
     </string-array>
     
     <string-array name="order_by">

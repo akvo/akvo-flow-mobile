@@ -140,13 +140,8 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     }
 
     private void displayRecord() {
-        // Display/Hide monitoring features
-        if (mSurveyGroup.isMonitored() && mRecord != null) {
-            mRecordView.setVisibility(View.VISIBLE);
-            mRecordTextView.setText("Record: " + mRecord.getName() + ", " + mRecord.getId());
-        } else {
-            mRecordView.setVisibility(View.GONE);
-        }
+        // TODO: Externalize string
+        mRecordTextView.setText("Record: " + mRecord.getName() + ", " + mRecord.getId());
     }
 
     @Override
@@ -156,11 +151,9 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             return;
         }
 
-        final String recordId = mRecord != null ? mRecord.getId() : null;
-
         // Check if there are ongoing (non-submitted) responses for this Survey
         boolean createNew = true;
-        Cursor c =  mDatabase.getSurveyInstances(recordId, surveyId, SurveyInstanceStatus.SAVED);
+        Cursor c =  mDatabase.getSurveyInstances(mRecord.getId(), surveyId, SurveyInstanceStatus.SAVED);
         if (c != null) {
             createNew = c.getCount() == 0;
             c.close();
@@ -171,21 +164,16 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         } else {
             // Display ResponsesDialogFragment
             ResponsesDialogFragment dialogFragment = ResponsesDialogFragment.instantiate(
-                    mSurveyGroup, surveyId, recordId);
+                    mSurveyGroup, surveyId, mRecord.getId());
             dialogFragment.show(getSupportFragmentManager(), "responses");
         }
     }
 
     private void startSurvey(String surveyId) {
-        String recordId = mRecord != null ? mRecord.getId() : null;
-        if (recordId == null) {
-            // Non-monitored group. Create a new Record for the locale
-            recordId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-        }
         long surveyInstanceId = mDatabase.createSurveyRespondent(surveyId,
-                String.valueOf(mUser.getId()), recordId);
+                String.valueOf(mUser.getId()), mRecord.getId());
 
-        startSurvey(surveyId, recordId, surveyInstanceId);
+        startSurvey(surveyId, mRecord.getId(), surveyInstanceId);
     }
 
     private void startSurvey(String surveyId, String recordId, long surveyInstanceId) {
@@ -263,10 +251,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.record_activity, menu);
-        if (mRecord == null) {
-            menu.removeItem(R.id.map_icon);
-        }
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -278,13 +262,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
                 return true;
             case R.id.map_icon:
                 viewOnMap();
-                return true;
-            case R.id.users:
-                Intent i = new Intent(this, ListUserActivity.class);
-                startActivity(i);
-                return true;
-            case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

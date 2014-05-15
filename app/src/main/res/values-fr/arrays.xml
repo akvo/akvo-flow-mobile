@@ -9,6 +9,7 @@
     <string-array name="record_tabs">
         <item>ENQUÊTES</item>
         <item>RÉPONSES</item>
+        <item>CARTE</item>
     </string-array>
     
     <string-array name="order_by">

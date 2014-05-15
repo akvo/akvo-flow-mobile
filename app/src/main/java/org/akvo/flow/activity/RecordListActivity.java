@@ -41,12 +41,12 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.MapFragment;
+import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.SurveyedLocaleListFragment;
-import org.akvo.flow.ui.fragment.SurveyedLocalesFragmentListener;
 import org.akvo.flow.service.SurveyedLocaleSyncService;
 
-public class RecordListActivity extends ActionBarActivity implements 
-            SurveyedLocalesFragmentListener, ActionBar.TabListener {
+public class RecordListActivity extends ActionBarActivity implements
+        RecordListListener, ActionBar.TabListener {
     private static final String TAG = RecordListActivity.class.getSimpleName();
     
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
@@ -75,7 +75,7 @@ public class RecordListActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 // Create new record and return the ID
                 String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-                onSurveyedLocaleSelected(newLocaleId);
+                onRecordSelected(newLocaleId);
             }
         });
         
@@ -123,7 +123,7 @@ public class RecordListActivity extends ActionBarActivity implements
         setIntent(intent);
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String surveyedLocaleId = intent.getDataString();
-            onSurveyedLocaleSelected(surveyedLocaleId);
+            onRecordSelected(surveyedLocaleId);
         }
     }
     
@@ -175,7 +175,7 @@ public class RecordListActivity extends ActionBarActivity implements
     }
 
     @Override
-    public void onSurveyedLocaleSelected(String surveyedLocaleId) {
+    public void onRecordSelected(String surveyedLocaleId) {
         // Start SurveysActivity, sending SurveyGroup + Record
         SurveyedLocale record = mDatabase.getSurveyedLocale(surveyedLocaleId);
         Intent intent = new Intent(this, RecordActivity.class);

@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.RecordListActivity;
 import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
@@ -50,17 +51,28 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener {
     private static final String TAG = MapFragment.class.getSimpleName();
-    
+
     private long mSurveyGroupId;
+    private String mRecordId; // If set, load a single record
     private SurveyDbAdapter mDatabase;
-    private SurveyedLocalesFragmentListener mListener;
+    private RecordListListener mListener;
+
+    private boolean mSingleRecord = false;
     
     private GoogleMap mMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
+        Bundle args = getArguments();
+        if (args.containsKey(RecordActivity.EXTRA_RECORD_ID)) {
+            // Single record mode.
+            mSingleRecord = true;
+            mRecordId = args.getString(RecordActivity.EXTRA_RECORD_ID);
+        } else {
+            mSingleRecord = false;
+            mSurveyGroupId = args.getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
+        }
     }
     
     @Override
@@ -70,7 +82,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (SurveyedLocalesFragmentListener)activity;
+            mListener = (RecordListListener)activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SurveyedLocalesFragmentListener");
@@ -137,7 +149,16 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
      */
     public void refresh() {
         if (isResumed()) {
-            getLoaderManager().restartLoader(0, null, this);
+            if (mSingleRecord) {
+                // Just get it from the DB
+                SurveyedLocale record = mDatabase.getSurveyedLocale(mRecordId);
+                if (mMap != null && record != null) {
+                    mMap.clear();
+                    displayRecord(record);
+                }
+            } else {
+                getLoaderManager().restartLoader(0, null, this);
+            }
         }
     }
     
@@ -145,18 +166,25 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         if (mMap != null) {
             mMap.clear();
             for (SurveyedLocale surveyedLocale : surveyedLocales) {
-                mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(surveyedLocale.getLatitude(), surveyedLocale.getLongitude()))
-                        .title(surveyedLocale.getName())
-                        .snippet(surveyedLocale.getId()));
+                displayRecord(surveyedLocale);
             }
         }
     }
 
+    private void displayRecord(SurveyedLocale record) {
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(record.getLatitude(), record.getLongitude()))
+                .title(record.getName())
+                .snippet(record.getId()));
+    }
+
     @Override
     public void onInfoWindowClick(Marker marker) {
+        if (mSingleRecord) {
+            return; // Do nothing. We are already inside the record Activity
+        }
         final String surveyedLocaleId = marker.getSnippet();
-        mListener.onSurveyedLocaleSelected(surveyedLocaleId);
+        mListener.onRecordSelected(surveyedLocaleId);
     }
 
     // ==================================== //

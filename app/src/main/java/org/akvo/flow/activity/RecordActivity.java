@@ -41,6 +41,8 @@ import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.ui.fragment.MapFragment;
+import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.fragment.ResponsesDialogFragment;
 import org.akvo.flow.ui.fragment.ResponsesDialogFragment.ResponsesDialogListener;
@@ -50,7 +52,7 @@ import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.util.ConstantUtil;
 
 public class RecordActivity extends ActionBarActivity implements SurveyListListener, TabListener,
-        ResponsesDialogListener{
+        ResponsesDialogListener, RecordListListener {
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_RECORD_ID = "record";
     
@@ -58,7 +60,8 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     
     private static final int POSITION_SURVEYS = 0;
     private static final int POSITION_RESPONSES = 1;
-    
+    private static final int POSITION_MAP = 2;
+
     private User mUser;
     private SurveyedLocale mRecord;
     private SurveyGroup mSurveyGroup;
@@ -104,11 +107,15 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         Tab listTab = actionBar.newTab()
                 .setText(mTabs[POSITION_SURVEYS])
                 .setTabListener(this);
-        Tab mapTab = actionBar.newTab()
+        Tab responsesTab = actionBar.newTab()
                 .setText(mTabs[POSITION_RESPONSES])
+                .setTabListener(this);
+        Tab mapTab = actionBar.newTab()
+                .setText(mTabs[POSITION_MAP])
                 .setTabListener(this);
         
         actionBar.addTab(listTab);
+        actionBar.addTab(responsesTab);
         actionBar.addTab(mapTab);
     }
     
@@ -229,6 +236,12 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
                     return SurveyListFragment.instantiate(mSurveyGroup, mRecord);
                 case POSITION_RESPONSES:
                     return ResponseListFragment.instantiate(mSurveyGroup, mRecord);
+                case POSITION_MAP:
+                    Fragment fragment = new MapFragment();
+                    Bundle args = new Bundle();
+                    args.putString(RecordActivity.EXTRA_RECORD_ID, mRecord.getId());
+                    fragment.setArguments(args);
+                    return fragment;
             }
             
             return null;
@@ -286,4 +299,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    @Override
+    public void onRecordSelected(String recordId) {
+    }
 }

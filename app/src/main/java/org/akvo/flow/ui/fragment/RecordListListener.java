@@ -22,8 +22,8 @@ package org.akvo.flow.ui.fragment;
  * hosting Activity.
  *
  */
-public interface SurveyedLocalesFragmentListener {
+public interface RecordListListener {
     
-    public void onSurveyedLocaleSelected(String surveyedLocaleId);
+    public void onRecordSelected(String surveyedLocaleId);
 
 }

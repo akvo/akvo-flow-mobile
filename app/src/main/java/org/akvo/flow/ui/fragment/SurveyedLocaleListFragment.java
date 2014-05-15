@@ -73,7 +73,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     private SurveyDbAdapter mDatabase;
     
     private SurveyedLocaleListAdapter mAdapter;
-    private SurveyedLocalesFragmentListener mListener;
+    private RecordListListener mListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,7 +90,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (SurveyedLocalesFragmentListener)activity;
+            mListener = (RecordListListener)activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SurveyedLocalesFragmentListener");
@@ -155,7 +155,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         final String localeId = cursor.getString(cursor.getColumnIndexOrThrow(
                 RecordColumns.RECORD_ID));
         
-        mListener.onSurveyedLocaleSelected(localeId);// Notify the host activity
+        mListener.onRecordSelected(localeId);// Notify the host activity
     }
     
     @Override

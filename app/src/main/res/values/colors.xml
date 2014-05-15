@@ -15,4 +15,8 @@
 
     <color name="blue_main">#2bb5e6</color>
     <color name="blue_disabled">#802bb5e6</color>
+
+    <!-- Buttons -->
+    <color name="button_green">#00a79d</color>
+    <color name="button_green_selected">#007f77</color>
 </resources>

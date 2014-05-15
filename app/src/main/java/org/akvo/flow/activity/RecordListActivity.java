@@ -33,6 +33,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -67,6 +68,16 @@ public class RecordListActivity extends ActionBarActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record_list_activity);
+
+        // New record click listener
+        findViewById(R.id.new_record).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create new record and return the ID
+                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+                onSurveyedLocaleSelected(newLocaleId);
+            }
+        });
         
         mTabs = getResources().getStringArray(R.array.records_activity_tabs);
         
@@ -151,11 +162,6 @@ public class RecordListActivity extends ActionBarActivity implements
                 return true;
             case R.id.search:
                 return onSearchRequested();
-            case R.id.new_record:
-                // Create new record and return the ID
-                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-                onSurveyedLocaleSelected(newLocaleId);
-                return true;
             case R.id.sync_records:
                 Toast.makeText(RecordListActivity.this, R.string.syncing_records, 
                         Toast.LENGTH_SHORT).show();

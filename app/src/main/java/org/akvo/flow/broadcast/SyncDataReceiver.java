@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.akvo.flow.service.DataSyncService;
-import org.akvo.flow.util.ConstantUtil;
 
 /**
  * this class will listen to any Broadcast messages fired by the system and will
@@ -30,15 +29,10 @@ import org.akvo.flow.util.ConstantUtil;
  * 
  * @author Christopher Fagiani
  */
-public class BroadcastDispatcher extends BroadcastReceiver {
-    @SuppressWarnings("unused")
-    private static final String TAG = "BroadcastDispatcher";
+public class SyncDataReceiver extends BroadcastReceiver {
 
     public void onReceive(Context context, Intent intent) {
-
-        if (ConstantUtil.DATA_AVAILABLE_INTENT.equals(intent.getAction())) {
-            // Launch Sync Service
-            context.startService(new Intent(context, DataSyncService.class));
-        }
+        // Launch Sync Service
+        context.startService(new Intent(context, DataSyncService.class));
     }
 }

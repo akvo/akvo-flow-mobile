@@ -53,7 +53,7 @@ public class SurveyedLocaleSyncService extends IntentService {
         FlowApi api = new FlowApi();
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         displayNotification(getString(R.string.syncing_records), 
-                getString(R.string.pleasewait), true);
+                getString(R.string.pleasewait), false);
         try {
             int batchSize = 0;
             while ((batchSize = sync(database, api, surveyGroupId)) != 0) {
@@ -63,12 +63,12 @@ public class SurveyedLocaleSyncService extends IntentService {
             }
             
             displayNotification(getString(R.string.sync_finished),
-                    String.format(getString(R.string.synced_records), syncedRecords), false);
+                    String.format(getString(R.string.synced_records), syncedRecords), true);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
             displayToast(getString(R.string.network_error));
             displayNotification(getString(R.string.sync_error), 
-                    getString(R.string.network_error), false);
+                    getString(R.string.network_error), true);
         } finally {
             database.close();
         }
@@ -98,25 +98,27 @@ public class SurveyedLocaleSyncService extends IntentService {
         });
     }
     
-    private void displayNotification(String title, String text, boolean progress) {
-        int icon = progress ? android.R.drawable.stat_sys_download
-                : android.R.drawable.stat_sys_download_done;
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+    private void displayNotification(String title, String text, boolean finished) {
+        int icon = finished ? android.R.drawable.stat_sys_download_done
+                : android.R.drawable.stat_sys_download;
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(icon)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setTicker(title);
-        
+
+        builder.setOngoing(!finished);// Ongoing if still syncing the records
+
         // Progress will only be displayed in Android versions > 4.0
-        mBuilder.setProgress(1, 1, progress);
+        builder.setProgress(1, 1, !finished);
         
         // Dummy intent. Do nothing when clicked
         PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        mBuilder.setContentIntent(intent);
+        builder.setContentIntent(intent);
         
         NotificationManager notificationManager = 
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
     
     /**

@@ -289,13 +289,16 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             TextView idView = (TextView) view.findViewById(R.id.locale_id);
             TextView dateView = (TextView) view.findViewById(R.id.last_modified);
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
+            TextView statusView = (TextView) view.findViewById(R.id.locale_status);
             final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
             Long time = c.getLong(c.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
+            int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
 
             nameView.setText(surveyedLocale.getName());
             idView.setText(surveyedLocale.getId());
             dateView.setText(getDateText(time));
             distanceView.setText(getDistanceText(surveyedLocale));
+            statusView.setText("Status: " + status);// TODO: Use icon
 
             // Alternate background
             int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;

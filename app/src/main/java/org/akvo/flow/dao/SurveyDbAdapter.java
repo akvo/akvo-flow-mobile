@@ -39,6 +39,7 @@ import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.ScoringRule;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
@@ -377,6 +378,10 @@ public class SurveyDbAdapter {
                     + ResponseColumns.SURVEY_INSTANCE_ID + ", " + ResponseColumns.QUESTION_ID + ")");
             db.execSQL("CREATE INDEX record_name_idx ON " + Tables.RECORD
                     + "(" + RecordColumns.NAME +")");
+            db.execSQL("CREATE INDEX response_status_idx ON " + Tables.SURVEY_INSTANCE
+                    + "(" + SurveyInstanceColumns.STATUS +")");
+            db.execSQL("CREATE INDEX response_modified_idx ON " + Tables.SURVEY_INSTANCE
+                    + "(" + SurveyInstanceColumns.SUBMITTED_DATE +")");
         }
 
         /**
@@ -1523,8 +1528,10 @@ public class SurveyDbAdapter {
     */
     public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
                 Double nearbyRadius, int orderBy) {
-        String queryString = "SELECT sl.*, MAX(r." + SurveyInstanceColumns.SUBMITTED_DATE + ") as "
-                + SurveyInstanceColumns.SUBMITTED_DATE + " FROM "
+        String queryString = "SELECT sl.*,"
+                + " MAX(r." + SurveyInstanceColumns.SUBMITTED_DATE + ") as " + SurveyInstanceColumns.SUBMITTED_DATE + ","
+                + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
+                + " FROM "
                 + Tables.RECORD + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
                 + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;
         String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =?";

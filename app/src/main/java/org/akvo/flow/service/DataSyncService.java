@@ -17,9 +17,13 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -94,6 +98,9 @@ public class DataSyncService extends IntentService {
     private static final String SIGNING_KEY_PROP = "signingKey";
     private static final String SIGNING_ALGORITHM = "HmacSHA1";
 
+    // TODO: Merge all IDs in one file
+    private static final int NOTIFICATION_ID = 101;
+
     /**
      * Used to have an extra  slash. Semantically  harmless, but made  the DB lookup fail
      */
@@ -116,8 +123,6 @@ public class DataSyncService extends IntentService {
     private static final String VIDEO_CONTENT_TYPE = "video/mp4";
     private static final String S3_DATA_FILE_PATH = "devicezip";
     private static final String S3_IMAGE_FILE_PATH = "images";
-
-    private static final int COMPLETE_ID = 1;// TODO: One ID per file will give more feedback
 
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
@@ -178,8 +183,7 @@ public class DataSyncService extends IntentService {
         for (long id : surveyInstanceIds) {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
-                fireNotification(NotificationType.EXPORT, getDestName(zipFileData.filename));
-                // Be nice and give some feedback
+                displayExportNotification(getDestName(zipFileData.filename));
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.filename);
@@ -398,28 +402,39 @@ public class DataSyncService extends IntentService {
         // Sync missing files. This will update the status of the transmissions if necessary
         checkMissingFiles(serverBase);
 
-        Set<Long> syncedFiles = new HashSet<Long>();// Successful transmissions
-        Set<Long> unsyncedFiles = new HashSet<Long>();// Unsuccessful transmissions
         List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
+
+        if (transmissions.isEmpty()) {
+            return;
+        }
+
+        Set<Long> syncedSurveys = new HashSet<Long>();// Successful transmissions
+        Set<Long> unsyncedSurveys = new HashSet<Long>();// Unsuccessful transmissions
+
+        int synced = 0, failed = 0, total = transmissions.size();
+        displaySyncNotification(synced, failed, total);
 
         for (FileTransmission transmission : transmissions) {
             final long surveyInstanceId = transmission.getRespondentId();
             if (syncFile(transmission.getFileName(), transmission.getStatus(), serverBase)) {
-                syncedFiles.add(surveyInstanceId);
+                syncedSurveys.add(surveyInstanceId);
+                synced++;
             } else {
-                unsyncedFiles.add(surveyInstanceId);
+                unsyncedSurveys.add(surveyInstanceId);
+                failed++;
             }
+            displaySyncNotification(synced, failed, total);
         }
 
         // Retain successful survey instances, to mark them as SYNCED
-        syncedFiles.removeAll(unsyncedFiles);
+        syncedSurveys.removeAll(unsyncedSurveys);
 
-        for (long surveyInstanceId : syncedFiles) {
+        for (long surveyInstanceId : syncedSurveys) {
             updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
         }
 
         // Ensure the unsynced ones are just EXPORTED
-        for (long surveyInstanceId : unsyncedFiles) {
+        for (long surveyInstanceId : unsyncedSurveys) {
             updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
         }
     }
@@ -457,10 +472,8 @@ public class DataSyncService extends IntentService {
         if (ok) {
             // Mark everything completed
             mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
-            fireNotification(NotificationType.SYNC, destName);
         } else {
             mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
-            fireNotification(NotificationType.ERROR, destName);
         }
 
         return ok;
@@ -473,8 +486,6 @@ public class DataSyncService extends IntentService {
             if (fileName.contains(File.separator)) {
                 fileName = fileName.substring(fileName.lastIndexOf(File.separator)); // TODO: Why show separator?
             }
-            final String fileNameForNotification = fileName;
-            fireNotification(NotificationType.PROGRESS, fileName);
 
             // Generate checksum, to be compared against response's ETag
             final String checksum = FileUtil.getMD5Checksum(fileAbsolutePath);
@@ -501,8 +512,9 @@ public class DataSyncService extends IntentService {
                     if (percentComplete > 1.0d) {
                         percentComplete = 1.0d;
                     }
-                    fireNotification(NotificationType.PROGRESS, PCT_FORMAT.format(percentComplete)
-                            + " - " + fileNameForNotification);
+                    // TODO: Include this progress somehow in the notification. Maybe the percentage should be bytes transmision progress
+                    //fireNotification(NotificationType.PROGRESS, PCT_FORMAT.format(percentComplete)
+                            //+ " - " + fileNameForNotification);
                 }
             });
 
@@ -659,38 +671,6 @@ public class DataSyncService extends IntentService {
         return success;
     }
 
-    /**
-     * displays a notification in the system status bar indicating the
-     * completion of the export/save operation TODO: the notifications may not
-     * have room to display the entire error message. Clicking them should
-     * trigger display of the full error by the Survey app
-     *
-     * @param type
-     */
-    private void fireNotification(NotificationType type, String extraText) {
-        String text = "";
-        switch (type) {
-            case EXPORT:
-                text = getString(R.string.exportcomplete);
-                break;
-            case SYNC:
-                text = getString(R.string.uploadcomplete);
-                break;
-            case PROGRESS:
-                text = getString(R.string.uploadprogress);
-                break;
-            case ERROR:
-                text = getString(R.string.uploaderror);
-                break;
-        }
-
-        if (extraText == null) {
-            extraText = "";
-        }
-
-        ViewUtil.fireNotification(text, extraText, this, COMPLETE_ID, null);
-    }
-
     private String getServerBase() {
         final String serverBase = mDatabase.getPreference(ConstantUtil.SERVER_SETTING_KEY);
         if (!TextUtils.isEmpty(serverBase)) {
@@ -722,7 +702,42 @@ public class DataSyncService extends IntentService {
         sendBroadcast(intentBroadcast);
     }
 
+    private void displayExportNotification(String filename) {
+        String text = getString(R.string.exportcomplete);
+        ViewUtil.fireNotification(text, filename, this, NOTIFICATION_ID, null);
+    }
 
+    /**
+     * Display a notification showing the up-to-date status of the sync
+     * @param synced number of successful transmissions
+     * @param failed number of failed transmissions
+     * @param total number of transmissions in the batch
+     */
+    private void displaySyncNotification(int synced, int failed, int total) {
+        final boolean finished = synced + failed == total;
+        int icon = finished ? android.R.drawable.stat_sys_download_done
+                : android.R.drawable.stat_sys_download;
+        // TODO: Externalize strings
+        String text = "Synced files: " + synced + ". Failed: " + failed + ".";
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(icon)
+                .setContentTitle("Data Synchronization")
+                .setContentText(text)
+                .setTicker(text);
+
+        builder.setOngoing(!finished);// Ongoing if still syncing data
+
+        // Progress will only be displayed in Android versions > 4.0
+        builder.setProgress(total, synced + failed, false);
+
+        // Dummy intent. Do nothing when clicked
+        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        builder.setContentIntent(intent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
 
     /**
      * Helper class to wrap zip file's meta-data.<br>

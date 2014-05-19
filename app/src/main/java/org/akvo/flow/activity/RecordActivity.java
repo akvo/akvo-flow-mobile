@@ -143,8 +143,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     }
 
     private void displayRecord() {
-        // TODO: Externalize string
-        mRecordTextView.setText("Data Point: " + mRecord.getName() + ", " + mRecord.getId());
+        mRecordTextView.setText(mRecord.getName() + ", " + mRecord.getId());
     }
 
     @Override

@@ -15,7 +15,9 @@
             android:padding="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp" />
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/record_small_icn"
+            android:textSize="16sp" />
 
         <View
             android:layout_width="match_parent"

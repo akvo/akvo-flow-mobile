@@ -93,6 +93,7 @@ public class SurveyDbAdapter {
         String NAME               = "name";
         String LATITUDE           = "latitude";
         String LONGITUDE          = "longitude";
+        String LAST_MODIFIED      = "last_modified";
     }
     
     public interface SyncTimeColumns {
@@ -282,6 +283,7 @@ public class SurveyDbAdapter {
                     + RecordColumns.NAME + " TEXT,"// REFERENCES ...
                     + RecordColumns.LATITUDE + " REAL,"// REFERENCES ...
                     + RecordColumns.LONGITUDE + " REAL,"// REFERENCES ...
+                    + RecordColumns.LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0,"
                     + "UNIQUE (" + RecordColumns.RECORD_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.TRANSMISSION + " ("
@@ -1483,6 +1485,7 @@ public class SurveyDbAdapter {
         if (!TextUtils.isEmpty(response)) {
             String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
             ContentValues surveyedLocaleValues = new ContentValues();
+            surveyedLocaleValues.put(RecordColumns.LAST_MODIFIED, System.currentTimeMillis());
             
             QuestionResponse metaResponse = new QuestionResponse();
             metaResponse.setRespondentId(surveyInstanceId);
@@ -1529,14 +1532,13 @@ public class SurveyDbAdapter {
     public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
                 Double nearbyRadius, int orderBy) {
         String queryString = "SELECT sl.*,"
-                + " MAX(r." + SurveyInstanceColumns.SUBMITTED_DATE + ") as " + SurveyInstanceColumns.SUBMITTED_DATE + ","
                 + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
                 + " FROM "
                 + Tables.RECORD + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
                 + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;
         String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =?";
         String groupBy = " GROUP BY sl." + RecordColumns.RECORD_ID;
-        String orderByStr = " ORDER BY " + SurveyInstanceColumns.SUBMITTED_DATE + " DESC";// By date
+        String orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
         
         // location part
         if (orderBy == ConstantUtil.ORDER_BY_DISTANCE && latitude != null && longitude != null){

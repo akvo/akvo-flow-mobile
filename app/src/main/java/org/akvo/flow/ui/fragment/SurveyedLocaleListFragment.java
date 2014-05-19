@@ -265,12 +265,14 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             return builder.toString();
         }
         
-        private String getDateText(Long time) {
-            String text = getString(R.string.last_modified);
+        private void displayDateText(TextView tv, Long time) {
             if (time != null && time > 0) {
-                text += new PrettyTime().format(new Date(time));
+                tv.setVisibility(View.VISIBLE);
+                tv.setText(getString(R.string.last_modified) +
+                        new PrettyTime().format(new Date(time)));
+            } else {
+                tv.setVisibility(View.GONE);
             }
-            return text;
         }
 
         @Override
@@ -281,13 +283,13 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
             ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
             final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
-            Long time = c.getLong(c.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
+            Long lastModified = c.getLong(c.getColumnIndexOrThrow(RecordColumns.LAST_MODIFIED));
             int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
 
             nameView.setText(surveyedLocale.getName());
             idView.setText(surveyedLocale.getId());
-            dateView.setText(getDateText(time));
             distanceView.setText(getDistanceText(surveyedLocale));
+            displayDateText(dateView, lastModified);
 
             int statusRes = 0;
             switch (status) {

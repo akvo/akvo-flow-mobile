@@ -37,10 +37,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -156,13 +153,6 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 RecordColumns.RECORD_ID));
         
         mListener.onRecordSelected(localeId);// Notify the host activity
-    }
-    
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Add this fragment's options to the 'more' submenu
-        SubMenu submenu = menu.findItem(R.id.more_submenu).getSubMenu();
-        submenu.add(0, ORDER_BY, 0, R.string.order_by);
     }
     
     @Override

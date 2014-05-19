@@ -59,7 +59,8 @@ public class RecordListActivity extends ActionBarActivity implements
     
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
-    
+
+    private MenuItem mSortItem;
     private ViewPager mPager;
     private TabsAdapter mAdapter;
     private String[] mTabs;
@@ -84,13 +85,8 @@ public class RecordListActivity extends ActionBarActivity implements
         mAdapter = new TabsAdapter(getSupportFragmentManager());
         mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                getSupportActionBar().setSelectedNavigationItem(position);
-            }
-        });
-        
+        mPager.setOnPageChangeListener(mAdapter);
+
         mSurveyGroup = (SurveyGroup) getIntent().getExtras().getSerializable(EXTRA_SURVEY_GROUP);
         setTitle(mSurveyGroup.getName());
         
@@ -147,9 +143,9 @@ public class RecordListActivity extends ActionBarActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.records_activity, menu);
         if (!mSurveyGroup.isMonitored()) {
-            SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
-            subMenu.removeItem(R.id.sync_records);
+            menu.removeItem(R.id.sync_records);
         }
+        mSortItem = menu.findItem(R.id.order_by);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -186,7 +182,7 @@ public class RecordListActivity extends ActionBarActivity implements
         startActivity(intent);
     }
     
-    class TabsAdapter extends FragmentPagerAdapter {
+    class TabsAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
         
         public TabsAdapter(FragmentManager fm) {
             super(fm);
@@ -240,7 +236,23 @@ public class RecordListActivity extends ActionBarActivity implements
         public CharSequence getPageTitle(int position) {
             return mTabs[position];
         }
-        
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            if (mSortItem != null) {
+                mSortItem.setVisible(position == POSITION_LIST);
+            }
+            getSupportActionBar().setSelectedNavigationItem(position);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+        }
+
     }
 
     @Override

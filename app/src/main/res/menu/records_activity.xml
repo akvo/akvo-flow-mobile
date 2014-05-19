@@ -10,19 +10,16 @@
         flowapp:showAsAction="always"/>
 
     <item
-        android:id="@+id/more_submenu"
-        android:title="@string/more"
-        android:icon="@drawable/ic_action_overflow"
-        android:orderInCategory="102"
-        flowapp:showAsAction="always">
-        
-        <menu>
-        
-            <item
-                android:id="@+id/sync_records"
-                android:title="@string/sync_records"/>
-        </menu>
-        
-    </item>
+        android:id="@+id/sync_records"
+        android:icon="@drawable/ic_action_record_sync"
+        android:orderInCategory="101"
+        android:title="@string/sync_records"
+        flowapp:showAsAction="always"/>
 
+    <item
+        android:id="@+id/order_by"
+        android:icon="@drawable/ic_action_sort"
+        android:orderInCategory="102"
+        android:title="@string/order_by"
+        flowapp:showAsAction="always"/>
 </menu>

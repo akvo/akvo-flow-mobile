@@ -17,7 +17,6 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,8 @@ public class SubmitTab extends ListView implements OnClickListener {
         mHeaderView = new TextView(context);
         mHeaderView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
-        mHeaderView.setTextColor(Color.RED);
+        final int padding = (int)PlatformUtil.dp2Pixel(context, 8);
+        mHeaderView.setPadding(padding, padding, padding, padding);
         mHeaderView.setTextSize(18);
         mSubmitButton = new Button(context);
         mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,

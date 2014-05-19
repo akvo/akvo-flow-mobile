@@ -715,13 +715,12 @@ public class DataSyncService extends IntentService {
      */
     private void displaySyncNotification(int synced, int failed, int total) {
         final boolean finished = synced + failed == total;
-        int icon = finished ? android.R.drawable.stat_sys_download_done
-                : android.R.drawable.stat_sys_download;
-        // TODO: Externalize strings
-        String text = "Synced files: " + synced + ". Failed: " + failed + ".";
+        int icon = finished ? android.R.drawable.stat_sys_upload_done
+                : android.R.drawable.stat_sys_upload;
+        String text = String.format(getString(R.string.data_sync_text), synced, failed);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(icon)
-                .setContentTitle("Data Synchronization")
+                .setContentTitle(getString(R.string.data_sync_title))
                 .setContentText(text)
                 .setTicker(text);
 

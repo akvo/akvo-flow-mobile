@@ -172,6 +172,10 @@
     <string name="error_assignment_title">Survey could not be downloaded</string>
     <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
 
+    <!-- Data sync -->
+    <string name="data_sync_title">Data Synchronization</string>
+    <string name="data_sync_text">Synced: %1$d - Failed: %2$d</string>
+
     <!-- Survey Groups Activity -->
     <string name="monitored_group">Monitored Project</string>
     <string name="regular_group">Regular Project</string>

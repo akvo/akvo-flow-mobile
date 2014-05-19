@@ -57,8 +57,6 @@ import org.akvo.flow.util.ConstantUtil;
 public class SurveyedLocaleListFragment extends ListFragment implements LocationListener, 
             OnItemClickListener, LoaderCallbacks<Cursor>, OrderByDialogListener {
     private static final String TAG = SurveyedLocaleListFragment.class.getSimpleName();
-    
-    private static final int ORDER_BY = 0;
 
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
@@ -159,7 +157,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case ORDER_BY:
+            case R.id.order_by:
                 DialogFragment dialogFragment = new OrderByDialogFragment();
                 dialogFragment.setTargetFragment(this, 0);
                 dialogFragment.show(getFragmentManager(), "order_by");

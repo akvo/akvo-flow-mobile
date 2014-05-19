@@ -145,7 +145,11 @@ public class RecordListActivity extends ActionBarActivity implements
         if (!mSurveyGroup.isMonitored()) {
             menu.removeItem(R.id.sync_records);
         }
-        mSortItem = menu.findItem(R.id.order_by);
+
+        // "Order By" is only available for the ListFragment, not the MapFragment
+        if (mAdapter.mSelected == POSITION_MAP) {
+            menu.removeItem(R.id.order_by);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -183,6 +187,7 @@ public class RecordListActivity extends ActionBarActivity implements
     }
     
     class TabsAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
+        int mSelected;
         
         public TabsAdapter(FragmentManager fm) {
             super(fm);
@@ -243,9 +248,7 @@ public class RecordListActivity extends ActionBarActivity implements
 
         @Override
         public void onPageSelected(int position) {
-            if (mSortItem != null) {
-                mSortItem.setVisible(position == POSITION_LIST);
-            }
+            mSelected = position;
             getSupportActionBar().setSelectedNavigationItem(position);
         }
 

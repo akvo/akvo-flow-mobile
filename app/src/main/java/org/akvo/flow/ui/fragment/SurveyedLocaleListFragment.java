@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -50,6 +51,7 @@ import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
 import org.akvo.flow.util.ConstantUtil;
@@ -277,7 +279,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             TextView idView = (TextView) view.findViewById(R.id.locale_id);
             TextView dateView = (TextView) view.findViewById(R.id.last_modified);
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
-            TextView statusView = (TextView) view.findViewById(R.id.locale_status);
+            ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
             final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
             Long time = c.getLong(c.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
             int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
@@ -286,7 +288,23 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             idView.setText(surveyedLocale.getId());
             dateView.setText(getDateText(time));
             distanceView.setText(getDistanceText(surveyedLocale));
-            statusView.setText("Status: " + status);// TODO: Use icon
+
+            int statusRes = 0;
+            switch (status) {
+                case SurveyInstanceStatus.SAVED:
+                    statusRes = R.drawable.record_saved_icn;
+                    break;
+                case SurveyInstanceStatus.SUBMITTED:
+                case SurveyInstanceStatus.EXPORTED:
+                    statusRes = R.drawable.record_exported_icn;
+                    break;
+                case SurveyInstanceStatus.SYNCED:
+                case SurveyInstanceStatus.DOWNLOADED:
+                    statusRes = R.drawable.record_synced_icn;
+                    break;
+            }
+
+            statusImage.setImageResource(statusRes);
 
             // Alternate background
             int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;

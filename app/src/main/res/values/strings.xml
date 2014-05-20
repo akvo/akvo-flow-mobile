@@ -186,7 +186,7 @@
     
     <!-- Empty Views -->
     <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the FLOW dashboard</string>
-    <string name="no_records_text">You have no Records synced. To edit records, you need to sync them, or create new ones</string>
+    <string name="no_records_text">You have no Data Points yet. Click on \'CREATE NEW DATA POINT\' to get started</string>
     
     <!-- Activity Labels -->
     <string name="survey_groups_activity">Projects</string>

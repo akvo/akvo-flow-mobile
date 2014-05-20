@@ -268,7 +268,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         private void displayDateText(TextView tv, Long time) {
             if (time != null && time > 0) {
                 tv.setVisibility(View.VISIBLE);
-                tv.setText(getString(R.string.last_modified) +
+                tv.setText(getString(R.string.last_modified) + " " +
                         new PrettyTime().format(new Date(time)));
             } else {
                 tv.setVisibility(View.GONE);

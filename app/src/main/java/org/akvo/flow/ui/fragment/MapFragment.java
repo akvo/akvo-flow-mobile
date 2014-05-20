@@ -103,7 +103,26 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         if (mMap != null) {
             mMap.setMyLocationEnabled(true);
             mMap.setOnInfoWindowClickListener(this);
-            
+        }
+    }
+
+    /**
+     * Center the map in the given record's coordinates. If no record is provided,
+     * the user's location will be used.
+     * @param record
+     */
+    private void centerMap(SurveyedLocale record) {
+        if (mMap == null) {
+            return; // Not ready yet
+        }
+
+        LatLng position = null;
+
+        if (record != null) {
+            // Center the map in the data point
+            position = new LatLng(record.getLatitude(), record.getLongitude());
+        } else {
+            // When multiple points are shown, center the map in user's location
             LocationManager manager = (LocationManager)getActivity()
                     .getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
@@ -111,9 +130,12 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             String provider = manager.getBestProvider(criteria, true);
             Location location = manager.getLastKnownLocation(provider);
             if (location != null) {
-                LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 10));
+                position = new LatLng(location.getLatitude(), location.getLongitude());
             }
+        }
+
+        if (position != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
         }
     }
     
@@ -156,8 +178,10 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
                     mMap.clear();
                     displayRecord(record);
                 }
+                centerMap(record);
             } else {
                 getLoaderManager().restartLoader(0, null, this);
+                centerMap(null);
             }
         }
     }

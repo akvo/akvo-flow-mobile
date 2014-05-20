@@ -132,10 +132,8 @@ public class ViewUtil {
             final DialogInterface.OnClickListener positiveListener,
             final DialogInterface.OnClickListener negativeListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
-        TextView tipText = new TextView(parentContext);
         builder.setTitle(titleId);
-        tipText.setText(textId);
-        builder.setView(tipText);
+        builder.setMessage(textId);
         builder.setPositiveButton(R.string.okbutton, positiveListener);
         if (includeNegative) {
             builder.setNegativeButton(R.string.cancelbutton, negativeListener);

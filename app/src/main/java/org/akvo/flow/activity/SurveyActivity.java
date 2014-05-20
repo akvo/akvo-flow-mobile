@@ -149,14 +149,24 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
         final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId());
         if (lastSurveyInstance != null) {
-            ViewUtil.showConfirmDialog(R.string.prefill_title, R.string.prefill_text,
-                    SurveyActivity.this, true,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            prefillSurvey(lastSurveyInstance);
-                        }
-                    });
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.prefill_title);
+            builder.setMessage(R.string.prefill_text);
+            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    prefillSurvey(lastSurveyInstance);
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            builder.show();
         }
     }
 

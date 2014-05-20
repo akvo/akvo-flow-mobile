@@ -253,6 +253,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 }
             }
             mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
+            mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 
             // Record meta-data, if applies
             if (mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {

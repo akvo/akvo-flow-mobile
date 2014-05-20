@@ -1485,8 +1485,7 @@ public class SurveyDbAdapter {
         if (!TextUtils.isEmpty(response)) {
             String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
             ContentValues surveyedLocaleValues = new ContentValues();
-            surveyedLocaleValues.put(RecordColumns.LAST_MODIFIED, System.currentTimeMillis());
-            
+
             QuestionResponse metaResponse = new QuestionResponse();
             metaResponse.setRespondentId(surveyInstanceId);
             metaResponse.setValue(response);
@@ -1518,6 +1517,17 @@ public class SurveyDbAdapter {
             // Store the META_NAME/META_GEO as a response
             createOrUpdateSurveyResponse(metaResponse);
         }
+    }
+
+    /**
+     * Update the last modification date, if necessary
+     */
+    public void updateRecordModifiedDate(String recordId, long timestamp) {
+        ContentValues values = new ContentValues();
+        values.put(RecordColumns.LAST_MODIFIED, timestamp);
+        database.update(Tables.RECORD, values,
+                RecordColumns.RECORD_ID + " = ? AND " + RecordColumns.LAST_MODIFIED + " < ?",
+                new String[]{recordId, String.valueOf(timestamp)});
     }
     
     /**
@@ -1616,9 +1626,10 @@ public class SurveyDbAdapter {
                 values.put(SurveyInstanceColumns.UUID, surveyInstance.getUuid());
                 id = database.insert(Tables.SURVEY_INSTANCE, null, values);
             }
-            
-            //createTransmissionHistory(id, null, ConstantUtil.DOWNLOADED_STATUS);
-                
+
+            // Update the record last modification date, if necessary
+            updateRecordModifiedDate(surveyedLocaleId, surveyInstance.getDate());
+
             // Now the responses...
             syncResponses(surveyInstance.getResponses(), id);
         }

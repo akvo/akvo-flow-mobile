@@ -2,8 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@id/android:list"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="8dp" >
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -13,6 +12,8 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/listitem_row_1"
+            android:padding="8dp"
             android:gravity="center_vertical" >
 
             <CheckBox
@@ -34,6 +35,8 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/listitem_row_2"
             android:gravity="center_vertical" >
 
             <CheckBox
@@ -63,6 +66,8 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/listitem_row_1"
+            android:padding="8dp"
             android:gravity="center_vertical" >
 
             <CheckBox
@@ -83,24 +88,18 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/pref_locale"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/listitem_row_2"
+            android:padding="8dp"
             android:gravity="center_vertical" >
-
-
-            <ImageButton
-                android:id="@+id/pref_locale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float" />
 
             <TextView
                 android:id="@+id/locale_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/pref_locale"
+                android:layout_alignParentTop="true"
                 android:gravity="center_vertical"
                 android:textSize="20sp"
                 android:text="@string/app_language" />
@@ -115,23 +114,18 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/pref_surveylang"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/listitem_row_1"
             android:gravity="center_vertical" >
-
-            <ImageButton
-                android:id="@+id/surveylangbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float" />
 
             <TextView
                 android:id="@+id/surveylanglabel"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/surveylangbutton"
+                android:layout_alignParentTop="true"
                 android:text="@string/surveylanglabel"
                 android:textSize="20sp" />
 
@@ -146,6 +140,8 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/listitem_row_2"
             android:gravity="center_vertical" >
 
             <CheckBox
@@ -166,23 +162,18 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/pref_server"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/listitem_row_1"
             android:gravity="center_vertical" >
-
-            <ImageButton
-                android:id="@+id/serverbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float" />
 
             <TextView
                 android:id="@+id/serverlabel"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/serverbutton"
+                android:layout_alignParentTop="true"
                 android:text="@string/serverlabel"
                 android:textSize="20sp" />
 
@@ -195,23 +186,18 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/pref_deviceid"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/listitem_row_2"
             android:gravity="center_vertical" >
-
-            <ImageButton
-                android:id="@+id/identbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float" />
 
             <TextView
                 android:id="@+id/identlabel"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/identbutton"
+                android:layout_alignParentTop="true"
                 android:text="@string/identlabel"
                 android:textSize="20sp" />
 
@@ -224,23 +210,18 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/pref_resize"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/listitem_row_1"
             android:gravity="center_vertical" >
-
-            <ImageButton
-                android:id="@+id/max_img_size_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float" />
 
             <TextView
                 android:id="@+id/max_img_size_title"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/max_img_size_btn"
+                android:layout_alignParentTop="true"
                 android:text="@string/resize_large_images"
                 android:textSize="20sp" />
 

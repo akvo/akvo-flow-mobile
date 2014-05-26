@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -49,7 +49,7 @@ import org.akvo.flow.util.ViewUtil;
  * Displays user editable preferences and takes care of persisting them to the
  * database. Some options require the user to enter an administrator passcode
  * via a dialog box before the operation can be performed.
- * 
+ *
  * @author Christopher Fagiani
  */
 public class PreferencesActivity extends Activity implements OnClickListener,
@@ -170,11 +170,11 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         beaconCheckbox.setOnCheckedChangeListener(this);
         screenOnCheckbox.setOnCheckedChangeListener(this);
         mobileDataCheckbox.setOnCheckedChangeListener(this);
-        findViewById(R.id.surveylangbutton).setOnClickListener(this);
-        findViewById(R.id.serverbutton).setOnClickListener(this);
-        findViewById(R.id.identbutton).setOnClickListener(this);
-        findViewById(R.id.max_img_size_btn).setOnClickListener(this);
         findViewById(R.id.pref_locale).setOnClickListener(this);
+        findViewById(R.id.pref_surveylang).setOnClickListener(this);
+        findViewById(R.id.pref_server).setOnClickListener(this);
+        findViewById(R.id.pref_deviceid).setOnClickListener(this);
+        findViewById(R.id.pref_resize).setOnClickListener(this);
     }
 
     public void onPause() {
@@ -188,102 +188,111 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     @Override
     public void onClick(View v) {
-        if (R.id.surveylangbutton == v.getId()) {
-            langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
-            langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
-            langsSelectedMasterIndexArray = langsPrefData.getLangsSelectedMasterIndexArray();
+        switch (v.getId()) {
+            case R.id.pref_surveylang:
+                langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
+                langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
+                langsSelectedMasterIndexArray = langsPrefData.getLangsSelectedMasterIndexArray();
 
-            ViewUtil.displayLanguageSelector(this, langsSelectedNameArray,
-                    langsSelectedBooleanArray,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int clicked) {
-                            database.savePreference(
-                                    ConstantUtil.SURVEY_LANG_SETTING_KEY,
-                                    LangsPreferenceUtil
-                                            .formLangPreferenceString(langsSelectedBooleanArray,
-                                                    langsSelectedMasterIndexArray));
+                ViewUtil.displayLanguageSelector(this, langsSelectedNameArray,
+                        langsSelectedBooleanArray,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int clicked) {
+                                database.savePreference(
+                                        ConstantUtil.SURVEY_LANG_SETTING_KEY,
+                                        LangsPreferenceUtil
+                                                .formLangPreferenceString(langsSelectedBooleanArray,
+                                                        langsSelectedMasterIndexArray)
+                                );
 
-                            languageTextView.setText(ArrayPreferenceUtil
-                                    .formSelectedItemString(langsSelectedNameArray,
-                                            langsSelectedBooleanArray));
-                            if (dialog != null) {
-                                dialog.dismiss();
+                                languageTextView.setText(ArrayPreferenceUtil
+                                        .formSelectedItemString(langsSelectedNameArray,
+                                                langsSelectedBooleanArray));
+                                if (dialog != null) {
+                                    dialog.dismiss();
+                                }
                             }
                         }
-                    });
-        } else if (R.id.pref_locale == v.getId()) {
-            showLanguageDialog();
-        } else if (R.id.serverbutton == v.getId()) {
-            ViewUtil.showAdminAuthDialog(this,
-                    new ViewUtil.AdminAuthDialogListener() {
-                        @Override
-                        public void onAuthenticated() {
-                            // We'll show a first options containing the default server,
-                            // but it's value will be an empty string "".
-                            String[] keys = new String[serverArray.length + 1];
-                            String[] values = new String[serverArray.length + 1];
-                            keys[0] = "";
-                            values[0] = props.getProperty(ConstantUtil.SERVER_BASE);
-                            for (int i=0; i<serverArray.length; i++) {
-                                keys[i+1] = String.valueOf(i);// DB value
-                                values[i+1] = serverArray[i];// Text to show
-                            }
-                            showPreferenceDialogBase(R.string.serverlabel,
-                                    ConstantUtil.SERVER_SETTING_KEY,
-                                    keys, values, serverTextView);
+                );
+                break;
+            case R.id.pref_locale:
+                showLanguageDialog();
+                break;
+            case R.id.pref_server:
+                ViewUtil.showAdminAuthDialog(this,
+                        new ViewUtil.AdminAuthDialogListener() {
+                            @Override
+                            public void onAuthenticated() {
+                                // We'll show a first options containing the default server,
+                                // but it's value will be an empty string "".
+                                String[] keys = new String[serverArray.length + 1];
+                                String[] values = new String[serverArray.length + 1];
+                                keys[0] = "";
+                                values[0] = props.getProperty(ConstantUtil.SERVER_BASE);
+                                for (int i = 0; i < serverArray.length; i++) {
+                                    keys[i + 1] = String.valueOf(i);// DB value
+                                    values[i + 1] = serverArray[i];// Text to show
+                                }
+                                showPreferenceDialogBase(R.string.serverlabel,
+                                        ConstantUtil.SERVER_SETTING_KEY,
+                                        keys, values, serverTextView);
 
+                            }
                         }
-                    });
-        } else if (R.id.identbutton == v.getId()) {
-            ViewUtil.showAdminAuthDialog(this,
-                    new ViewUtil.AdminAuthDialogListener() {
-                        @Override
-                        public void onAuthenticated() {
-                            final EditText inputView = new EditText(PreferencesActivity.this);
-                            // one line only
-                            inputView.setSingleLine();
-                            ViewUtil.ShowTextInputDialog(
-                                    PreferencesActivity.this,
-                                    R.string.identlabel,
-                                    R.string.setidentlabel, inputView,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            String s = StringUtil.ControlToSPace(inputView
-                                                    .getText().toString());
-                                            // drop any control chars,
-                                            // especially tabs
-                                            identTextView.setText(s);
-                                            database.savePreference(
-                                                    ConstantUtil.DEVICE_IDENT_KEY, s);
+                );
+                break;
+            case R.id.pref_deviceid:
+                ViewUtil.showAdminAuthDialog(this,
+                        new ViewUtil.AdminAuthDialogListener() {
+                            @Override
+                            public void onAuthenticated() {
+                                final EditText inputView = new EditText(PreferencesActivity.this);
+                                // one line only
+                                inputView.setSingleLine();
+                                ViewUtil.ShowTextInputDialog(
+                                        PreferencesActivity.this,
+                                        R.string.identlabel,
+                                        R.string.setidentlabel, inputView,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String s = StringUtil.ControlToSPace(inputView
+                                                        .getText().toString());
+                                                // drop any control chars,
+                                                // especially tabs
+                                                identTextView.setText(s);
+                                                database.savePreference(
+                                                        ConstantUtil.DEVICE_IDENT_KEY, s);
+                                            }
                                         }
-                                    }
-                            );
+                                );
+                            }
                         }
-                    }
-            );
-        } else if (R.id.max_img_size_btn == v.getId()) {
-            String[] keys = new String[maxImgSizes.length];
-            for (int i = 0; i < maxImgSizes.length; i++) {
-                keys[i] = String.valueOf(i);
-            }
-            showPreferenceDialogBase(R.string.resize_large_images,// TODO: change string
-                    ConstantUtil.MAX_IMG_SIZE,
-                    keys, maxImgSizes, maxImgSizeTextView);
+                );
+                break;
+            case R.id.pref_resize:
+                String[] keys = new String[maxImgSizes.length];
+                for (int i = 0; i < maxImgSizes.length; i++) {
+                    keys[i] = String.valueOf(i);
+                }
+                showPreferenceDialogBase(R.string.resize_large_images,// TODO: change string
+                        ConstantUtil.MAX_IMG_SIZE,
+                        keys, maxImgSizes, maxImgSizeTextView);
+                break;
         }
     }
 
     /**
      * displays a dialog that allows the user to choose a setting from a string
      * array
-     * 
-     * @param titleId - resource id of dialog title
-     * @param settingKey - key of setting to edit
-     * @param keys - string array containing keys (to be stored in the DB)
-     * @param values - string array containing values (text mapping of the key)
+     *
+     * @param titleId        - resource id of dialog title
+     * @param settingKey     - key of setting to edit
+     * @param keys           - string array containing keys (to be stored in the DB)
+     * @param values         - string array containing values (text mapping of the key)
      * @param currentValView - view to update with value selected
      */
-    private void showPreferenceDialogBase(int titleId,  final String settingKey,
+    private void showPreferenceDialogBase(int titleId, final String settingKey,
             final String[] keys, final String[] values, final TextView currentValView) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(titleId).setItems(values,
@@ -296,7 +305,8 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                             dialog.dismiss();
                         }
                     }
-                });
+                }
+        );
         builder.show();
     }
 
@@ -306,8 +316,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView == saveUserCheckbox) {
-            database.savePreference(ConstantUtil.USER_SAVE_SETTING_KEY, ""
-                    + isChecked);
+            database.savePreference(ConstantUtil.USER_SAVE_SETTING_KEY, "" + isChecked);
         } else if (buttonView == beaconCheckbox) {
             database.savePreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY, "" + isChecked);
             if (isChecked) {
@@ -332,7 +341,8 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                     public void onClick(DialogInterface dialog, int which) {
                         FlowApp.getApp().setAppLanguage(languageCodes[which], true);
                     }
-                });
+                }
+        );
         builder.show();
     }
 

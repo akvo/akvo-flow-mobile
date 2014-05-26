@@ -54,7 +54,8 @@
         <activity android:name="org.akvo.flow.activity.ListUserActivity"
             android:label="@string/userlabel"/>
         <activity android:name="org.akvo.flow.activity.UserEditActivity" />
-        <activity android:name="org.akvo.flow.activity.SettingsActivity" />
+        <activity android:name="org.akvo.flow.activity.SettingsActivity"
+            android:label="@string/settingslabel"/>
         <activity android:name="org.akvo.flow.activity.PreferencesActivity" />
         <activity android:name="org.akvo.flow.activity.ImageBrowserActivity" />
         <activity android:name="org.akvo.flow.activity.TransmissionHistoryActivity" />

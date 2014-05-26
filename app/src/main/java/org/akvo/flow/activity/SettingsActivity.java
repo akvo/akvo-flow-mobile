@@ -19,9 +19,11 @@ package org.akvo.flow.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.app.AlertDialog;
-import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -30,11 +32,14 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -56,15 +61,16 @@ import org.akvo.flow.util.ViewUtil;
  * 
  * @author Christopher Fagiani
  */
-public class SettingsActivity extends ListActivity {
+public class SettingsActivity extends ActionBarActivity implements AdapterView.OnItemClickListener {
     private static final String TAG = "SettingsActivity";
     private static final String LABEL = "label";
     private static final String DESC = "desc";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.settingsmenu);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
         Resources resources = getResources();
@@ -96,7 +102,9 @@ public class SettingsActivity extends ListActivity {
                 R.id.optionLabel, R.id.optionDesc
         };
 
-        setListAdapter(new SimpleAdapter(this, list, R.layout.settingsdetail, fromKeys, toIds));
+        ListView lv = (ListView)findViewById(android.R.id.list);
+        lv.setAdapter(new SettingsAdapter(this, list, R.layout.settingsdetail, fromKeys, toIds));
+        lv.setOnItemClickListener(this);
     }
 
     /**
@@ -118,8 +126,7 @@ public class SettingsActivity extends ListActivity {
      * was and then handle that type of action
      */
     @Override
-    protected void onListItemClick(ListView list, View view, int position,
-            long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         TextView label = (TextView) view.findViewById(R.id.optionLabel);
         if (label != null) {
             String val = label.getText().toString();
@@ -402,4 +409,34 @@ public class SettingsActivity extends ListActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+
+        return onOptionsItemSelected(item);
+    }
+
+    class SettingsAdapter extends SimpleAdapter {
+
+        public SettingsAdapter(Context context, List<? extends Map<String, ?>> data, int resource,
+                String[] from, int[] to) {
+            super(context, data, resource, from, to);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+
+            // Alternate background
+            int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+            final int res= PlatformUtil.getResource(SettingsActivity.this, attr);
+            view.setBackgroundResource(res);
+
+            return view;
+        }
+    }
 }

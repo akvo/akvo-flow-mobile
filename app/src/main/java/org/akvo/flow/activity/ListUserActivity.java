@@ -34,7 +34,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -206,9 +205,9 @@ public class ListUserActivity extends ActionBarActivity {
             // Set the user in the App, and finish the Activity
             User user = (User) view.getTag();
             FlowApp.getApp().setUser(user);
+            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
+                    String.valueOf(user.getId()));// Save the last id for future sessions
             display();
-            Toast.makeText(ListUserActivity.this, "Logged in as " + user.getName(), 
-                    Toast.LENGTH_LONG).show();
             finish();
         }
         

@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -245,6 +246,12 @@ public class FreetextQuestionView extends QuestionView {
         public void onFocusChange(View view, boolean hasFocus) {
             if (!hasFocus && capture()) {
                 captureResponse();
+            }
+
+            if (!hasFocus) {
+                InputMethodManager imm = (InputMethodManager)getContext().getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
     }

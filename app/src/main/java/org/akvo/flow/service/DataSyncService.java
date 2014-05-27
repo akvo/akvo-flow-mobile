@@ -717,7 +717,11 @@ public class DataSyncService extends IntentService {
         final boolean finished = synced + failed == total;
         int icon = finished ? android.R.drawable.stat_sys_upload_done
                 : android.R.drawable.stat_sys_upload;
-        String text = String.format(getString(R.string.data_sync_text), synced, failed);
+
+        // Do not show failed if there is none
+        String text = failed > 0 ? String.format(getString(R.string.data_sync_all), synced, failed)
+            : String.format(getString(R.string.data_sync_synced), synced);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(icon)
                 .setContentTitle(getString(R.string.data_sync_title))

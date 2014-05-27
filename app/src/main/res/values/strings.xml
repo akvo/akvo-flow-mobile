@@ -172,7 +172,8 @@
 
     <!-- Data sync -->
     <string name="data_sync_title">Data Synchronization</string>
-    <string name="data_sync_text">Synced: %1$d - Failed: %2$d</string>
+    <string name="data_sync_all">Synced Files: %1$d - Failed: %2$d</string>
+    <string name="data_sync_synced">Synced Files: %1$d</string>
 
     <!-- Survey Groups Activity -->
     <string name="monitored_group">Monitored Project</string>

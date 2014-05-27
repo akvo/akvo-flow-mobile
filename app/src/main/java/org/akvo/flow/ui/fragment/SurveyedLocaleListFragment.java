@@ -44,6 +44,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.RecordListActivity;
@@ -76,7 +77,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroupId = getArguments().getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
-        mOrderBy = ConstantUtil.ORDER_BY_DISTANCE;// Default case
+        mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }
     
@@ -122,11 +123,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 mLongitude = loc.getLongitude();
             }
         }
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
         refresh();
-        
-        if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE) {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-        }
     }
     
     @Override
@@ -142,6 +140,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
      */
     public void refresh() {
         if (isResumed()) {
+            if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
+                // Warn user that the location is unknown
+                Toast.makeText(getActivity(), "Unknown Location", Toast.LENGTH_SHORT).show();
+                return;
+            }
             getLoaderManager().restartLoader(0, null, this);
         }
     }
@@ -211,9 +214,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mLocationManager.removeUpdates(this);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
-        if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE) {
-            refresh();
-        }
+        refresh();
     }
 
     @Override
@@ -240,7 +241,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         private String getDistanceText(SurveyedLocale surveyedLocale) {
             StringBuilder builder = new StringBuilder("Distance: ");
             
-            if (mLatitude != 0.0d || mLongitude != 0.0d) {
+            if (surveyedLocale.getLatitude() != null && surveyedLocale.getLongitude() != null
+                    && (mLatitude != 0.0d || mLongitude != 0.0d)) {
                 float[] results = new float[1];
                 Location.distanceBetween(mLatitude, mLongitude, surveyedLocale.getLatitude(), surveyedLocale.getLongitude(), results);
                 final double distance = results[0];

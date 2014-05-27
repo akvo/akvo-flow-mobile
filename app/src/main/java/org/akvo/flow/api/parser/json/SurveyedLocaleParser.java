@@ -59,8 +59,11 @@ public class SurveyedLocaleParser {
         try {
             String id = jSurveyedLocale.getString(Attrs.ID);
             long surveyGroupId = jSurveyedLocale.getLong(Attrs.SURVEY_GROUP_ID);
-            double latitude = jSurveyedLocale.optDouble(Attrs.LATITUDE, 0.0d);
-            double longitude = jSurveyedLocale.optDouble(Attrs.LONGITUDE, 0.0d);
+            Double latitude = jSurveyedLocale.has(Attrs.LATITUDE) ?
+                    jSurveyedLocale.getDouble(Attrs.LATITUDE) : null;
+            Double longitude = jSurveyedLocale.has(Attrs.LONGITUDE) ?
+                jSurveyedLocale.getDouble(Attrs.LONGITUDE) : null;
+
             String name = jSurveyedLocale.optString(Attrs.NAME, "Unknown");
             
             JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
@@ -78,7 +81,6 @@ public class SurveyedLocaleParser {
     
     interface Attrs {
         // Main response
-        String SURVEYED_LOCALE_COUNT = "surveyedLocaleCount";
         String SYNC_TIME             = "lastUpdateTime";
         String SURVEYED_LOCALE_DATA  = "surveyedLocaleData";
         

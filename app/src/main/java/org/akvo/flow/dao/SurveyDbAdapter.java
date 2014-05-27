@@ -1261,14 +1261,10 @@ public class SurveyDbAdapter {
         String id = base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
         // TODO: Don not initialize the values here
         String name = context.getString(R.string.unknown);
-        double lat = 0.0d;
-        double lon = 0.0d;
         ContentValues values = new ContentValues();
         values.put(RecordColumns.RECORD_ID, id);
         values.put(RecordColumns.SURVEY_GROUP_ID, surveyGroupId);
         values.put(RecordColumns.NAME, name);
-        values.put(RecordColumns.LATITUDE, lat);
-        values.put(RecordColumns.LONGITUDE, lon);
         database.insert(Tables.RECORD, null, values);
         
         return id;
@@ -1278,8 +1274,16 @@ public class SurveyDbAdapter {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(RecordColumns.RECORD_ID));
         long surveyGroupId = cursor.getLong(cursor.getColumnIndexOrThrow(RecordColumns.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(RecordColumns.NAME));
-        double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(RecordColumns.LATITUDE));
-        double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(RecordColumns.LONGITUDE));
+
+        // Location. Check for null values first
+        final int latCol = cursor.getColumnIndexOrThrow(RecordColumns.LATITUDE);
+        final int lonCol = cursor.getColumnIndexOrThrow(RecordColumns.LONGITUDE);
+        Double latitude = null;
+        Double longitude = null;
+        if (!cursor.isNull(latCol) && !cursor.isNull(lonCol)) {
+            latitude = cursor.getDouble(latCol);
+            longitude = cursor.getDouble(lonCol);
+        }
         return new SurveyedLocale(id, name, surveyGroupId, latitude, longitude);
     }
     
@@ -1560,25 +1564,15 @@ public class SurveyDbAdapter {
                     Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)),2);
 
                     // this uses a simple planar approximation of distance. this should be good enough for our purpose.
-                    String orderByTempl = " ORDER BY ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
-                            + RecordColumns.LATITUDE + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
-                            + RecordColumns.LONGITUDE + ") * %s)";
+                    String orderByTempl = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE + " IS NULL THEN 1 ELSE 0 END,"
+                            + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - " + RecordColumns.LATITUDE
+                            + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - " + RecordColumns.LONGITUDE + ") * %s)";
                     orderByStr = String.format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
                 }
                 break;
             case ConstantUtil.ORDER_BY_STATUS:
                 orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
                 break;
-        }
-
-        // location part
-        if (orderBy == ConstantUtil.ORDER_BY_DISTANCE && latitude != null && longitude != null){
-            // this is to correct the distance for the shortening at higher latitudes
-            Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)),2);
-
-            // this uses a simple planar approximation of distance. this should be good enough for our purpose.
-            String orderByTempl = " ORDER BY ((%s - " + RecordColumns.LATITUDE + ") * (%s - " + RecordColumns.LATITUDE + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - " + RecordColumns.LONGITUDE + ") * %s)";
-            orderByStr = String.format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
         }
 
         String[] whereValues = new String[] {String.valueOf(surveyGroupId)};

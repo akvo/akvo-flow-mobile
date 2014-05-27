@@ -190,7 +190,9 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         if (mMap != null) {
             mMap.clear();
             for (SurveyedLocale surveyedLocale : surveyedLocales) {
-                displayRecord(surveyedLocale);
+                if (surveyedLocale.getLatitude() != null && surveyedLocale.getLongitude() != null) {
+                    displayRecord(surveyedLocale);
+                }
             }
         }
     }

@@ -118,7 +118,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
 
         LatLng position = null;
 
-        if (record != null) {
+        if (record != null && record.getLatitude() != null && record.getLongitude() != null) {
             // Center the map in the data point
             position = new LatLng(record.getLatitude(), record.getLongitude());
         } else {
@@ -174,7 +174,8 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             if (mSingleRecord) {
                 // Just get it from the DB
                 SurveyedLocale record = mDatabase.getSurveyedLocale(mRecordId);
-                if (mMap != null && record != null) {
+                if (mMap != null && record != null && record.getLatitude() != null
+                        && record.getLongitude() != null) {
                     mMap.clear();
                     displayRecord(record);
                 }

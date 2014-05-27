@@ -203,7 +203,7 @@
     <string name="repeat_answer">Please, repeat answer</string>
     <string name="error_answer_match">Answers do not match</string>
     <string name="reg_form_warning_title">Registration Survey</string>
-    <string name="reg_form_warning_text">This Data Point already contains a response for this survey. Any new response will override previous values. Do you want to continue?</string>
+    <string name="reg_form_warning_text">This Data Point already contains a response for this form. Any new responses will be used as the most recent values. Do you want to continue?</string>
 
     <!-- Record Activity -->
     <string name="unknown">Unknown</string>

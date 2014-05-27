@@ -225,6 +225,7 @@ public class ConstantUtil {
     public static final int ORDER_BY_NONE     = -1;
     public static final int ORDER_BY_DATE     = 0;
     public static final int ORDER_BY_DISTANCE = 1;
+    public static final int ORDER_BY_STATUS   = 2;
 
     /**
      * Max picture size

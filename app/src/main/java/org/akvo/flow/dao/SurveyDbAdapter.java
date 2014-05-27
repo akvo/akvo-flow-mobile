@@ -1540,7 +1540,7 @@ public class SurveyDbAdapter {
     * @return
     */
     public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
-                Double nearbyRadius, int orderBy) {
+            Double nearbyRadius, int orderBy) {
         String queryString = "SELECT sl.*,"
                 + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
                 + " FROM "
@@ -1548,18 +1548,39 @@ public class SurveyDbAdapter {
                 + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;
         String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =?";
         String groupBy = " GROUP BY sl." + RecordColumns.RECORD_ID;
-        String orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
-        
+
+        String orderByStr = "";
+        switch (orderBy) {
+            case ConstantUtil.ORDER_BY_DATE:
+                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
+                break;
+            case ConstantUtil.ORDER_BY_DISTANCE:
+                if (latitude != null && longitude != null){
+                    // this is to correct the distance for the shortening at higher latitudes
+                    Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)),2);
+
+                    // this uses a simple planar approximation of distance. this should be good enough for our purpose.
+                    String orderByTempl = " ORDER BY ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
+                            + RecordColumns.LATITUDE + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
+                            + RecordColumns.LONGITUDE + ") * %s)";
+                    orderByStr = String.format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
+                }
+                break;
+            case ConstantUtil.ORDER_BY_STATUS:
+                orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
+                break;
+        }
+
         // location part
         if (orderBy == ConstantUtil.ORDER_BY_DISTANCE && latitude != null && longitude != null){
             // this is to correct the distance for the shortening at higher latitudes
             Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)),2);
-            
+
             // this uses a simple planar approximation of distance. this should be good enough for our purpose.
             String orderByTempl = " ORDER BY ((%s - " + RecordColumns.LATITUDE + ") * (%s - " + RecordColumns.LATITUDE + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - " + RecordColumns.LONGITUDE + ") * %s)";
             orderByStr = String.format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
-        } 
-        
+        }
+
         String[] whereValues = new String[] {String.valueOf(surveyGroupId)};
         return database.rawQuery(queryString + whereClause + groupBy + orderByStr, whereValues);
     }

@@ -52,6 +52,8 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
         switch (mOrderBy) {
             case ConstantUtil.ORDER_BY_DISTANCE:
             case ConstantUtil.ORDER_BY_DATE:
+            case ConstantUtil.ORDER_BY_STATUS:
+                // TODO: Compute filter here in the Loader, instead of the DB
                 return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mRadius, mOrderBy);
             case ConstantUtil.ORDER_BY_NONE:
                 return database.getSurveyedLocales(mSurveyGroupId);

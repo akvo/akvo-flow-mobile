@@ -33,11 +33,11 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleSyncService extends IntentService {
     private static final String TAG = SurveyedLocaleSyncService.class.getSimpleName();
-    private static final int NOTIFICATION_ID = 100;
-    
+
     public static final String SURVEY_GROUP = "survey_group";
     
     private Handler mHandler = new Handler();
@@ -118,7 +118,7 @@ public class SurveyedLocaleSyncService extends IntentService {
         
         NotificationManager notificationManager = 
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+        notificationManager.notify(ConstantUtil.NOTIFICATION_RECORD_SYNC, builder.build());
     }
     
     /**

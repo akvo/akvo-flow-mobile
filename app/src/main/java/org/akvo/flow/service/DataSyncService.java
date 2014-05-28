@@ -98,9 +98,6 @@ public class DataSyncService extends IntentService {
     private static final String SIGNING_KEY_PROP = "signingKey";
     private static final String SIGNING_ALGORITHM = "HmacSHA1";
 
-    // TODO: Merge all IDs in one file
-    private static final int NOTIFICATION_ID = 101;
-
     /**
      * Used to have an extra  slash. Semantically  harmless, but made  the DB lookup fail
      */
@@ -704,7 +701,7 @@ public class DataSyncService extends IntentService {
 
     private void displayExportNotification(String filename) {
         String text = getString(R.string.exportcomplete);
-        ViewUtil.fireNotification(text, filename, this, NOTIFICATION_ID, null);
+        ViewUtil.fireNotification(text, filename, this, ConstantUtil.NOTIFICATION_DATA_SYNC, null);
     }
 
     /**
@@ -739,7 +736,7 @@ public class DataSyncService extends IntentService {
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+        notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
     }
 
     /**

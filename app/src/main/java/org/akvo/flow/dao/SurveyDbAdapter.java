@@ -1221,7 +1221,7 @@ public class SurveyDbAdapter {
     }
     
     public static SurveyGroup getSurveyGroup(Cursor cursor) {
-        int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID));
+        long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.NAME));
         String registerSurveyId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.REGISTER_SURVEY_ID));
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.MONITORED)) > 0;
@@ -1623,7 +1623,7 @@ public class SurveyDbAdapter {
                 
             long id = -1;
             if (cursor.moveToFirst()) {
-                id = cursor.getInt(0);
+                id = cursor.getLong(0);
             }
             cursor.close();
                 

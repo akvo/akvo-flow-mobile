@@ -40,6 +40,7 @@ import org.akvo.flow.service.LocationService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
+import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
@@ -223,6 +224,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                             final EditText inputView = new EditText(PreferencesActivity.this);
                             // one line only
                             inputView.setSingleLine();
+                            inputView.setText(StatusUtil.getServerBase(PreferencesActivity.this));
                             ViewUtil.ShowTextInputDialog(
                                     PreferencesActivity.this, R.string.serverlabel,
                                     R.string.serverlabel, inputView,
@@ -232,9 +234,9 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                                             String s = StringUtil.ControlToSPace(inputView
                                                     .getText().toString());
                                             // drop any control chars, especially tabs
-                                            serverTextView.setText(s);
                                             database.savePreference(
                                                     ConstantUtil.SERVER_SETTING_KEY, s);
+                                            serverTextView.setText(StatusUtil.getServerBase(PreferencesActivity.this));
                                         }
                                     }
                             );

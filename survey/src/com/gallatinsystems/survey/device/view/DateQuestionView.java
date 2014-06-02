@@ -27,6 +27,7 @@ import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
 import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -73,6 +74,7 @@ public class DateQuestionView extends QuestionView {
         dateTextEdit = new EditText(context);
         dateTextEdit.setWidth(DEFAULT_WIDTH);
         dateTextEdit.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        dateTextEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         dateTextEdit.setFocusable(false);
 

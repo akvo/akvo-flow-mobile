@@ -23,6 +23,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -58,6 +59,7 @@ public class CompassQuestionView extends QuestionView implements
     protected void init() {
         Context context = getContext();
         headingEdit = new EditText(context);
+        headingEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
         headingEdit.setWidth(screenWidth / 2);
         addView(headingEdit);
         if (sensorMgr != null) {

@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -78,8 +79,11 @@ public class FreetextQuestionView extends QuestionView implements
             TableRow tr2 = new TableRow(context);
             doubleEntryEdit = createQuestionView();
             doubleEntryEdit.setTag(doubleEntryTag);
+            doubleEntryEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
             tr2.addView(doubleEntryEdit);
             addView(tr2);
+        } else {
+            freetextEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
         }
     }
     

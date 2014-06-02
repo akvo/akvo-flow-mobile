@@ -23,6 +23,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
 import org.akvo.flow.dao.SurveyDbAdapter;
 
@@ -145,6 +146,23 @@ public class StatusUtil {
         db.close();
 
         return use3G;
+    }
+
+    /**
+     * Get the specified server URL. If no custom server has been set (debug),
+     * the default one will be returned.
+     * @param context
+     * @return server URL string
+     */
+    public static String getServerBase(Context context) {
+        SurveyDbAdapter db = new SurveyDbAdapter(context).open();
+        String serverBase = db.getPreference(ConstantUtil.SERVER_SETTING_KEY);
+        if (TextUtils.isEmpty(serverBase)) {
+            serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
+        }
+        db.close();
+
+        return serverBase;
     }
     
 }

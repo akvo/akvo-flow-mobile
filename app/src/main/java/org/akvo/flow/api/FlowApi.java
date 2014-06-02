@@ -40,11 +40,9 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
-import org.akvo.flow.R;
 import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -59,7 +57,7 @@ public class FlowApi {
 
     static {
         Context context = FlowApp.getApp();
-        BASE_URL = getBaseUrl(context);
+        BASE_URL = StatusUtil.getServerBase(context);
         PHONE_NUMBER = getPhoneNumber(context);
         IMEI = getImei(context);
         API_KEY = getApiKey(context);
@@ -123,23 +121,7 @@ public class FlowApi {
         
         return status;
     }
-    
-    private static String getBaseUrl(Context context) {
-        SurveyDbAdapter db = new SurveyDbAdapter(context);
-        db.open();
-        String serverBase = db.getPreference(ConstantUtil.SERVER_SETTING_KEY);
-        db.close();
-        if (serverBase != null && serverBase.trim().length() > 0) {
-            serverBase = context.getResources().getStringArray(R.array.servers)[Integer
-                    .parseInt(serverBase)];
-        } else {
-            serverBase = new PropertyUtil(context.getResources()).
-                    getProperty(ConstantUtil.SERVER_BASE);
-        }
-            
-        return serverBase;
-    }
-    
+
     private static String getPhoneNumber(Context context) {
         try {
             String phoneNumber = StatusUtil.getPhoneNumber(context);

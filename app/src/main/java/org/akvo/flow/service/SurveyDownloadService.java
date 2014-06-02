@@ -136,7 +136,7 @@ public class SurveyDownloadService extends Service {
                 databaseAdaptor.open();
                 
                 // Load preferences
-                final String serverBase = getServerBase();
+                final String serverBase = StatusUtil.getServerBase(this);
                 final String deviceId = getDeviceId();
                 
                 List<Survey> surveys = null;
@@ -218,19 +218,6 @@ public class SurveyDownloadService extends Service {
                     "Error while waiting for download executor to terminate", e);
         }
         stopSelf();
-    }
-
-    private String getServerBase() {
-        String serverBase = databaseAdaptor
-                .getPreference(ConstantUtil.SERVER_SETTING_KEY);
-        if (serverBase != null && serverBase.trim().length() > 0) {
-            serverBase = getResources().getStringArray(R.array.servers)[Integer
-                    .parseInt(serverBase)];
-        } else {
-            serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
-        }
-        
-        return serverBase;
     }
 
     private String getDeviceId() {

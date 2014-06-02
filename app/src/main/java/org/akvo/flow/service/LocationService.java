@@ -22,20 +22,17 @@ import java.util.TimerTask;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 
 /**
@@ -62,7 +59,6 @@ public class LocationService extends Service {
     private static final String TAG = "LocationService";
     private String version;
     private String deviceId;
-    private PropertyUtil props;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -79,7 +75,7 @@ public class LocationService extends Service {
         // already
         // started
         SurveyDbAdapter database = null;
-        final String server;
+        final String server = StatusUtil.getServerBase(this);
         try {
             database = new SurveyDbAdapter(this);
 
@@ -90,17 +86,7 @@ public class LocationService extends Service {
             if (val != null) {
                 sendBeacon = Boolean.parseBoolean(val);
             }
-            Resources resources = getResources();
             version = PlatformUtil.getVersionName(this);
-            String serverBase = database
-                    .getPreference(ConstantUtil.SERVER_SETTING_KEY);
-            if (serverBase != null && serverBase.trim().length() > 0) {
-                serverBase = resources.getStringArray(R.array.servers)[Integer
-                        .parseInt(serverBase)];
-            } else {
-                serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
-            }
-            server = serverBase;
         } finally {
             if (database != null) {
                 database.close();
@@ -118,8 +104,7 @@ public class LocationService extends Service {
                         String provider = locMgr.getBestProvider(
                                 locationCriteria, true);
                         if (provider != null) {
-                            sendLocation(server,
-                                    locMgr.getLastKnownLocation(provider));
+                            sendLocation(server, locMgr.getLastKnownLocation(provider));
                         }
                     }
                 }
@@ -135,7 +120,6 @@ public class LocationService extends Service {
         locMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationCriteria = new Criteria();
         locationCriteria.setAccuracy(Criteria.NO_REQUIREMENT);
-        props = new PropertyUtil(getResources());
     }
 
     /**

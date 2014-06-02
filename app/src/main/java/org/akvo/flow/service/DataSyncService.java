@@ -395,7 +395,7 @@ public class DataSyncService extends IntentService {
      * MD5 checksum. Only if these fields match the transmission will be considered successful.
      */
     private void syncFiles() {
-        final String serverBase = getServerBase();
+        final String serverBase = StatusUtil.getServerBase(this);
         // Sync missing files. This will update the status of the transmissions if necessary
         checkMissingFiles(serverBase);
 
@@ -666,15 +666,6 @@ public class DataSyncService extends IntentService {
             Log.e(TAG, "GAE sync notification failed for file: " + fileName);
         }
         return success;
-    }
-
-    private String getServerBase() {
-        final String serverBase = mDatabase.getPreference(ConstantUtil.SERVER_SETTING_KEY);
-        if (!TextUtils.isEmpty(serverBase)) {
-            return getResources().getStringArray(R.array.servers)[Integer.parseInt(serverBase)];
-        }
-
-        return mProps.getProperty(ConstantUtil.SERVER_BASE);
     }
 
     private static String getDestName(String filename) {

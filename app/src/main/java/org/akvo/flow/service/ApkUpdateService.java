@@ -44,13 +44,11 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -113,18 +111,6 @@ public class ApkUpdateService extends IntentService {
         }
     }
 
-    private String getServerBase() {
-        SurveyDbAdapter db = new SurveyDbAdapter(this).open();
-        final String serverBase = db.getPreference(ConstantUtil.SERVER_SETTING_KEY);
-        db.close();
-        if (!TextUtils.isEmpty(serverBase)) {
-            return getResources().getStringArray(R.array.servers)[Integer.parseInt(serverBase)];
-        }
-
-        PropertyUtil props = new PropertyUtil(getResources());
-        return props.getProperty(ConstantUtil.SERVER_BASE);
-    }
-
     /**
      * Check for the latest downloaded version. If old versions are found, delete them.
      * The APK corresponding to the installed version will also be deleted, if found,
@@ -178,7 +164,8 @@ public class ApkUpdateService extends IntentService {
         }
 
         try {
-            String response = HttpUtil.httpGet(getServerBase() + APK_VERSION_SERVICE_PATH);
+            final String url = StatusUtil.getServerBase(this) + APK_VERSION_SERVICE_PATH;
+            String response = HttpUtil.httpGet(url);
             if (!TextUtils.isEmpty(response)) {
                 JSONObject json = new JSONObject(response);
                 String ver = json.getString("version");

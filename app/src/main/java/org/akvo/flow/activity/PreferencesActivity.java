@@ -71,7 +71,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private boolean[] langsSelectedBooleanArray;
     private int[] langsSelectedMasterIndexArray;
 
-    private String[] serverArray;
     private String[] maxImgSizes;
     private PropertyUtil props;
 
@@ -93,7 +92,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         Resources res = getResources();
         props = new PropertyUtil(res);
 
-        serverArray = res.getStringArray(R.array.servers);
         maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
     }
 
@@ -136,7 +134,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
 
         val = settings.get(ConstantUtil.SERVER_SETTING_KEY);
         if (val != null && val.trim().length() > 0) {
-            serverTextView.setText(serverArray[Integer.parseInt(val)]);
+            serverTextView.setText(val);
         } else {
             serverTextView.setText(props.getProperty(ConstantUtil.SERVER_BASE));
         }
@@ -219,26 +217,29 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                 showLanguageDialog();
                 break;
             case R.id.pref_server:
-                ViewUtil.showAdminAuthDialog(this,
-                        new ViewUtil.AdminAuthDialogListener() {
-                            @Override
-                            public void onAuthenticated() {
-                                // We'll show a first options containing the default server,
-                                // but it's value will be an empty string "".
-                                String[] keys = new String[serverArray.length + 1];
-                                String[] values = new String[serverArray.length + 1];
-                                keys[0] = "";
-                                values[0] = props.getProperty(ConstantUtil.SERVER_BASE);
-                                for (int i = 0; i < serverArray.length; i++) {
-                                    keys[i + 1] = String.valueOf(i);// DB value
-                                    values[i + 1] = serverArray[i];// Text to show
-                                }
-                                showPreferenceDialogBase(R.string.serverlabel,
-                                        ConstantUtil.SERVER_SETTING_KEY,
-                                        keys, values, serverTextView);
-
-                            }
+                ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
+                        @Override
+                        public void onAuthenticated() {
+                            final EditText inputView = new EditText(PreferencesActivity.this);
+                            // one line only
+                            inputView.setSingleLine();
+                            ViewUtil.ShowTextInputDialog(
+                                    PreferencesActivity.this, R.string.serverlabel,
+                                    R.string.serverlabel, inputView,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            String s = StringUtil.ControlToSPace(inputView
+                                                    .getText().toString());
+                                            // drop any control chars, especially tabs
+                                            serverTextView.setText(s);
+                                            database.savePreference(
+                                                    ConstantUtil.SERVER_SETTING_KEY, s);
+                                        }
+                                    }
+                            );
                         }
+                    }
                 );
                 break;
             case R.id.pref_deviceid:

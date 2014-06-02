@@ -428,7 +428,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     }
                 } else if (!f.renameTo(new File(absoluteFile))) {
                     // must check  return  value to  know if it  failed!
-                    Log.e(TAG, "Media file rename failed");
+                    Log.e(TAG, "Media file resize failed");
                 }
 
                 Bundle photoData = new Bundle();

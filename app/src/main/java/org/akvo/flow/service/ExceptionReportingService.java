@@ -28,19 +28,16 @@ import java.util.TimerTask;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 
 /**
@@ -75,7 +72,6 @@ public class ExceptionReportingService extends Service {
 
     private String version;
     private String deviceId;
-    private PropertyUtil props;
     private String phoneNumber;
     private String imei;
 
@@ -92,23 +88,13 @@ public class ExceptionReportingService extends Service {
      */
     public int onStartCommand(final Intent intent, int flags, int startid) {
         SurveyDbAdapter database = null;
-        String server = null;
+        String server = StatusUtil.getServerBase(this);
 
         try {
             database = new SurveyDbAdapter(this);
             database.open();
             deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-            Resources resources = getResources();
             version = PlatformUtil.getVersionName(this);
-            String serverBase = database
-                    .getPreference(ConstantUtil.SERVER_SETTING_KEY);
-            if (serverBase != null && serverBase.trim().length() > 0) {
-                serverBase = resources.getStringArray(R.array.servers)[Integer
-                        .parseInt(serverBase)];
-            } else {
-                serverBase = props.getProperty(ConstantUtil.SERVER_BASE);
-            }
-            server = serverBase;
             phoneNumber = StatusUtil.getPhoneNumber(this);
             imei = StatusUtil.getImei(this);
         } finally {
@@ -136,9 +122,7 @@ public class ExceptionReportingService extends Service {
 
     public void onCreate() {
         super.onCreate();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-                .getInstance());
-        props = new PropertyUtil(getResources());
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**

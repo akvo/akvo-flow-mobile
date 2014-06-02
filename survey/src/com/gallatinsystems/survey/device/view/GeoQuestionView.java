@@ -30,6 +30,7 @@ import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -99,6 +100,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         latField.setWidth(screenWidth / 2);
         latField.setOnFocusChangeListener(this);
         latField.setKeyListener(numericListener);
+        latField.setSingleLine();
 
         latLabel = new TextView(context);
         latLabel.setText(R.string.lat);
@@ -113,6 +115,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         lonField.setWidth(screenWidth / 2);
         lonField.setKeyListener(numericListener);
         lonField.setOnFocusChangeListener(this);
+        lonField.setSingleLine();
 
         lonLabel = new TextView(context);
         lonLabel.setText(R.string.lon);
@@ -128,6 +131,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
         elevationField.setWidth(screenWidth / 2);
         elevationField.setKeyListener(numericListener);
         elevationField.setOnFocusChangeListener(this);
+        elevationField.setSingleLine();
+        elevationField.setImeOptions(EditorInfo.IME_ACTION_DONE);
         elevationLabel = new TextView(context);
         elevationLabel.setText(R.string.elevation);
 

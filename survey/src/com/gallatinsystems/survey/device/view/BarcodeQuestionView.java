@@ -22,6 +22,7 @@ import android.os.Build;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableRow;
@@ -56,6 +57,7 @@ public class BarcodeQuestionView extends QuestionView implements
         barcodeText = new EditText(context);
         barcodeText.setWidth(DEFAULT_WIDTH);
         barcodeText.setOnFocusChangeListener(this);
+        barcodeText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         barcodeButton.setText(R.string.scanbarcode);
 
         barcodeButton.setOnClickListener(this);

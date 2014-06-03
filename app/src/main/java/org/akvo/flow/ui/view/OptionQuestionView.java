@@ -16,22 +16,20 @@
 
 package org.akvo.flow.ui.view;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -180,7 +178,7 @@ public class OptionQuestionView extends QuestionView {
                 public boolean onLongClick(View v) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle(R.string.optiontext);
-                    builder.setMessage(((RadioButton)v).getText().toString());
+                    builder.setMessage(((RadioButton) v).getText().toString());
                     builder.setPositiveButton(R.string.okbutton,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
@@ -476,18 +474,19 @@ public class OptionQuestionView extends QuestionView {
      * the "OTHER" option in a freetext view.
      */
     private void displayOtherDialog() {
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        AlertDialog.Builder otherDialog = new AlertDialog.Builder(getContext());
-        final View rootView = inflater.inflate(R.layout.otherdialog,
-                (ViewGroup) findViewById(R.id.otherroot));
-        otherDialog.setView(rootView);
-        otherDialog.setPositiveButton(R.string.okbutton,
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LinearLayout main = new LinearLayout(getContext());
+        main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        main.setOrientation(LinearLayout.VERTICAL);
+        builder.setTitle(R.string.otherinstructions);
+        final EditText inputView = new EditText(getContext());
+        inputView.setSingleLine();
+        main.addView(inputView);
+        builder.setView(main);
+        builder.setPositiveButton(R.string.okbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        EditText val = (EditText) rootView
-                                .findViewById(R.id.otherField);
-                        mLatestOtherText = val.getText().toString();
+                        mLatestOtherText = inputView.getText().toString();
                         if (mLatestOtherText == null) {
                             mLatestOtherText = "";
                         } else {
@@ -496,19 +495,16 @@ public class OptionQuestionView extends QuestionView {
                         if (getQuestion().isAllowMultiple()
                                 && getResponse() != null
                                 && getResponse().getValue() != null) {
-                            // if we support multiple, we need to append the
-                            // answer
+                            // if we support multiple, we need to append the answer
                             String responseText = getMultipleSelections();
 
                             setResponse(new QuestionResponse(responseText,
-                                    ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion
-                                            .getId()));
+                                    ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion.getId()));
                         } else {
                             // if we aren't supporting multiple or we don't
                             // already have a value, just set it
                             setResponse(new QuestionResponse(mLatestOtherText,
-                                    ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion
-                                            .getId()));
+                                    ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion.getId()));
                         }
                         // update the UI with the other text
                         if (mOtherText != null) {
@@ -519,18 +515,18 @@ public class OptionQuestionView extends QuestionView {
                         }
                     }
                 });
-        otherDialog.setNegativeButton(R.string.cancelbutton,
+        builder.setNegativeButton(R.string.cancelbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         setResponse(new QuestionResponse("",
-                                ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion
-                                        .getId()));
+                                ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion.getId()));
                         if (dialog != null) {
                             dialog.dismiss();
                         }
                     }
                 });
-        otherDialog.show();
+
+        builder.show();
     }
 
     /**

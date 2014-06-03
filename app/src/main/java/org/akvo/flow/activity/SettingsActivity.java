@@ -147,9 +147,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                     startActivity(i);
                 } catch (Exception e) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    TextView tipText = new TextView(this);
-                    tipText.setText(R.string.nogpsstatus);
-                    builder.setView(tipText);
+                    builder.setMessage(R.string.nogpsstatus);
                     builder.setPositiveButton(R.string.okbutton,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
@@ -161,12 +159,10 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                 }
             } else if (resources.getString(R.string.aboutlabel).equals(val)) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                TextView tipText = new TextView(this);
                 String txt = resources.getString(R.string.abouttext) + " "
                         + PlatformUtil.getVersionName(this);
-                tipText.setText(txt);
                 builder.setTitle(R.string.abouttitle);
-                builder.setView(tipText);
+                builder.setMessage(txt);
                 builder.setPositiveButton(R.string.okbutton,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -183,11 +179,8 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                             public void onAuthenticated() {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(
                                         SettingsActivity.this);
-                                TextView tipText = new TextView(
-                                        SettingsActivity.this);
-                                tipText.setText(R.string.reloadconftext);
                                 builder.setTitle(R.string.conftitle);
-                                builder.setView(tipText);
+                                builder.setMessage(R.string.reloadconftext);
                                 builder.setPositiveButton(R.string.okbutton,
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(
@@ -322,17 +315,14 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                             builder.append(
                                     resources.getString(R.string.sdcardspace))
                                     .append(String.format(" %.2f",
-                                            (double) space
-                                                    / (double) (1024 * 1024)));
+                                            (double) space / (double) (1024 * 1024)));
                         }
                     }
                 }
                 AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                TextView tipText = new TextView(this);
-                tipText.setText(Html.fromHtml(builder.toString()),
-                        BufferType.SPANNABLE);
                 dialog.setTitle(R.string.checksd);
-                dialog.setView(tipText);
+                String text = Html.fromHtml(builder.toString()).toString();
+                dialog.setMessage(text);
                 dialog.setPositiveButton(R.string.okbutton,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {

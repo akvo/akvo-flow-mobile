@@ -179,10 +179,8 @@ public class OptionQuestionView extends QuestionView {
                 @Override
                 public boolean onLongClick(View v) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    TextView tipText = new TextView(getContext());
-                    tipText.setText(((RadioButton) (v)).getText(), BufferType.SPANNABLE);
                     builder.setTitle(R.string.optiontext);
-                    builder.setView(tipText);
+                    builder.setMessage(((RadioButton)v).getText().toString());
                     builder.setPositiveButton(R.string.okbutton,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {

@@ -41,7 +41,6 @@ import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.domain.ScoringRule;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
@@ -259,7 +258,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             notifyQuestionListeners(QuestionInteractionEvent.VIDEO_TIP_VIEW);
         } else if (ConstantUtil.TIP_HELP_TYPE.equals(type)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            TextView tipText = new TextView(getContext());
             StringBuilder textBuilder = new StringBuilder();
             ArrayList<QuestionHelp> helpItems = mQuestion.getHelpByType(type);
             boolean isFirst = true;
@@ -291,8 +289,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     }
                 }
             }
-            tipText.setText(Html.fromHtml(textBuilder.toString()));
-            builder.setView(tipText);
+            builder.setMessage(Html.fromHtml(textBuilder.toString()));
             builder.setPositiveButton(R.string.okbutton,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {

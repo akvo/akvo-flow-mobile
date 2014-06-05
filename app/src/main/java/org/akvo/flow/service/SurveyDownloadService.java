@@ -468,23 +468,23 @@ public class SurveyDownloadService extends Service {
      * invokes a service call to list all surveys that have been designated for
      * this device (based on phone number).
      * 
-     * @return - an arrayList of Survey objects with the id and version
-     *         populated
+     * @return - an arrayList of Survey objects with the id and version populated
      */
     private List<Survey> checkForSurveys(String serverBase, String deviceId) {
-        String response = null;
         List<Survey> surveys = null;
+        String phoneNumber = StatusUtil.getPhoneNumber(this);
+        if (phoneNumber == null) {
+            phoneNumber = "";
+        }
+        String imei = StatusUtil.getImei(this);
+        String version = PlatformUtil.getVersionName(this);
         try {
-            response = HttpUtil
-                    .httpGet(serverBase
-                            + SURVEY_LIST_SERVICE_PATH
-                            + URLEncoder.encode(StatusUtil.getPhoneNumber(this), "UTF-8")
-                            + IMEI_PARAM
-                            + URLEncoder.encode(StatusUtil.getImei(this), "UTF-8")
-                            + VERSION_PARAM
-                            + URLEncoder.encode(PlatformUtil.getVersionName(this), "UTF-8")
-                            + (deviceId != null ? DEV_ID_PARAM
-                                    + URLEncoder.encode(deviceId, "UTF-8") : ""));
+            final String url = serverBase
+                    + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
+                    + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
+                    + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
+                    + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
+            String response = HttpUtil.httpGet(url);
             if (response != null) {
                 surveys = new SurveyMetaParser().parseList(response);
             }

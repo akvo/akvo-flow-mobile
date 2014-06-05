@@ -111,7 +111,6 @@
     <string name="delete_responses_warning">Cela va effacer définitivement toutes les données, images et fichier .zip de l\'appareil de l\'appareil. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
     <string name="unsentdatawarning">Certaines données n\'ont pas été envoyées. Soyez sûr de les exporter avant de les effacer. This operation is not reversible. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
     <string name="deleteonewarning">Cela va effacer définitivement les données. Choisir OK pour continuer ou annuler pour arrêter.</string>
-    <string name="savestartnew">Enregistrer et commencer à nouveau</string>
     <string name="nextbutton">Suivant</string>
     <string name="submittext">Si vous avez terminé avec l\'enquête, choisir Envoyer pour envoyer les données. Une fois que Envoyer est choisi, vous pouvez revoir les données mais vous ne pourrez plus les changer.</string>
     <string name="donebutton">Terminé</string>

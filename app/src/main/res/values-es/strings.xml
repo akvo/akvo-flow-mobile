@@ -111,7 +111,6 @@
     <string name="delete_responses_warning">Esta acción borrará permanentemente las respuestas, imágenes y archivos zip del dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
     <string name="unsentdatawarning">Algunas respuestas no han sido enviadas. Asegúrese de exportarlas antes de borrarlas. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
     <string name="deleteonewarning">Esta acción borrará permanentemente esta respuesta. Pulse OK para continuar o Cancelar para salir.</string>
-    <string name="savestartnew">Guardar y comenzar nuevo</string>
     <string name="nextbutton">Siguiente</string>
     <string name="submittext">Si ha terminado con la encuesta, pulse Enviar para mandar los datos. Una vez pulsado Enviar, podrá revisar los datos, pero no podrá editarlos.</string>
     <string name="donebutton">Terminado</string>

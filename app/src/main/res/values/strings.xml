@@ -108,7 +108,6 @@
     <string name="delete_responses_warning">This will permanently delete responses, images, and zip files on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="unsentdatawarning">Some responses are not submitted. Make sure you export them before deletion. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="deleteonewarning">This will permanently delete this survey response. Click OK to proceed or cancel to abort.</string>
-    <string name="savestartnew">Save and Start New</string>
     <string name="nextbutton">Next</string>
     <string name="submittext">If you are finished with the survey, press submit to send the data. Once you press submit, you can review the data but you will not be able to edit it.</string>
     <string name="donebutton">Done</string>

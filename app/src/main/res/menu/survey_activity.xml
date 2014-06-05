@@ -12,9 +12,6 @@
         <menu>
 
             <item
-                android:id="@+id/new_survey"
-                android:title="@string/savestartnew"/>
-            <item
                 android:id="@+id/edit_lang"
                 android:title="@string/langoption"/>
             <item

@@ -324,7 +324,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         getMenuInflater().inflate(R.menu.survey_activity, menu);
         if (isReadOnly()) {
             SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
-            subMenu.removeItem(R.id.new_survey);
             subMenu.removeItem(R.id.clear);
         }
         return super.onCreateOptionsMenu(menu);

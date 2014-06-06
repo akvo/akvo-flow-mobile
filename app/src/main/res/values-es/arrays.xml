@@ -2,7 +2,7 @@
 <resources>
     
     <string-array name="records_activity_tabs">
-        <item>REGISTROS</item>
+        <item>PUNTOS DE DATOS</item>
         <item>MAPA</item>
     </string-array>
     

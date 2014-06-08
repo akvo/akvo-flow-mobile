@@ -128,9 +128,11 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             String provider = manager.getBestProvider(criteria, true);
-            Location location = manager.getLastKnownLocation(provider);
-            if (location != null) {
-                position = new LatLng(location.getLatitude(), location.getLongitude());
+            if (provider != null) {
+                Location location = manager.getLastKnownLocation(provider);
+                if (location != null) {
+                    position = new LatLng(location.getLatitude(), location.getLongitude());
+                }
             }
         }
 

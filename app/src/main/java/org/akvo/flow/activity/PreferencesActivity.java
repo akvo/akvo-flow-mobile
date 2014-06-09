@@ -94,6 +94,17 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         props = new PropertyUtil(res);
 
         maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
+
+        // Setup event listeners
+        saveUserCheckbox.setOnCheckedChangeListener(this);
+        beaconCheckbox.setOnCheckedChangeListener(this);
+        screenOnCheckbox.setOnCheckedChangeListener(this);
+        mobileDataCheckbox.setOnCheckedChangeListener(this);
+        findViewById(R.id.pref_locale).setOnClickListener(this);
+        findViewById(R.id.pref_surveylang).setOnClickListener(this);
+        findViewById(R.id.pref_server).setOnClickListener(this);
+        findViewById(R.id.pref_deviceid).setOnClickListener(this);
+        findViewById(R.id.pref_resize).setOnClickListener(this);
     }
 
     /**
@@ -164,16 +175,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         database = new SurveyDbAdapter(this);
         database.open();
         populateFields();
-        // TODO: this listeners assignations should be moved to onCreate()
-        saveUserCheckbox.setOnCheckedChangeListener(this);
-        beaconCheckbox.setOnCheckedChangeListener(this);
-        screenOnCheckbox.setOnCheckedChangeListener(this);
-        mobileDataCheckbox.setOnCheckedChangeListener(this);
-        findViewById(R.id.pref_locale).setOnClickListener(this);
-        findViewById(R.id.pref_surveylang).setOnClickListener(this);
-        findViewById(R.id.pref_server).setOnClickListener(this);
-        findViewById(R.id.pref_deviceid).setOnClickListener(this);
-        findViewById(R.id.pref_resize).setOnClickListener(this);
     }
 
     public void onPause() {
@@ -278,7 +279,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                 for (int i = 0; i < maxImgSizes.length; i++) {
                     keys[i] = String.valueOf(i);
                 }
-                showPreferenceDialogBase(R.string.resize_large_images,// TODO: change string
+                showPreferenceDialogBase(R.string.resize_large_images,
                         ConstantUtil.MAX_IMG_SIZE,
                         keys, maxImgSizes, maxImgSizeTextView);
                 break;

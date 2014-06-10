@@ -23,44 +23,32 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.SurveyInstance;
 
 public class SurveyInstanceParser {
-    private static final String TAG = SurveyInstanceParser.class.getSimpleName();
 
-    public SurveyInstance parse(JSONObject jSurveyInstance) {
-        try {
-            String uuid = jSurveyInstance.getString(Attrs.UUID);
-            String surveyId = jSurveyInstance.getString(Attrs.SURVEY_ID);
-            long date = jSurveyInstance.getLong(Attrs.DATE);
-            
-            JSONArray jQuestionResponses = jSurveyInstance.getJSONArray(Attrs.QUESTION_RESPONSE_LIST);
-            List<QuestionResponse> responses = new QuestionResponseParser().parseList(jQuestionResponses);
-            
-            return new SurveyInstance(uuid, surveyId, date, responses);
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
-        }
+    public SurveyInstance parse(JSONObject jSurveyInstance) throws JSONException {
+        String uuid = jSurveyInstance.getString(Attrs.UUID);
+        String surveyId = jSurveyInstance.getString(Attrs.SURVEY_ID);
+        long date = jSurveyInstance.getLong(Attrs.DATE);
+
+        JSONArray jQuestionResponses = jSurveyInstance.getJSONArray(Attrs.QUESTION_RESPONSE_LIST);
+        List<QuestionResponse> responses = new QuestionResponseParser().parseList(jQuestionResponses);
+
+        return new SurveyInstance(uuid, surveyId, date, responses);
     }
 
-    public List<SurveyInstance> parseList(JSONArray jSurveyInstances) {
+    public List<SurveyInstance> parseList(JSONArray jSurveyInstances) throws JSONException {
         List<SurveyInstance> surveyInstances = new ArrayList<SurveyInstance>();
-        try {
-            for (int i=0; i<jSurveyInstances.length(); i++) {
-                JSONObject jSurveyInstance = jSurveyInstances.getJSONObject(i);
-                SurveyInstance surveyInstance = parse(jSurveyInstance);
-                if (surveyInstance != null) {
-                    surveyInstances.add(surveyInstance);
-                }
+        for (int i=0; i<jSurveyInstances.length(); i++) {
+            JSONObject jSurveyInstance = jSurveyInstances.getJSONObject(i);
+            SurveyInstance surveyInstance = parse(jSurveyInstance);
+            if (surveyInstance != null) {
+                surveyInstances.add(surveyInstance);
             }
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
         }
-        
+
         return surveyInstances;
     }
     

@@ -23,60 +23,45 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 
 public class SurveyedLocaleParser {
-    private static final String TAG = SurveyedLocaleParser.class.getSimpleName();
-    
-    public SurveyedLocalesResponse parseResponse(String response) {
-        SurveyedLocalesResponse surveyedLocaleResponse = null;
+
+    public SurveyedLocalesResponse parseResponse(String response) throws JSONException {
         List<SurveyedLocale> surveyedLocales = new ArrayList<SurveyedLocale>();
-        try {
-            JSONObject jResponse = new JSONObject(response);
-            String syncTime = String.valueOf(jResponse.getLong(Attrs.SYNC_TIME));
-            JSONArray jSurveyedLocales = jResponse.getJSONArray(Attrs.SURVEYED_LOCALE_DATA);
-            for (int i=0; i<jSurveyedLocales.length(); i++) {
-                JSONObject jSurveyedLocale = jSurveyedLocales.getJSONObject(i);
-                SurveyedLocale surveyedLocale = parseSurveyedLocale(jSurveyedLocale);
-                if (surveyedLocale != null) {
-                    surveyedLocales.add(surveyedLocale);
-                }
+        JSONObject jResponse = new JSONObject(response);
+        String syncTime = String.valueOf(jResponse.getLong(Attrs.SYNC_TIME));
+        JSONArray jSurveyedLocales = jResponse.getJSONArray(Attrs.SURVEYED_LOCALE_DATA);
+        for (int i=0; i<jSurveyedLocales.length(); i++) {
+            JSONObject jSurveyedLocale = jSurveyedLocales.getJSONObject(i);
+            SurveyedLocale surveyedLocale = parseSurveyedLocale(jSurveyedLocale);
+            if (surveyedLocale != null) {
+                surveyedLocales.add(surveyedLocale);
             }
-            
-            surveyedLocaleResponse = new SurveyedLocalesResponse(syncTime, surveyedLocales);
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
         }
-        
-        return surveyedLocaleResponse;
+
+        return new SurveyedLocalesResponse(syncTime, surveyedLocales);
     }
 
-    public SurveyedLocale parseSurveyedLocale(JSONObject jSurveyedLocale) {
-        try {
-            String id = jSurveyedLocale.getString(Attrs.ID);
-            long surveyGroupId = jSurveyedLocale.getLong(Attrs.SURVEY_GROUP_ID);
-            Double latitude = jSurveyedLocale.has(Attrs.LATITUDE) ?
-                    jSurveyedLocale.getDouble(Attrs.LATITUDE) : null;
-            Double longitude = jSurveyedLocale.has(Attrs.LONGITUDE) ?
-                jSurveyedLocale.getDouble(Attrs.LONGITUDE) : null;
+    public SurveyedLocale parseSurveyedLocale(JSONObject jSurveyedLocale) throws JSONException {
+        String id = jSurveyedLocale.getString(Attrs.ID);
+        long surveyGroupId = jSurveyedLocale.getLong(Attrs.SURVEY_GROUP_ID);
+        Double latitude = jSurveyedLocale.has(Attrs.LATITUDE) ?
+                jSurveyedLocale.getDouble(Attrs.LATITUDE) : null;
+        Double longitude = jSurveyedLocale.has(Attrs.LONGITUDE) ?
+            jSurveyedLocale.getDouble(Attrs.LONGITUDE) : null;
 
-            String name = jSurveyedLocale.optString(Attrs.NAME, "Unknown");
-            
-            JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
-            List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);
-            
-            SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, surveyGroupId, latitude, longitude);
-            surveyedLocale.setSurveyInstances(surveyInstances);
-            
-            return surveyedLocale;
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
-        }
+        String name = jSurveyedLocale.optString(Attrs.NAME, "Unknown");
+
+        JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
+        List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);
+
+        SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, surveyGroupId, latitude, longitude);
+        surveyedLocale.setSurveyInstances(surveyInstances);
+
+        return surveyedLocale;
     }
     
     interface Attrs {

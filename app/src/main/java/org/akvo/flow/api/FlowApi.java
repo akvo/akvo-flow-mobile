@@ -43,9 +43,12 @@ import android.util.Log;
 import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.exception.SyncException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
+import org.json.JSONException;
 
 public class FlowApi {
     private static final String TAG = FlowApi.class.getSimpleName();
@@ -64,7 +67,7 @@ public class FlowApi {
     }
     
     public SurveyedLocalesResponse getSurveyedLocales(long surveyGroup, String timestamp) 
-            throws IOException {
+            throws IOException, SyncException {
         SurveyedLocalesResponse surveyedLocalesResponse = null;
         final String query =  PARAM.IMEI + IMEI
                 + "&" + PARAM.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
@@ -78,7 +81,12 @@ public class FlowApi {
                 + "&" + PARAM.HMAC + getAuthorization(query);
         String response = httpGet(url);
         if (response != null) {
-            surveyedLocalesResponse = new SurveyedLocaleParser().parseResponse(response);
+            try {
+                surveyedLocalesResponse = new SurveyedLocaleParser().parseResponse(response);
+            } catch (JSONException e) {
+                PersistentUncaughtExceptionHandler.recordException(e);
+                throw new SyncException(e.getMessage(), e);
+            }
         }
         
         return surveyedLocalesResponse;

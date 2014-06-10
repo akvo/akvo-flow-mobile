@@ -32,7 +32,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.Toast;
 
@@ -60,7 +59,6 @@ public class RecordListActivity extends ActionBarActivity implements
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
 
-    private MenuItem mSortItem;
     private ViewPager mPager;
     private TabsAdapter mAdapter;
     private String[] mTabs;

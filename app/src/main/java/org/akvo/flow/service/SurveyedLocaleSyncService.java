@@ -33,6 +33,7 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.exception.SyncException;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleSyncService extends IntentService {
@@ -69,13 +70,18 @@ public class SurveyedLocaleSyncService extends IntentService {
             displayToast(getString(R.string.network_error));
             displayNotification(getString(R.string.sync_error), 
                     getString(R.string.network_error), true);
+        } catch (SyncException e) {
+            Log.e(TAG, e.getMessage());
+            displayToast(getString(R.string.sync_error));
+            displayNotification(getString(R.string.sync_error),
+                    getString(R.string.sync_error), true);
         } finally {
             database.close();
         }
     }
         
-    private int sync(SurveyDbAdapter database, FlowApi api, 
-            long surveyGroupId) throws IOException {
+    private int sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId) throws IOException,
+            SyncException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         SurveyedLocalesResponse response = api.getSurveyedLocales(surveyGroupId, syncTime);

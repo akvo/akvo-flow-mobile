@@ -31,7 +31,13 @@ rm -rf builds
 mkdir tmp
 mkdir builds
 
-find $FLOW_SERVER_CONFIG/ -name 'appengine-web.xml' -exec sed -n 's/\(.*\)<application>\(.*\)<\/application>\(.*\)/\2/p' {} \; | sort > tmp/instances.txt
+# If an argument is provided with the instance name, deploy only that instance APK. Otherwise, deploy all of them
+if [[ -n "$1" ]]; then
+    echo $1 > tmp/instances.txt
+else
+    find $FLOW_SERVER_CONFIG/ -name 'appengine-web.xml' -exec sed -n 's/\(.*\)<application>\(.*\)<\/application>\(.*\)/\2/p' {} \; | sort > tmp/instances.txt
+fi
+
 for i in $(cat tmp/instances.txt); do 
     rm -rf bin
     rm -rf gen
@@ -40,7 +46,7 @@ for i in $(cat tmp/instances.txt); do
         echo 'generating apk version' $VERSION 'for instance' $i
         ant flow-release -Dsurvey.properties=$FLOW_SERVER_CONFIG/$i/survey.properties >> tmp/antout.txt
         mkdir -p builds/$i/$VERSION
-        mv bin/fieldsurvey-*.apk builds/$i/$VERSION/
+        mv bin/fieldsurvey-$VERSION.apk builds/$i/$VERSION/
         java -jar $FLOW_DEPLOY_JAR $FLOW_S3_ACCESS_KEY $FLOW_S3_SECRET_KEY $i builds/$i/$VERSION/fieldsurvey-$VERSION.apk $VERSION $FLOW_GAE_USERNAME $FLOW_GAE_PASSWORD
     else
         echo 'Cannot find survey.properties file for instance' $i

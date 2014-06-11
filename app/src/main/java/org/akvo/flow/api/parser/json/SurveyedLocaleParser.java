@@ -16,9 +16,12 @@
 
 package org.akvo.flow.api.parser.json;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,25 +31,33 @@ import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 
 public class SurveyedLocaleParser {
+    private static final String TAG = SurveyedLocaleParser.class.getSimpleName();
 
-    public SurveyedLocalesResponse parseResponse(String response) throws JSONException {
-        List<SurveyedLocale> surveyedLocales = new ArrayList<SurveyedLocale>();
-        JSONObject jResponse = new JSONObject(response);
-        String syncTime = String.valueOf(jResponse.getLong(Attrs.SYNC_TIME));
-        JSONArray jSurveyedLocales = jResponse.getJSONArray(Attrs.SURVEYED_LOCALE_DATA);
-        for (int i=0; i<jSurveyedLocales.length(); i++) {
-            JSONObject jSurveyedLocale = jSurveyedLocales.getJSONObject(i);
-            SurveyedLocale surveyedLocale = parseSurveyedLocale(jSurveyedLocale);
-            if (surveyedLocale != null) {
+    public SurveyedLocalesResponse parseResponse(String response) {
+        final List<SurveyedLocale> surveyedLocales = new ArrayList<SurveyedLocale>();
+        String error = null;
+        try {
+            JSONObject jResponse = new JSONObject(response);
+            JSONArray jSurveyedLocales = jResponse.getJSONArray(Attrs.SURVEYED_LOCALE_DATA);
+            for (int i=0; i<jSurveyedLocales.length(); i++) {
+                JSONObject jSurveyedLocale = jSurveyedLocales.getJSONObject(i);
+                SurveyedLocale surveyedLocale = parseSurveyedLocale(jSurveyedLocale);
                 surveyedLocales.add(surveyedLocale);
             }
+        } catch (JSONException e) {
+            // Something went wrong in the parsing. We consider this invalid data,
+            // and will stop the sync, to avoid storing corrupted data.
+            PersistentUncaughtExceptionHandler.recordException(e);
+            Log.e(TAG, e.getMessage());
+            error = "Invalid Json response";
         }
 
-        return new SurveyedLocalesResponse(syncTime, surveyedLocales);
+        return new SurveyedLocalesResponse(surveyedLocales, error);
     }
 
     public SurveyedLocale parseSurveyedLocale(JSONObject jSurveyedLocale) throws JSONException {
         String id = jSurveyedLocale.getString(Attrs.ID);
+        long lastModified = jSurveyedLocale.getLong(Attrs.LAST_MODIFIED);
         long surveyGroupId = jSurveyedLocale.getLong(Attrs.SURVEY_GROUP_ID);
         Double latitude = jSurveyedLocale.has(Attrs.LATITUDE) ?
                 jSurveyedLocale.getDouble(Attrs.LATITUDE) : null;
@@ -58,7 +69,8 @@ public class SurveyedLocaleParser {
         JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
         List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);
 
-        SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, surveyGroupId, latitude, longitude);
+        SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, lastModified, surveyGroupId,
+                latitude, longitude);
         surveyedLocale.setSurveyInstances(surveyInstances);
 
         return surveyedLocale;
@@ -66,7 +78,6 @@ public class SurveyedLocaleParser {
     
     interface Attrs {
         // Main response
-        String SYNC_TIME             = "lastUpdateTime";
         String SURVEYED_LOCALE_DATA  = "surveyedLocaleData";
         
         // SurveyedLocale
@@ -76,6 +87,7 @@ public class SurveyedLocaleParser {
         String LATITUDE         = "lat";
         String LONGITUDE        = "lon";
         String SURVEY_INSTANCES = "surveyInstances";
+        String LAST_MODIFIED    = "lastUpdateDateTime";
     }
 
 }

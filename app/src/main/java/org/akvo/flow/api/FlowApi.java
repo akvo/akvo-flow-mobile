@@ -43,12 +43,10 @@ import android.util.Log;
 import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.exception.SyncException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
-import org.json.JSONException;
 
 public class FlowApi {
     private static final String TAG = FlowApi.class.getSimpleName();
@@ -81,12 +79,7 @@ public class FlowApi {
                 + "&" + PARAM.HMAC + getAuthorization(query);
         String response = httpGet(url);
         if (response != null) {
-            try {
-                surveyedLocalesResponse = new SurveyedLocaleParser().parseResponse(response);
-            } catch (JSONException e) {
-                PersistentUncaughtExceptionHandler.recordException(e);
-                throw new SyncException(e.getMessage(), e);
-            }
+            surveyedLocalesResponse = new SurveyedLocaleParser().parseResponse(response);
         }
         
         return surveyedLocalesResponse;

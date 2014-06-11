@@ -21,20 +21,19 @@ import java.util.List;
 import org.akvo.flow.domain.SurveyedLocale;
 
 public class SurveyedLocalesResponse {
-    private String mSyncTime;
     private List<SurveyedLocale> mSurveyedLocales;
-    
-    public SurveyedLocalesResponse(String syncTime, List<SurveyedLocale> surveyedLocales) {
-        mSyncTime = syncTime;
+    private String mError;
+
+    public SurveyedLocalesResponse(List<SurveyedLocale> surveyedLocales, String error) {
         mSurveyedLocales = surveyedLocales;
-    }
-    
-    public String getSyncTime() {
-        return mSyncTime;
+        mError = error;
     }
     
     public List<SurveyedLocale> getSurveyedLocales() {
         return mSurveyedLocales;
     }
 
+    public String getError() {
+        return mError;
+    }
 }

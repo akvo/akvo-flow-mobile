@@ -85,12 +85,14 @@ public class SurveyedLocaleSyncService extends IntentService {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         SurveyedLocalesResponse response = api.getSurveyedLocales(surveyGroupId, syncTime);
-        if (response != null && !(response.getSyncTime().equals(syncTime))) {
+        if (response != null) {
             database.syncSurveyedLocales(response.getSurveyedLocales());
-            database.setSyncTime(surveyGroupId, response.getSyncTime());
+            String error = response.getError();
+            if (error != null) {
+                throw new SyncException(error);
+            }
             return response.getSurveyedLocales().size();
         }
-            
         return 0;
     }
     
@@ -98,8 +100,7 @@ public class SurveyedLocaleSyncService extends IntentService {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
             }
         });
     }

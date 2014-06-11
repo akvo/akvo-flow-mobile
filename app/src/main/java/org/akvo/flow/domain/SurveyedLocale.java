@@ -27,21 +27,28 @@ public class SurveyedLocale implements Serializable {
     
     private String mId;
     private String mName;
+    private long mLastModified;
     private long mSurveyGroupId;
     private Double mLatitude;
     private Double mLongitude;
     private List<SurveyInstance> mSurveyInstances = null;
 
-    public SurveyedLocale(String id, String name, long surveyGroupId, Double latitude, Double longitude) {
+    public SurveyedLocale(String id, String name, long lastModified, long surveyGroupId,
+            Double latitude, Double longitude) {
         mId = id;
         mName = name;
+        mLastModified = lastModified;
         mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
     }
-    
+
     public long getSurveyGroupId() {
         return mSurveyGroupId;
+    }
+
+    public long getLastModified() {
+        return mLastModified;
     }
     
     public String getId() {

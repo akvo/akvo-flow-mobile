@@ -60,7 +60,8 @@ public class SurveyedLocaleSyncService extends IntentService {
             while ((batchSize = sync(database, api, surveyGroupId)) != 0) {
                 syncedRecords += batchSize;
                 sendBroadcastNotification();// Keep the UI fresh!
-                // TODO: Update notification with new batch info?
+                displayNotification(getString(R.string.syncing_records),
+                        String.format(getString(R.string.synced_records), syncedRecords), false);
             }
             
             displayNotification(getString(R.string.sync_finished),
@@ -78,6 +79,8 @@ public class SurveyedLocaleSyncService extends IntentService {
         } finally {
             database.close();
         }
+
+        sendBroadcastNotification();
     }
         
     private int sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId) throws IOException,

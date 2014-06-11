@@ -1273,6 +1273,7 @@ public class SurveyDbAdapter {
     public static SurveyedLocale getSurveyedLocale(Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(RecordColumns.RECORD_ID));
         long surveyGroupId = cursor.getLong(cursor.getColumnIndexOrThrow(RecordColumns.SURVEY_GROUP_ID));
+        long lastModified = cursor.getLong(cursor.getColumnIndexOrThrow(RecordColumns.LAST_MODIFIED));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(RecordColumns.NAME));
 
         // Location. Check for null values first
@@ -1284,13 +1285,14 @@ public class SurveyDbAdapter {
             latitude = cursor.getDouble(latCol);
             longitude = cursor.getDouble(lonCol);
         }
-        return new SurveyedLocale(id, name, surveyGroupId, latitude, longitude);
+        return new SurveyedLocale(id, name, lastModified, surveyGroupId, latitude, longitude);
     }
-    
+
+    // TODO: DRY -- getSurveyedLocales and getSurveyedLocale should use the same query
     public Cursor getSurveyedLocales(long surveyGroupId) {
         return database.query(Tables.RECORD,
                 new String[] {RecordColumns._ID, RecordColumns.RECORD_ID, RecordColumns.SURVEY_GROUP_ID,
-                        RecordColumns.NAME, RecordColumns.LATITUDE, RecordColumns.LONGITUDE},
+                        RecordColumns.LAST_MODIFIED, RecordColumns.NAME, RecordColumns.LATITUDE, RecordColumns.LONGITUDE},
                 RecordColumns.SURVEY_GROUP_ID + " = ?",
                 new String[] {String.valueOf(surveyGroupId)},
                 null, null, null);
@@ -1299,7 +1301,7 @@ public class SurveyDbAdapter {
     public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
         Cursor cursor = database.query(Tables.RECORD,
                 new String[] {RecordColumns._ID, RecordColumns.RECORD_ID, RecordColumns.SURVEY_GROUP_ID,
-                        RecordColumns.NAME, RecordColumns.LATITUDE, RecordColumns.LONGITUDE},
+                        RecordColumns.LAST_MODIFIED, RecordColumns.NAME, RecordColumns.LATITUDE, RecordColumns.LONGITUDE},
                 RecordColumns.RECORD_ID + " = ?",
                 new String[] {String.valueOf(surveyedLocaleId)},
                 null, null, null);

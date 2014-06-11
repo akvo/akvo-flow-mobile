@@ -48,7 +48,7 @@ public class SurveyedLocaleParser {
             // Something went wrong in the parsing. We consider this invalid data,
             // and will stop the sync, to avoid storing corrupted data.
             PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, e.getMessage(), e);
             error = "Invalid Json response";
         }
 

@@ -198,6 +198,12 @@ public class ListUserActivity extends ActionBarActivity {
                 colorRes = selectedColor;
             }
             nameView.setTextColor(getResources().getColorStateList(colorRes));
+
+            // Alternate background
+            int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1
+                    : R.attr.listitem_bg2;
+            final int res= PlatformUtil.getResource(context, attr);
+            view.setBackgroundResource(res);
         }
 
         @Override

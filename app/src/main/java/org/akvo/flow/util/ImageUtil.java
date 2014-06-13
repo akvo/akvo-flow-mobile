@@ -17,6 +17,8 @@ package org.akvo.flow.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
@@ -70,11 +72,31 @@ public class ImageUtil {
         options.inJustDecodeBounds = false;
         Bitmap bitmap = BitmapFactory.decodeFile(origFilename, options);
 
-        if (bitmap != null) {
+        if (bitmap != null && saveImage(bitmap, outFilename)) {
+            checkOrientation(origFilename, outFilename);// Ensure the EXIF data is not lost
             Log.d(TAG, "Resized Image size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
-            return saveImage(bitmap, outFilename);
+            return true;
         }
         return false;
+    }
+
+    private static void checkOrientation(String originalImage, String resizedImage) {
+        try {
+            ExifInterface exif1 = new ExifInterface(originalImage);
+            ExifInterface exif2 = new ExifInterface(resizedImage);
+
+            final String orientation1 = exif1.getAttribute(ExifInterface.TAG_ORIENTATION);
+            final String orientation2 = exif2.getAttribute(ExifInterface.TAG_ORIENTATION);
+
+            if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
+                Log.d(TAG, "Orientation property in EXIF does not match. Overriding it with original value...");
+                exif2.setAttribute(ExifInterface.TAG_ORIENTATION, orientation1);
+                exif2.saveAttributes();
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
     }
 
     private static boolean saveImage(Bitmap bitmap, String filename) {

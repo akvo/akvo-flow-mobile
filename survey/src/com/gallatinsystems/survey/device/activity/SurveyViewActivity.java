@@ -40,11 +40,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -455,6 +457,24 @@ public class SurveyViewActivity extends TabActivity implements
         }
         return false;
     }
+    
+    private void checkOrientation(String originalImage, String resizedImage) {
+        try {
+            ExifInterface exif1 = new ExifInterface(originalImage);
+            ExifInterface exif2 = new ExifInterface(resizedImage);
+
+            final String orientation1 = exif1.getAttribute(ExifInterface.TAG_ORIENTATION);
+            final String orientation2 = exif2.getAttribute(ExifInterface.TAG_ORIENTATION);
+
+            if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
+                Log.d(TAG, "Orientation property in EXIF does not match. Overriding it with original value...");
+                exif2.setAttribute(ExifInterface.TAG_ORIENTATION, orientation1);
+                exif2.saveAttributes();
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
 
     /**
      * this handles the data returned from other activities. Right now the only
@@ -516,6 +536,7 @@ public class SurveyViewActivity extends TabActivity implements
                     String absoluteFile = newPath + File.separator + newFilename;
 
                     if (resizedToNewFile(f, absoluteFile)) {
+                        checkOrientation(f.getAbsolutePath(), absoluteFile);
                         if (!f.delete()) { // must check return value to know if
                                            // it failed
                             Log.e(ACTIVITY_NAME, "Media file delete failed");

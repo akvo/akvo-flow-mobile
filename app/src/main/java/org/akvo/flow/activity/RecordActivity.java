@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -45,16 +45,13 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
-import org.akvo.flow.ui.fragment.ResponsesDialogFragment;
-import org.akvo.flow.ui.fragment.ResponsesDialogFragment.ResponsesDialogListener;
 import org.akvo.flow.ui.fragment.SurveyListFragment;
 import org.akvo.flow.ui.fragment.SurveyListFragment.SurveyListListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.ViewUtil;
 
 public class RecordActivity extends ActionBarActivity implements SurveyListListener, TabListener,
-        ResponsesDialogListener, RecordListListener {
+        RecordListListener {
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_RECORD_ID = "record";
     
@@ -173,7 +170,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             builder.setPositiveButton(R.string.start_new_response, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    onNewResponse(surveyId);
+                    startSurvey(surveyId);
                     dialog.dismiss();
                 }
             });
@@ -204,20 +201,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
         startActivity(i);
-    }
-
-    // **************************** //
-    // * DialogFragment callbacks * //
-    // **************************** //
-
-    @Override
-    public void onResponseClick(String surveyId, String recordId, long surveyInstanceId) {
-        startSurvey(surveyId, recordId, surveyInstanceId);
-    }
-
-    @Override
-    public void onNewResponse(String surveyId) {
-        startSurvey(surveyId);
     }
 
     class TabsAdapter extends FragmentPagerAdapter {

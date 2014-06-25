@@ -16,6 +16,8 @@
 
 package org.akvo.flow.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -49,6 +51,7 @@ import org.akvo.flow.ui.fragment.SurveyListFragment;
 import org.akvo.flow.ui.fragment.SurveyListFragment.SurveyListListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.ViewUtil;
 
 public class RecordActivity extends ActionBarActivity implements SurveyListListener, TabListener,
         ResponsesDialogListener, RecordListListener {
@@ -147,7 +150,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     }
 
     @Override
-    public void onSurveyClick(String surveyId) {
+    public void onSurveyClick(final String surveyId) {
         if (BootstrapService.isProcessing) {
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
@@ -164,10 +167,25 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         if (createNew) {
             startSurvey(surveyId);
         } else {
-            // Display ResponsesDialogFragment
-            ResponsesDialogFragment dialogFragment = ResponsesDialogFragment.instantiate(
-                    mSurveyGroup, surveyId, mRecord.getId());
-            dialogFragment.show(getSupportFragmentManager(), "responses");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.choose_response);
+            builder.setMessage(R.string.choose_response_text);
+            builder.setPositiveButton(R.string.start_new_response, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    onNewResponse(surveyId);
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton(R.string.resume_response, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mPager.setCurrentItem(POSITION_RESPONSES);
+                    dialog.dismiss();
+                }
+            });
+
+            builder.show();
         }
     }
 

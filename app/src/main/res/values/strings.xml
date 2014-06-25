@@ -200,7 +200,9 @@
   <string name="last_modified">Last Modified:</string>
   <string name="last_response">Last Response:</string>
   <string name="choose_response">Choose Response</string>
-  <string name="start_new_response">Start New Response</string>
+  <string name="choose_response_text">There are unfinished responses for this survey. Do you want to load a saved response, or start a new response?</string>
+  <string name="resume_response">Load</string>
+  <string name="start_new_response">New</string>
   <!--APK update-->
   <string name="updateavail">A new FLOW update is available</string>
   <string name="updatedownloaded">FLOW update has been downloaded</string>

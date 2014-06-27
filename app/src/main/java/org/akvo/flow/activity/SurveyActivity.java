@@ -81,6 +81,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
      */
     private String mRequestQuestionId;
 
+    private ViewPager mPager;
     private SurveyTabAdapter mAdapter;
 
     private boolean mReadOnly;//flag to represent whether the Survey can be edited or not
@@ -121,10 +122,10 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
         // Set the survey name as Activity title
         setTitle(mSurvey.getName());
-        ViewPager pager = (ViewPager)findViewById(R.id.pager);
-        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), pager, this, this);
+        mPager = (ViewPager)findViewById(R.id.pager);
+        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
         mAdapter.load();// Instantiate tabs and views. TODO: Lazy loading with fragments!
-        pager.setAdapter(mAdapter);
+        mPager.setAdapter(mAdapter);
 
         // Initialize new survey or load previous responses
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
@@ -303,11 +304,15 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     protected void onResume() {
         super.onResume();
         recordDuration(true);// Keep track of this session's duration.
+        if (Boolean.valueOf(mDatabase.getPreference(ConstantUtil.SCREEN_ON_KEY))) {
+            mPager.setKeepScreenOn(true);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mPager.setKeepScreenOn(false);
         mAdapter.onPause();
         recordDuration(false);
         saveState();

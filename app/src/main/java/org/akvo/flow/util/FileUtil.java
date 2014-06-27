@@ -495,4 +495,46 @@ public class FileUtil {
         cursor.close();
     }
 
+    /**
+     * Check for the latest downloaded version. If old versions are found, delete them.
+     * The APK corresponding to the installed version will also be deleted, if found,
+     * in order to perform a cleanup after an upgrade.
+     *
+     * @return the path and version of a newer APK, if found, null otherwise
+     */
+    public static String checkDownloadedVersions(Context context) {
+        final String installedVer = PlatformUtil.getVersionName(context);
+
+        String maxVersion = installedVer;// Keep track of newest version available
+        String apkPath = null;
+
+        File appsLocation = new File(FileUtil.getStorageDirectory(ConstantUtil.APK_DIR, false));
+        File[] versions = appsLocation.listFiles();
+        if (versions != null) {
+            for (File version : versions) {
+                File[] apks = version.listFiles();
+                if (apks == null) {
+                    continue;// Nothing to see here
+                }
+
+                String versionName = version.getName();
+                if (!PlatformUtil.isNewerVersion(maxVersion, versionName)) {
+                    // Delete old versions
+                    for (File apk : apks) {
+                        apk.delete();
+                    }
+                    version.delete();
+                } else if (apks.length > 0){
+                    maxVersion = versionName;
+                    apkPath = apks[0].getAbsolutePath();// There should only be 1
+                }
+            }
+        }
+
+        if (apkPath != null && maxVersion != null) {
+            return apkPath;
+        }
+        return null;
+    }
+
 }

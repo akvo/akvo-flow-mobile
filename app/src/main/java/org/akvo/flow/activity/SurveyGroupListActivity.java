@@ -50,6 +50,7 @@ import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -134,18 +135,25 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     }
 
     /**
-     * Check if new FLOW versions are available to install.
+     * Check if new FLOW versions are available to installAppUpdate.
      * First we check the local storage, to see if the version is already
-     * downloaded. If so, we display a dialog to request the user to install it.
+     * downloaded. If so, we display a dialog to request the user to installAppUpdate it.
      * Otherwise, we trigger the ApkUpdateService to check for updates.
      */
     private void checkApkUpdates() {
-        String[] latestVersion = ApkUpdateService.checkDownloadedVersions(this);
+        final String latestVersion = FileUtil.checkDownloadedVersions(this);
         if (latestVersion != null) {
-            ApkUpdateService.displayInstallDialog(this, latestVersion[0], latestVersion[1]);
+            // In your face!
+            ViewUtil.showConfirmDialog(R.string.updatedownloaded, R.string.clicktoinstall, this, true,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            PlatformUtil.installAppUpdate(SurveyGroupListActivity.this, latestVersion);
+                        }
+                    }
+            );
         } else {
             Intent apkUpdateIntent = new Intent(this, ApkUpdateService.class);
-            apkUpdateIntent.putExtra(ApkUpdateService.EXTRA_MODE, ApkUpdateService.MODE_CHECK);
             startService(apkUpdateIntent);
         }
     }

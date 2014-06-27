@@ -518,6 +518,11 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 });
     }
 
+    @Override
+    public void nextTab() {
+        mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
+    }
+
     /**
      * event handler that can be used to handle events fired by individual
      * questions at the Activity level. Because we can't launch the photo

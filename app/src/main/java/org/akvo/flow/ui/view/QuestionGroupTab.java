@@ -3,6 +3,9 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
@@ -87,6 +90,17 @@ public class QuestionGroupTab extends ScrollView {
             inflater.inflate(R.layout.divider, questionView);
             mContainer.addView(questionView);
         }
+
+        Button next = new Button(context);
+        next.setText(R.string.nextbutton);
+        next.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        next.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSurveyListener.nextTab();
+            }
+        });
+        mContainer.addView(next);
     }
 
     @Override

@@ -12,5 +12,6 @@ public interface SurveyListener {
     public String[] getLanguages();
     public boolean isReadOnly();
     public void onSurveySubmit();
+    public void nextTab();
     public Map<String, QuestionResponse> getResponses();
 }

@@ -11,8 +11,7 @@
         android:layout_marginRight="8dp"
         android:layout_alignParentLeft="true"
         android:adjustViewBounds="true"
-        android:layout_centerVertical="true"
-        android:src="@drawable/checklist" />
+        android:layout_centerVertical="true" />
 
     <TextView
         android:id="@+id/text1"

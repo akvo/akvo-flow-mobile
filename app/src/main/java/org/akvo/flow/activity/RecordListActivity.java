@@ -144,8 +144,13 @@ public class RecordListActivity extends ActionBarActivity implements
             menu.removeItem(R.id.sync_records);
         }
 
-        // "Order By" is only available for the ListFragment, not the MapFragment
-        if (mAdapter.mSelected == POSITION_MAP) {
+        // "Order By" is only available for the ListFragment, not the MapFragment.
+        // The navigation components maintain 2 different indexes: Tab index and Pager index.
+        // The system seems to always update the tab index first, prior to the onCreateOptionsMenu
+        // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
+        // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
+        // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
+        if (getSupportActionBar().getSelectedNavigationIndex() == POSITION_MAP) {
             menu.removeItem(R.id.order_by);
         }
 

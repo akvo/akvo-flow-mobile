@@ -15,12 +15,13 @@
  */
 package org.akvo.flow.activity;
 
+import android.app.Activity;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -44,7 +45,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-public class AppUpdateActivity extends ActionBarActivity implements View.OnClickListener {
+public class AppUpdateActivity extends Activity implements View.OnClickListener {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
 
@@ -61,6 +62,7 @@ public class AppUpdateActivity extends ActionBarActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.app_update_activity);
 
         mUrl = getIntent().getStringExtra(EXTRA_URL);
@@ -83,6 +85,7 @@ public class AppUpdateActivity extends ActionBarActivity implements View.OnClick
             // Stop the update process
             mButton.setText(R.string.download_and_install);
             mTask.cancel(true);
+            finish();
         }
     }
 

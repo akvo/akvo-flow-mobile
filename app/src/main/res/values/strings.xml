@@ -224,7 +224,7 @@
     <string name="action_data_sync">fieldsurvey.ACTION_DATA_SYNC</string>
 
     <string name="app_update_activity">Akvo FLOW Update</string>
-    <string name="app_update">A new version of Akvo FLOW app is available. Click \'Download &amp; Install\' to start the update.</string>
+    <string name="app_update">A new version of the Akvo FLOW app is available. Click \'Download &amp; Install\' to start the update.</string>
     <string name="download_and_install">Download &amp; Install</string>
     <string name="action_settings">Settings</string>
 

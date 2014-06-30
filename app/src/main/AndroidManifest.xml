@@ -61,6 +61,11 @@
         <activity android:name=".activity.PreferencesActivity" />
         <activity android:name=".activity.ImageBrowserActivity" />
         <activity android:name=".activity.TransmissionHistoryActivity" />
+        <activity
+            android:name=".activity.AppUpdateActivity"
+            android:label="@string/app_update_activity"
+            android:theme="@style/Flow.Dialog">
+        </activity>
 
         <service android:name=".service.DataSyncService" />
         <service android:name=".service.SurveyDownloadService" />
@@ -92,10 +97,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name=".activity.AppUpdateActivity"
-            android:label="@string/app_update_activity" >
-        </activity>
     </application>
 
 </manifest>

@@ -90,16 +90,6 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(Uri.fromFile(file), type);
             getContext().startActivity(intent);
-            /*
-            Dialog dia = new Dialog(new ContextThemeWrapper(getContext(), R.style.Flow_Dialog));
-            dia.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            ImageView imageView = new ImageView(getContext());
-            imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT));
-            ImageUtil.displayImage(imageView, filename);
-            dia.setContentView(imageView);
-            dia.show();
-            */
         } else if (v == mMediaButton) {
             if (isImage()) {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
@@ -140,7 +130,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mImage.setVisibility(View.INVISIBLE);
+        mImage.setVisibility(View.GONE);
     }
 
     @Override

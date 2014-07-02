@@ -41,11 +41,8 @@ public class ConstantUtil {
     public static final String STACKTRACE_DIR = "fieldsurvey/stacktrace/";
     public static final String STACKTRACE_FILENAME = "err-";
     public static final String STACKTRACE_SUFFIX = ".stacktrace";
-
-    /**
-     * remote dirs
-     */
-    public static final String REMOTE_APK_DIR = "apk/";
+    public static final String IMAGE_MIME = "image/jpg";
+    public static final String VIDEO_MIME = "video/mp4";
 
     /**
      * survey file locations

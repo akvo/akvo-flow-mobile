@@ -19,13 +19,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 
 public class ImageUtil {
     private static final String TAG = ImageUtil.class.getSimpleName();
@@ -168,6 +172,68 @@ public class ImageUtil {
             }
         }
         return inSampleSize;
+    }
+
+    public static void displayImage(ImageView imageView, String filename) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filename, options);
+
+        // Calculate inSampleSize
+        final int[] size = getImageSize(imageView);// [width, height]
+        options.inSampleSize = calculateInSampleSize(options, size[0], size[1]);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeFile(filename, options);
+
+        if (bitmap != null) {
+            Log.d(TAG, "Displaying image with inSampleSize: " + options.inSampleSize);
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    /**
+     * Size computing algorithm:
+     * 1) Get layout_width and layout_height. If both of them haven't exact value then go to step #2.
+     * 2) Get maxWidth and maxHeight. If both of them are not set then go to step #3.
+     * 3) Get device screen dimensions.
+     */
+    public static int[] getImageSize(ImageView imageView) {
+        DisplayMetrics displayMetrics = imageView.getContext().getResources().getDisplayMetrics();
+
+        ViewGroup.LayoutParams params = imageView.getLayoutParams();
+        int width = params.width; // Get layout width parameter
+        if (width <= 0) width = getFieldValue(imageView, "mMaxWidth"); // Check maxWidth parameter
+        if (width <= 0) width = displayMetrics.widthPixels;
+
+        int height = params.height; // Get layout height parameter
+        if (height <= 0) height = getFieldValue(imageView, "mMaxHeight"); // Check maxHeight parameter
+        if (height <= 0) height = displayMetrics.heightPixels;
+
+        return new int[]{width, height};
+    }
+
+    /**
+     * Access the properties by Reflection.
+     *
+     * @param object
+     * @param fieldName
+     * @return
+     */
+    private static int getFieldValue(Object object, String fieldName) {
+        int value = 0;
+        try {
+            Field field = ImageView.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            int fieldValue = (Integer) field.get(object);
+            if (fieldValue > 0 && fieldValue < Integer.MAX_VALUE) {
+                value = fieldValue;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return value;
     }
 
 }

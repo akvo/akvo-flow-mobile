@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,11 +16,13 @@
 
 package org.akvo.flow.ui.view;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -32,6 +34,9 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.ImageUtil;
+
+import java.io.File;
 
 /**
  * Question type that supports taking a picture/video/audio recording with the
@@ -41,7 +46,7 @@ import org.akvo.flow.util.ConstantUtil;
  */
 public class MediaQuestionView extends QuestionView implements OnClickListener {
     private Button mMediaButton;
-    private ImageView mCompleteIcon;
+    private ImageView mImage;
     private String mMediaType;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
@@ -55,9 +60,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         setQuestionView(R.layout.media_question_view);
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
-        mCompleteIcon = (ImageView)findViewById(R.id.completed_iv);
+        mImage = (ImageView)findViewById(R.id.completed_iv);
 
-        if (ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType)) {
+        if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
         } else {
             mMediaButton.setText(R.string.takevideo);
@@ -67,27 +72,36 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             mMediaButton.setEnabled(false);
         }
 
-        mCompleteIcon.setOnClickListener(this);
-        mCompleteIcon.setVisibility(View.INVISIBLE);
+        mImage.setOnClickListener(this);
+        mImage.setVisibility(View.INVISIBLE);
     }
 
     /**
      * handle the action button click
      */
     public void onClick(View v) {
-        if (v == mCompleteIcon && ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType)) {
-            Dialog dia = new Dialog(getContext());
+        if (v == mImage) {
+            String filename = getResponse() != null ? getResponse().getValue() : null;
+            if (TextUtils.isEmpty(filename)) {
+                return;
+            }
+            File file = new File(filename);
+            String type = isImage() ? ConstantUtil.IMAGE_MIME : ConstantUtil.VIDEO_MIME;
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(file), type);
+            getContext().startActivity(intent);
+            /*
+            Dialog dia = new Dialog(new ContextThemeWrapper(getContext(), R.style.Flow_Dialog));
+            dia.requestWindowFeature(Window.FEATURE_NO_TITLE);
             ImageView imageView = new ImageView(getContext());
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 2;
-            Bitmap bm = BitmapFactory.decodeFile(getResponse().getValue(),
-                    options);
-            imageView.setImageBitmap(bm);
-            dia.setContentView(imageView, new LayoutParams(
-                    LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+            imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT));
+            ImageUtil.displayImage(imageView, filename);
+            dia.setContentView(imageView);
             dia.show();
+            */
         } else if (v == mMediaButton) {
-            if (ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType)) {
+            if (isImage()) {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
             } else {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
@@ -102,13 +116,11 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void questionComplete(Bundle mediaData) {
         if (mediaData != null) {
-            mCompleteIcon.setVisibility(View.VISIBLE);
-            setResponse(new QuestionResponse(
-                    mediaData.getString(ConstantUtil.MEDIA_FILE_KEY),
-                    ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType) ?
-                            ConstantUtil.IMAGE_RESPONSE_TYPE
-                            : ConstantUtil.VIDEO_RESPONSE_TYPE,
+            final String result = mediaData.getString(ConstantUtil.MEDIA_FILE_KEY);
+            setResponse(new QuestionResponse(result,
+                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
                     getQuestion().getId()));
+            displayThumbnail();
         }
     }
 
@@ -119,9 +131,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        if (resp != null && resp.getValue() != null) {
-            mCompleteIcon.setVisibility(View.VISIBLE);
-        }
+        displayThumbnail();
     }
 
     /**
@@ -130,11 +140,35 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mCompleteIcon.setVisibility(View.INVISIBLE);
+        mImage.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+    }
+
+    private void displayThumbnail() {
+        String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (TextUtils.isEmpty(filename)) {
+            return;
+        }
+        if (!new File(filename).exists()) {
+            // Looks like the image is not present in the filesystem (i.e. remote URL)
+            // TODO: Handle image downloads
+            mImage.setImageResource(R.drawable.checkmark);
+        } else if (isImage()) {
+            // Image thumbnail
+            ImageUtil.displayImage(mImage, filename);
+        } else {
+            // Video thumbnail
+            mImage.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
+                    filename, MediaStore.Video.Thumbnails.MINI_KIND));
+        }
+        mImage.setVisibility(View.VISIBLE);
+    }
+
+    private boolean isImage() {
+        return ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType);
     }
 
 }

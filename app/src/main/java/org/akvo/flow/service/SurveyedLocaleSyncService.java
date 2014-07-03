@@ -36,7 +36,7 @@ import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.exception.SyncException;
+import org.akvo.flow.exception.ApiException;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleSyncService extends IntentService {
@@ -78,11 +78,11 @@ public class SurveyedLocaleSyncService extends IntentService {
             displayToast(getString(R.string.network_error));
             displayNotification(getString(R.string.sync_error), 
                     getString(R.string.network_error), true);
-        } catch (SyncException e) {
+        } catch (ApiException e) {
+            // TODO: Use error codes or keywords to localize the message
             Log.e(TAG, e.getMessage());
-            displayToast(getString(R.string.sync_error));
-            displayNotification(getString(R.string.sync_error),
-                    getString(R.string.sync_error), true);
+            displayToast(e.getMessage());
+            displayNotification(getString(R.string.sync_error), e.getMessage(), true);
         } finally {
             database.close();
         }
@@ -94,7 +94,7 @@ public class SurveyedLocaleSyncService extends IntentService {
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
     private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
-            throws IOException, SyncException {
+            throws IOException, ApiException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
@@ -105,7 +105,7 @@ public class SurveyedLocaleSyncService extends IntentService {
                 records.add(locale.getId());
             }
             if (response.getError() != null) {
-                throw new SyncException(response.getError());
+                throw new ApiException(response.getError());
             }
         }
         return records;

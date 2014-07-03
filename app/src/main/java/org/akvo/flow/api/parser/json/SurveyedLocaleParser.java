@@ -49,7 +49,7 @@ public class SurveyedLocaleParser {
             // and will stop the sync, to avoid storing corrupted data.
             PersistentUncaughtExceptionHandler.recordException(e);
             Log.e(TAG, e.getMessage(), e);
-            error = "Invalid Json response";
+            error = "Invalid JSON response";
         }
 
         return new SurveyedLocalesResponse(surveyedLocales, error);

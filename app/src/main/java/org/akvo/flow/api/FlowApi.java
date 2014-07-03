@@ -43,10 +43,11 @@ import android.util.Log;
 import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.exception.SyncException;
+import org.akvo.flow.exception.ApiException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
+import org.apache.http.HttpStatus;
 
 public class FlowApi {
     private static final String TAG = FlowApi.class.getSimpleName();
@@ -65,7 +66,7 @@ public class FlowApi {
     }
     
     public SurveyedLocalesResponse getSurveyedLocales(long surveyGroup, String timestamp) 
-            throws IOException, SyncException {
+            throws IOException, ApiException {
         SurveyedLocalesResponse surveyedLocalesResponse = null;
         final String query =  PARAM.IMEI + IMEI
                 + "&" + PARAM.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
@@ -85,20 +86,16 @@ public class FlowApi {
         return surveyedLocalesResponse;
     }
     
-    private String httpGet(String url) throws IOException {
+    private String httpGet(String url) throws IOException, ApiException {
         HttpURLConnection conn = (HttpURLConnection) (new URL(url).openConnection());
-        String response = null;
         final long t0 = System.currentTimeMillis();
-
         try {
             int status = getStatusCode(conn);
-            if (status == 200) {
-                InputStream in = new BufferedInputStream(conn.getInputStream());
-                response = readStream(in);
-                final long t = System.currentTimeMillis() - t0;
-                Log.d(TAG, "Request time: " + t + ". URL: " + url);
-            } else {
-                Log.e(TAG, "Status Code: " + status + ". Expected: 200");
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            String response = readStream(in);
+            Log.d(TAG, "Request time: " + (System.currentTimeMillis() - t0) + ". URL: " + url);
+            if (status != HttpStatus.SC_OK) {
+                throw new ApiException(response);
             }
             return response;
         } finally {
@@ -109,18 +106,15 @@ public class FlowApi {
     }
     
     private int getStatusCode(HttpURLConnection conn) throws IOException {
-        int status = 0;
         try {
-            status = conn.getResponseCode();
+            return conn.getResponseCode();
         } catch (IOException e) {
             // HttpUrlConnection will throw an IOException if any 4XX
             // response is sent. If we request the status again, this
             // time the internal status will be properly set, and we'll be
             // able to retrieve it.
-            status = conn.getResponseCode();
+            return conn.getResponseCode();
         }
-        
-        return status;
     }
 
     private static String getPhoneNumber(Context context) {

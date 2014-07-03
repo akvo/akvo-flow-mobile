@@ -17,6 +17,8 @@
 package org.akvo.flow.service;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -33,6 +35,7 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.SyncException;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -56,14 +59,18 @@ public class SurveyedLocaleSyncService extends IntentService {
         displayNotification(getString(R.string.syncing_records), 
                 getString(R.string.pleasewait), false);
         try {
-            int batchSize = 0;
-            while ((batchSize = sync(database, api, surveyGroupId)) != 0) {
-                syncedRecords += batchSize;
+            Set<String> batch, lastBatch = null;
+            while (true) {
+                batch = sync(database, api, surveyGroupId);
+                if (lastBatch != null && lastBatch.containsAll(batch)) {
+                    break;
+                }
+                syncedRecords += batch.size();
                 sendBroadcastNotification();// Keep the UI fresh!
                 displayNotification(getString(R.string.syncing_records),
                         String.format(getString(R.string.synced_records), syncedRecords), false);
+                lastBatch = batch;
             }
-            
             displayNotification(getString(R.string.sync_finished),
                     String.format(getString(R.string.synced_records), syncedRecords), true);
         } catch (IOException e) {
@@ -82,21 +89,26 @@ public class SurveyedLocaleSyncService extends IntentService {
 
         sendBroadcastNotification();
     }
-        
-    private int sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId) throws IOException,
-            SyncException {
+
+    /**
+     * Sync a Record batch, and return the Set of Record IDs within the response
+     */
+    private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
+            throws IOException, SyncException {
         final String syncTime = database.getSyncTime(surveyGroupId);
+        Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         SurveyedLocalesResponse response = api.getSurveyedLocales(surveyGroupId, syncTime);
         if (response != null) {
-            database.syncSurveyedLocales(response.getSurveyedLocales());
-            String error = response.getError();
-            if (error != null) {
-                throw new SyncException(error);
+            for (SurveyedLocale locale : response.getSurveyedLocales()) {
+                database.syncSurveyedLocale(locale);
+                records.add(locale.getId());
             }
-            return response.getSurveyedLocales().size();
+            if (response.getError() != null) {
+                throw new SyncException(response.getError());
+            }
         }
-        return 0;
+        return records;
     }
     
     private void displayToast(final String text) {

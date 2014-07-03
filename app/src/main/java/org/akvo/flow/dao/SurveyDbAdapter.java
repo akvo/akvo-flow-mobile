@@ -1649,32 +1649,30 @@ public class SurveyDbAdapter {
         }
     }
     
-    public void syncSurveyedLocales(List<SurveyedLocale> surveyedLocales) {
-        for (SurveyedLocale surveyedLocale : surveyedLocales) {
-            final String id = surveyedLocale.getId();
-            try {
-                database.beginTransaction();
-                
-                ContentValues values = new ContentValues();
-                values.put(RecordColumns.RECORD_ID, id);
-                values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
-                values.put(RecordColumns.NAME, surveyedLocale.getName());
-                values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
-                values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
-                database.insert(Tables.RECORD, null, values);
-                
-                syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
+    public void syncSurveyedLocale(SurveyedLocale surveyedLocale) {
+        final String id = surveyedLocale.getId();
+        try {
+            database.beginTransaction();
 
-                // Update the record last modification date, if necessary
-                updateRecordModifiedDate(id, surveyedLocale.getLastModified());
+            ContentValues values = new ContentValues();
+            values.put(RecordColumns.RECORD_ID, id);
+            values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
+            values.put(RecordColumns.NAME, surveyedLocale.getName());
+            values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
+            values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
+            database.insert(Tables.RECORD, null, values);
 
-                String syncTime = String.valueOf(surveyedLocale.getLastModified());
-                setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
+            syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
 
-                database.setTransactionSuccessful();
-            } finally {
-                database.endTransaction();
-            }
+            // Update the record last modification date, if necessary
+            updateRecordModifiedDate(id, surveyedLocale.getLastModified());
+
+            String syncTime = String.valueOf(surveyedLocale.getLastModified());
+            setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
+
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
         }
     }
     

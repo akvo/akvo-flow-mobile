@@ -28,6 +28,7 @@ public class QuestionGroupTab extends ScrollView {
 
     private List<QuestionView> mQuestionViews;
     private LinearLayout mContainer;
+    private boolean mLoaded;
 
     public QuestionGroupTab(Context context, QuestionGroup group,  SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -36,6 +37,7 @@ public class QuestionGroupTab extends ScrollView {
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
         mQuestionViews = new ArrayList<QuestionView>();
+        mLoaded = false;
         init();
     }
 
@@ -57,6 +59,7 @@ public class QuestionGroupTab extends ScrollView {
      * retrieve them from the corresponding position in mQuestionViews.
      */
     public void load() {
+        mLoaded = true;
         LayoutInflater inflater = LayoutInflater.from(getContext());
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
@@ -171,6 +174,10 @@ public class QuestionGroupTab extends ScrollView {
             // Notify the View so it can release any system resource (i.e. Location updates)
             q.releaseResources();
         }
+    }
+
+    public boolean isLoaded() {
+        return mLoaded;
     }
 
 }

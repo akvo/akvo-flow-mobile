@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -160,6 +161,14 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         View view;
         if (position < mQuestionGroupTabs.size()) {
             view = mQuestionGroupTabs.get(position);// Already instantiated
+            // Load tab, if necessary
+            QuestionGroupTab tab = (QuestionGroupTab)view;
+            if (!tab.isLoaded()) {
+                Log.i("TabAdapter", "instantiateItem() - Inflating Tab #" + position);
+                tab.load();
+                setupDependencies();
+                tab.loadState();
+            }
         } else {
             view = mSubmitTab;
         }
@@ -193,6 +202,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     public void onPageSelected(int position) {
         if (position == mQuestionGroupTabs.size() && mSubmitTab != null) {
             mSubmitTab.refresh(checkInvalidQuestions());
+        } else {
         }
 
         // Select the corresponding tab

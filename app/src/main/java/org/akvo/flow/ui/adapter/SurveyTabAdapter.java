@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionGroupTab;
@@ -25,6 +24,8 @@ import java.util.List;
 
 public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener,
         ActionBar.TabListener {
+    private static final String TAG = SurveyTabAdapter.class.getSimpleName();
+
     private Context mContext;
     private SurveyListener mSurveyListener;
     private QuestionInteractionListener mQuestionListener;
@@ -84,6 +85,20 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
+    /**
+     * Check if the tab is loaded, and do so if it has not been loaded yet.
+     * @param tab
+     */
+    private void loadTab(int position) {
+        QuestionGroupTab tab = mQuestionGroupTabs.get(position);
+        if (!tab.isLoaded()) {
+            Log.d(TAG, "Loading Tab #" + position);
+            tab.load();
+            setupDependencies();// Dependencies might occur across tabs
+            tab.loadState();
+        }
+    }
+
     public void reset() {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             if (questionGroupTab.isLoaded()) {
@@ -128,7 +143,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
      */
     private void setupDependencies() {
         for (QuestionGroup group : mQuestionGroups) {
-            for (Question question : group.getQuestions()) {// TODO: Add getQuestions() to Survey
+            for (Question question : group.getQuestions()) {
                 setupDependencies(question);
             }
         }
@@ -155,14 +170,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         View view;
         if (position < mQuestionGroupTabs.size()) {
             view = mQuestionGroupTabs.get(position);// Already instantiated
-            // Load tab, if necessary
-            QuestionGroupTab tab = (QuestionGroupTab)view;
-            if (!tab.isLoaded()) {
-                Log.d("TabAdapter", "instantiateItem() - Inflating Tab #" + position);
-                tab.load();
-                setupDependencies();// Dependencies might occur across tabs
-                tab.loadState();
-            }
+            loadTab(position);// Load tab state, if necessary
         } else {
             view = mSubmitTab;
         }
@@ -195,8 +203,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     @Override
     public void onPageSelected(int position) {
         if (position == mQuestionGroupTabs.size() && mSubmitTab != null) {
+            loadTab(position);// Check all the tabs have been populated by now
             mSubmitTab.refresh(checkInvalidQuestions());
-        } else {
         }
 
         // Select the corresponding tab

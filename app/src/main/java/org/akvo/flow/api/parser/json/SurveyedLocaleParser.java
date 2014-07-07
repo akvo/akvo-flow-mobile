@@ -59,9 +59,9 @@ public class SurveyedLocaleParser {
         String id = jSurveyedLocale.getString(Attrs.ID);
         long lastModified = jSurveyedLocale.getLong(Attrs.LAST_MODIFIED);
         long surveyGroupId = jSurveyedLocale.getLong(Attrs.SURVEY_GROUP_ID);
-        Double latitude = jSurveyedLocale.has(Attrs.LATITUDE) ?
+        Double latitude = jSurveyedLocale.has(Attrs.LATITUDE) && !jSurveyedLocale.isNull(Attrs.LATITUDE) ?
                 jSurveyedLocale.getDouble(Attrs.LATITUDE) : null;
-        Double longitude = jSurveyedLocale.has(Attrs.LONGITUDE) ?
+        Double longitude = jSurveyedLocale.has(Attrs.LONGITUDE) && !jSurveyedLocale.isNull(Attrs.LONGITUDE) ?
             jSurveyedLocale.getDouble(Attrs.LONGITUDE) : null;
 
         String name = jSurveyedLocale.optString(Attrs.NAME, "Unknown");

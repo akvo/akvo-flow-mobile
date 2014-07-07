@@ -203,7 +203,11 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     @Override
     public void onPageSelected(int position) {
         if (position == mQuestionGroupTabs.size() && mSubmitTab != null) {
-            loadTab(position);// Check all the tabs have been populated by now
+            // Check all the tabs have been populated by now
+            int i = 0;
+            while (i < position) {
+                loadTab(i++);
+            }
             mSubmitTab.refresh(checkInvalidQuestions());
         }
 

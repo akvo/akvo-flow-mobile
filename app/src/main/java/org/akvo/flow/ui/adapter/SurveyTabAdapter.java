@@ -6,13 +6,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionGroupTab;
@@ -24,6 +24,8 @@ import java.util.List;
 
 public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener,
         ActionBar.TabListener {
+    private static final String TAG = SurveyTabAdapter.class.getSimpleName();
+
     private Context mContext;
     private SurveyListener mSurveyListener;
     private QuestionInteractionListener mQuestionListener;
@@ -77,24 +79,32 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mPager.setOnPageChangeListener(this);
     }
 
-    public void load() {
-        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.load();
-        }
-
-        // Now that all the tabs are populated, we setup the dependencies
-        setupDependencies();
-    }
-
     public void notifyOptionsChanged() {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             questionGroupTab.notifyOptionsChanged();// Spread the word
         }
     }
 
-    public void loadState() {
+    /**
+     * Check if the tab is loaded, and do so if it has not been loaded yet.
+     * @param tab
+     */
+    private void loadTab(int position) {
+        QuestionGroupTab tab = mQuestionGroupTabs.get(position);
+        if (!tab.isLoaded()) {
+            Log.d(TAG, "Loading Tab #" + position);
+            tab.load();
+            setupDependencies();// Dependencies might occur across tabs
+            tab.loadState();
+        }
+    }
+
+    public void reset() {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.loadState();
+            if (questionGroupTab.isLoaded()) {
+                // Only care about the loaded tabs
+                questionGroupTab.loadState();
+            }
         }
     }
 
@@ -133,7 +143,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
      */
     private void setupDependencies() {
         for (QuestionGroup group : mQuestionGroups) {
-            for (Question question : group.getQuestions()) {// TODO: Add getQuestions() to Survey
+            for (Question question : group.getQuestions()) {
                 setupDependencies(question);
             }
         }
@@ -160,6 +170,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         View view;
         if (position < mQuestionGroupTabs.size()) {
             view = mQuestionGroupTabs.get(position);// Already instantiated
+            loadTab(position);// Load tab state, if necessary
         } else {
             view = mSubmitTab;
         }
@@ -192,6 +203,11 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     @Override
     public void onPageSelected(int position) {
         if (position == mQuestionGroupTabs.size() && mSubmitTab != null) {
+            // Check all the tabs have been populated by now
+            int i = 0;
+            while (i < position) {
+                loadTab(i++);
+            }
             mSubmitTab.refresh(checkInvalidQuestions());
         }
 
@@ -229,6 +245,5 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         return invalidQuestions;
     }
-
 
 }

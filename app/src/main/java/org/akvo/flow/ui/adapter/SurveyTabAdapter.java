@@ -78,24 +78,18 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mPager.setOnPageChangeListener(this);
     }
 
-    public void load() {
-        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.load();
-        }
-
-        // Now that all the tabs are populated, we setup the dependencies
-        setupDependencies();
-    }
-
     public void notifyOptionsChanged() {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             questionGroupTab.notifyOptionsChanged();// Spread the word
         }
     }
 
-    public void loadState() {
+    public void reset() {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.loadState();
+            if (questionGroupTab.isLoaded()) {
+                // Only care about the loaded tabs
+                questionGroupTab.loadState();
+            }
         }
     }
 
@@ -164,9 +158,9 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
             // Load tab, if necessary
             QuestionGroupTab tab = (QuestionGroupTab)view;
             if (!tab.isLoaded()) {
-                Log.i("TabAdapter", "instantiateItem() - Inflating Tab #" + position);
+                Log.d("TabAdapter", "instantiateItem() - Inflating Tab #" + position);
                 tab.load();
-                setupDependencies();
+                setupDependencies();// Dependencies might occur across tabs
                 tab.loadState();
             }
         } else {
@@ -239,6 +233,5 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         return invalidQuestions;
     }
-
 
 }

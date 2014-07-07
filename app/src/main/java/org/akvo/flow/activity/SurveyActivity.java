@@ -124,7 +124,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         setTitle(mSurvey.getName());
         mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
-        //mAdapter.load();// Instantiate tabs and views. TODO: Lazy loading with fragments!
         mPager.setAdapter(mAdapter);
 
         // Initialize new survey or load previous responses
@@ -213,7 +212,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
      */
     private void loadState(Map<String, QuestionResponse> responses) {
         mQuestionResponses = responses;
-        //mAdapter.loadState();
+        mAdapter.reset();// Propagate the change
     }
 
     /**

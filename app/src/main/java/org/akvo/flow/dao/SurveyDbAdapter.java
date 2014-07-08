@@ -1261,7 +1261,6 @@ public class SurveyDbAdapter {
         ContentValues values = new ContentValues();
         values.put(RecordColumns.RECORD_ID, id);
         values.put(RecordColumns.SURVEY_GROUP_ID, surveyGroupId);
-        //values.put(RecordColumns.NAME, context.getString(R.string.unknown));
         database.insert(Tables.RECORD, null, values);
         
         return id;

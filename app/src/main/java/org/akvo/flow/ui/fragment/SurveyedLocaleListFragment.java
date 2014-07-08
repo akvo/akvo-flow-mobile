@@ -288,7 +288,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             Long lastModified = c.getLong(c.getColumnIndexOrThrow(RecordColumns.LAST_MODIFIED));
             int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
 
-            nameView.setText(surveyedLocale.getName());
+            nameView.setText(surveyedLocale.getDisplayName(context));
             idView.setText(surveyedLocale.getId());
             distanceView.setText(getDistanceText(surveyedLocale));
             displayDateText(dateView, lastModified);

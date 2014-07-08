@@ -64,7 +64,7 @@ public class SurveyedLocaleParser {
         Double longitude = jSurveyedLocale.has(Attrs.LONGITUDE) && !jSurveyedLocale.isNull(Attrs.LONGITUDE) ?
             jSurveyedLocale.getDouble(Attrs.LONGITUDE) : null;
 
-        String name = jSurveyedLocale.optString(Attrs.NAME, "Unknown");
+        String name = jSurveyedLocale.optString(Attrs.NAME, null);
 
         JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
         List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);

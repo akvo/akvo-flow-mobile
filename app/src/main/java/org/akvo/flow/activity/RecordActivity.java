@@ -143,7 +143,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     }
 
     private void displayRecord() {
-        mRecordTextView.setText(mRecord.getName() + ", " + mRecord.getId());
+        mRecordTextView.setText(mRecord.getDisplayName(this) + ", " + mRecord.getId());
     }
 
     @Override

@@ -16,6 +16,11 @@
 
 package org.akvo.flow.domain;
 
+import android.content.Context;
+import android.text.TextUtils;
+
+import org.akvo.flow.R;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -73,6 +78,13 @@ public class SurveyedLocale implements Serializable {
     
     public String getName() {
         return mName;
+    }
+
+    /**
+     * Get record name if exists, 'Unknown' otherwise
+     */
+    public String getDisplayName(Context context) {
+        return TextUtils.isEmpty(mName) ? context.getString(R.string.unknown) : mName;
     }
     
 }

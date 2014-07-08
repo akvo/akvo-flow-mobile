@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -39,7 +39,6 @@ import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.domain.ScoringRule;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
@@ -1259,12 +1258,10 @@ public class SurveyDbAdapter {
         String base32Id = Base32.base32Uuid();
         // Put dashes between the 4-5 and 8-9 positions to increase readability
         String id = base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
-        // TODO: Don not initialize the values here
-        String name = context.getString(R.string.unknown);
         ContentValues values = new ContentValues();
         values.put(RecordColumns.RECORD_ID, id);
         values.put(RecordColumns.SURVEY_GROUP_ID, surveyGroupId);
-        values.put(RecordColumns.NAME, name);
+        //values.put(RecordColumns.NAME, context.getString(R.string.unknown));
         database.insert(Tables.RECORD, null, values);
         
         return id;

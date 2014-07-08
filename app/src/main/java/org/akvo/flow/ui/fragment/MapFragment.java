@@ -203,7 +203,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     private void displayRecord(SurveyedLocale record) {
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(record.getLatitude(), record.getLongitude()))
-                .title(record.getName())
+                .title(record.getDisplayName(getActivity()))
                 .snippet(record.getId()));
     }
 

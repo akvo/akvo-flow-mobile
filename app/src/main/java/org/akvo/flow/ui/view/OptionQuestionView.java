@@ -394,9 +394,8 @@ public class OptionQuestionView extends QuestionView {
         if (OTHER_TEXT.equals(mIdToValueMap.get(checkedId))) {
             // only display the dialog if OTHER isn't already populated as
             // the response need this to suppress the OTHER dialog
-            if (isChecked
-                    && (getResponse() == null || !getResponse().getType()
-                            .equals(ConstantUtil.OTHER_RESPONSE_TYPE))) {
+            if (isChecked && (getResponse() == null || !getResponse().getType()
+                    .equals(ConstantUtil.OTHER_RESPONSE_TYPE))) {
                 displayOtherDialog();
             } else if (!isChecked && getResponse() != null) {
                 // since they unchecked "Other", clear the display
@@ -518,8 +517,11 @@ public class OptionQuestionView extends QuestionView {
         builder.setNegativeButton(R.string.cancelbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        setResponse(new QuestionResponse("",
-                                ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion.getId()));
+                        // Reset the answer only for single-choice questions
+                        if (!getQuestion().isAllowMultiple()) {
+                            setResponse(new QuestionResponse("", ConstantUtil.OTHER_RESPONSE_TYPE,
+                                    mQuestion.getId()));
+                        }
                         if (dialog != null) {
                             dialog.dismiss();
                         }

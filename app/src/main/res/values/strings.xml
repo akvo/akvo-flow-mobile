@@ -194,6 +194,7 @@
     <string name="error_answer_match">Answers do not match</string>
     <string name="reg_form_warning_title">Registration Survey</string>
     <string name="reg_form_warning_text">This Data Point already contains a response for this form. Any new responses will be used as the most recent values. Do you want to continue?</string>
+    <string name="error_img_preview">Can\'t load image preview</string>
     <!-- RecordList Activity -->
     <string name="create_data_point">CREATE NEW DATA POINT</string>
     <!-- Record Activity -->

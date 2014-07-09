@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -82,13 +83,13 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     public void onClick(View v) {
         if (v == mImage) {
             String filename = getResponse() != null ? getResponse().getValue() : null;
-            if (TextUtils.isEmpty(filename)) {
+            if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
+                Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
                 return;
             }
-            File file = new File(filename);
             String type = isImage() ? ConstantUtil.IMAGE_MIME : ConstantUtil.VIDEO_MIME;
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(file), type);
+            intent.setDataAndType(Uri.fromFile(new File(filename)), type);
             getContext().startActivity(intent);
         } else if (v == mMediaButton) {
             if (isImage()) {

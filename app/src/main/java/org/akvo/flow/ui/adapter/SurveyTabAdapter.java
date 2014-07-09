@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.akvo.flow.R;
 import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
@@ -72,7 +73,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         if (mSubmitTab != null) {
             mActionBar.addTab(mActionBar.newTab()
-                    .setText("Submit")// TODO: Externalize string
+                    .setText(R.string.submitbutton)
                     .setTabListener(this));
         }
 

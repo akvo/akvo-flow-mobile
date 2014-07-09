@@ -336,6 +336,9 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.edit_lang:
                 displayLanguagesDialog();
                 return true;

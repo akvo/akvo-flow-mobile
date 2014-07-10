@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -19,6 +19,7 @@ package org.akvo.flow.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +41,8 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.ViewUtil;
 
 /**
@@ -69,7 +70,6 @@ public class BootstrapService extends Service {
     private Thread workerThread;
     private SurveyDbAdapter databaseAdapter;
     private static final Integer NOTIFICATION_ID = new Integer(123);
-    private PropertyUtil props;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -216,32 +216,19 @@ public class BootstrapService extends Service {
                         survey.setLocation(ConstantUtil.FILE_LOCATION);
                         survey.setFileName(fileName);
 
-                        // in both cases (new survey and existing), we need to
-                        // update the xml
-                        FileUtil.extractAndSaveFile(
-                                zis,
-                                FileUtil.getFileOutputStream(
-                                        fileName,
-                                        ConstantUtil.DATA_DIR,
-                                        props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                                        this));
+                        // in both cases (new survey and existing), we need to update the xml
+                        File file = new File(FileUtil.getFilesDir(FileType.FORMS), fileName);
+                        FileUtil.extractAndSaveFile(zis, new FileOutputStream(file));
                         // now read the survey XML back into memory to see if
                         // there is a version
                         Survey loadedSurvey = null;
                         try {
-                            InputStream in = FileUtil
-                                    .getFileInputStream(
-                                            survey.getFileName(),
-                                            ConstantUtil.DATA_DIR,
-                                            props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                                            this);
+                            InputStream in = new FileInputStream(file);
                             loadedSurvey = SurveyDao.loadSurvey(survey, in);
-
                         } catch (FileNotFoundException e) {
                             Log.e(TAG, "Could not load survey xml file");
                         }
-                        if (loadedSurvey != null
-                                && loadedSurvey.getVersion() > 0) {
+                        if (loadedSurvey != null && loadedSurvey.getVersion() > 0) {
                             survey.setVersion(loadedSurvey.getVersion());
                         } else if (survey.getVersion() <= 0) {
                             survey.setVersion(1d);
@@ -253,15 +240,12 @@ public class BootstrapService extends Service {
                     } else {
                         // if it's not a sql file and its not a survey, it must
                         // be help media
-                        FileUtil.extractAndSaveFile(
-                                zis,
-                                FileUtil.getFileOutputStream(
-                                        fileName,
-                                        ConstantUtil.DATA_DIR + id
-                                                + File.separator,
-                                        props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                                        this));
-
+                        File helpDir = new File(FileUtil.getFilesDir(FileType.FORMS), id);
+                        if (!helpDir.exists()) {
+                            helpDir.mkdir();
+                        }
+                        File file = new File(helpDir, fileName);
+                        FileUtil.extractAndSaveFile(zis, new FileOutputStream(file));
                         // record the fact that this survey had media
                         surveysWithImages.add(id);
                     }
@@ -316,27 +300,21 @@ public class BootstrapService extends Service {
         ArrayList<File> zipFiles = new ArrayList<File>();
         // zip files can only be loaded on the SD card (not internal storage) so
         // we only need to look there
-        if (Environment.MEDIA_MOUNTED.equals(Environment
-                .getExternalStorageState())) {
-            File dir = FileUtil.findOrCreateDir(FileUtil.getStorageDirectory(
-                    ConstantUtil.BOOTSTRAP_DIR, false));
-            if (dir != null) {
-                File[] fileList = dir.listFiles();
-                if (fileList != null) {
-                    for (int i = 0; i < fileList.length; i++) {
-                        if (fileList[i].isFile()
-                                && fileList[i]
-                                        .getName()
-                                        .toLowerCase()
-                                        .endsWith(
-                                                ConstantUtil.ARCHIVE_SUFFIX
-                                                        .toLowerCase())) {
-                            zipFiles.add(fileList[i]);
-                        }
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            File dir = FileUtil.getFilesDir(FileType.INPUT);
+            File[] fileList = dir.listFiles();
+            if (fileList != null) {
+                for (int i = 0; i < fileList.length; i++) {
+                    if (fileList[i].isFile()
+                            && fileList[i]
+                                    .getName()
+                                    .toLowerCase()
+                                    .endsWith(ConstantUtil.ARCHIVE_SUFFIX.toLowerCase())) {
+                        zipFiles.add(fileList[i]);
                     }
                 }
-                Collections.sort(zipFiles);
             }
+            Collections.sort(zipFiles);
         }
         return zipFiles;
     }
@@ -347,7 +325,6 @@ public class BootstrapService extends Service {
      */
     public void onCreate() {
         super.onCreate();
-        props = new PropertyUtil(getResources());
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
                 .getInstance());
     }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,6 +16,8 @@
 
 package org.akvo.flow.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -138,10 +140,8 @@ public class LangsPreferenceUtil {
                         ConstantUtil.RESOURCE_PACKAGE));
             } else {
                 // load from file
-                in = FileUtil.getFileInputStream(survey.getFileName(),
-                        ConstantUtil.DATA_DIR,
-                        props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                        context);
+                File f = new File(FileUtil.getFilesDir(FileUtil.FileType.FORMS), survey.getFileName());
+                in = new FileInputStream(f);
             }
             Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);
             if (hydratedSurvey != null) {

@@ -27,8 +27,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.apache.http.HttpStatus;
@@ -106,13 +106,13 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
         @Override
         protected String doInBackground(Void... params) {
             // Create parent directories, and delete files, if necessary
-            String localPath = cleanupDownloads(mUrl, mVersion);
+            String filename = createFile(mUrl, mVersion).getAbsolutePath();
 
-            if (downloadApk(mUrl, localPath) && !isCancelled()) {
-                return localPath;
+            if (downloadApk(mUrl, filename) && !isCancelled()) {
+                return filename;
             }
             // Clean up sd-card to ensure no corrupted file is leaked.
-            cleanupDownloads(mUrl, mVersion);
+            cleanupDownloads(mVersion);
             return null;
         }
 
@@ -149,14 +149,11 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
         protected void onCancelled () {
             Log.d(TAG, "onCancelled() - APK update task cancelled");
             mProgress.setProgress(0);
-            cleanupDownloads(mUrl, mVersion);
+            cleanupDownloads(mVersion);
         }
 
-        private String cleanupDownloads(String location, String version) {
-            String fileName = location.substring(location.lastIndexOf('/') + 1);
-            String dir = FileUtil.getStorageDirectory(ConstantUtil.APK_DIR + version, false);
-
-            File directory = new File(dir);
+        private void cleanupDownloads(String version) {
+            File directory = new File(FileUtil.getFilesDir(FileType.APK), version);
             // Empty the directory
             if (directory.exists()) {
                 for (File f : directory.listFiles()) {
@@ -164,11 +161,25 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
                 }
             }
             directory.delete();
-            directory.mkdirs();
+        }
 
-            String localPath = dir + "/" + fileName;
+        /**
+         * Wipe any existing apk file, and create a new File for the new one, according to the
+         * given version
+         * @param location
+         * @param version
+         * @return
+         */
+        private File createFile(String location, String version) {
+            cleanupDownloads(version);
 
-            return localPath;
+            String fileName = location.substring(location.lastIndexOf('/') + 1);
+            File directory = new File(FileUtil.getFilesDir(FileType.APK), version);
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+
+            return new File(directory, fileName);
         }
 
         /**

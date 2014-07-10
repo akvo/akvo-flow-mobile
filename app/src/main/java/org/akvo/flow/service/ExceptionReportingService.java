@@ -36,6 +36,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -130,17 +131,7 @@ public class ExceptionReportingService extends Service {
      * 
      * @return
      */
-    private String[] getTraceFiles() {
-        String dirString = null;
-        if (Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            dirString = FileUtil.getStorageDirectory(
-                    ConstantUtil.STACKTRACE_DIR, false);
-        } else {
-            dirString = FileUtil.getStorageDirectory(
-                    ConstantUtil.STACKTRACE_DIR, true);
-        }
-        File dir = FileUtil.findOrCreateDir(dirString);
+    private String[] getTraceFiles(File dir) {
         FilenameFilter traceFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith(ConstantUtil.STACKTRACE_SUFFIX);
@@ -157,21 +148,15 @@ public class ExceptionReportingService extends Service {
         if (StatusUtil.hasDataConnection(this)) {
             try {
                 if (server != null) {
-                    String dirString = null;
-                    if (Environment.getExternalStorageState().equals(
-                            Environment.MEDIA_MOUNTED)) {
-                        dirString = FileUtil.getStorageDirectory(
-                                ConstantUtil.STACKTRACE_DIR, false);
-                    } else {
-                        dirString = FileUtil.getStorageDirectory(
-                                ConstantUtil.STACKTRACE_DIR, true);
+                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                        return;
                     }
-                    String[] list = getTraceFiles();
+                    File dir = FileUtil.getFilesDir(FileType.STACKTRACE);
+                    String[] list = getTraceFiles(dir);
                     if (list != null && list.length > 0) {
                         for (int i = 0; i < list.length; i++) {
-                            String trace = FileUtil.readFileAsString(dirString
-                                    + list[i]);
-                            File f = new File(dirString + list[i]);
+                            String trace = FileUtil.readFileAsString(dir.getAbsolutePath() + list[i]);
+                            File f = new File(dir + list[i]);
 
                             Map<String, String> params = new HashMap<String, String>();
                             params.put(ACTION_PARAM, ACTION_VALUE);

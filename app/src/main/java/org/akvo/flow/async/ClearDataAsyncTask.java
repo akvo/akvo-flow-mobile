@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,7 +16,6 @@
 
 package org.akvo.flow.async;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 
 import android.content.Context;
@@ -27,9 +26,8 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.PropertyUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 
 public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private static final String TAG = ClearDataAsyncTask.class.getSimpleName();
@@ -40,14 +38,9 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private WeakReference<Context> mWeakContext;
 
     private SurveyDbAdapter mDatabase;
-    private boolean mUseInternalStorage;
 
     public ClearDataAsyncTask(Context context) {
         mWeakContext = new WeakReference<Context>(context);
-
-        mUseInternalStorage = new PropertyUtil(context.getResources())
-                .getBoolean(ConstantUtil.USE_INTERNAL_STORAGE);
-
         // Use the Application Context to be held by the Database
         // This will allow the current Activity to be GC if it's finished
         mDatabase = new SurveyDbAdapter(context.getApplicationContext());
@@ -115,24 +108,14 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private void clearExternalStorage(boolean responsesOnly) {
         if (!responsesOnly) {
             // Delete downloaded survey xml/zips
-            FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                    ConstantUtil.DATA_DIR, mUseInternalStorage)), false);
-
-            // Delete stacktrace files (depending on SD card state,
-            // they may be written to both internal and external storage)
-            FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                    ConstantUtil.STACKTRACE_DIR, false)), false);
-
-            FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                    ConstantUtil.STACKTRACE_DIR, true)), false);
-
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.FORMS), false);
+            // Delete stacktrace files
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.STACKTRACE), false);
             // Delete bootstraps
-            FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                    ConstantUtil.BOOTSTRAP_DIR, mUseInternalStorage)), false);
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INPUT), false);
         }
 
         // Delete exported zip/image files
-        FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                ConstantUtil.SURVEYAL_DIR, mUseInternalStorage)), true);
+        FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.DATA), true);
     }
 }

@@ -49,12 +49,14 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -186,8 +188,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         InputStream in = null;
         try {
             // load from file
-            in = FileUtil.getFileInputStream(surveyMeta.getFileName(),
-                    ConstantUtil.DATA_DIR, false, this);
+            File file = new File(FileUtil.getFilesDir(FileType.FORMS), surveyMeta.getFileName());
+            in = new FileInputStream(file);
             mSurvey = SurveyDao.loadSurvey(surveyMeta, in);
             mSurvey.setId(surveyId);
         } catch (FileNotFoundException e) {
@@ -407,17 +409,13 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     fileSuffix = VIDEO_SUFFIX;
                 }
 
-                File f = new File(Environment.getExternalStorageDirectory()
-                        .getAbsolutePath() + File.separator + filePrefix + fileSuffix);
+                File tmp = getTmpFile(requestCode == PHOTO_ACTIVITY_REQUEST);
 
                 // Ensure no image is saved in the DCIM folder
-                FileUtil.cleanDCIM(this, f.getAbsolutePath());
+                FileUtil.cleanDCIM(this, tmp.getAbsolutePath());
 
-                String newFilename = filePrefix + System.nanoTime() + fileSuffix;
-                String newPath = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
-                        newFilename, false);
-                FileUtil.findOrCreateDir(newPath);
-                String absoluteFile = newPath + File.separator + newFilename;
+                String filename = filePrefix + System.nanoTime() + fileSuffix;
+                File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
                 int maxImgSize = ConstantUtil.IMAGE_SIZE_320_240;
                 String maxImgSizePref = mDatabase.getPreference(ConstantUtil.MAX_IMG_SIZE);
@@ -427,18 +425,18 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
                 String sizeTxt = getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize];
 
-                if (ImageUtil.resizeImage(f.getAbsolutePath(), absoluteFile, maxImgSize)) {
+                if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(), maxImgSize)) {
                     Toast.makeText(this, "Image resized to " + sizeTxt, Toast.LENGTH_LONG).show();
-                    if (!f.delete()) { // must check return value to know if it failed
+                    if (!tmp.delete()) { // must check return value to know if it failed
                         Log.e(TAG, "Media file delete failed");
                     }
-                } else if (!f.renameTo(new File(absoluteFile))) {
+                } else if (!tmp.renameTo(imgFile)) {
                     // must check  return  value to  know if it  failed!
                     Log.e(TAG, "Media file resize failed");
                 }
 
                 Bundle photoData = new Bundle();
-                photoData.putString(ConstantUtil.MEDIA_FILE_KEY, absoluteFile);
+                photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
             } else {
                 Log.e(TAG, "Result of camera op was not ok: " + resultCode);
@@ -538,9 +536,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         if (QuestionInteractionEvent.TAKE_PHOTO_EVENT.equals(event.getEventType())) {
             // fire off the intent
             Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment
-                    .getExternalStorageDirectory().getAbsolutePath() + File.separator
-                    + TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX)));
+            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTmpFile(true)));
             if (event.getSource() != null) {
                 mRequestQuestionId = event.getSource().getQuestion().getId();
             } else {
@@ -551,9 +547,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event.getEventType())) {
             // fire off the intent
             Intent i = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment
-                    .getExternalStorageDirectory().getAbsolutePath() + File.separator
-                    + TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX)));
+            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTmpFile(false)));
             if (event.getSource() != null) {
                 mRequestQuestionId = event.getSource().getQuestion().getId();
             } else {
@@ -665,6 +659,12 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 }
             }
         }
+    }
+
+    private File getTmpFile(boolean image) {
+        String filename = image ? TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX
+                : TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
+        return new File(FileUtil.getFilesDir(FileType.TMP), filename);
     }
 
 }

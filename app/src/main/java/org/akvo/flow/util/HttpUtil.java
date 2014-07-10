@@ -154,7 +154,6 @@ public class HttpUtil {
                 // compress since
                 // that may not preserve the original file type so subsequent
                 // call will encounter cache misses.
-                FileUtil.findOrCreateDir(cacheDir);
                 httpDownload(url, cacheDir + "/" + fileName);
                 bitMap = BitmapFactory.decodeFile(cacheDir + "/" + fileName);
             }

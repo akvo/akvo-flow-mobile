@@ -39,6 +39,7 @@ import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.Base64;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.MultipartStream;
 import org.akvo.flow.util.PlatformUtil;
@@ -60,7 +61,6 @@ import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -98,10 +98,6 @@ public class DataSyncService extends IntentService {
     private static final String SIGNING_KEY_PROP = "signingKey";
     private static final String SIGNING_ALGORITHM = "HmacSHA1";
 
-    /**
-     * Used to have an extra  slash. Semantically  harmless, but made  the DB lookup fail
-     */
-    private static final String TEMP_FILE_NAME = "wfp";
     private static final String SURVEY_DATA_FILE = "data.txt";
     private static final String SIG_FILE_NAME = ".sig";
 
@@ -126,14 +122,10 @@ public class DataSyncService extends IntentService {
 
     private static final String UTF8 = "UTF-8";
 
-    private enum NotificationType { PROGRESS, EXPORT, SYNC, ERROR };
-
     /**
      * Number of retries to upload a file to S3
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
-
-    private static final NumberFormat PCT_FORMAT = NumberFormat.getPercentInstance();
 
     private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
@@ -194,7 +186,8 @@ public class DataSyncService extends IntentService {
     }
 
     private ZipFileData formZip(long surveyInstanceId) {
-        String fileName = createFileName();
+        File zipFile = new File(FileUtil.getFilesDir(FileType.DATA),
+                System.nanoTime() + ConstantUtil.ARCHIVE_SUFFIX);
         ZipFileData zipFileData = new ZipFileData();
         StringBuilder surveyBuf = new StringBuilder();
 
@@ -203,8 +196,7 @@ public class DataSyncService extends IntentService {
 
         // Write the data into the zip file
         try {
-            File zipFile = new File(fileName);
-            fileName = zipFile.getAbsolutePath();// Will normalize filename.
+            String fileName = zipFile.getAbsolutePath();// Will normalize filename.
             zipFileData.filename = fileName;
             Log.i(TAG, "Creating zip file: " + fileName);
             FileOutputStream fout = new FileOutputStream(zipFile);
@@ -364,20 +356,6 @@ public class DataSyncService extends IntentService {
             return val;
         } else
             return "";
-    }
-
-    /**
-     * constructs a filename for the data file
-     * 
-     * @return
-     */
-    private String createFileName() {
-        // TODO move zip file extension to constantutil
-        String fileName = TEMP_FILE_NAME + System.nanoTime() + ".zip";
-        String dir = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR, fileName, false);
-        FileUtil.findOrCreateDir(dir);
-
-        return dir + File.separator + fileName;
     }
 
     // ================================================================= //
@@ -603,8 +581,8 @@ public class DataSyncService extends IntentService {
             for (int i=0; i<jFiles.length(); i++) {
                 // Build the sdcard path for each image
                 String filename = jFiles.getString(i);
-                String dir = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR, filename, false);
-                files.add(dir + "/" + filename);
+                File file = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
+                files.add(file.getAbsolutePath());
             }
         }
         return files;

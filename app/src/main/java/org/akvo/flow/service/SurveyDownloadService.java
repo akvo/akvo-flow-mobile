@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,6 +16,7 @@
 
 package org.akvo.flow.service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -52,6 +53,7 @@ import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.exception.TransferException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -262,17 +264,11 @@ public class SurveyDownloadService extends Service {
     private boolean downloadSurvey(String serverBase, Survey survey) {
         boolean success = false;
         try {
-            HttpUtil.httpDownload(
-                    props.getProperty(ConstantUtil.SURVEY_S3_URL)
-                            + survey.getId() + ConstantUtil.ARCHIVE_SUFFIX,
-                    FileUtil.getFileOutputStream(
-                            survey.getId() + ConstantUtil.ARCHIVE_SUFFIX,
-                            ConstantUtil.DATA_DIR,
-                            props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                            this));
-            extractAndSave(FileUtil.getFileInputStream(survey.getId()
-                    + ConstantUtil.ARCHIVE_SUFFIX, ConstantUtil.DATA_DIR,
-                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this));
+            String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
+            File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
+            HttpUtil.httpDownload(props.getProperty(ConstantUtil.SURVEY_S3_URL) + filename,
+                            new FileOutputStream(file));
+            extractAndSave(new FileInputStream(file));
 
             survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
             survey.setType(DEFAULT_TYPE);
@@ -312,9 +308,8 @@ public class SurveyDownloadService extends Service {
         ZipInputStream zis = new ZipInputStream(zipFile);
         ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
-            FileOutputStream fout = FileUtil.getFileOutputStream(
-                    entry.getName(), ConstantUtil.DATA_DIR,
-                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this);
+            File f = new File(FileUtil.getFilesDir(FileType.FORMS), entry.getName());
+            FileOutputStream fout = new FileOutputStream(f);
             byte[] buffer = new byte[2048];
             int size;
             while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
@@ -337,21 +332,15 @@ public class SurveyDownloadService extends Service {
         if (StatusUtil.hasDataConnection(this)) {
             try {
                 InputStream in = null;
-                if (ConstantUtil.RESOURCE_LOCATION.equalsIgnoreCase(survey
-                        .getLocation())) {
+                if (ConstantUtil.RESOURCE_LOCATION.equalsIgnoreCase(survey.getLocation())) {
                     // load from resource
                     Resources res = getResources();
-                    in = res.openRawResource(res.getIdentifier(
-                            survey.getFileName(), ConstantUtil.RAW_RESOURCE,
-                            ConstantUtil.RESOURCE_PACKAGE));
+                    in = res.openRawResource(res.getIdentifier(survey.getFileName(),
+                            ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
                 } else {
                     // load from file
-                    in = FileUtil
-                            .getFileInputStream(
-                                    survey.getFileName(),
-                                    ConstantUtil.DATA_DIR,
-                                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                                    this);
+                    File f = new File(FileUtil.getFilesDir(FileType.FORMS), survey.getFileName());
+                    in = new FileInputStream(f);
                 }
                 Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);
                 if (hydratedSurvey != null) {
@@ -415,10 +404,12 @@ public class SurveyDownloadService extends Service {
      */
     private void downloadBinary(final String remoteFile, final String surveyId) {
         try {
-            final FileOutputStream out = FileUtil.getFileOutputStream(
-                    remoteFile.substring(remoteFile.lastIndexOf("/") + 1),
-                    ConstantUtil.DATA_DIR + surveyId + "/",
-                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this);
+            String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
+            File dir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            final FileOutputStream out = new FileOutputStream(new File(dir, filename));
             downloadExecutor.execute(new Runnable() {
                 @Override
                 public void run() {

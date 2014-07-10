@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,6 +16,7 @@
 
 package org.akvo.flow.exception;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,11 +26,11 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import android.os.Environment;
 import android.util.Log;
 
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 
 /**
  * This exception handler will log all exceptions it handles to the filesystem
@@ -121,33 +122,20 @@ public class PersistentUncaughtExceptionHandler implements
                 printWriter.print("\n" + exception.getMessage());
             }
 
+            String filename = ConstantUtil.STACKTRACE_FILENAME + System.currentTimeMillis()
+                    + ConstantUtil.STACKTRACE_SUFFIX;
+            File file = new File(FileUtil.getFilesDir(FileType.STACKTRACE), filename);
+            FileOutputStream out;
             try {
-                FileOutputStream out = null;
-                if (Environment.getExternalStorageState().equals(
-                        Environment.MEDIA_MOUNTED)) {
-                    out = FileUtil.getFileOutputStream(
-                            ConstantUtil.STACKTRACE_FILENAME
-                                    + Long.toString(System.currentTimeMillis())
-                                    + ConstantUtil.STACKTRACE_SUFFIX,
-                            ConstantUtil.STACKTRACE_DIR, false, null);
-                } else {
-                    out = FileUtil.getFileOutputStream(
-                            ConstantUtil.STACKTRACE_FILENAME
-                                    + Long.toString(System.currentTimeMillis())
-                                    + ConstantUtil.STACKTRACE_SUFFIX,
-                            ConstantUtil.STACKTRACE_DIR, true, null);
-                }
-
+                out = new FileOutputStream(file);
                 FileUtil.writeStringToFile(result.toString(), out);
             } catch (IOException e) {
                 Log.e(TAG, "Couldn't save trace file", e);
             } finally {
-                if (result != null) {
-                    try {
-                        result.close();
-                    } catch (IOException e) {
-                        Log.w(TAG, "Can't close print writer object", e);
-                    }
+                try {
+                    result.close();
+                } catch (IOException e) {
+                    Log.w(TAG, "Can't close print writer object", e);
                 }
             }
         }

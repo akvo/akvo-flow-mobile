@@ -22,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -39,6 +38,8 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.akvo.flow.app.FlowApp;
+
 /**
  * utility for manipulating files
  * 
@@ -47,7 +48,66 @@ import android.util.Log;
 public class FileUtil {
     private static final String TAG = FileUtil.class.getSimpleName();
 
+    // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
+    private static final String DIR_DATA = "akvoflow/data/files"; // form responses zip files
+    private static final String DIR_MEDIA = "akvoflow/data/media"; // form responses media files
+    private static final String DIR_INPUT = "akvoflow/input"; // Bootstrap files
+
+    // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
+    private static final String DIR_FORMS = "forms"; // Form definitions
+    private static final String DIR_STACKTRACE = "stacktrace"; // Crash reports
+    private static final String DIR_TMP = "tmp"; // Temporary files
+    private static final String DIR_APK = "apk"; // App upgrades
+
     private static final int BUFFER_SIZE = 2048;
+
+    public enum FileType {DATA, MEDIA, INPUT, FORMS, STACKTRACE, TMP, APK};
+
+    public static File getFilesDir(FileType type) {
+        String path = null;
+        switch (type) {
+            case DATA:
+                path =  getFilesStorageDir(false) + File.separator + DIR_DATA;
+                break;
+            case MEDIA:
+                path = getFilesStorageDir(false) + File.separator + DIR_MEDIA;
+                break;
+            case INPUT:
+                path = getFilesStorageDir(false) + File.separator + DIR_INPUT;
+                break;
+            case FORMS:
+                path = getFilesStorageDir(true) + File.separator + DIR_FORMS;
+                break;
+            case STACKTRACE:
+                path = getFilesStorageDir(true) + File.separator + DIR_STACKTRACE;
+                break;
+            case TMP:
+                path = getFilesStorageDir(true) + File.separator + DIR_TMP;
+                break;
+            case APK:
+                path = getFilesStorageDir(true) + File.separator + DIR_APK;
+                break;
+        }
+        File dir = new File(path);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    /**
+     * Get the root of the files storage directory, depending on the resource being app internal
+     * (not concerning the user) or not (users might need to pull the resource from the storage).
+     * @param internal true for app specific resources, false otherwise
+     * @return The root directory for this kind of resources
+     */
+    private static final String getFilesStorageDir(boolean internal) {
+        Context context = FlowApp.getApp().getApplicationContext();
+        if (internal) {
+            return context.getExternalFilesDir(null).getAbsolutePath();
+        }
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
 
     /**
      * writes the contents string to the file indicated by filePath
@@ -64,44 +124,6 @@ public class FileUtil {
             bw.flush();
             bw.close();
         }
-    }
-
-    /**
-     * Creates the data directory if it does not exist.
-     * 
-     * @param directory Absolute path to the location
-     * @return The File object representing that directory
-     */
-    public static File findOrCreateDir(String directory) {
-        File dir = new File(directory);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        return dir;
-    }
-
-    /**
-     * checks if a file exists
-     * 
-     * @param file
-     * @return
-     */
-    public static boolean doesFileExist(String file, String subDir,
-            boolean useInternal, Context c) {
-        boolean exists = false;
-        if (file != null) {
-            FileInputStream in = null;
-            try {
-                in = getFileInputStream(file, subDir, useInternal, c);
-                exists = true;
-                in.close();
-            } catch (FileNotFoundException e) {
-                exists = false;
-            } catch (IOException e) {
-                // no-op
-            }
-        }
-        return exists;
     }
 
     /**
@@ -165,8 +187,7 @@ public class FileUtil {
      * @return
      * @throws IOException
      */
-    public static ByteArrayOutputStream readZipEntry(ZipInputStream zis)
-            throws IOException {
+    public static ByteArrayOutputStream readZipEntry(ZipInputStream zis) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[BUFFER_SIZE];
         int size;
@@ -174,107 +195,6 @@ public class FileUtil {
             out.write(buffer, 0, size);
         }
         return out;
-    }
-
-    public static FileOutputStream getFileOutputStream(String file,
-            String subDir, boolean useInternal, Context c)
-            throws FileNotFoundException {
-        FileOutputStream out = null;
-        if (useInternal) {
-            out = c.openFileOutput(file, Context.MODE_WORLD_WRITEABLE);
-        } else {
-            String dir = getStorageDirectory(subDir, useInternal);
-            findOrCreateDir(dir);
-            out = new FileOutputStream(dir + file);
-        }
-        return out;
-    }
-
-    public static String getPathForFile(String file, String subDir,
-            boolean useInternal) {
-        String path = null;
-        if (useInternal) {
-            path = file;
-        } else {
-            String dir = getStorageDirectory(subDir, useInternal);
-            path = dir + file;
-        }
-        return path;
-    }
-
-    public static FileInputStream getFileInputStream(String file,
-            String subDir, boolean useInternal, Context c)
-            throws FileNotFoundException {
-        FileInputStream in = null;
-        if (useInternal) {
-            in = c.openFileInput(file);
-        } else {
-            String dir = getStorageDirectory(subDir, useInternal);
-            in = new FileInputStream(dir + file);
-        }
-        return in;
-    }
-
-    /**
-     * returns the path to the storage directory rooted at either the internal
-     * or external storage root. This method will NOT create any directories.
-     * 
-     * @param subDir
-     * @param useInternalStorage
-     * @return
-     */
-    public static String getStorageDirectory(String subDir,
-            boolean useInternalStorage) {
-        return getStorageDirectory(subDir, null, useInternalStorage);
-    }
-
-    /**
-     * returns the full path to a storage directory rooted at either the
-     * internal or external storage root. If subdir is not null, it will be
-     * appended to the root. If fileName is not null, the last 5 characters of
-     * the filename (before the file extension, if any) will be used as
-     * directories. If the file name is < 5 characters long, it will be padded
-     * with 0 as an example: getStorageDirectory("test","photo12345.jpg", false)
-     * would return something like "/sdcard/test/1/2/3/4/5/" and
-     * getStorageDirectory("test,"
-     * abc.jpg",false) would return something like "/sdcard/test/a/b/c/0/0"
-     * 
-     * @param subDir
-     * @param fileName
-     * @param useInternalStorage
-     * @return
-     */
-    public static String getStorageDirectory(String subDir, String fileName,
-            boolean useInternalStorage) {
-        String dir = "";
-        if (useInternalStorage) {
-            dir = Environment.getDataDirectory().getAbsolutePath();
-        } else {
-            dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-        }
-        if (!dir.endsWith(File.separator)) {
-            dir += File.separator;
-        }
-        if (subDir != null) {
-            dir += subDir;
-        }
-        if (fileName != null) {
-            if (fileName.contains(".")) {
-                fileName = fileName.substring(0, fileName.lastIndexOf("."));
-            }
-            char[] fileChars = fileName.toCharArray();
-            int count = 0;
-            for (int i = Math.max(0, fileChars.length - 5); i < fileChars.length; i++) {
-                dir = dir + File.separator + fileChars[i];
-                count++;
-            }
-            if (count < 5) {
-                for (int i = count; i < 5; i++) {
-                    dir = dir + File.separator + "0";
-                }
-            }
-        }
-        return dir;
     }
 
     /**
@@ -299,59 +219,6 @@ public class FileUtil {
             // now delete the directory itself
             if (deleteDir) {
                 dir.delete();
-            }
-        }
-    }
-
-    /**
-     * non-recursive delete of all files in a single directory that match the
-     * expression (regex) passed in
-     * 
-     * @param path
-     * @param expression
-     */
-    public static void deleteFilesMatchingExpression(String path,
-            String expression) {
-        deleteFilesMatchingExpression(new File(path), expression, false);
-    }
-
-    /**
-     * non-recursive delete of all files in a single directory that match the
-     * expression (regex) passed in
-     * 
-     * @param path
-     * @param expression
-     */
-    public static void deleteFilesMatchingExpression(String path,
-            String expression, boolean recurse) {
-        deleteFilesMatchingExpression(new File(path), expression, recurse);
-    }
-
-    /**
-     * delete of all files in a single directory that match the expression
-     * (regex) passed in
-     * 
-     * @param path
-     * @param expression
-     * @param recurse - if true, traverse subdirs too
-     */
-    public static void deleteFilesMatchingExpression(File root,
-            String expression, boolean recurse) {
-        if (root != null) {
-            if (root.isDirectory()) {
-                File[] files = root.listFiles();
-                if (files != null) {
-                    for (int i = 0; i < files.length; i++) {
-                        if (recurse && files[i].isDirectory()) {
-                            deleteFilesMatchingExpression(files[i], expression,
-                                    recurse);
-                        } else if (files[i].isFile()) {
-                            if (files[i].getName().matches(expression)) {
-                                files[i].delete();
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -508,7 +375,7 @@ public class FileUtil {
         String maxVersion = installedVer;// Keep track of newest version available
         String apkPath = null;
 
-        File appsLocation = new File(FileUtil.getStorageDirectory(ConstantUtil.APK_DIR, false));
+        File appsLocation = getFilesDir(FileType.APK);
         File[] versions = appsLocation.listFiles();
         if (versions != null) {
             for (File version : versions) {

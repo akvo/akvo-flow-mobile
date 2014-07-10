@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -25,20 +25,15 @@ public class ConstantUtil {
     /**
      * file system constants
      */
-    public static final String DATA_DIR = "fieldsurvey/data/";
-    public static final String APK_DIR = "fieldsurvey/apk/";
-    public static final String SURVEYAL_DIR = "fieldsurvey/surveyal";
     public static final String FILE_SURVEY_LOCATION_TYPE = "file";
     public static final String ARCHIVE_SUFFIX = ".zip";
     public static final String IMAGE_SUFFIX = ".jpg";
     public static final String VIDEO_SUFFIX = ".mp4";
     public static final String XML_SUFFIX = ".xml";
-    public static final String BOOTSTRAP_DIR = "fieldsurvey/bootstrap";
     public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";
     public static final String PROCESSED_OK_SUFFIX = ".processed";
     public static final String PROCESSED_ERROR_SUFFIX = ".error";
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
-    public static final String STACKTRACE_DIR = "fieldsurvey/stacktrace/";
     public static final String STACKTRACE_FILENAME = "err-";
     public static final String STACKTRACE_SUFFIX = ".stacktrace";
     public static final String IMAGE_MIME = "image/jpg";
@@ -53,7 +48,6 @@ public class ConstantUtil {
     /**
      * size limits
      */
-    public static final long BIG_PHOTO_FILE = 100000; // Bytes
     public static final String SPACE_WARNING_MB_LEVELS = "100, 50, 25, 10, 5, 1";
 
     /**
@@ -65,9 +59,7 @@ public class ConstantUtil {
     public static final String VIDEO_QUESTION_TYPE = "video";
     public static final String PHOTO_QUESTION_TYPE = "photo";
     public static final String SCAN_QUESTION_TYPE = "scan";
-    //public static final String TRACK_QUESTION_TYPE = "track";
     public static final String STRENGTH_QUESTION_TYPE = "strength";
-    public static final String HEADING_QUESTION_TYPE = "heading";
     public static final String DATE_QUESTION_TYPE = "date";
 
     /**
@@ -90,7 +82,6 @@ public class ConstantUtil {
     public static final String IMAGE_RESPONSE_TYPE = "IMAGE";
     public static final String VIDEO_RESPONSE_TYPE = "VIDEO";
     public static final String GEO_RESPONSE_TYPE = "GEO";
-    //public static final String TRACK_RESPONSE_TYPE = "TRACK";
     public static final String DATE_RESPONSE_TYPE = "DATE";
     public static final String OTHER_RESPONSE_TYPE = "OTHER";
 
@@ -127,7 +118,6 @@ public class ConstantUtil {
     public static final String IMAGE_CAPTION_LIST_KEY = "imagecaps";
     public static final String READONLY_KEY = "readonly";
     public static final String SINGLE_SURVEY_KEY = "single_survey";
-    public static final String QUESTION_ID_KEY = "questionId";
     public static final String SURVEY_GROUP = "survey_group";
     public static final String SURVEYED_LOCALE_ID = "surveyed_locale_id";
 
@@ -143,21 +133,8 @@ public class ConstantUtil {
     public static final String SERVER_SETTING_KEY = "backend.server";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
-    public static final String SURVEY_TEXT_SIZE_KEY = "survey.textsize";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
     public static final String PREF_LOCALE = "pref.locale";
-
-    /**
-     * settings values
-     */
-    public static final String LARGE_TXT = "LARGE";
-    public static final String NORMAL_TXT = "NORMAL";
-
-    /**
-     * index values into string arrays
-    public static final int UPLOAD_DATA_ALLWAYS_IDX = 0;
-    public static final int UPLOAD_NEVER_IDX = 1;
-     */
 
     /**
      * intents
@@ -198,8 +175,6 @@ public class ConstantUtil {
     public static final String DATA_UPLOAD_URL = "dataUploadUrl";
     public static final String SERVER_BASE = "serverBase";
     public static final String SURVEY_S3_URL = "surveyS3Url";
-    public static final String USE_INTERNAL_STORAGE = "useInternalStorage";
-    public static final String PROMPT_ON_OPT_CHANGE = "promptOnOptionChange";
     public static final String API_KEY = "apiKey";
 
     /**

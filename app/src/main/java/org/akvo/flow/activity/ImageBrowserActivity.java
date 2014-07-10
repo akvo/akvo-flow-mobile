@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,6 +16,7 @@
 
 package org.akvo.flow.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -32,6 +33,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import org.akvo.flow.R;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.ui.adapter.HelpImageBrowserAdapter;
 
@@ -70,9 +72,11 @@ public class ImageBrowserActivity extends Activity implements
         captions = extras
                 .getStringArrayList(ConstantUtil.IMAGE_CAPTION_LIST_KEY);
         surveyId = extras.getString(ConstantUtil.SURVEY_ID_KEY);
-        imageAdapter = new HelpImageBrowserAdapter(this, imageUrls, FileUtil
-                .getStorageDirectory(ConstantUtil.DATA_DIR + surveyId, props
-                        .getBoolean(ConstantUtil.USE_INTERNAL_STORAGE)));
+        File cacheDir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
+        if (!cacheDir.exists()) {
+            cacheDir.mkdir();
+        }
+        imageAdapter = new HelpImageBrowserAdapter(this, imageUrls, cacheDir.getAbsolutePath());
         if (imageUrls.size() == 1) {
             gallery.setVisibility(View.GONE);
         } else {

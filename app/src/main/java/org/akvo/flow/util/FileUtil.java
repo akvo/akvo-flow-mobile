@@ -51,7 +51,7 @@ public class FileUtil {
     // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
     private static final String DIR_DATA = "akvoflow/data/files"; // form responses zip files
     private static final String DIR_MEDIA = "akvoflow/data/media"; // form responses media files
-    private static final String DIR_INBOX = "akvoflow/input"; // Bootstrap files
+    private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
 
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
     private static final String DIR_FORMS = "forms"; // Form definitions

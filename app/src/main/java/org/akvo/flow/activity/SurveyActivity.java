@@ -53,6 +53,7 @@ import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
@@ -400,12 +401,10 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
         if (requestCode == PHOTO_ACTIVITY_REQUEST || requestCode == VIDEO_ACTIVITY_REQUEST) {
             if (resultCode == RESULT_OK) {
-                String filePrefix, fileSuffix;
+                String fileSuffix;
                 if (requestCode == PHOTO_ACTIVITY_REQUEST) {
-                    filePrefix = TEMP_PHOTO_NAME_PREFIX;
                     fileSuffix = IMAGE_SUFFIX;
                 } else {
-                    filePrefix = TEMP_VIDEO_NAME_PREFIX;
                     fileSuffix = VIDEO_SUFFIX;
                 }
 
@@ -414,7 +413,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 // Ensure no image is saved in the DCIM folder
                 FileUtil.cleanDCIM(this, tmp.getAbsolutePath());
 
-                String filename = filePrefix + System.nanoTime() + fileSuffix;
+                String filename = PlatformUtil.uuid() + fileSuffix;
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
                 int maxImgSize = ConstantUtil.IMAGE_SIZE_320_240;

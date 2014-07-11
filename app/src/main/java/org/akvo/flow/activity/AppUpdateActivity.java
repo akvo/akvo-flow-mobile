@@ -154,13 +154,7 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
 
         private void cleanupDownloads(String version) {
             File directory = new File(FileUtil.getFilesDir(FileType.APK), version);
-            // Empty the directory
-            if (directory.exists()) {
-                for (File f : directory.listFiles()) {
-                    f.delete();
-                }
-            }
-            directory.delete();
+            FileUtil.deleteFilesInDirectory(directory, true);
         }
 
         /**

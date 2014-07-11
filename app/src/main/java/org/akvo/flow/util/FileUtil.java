@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -137,11 +138,14 @@ public class FileUtil {
         StringBuilder contents = new StringBuilder();
         BufferedReader input = new BufferedReader(new FileReader(file));
         String line = null;
-        while ((line = input.readLine()) != null) {
-            contents.append(line);
-            contents.append(System.getProperty("line.separator"));
+        try {
+            while ((line = input.readLine()) != null) {
+                contents.append(line);
+                contents.append(System.getProperty("line.separator"));
+            }
+        } finally {
+            close(input);
         }
-        input.close();
         return contents.toString();
     }
 
@@ -155,10 +159,13 @@ public class FileUtil {
      * @throws IOException
      */
     public static String readTextFromZip(ZipInputStream zis) throws IOException {
-        ByteArrayOutputStream out = readZipEntry(zis);
-        String data = out.toString();
-        out.close();
-        return data;
+        ByteArrayOutputStream out = null;
+        try {
+            out = readZipEntry(zis);
+            return out.toString();
+        } finally {
+            close(out);
+        }
     }
 
     /**
@@ -172,10 +179,14 @@ public class FileUtil {
      */
     public static void extractAndSaveFile(ZipInputStream zip,
             FileOutputStream destinationFile) throws IOException {
-        ByteArrayOutputStream out = readZipEntry(zip);
-        destinationFile.write(out.toByteArray());
-        out.close();
-        destinationFile.close();
+        ByteArrayOutputStream out = null;
+        try {
+            out = readZipEntry(zip);
+            destinationFile.write(out.toByteArray());
+        } finally {
+            close(out);
+            destinationFile.close();
+        }
     }
 
     /**
@@ -255,11 +266,7 @@ public class FileUtil {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         } finally {
-            try {
-                if (in != null)
-                    in.close();
-            } catch (IOException ignored) {
-            }
+            close(in);
         }
 
         return stringBuilder.toString();
@@ -402,6 +409,17 @@ public class FileUtil {
             return apkPath;
         }
         return null;
+    }
+
+    public static void close(Closeable closeable) {
+        if (closeable == null) {
+            return;
+        }
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
 }

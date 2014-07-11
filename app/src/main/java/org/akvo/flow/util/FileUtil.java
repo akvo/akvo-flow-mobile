@@ -51,7 +51,7 @@ public class FileUtil {
     // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
     private static final String DIR_DATA = "akvoflow/data/files"; // form responses zip files
     private static final String DIR_MEDIA = "akvoflow/data/media"; // form responses media files
-    private static final String DIR_INPUT = "akvoflow/input"; // Bootstrap files
+    private static final String DIR_INBOX = "akvoflow/input"; // Bootstrap files
 
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
     private static final String DIR_FORMS = "forms"; // Form definitions
@@ -61,19 +61,19 @@ public class FileUtil {
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INPUT, FORMS, STACKTRACE, TMP, APK};
+    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK};
 
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
             case DATA:
-                path =  getFilesStorageDir(false) + File.separator + DIR_DATA;
+                path = getFilesStorageDir(false) + File.separator + DIR_DATA;
                 break;
             case MEDIA:
                 path = getFilesStorageDir(false) + File.separator + DIR_MEDIA;
                 break;
-            case INPUT:
-                path = getFilesStorageDir(false) + File.separator + DIR_INPUT;
+            case INBOX:
+                path = getFilesStorageDir(false) + File.separator + DIR_INBOX;
                 break;
             case FORMS:
                 path = getFilesStorageDir(true) + File.separator + DIR_FORMS;

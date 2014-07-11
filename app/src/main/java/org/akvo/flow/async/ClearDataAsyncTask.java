@@ -112,7 +112,7 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
             // Delete stacktrace files
             FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.STACKTRACE), false);
             // Delete bootstraps
-            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INPUT), false);
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INBOX), false);
         }
 
         // Delete exported zip/image files

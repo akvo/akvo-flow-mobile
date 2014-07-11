@@ -301,7 +301,7 @@ public class BootstrapService extends Service {
         // zip files can only be loaded on the SD card (not internal storage) so
         // we only need to look there
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = FileUtil.getFilesDir(FileType.INPUT);
+            File dir = FileUtil.getFilesDir(FileType.INBOX);
             File[] fileList = dir.listFiles();
             if (fileList != null) {
                 for (int i = 0; i < fileList.length; i++) {

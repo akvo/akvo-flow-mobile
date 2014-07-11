@@ -186,13 +186,14 @@ public class DataSyncService extends IntentService {
     }
 
     private ZipFileData formZip(long surveyInstanceId) {
-        File zipFile = new File(FileUtil.getFilesDir(FileType.DATA),
-                System.nanoTime() + ConstantUtil.ARCHIVE_SUFFIX);
         ZipFileData zipFileData = new ZipFileData();
         StringBuilder surveyBuf = new StringBuilder();
 
         // Hold the responses in the StringBuilder
-        processSurveyData(surveyInstanceId, surveyBuf, zipFileData.imagePaths);
+        String uuid = processSurveyData(surveyInstanceId, surveyBuf, zipFileData.imagePaths);
+
+        // THe filename will match the Survey Instance UUID
+        File zipFile = new File(FileUtil.getFilesDir(FileType.DATA), uuid + ConstantUtil.ARCHIVE_SUFFIX);
 
         // Write the data into the zip file
         try {
@@ -263,8 +264,10 @@ public class DataSyncService extends IntentService {
      * @param surveyInstanceId - Survey Instance Id
      * @param buf - IN param. After execution this will contain the data to be sent
      * @param imagePaths - IN param. After execution this will contain the list of photo paths to send
+     * @return Survey Instance UUID
      */
-    private void processSurveyData(long surveyInstanceId, StringBuilder buf, List<String> imagePaths) {
+    private String processSurveyData(long surveyInstanceId, StringBuilder buf, List<String> imagePaths) {
+        String uuid = null;
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
         if (data != null) {
@@ -306,6 +309,10 @@ public class DataSyncService extends IntentService {
                     final long submitted_date = data.getLong(submitted_date_col);
                     final long surveyal_time = (data.getLong(duration_col)) / 1000;
 
+                    if (uuid == null) {
+                        uuid = data.getString(uuid_col);// Parse it just once
+                    }
+
                     buf.append(data.getString(survey_fk_col));
                     buf.append(DELIMITER).append(String.valueOf(surveyInstanceId));
                     buf.append(DELIMITER).append(data.getString(question_fk_col));
@@ -318,7 +325,7 @@ public class DataSyncService extends IntentService {
                     buf.append(DELIMITER).append(deviceIdentifier);
                     buf.append(DELIMITER).append(neverNull(data.getString(scored_val_col)));
                     buf.append(DELIMITER).append(neverNull(data.getString(strength_col)));
-                    buf.append(DELIMITER).append(data.getString(uuid_col));
+                    buf.append(DELIMITER).append(uuid);
                     buf.append(DELIMITER).append(surveyal_time);
                     buf.append(DELIMITER).append(data.getString(localeId_col));
                     buf.append("\n");
@@ -332,6 +339,7 @@ public class DataSyncService extends IntentService {
 
             data.close();
         }
+        return uuid;
     }
 
     // replace troublesome chars in user-provided values

@@ -26,6 +26,7 @@ import android.util.Log;
 import android.util.TypedValue;
 
 import java.io.File;
+import java.util.UUID;
 
 /**
  * Utilities class to provide Android related functionalities
@@ -107,6 +108,16 @@ public class PlatformUtil {
                 "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    public static String uuid(){
+        return UUID.randomUUID().toString();
+    }
+
+    public static String recordUuid(){
+        String base32Id = Base32.base32Uuid();
+        // Put dashes between the 4-5 and 8-9 positions to increase readability
+        return base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
     }
 
 }

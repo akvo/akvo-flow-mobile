@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.UUID;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -43,8 +42,8 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.util.Base32;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well
@@ -776,7 +775,7 @@ public class SurveyDbAdapter {
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
         initialValues.put(SurveyInstanceColumns.USER_ID, userId);
         initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
-        initialValues.put(SurveyInstanceColumns.UUID, UUID.randomUUID().toString());
+        initialValues.put(SurveyInstanceColumns.UUID, PlatformUtil.uuid());
         initialValues.put(SurveyInstanceColumns.START_DATE, time);
         initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME
         initialValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
@@ -1255,9 +1254,7 @@ public class SurveyDbAdapter {
     }
     
     public String createSurveyedLocale(long surveyGroupId) {
-        String base32Id = Base32.base32Uuid();
-        // Put dashes between the 4-5 and 8-9 positions to increase readability
-        String id = base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
+        String id = PlatformUtil.recordUuid();
         ContentValues values = new ContentValues();
         values.put(RecordColumns.RECORD_ID, id);
         values.put(RecordColumns.SURVEY_GROUP_ID, surveyGroupId);

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Light Styles -->
+    <style name="Flow.ActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
+        <item name="android:backgroundStacked" tools:targetApi="14">@drawable/ab_stacked_solid_flow</item>
+        <item name="backgroundStacked">@drawable/ab_stacked_solid_flow</item>
+
+        <item name="android:background" tools:targetApi="14">@drawable/ab_solid_flow</item>
+        <item name="background">@drawable/ab_solid_flow</item>
+
+        <item name="android:titleTextStyle" tools:targetApi="11">@style/Flow.ActionBar.Text</item>
+        <item name="titleTextStyle">@style/Flow.ActionBar.Text</item>
+    </style>
+
+    <style name="Flow.ActionBar.Tabs" parent="@style/Widget.AppCompat.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab</item>
+        <item name="background">@drawable/tab_indicator_ab</item>
+    </style>
+
+    <style name="Flow.ActionBar.Text" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/orange_main</item>
+    </style>
+
+    <style name="Flow.ActionBar.TabText" parent="@style/Widget.AppCompat.ActionBar.TabText">
+        <item name="android:textColor">@color/tab_text_color</item>
+    </style>
+
+    <style name="Flow.ListView" parent="@android:style/Widget.ListView">
+        <item name="android:cacheColorHint">@android:color/transparent</item>
+        <item name="android:divider">@color/white</item>
+    </style>
+
+    <!-- Dark Styles -->
+    <!-- TODO -->
+
+</resources>

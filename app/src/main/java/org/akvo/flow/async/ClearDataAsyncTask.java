@@ -1,0 +1,121 @@
+/*
+ *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
+
+package org.akvo.flow.async;
+
+import java.lang.ref.WeakReference;
+
+import android.content.Context;
+import android.database.SQLException;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
+
+import org.akvo.flow.R;
+import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+
+public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
+    private static final String TAG = ClearDataAsyncTask.class.getSimpleName();
+
+    /**
+     * Use a WeakReference to avoid Context leaks
+     */
+    private WeakReference<Context> mWeakContext;
+
+    private SurveyDbAdapter mDatabase;
+
+    public ClearDataAsyncTask(Context context) {
+        mWeakContext = new WeakReference<Context>(context);
+        // Use the Application Context to be held by the Database
+        // This will allow the current Activity to be GC if it's finished
+        mDatabase = new SurveyDbAdapter(context.getApplicationContext());
+    }
+
+    @Override
+    protected Boolean doInBackground(Boolean... params) {
+        final boolean responsesOnly = params[0];
+
+        boolean ok = true;
+        try {
+            // Internal database
+            clearDatabase(responsesOnly);
+
+            // External storage
+            clearExternalStorage(responsesOnly);
+        } catch (SQLException e) {
+            Log.e(TAG, e.getMessage());
+            ok = false;
+        }
+
+        return ok;
+    }
+
+    @Override
+    protected void onPostExecute(Boolean result) {
+        final int messageId = result != null && result ? R.string.clear_data_success
+                : R.string.clear_data_error;
+
+        final Context context = mWeakContext.get();
+        if (context != null) {
+            Toast.makeText(context, messageId, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Permanently deletes data from the internal database.
+     * 
+     * @param responsesOnly Flag to specify a partial deletion (user generated
+     *            data).
+     */
+    private void clearDatabase(boolean responsesOnly) throws SQLException {
+        try {
+            mDatabase.open();
+
+            if (responsesOnly) {
+                // Delete only user generated data
+                mDatabase.clearCollectedData();
+            } else {
+                mDatabase.clearAllData();
+            }
+        } finally {
+            if (mDatabase != null) {
+                mDatabase.close();
+            }
+        }
+    }
+
+    /**
+     * Permanently deletes data from the external storage
+     * 
+     * @param responsesOnly Flag to specify a partial deletion (user generated
+     *            data).
+     */
+    private void clearExternalStorage(boolean responsesOnly) {
+        if (!responsesOnly) {
+            // Delete downloaded survey xml/zips
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.FORMS), false);
+            // Delete stacktrace files
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.STACKTRACE), false);
+            // Delete bootstraps
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INBOX), false);
+        }
+
+        // Delete exported zip/image files
+        FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.DATA), true);
+    }
+}

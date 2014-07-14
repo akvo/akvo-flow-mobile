@@ -11,18 +11,22 @@
 *.project
 *.settings
 
-# Build config and output paths
-.gradle
-.gwt-log
-gwt-unitcache
-
 # Testing
 .calabash_settings
 
-survey/bin
-survey/gen
-survey/res/raw/survey.properties
+app/bin
+app/gen
+survey.properties
 survey_test/bin
 survey_test/gen
 survey_test/src/com/jayway/test/SurveyDataTest.java
 
+# Android Studio and Gradle
+local.properties
+*.iml
+*.iws
+*.ipr
+.idea/
+.gradle/
+build/
+gradle.properties

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="records_activity_tabs">
+        <item>DATA POINTS</item>
+        <item>MAP</item>
+    </string-array>
+    
+    <string-array name="record_tabs">
+        <item>FORMS</item>
+        <item>HISTORY</item>
+        <item>MAP</item>
+    </string-array>
+    
+    <string-array name="order_by">
+        <item>Date</item>
+        <item>Distance</item>
+        <item>Status</item>
+    </string-array>
+
+    <!-- App languages -->
+    <string-array name="app_languages">
+        <item>English</item>
+        <item>Español</item>
+        <item>Français</item>
+    </string-array>
+    <string-array name="app_language_codes">
+        <item>en</item>
+        <item>es</item>
+        <item>fr</item>
+    </string-array>
+
+    <string-array name="languages">
+        <item>English</item>
+        <item>French</item>
+        <item>Spanish</item>
+        <item>Bahasa Indonesia</item>
+        <item>Kinyarwanda</item>
+        <item>Chichewa</item>
+        <item>Bengali</item>
+        <item>Hindi</item>
+        <item>Quechua</item>
+    </string-array>
+    <string-array name="languagecodes">
+        <item>en</item>
+        <item>fr</item>
+        <item>es</item>
+        <item>id</item>
+        <item>rw</item>
+        <item>ny</item>
+        <item>bn</item>
+        <item>hi</item>
+        <item>qu</item>
+    </string-array>
+    <!-- must have enough colors for all languages -->
+    <string-array name="colors">
+        <item>white</item>
+        <item>red</item>
+        <item>blue</item>
+        <item>yellow</item>
+        <item>green</item>
+        <item>#ff8800</item>
+        <item>#00ffff</item>
+        <item>purple</item>
+    </string-array>
+    <string-array name="lengthmetric">
+        <item>millimeters</item>
+        <item>centimeters</item>
+        <item>meters</item>
+    </string-array>
+    <string-array name="lengthconversion">
+        <item>0.001</item>
+        <item>0.01</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="velocitymetric">
+        <item>mm / second</item>
+        <item>cm / second</item>
+        <item>m / second</item>
+    </string-array>
+    <string-array name="velocityconversion">
+        <item>0.001</item>
+        <item>0.01</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="flowratemetric">
+        <item>liter / second</item>
+    </string-array>
+    <string-array name="flowconversion">
+        <item>1</item>
+    </string-array>
+    <string-array name="countries">
+        <item>HN</item>
+        <item>GT</item>
+        <item>LR</item>
+        <item>MW</item>
+        <item>RW</item>
+        <item>US</item>
+    </string-array>
+    <string-array name="distancemesures">
+        <item>meters</item>
+        <item>kilometers</item>
+    </string-array>
+    <string-array name="plotintervals">
+        <item>30 Seconds</item>
+        <item>60 Seconds</item>
+        <item>2 Minutes</item>
+        <item>5 Minutes</item>
+        <item>10 Minutes</item>
+    </string-array>
+
+    <string-array name="max_image_size_pref">
+        <item>320x240px</item>
+        <item>640x480px</item>
+        <item>1280x960px</item>
+    </string-array>
+
+</resources>

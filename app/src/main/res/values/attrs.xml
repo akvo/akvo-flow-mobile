@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FlowTheme">
+
+        <!-- TEXT -->
+        <attr name="textColorPrimary" format="reference|color" />
+        <attr name="textColorSecondary" format="reference|color" />
+        <attr name="textColorTertiary" format="reference|color" />
+
+        <!-- BACKGROUND -->
+        <attr name="listitem_bg1" format="reference|color" />
+        <attr name="listitem_bg2" format="reference|color" />
+    </declare-styleable>
+</resources>

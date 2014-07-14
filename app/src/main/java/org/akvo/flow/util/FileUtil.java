@@ -64,6 +64,13 @@ public class FileUtil {
 
     public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK};
 
+    /**
+     * Get the appropriate files directory for the given FileType. The directory may or may
+     * not be in the app-specific External Storage. The caller cannot assume anything about
+     * the location.
+     * @param type FileType to determine the type of resource attempting to use.
+     * @return File representing the root directory for the given FileType.
+     */
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
@@ -103,9 +110,8 @@ public class FileUtil {
      * @return The root directory for this kind of resources
      */
     private static final String getFilesStorageDir(boolean internal) {
-        Context context = FlowApp.getApp().getApplicationContext();
         if (internal) {
-            return context.getExternalFilesDir(null).getAbsolutePath();
+            return FlowApp.getApp().getExternalFilesDir(null).getAbsolutePath();
         }
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
@@ -411,6 +417,10 @@ public class FileUtil {
         return null;
     }
 
+    /**
+     * Helper function to close a Closeable instance
+     * @param closeable
+     */
     public static void close(Closeable closeable) {
         if (closeable == null) {
             return;

@@ -10,7 +10,7 @@ Getting Started
 To set up your development environment you'll need:
 
 * [Android SDK](http://developer.android.com/sdk/index.html): With the **SDK Manager**, ensure you have at least the version 23.0.2 of the **Android SDK Tools** and the version 20 of the **Android SDK Build-Tools**. You will also need to check out the **Android Support Library**, **Android Support Repository** and **Google Play Services**.
-* [Optional] [Android Studio](https://developer.android.com/sdk/installing/studio.html) or [Eclipse](http://eclipse.org/) (using the [Gradle Plugin](http://www.gradle.org/docs/current/userguide/eclipse_plugin.html) (Given the built-in Gradle support, **Android Studio is recommended**).
+* [Optional] [Android Studio](https://developer.android.com/sdk/installing/studio.html) or [Eclipse](http://eclipse.org/) (using the [Gradle Plugin](http://www.gradle.org/docs/current/userguide/eclipse_plugin.html)) (Given the built-in Gradle support, **Android Studio is recommended**).
 * [Optional] [Gradle](http://www.gradle.org/): You can either use a local Gradle installation, or just use the bundled binaries (**recommended**).
 
 Importing the Project in Android Studio

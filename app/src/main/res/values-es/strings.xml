@@ -18,8 +18,6 @@
   <string name="clearbutton">Borrar</string>
   <string name="submitbutton">Enviar</string>
   <string name="geodialog">Para realizar esta acción el GPS debe estar activado. Pulse OK para ir a sección de ajustes. Seleccione Satélites GPS y regrese a la aplicación. Una vez activado el GPS, vuelva a intentar la búsqueda.</string>
-  <string name="currentuser">Usuario activo:</string>
-  <string name="lastsync">Última sincronización:</string>
   <string name="userlabel">Organizar usuarios</string>
   <string name="resize_large_images">Reducir imágenes grandes</string>
   <string name="settingslabel">Ajustes</string>
@@ -31,12 +29,7 @@
   <string name="editmenu">Editar usuario</string>
   <string name="deleteusermenu">Borrar usuario</string>
   <string name="mustselectuser">Seleccione Organizar usuarios y elija un usuario para continuar.</string>
-  <string name="syncinprogress">Sincronizando...</string>
   <string name="exportcomplete">Los datos han sido exportados a la tarjeta SD</string>
-  <string name="uploadcomplete">Todos los datos han sido enviados al servidor</string>
-  <string name="uploadprogress">Enviando los datos al servidor</string>
-  <string name="filecomplete">Fichero subido satisfactóriamente</string>
-  <string name="nothingtoexport">No hay datos sin enviar</string>
   <string name="prefoptlabel">Ajustes</string>
   <string name="prefoptdesc">Seleccionar el idioma predeterminado y otras opciones</string>
   <string name="sendoptlabel">Sincronizar datos</string>
@@ -47,20 +40,13 @@
   <string name="screenoptdesc">Evitar que la pantalla se apague durante la introducción de datos. Asegúrese de apagar la pantalla (o cerrar la aplicación) cuando no esté en uso, para reducir el consumo de batería.</string>
   <string name="aboutlabel">Acerca de</string>
   <string name="aboutdesc">Muestra información sobre la versión actual</string>
-  <string name="abouttitle">Acerca de - Akvo FLOW</string>
-  <string name="abouttext">Akvo FLOW\nDesarrollado por: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion </string>
   <string name="gpsstatuslabel">Estado del GPS</string>
   <string name="gpsstatusdesc">Abrir la aplicación GPS Status si la tiene instalada en este dispositivo.</string>
-  <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instálela a través de Play Store.</string>
   <string name="otherinstructions">Por favor, introduzca una descripción</string>
-  <string name="mandatorywarning">Las preguntas marcadas con un asterisco * son obligatorias. Ud. tiene que responderlas antes de poder enviar los datos:</string>
-  <string name="cannotsave">Las respuestas no han podido ser enviadas</string>
-  <string name="description">Descripción</string>
   <string name="texthelpoption">Ver ayuda texto</string>
   <string name="videohelpoption">Ver ayuda video</string>
   <string name="photohelpoption">Ver ayuda imágenes</string>
   <string name="helpheading">Opciones de ayuda</string>
-  <string name="plotsettings">Ajustes</string>
   <string name="surveysupdated">Las encuestas instaladas han sido actualizadas</string>
   <string name="deleteresponse">Eliminar respuesta</string>
   <string name="othertext">Otros...</string>
@@ -71,7 +57,6 @@
   <string name="scanbarcode">Escanear código de barras</string>
   <string name="barcodeerror">Barcode Scanner no está instalado. Por favor, instale Barcode Scanner a través de Play Store.</string>
   <string name="imagehelpviewmessage">Pulse una imagen para verla en tamaño grande. Pulse atrás para volver a la encuesta.</string>
-  <string name="validationerrtitle">Respuesta no válida</string>
   <string name="toosmallerr">El valor es demasiado pequeño. Valor mínimo: </string>
   <string name="toolargeerr">El valor es demasiado grande. Valor máximo: </string>
   <string name="baddatatypeerr">La respuesta ha de ser numérica</string>
@@ -82,20 +67,8 @@
   <string name="reloadconftext">¿Está seguro de querer borrar y descargar todo de nuevo?</string>
   <string name="submitcompletetitle">Encuesta enviada</string>
   <string name="submitcompletetext">Las respuestas de la encuesta serán enviadas al servidor.</string>
-  <string name="savecompletetitle">Encuesta guardada</string>
-  <string name="savecompletetext">Las respuestas de la encuesta han sido guardadas.</string>
   <string name="optiontext">Opción</string>
-  <string name="largetxtoption">Texto grande</string>
-  <string name="normaltxtoption">Texto normal</string>
   <string name="langoption">Idiomas</string>
-  <string name="reviewtext">Seleccione una encuesta para ver, editar y enviar.</string>
-  <string name="reviewrotext">Seleccione una encuesta para ver (sólo lectura).</string>
-  <string name="savedsurveyslabel">Encuestas guardadas</string>
-  <string name="submittedsurveyslabel">Revisar encuestas enviadas</string>
-  <string name="reviewlabel">Estado de la encuesta</string>
-  <string name="gosavedsurveyslabel">Revisar encuestas guardadas</string>
-  <string name="gosubmittedsurveyslabel">Revisar encuestas enviadas</string>
-  <string name="goclassicsurveyslabel">Revisar encuestas (obsoleto)</string>
   <string name="langmandatorytitle">Selección no válida</string>
   <string name="langmandatorytext">Debe elegir al menos un idioma</string>
   <string name="pleasewait">Por favor, espere</string>
@@ -109,10 +82,8 @@
   <string name="deleteonewarning">Esta acción borrará permanentemente esta respuesta. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="nextbutton">Siguiente</string>
   <string name="submittext">Si ha terminado con la encuesta, pulse Enviar para mandar los datos. Una vez pulsado Enviar, podrá revisar los datos, pero no podrá editarlos.</string>
-  <string name="donebutton">Terminado</string>
   <string name="cleartitle">Borrar respuestas</string>
   <string name="cleardesc">¿Está seguro de querer borrar las respuestas?</string>
-  <string name="loadmore">Cargar más...</string>
   <string name="authtitle">Autorización necesaria</string>
   <string name="authtext">Por favor, introduzca el código de administrador: </string>
   <string name="authfailed">Autorización fallida</string>
@@ -121,20 +92,14 @@
   <string name="clearquestiondesc">¿Quiere borrar la respuesta de esta pregunta?</string>
   <string name="identlabel">Identificador de dispositivo</string>
   <string name="setidentlabel">Establecer identificador de dispositivo</string>
-  <string name="strengthtext">Fuerza de preferencia</string>
   <string name="bootstrapstart">Cargando datos de la encuesta desde la tarjeta SD</string>
   <string name="bootstrapcomplete">Datos cargados desde la tarjeta SD</string>
   <string name="bootstraperror">Ha ocurrido un error procesando el archivo zip bootstrap</string>
   <string name="transmissionhist">Historial de transmisión</string>
   <string name="transstartdate">Transmisión comenzada:</string>
   <string name="transenddate">Transmisión terminada:</string>
-  <string name="resendall">Reenviar todas las encuestas</string>
-  <string name="resendone">Reenviar encuesta</string>
-  <string name="generatedcode">Código único</string>
   <string name="confirmchangetitle">¿Cambiar respuesta?</string>
   <string name="confirmchangetext">¿Quiere cambiar su respuesta?</string>
-  <string name="uploaderror">Ha ocurrido un error al enviar los datos</string>
-  <string name="captureheading">Captura de título</string>
   <string name="resetall">Borrar todo (usuarios, encuestas, y todos los datos recolectados)</string>
   <string name="resetalldesc">Borrar permanentemente todas las encuentas, respuestas (incluyendo imágenes y archivos zip exportados) y usuarios</string>
   <string name="reset_responses">Borrar datos recolectados e imágenes</string>
@@ -147,12 +112,9 @@
   <string name="pickdate">Seleccione fecha</string>
   <string name="cannotupdate">La encuesta no ha podido ser descargada. Podría no esta publicada o su tarjeta SD podría estar configurada para transferir archivos mediante USB.</string>
   <string name="pleasewaitforbootstrap">Por favor, espere a que el archivo bootstrap haya sido procesado.</string>
-  <string name="surveychecklabel">Buscar automáticamente nuevas encuentas.</string>
-  <string name="uploaderrorlabel">Envío automático de errores de la aplicación.</string>
   <string name="clear_data_success">Los datos han sido correctamente eliminados del dispositivo</string>
   <string name="clear_data_error">Ha ocurrido un error borrando los datos</string>
   <string name="configuring_languages">Configurando los idiomas de las encuestas...</string>
-  <string name="new_record">Nuevo Punto de Datos</string>
   <string name="sync_records">Sincronizar Puntos de Datos</string>
   <string name="order_by">Ordenar por</string>
   <string name="syncing_records">Sincronizando Puntos de Datos...</string>
@@ -170,9 +132,6 @@
   <string name="data_sync_title">Sincronización de datos</string>
   <string name="data_sync_all">Ficheros sincronizados: %1$d - Fallidos: %2$d</string>
   <string name="data_sync_synced">Ficheros sincronizados: %1$d</string>
-  <!--Survey Groups Activity-->
-  <string name="monitored_group">Grupo monitorizado</string>
-  <string name="regular_group">Grupo normal</string>
   <!--Localization-->
   <string name="app_language">Idioma de la aplicación</string>
   <string name="please_restart">Por favor, reinicie la aplicación</string>
@@ -200,14 +159,9 @@
   <string name="last_modified">Última modificación:</string>
   <string name="last_response">Última respuesta:</string>
   <string name="choose_response">Elija respuesta</string>
-  <string name="start_new_response">Crear nueva respuesta</string>
   <!--APK update-->
-  <string name="updateavail">Hay una nueva version de FLOW disponible</string>
   <string name="updatedownloaded">La nueva versión de FLOW ha sido descargada</string>
-  <string name="downloadingupdate">Descargando actualización de FLOW</string>
-  <string name="completed">Completado: </string>
   <string name="clicktoinstall">La nueva versión de FLOW ha sido descargada. Haga clic aquí para instalarla</string>
-  <string name="clicktodownload">Haga clic aquí para descargarla</string>
   <string name="apk_upgrade_error">Error descargando la actualización de FLOW</string>
   <!--Misc-->
   <string name="okbutton">OK</string>

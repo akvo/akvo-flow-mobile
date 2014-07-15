@@ -18,8 +18,6 @@
   <string name="clearbutton">Effacer</string>
   <string name="submitbutton">Envoyer</string>
   <string name="geodialog">Le GPS doit être activé. Sélectionner OK pour aller au menu des paramètres. Sélectionner utilisation des satellites GPS et ensuite pressez le bouton de retour. Une fois que le GPS est activé, vous pouvez appuyer à nouveau sur \"Prendre la géolocalisation\" pour avoir votre position.</string>
-  <string name="currentuser">Utilisateur actuel:</string>
-  <string name="lastsync">Dernière Synchronisation:</string>
   <string name="userlabel">Gérer les utilisateurs</string>
   <string name="resize_large_images">Réduire les images trop lourdes</string>
   <string name="settingslabel">Paramètres</string>
@@ -31,12 +29,7 @@
   <string name="editmenu">Sélectionner un utilisateur</string>
   <string name="deleteusermenu">Supprimer un utilisateur</string>
   <string name="mustselectuser">Veuillez cliquer sur l\'icone \"gestion des utilisateurs\" et choisir un utilisateur avant de continuer.</string>
-  <string name="syncinprogress">Synchronisation en cours...</string>
   <string name="exportcomplete">Les données ont été exportés sur la carte SD</string>
-  <string name="uploadcomplete">Toutes les données ont été envoyées au serveur</string>
-  <string name="uploadprogress">Envoie des données au serveur</string>
-  <string name="filecomplete">Fichier chargé avec succès</string>
-  <string name="nothingtoexport">Il n\'y a pas de donnée non-envoyée</string>
   <string name="prefoptlabel">Préférences</string>
   <string name="prefoptdesc">Choisir la langue par défaut de l\'enquête et autres préférences</string>
   <string name="sendoptlabel">Synchroniser les données</string>
@@ -47,20 +40,13 @@
   <string name="screenoptdesc">Empêcher l\'écran de s\'éteindre pendant que vous remplissez les données. S\'assurer d\'éteindre l\'écran manuellement (ou quitter l\'application) quand ceci n\'est pas utilisé afin d\'économiser la batterie.</string>
   <string name="aboutlabel">A propos</string>
   <string name="aboutdesc">Information sur les versions.</string>
-  <string name="abouttitle">A propos de - FieldSurvey</string>
-  <string name="abouttext">FieldSurvey\nDevelopée par: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion </string>
   <string name="gpsstatuslabel">Etat du GPS</string>
   <string name="gpsstatusdesc">Démarre l\'application de GPS Status si elle est installée sur cet appareil.</string>
-  <string name="nogpsstatus">GPS Status n\'est pas installé sur cet appareil. Veuillez l\'installer en utilisant Android Market.</string>
   <string name="otherinstructions">Veuillez entrer une description</string>
-  <string name="mandatorywarning">Les questions indiquée avec * sont obligatoires. Vous devez entrer une réponse pour les questions suivantes avant de pouvoir envoyer:</string>
-  <string name="cannotsave">Les réponses ne peuvent pas être envoyées</string>
-  <string name="description">Description</string>
   <string name="texthelpoption">Voir le texte d\'aide</string>
   <string name="videohelpoption">Voir la vidéo d\'aide</string>
   <string name="photohelpoption">Voir les photos d\'aide</string>
   <string name="helpheading">Options d\'aide</string>
-  <string name="plotsettings">Paramètres</string>
   <string name="surveysupdated">Les enquêtes installées ont été mises à jour</string>
   <string name="deleteresponse">Effacer les réponses</string>
   <string name="othertext">Autre...</string>
@@ -71,7 +57,6 @@
   <string name="scanbarcode">Scanner le code barre</string>
   <string name="barcodeerror">Le scanner n\'est pas installé. Veuillez installer l\'application de code barre sur Android Market.</string>
   <string name="imagehelpviewmessage">Cliquer sur une icone pour agrandir l\'image. Appuyer sur retour pour revenir à l\'enquête.</string>
-  <string name="validationerrtitle">Réponse non valide</string>
   <string name="toosmallerr">La valeur est trop petite. Valeur minimum: </string>
   <string name="toolargeerr">La valeur est trop grande. valeur maximum: </string>
   <string name="baddatatypeerr">La réponse doit être numérique</string>
@@ -82,20 +67,8 @@
   <string name="reloadconftext">Etes-vous sûr de vouloir effacer et recharger toutes les enquêtes?</string>
   <string name="submitcompletetitle">Enquête envoyée</string>
   <string name="submitcompletetext">Les données de l\'enquêtes vont être envoyées au serveur.</string>
-  <string name="savecompletetitle">Enquête enregistrée</string>
-  <string name="savecompletetext">Les réponses de l\'enquête ont été enregistrées.</string>
   <string name="optiontext">Option</string>
-  <string name="largetxtoption">Texte gros</string>
-  <string name="normaltxtoption">Texte normal</string>
   <string name="langoption">Langues</string>
-  <string name="reviewtext">Sélectionner une enquêtes pour voir, éditer et envoyer.</string>
-  <string name="reviewrotext">Sélectionner une enquête pour voir les données (lecture seule).</string>
-  <string name="savedsurveyslabel">Enquêtes enregistrées</string>
-  <string name="submittedsurveyslabel">Revoir les enquêtes envoyées</string>
-  <string name="reviewlabel">Statut de l\'enquête</string>
-  <string name="gosavedsurveyslabel">Revoir les enquêtes enregistrées</string>
-  <string name="gosubmittedsurveyslabel">Revoir les enquêtes envoyées</string>
-  <string name="goclassicsurveyslabel">Revoir les enquêtes (obsolète)</string>
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
   <string name="pleasewait">Veuillez attendre</string>
@@ -109,10 +82,8 @@
   <string name="deleteonewarning">Cela va effacer définitivement les données. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="nextbutton">Suivant</string>
   <string name="submittext">Si vous avez terminé avec l\'enquête, choisir Envoyer pour envoyer les données. Une fois que Envoyer est choisi, vous pouvez revoir les données mais vous ne pourrez plus les changer.</string>
-  <string name="donebutton">Terminé</string>
   <string name="cleartitle">Effacer les réponses de l\'enquête</string>
   <string name="cleardesc">Etes-vous sûr de vouloir effacer les réponses?</string>
-  <string name="loadmore">Charger plus...</string>
   <string name="authtitle">Autorisation nécessaire</string>
   <string name="authtext">Veuillez entrer le mot de passe de l\'administrateur: </string>
   <string name="authfailed">L\'Autorisation a échoué</string>
@@ -121,20 +92,14 @@
   <string name="clearquestiondesc">Voulez-vous effacer la réponse à cette question?</string>
   <string name="identlabel">Identifiant de l\'appareil</string>
   <string name="setidentlabel">Etablir l\'identifiant de l\'appareil</string>
-  <string name="strengthtext">Force de préférence</string>
   <string name="bootstrapstart">Charger les données de l\'enquête depuis la carte SD</string>
   <string name="bootstrapcomplete">Chargement des données depuis la carte SD effectué</string>
   <string name="bootstraperror">Erreur lors de l\'exportation du fichier zip</string>
   <string name="transmissionhist">Historique des transmissions</string>
   <string name="transstartdate">La transmission a commencé:</string>
   <string name="transenddate">La transmission est finie:</string>
-  <string name="resendall">Renvoyer toutes les données</string>
-  <string name="resendone">Renvoyer l\'enquête</string>
-  <string name="generatedcode">Code unique</string>
   <string name="confirmchangetitle">Changer la réponse?</string>
   <string name="confirmchangetext">Voulez-vous changer votre réponse?</string>
-  <string name="uploaderror">Erreur lors du chargement</string>
-  <string name="captureheading">Position de capture</string>
   <string name="resetall">Tout effacer (utilisateurs, enquêtes, et toutes les données collectées)</string>
   <string name="resetalldesc">Effacer définitivement toutes les enquêtes, données (y compris les images et fichiers .zip exportés) et utilisateurs</string>
   <string name="reset_responses">Effacer les données collectées et les images</string>
@@ -147,12 +112,9 @@
   <string name="pickdate">Choisir une date</string>
   <string name="cannotupdate">Les enquêtes n\'ont pas pu être téléchargées. Elles ne sont peut-être pas publiées ou votre carte SD est peut-être encore en mode transfert USB.</string>
   <string name="pleasewaitforbootstrap">Veuillez attendre jusqu\'à ce que le fichier soit prêt.</string>
-  <string name="surveychecklabel">Vérifier automatiquement pour les mises à jour des enquêtes</string>
-  <string name="uploaderrorlabel">Charger automatiquement les erreurs de l\'application</string>
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
   <string name="configuring_languages">Paramètrer la langue de l\'enquête...</string>
-  <string name="new_record">Nouvel enregistrement</string>
   <string name="sync_records">Synchroniser les enregistrements</string>
   <string name="order_by">Classé par</string>
   <string name="syncing_records">Synchronisation des enregistrements en cours...</string>
@@ -170,9 +132,6 @@
   <string name="data_sync_title">Synchronisation des données</string>
   <string name="data_sync_all">Fichiers synchronisés: %1$d - Échec: %2$d</string>
   <string name="data_sync_synced">Fichiers synchronisés: %1$d</string>
-  <!--Survey Groups Activity-->
-  <string name="monitored_group">Groupe surveillé</string>
-  <string name="regular_group">Groupe normal</string>
   <!--Localization-->
   <string name="app_language">Langue de l\'application</string>
   <string name="please_restart">Veuillez redémarrer l\'application</string>
@@ -200,14 +159,9 @@
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
   <string name="choose_response">Choisissez la réponse</string>
-  <string name="start_new_response">Commencer une nouvelle réponse</string>
   <!--APK update-->
-  <string name="updateavail">Une nouvelle version de FLOW est disponible</string>
   <string name="updatedownloaded">La mise à jour de FLOW a été téléchargé</string>
-  <string name="downloadingupdate">Téléchargement de la mise à jour de FLOW </string>
-  <string name="completed">Terminé: </string>
   <string name="clicktoinstall">La nouvelle version est téléchargée. Cliquez ici pour l\'installer</string>
-  <string name="clicktodownload">Cliquer ici pour la télécharger</string>
   <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de FLOW.</string>
   <!--Misc-->
   <string name="okbutton">OK</string>

@@ -37,6 +37,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.service.LocationService;
+import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
@@ -267,6 +268,10 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                                                 identTextView.setText(s);
                                                 database.savePreference(
                                                         ConstantUtil.DEVICE_IDENT_KEY, s);
+                                                // Trigger the SurveySync Service, in order to force
+                                                // a backend connection with the new Device ID
+                                                startService(new Intent(PreferencesActivity.this,
+                                                        SurveyDownloadService.class));
                                             }
                                         }
                                 );

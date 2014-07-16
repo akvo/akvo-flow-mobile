@@ -60,7 +60,7 @@ public class ResponseListAdapter extends CursorAdapter {
             case SurveyInstanceStatus.DOWNLOADED:
                 statusText = "Synced: ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE));
-                icon = R.drawable.form_submitted_icn;
+                icon = R.drawable.checkmark;
                 finished = true;
                 break;
         }

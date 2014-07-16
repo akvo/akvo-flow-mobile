@@ -24,7 +24,7 @@ set -e
 [[ -n "${FLOW_GAE_USERNAME}" ]] || { echo "FLOW_GAE_USERNAME env var needs to be set"; exit 1; }
 [[ -n "${FLOW_GAE_PASSWORD}" ]] || { echo "FLOW_GAE_PASSWORD env var needs to be set"; exit 1; }
 
-VERSION=$(sed -n '/android:versionName="/{;s///;s/".*$//;p;d;}' AndroidManifest.xml | tr -d ' ')
+VERSION=$(sed -n '/android:versionName="/{;s///;s/".*$//;p;d;}' app/src/main/AndroidManifest.xml | tr -d ' ')
 
 rm -rf tmp
 rm -rf builds
@@ -40,14 +40,16 @@ fi
 
 for i in $(cat tmp/instances.txt); do 
     rm -rf bin
-    rm -rf gen
     echo '=================================================='
     if [[ -f $FLOW_SERVER_CONFIG/$i/survey.properties ]]; then
+        filename=builds/$i/$VERSION/flow-$VERSION.apk
         echo 'generating apk version' $VERSION 'for instance' $i
-        ant flow-release -Dsurvey.properties=$FLOW_SERVER_CONFIG/$i/survey.properties >> tmp/antout.txt
+        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
+        gradle clean
+        gradle assembleRelease
         mkdir -p builds/$i/$VERSION
-        mv bin/fieldsurvey-$VERSION.apk builds/$i/$VERSION/
-        java -jar $FLOW_DEPLOY_JAR $FLOW_S3_ACCESS_KEY $FLOW_S3_SECRET_KEY $i builds/$i/$VERSION/fieldsurvey-$VERSION.apk $VERSION $FLOW_GAE_USERNAME $FLOW_GAE_PASSWORD
+        mv app/bin/flow.apk $filename
+        java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$VERSION" "$FLOW_GAE_USERNAME" "$FLOW_GAE_PASSWORD"
     else
         echo 'Cannot find survey.properties file for instance' $i
     fi

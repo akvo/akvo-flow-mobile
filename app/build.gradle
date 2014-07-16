@@ -40,6 +40,10 @@ android {
 
 }
 
+android.applicationVariants.all { variant ->
+    variant.outputFile = file("bin/flow.apk")
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.android.support:appcompat-v7:19.+'

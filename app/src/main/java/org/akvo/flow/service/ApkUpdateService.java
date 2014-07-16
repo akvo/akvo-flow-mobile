@@ -39,7 +39,7 @@ import org.akvo.flow.util.StatusUtil;
  */
 public class ApkUpdateService extends IntentService {
     private static final String TAG = "APK_UPDATE_SERVICE";
-    private static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=fieldSurvey";
+    private static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
 
     public ApkUpdateService() {
         super(TAG);

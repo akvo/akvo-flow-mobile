@@ -28,7 +28,7 @@ set -e
 # Move to the project directory
 cd $FLOW_MOBILE
 
-version=$(sed -n '/android:versionName="/{;s///;s/".*$//;p;d;}' app/src/main/AndroidManifest.xml | tr -d ' ')
+version=$(sed -n "/android:versionName="/{;s///;s/".*$//;p;d;}" app/src/main/AndroidManifest.xml | tr -d " ")
 
 rm -rf tmp
 rm -rf builds
@@ -39,15 +39,15 @@ mkdir builds
 if [[ -n "$1" ]]; then
     echo $1 > tmp/instances.txt
 else
-    find $FLOW_SERVER_CONFIG/ -name 'appengine-web.xml' -exec sed -n 's/\(.*\)<application>\(.*\)<\/application>\(.*\)/\2/p' {} \; | sort > tmp/instances.txt
+    find $FLOW_SERVER_CONFIG/ -name "appengine-web.xml" -exec sed -n "s/\(.*\)<application>\(.*\)<\/application>\(.*\)/\2/p" {} \; | sort > tmp/instances.txt
 fi
 
 for i in $(cat tmp/instances.txt); do 
     rm -rf bin
-    echo '=================================================='
+    echo "=================================================="
     if [[ -f $FLOW_SERVER_CONFIG/$i/survey.properties ]]; then
         filename=builds/$i/$version/flow-$version.apk
-        echo 'generating apk version' $version 'for instance' $i
+        echo "generating apk version" $version "for instance" $i
         cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
         ./gradlew clean
         ./gradlew assembleRelease
@@ -55,6 +55,6 @@ for i in $(cat tmp/instances.txt); do
         mv app/bin/flow.apk $filename
         java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$FLOW_GAE_USERNAME" "$FLOW_GAE_PASSWORD"
     else
-        echo 'Cannot find survey.properties file for instance' $i
+        echo "Cannot find survey.properties file for instance" $i
     fi
 done

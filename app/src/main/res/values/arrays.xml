@@ -16,6 +16,7 @@
         <item>Date</item>
         <item>Distance</item>
         <item>Status</item>
+        <item>Name</item>
     </string-array>
 
     <!-- App languages -->

@@ -1568,6 +1568,9 @@ public class SurveyDbAdapter {
             case ConstantUtil.ORDER_BY_STATUS:
                 orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
                 break;
+            case ConstantUtil.ORDER_BY_NAME:
+                orderByStr = " ORDER BY " + RecordColumns.NAME + " ASC";// By name
+                break;
         }
 
         String[] whereValues = new String[] {String.valueOf(surveyGroupId)};

@@ -16,6 +16,7 @@
         <item>Fecha</item>
         <item>Distancia</item>
         <item>Estado</item>
+        <item>Nombre</item>
     </string-array>
 
 </resources>

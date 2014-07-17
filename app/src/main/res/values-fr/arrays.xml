@@ -16,6 +16,7 @@
         <item>Date</item>
         <item>Distance</item>
         <item>Status</item> <!-- TODO -->
+        <item>Name</item> <!-- TODO -->
     </string-array>
 
 </resources>

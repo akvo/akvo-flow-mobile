@@ -28,7 +28,7 @@ set -e
 # Move to the project directory
 cd $FLOW_MOBILE
 
-version=$(sed -n "/android:versionName="/{;s///;s/".*$//;p;d;}" app/src/main/AndroidManifest.xml | tr -d " ")
+version=$(sed -n "/android:versionName=\"/{;s///;s/\".*$//;p;d;}" app/src/main/AndroidManifest.xml | tr -d " ")
 
 rm -rf tmp
 rm -rf builds

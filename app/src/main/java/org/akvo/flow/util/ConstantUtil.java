@@ -36,7 +36,7 @@ public class ConstantUtil {
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
     public static final String STACKTRACE_FILENAME = "err-";
     public static final String STACKTRACE_SUFFIX = ".stacktrace";
-    public static final String IMAGE_MIME = "image/jpg";
+    public static final String IMAGE_MIME = "image/jpeg";
     public static final String VIDEO_MIME = "video/mp4";
 
     /**

@@ -310,13 +310,15 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                         // would tie us to later versions of Android. So for
                         // maximum compatibility, just use StatFS
                         StatFs fs = new StatFs(f.getAbsolutePath());
-                        if (fs != null) {
-                            long space = fs.getFreeBlocks() * fs.getBlockSize();
-                            builder.append(
-                                    resources.getString(R.string.sdcardspace))
-                                    .append(String.format(" %.2f",
-                                            (double) space / (double) (1024 * 1024)));
-                        }
+                        // We first cast the blocks and size values to float, to avoid an
+                        // integer overflow scenario. Ideally we should use getFreeBlocksLong()
+                        // instead, but it's only available in API level 18+
+                        long fb = fs.getFreeBlocks();
+                        long bs = fs.getBlockSize();
+                        long space = fb * bs;
+                        builder.append(resources.getString(R.string.sdcardspace))
+                                .append(String.format(" %.2f",
+                                        (double) space / (double) (1024 * 1024)));
                     }
                 }
                 AlertDialog.Builder dialog = new AlertDialog.Builder(this);

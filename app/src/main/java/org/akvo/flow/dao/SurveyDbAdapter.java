@@ -1116,9 +1116,10 @@ public class SurveyDbAdapter {
         clearCollectedData();
 
         // Surveys and preferences
-        executeSql("delete from survey");
-        executeSql("delete from user");
-        executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
+        executeSql("DELETE FROM " + Tables.SURVEY);
+        executeSql("DELETE FROM " + Tables.SURVEY_GROUP);
+        executeSql("DELETE FROM " + Tables.USER);
+        executeSql("UPDATE preferences SET value = '' WHERE key = 'user.lastuser.id'");
     }
 
     /**
@@ -1126,9 +1127,11 @@ public class SurveyDbAdapter {
      * any response saved in the database, as well as the transmission history.
      */
     public void clearCollectedData() {
-        executeSql("delete from survey_instance");
-        executeSql("delete from response");
-        executeSql("delete from transmission");
+        executeSql("DELETE FROM " + Tables.SYNC_TIME);
+        executeSql("DELETE FROM " + Tables.RESPONSE);
+        executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE);
+        executeSql("DELETE FROM " + Tables.RECORD);
+        executeSql("DELETE FROM " + Tables.TRANSMISSION);
     }
 
     /**

@@ -35,13 +35,11 @@ public class S3Api {
 
     private static final int BUFFER_SIZE = 8192;
 
-    private static final String PREFIX_SURVEY = "surveys/";
+    private static final String PREFIX_SURVEY = "surveys/";// TODO: Use same pattern as other directories (receive objectKey directly)
 
     private String mBucket;
     private String mAccessKey;
     private String mSecret;
-
-    public enum FileType {ZIP, IMAGE, VIDEO}
 
     public S3Api(Context c) {
         PropertyUtil properties = new PropertyUtil(c.getResources());
@@ -68,13 +66,9 @@ public class S3Api {
             in = new BufferedInputStream(conn.getInputStream());
             out = new BufferedOutputStream(new FileOutputStream(dst));
 
-            byte[] b = new byte[BUFFER_SIZE];
-            int read;
-            while ((read = in.read(b)) != -1) {
-                out.write(b, 0, read);
-            }
+            copyStream(in, out);
 
-            int status = conn.getResponseCode();// TODO: Check for IOException
+            int status = conn.getResponseCode();
             if (status != HttpStatus.SC_OK) {
                 Log.e(TAG, "Status Code: " + status + ". Expected: 200 - OK");
                 return false;
@@ -111,12 +105,7 @@ public class S3Api {
             in = new BufferedInputStream(new FileInputStream(file));
             out = new BufferedOutputStream(conn.getOutputStream());
 
-            byte[] b = new byte[BUFFER_SIZE];
-            int read;
-            while ((read = in.read(b)) != -1) {
-                out.write(b, 0, read);
-            }
-
+            copyStream(in, out);
             out.flush();
 
             return true;
@@ -152,6 +141,14 @@ public class S3Api {
         } catch (InvalidKeyException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void copyStream(InputStream in, OutputStream out) throws IOException {
+        byte[] b = new byte[BUFFER_SIZE];
+        int read;
+        while ((read = in.read(b)) != -1) {
+            out.write(b, 0, read);
         }
     }
 

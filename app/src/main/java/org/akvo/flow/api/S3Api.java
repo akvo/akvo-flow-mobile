@@ -52,10 +52,8 @@ public class S3Api {
 
     public boolean get(String objectKey, File dst) throws IOException {
         // Get date and signature
-        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ");
-        df.setTimeZone(TimeZone.getTimeZone("GMT"));
-        final String d = df.format(new Date()) + "GMT";
-        final String payload = "GET\n\n\n" + d + "\n" + "/" + mBucket + "/" + objectKey;
+        final String date = getDate();
+        final String payload = "GET\n\n\n" + date + "\n" + "/" + mBucket + "/" + objectKey;
         final String signature = getSignature(payload);
         final URL url = new URL(String.format(Path.URL, mBucket, objectKey));
 
@@ -64,7 +62,7 @@ public class S3Api {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Date", d);
+            conn.setRequestProperty("Date", date);
             conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
 
             in = new BufferedInputStream(conn.getInputStream());
@@ -93,10 +91,8 @@ public class S3Api {
 
     public boolean put(String objectKey, File file, String type) throws IOException {
         // Get date and signature
-        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ");
-        df.setTimeZone(TimeZone.getTimeZone("GMT"));
-        final String d = df.format(new Date()) + "GMT";
-        final String payload = "PUT\n\n" + type + "\n" + d + "\n" + "/" + mBucket + "/" + objectKey;
+        final String date = getDate();
+        final String payload = "PUT\n\n" + type + "\n" + date + "\n" + "/" + mBucket + "/" + objectKey;
         final String signature = getSignature(payload);
         final URL url = new URL(String.format(Path.URL, mBucket, objectKey));
 
@@ -108,7 +104,7 @@ public class S3Api {
             conn.setRequestMethod("PUT");
             conn.setDoOutput(true);
             conn.setRequestProperty("ETag", FileUtil.getMD5Checksum(file));
-            conn.setRequestProperty("Date", d);
+            conn.setRequestProperty("Date", date);
             conn.setRequestProperty("Content-Type", type);
             conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
 
@@ -135,6 +131,12 @@ public class S3Api {
 
     public boolean downloadSurvey(String filename, File dst) throws IOException {
         return get(PREFIX_SURVEY + filename, dst);
+    }
+
+    private String getDate() {
+        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return df.format(new Date()) + "GMT";
     }
 
     private String getSignature(String payload) {

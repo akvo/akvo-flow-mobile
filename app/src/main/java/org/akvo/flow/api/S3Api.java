@@ -12,6 +12,7 @@ import org.apache.http.HttpStatus;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,27 +35,28 @@ public class S3Api {
 
     private static final int BUFFER_SIZE = 8192;
 
-    private static final String GET = "GET";
     private static final String PREFIX_SURVEY = "surveys/";
 
-    private PropertyUtil mProperties;
     private String mBucket;
     private String mAccessKey;
     private String mSecret;
 
+    public enum FileType {ZIP, IMAGE, VIDEO}
+
     public S3Api(Context c) {
-        mProperties = new PropertyUtil(c.getResources());
-        mBucket = mProperties.getProperty(ConstantUtil.S3_BUCKET);
-        mAccessKey = mProperties.getProperty(ConstantUtil.S3_ACCESSKEY);
-        mSecret = mProperties.getProperty(ConstantUtil.S3_SECRET);
+        PropertyUtil properties = new PropertyUtil(c.getResources());
+        mBucket = properties.getProperty(ConstantUtil.S3_BUCKET);
+        mAccessKey = properties.getProperty(ConstantUtil.S3_ACCESSKEY);
+        mSecret = properties.getProperty(ConstantUtil.S3_SECRET);
     }
 
-    private boolean get(String objectKey, File dst) throws IOException {
+    public boolean get(String objectKey, File dst) throws IOException {
         // Get date and signature
         final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ");
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
         final String d = df.format(new Date()) + "GMT";
-        final String signature = getSignature(GET, objectKey, d);
+        final String payload = "GET\n\n\n" + d + "\n" + "/" + mBucket + "/" + objectKey;
+        final String signature = getSignature(payload);
         final URL url = new URL(String.format(Path.URL, mBucket, objectKey));
 
         InputStream in = null;
@@ -89,13 +91,53 @@ public class S3Api {
         }
     }
 
+    public boolean put(String objectKey, File file, String type) throws IOException {
+        // Get date and signature
+        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        final String d = df.format(new Date()) + "GMT";
+        final String payload = "PUT\n\n" + type + "\n" + d + "\n" + "/" + mBucket + "/" + objectKey;
+        final String signature = getSignature(payload);
+        final URL url = new URL(String.format(Path.URL, mBucket, objectKey));
+
+        InputStream in = null;
+        OutputStream out = null;
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("PUT");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("ETag", FileUtil.getMD5Checksum(file));
+            conn.setRequestProperty("Date", d);
+            conn.setRequestProperty("Content-Type", type);
+            conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
+
+            in = new BufferedInputStream(new FileInputStream(file));
+            out = new BufferedOutputStream(conn.getOutputStream());
+
+            byte[] b = new byte[BUFFER_SIZE];
+            int read;
+            while ((read = in.read(b)) != -1) {
+                out.write(b, 0, read);
+            }
+
+            out.flush();
+
+            return true;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+            FileUtil.close(in);
+            FileUtil.close(out);
+        }
+    }
+
     public boolean downloadSurvey(String filename, File dst) throws IOException {
         return get(PREFIX_SURVEY + filename, dst);
     }
 
-    private String getSignature(String method, String objectKey, String date) {
-        final String payload = method + "\n\n\n" + date + "\n" + "/" + mBucket + "/" + objectKey;
-
+    private String getSignature(String payload) {
         try {
             Key signingKey = new SecretKeySpec(mSecret.getBytes(), "HmacSHA1");
             Mac mac = Mac.getInstance("HmacSHA1");

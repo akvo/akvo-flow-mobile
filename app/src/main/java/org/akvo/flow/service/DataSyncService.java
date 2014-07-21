@@ -22,12 +22,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
 import org.akvo.flow.R;
+import org.akvo.flow.api.S3Api;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
@@ -41,14 +41,12 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.MultipartStream;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.ViewUtil;
 
-import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -114,6 +112,7 @@ public class DataSyncService extends IntentService {
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
     private static final String VIDEO_CONTENT_TYPE = "video/mp4";
+
     private static final String S3_DATA_FILE_PATH = "devicezip";
     private static final String S3_IMAGE_FILE_PATH = "images";
 
@@ -423,26 +422,22 @@ public class DataSyncService extends IntentService {
     }
 
     private boolean syncFile(String filename, int status, String serverBase) {
-        String contentType, dir, policy, signature, action;
+        String contentType, dir, action;
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
                     : VIDEO_CONTENT_TYPE;
             dir = S3_IMAGE_FILE_PATH;
-            policy = mProps.getProperty(ConstantUtil.IMAGE_S3_POLICY);
-            signature = mProps.getProperty(ConstantUtil.IMAGE_S3_SIG);
             // Only notify server if the previous attempts have failed
             action = TransmissionStatus.FAILED == status ? ACTION_IMAGE : null;
         } else {
             contentType = DATA_CONTENT_TYPE;
             dir = S3_DATA_FILE_PATH;
-            policy = mProps.getProperty(ConstantUtil.DATA_S3_POLICY);
-            signature = mProps.getProperty(ConstantUtil.DATA_S3_SIG);
             action = ACTION_SUBMIT;
         }
 
         mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
 
-        boolean ok = sendFile(filename, dir, policy, signature, contentType, FILE_UPLOAD_RETRIES);
+        boolean ok = sendFile(filename, dir, contentType, FILE_UPLOAD_RETRIES);
         final String destName = getDestName(filename);
 
         if (ok && action != null) {
@@ -462,76 +457,16 @@ public class DataSyncService extends IntentService {
         return ok;
     }
 
-    private boolean sendFile(String fileAbsolutePath, String dir, String policy, String sig,
-            String contentType, int retries) {
+    private boolean sendFile(String fileAbsolutePath, String dir,  String contentType, int retries) {
         try {
             String fileName = fileAbsolutePath;
             if (fileName.contains(File.separator)) {
-                fileName = fileName.substring(fileName.lastIndexOf(File.separator)); // TODO: Why show separator?
+                fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
             }
 
-            // Generate checksum, to be compared against response's ETag
-            final String checksum = FileUtil.getMD5Checksum(fileAbsolutePath);
-
-            MultipartStream stream = new MultipartStream(new URL(
-                    mProps.getProperty(ConstantUtil.DATA_UPLOAD_URL)));
-
-            stream.addFormField("key", dir + "/${filename}");
-            stream.addFormField("AWSAccessKeyId", mProps.getProperty(ConstantUtil.S3_ID));
-            stream.addFormField("acl", "public-read");
-            stream.addFormField("success_action_redirect", "http://www.gallatinsystems.com/SuccessUpload.html");
-            stream.addFormField("policy", policy);
-            stream.addFormField("signature", sig);
-            stream.addFormField("Content-Type", contentType);
-            stream.addFile("file", fileAbsolutePath, null);
-            int code = stream.execute(new MultipartStream.MultipartStreamStatusListner() {
-                @Override
-                public void uploadProgress(long bytesSent, long totalBytes) {
-                    double percentComplete = 0.0d;
-                    if (bytesSent > 0 && totalBytes > 0) {
-                        percentComplete = ((double) bytesSent)
-                                / ((double) totalBytes);
-                    }
-                    if (percentComplete > 1.0d) {
-                        percentComplete = 1.0d;
-                    }
-                    // TODO: Include this progress somehow in the notification. Maybe the percentage should be bytes transmision progress
-                    //fireNotification(NotificationType.PROGRESS, PCT_FORMAT.format(percentComplete)
-                            //+ " - " + fileNameForNotification);
-                }
-            });
-
-            /*
-            * Determine if an upload to Amazon S3 is successful. The response
-            * headers should contain a redirection to a URL, in which query, a
-            * parameter called "etag" will be the md5 checksum of the uploaded
-            * file.
-            */
-            String etag = null;
-            if (code == HttpStatus.SC_SEE_OTHER) {
-                String location = stream.getResponseHeader("Location");
-                Uri uri = Uri.parse(location);
-                etag = uri.getQueryParameter("etag");
-                etag = etag.replaceAll("\"", "");// Remove quotes
-                Log.d(TAG, "ETag: " + etag);
-            } else {
-                Log.e(TAG, "Server returned a bad code after upload: " + code);
-            }
-
-            if (etag != null && etag.equals(checksum)) {
-                Log.d(TAG, "File uploaded successfully to datastore : " + fileName);
-                return true;
-            } else {
-                Log.e(TAG, "Server returned a bad checksum after upload: " + etag);
-
-                if (retries > 0) {
-                    Log.i(TAG, "Retrying upload. Remaining attempts: " + retries);
-                    return sendFile(fileAbsolutePath, dir, policy, sig, contentType, --retries);
-                }
-
-                Log.e(TAG, "File " + fileName + " upload failed.");
-                return false;
-            }
+            final String objectKey = dir + "/" + fileName;
+            S3Api s3Api = new S3Api(this);
+            return s3Api.put(objectKey, new File(fileAbsolutePath), contentType);
         } catch (Exception e) {
             Log.e(TAG, "Could not send upload " + e.getMessage(), e);
             PersistentUncaughtExceptionHandler.recordException(e);

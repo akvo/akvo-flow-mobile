@@ -42,6 +42,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.akvo.flow.R;
+import org.akvo.flow.api.S3Api;
 import org.akvo.flow.api.parser.csv.SurveyMetaParser;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
@@ -57,7 +58,6 @@ import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -85,7 +85,6 @@ public class SurveyDownloadService extends Service {
     private static final String SD_LOC = "sdcard";
 
     private SurveyDbAdapter databaseAdaptor;
-    private PropertyUtil props;
     private Thread thread;
     private ThreadPoolExecutor downloadExecutor;
     private static Semaphore lock = new Semaphore(1);
@@ -119,7 +118,6 @@ public class SurveyDownloadService extends Service {
         super.onCreate();
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
                 .getInstance());
-        props = new PropertyUtil(getResources());
         downloadExecutor = new ThreadPoolExecutor(1, 3, 5000,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }
@@ -170,7 +168,7 @@ public class SurveyDownloadService extends Service {
                         for (int i = 0; i < surveys.size(); i++) {
                             Survey survey = surveys.get(i);
                             try {
-                                if (downloadSurvey(serverBase, survey)) {
+                                if (downloadSurvey(survey)) {
                                     databaseAdaptor.saveSurvey(survey);
                                     String[] langs = LangsPreferenceUtil.determineLanguages(this,
                                             survey);
@@ -246,9 +244,7 @@ public class SurveyDownloadService extends Service {
                 }
             }
 
-            if (group != null) {
-                surveyGroups.put(group.getId(), group);
-            }
+            surveyGroups.put(group.getId(), group);
         }
         
         // Now, add them to the database
@@ -261,37 +257,31 @@ public class SurveyDownloadService extends Service {
      * Downloads the survey based on the ID and then updates the survey object
      * with the filename and location
      */
-    private boolean downloadSurvey(String serverBase, Survey survey) {
+    private boolean downloadSurvey(Survey survey) {
         boolean success = false;
         try {
             String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
             File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
-            HttpUtil.httpDownload(props.getProperty(ConstantUtil.SURVEY_S3_URL) + filename,
-                            new FileOutputStream(file));
-            extractAndSave(new FileInputStream(file));
-
-            survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
-            survey.setType(DEFAULT_TYPE);
-            survey.setLocation(SD_LOC);
-            success = true;
+            S3Api s3Api = new S3Api(this);
+            if (s3Api.downloadSurvey(filename, file)) {// Download zip file
+                extractAndSave(new FileInputStream(file));
+                survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
+                survey.setType(DEFAULT_TYPE);
+                survey.setLocation(SD_LOC);
+                success = true;
+            }
         } catch (IOException e) {
             Log.e(TAG, "Could write survey file " + survey.getFileName(), e);
             String text = getResources().getString(R.string.cannotupdate);
             ViewUtil.fireNotification(text, text, this, FAIL_ID, null);
-            PersistentUncaughtExceptionHandler
-                    .recordException(new TransferException(survey.getId(),
-                            null, e));
-
+            PersistentUncaughtExceptionHandler.recordException(
+                    new TransferException(survey.getId(), null, e));
         } catch (Exception e) {
             Log.e(TAG, "Could not download survey " + survey.getId(), e);
-
             String text = getResources().getString(R.string.cannotupdate);
             ViewUtil.fireNotification(text, text, this, FAIL_ID, null);
-
-            PersistentUncaughtExceptionHandler
-                    .recordException(new TransferException(survey.getId(),
-                            null, e));
-
+            PersistentUncaughtExceptionHandler.recordException(
+                    new TransferException(survey.getId(), null, e));
         }
         return success;
     }
@@ -460,6 +450,7 @@ public class SurveyDownloadService extends Service {
      * this device (based on phone number).
      * 
      * @return - an arrayList of Survey objects with the id and version populated
+     * TODO: Move this feature to FLOWApi
      */
     private List<Survey> checkForSurveys(String serverBase, String deviceId) {
         List<Survey> surveys = null;
@@ -494,8 +485,7 @@ public class SurveyDownloadService extends Service {
      * @param type
      */
     private void fireNotification(int count) {
-        String text = getResources().getText(R.string.surveysupdated)
-                .toString();
+        String text = getResources().getText(R.string.surveysupdated).toString();
         ViewUtil.fireNotification(text, text, this, COMPLETE_ID, null);
     }
 

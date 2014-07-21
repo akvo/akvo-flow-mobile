@@ -176,6 +176,9 @@ public class ConstantUtil {
     public static final String SERVER_BASE = "serverBase";
     public static final String SURVEY_S3_URL = "surveyS3Url";
     public static final String API_KEY = "apiKey";
+    public static final String S3_BUCKET = "s3BucketName";
+    public static final String S3_ACCESSKEY = "s3AccessKey";
+    public static final String S3_SECRET = "s3Secret";
 
     /**
      * resource related constants

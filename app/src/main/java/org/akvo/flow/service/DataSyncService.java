@@ -112,9 +112,6 @@ public class DataSyncService extends IntentService {
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
     private static final String VIDEO_CONTENT_TYPE = "video/mp4";
 
-    private static final String S3_DATA_FILE_PATH = "devicezip";
-    private static final String S3_IMAGE_FILE_PATH = "images";
-
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
 
@@ -425,12 +422,12 @@ public class DataSyncService extends IntentService {
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
                     : VIDEO_CONTENT_TYPE;
-            dir = S3_IMAGE_FILE_PATH;
+            dir = ConstantUtil.S3_IMAGE_DIR;
             // Only notify server if the previous attempts have failed
             action = TransmissionStatus.FAILED == status ? ACTION_IMAGE : null;
         } else {
             contentType = DATA_CONTENT_TYPE;
-            dir = S3_DATA_FILE_PATH;
+            dir = ConstantUtil.S3_DATA_DIR;
             action = ACTION_SUBMIT;
         }
 
@@ -464,7 +461,7 @@ public class DataSyncService extends IntentService {
                 fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
             }
 
-            final String objectKey = dir + "/" + fileName;
+            final String objectKey = dir + fileName;
             S3Api s3Api = new S3Api(this);
             ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType);
             if (!ok && retries > 0) {

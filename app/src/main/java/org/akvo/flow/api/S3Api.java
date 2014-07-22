@@ -35,8 +35,6 @@ public class S3Api {
 
     private static final int BUFFER_SIZE = 8192;
 
-    private static final String PREFIX_SURVEY = "surveys/";// TODO: Use same pattern as other directories (receive objectKey directly)
-
     private String mBucket;
     private String mAccessKey;
     private String mSecret;
@@ -108,6 +106,11 @@ public class S3Api {
             copyStream(in, out);
             out.flush();
 
+            int status = conn.getResponseCode();
+            if (status >= 400) {
+                Log.e(TAG, "Status Code: " + status + ". Expected: 2XX");
+                return false;
+            }
             return true;
         } finally {
             if (conn != null) {
@@ -116,10 +119,6 @@ public class S3Api {
             FileUtil.close(in);
             FileUtil.close(out);
         }
-    }
-
-    public boolean downloadSurvey(String filename, File dst) throws IOException {
-        return get(PREFIX_SURVEY + filename, dst);
     }
 
     private String getDate() {

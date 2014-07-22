@@ -167,18 +167,18 @@ public class ConstantUtil {
     /**
      * property file keys
      */
-    public static final String S3_ID = "s3Id";
-    public static final String DATA_S3_POLICY = "dataS3Policy";
-    public static final String DATA_S3_SIG = "dataS3Sig";
-    public static final String IMAGE_S3_POLICY = "imageS3Policy";
-    public static final String IMAGE_S3_SIG = "imageS3Sig";
-    public static final String DATA_UPLOAD_URL = "dataUploadUrl";
     public static final String SERVER_BASE = "serverBase";
-    public static final String SURVEY_S3_URL = "surveyS3Url";
     public static final String API_KEY = "apiKey";
     public static final String S3_BUCKET = "s3BucketName";
     public static final String S3_ACCESSKEY = "s3AccessKey";
     public static final String S3_SECRET = "s3Secret";
+
+    /**
+     * S3 bucket directories (object prefixes)
+     */
+    public static final String S3_DATA_DIR = "devicezip/";
+    public static final String S3_IMAGE_DIR = "images/";
+    public static final String S3_SURVEYS_DIR = "surveys/";
 
     /**
      * resource related constants

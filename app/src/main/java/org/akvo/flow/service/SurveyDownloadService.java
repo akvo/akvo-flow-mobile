@@ -260,10 +260,11 @@ public class SurveyDownloadService extends Service {
     private boolean downloadSurvey(Survey survey) {
         boolean success = false;
         try {
-            String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
-            File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
+            final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
+            final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+            final File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
             S3Api s3Api = new S3Api(this);
-            if (s3Api.downloadSurvey(filename, file)) {// Download zip file
+            if (s3Api.get(objectKey, file)) {// Download zip file
                 extractAndSave(new FileInputStream(file));
                 survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
                 survey.setType(DEFAULT_TYPE);

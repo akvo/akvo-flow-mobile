@@ -16,6 +16,7 @@
 
 package org.akvo.flow.ui.view;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.media.ThumbnailUtils;
@@ -23,8 +24,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -87,10 +90,21 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
                 Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
                 return;
             }
-            String type = isImage() ? ConstantUtil.IMAGE_MIME : ConstantUtil.VIDEO_MIME;
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(new File(filename)), type);
-            getContext().startActivity(intent);
+            if (isImage()) {
+                // Images are embedded in the app itself, whereas video are delegated through an Intent
+                Dialog dia = new Dialog(new ContextThemeWrapper(getContext(), R.style.Flow_Dialog));
+                dia.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                ImageView imageView = new ImageView(getContext());
+                imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT));
+                ImageUtil.displayImage(imageView, filename);
+                dia.setContentView(imageView);
+                dia.show();
+            } else {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
+                getContext().startActivity(intent);
+            }
         } else if (v == mMediaButton) {
             if (isImage()) {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);

@@ -54,7 +54,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -457,7 +456,8 @@ public class DataSyncService extends IntentService {
         return ok;
     }
 
-    private boolean sendFile(String fileAbsolutePath, String dir,  String contentType, int retries) {
+    private boolean sendFile(String fileAbsolutePath, String dir, String contentType, int retries) {
+        boolean ok = false;
         try {
             String fileName = fileAbsolutePath;
             if (fileName.contains(File.separator)) {
@@ -466,12 +466,17 @@ public class DataSyncService extends IntentService {
 
             final String objectKey = dir + "/" + fileName;
             S3Api s3Api = new S3Api(this);
-            return s3Api.put(objectKey, new File(fileAbsolutePath), contentType);
-        } catch (Exception e) {
-            Log.e(TAG, "Could not send upload " + e.getMessage(), e);
+            ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType);
+            if (!ok && retries > 0) {
+                // If we have not expired all the retry attempts, try again.
+                ok = sendFile(fileAbsolutePath, dir, contentType, --retries);
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Could not send file: " + fileAbsolutePath + ". " + e.getMessage(), e);
             PersistentUncaughtExceptionHandler.recordException(e);
-            return false;
         }
+
+        return ok;
     }
 
     /**

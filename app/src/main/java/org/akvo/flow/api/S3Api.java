@@ -1,7 +1,6 @@
 package org.akvo.flow.api;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
@@ -33,6 +32,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class S3Api {
     private static final String TAG = S3Api.class.getSimpleName();
+    private static final String URL = "https://%s.s3.amazonaws.com/%s";
+    private static final String PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s";// date, bucket, obj
+    private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
+    private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
 
     private static final int BUFFER_SIZE = 8192;
 
@@ -50,9 +53,9 @@ public class S3Api {
     public boolean get(String objectKey, File dst) throws IOException {
         // Get date and signature
         final String date = getDate();
-        final String payload = "GET\n\n\n" + date + "\n" + "/" + mBucket + "/" + objectKey;
+        final String payload = String.format(PAYLOAD_GET, date, mBucket, objectKey);
         final String signature = getSignature(payload);
-        final URL url = new URL(String.format(Path.URL, mBucket, objectKey));
+        final URL url = new URL(String.format(URL, mBucket, objectKey));
 
         InputStream in = null;
         OutputStream out = null;
@@ -84,26 +87,28 @@ public class S3Api {
 
     public boolean put(String objectKey, File file, String type, boolean isPublic) throws IOException {
         // Get date and signature
+        final String md5 = Base64.encodeToString(FileUtil.getMD5Checksum(file), Base64.NO_WRAP);
         final String date = getDate();
-        final String payload = "PUT\n\n" + type + "\n" + date + "\n" + "/" + mBucket + "/" + objectKey;
+        String payloadStr = isPublic ? PAYLOAD_PUT_PUBLIC : PAYLOAD_PUT_PRIVATE;
+        final String payload = String.format(payloadStr, md5, type, date, mBucket, objectKey);
         final String signature = getSignature(payload);
-        final URL url = new URL(String.format(Path.URL, mBucket, objectKey));
+        final URL url = new URL(String.format(URL, mBucket, objectKey));
 
         InputStream in = null;
         OutputStream out = null;
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("PUT");
             conn.setDoOutput(true);
-            conn.setRequestProperty("ETag", FileUtil.getMD5Checksum(file));
-            conn.setRequestProperty("Date", date);
+            conn.setRequestMethod("PUT");
+            conn.setRequestProperty("Content-MD5", md5);
             conn.setRequestProperty("Content-Type", type);
-            conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
+            conn.setRequestProperty("Date", date);
             if (isPublic) {
                 // If we don't send this header, the object will be private by default
                 conn.setRequestProperty("x-amz-acl", "public-read");
             }
+            conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
 
             in = new BufferedInputStream(new FileInputStream(file));
             out = new BufferedOutputStream(conn.getOutputStream());
@@ -156,7 +161,4 @@ public class S3Api {
         }
     }
 
-    interface Path {
-        String URL = "https://%s.s3.amazonaws.com/%s";
-    }
 }

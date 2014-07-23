@@ -225,7 +225,7 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
                     Map<String, List<String>> headers = conn.getHeaderFields();
                     String etag = headers != null ? getHeader(headers, "ETag") : null;
                     etag = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
-                    final String checksum = FileUtil.getMD5Checksum(localPath);
+                    final String checksum = FileUtil.hexMd5(new File(localPath));
 
                     if (etag != null && etag.equals(checksum)) {
                         ok = true;

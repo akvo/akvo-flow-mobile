@@ -1,6 +1,7 @@
 package org.akvo.flow.api;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
@@ -81,7 +82,7 @@ public class S3Api {
         }
     }
 
-    public boolean put(String objectKey, File file, String type) throws IOException {
+    public boolean put(String objectKey, File file, String type, boolean isPublic) throws IOException {
         // Get date and signature
         final String date = getDate();
         final String payload = "PUT\n\n" + type + "\n" + date + "\n" + "/" + mBucket + "/" + objectKey;
@@ -99,6 +100,10 @@ public class S3Api {
             conn.setRequestProperty("Date", date);
             conn.setRequestProperty("Content-Type", type);
             conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
+            if (isPublic) {
+                // If we don't send this header, the object will be private by default
+                conn.setRequestProperty("x-amz-acl", "public-read");
+            }
 
             in = new BufferedInputStream(new FileInputStream(file));
             out = new BufferedOutputStream(conn.getOutputStream());

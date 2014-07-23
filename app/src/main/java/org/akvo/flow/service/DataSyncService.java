@@ -419,21 +419,24 @@ public class DataSyncService extends IntentService {
 
     private boolean syncFile(String filename, int status, String serverBase) {
         String contentType, dir, action;
+        boolean isPublic;
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
                     : VIDEO_CONTENT_TYPE;
             dir = ConstantUtil.S3_IMAGE_DIR;
             // Only notify server if the previous attempts have failed
             action = TransmissionStatus.FAILED == status ? ACTION_IMAGE : null;
+            isPublic = true;// Images/Videos have a public read policy
         } else {
             contentType = DATA_CONTENT_TYPE;
             dir = ConstantUtil.S3_DATA_DIR;
             action = ACTION_SUBMIT;
+            isPublic = false;
         }
 
         mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
 
-        boolean ok = sendFile(filename, dir, contentType, FILE_UPLOAD_RETRIES);
+        boolean ok = sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES);
         final String destName = getDestName(filename);
 
         if (ok && action != null) {
@@ -453,7 +456,8 @@ public class DataSyncService extends IntentService {
         return ok;
     }
 
-    private boolean sendFile(String fileAbsolutePath, String dir, String contentType, int retries) {
+    private boolean sendFile(String fileAbsolutePath, String dir, String contentType,
+            boolean isPublic, int retries) {
         boolean ok = false;
         try {
             String fileName = fileAbsolutePath;
@@ -463,10 +467,10 @@ public class DataSyncService extends IntentService {
 
             final String objectKey = dir + fileName;
             S3Api s3Api = new S3Api(this);
-            ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType);
+            ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType, isPublic);
             if (!ok && retries > 0) {
                 // If we have not expired all the retry attempts, try again.
-                ok = sendFile(fileAbsolutePath, dir, contentType, --retries);
+                ok = sendFile(fileAbsolutePath, dir, contentType, isPublic, --retries);
             }
         } catch (IOException e) {
             Log.e(TAG, "Could not send file: " + fileAbsolutePath + ". " + e.getMessage(), e);

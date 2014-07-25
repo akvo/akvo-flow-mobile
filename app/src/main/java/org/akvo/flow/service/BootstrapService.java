@@ -234,7 +234,6 @@ public class BootstrapService extends Service {
                             // Something went wrong, we cannot continue with this survey
                             continue;
                         }
-                        survey.setSurveyGroup(loadedSurvey.getSurveyGroup());
 
                         if (loadedSurvey.getVersion() > 0) {
                             survey.setVersion(loadedSurvey.getVersion());
@@ -243,7 +242,8 @@ public class BootstrapService extends Service {
                         }
 
                         // Process SurveyGroup, and save it to the DB
-                        SurveyGroup group = parseSurveyGroup(survey);
+                        SurveyGroup group = parseSurveyGroup(loadedSurvey);
+                        survey.setSurveyGroup(group);
                         databaseAdapter.addSurveyGroup(group);
 
                         // now save the survey and add the languages

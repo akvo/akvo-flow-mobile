@@ -38,6 +38,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
@@ -233,6 +234,11 @@ public class BootstrapService extends Service {
                         } else if (survey.getVersion() <= 0) {
                             survey.setVersion(1d);
                         }
+
+                        // Process SurveyGroup, and save it to the DB
+                        SurveyGroup group = parseSurveyGroup(survey);
+                        databaseAdapter.addSurveyGroup(group);
+
                         // now save the survey and add the languages
                         databaseAdapter.saveSurvey(survey);
                         String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
@@ -317,6 +323,19 @@ public class BootstrapService extends Service {
             Collections.sort(zipFiles);
         }
         return zipFiles;
+    }
+
+    private SurveyGroup parseSurveyGroup(Survey survey) {
+        // Temporary hack to support the concept of 'Project', where a non-monitored
+        // project (current SurveyGroup) can only hold one survey.
+        // See https://github.com/akvo/akvo-flow-mobile/issues/100
+        SurveyGroup group = survey.getSurveyGroup();
+        if (group != null && group.isMonitored()) {
+            return group; // Do nothing. The group remains unmodified
+        }
+
+        long id = Long.valueOf(survey.getId());
+        return new SurveyGroup(id, survey.getName(), survey.getId(), false);
     }
 
     /**

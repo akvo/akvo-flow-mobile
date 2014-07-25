@@ -196,13 +196,11 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
         Intent i = new Intent(view.getContext(), SurveyActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, (Long) view.getTag(USER_ID_KEY));
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, ((Long) view.getTag(SURVEY_ID_KEY)).toString());
+        i.putExtra(ConstantUtil.SURVEY_ID_KEY, view.getTag(SURVEY_ID_KEY).toString());
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, (Long) view.getTag(SURVEY_INSTANCE_ID_KEY));
 
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        if (mSurveyGroup.isMonitored()) {
-            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
-        }
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
 
         // Read-only vs editable
         if ((Boolean)view.getTag(FINISHED_KEY)) {

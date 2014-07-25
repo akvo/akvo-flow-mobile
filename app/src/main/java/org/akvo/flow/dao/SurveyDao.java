@@ -16,6 +16,8 @@
 
 package org.akvo.flow.dao;
 
+import android.text.TextUtils;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -38,13 +40,15 @@ public class SurveyDao {
             throws FileNotFoundException {
         if (survey != null) {
             String tempName = survey.getName();
+            String id = survey.getId();
             SaxSurveyParser parser = new SaxSurveyParser();
             survey = parser.parse(in);
 
-            if (survey != null
-                    && (survey.getName() == null || survey.getName().trim()
-                            .length() == 0)) {
-                survey.setName(tempName);
+            if (survey != null) {
+                survey.setId(id);
+                if (TextUtils.isEmpty(survey.getName())) {
+                    survey.setName(tempName);
+                }
             }
         }
         return survey;

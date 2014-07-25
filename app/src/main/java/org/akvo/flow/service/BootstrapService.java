@@ -229,9 +229,16 @@ public class BootstrapService extends Service {
                         } catch (FileNotFoundException e) {
                             Log.e(TAG, "Could not load survey xml file");
                         }
-                        if (loadedSurvey != null && loadedSurvey.getVersion() > 0) {
+
+                        if (loadedSurvey == null) {
+                            // Something went wrong, we cannot continue with this survey
+                            continue;
+                        }
+                        survey.setSurveyGroup(loadedSurvey.getSurveyGroup());
+
+                        if (loadedSurvey.getVersion() > 0) {
                             survey.setVersion(loadedSurvey.getVersion());
-                        } else if (survey.getVersion() <= 0) {
+                        } else {
                             survey.setVersion(1d);
                         }
 

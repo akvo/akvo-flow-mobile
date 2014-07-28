@@ -29,6 +29,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.crypto.Mac;
@@ -43,8 +44,11 @@ import android.util.Log;
 import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.ApiException;
+import org.akvo.flow.exception.ApiException.Status;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.apache.http.HttpStatus;
@@ -65,9 +69,8 @@ public class FlowApi {
         API_KEY = getApiKey(context);
     }
     
-    public SurveyedLocalesResponse getSurveyedLocales(long surveyGroup, String timestamp) 
+    public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
             throws IOException, ApiException {
-        SurveyedLocalesResponse surveyedLocalesResponse = null;
         final String query =  PARAM.IMEI + IMEI
                 + "&" + PARAM.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
                 + "&" + PARAM.PHONE_NUMBER + PHONE_NUMBER
@@ -80,10 +83,14 @@ public class FlowApi {
                 + "&" + PARAM.HMAC + getAuthorization(query);
         String response = httpGet(url);
         if (response != null) {
-            surveyedLocalesResponse = new SurveyedLocaleParser().parseResponse(response);
+            SurveyedLocalesResponse slRes = new SurveyedLocaleParser().parseResponse(response);
+            if (slRes.getError() != null) {
+                throw new ApiException(slRes.getError(), Status.MALFORMED_RESPONSE);
+            }
+            return slRes.getSurveyedLocales();
         }
         
-        return surveyedLocalesResponse;
+        return null;
     }
     
     private String httpGet(String url) throws IOException, ApiException {
@@ -91,12 +98,12 @@ public class FlowApi {
         final long t0 = System.currentTimeMillis();
         try {
             int status = getStatusCode(conn);
+            if (status != HttpStatus.SC_OK) {
+                throw new ApiException(conn.getResponseMessage(), status);
+            }
             InputStream in = new BufferedInputStream(conn.getInputStream());
             String response = readStream(in);
             Log.d(TAG, "Request time: " + (System.currentTimeMillis() - t0) + ". URL: " + url);
-            if (status != HttpStatus.SC_OK) {
-                throw new ApiException(response);
-            }
             return response;
         } finally {
             if (conn != null) {
@@ -191,9 +198,7 @@ public class FlowApi {
                 builder.append(line + "\n");
             }
         } finally {
-            try {
-                reader.close();
-            } catch (Exception ignored) {}
+            FileUtil.close(reader);
         }
         
         return builder.toString();

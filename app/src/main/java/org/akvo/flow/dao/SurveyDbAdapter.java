@@ -982,16 +982,21 @@ public class SurveyDbAdapter {
         });
     }
 
-    public void createTransmission (long surveyInstanceId, String filename) {
+    public void createTransmission(long surveyInstanceId, String filename) {
         createTransmission(surveyInstanceId, filename, TransmissionStatus.QUEUED);
     }
 
 
-    public void createTransmission (long surveyInstanceId, String filename, int status) {
+    public void createTransmission(long surveyInstanceId, String filename, int status) {
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
         values.put(TransmissionColumns.FILENAME, filename);
         values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            final String date = String.valueOf(System.currentTimeMillis());
+            values.put(TransmissionColumns.START_DATE, date);
+            values.put(TransmissionColumns.END_DATE, date);
+        }
         database.insert(Tables.TRANSMISSION, null, values);
     }
 
@@ -1645,6 +1650,10 @@ public class SurveyDbAdapter {
 
             // Now the responses...
             syncResponses(surveyInstance.getResponses(), id);
+
+            // The filename is a unique column in the transmission table, and as we do not have
+            // a file to hold this data, we set the value to the instance UUID
+            createTransmission(id, surveyInstance.getUuid(), TransmissionStatus.SYNCED);
         }
     }
     

@@ -145,14 +145,6 @@ public class SurveyDownloadService extends Service {
                 if (surveyId != null && surveyId.trim().length() > 0) {
                     surveys = getSurveyHeader(serverBase, surveyId, deviceId);
                     if (surveys != null && surveys.size() > 0) {
-                        // Monitored surveys cannot be downloaded without assignments
-                        if (surveys.get(0).getSurveyGroup().isMonitored()) {
-                            final String title = getString(R.string.error_assignment_title);
-                            final String text = getString(R.string.error_assignment_text);
-                            ViewUtil.fireNotification(title, text, this, FAIL_ID, null);
-                            return;
-                        }
-
                         // if we already have the survey, delete it first
                         databaseAdaptor.deleteSurvey(surveyId.trim(), true);
                     }
@@ -433,8 +425,7 @@ public class SurveyDownloadService extends Service {
      * @param surveyId
      * @return
      */
-    private List<Survey> getSurveyHeader(String serverBase,
-            String surveyId, String deviceId) {
+    private List<Survey> getSurveyHeader(String serverBase, String surveyId, String deviceId) {
         String response = null;
         List<Survey> surveys = new ArrayList<Survey>();
         try {

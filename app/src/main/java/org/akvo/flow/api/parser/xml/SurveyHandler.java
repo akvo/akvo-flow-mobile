@@ -18,6 +18,7 @@ package org.akvo.flow.api.parser.xml;
 
 import java.util.ArrayList;
 
+import org.akvo.flow.domain.SurveyGroup;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -83,6 +84,10 @@ public class SurveyHandler extends DefaultHandler {
     private static final String SOURCE_QUESTION_ID = "sourceId";
     private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
     private static final String DOUBLE_ENTRY = "requireDoubleEntry";
+
+    private static final String SURVEY_GROUP_ID = "surveyGroupId";
+    private static final String SURVEY_GROUP_NAME = "surveyGroupName";
+    private static final String REGISTRATION_SURVEY = "registrationSurvey";
 
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
@@ -219,8 +224,7 @@ public class SurveyHandler extends DefaultHandler {
         super.startElement(uri, localName, name, attributes);
         if (localName.equalsIgnoreCase(SURVEY)) {
             if (attributes.getValue(VERSION) != null) {
-                survey.setVersion(Double.parseDouble(attributes
-                        .getValue(VERSION)));
+                survey.setVersion(Double.parseDouble(attributes.getValue(VERSION)));
             }
             if (attributes.getValue(DEFAULT_LANG) != null) {
                 survey.setLanguage(attributes.getValue(DEFAULT_LANG));
@@ -229,6 +233,14 @@ public class SurveyHandler extends DefaultHandler {
             }
             if (attributes.getValue(SOURCE_SURVEY_ID) != null) {
                 survey.setSourceSurveyId(attributes.getValue(SOURCE_SURVEY_ID));
+            }
+            // SurveyGroup info, if exists
+            if (attributes.getValue(SURVEY_GROUP_ID) != null &&
+                    attributes.getValue(SURVEY_GROUP_NAME) != null) {
+                long sgid = Long.valueOf(attributes.getValue(SURVEY_GROUP_ID));
+                String sgname = attributes.getValue(SURVEY_GROUP_NAME);
+                String regform = attributes.getValue(REGISTRATION_SURVEY);
+                survey.setSurveyGroup(new SurveyGroup(sgid, sgname, regform, regform != null));
             }
         } else if (localName.equalsIgnoreCase(QUESTION_GROUP)) {
             currentQuestionGroup = new QuestionGroup();

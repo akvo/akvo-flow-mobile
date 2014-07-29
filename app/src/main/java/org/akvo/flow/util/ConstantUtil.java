@@ -169,9 +169,9 @@ public class ConstantUtil {
      */
     public static final String SERVER_BASE = "serverBase";
     public static final String API_KEY = "apiKey";
-    public static final String S3_BUCKET = "s3BucketName";
-    public static final String S3_ACCESSKEY = "s3AccessKey";
-    public static final String S3_SECRET = "s3Secret";
+    public static final String S3_BUCKET = "awsBucket";
+    public static final String S3_ACCESSKEY = "awsAccessKeyId";
+    public static final String S3_SECRET = "awsAccessSecret";
 
     /**
      * S3 bucket directories (object prefixes)

@@ -1467,12 +1467,11 @@ public class SurveyDbAdapter {
     }
     
     public String getSurveyedLocaleId(long surveyInstanceId) {
-        Cursor cursor = database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
+        Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
-                    Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
-                    SurveyInstanceColumns.RECORD_ID
+                    SurveyInstanceColumns._ID, SurveyInstanceColumns.RECORD_ID
                 },
-                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID + "= ?",
+                SurveyInstanceColumns._ID + "= ?",
                 new String[]{String.valueOf(surveyInstanceId)},
                 null, null, null);
         

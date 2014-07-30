@@ -1400,15 +1400,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Get all the SurveyInstances for a particular SurveyGroup
-     */
-    public Cursor getSurveyInstances(long surveyGroupId) {
-        return getSurveyInstances(
-                Tables.SURVEY + "." + SurveyColumns.SURVEY_GROUP_ID + "= ?",
-                new String[] { String.valueOf(surveyGroupId) });
-    }
-
-    /**
      * Get SurveyInstances with a particular status.
      * If the recordId is not null, results will be filtered by Record.
      */

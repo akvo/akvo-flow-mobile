@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -23,31 +23,16 @@ import org.akvo.flow.async.loader.base.DataLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 
 public class SurveyInstanceLoader extends DataLoader<Cursor> {
-    private long mSurveyGroupId;
     private String mSurveyedLocaleId;
-    private String mSurveyId;
-    private int mStatus;
 
-    public SurveyInstanceLoader(Context context, SurveyDbAdapter db, long surveyGroupId, 
-            String surveyedLocaleId, String surveyId, int status) {
+    public SurveyInstanceLoader(Context context, SurveyDbAdapter db,  String surveyedLocaleId) {
         super(context, db);
-        mSurveyGroupId = surveyGroupId;
         mSurveyedLocaleId = surveyedLocaleId;
-        mSurveyId = surveyId;
-        mStatus = status;
     }
 
     @Override
     public Cursor loadData(SurveyDbAdapter database) {
-        if (mSurveyId != null) {
-            // Specific Survey with a particular Status
-            return database.getSurveyInstances(mSurveyedLocaleId, mSurveyId, mStatus);
-        } else if (mSurveyedLocaleId != null) {
-            // Monitored
-            return database.getSurveyInstances(mSurveyedLocaleId);
-        }
-        // Non monitored
-        return database.getSurveyInstances(mSurveyGroupId);
+        return database.getSurveyInstances(mSurveyedLocaleId);
     }
 
 }

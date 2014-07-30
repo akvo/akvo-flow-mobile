@@ -1085,9 +1085,10 @@ public class SurveyDbAdapter {
                         TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
                         TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
                 },
-                TransmissionColumns.STATUS + " IN (?, ?)",
+                TransmissionColumns.STATUS + " IN (?, ?, ?)",
                 new String[] {
                         String.valueOf(TransmissionStatus.FAILED),
+                        String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
                         String.valueOf(TransmissionStatus.QUEUED)
                 }, null, null, null);
 

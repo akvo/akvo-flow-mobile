@@ -140,7 +140,7 @@ public class FileUtil {
      * @return
      * @throws IOException
      */
-    public static String readFileAsString(String file) throws IOException {
+    public static String readFileAsString(File file) throws IOException {
         StringBuilder contents = new StringBuilder();
         BufferedReader input = new BufferedReader(new FileReader(file));
         String line = null;

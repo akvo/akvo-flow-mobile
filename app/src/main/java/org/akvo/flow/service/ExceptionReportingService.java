@@ -89,7 +89,7 @@ public class ExceptionReportingService extends Service {
      */
     public int onStartCommand(final Intent intent, int flags, int startid) {
         SurveyDbAdapter database = null;
-        String server = StatusUtil.getServerBase(this);
+        final String server = StatusUtil.getServerBase(this);
 
         try {
             database = new SurveyDbAdapter(this);
@@ -103,7 +103,6 @@ public class ExceptionReportingService extends Service {
                 database.close();
             }
         }
-        final String finalServer = server;
         // Safe to lazy initialize the static field, since this method
         // will always be called in the Main Thread
         if (timer == null) {
@@ -112,8 +111,9 @@ public class ExceptionReportingService extends Service {
 
                 @Override
                 public void run() {
-                    if (StatusUtil.hasDataConnection(ExceptionReportingService.this)) {
-                        submitStackTraces(finalServer);
+                    if (StatusUtil.hasDataConnection(ExceptionReportingService.this) &&
+                            Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                        submitStackTraces(server);
                     }
                 }
             }, INITIAL_DELAY, INTERVAL);
@@ -145,42 +145,34 @@ public class ExceptionReportingService extends Service {
      * the server and, on success, delete the file.
      */
     public void submitStackTraces(String server) {
-        if (StatusUtil.hasDataConnection(this)) {
-            try {
-                if (server != null) {
-                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                        return;
-                    }
-                    File dir = FileUtil.getFilesDir(FileType.STACKTRACE);
-                    String[] list = getTraceFiles(dir);
-                    if (list != null && list.length > 0) {
-                        for (int i = 0; i < list.length; i++) {
-                            String trace = FileUtil.readFileAsString(dir.getAbsolutePath() + list[i]);
-                            File f = new File(dir + list[i]);
+        try {
+            File dir = FileUtil.getFilesDir(FileType.STACKTRACE);
+            String[] list = getTraceFiles(dir);
+            if (list != null && list.length > 0) {
+                for (int i = 0; i < list.length; i++) {
+                    File f = new File(dir, list[i]);
+                    String trace = FileUtil.readFileAsString(f);
 
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put(ACTION_PARAM, ACTION_VALUE);
-                            params.put(PHONE_PARAM, phoneNumber);
-                            params.put(IMEI_PARAM, imei);
-                            params.put(VER_PARAM, version);
-                            params.put(DATE_PARAM,
-                                    DATE_FMT.get().format(new Date(f.lastModified())));
-                            params.put(DEV_ID_PARAM, deviceId);
-                            params.put(TRACE_PARAM, trace);
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put(ACTION_PARAM, ACTION_VALUE);
+                    params.put(PHONE_PARAM, phoneNumber);
+                    params.put(IMEI_PARAM, imei);
+                    params.put(VER_PARAM, version);
+                    params.put(DATE_PARAM,
+                            DATE_FMT.get().format(new Date(f.lastModified())));
+                    params.put(DEV_ID_PARAM, deviceId);
+                    params.put(TRACE_PARAM, trace);
 
-                            String response = HttpUtil.httpPost(server
-                                    + EXCEPTION_SERVICE_PATH, params);
-                            if (response == null
-                                    || response.trim().length() == 0
-                                    || "ok".equalsIgnoreCase(response)) {
-                                f.delete();
-                            }
-                        }
+                    String response = HttpUtil.httpPost(server + EXCEPTION_SERVICE_PATH, params);
+                    if (response == null
+                            || response.trim().length() == 0
+                            || "ok".equalsIgnoreCase(response)) {
+                        f.delete();
                     }
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "Could not send exception", e);
             }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not send exception", e);
         }
     }
 

@@ -70,7 +70,7 @@ public class SurveyDbAdapter {
                 + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
 
         String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
-                + "LEFT OUTER JOIN survey ON (survey_instance.survey_id = survey.survey_id)";
+                + "JOIN survey ON (survey_instance.survey_id = survey.survey_id)";
 
         String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
                 + "survey.survey_id=survey_instance.survey_id";

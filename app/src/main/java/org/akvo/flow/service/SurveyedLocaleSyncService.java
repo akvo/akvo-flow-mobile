@@ -49,6 +49,8 @@ public class SurveyedLocaleSyncService extends IntentService {
     
     public SurveyedLocaleSyncService() {
         super(TAG);
+        // Tell the system to restart the service if it was unexpectedly stopped before completion
+        setIntentRedelivery(true);
     }
     
     @Override
@@ -156,5 +158,5 @@ public class SurveyedLocaleSyncService extends IntentService {
         Intent intentBroadcast = new Intent(getString(R.string.action_locales_sync));
         sendBroadcast(intentBroadcast);
     }
-    
+
 }

@@ -160,6 +160,8 @@ public class QuestionView extends TableLayout implements
         if (question.isMandatory()) {
             text.append("<i><b>");
         }
+
+        text.append(question.getOrder()).append(". ");// Prefix the text with the order
         for (int i = 0; i < langs.length; i++) {
             if (defaultLang.equalsIgnoreCase(langs[i])) {
                 if (!isFirst) {

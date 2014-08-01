@@ -16,6 +16,7 @@
 
 package org.akvo.flow.activity;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +29,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,7 +62,10 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     
     // Loader IDs
     private static final int ID_SURVEY_GROUP_LIST = 0;
-    
+
+    // Menu Item IDs
+    private static final int ITEM_DELETE = 0;
+
     private SurveyGroupListAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
     
@@ -82,6 +87,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(mAdapter);
         mListView.setEmptyView(mEmptyView);
+        registerForContextMenu(mListView);
         
         mEmptyView.setText(R.string.loading);// Be friendly
         init();// No external storage will finish the application
@@ -91,7 +97,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     public void onResume() {
         super.onResume();
         mDatabase.open();
-        getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, this);
+        loadData();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }
@@ -158,6 +164,10 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         }
     }
 
+    private void loadData() {
+        getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, this);
+    }
+
     // ==================================== //
     // ========= Loader Callbacks ========= //
     // ==================================== //
@@ -208,7 +218,46 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
                 return super.onOptionsItemSelected(item);
         }
     }
-    
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view,
+            ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        menu.add(0, ITEM_DELETE, 0, R.string.delete);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        Long id = mAdapter.getItemId(info.position);// This ID is the _id column in the SQLite db
+        switch (item.getItemId()) {
+            case ITEM_DELETE:
+                deleteSurveyGroup(id);
+                break;
+        }
+        return true;
+    }
+
+    private void deleteSurveyGroup(final long surveyGroupId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_project_text)
+                .setCancelable(true)
+                .setPositiveButton(R.string.okbutton,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                mDatabase.deleteSurveyGroup(surveyGroupId);
+                                loadData();
+                            }
+                        })
+                .setNegativeButton(R.string.cancelbutton,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        builder.show();
+    }
+
     class SurveyGroupListAdapter extends CursorAdapter implements OnItemClickListener {
         final int mTextColor;
         
@@ -272,7 +321,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
             mEmptyView.setText(R.string.no_surveys_text);
-            getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, SurveyGroupListActivity.this);
+            loadData();
         }
     };
     

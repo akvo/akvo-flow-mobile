@@ -1373,6 +1373,15 @@ public class SurveyDbAdapter {
         return surveys;
     }
 
+    public void deleteSurveyGroup(long surveyGroupId) {
+        // First the group
+        database.delete(Tables.SURVEY_GROUP, SurveyGroupColumns._ID + " = ? ",
+                new String[] { String.valueOf(surveyGroupId) });
+        // Now the surveys
+        database.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
+                new String[] { String.valueOf(surveyGroupId) });
+    }
+
     /**
      * marks a survey record identified by the ID passed in as deleted.
      *

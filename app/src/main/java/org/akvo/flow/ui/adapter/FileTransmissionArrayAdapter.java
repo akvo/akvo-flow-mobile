@@ -51,28 +51,27 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
 
     private void bindView(View view, FileTransmission trans) {
         ImageView imageView = (ImageView) view.findViewById(R.id.statusicon);
+        TextView tv = (TextView)view.findViewById(R.id.statustext);
 
-        String statusText = "Unknown";//TODO: Hey buddy, you can do this way better...
         switch (trans.getStatus()) {
             case TransmissionStatus.QUEUED:
-                statusText = "Queued";
+                tv.setText(R.string.status_queued);
                 imageView.setImageResource(R.drawable.yellowcircle);
                 break;
             case TransmissionStatus.IN_PROGRESS:
-                statusText = "In Progress";
+                tv.setText(R.string.status_in_progress);
                 imageView.setImageResource(R.drawable.blueuparrow);
                 break;
             case TransmissionStatus.SYNCED:
-                statusText = "Synced";
+                tv.setText(R.string.status_synced);
                 imageView.setImageResource(R.drawable.greencircle);
                 break;
             case TransmissionStatus.FAILED:
-                statusText = "Failed";
+                tv.setText(R.string.status_failed);
                 imageView.setImageResource(R.drawable.redcircle);
                 break;
         }
 
-        ((TextView)view.findViewById(R.id.statustext)).setText(statusText);
         TextView startDate = (TextView) view.findViewById(R.id.startdate);
         if (trans.getStartDate() != null) {
             startDate.setText(dateFormat.format(trans.getStartDate()));

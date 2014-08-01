@@ -167,6 +167,14 @@
     <string name="choose_response_text">There are unfinished responses for this survey. Do you want to load a saved response, or start a new response?</string>
     <string name="resume_response">Load</string>
     <string name="start_new_response">New</string>
+    <!-- Form & transmission status -->
+    <string name="status_queued">Queued</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_synced">Synced</string>
+    <string name="status_failed">Failed</string>
+    <string name="status_saved">Saved</string>
+    <string name="status_submitted">Submitted</string>
+    <string name="status_exported">Exported</string>
     <!-- APK update -->
     <string name="app_update_activity">Akvo FLOW Update</string>
     <string name="app_update">A new version of the Akvo FLOW app is available. Click \'Download &amp; Install\' to start the update.</string>

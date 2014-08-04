@@ -1701,7 +1701,7 @@ public class SurveyDbAdapter {
     }
 
     // Wrap DB projections and column indexes.
-    interface RecordQuery {
+    public interface RecordQuery {
         String[] PROJECTION = {
                 RecordColumns._ID,
                 RecordColumns.RECORD_ID,

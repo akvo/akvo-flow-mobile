@@ -41,6 +41,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.ui.fragment.StatsDialogFragment;
 import org.akvo.flow.ui.fragment.SurveyedLocaleListFragment;
 import org.akvo.flow.service.SurveyedLocaleSyncService;
 
@@ -171,6 +172,10 @@ public class RecordListActivity extends ActionBarActivity implements
                 Intent intent = new Intent(this, SurveyedLocaleSyncService.class);
                 intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroup.getId());
                 startService(intent);
+                return true;
+            case R.id.stats:
+                StatsDialogFragment dialogFragment = StatsDialogFragment.newInstance(mSurveyGroup.getId());
+                dialogFragment.show(getSupportFragmentManager(), "stats");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

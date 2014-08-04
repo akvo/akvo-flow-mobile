@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import android.util.Log;
-
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
@@ -32,14 +30,12 @@ import org.akvo.flow.util.ConstantUtil;
  *
  */
 public class SurveyMetaParser {
-    private static final String TAG = SurveyMetaParser.class.getSimpleName();
 
     public Survey parse(String response) {
         String[] touple = response.split(",");
         if (touple.length < Attr.COUNT) {
-            Log.e(TAG, "Survey list response is in an unrecognized format");
-            return null;
-        } 
+            throw new IllegalArgumentException("Survey list response is in an unrecognized format");
+        }
         Survey survey = new Survey();
         survey.setId(touple[Attr.ID]);
         survey.setName(touple[Attr.NAME]);

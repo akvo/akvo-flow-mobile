@@ -1235,37 +1235,31 @@ public class SurveyDbAdapter {
     }
     
     public static SurveyedLocale getSurveyedLocale(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndexOrThrow(RecordColumns.RECORD_ID));
-        long surveyGroupId = cursor.getLong(cursor.getColumnIndexOrThrow(RecordColumns.SURVEY_GROUP_ID));
-        long lastModified = cursor.getLong(cursor.getColumnIndexOrThrow(RecordColumns.LAST_MODIFIED));
-        String name = cursor.getString(cursor.getColumnIndexOrThrow(RecordColumns.NAME));
+        String id = cursor.getString(RecordQuery.RECORD_ID);
+        long surveyGroupId = cursor.getLong(RecordQuery.SURVEY_GROUP_ID);
+        long lastModified = cursor.getLong(RecordQuery.LAST_MODIFIED);
+        String name = cursor.getString(RecordQuery.NAME);
 
         // Location. Check for null values first
-        final int latCol = cursor.getColumnIndexOrThrow(RecordColumns.LATITUDE);
-        final int lonCol = cursor.getColumnIndexOrThrow(RecordColumns.LONGITUDE);
         Double latitude = null;
         Double longitude = null;
-        if (!cursor.isNull(latCol) && !cursor.isNull(lonCol)) {
-            latitude = cursor.getDouble(latCol);
-            longitude = cursor.getDouble(lonCol);
+        if (!cursor.isNull(RecordQuery.LATITUDE) && !cursor.isNull(RecordQuery.LONGITUDE)) {
+            latitude = cursor.getDouble(RecordQuery.LATITUDE);
+            longitude = cursor.getDouble(RecordQuery.LONGITUDE);
         }
         return new SurveyedLocale(id, name, lastModified, surveyGroupId, latitude, longitude);
     }
 
     // TODO: DRY -- getSurveyedLocales and getSurveyedLocale should use the same query
     public Cursor getSurveyedLocales(long surveyGroupId) {
-        return database.query(Tables.RECORD,
-                new String[] {RecordColumns._ID, RecordColumns.RECORD_ID, RecordColumns.SURVEY_GROUP_ID,
-                        RecordColumns.LAST_MODIFIED, RecordColumns.NAME, RecordColumns.LATITUDE, RecordColumns.LONGITUDE},
+        return database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.SURVEY_GROUP_ID + " = ?",
                 new String[] {String.valueOf(surveyGroupId)},
                 null, null, null);
     }
     
     public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
-        Cursor cursor = database.query(Tables.RECORD,
-                new String[] {RecordColumns._ID, RecordColumns.RECORD_ID, RecordColumns.SURVEY_GROUP_ID,
-                        RecordColumns.LAST_MODIFIED, RecordColumns.NAME, RecordColumns.LATITUDE, RecordColumns.LONGITUDE},
+        Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
                 new String[] {String.valueOf(surveyedLocaleId)},
                 null, null, null);
@@ -1704,6 +1698,27 @@ public class SurveyDbAdapter {
     public Cursor query(String table, String[] columns, String selection, String[] selectionArgs,
         String groupBy, String having, String orderBy) {
         return database.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+    }
+
+    // Wrap DB projections and column indexes.
+    interface RecordQuery {
+        String[] PROJECTION = {
+                RecordColumns._ID,
+                RecordColumns.RECORD_ID,
+                RecordColumns.SURVEY_GROUP_ID,
+                RecordColumns.LAST_MODIFIED,
+                RecordColumns.NAME,
+                RecordColumns.LATITUDE,
+                RecordColumns.LONGITUDE
+        };
+
+        int _ID = 0;
+        int RECORD_ID = 1;
+        int SURVEY_GROUP_ID = 2;
+        int LAST_MODIFIED = 3;
+        int NAME = 4;
+        int LATITUDE = 5;
+        int LONGITUDE = 6;
     }
 
 }

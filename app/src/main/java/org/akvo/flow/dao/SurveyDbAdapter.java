@@ -181,7 +181,7 @@ public class SurveyDbAdapter {
     private SQLiteDatabase database;
 
     /**
-     * TODO: Double check this inserts, and use Constants!
+     * TODO: Double check these inserts, and use Constants!
      */
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
@@ -722,44 +722,6 @@ public class SurveyDbAdapter {
         responseToSave.setId(id);
         resp.setId(id);
         return responseToSave;
-    }
-
-    /**
-     * Get the latest non-submitted survey, if any
-     * @param surveyId
-     * @param surveyGroupId
-     * @param surveyedLocaleId
-     * @return the id of the most recent saved SurveyInstance, if exists. null otherwise
-     */
-    public Long getSavedSurveyInstance(String surveyId, long surveyGroupId, String surveyedLocaleId) {
-        String where = SurveyInstanceColumns.SUBMITTED_DATE + " IS NULL AND "
-                + SurveyInstanceColumns.SURVEY_ID + "= ?  AND " + SurveyInstanceColumns.STATUS + " = ? ";
-        List<String> argList =  new ArrayList<String>();
-        argList.add(surveyId);
-        argList.add(String.valueOf(SurveyInstanceStatus.SAVED));
-
-        if (surveyedLocaleId != null) {
-            where += " AND " + SurveyInstanceColumns.RECORD_ID + " =  ?";
-            argList.add(surveyedLocaleId);
-        }
-
-        Cursor results = database.query(Tables.SURVEY_INSTANCE,
-                new String[] {
-                        SurveyInstanceColumns._ID
-                },
-                where, argList.toArray(new String[argList.size()]),
-                null, null, SurveyInstanceColumns.SAVED_DATE + " DESC", "1");
-
-        Long id = null;
-        if (results != null && results.getCount() > 0) {
-            results.moveToFirst();
-            id = results.getLong(0);
-        }
-        if (results != null) {
-            results.close();
-        }
-
-        return id;
     }
 
     /**
@@ -1505,7 +1467,7 @@ public class SurveyDbAdapter {
                     metaResponse.setQuestionId(ConstantUtil.QUESTION_LOCALE_NAME);
                     break;
                 case GEOLOCATION:
-                    String[] parts = response != null ? response.split("\\|") : new String[]{};
+                    String[] parts = response.split("\\|");
                     if (parts.length < 2) {
                         return;// Wrong format
                     }

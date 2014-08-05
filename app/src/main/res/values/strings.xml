@@ -164,7 +164,7 @@
     <string name="stats_title">Project Stats</string>
     <string name="stats_total">Total Data Points:</string>
     <string name="stats_week">Last 7 days:</string>
-    <string name="stats_today">Last 24 hours:</string>
+    <string name="stats_today">Today:</string>
     <!-- Record Activity -->
     <string name="unknown">Unknown</string>
     <string name="last_modified">Last Modified:</string>

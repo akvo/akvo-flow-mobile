@@ -25,6 +25,9 @@ import org.akvo.flow.dao.SurveyDbAdapter.Tables;
 import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.RecordQuery;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class StatsLoader extends DataLoader<StatsLoader.Stats> {
     private long mSurveyGroupId;
 
@@ -52,7 +55,14 @@ public class StatsLoader extends DataLoader<StatsLoader.Stats> {
             c.close();
         }
 
-        c = queryRecords(database, System.currentTimeMillis() - WEEK);
+        // Setup a calendar with last midnight's date
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        c = queryRecords(database, calendar.getTimeInMillis());
         if (c != null) {
             stats.mThisWeek = c.getCount();
             c.close();

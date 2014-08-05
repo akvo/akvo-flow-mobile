@@ -1250,7 +1250,6 @@ public class SurveyDbAdapter {
         return new SurveyedLocale(id, name, lastModified, surveyGroupId, latitude, longitude);
     }
 
-    // TODO: DRY -- getSurveyedLocales and getSurveyedLocale should use the same query
     public Cursor getSurveyedLocales(long surveyGroupId) {
         return database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.SURVEY_GROUP_ID + " = ?",
@@ -1502,8 +1501,10 @@ public class SurveyDbAdapter {
     * @param nearbyRadius
     * @return
     */
-    public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
-            Double nearbyRadius, int orderBy) {
+    public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude, int orderBy) {
+        // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
+        // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
+        // fully compatible. TODO: This should be refactored and replaced with a less complex approach.
         String queryString = "SELECT sl.*,"
                 + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
                 + " FROM "
@@ -1706,19 +1707,19 @@ public class SurveyDbAdapter {
                 RecordColumns._ID,
                 RecordColumns.RECORD_ID,
                 RecordColumns.SURVEY_GROUP_ID,
-                RecordColumns.LAST_MODIFIED,
                 RecordColumns.NAME,
                 RecordColumns.LATITUDE,
-                RecordColumns.LONGITUDE
+                RecordColumns.LONGITUDE,
+                RecordColumns.LAST_MODIFIED,
         };
 
         int _ID = 0;
         int RECORD_ID = 1;
         int SURVEY_GROUP_ID = 2;
-        int LAST_MODIFIED = 3;
-        int NAME = 4;
-        int LATITUDE = 5;
-        int LONGITUDE = 6;
+        int NAME = 3;
+        int LATITUDE = 4;
+        int LONGITUDE = 5;
+        int LAST_MODIFIED = 6;
     }
 
 }

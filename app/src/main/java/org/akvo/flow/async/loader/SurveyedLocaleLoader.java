@@ -27,17 +27,15 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
     private long mSurveyGroupId;
     private double mLatitude;
     private double mLongitude;
-    private double mRadius;
-    
+
     private int mOrderBy;
 
     public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, long surveyGroupId,
-            double latitude, double longitude, double radius, int orderBy) {
+            double latitude, double longitude, int orderBy) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
-        mRadius = radius;
         mOrderBy = orderBy;
     }
     
@@ -55,7 +53,7 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
             case ConstantUtil.ORDER_BY_STATUS:
             case ConstantUtil.ORDER_BY_NAME:
                 // TODO: Compute filter here in the Loader, instead of the DB
-                return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mRadius, mOrderBy);
+                return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
             case ConstantUtil.ORDER_BY_NONE:
                 return database.getSurveyedLocales(mSurveyGroupId);
             default:

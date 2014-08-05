@@ -82,7 +82,7 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
         mDayView = (TextView)v.findViewById(R.id.day);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Project Stats");
+        builder.setTitle(R.string.stats_title);
         builder.setView(v);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override

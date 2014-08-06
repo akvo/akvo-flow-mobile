@@ -31,8 +31,7 @@ import java.util.Date;
 public class StatsLoader extends DataLoader<StatsLoader.Stats> {
     private long mSurveyGroupId;
 
-    private static final long DAY = 1000 * 60 * 60 * 24;
-    private static final long WEEK = 1000 * 60 * 60 * 24 * 7;
+    private static final long WEEK = 1000 * 60 * 60 * 24 * 7;// Week milliseconds
 
     public StatsLoader(Context context, SurveyDbAdapter db, long surveyGroupId) {
         super(context, db);
@@ -49,9 +48,9 @@ public class StatsLoader extends DataLoader<StatsLoader.Stats> {
             c.close();
         }
 
-        c = queryRecords(database, System.currentTimeMillis() - DAY);
+        c = queryRecords(database, System.currentTimeMillis() - WEEK);
         if (c != null) {
-            stats.mToday = c.getCount();
+            stats.mThisWeek = c.getCount();
             c.close();
         }
 
@@ -64,7 +63,7 @@ public class StatsLoader extends DataLoader<StatsLoader.Stats> {
 
         c = queryRecords(database, calendar.getTimeInMillis());
         if (c != null) {
-            stats.mThisWeek = c.getCount();
+            stats.mToday = c.getCount();
             c.close();
         }
 

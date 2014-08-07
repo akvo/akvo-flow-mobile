@@ -55,7 +55,7 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
         switch (trans.getStatus()) {
             case TransmissionStatus.QUEUED:
                 tv.setText(R.string.status_queued);
-                imageView.setImageResource(R.drawable.yellowcircle);
+                imageView.setImageResource(R.drawable.queued_icn);
                 break;
             case TransmissionStatus.IN_PROGRESS:
                 tv.setText(R.string.status_in_progress);

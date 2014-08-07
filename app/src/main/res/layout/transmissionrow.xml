@@ -2,19 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textSize="30sp" >
+    android:padding="8dp" >
 
     <ImageView
         android:id="@+id/statusicon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="5dp" />
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginRight="4dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/queued_icn"
+        android:layout_alignParentLeft="true" />
 
     <TextView
         android:id="@+id/statustext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Queued"
+        android:layout_alignBottom="@id/statusicon"
         android:layout_toRightOf="@id/statusicon" />
 
     <TextView
@@ -22,6 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:textSize="18sp"
         android:layout_below="@id/statusicon" />
 
     <TextView
@@ -30,6 +36,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/filename"
+        android:layout_marginRight="4dp"
+        android:textSize="16sp"
         android:text="@string/transstartdate" />
 
     <TextView
@@ -37,6 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/filename"
+        android:textSize="16sp"
         android:layout_toRightOf="@id/startdatelabel" />
 
     <TextView
@@ -45,6 +54,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/startdatelabel"
+        android:layout_marginRight="4dp"
+        android:textSize="16sp"
         android:text="@string/transenddate" />
 
     <TextView
@@ -52,6 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/startdate"
+        android:textSize="16sp"
         android:layout_toRightOf="@id/enddatelabel" />
 
 </RelativeLayout>

@@ -64,11 +64,11 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
                 break;
             case TransmissionStatus.SYNCED:
                 tv.setText(R.string.status_synced);
-                imageView.setImageResource(R.drawable.greencircle);
+                imageView.setImageResource(R.drawable.checkmark);
                 break;
             case TransmissionStatus.FAILED:
                 tv.setText(R.string.status_failed);
-                imageView.setImageResource(R.drawable.redcircle);
+                imageView.setImageResource(R.drawable.red_cross);
                 break;
         }
 

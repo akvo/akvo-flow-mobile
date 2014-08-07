@@ -35,7 +35,7 @@ public class ResponseListAdapter extends CursorAdapter {
 
         // This default values should NEVER be displayed
         String statusText = "";
-        int icon = R.drawable.redcircle;
+        int icon = R.drawable.red_cross;
         boolean finished = false;
         long displayDate = 0L;
         switch (status) {

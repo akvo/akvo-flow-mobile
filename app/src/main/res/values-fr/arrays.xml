@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="records_activity_tabs">
+        <item>ENREGISTREMENTS</item>
+        <item>CARTE</item>
+    </string-array>
+    
+    <string-array name="record_tabs">
+        <item>ENQUÊTES</item>
+        <item>RÉPONSES</item>
+        <item>CARTE</item>
+    </string-array>
+    
+    <string-array name="order_by">
+        <item>Date</item>
+        <item>Distance</item>
+        <item>Status</item> <!-- TODO -->
+        <item>Name</item> <!-- TODO -->
+    </string-array>
+
+</resources>

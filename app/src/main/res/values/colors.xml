@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="default_underline_indicator_selected_color">#FF33B5E5</color>
+
+    <color name="white">#ffffff</color>
+
+    <color name="background_main">#fffef2e7</color>
+    <color name="background_alternate">#f1eae4</color>
+
+    <color name="black_main">#000000</color>
+    <color name="black_diabled">#8f8f8f</color>
+
+    <color name="orange_main">#e17e26</color>
+    <color name="orange_disabled">#80e17e26</color>
+
+    <color name="blue_main">#2bb5e6</color>
+    <color name="blue_disabled">#802bb5e6</color>
+
+    <!-- Buttons -->
+    <color name="button_green">#00a79d</color>
+    <color name="button_green_selected">#007f77</color>
+
+    <color name="record_name_background">#CEC6BC</color>
+
+</resources>

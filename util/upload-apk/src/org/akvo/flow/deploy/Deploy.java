@@ -135,7 +135,7 @@ public class Deploy {
             DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
             
             Entity e = new Entity("DeviceApplication");
-            e.setProperty("appCode", "fieldSurvey");
+            e.setProperty("appCode", "flowapp");
             e.setProperty("deviceType", "androidPhone");
             e.setProperty("version", version);
             e.setProperty("fileName", url);

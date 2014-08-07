@@ -45,8 +45,7 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
             List<FileTransmission> objects) {
         super(context, resourceId, objects);
         layoutId = resourceId;
-        // TODO:  US-style  date should  not be  hardcoded...
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     }
 
     private void bindView(View view, FileTransmission trans) {

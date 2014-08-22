@@ -189,7 +189,7 @@ public class MultipartStream {
         urlConn.setRequestProperty("Accept", "*/*");
         urlConn.setRequestProperty("Content-Type",
                 "multipart/form-data; boundary=" + BOUNDRY);
-        urlConn.setRequestProperty("Connection", "Keep-Alive");
+        urlConn.setRequestProperty("Connection", "close");
         urlConn.setRequestProperty("Cache-Control", "no-cache");
         urlConn.setRequestProperty("Content-Length", totalBytes + "");
         out = new DataOutputStream(urlConn.getOutputStream());

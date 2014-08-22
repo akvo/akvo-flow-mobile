@@ -1,5 +1,11 @@
 Akvo FLOW app 
-Last update 7 August 2014
+Last update 22 August 2014
+
+#ver 2.0.1
+
+Features / Bugfixes
+-------------------
+* #144 - Do not reuse HTTP connections
 
 #ver 2.0.0
 

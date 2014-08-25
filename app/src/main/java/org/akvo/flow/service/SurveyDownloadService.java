@@ -245,6 +245,11 @@ public class SurveyDownloadService extends Service {
                 new FileOutputStream(file));
         extractAndSave(new FileInputStream(file));
 
+        // Compressed file is not needed any more
+        if (!file.delete()) {
+            Log.e(TAG, "Could not delete survey zip file: " + filename);
+        }
+
         survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
         survey.setType(DEFAULT_TYPE);
         survey.setLocation(ConstantUtil.FILE_LOCATION);

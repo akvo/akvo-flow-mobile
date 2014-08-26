@@ -1,5 +1,60 @@
-Akvo FLOW Field Survey app 
-Last update 19 March 2014
+Akvo FLOW app 
+Last update 22 August 2014
+
+#ver 2.0.1
+
+Features / Bugfixes
+-------------------
+* #144 - Do not reuse HTTP connections
+
+#ver 2.0.0
+
+Features / Bugfixes
+-------------------
+* #126 - Bootstrap functionality is not ready yet in the new app
+* #123 - NPE when the Question Group has no questions
+* #122 - Survey Group does not get deleted on "Delete Everything"
+* #120 - Bogus filesystem stats
+* #119 - Provide alphabetical order option in Data Points list
+* #117 - Immediately notify server after Device ID update
+* #115 - Implement new file naming convention
+* #113 - Resize of images removes rotation information
+* #110 - Make Data Points synchronization atomic
+* #108 - App crashes when opening a monitoring group and GPS is disabled
+* #104 - Disallow question navigation through keyboard's 'Next' button
+* #103 - Allow text-based server changed
+* #100 - Split regular Survey Group's forms into different Projects
+* #98 - Clicking cancel on "Other.." popup for option questions
+* #97 - App Redesign
+* #95 - Change 'Save and start new' to only 'Save'
+* #94 - Force login to interact with the app
+* #93 - Delete empty Records
+* #92 - Delete empty SurveyInstances
+* #91 - Update Record info through Registration Survey
+* #90 - Port double entry functionality to Monitoring Features branch
+* #89 - Display feedback on wrong answers
+* #87 - Users can ignore number question invalid responses
+* #85 - Disallow users from downloading monitoring surveys w/o assignment
+* #79 - Select maximum image size from within the app
+* #77 - Use a single 'Sync over 3G' preference
+* #67 - Keep track of Survey Instances in exported zip files
+* #58 - Add feedback in case of empty lists
+* #52 - Monitoring Features: Provide 'Recently Used' records
+* #51 - Rename application
+* #43 - Refactor: Survey Display
+* #32 - Point Updates
+* #20 - Provide localized Strings
+
+Known (minor) Issues
+--------------------
+* #101 - Last Response time is null when a saved response is stored (Monitoring Features)
+* #23 - Survey titles containing commas (,) are not parsed correctly
+
+Not Implemented yet
+-------------------
+* #125 - Improve notifications readability
+* #96 - Media files synchronization
+* #59 - Change screen change animation to left-right movement
 
 #ver 1.13.3
 

@@ -64,8 +64,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
     private double mLongitude = 0.0d;
-    private static final double RADIUS = 100000d;// Meters
-    
+
     private int mOrderBy;
     private long mSurveyGroupId;
     private SurveyDbAdapter mDatabase;
@@ -186,7 +185,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, mLatitude, mLongitude, RADIUS, mOrderBy);
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
     }
 
     @Override
@@ -285,13 +284,14 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
             ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
             final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
-            Long lastModified = c.getLong(c.getColumnIndexOrThrow(RecordColumns.LAST_MODIFIED));
+
+            // This cursor contains extra info about the Record status
             int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
 
             nameView.setText(surveyedLocale.getDisplayName(context));
             idView.setText(surveyedLocale.getId());
             distanceView.setText(getDistanceText(surveyedLocale));
-            displayDateText(dateView, lastModified);
+            displayDateText(dateView, surveyedLocale.getLastModified());
 
             int statusRes = 0;
             switch (status) {

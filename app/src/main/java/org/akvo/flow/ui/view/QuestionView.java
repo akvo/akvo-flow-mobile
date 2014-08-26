@@ -167,6 +167,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         if (mQuestion.isMandatory()) {
             text.append("<i><b>");
         }
+
+        text.append(mQuestion.getOrder()).append(". ");// Prefix the text with the order
         final String[] langs = getLanguages();
         final String language = getDefaultLang();
 

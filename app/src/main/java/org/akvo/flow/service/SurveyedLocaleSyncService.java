@@ -18,6 +18,7 @@ package org.akvo.flow.service;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import android.app.IntentService;
@@ -48,6 +49,8 @@ public class SurveyedLocaleSyncService extends IntentService {
     
     public SurveyedLocaleSyncService() {
         super(TAG);
+        // Tell the system to restart the service if it was unexpectedly stopped before completion
+        setIntentRedelivery(true);
     }
     
     @Override
@@ -79,10 +82,16 @@ public class SurveyedLocaleSyncService extends IntentService {
             displayNotification(getString(R.string.sync_error), 
                     getString(R.string.network_error), true);
         } catch (ApiException e) {
-            // TODO: Use error codes or keywords to localize the message
             Log.e(TAG, e.getMessage());
-            displayToast(e.getMessage());
-            displayNotification(getString(R.string.sync_error), e.getMessage(), true);
+            String message = e.getMessage();
+            switch (e.getStatus()) {
+                case ApiException.Status.SC_FORBIDDEN:
+                    // A missing assignment might be the issue. Let's hint the user.
+                    message = getString(R.string.error_assignment_text);
+                    break;
+            }
+            displayToast(message);
+            displayNotification(getString(R.string.sync_error), message, true);
         } finally {
             database.close();
         }
@@ -98,14 +107,11 @@ public class SurveyedLocaleSyncService extends IntentService {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
-        SurveyedLocalesResponse response = api.getSurveyedLocales(surveyGroupId, syncTime);
-        if (response != null) {
-            for (SurveyedLocale locale : response.getSurveyedLocales()) {
+        List<SurveyedLocale> locales = api.getSurveyedLocales(surveyGroupId, syncTime);
+        if (locales != null) {
+            for (SurveyedLocale locale : locales) {
                 database.syncSurveyedLocale(locale);
                 records.add(locale.getId());
-            }
-            if (response.getError() != null) {
-                throw new ApiException(response.getError());
             }
         }
         return records;
@@ -152,5 +158,5 @@ public class SurveyedLocaleSyncService extends IntentService {
         Intent intentBroadcast = new Intent(getString(R.string.action_locales_sync));
         sendBroadcast(intentBroadcast);
     }
-    
+
 }

@@ -48,6 +48,7 @@ import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.service.DataSyncService;
@@ -380,19 +381,23 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                             R.string.okbutton,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    if (!responsesOnly) {
+                                        // Delete everything implies logging the current user out (if any)
+                                        FlowApp.getApp().setUser(null);
+                                    }
                                     new ClearDataAsyncTask(SettingsActivity.this)
                                             .execute(responsesOnly);
                                 }
-                            })
+                            }
+                    )
                     .setNegativeButton(
                             R.string.cancelbutton,
                             new DialogInterface.OnClickListener() {
-                                public void onClick(
-                                        DialogInterface dialog,
-                                        int id) {
+                                public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
-                            });
+                            }
+                    );
             builder.show();
         } catch (SQLException e) {
             Log.e(TAG, e.getMessage());

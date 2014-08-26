@@ -40,8 +40,11 @@
   <string name="screenoptdesc">Empêcher l\'écran de s\'éteindre pendant que vous remplissez les données. S\'assurer d\'éteindre l\'écran manuellement (ou quitter l\'application) quand ceci n\'est pas utilisé afin d\'économiser la batterie.</string>
   <string name="aboutlabel">A propos</string>
   <string name="aboutdesc">Information sur les versions.</string>
+  <string name="abouttitle">A propos - Application Akvo FLOW</string>
+  <string name="abouttext">Application Akvo FLOW\nDéveloppé par: Akvo Foundation\nTous Droits réservés © 2010-2014 Stichting Akvo\nVersion</string>
   <string name="gpsstatuslabel">Etat du GPS</string>
   <string name="gpsstatusdesc">Démarre l\'application de GPS Status si elle est installée sur cet appareil.</string>
+  <string name="nogpsstatus">GPS Status n\'est pas installé sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
   <string name="otherinstructions">Veuillez entrer une description</string>
   <string name="texthelpoption">Voir le texte d\'aide</string>
   <string name="videohelpoption">Voir la vidéo d\'aide</string>
@@ -145,6 +148,8 @@
   <string name="more">Plus</string>
   <!--Search-->
   <string name="search_hint">Chercher un enregistrement</string>
+  <!--Project List (Survey Group) Activity-->
+  <string name="delete_project_text">La suppression est definitive. Cliquez OK pour continuer ou annuler.</string>
   <!--Survey Activity-->
   <string name="error_responses">Certaines réponses contiennent des erreurs. Vous devez vérifier les questions suivantes avant d\'envoyer</string>
   <string name="error_question_mandatory">Cette réponse est obligatoire</string>
@@ -152,14 +157,33 @@
   <string name="error_answer_match">Les réponses ne correspondent pas</string>
   <string name="reg_form_warning_title">Questionnaire d\'enregistrement</string>
   <string name="reg_form_warning_text">Ce point contient déjà une réponse pour ce formulaire. Toute nouvelle réponse sera considérée comme la plus récente. Voulez-vous continuer?</string>
+  <string name="error_img_preview">Impossible de charger l\'image</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CRÉER UN NOUVEAU POINT</string>
+  <string name="stats_title">Statistiques du projet</string>
+  <string name="stats_total">Total de points:</string>
+  <string name="stats_week">Les 7 derniers jours:</string>
+  <string name="stats_today">Aujourd\'hui:</string>
   <!--Record Activity-->
   <string name="unknown">Inconnu</string>
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
   <string name="choose_response">Choisissez la réponse</string>
+  <string name="choose_response_text">Il y a des réponses inachevées dans ce questionnaire. Voulez-vous charger une réponse enregistrée, ou commencer une nouvelle?</string>
+  <string name="resume_response">Chargement</string>
+  <string name="start_new_response">Nouveau</string>
+  <!--Form & transmission status-->
+  <string name="status_queued">En attente</string>
+  <string name="status_in_progress">En cours</string>
+  <string name="status_synced">Synchronisé</string>
+  <string name="status_failed">Échec</string>
+  <string name="status_saved">Enregistré</string>
+  <string name="status_submitted">Envoyé</string>
+  <string name="status_exported">Exporté</string>
   <!--APK update-->
+  <string name="app_update_activity">Mise à jour de Akvo FLOW</string>
+  <string name="app_update">Une nouvelle version de Akvo FLOW est disponible. Cliquer sur Télécharger et Installer pour commencer la mise à jour.</string>
+  <string name="download_and_install">Télécharger et Installer</string>
   <string name="updatedownloaded">La mise à jour de FLOW a été téléchargé</string>
   <string name="clicktoinstall">La nouvelle version est téléchargée. Cliquez ici pour l\'installer</string>
   <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de FLOW.</string>
@@ -168,6 +192,8 @@
   <string name="cancelbutton">Annuler</string>
   <string name="yes">Oui</string>
   <string name="no">Non</string>
+  <string name="retry">Réessayer</string>
+  <string name="delete">Supprimer</string>
   <!--Intent Actions. Do not translate this strings-->
   <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
   <string name="action_locales_sync">fieldsurvey.ACTION_LOCALES_SYNC</string>

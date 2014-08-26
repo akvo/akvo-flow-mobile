@@ -50,7 +50,7 @@ public class S3Api {
         mSecret = properties.getProperty(ConstantUtil.S3_SECRET);
     }
 
-    public boolean get(String objectKey, File dst) throws IOException {
+    public void get(String objectKey, File dst) throws IOException {
         // Get date and signature
         final String date = getDate();
         final String payload = String.format(PAYLOAD_GET, date, mBucket, objectKey);
@@ -72,10 +72,8 @@ public class S3Api {
 
             int status = conn.getResponseCode();
             if (status != HttpStatus.SC_OK) {
-                Log.e(TAG, "Status Code: " + status + ". Expected: 200 - OK");
-                return false;
+                throw new IOException("Status Code: " + status + ". Expected: 200 - OK");
             }
-            return true;
         } finally {
             if (conn != null) {
                 conn.disconnect();

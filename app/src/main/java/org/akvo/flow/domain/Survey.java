@@ -39,6 +39,10 @@ public class Survey {
     private boolean helpDownloaded;
     private String language;
     private String sourceSurveyId;// "Copied-from" survey Id
+
+    public Survey() {
+        questionGroups = new ArrayList<QuestionGroup>();
+    }
     
     public void setSurveyGroup(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
@@ -152,9 +156,6 @@ public class Survey {
      * @param group
      */
     public void addQuestionGroup(QuestionGroup group) {
-        if (questionGroups == null) {
-            questionGroups = new ArrayList<QuestionGroup>();
-        }
         questionGroups.add(group);
     }
     

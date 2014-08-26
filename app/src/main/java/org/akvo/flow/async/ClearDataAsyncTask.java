@@ -117,5 +117,6 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
         // Delete exported zip/image files
         FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.DATA), true);
+        FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.MEDIA), true);
     }
 }

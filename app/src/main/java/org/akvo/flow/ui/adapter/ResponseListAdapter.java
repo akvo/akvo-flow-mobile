@@ -35,30 +35,30 @@ public class ResponseListAdapter extends CursorAdapter {
 
         // This default values should NEVER be displayed
         String statusText = "";
-        int icon = R.drawable.redcircle;
+        int icon = R.drawable.red_cross;
         boolean finished = false;
         long displayDate = 0L;
         switch (status) {
             case SurveyInstanceStatus.SAVED:
-                statusText = "Saved: ";
+                statusText = context.getString(R.string.status_saved) + ": ";
                 icon = R.drawable.form_saved_icn;
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE));
                 break;
             case SurveyInstanceStatus.SUBMITTED:
-                statusText = "Submitted: ";
+                statusText = context.getString(R.string.status_submitted) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
-                icon = R.drawable.yellowcircle;
+                icon = R.drawable.exported_icn;
                 finished = true;
                 break;
             case SurveyInstanceStatus.EXPORTED:
-                statusText = "Exported: ";
+                statusText = context.getString(R.string.status_exported) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE));
-                icon = R.drawable.yellowcircle;
+                icon = R.drawable.exported_icn;
                 finished = true;
                 break;
             case SurveyInstanceStatus.SYNCED:
             case SurveyInstanceStatus.DOWNLOADED:
-                statusText = "Synced: ";
+                statusText = context.getString(R.string.status_synced) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE));
                 icon = R.drawable.checkmark;
                 finished = true;

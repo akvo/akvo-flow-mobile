@@ -29,6 +29,10 @@ public class QuestionGroup {
     private String heading;
     private ArrayList<Question> questions;
 
+    public QuestionGroup() {
+        questions = new ArrayList<Question>();
+    }
+
     public int getOrder() {
         return order;
     }
@@ -49,14 +53,7 @@ public class QuestionGroup {
         return questions;
     }
 
-    public void setQuestions(ArrayList<Question> questions) {
-        this.questions = questions;
-    }
-
     public void addQuestion(Question q) {
-        if (questions == null) {
-            questions = new ArrayList<Question>();
-        }
         questions.add(q);
     }
     

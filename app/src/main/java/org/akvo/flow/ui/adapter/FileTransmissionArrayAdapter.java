@@ -45,34 +45,32 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
             List<FileTransmission> objects) {
         super(context, resourceId, objects);
         layoutId = resourceId;
-        // TODO:  US-style  date should  not be  hardcoded...
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
     private void bindView(View view, FileTransmission trans) {
         ImageView imageView = (ImageView) view.findViewById(R.id.statusicon);
+        TextView tv = (TextView)view.findViewById(R.id.statustext);
 
-        String statusText = "Unknown";//TODO: Hey buddy, you can do this way better...
         switch (trans.getStatus()) {
             case TransmissionStatus.QUEUED:
-                statusText = "Queued";
-                imageView.setImageResource(R.drawable.yellowcircle);
+                tv.setText(R.string.status_queued);
+                imageView.setImageResource(R.drawable.queued_icn);
                 break;
             case TransmissionStatus.IN_PROGRESS:
-                statusText = "In Progress";
+                tv.setText(R.string.status_in_progress);
                 imageView.setImageResource(R.drawable.blueuparrow);
                 break;
             case TransmissionStatus.SYNCED:
-                statusText = "Synced";
-                imageView.setImageResource(R.drawable.greencircle);
+                tv.setText(R.string.status_synced);
+                imageView.setImageResource(R.drawable.checkmark);
                 break;
             case TransmissionStatus.FAILED:
-                statusText = "Failed";
-                imageView.setImageResource(R.drawable.redcircle);
+                tv.setText(R.string.status_failed);
+                imageView.setImageResource(R.drawable.red_cross);
                 break;
         }
 
-        ((TextView)view.findViewById(R.id.statustext)).setText(statusText);
         TextView startDate = (TextView) view.findViewById(R.id.startdate);
         if (trans.getStartDate() != null) {
             startDate.setText(dateFormat.format(trans.getStartDate()));

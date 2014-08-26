@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -47,6 +48,7 @@ import org.akvo.flow.api.parser.csv.SurveyMetaParser;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;
+import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
@@ -73,16 +75,11 @@ public class SurveyDownloadService extends Service {
     private static final int COMPLETE_ID = 2;
     private static final int FAIL_ID = 3;
 
-    @SuppressWarnings("unused")
-    private static final String NO_SURVEY = "No Survey Found";
     private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice&devicePhoneNumber=";
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
     private static final String DEV_ID_PARAM = "&devId=";
     private static final String IMEI_PARAM = "&imei=";
     private static final String VERSION_PARAM = "&ver=";
-    @SuppressWarnings("unused")
-    private static final String SURVEY_SERVICE_SERVICE_PATH = "/surveymanager?surveyId=";
-    private static final String SD_LOC = "sdcard";
 
     private SurveyDbAdapter databaseAdaptor;
     private Thread thread;
@@ -101,10 +98,7 @@ public class SurveyDownloadService extends Service {
         thread = new Thread(new Runnable() {
             public void run() {
                 if (intent != null) {
-                    String surveyId = null;
-                    if (intent.getExtras() != null) {
-                        surveyId = intent.getExtras().getString(ConstantUtil.SURVEY_ID_KEY);
-                    }
+                    String surveyId = intent.getStringExtra(ConstantUtil.SURVEY_ID_KEY);
                     checkAndDownload(surveyId);
                     sendBroadcastNotification();
                 }
@@ -139,52 +133,40 @@ public class SurveyDownloadService extends Service {
                 final String serverBase = StatusUtil.getServerBase(this);
                 final String deviceId = getDeviceId();
                 
-                List<Survey> surveys = null;
+                List<Survey> surveys;
                 if (surveyId != null && surveyId.trim().length() > 0) {
                     surveys = getSurveyHeader(serverBase, surveyId, deviceId);
-                    if (surveys != null && surveys.size() > 0) {
-                        // Monitored surveys cannot be downloaded without assignments
-                        if (surveys.get(0).getSurveyGroup().isMonitored()) {
-                            final String title = getString(R.string.error_assignment_title);
-                            final String text = getString(R.string.error_assignment_text);
-                            ViewUtil.fireNotification(title, text, this, FAIL_ID, null);
-                            return;
-                        }
-
+                    if (!surveys.isEmpty()) {
                         // if we already have the survey, delete it first
                         databaseAdaptor.deleteSurvey(surveyId.trim(), true);
                     }
                 } else {
                     surveys = checkForSurveys(serverBase, deviceId);
                 }
-                if (surveys != null && surveys.size() > 0) {
+                if (!surveys.isEmpty()) {
                     // First, sync the SurveyGroups
                     syncSurveyGroups(surveys);
                     
                     // if there are surveys for this device, see if we need them
                     surveys = databaseAdaptor.checkSurveyVersions(surveys);
                     int updateCount = 0;
-                    if (surveys != null && surveys.size() > 0) {
-                        for (int i = 0; i < surveys.size(); i++) {
-                            Survey survey = surveys.get(i);
-                            try {
-                                if (downloadSurvey(survey)) {
-                                    databaseAdaptor.saveSurvey(survey);
-                                    String[] langs = LangsPreferenceUtil.determineLanguages(this,
-                                            survey);
-                                    databaseAdaptor.addLanguages(langs);
-                                    downloadHelp(survey);
-                                    updateCount++;
-                                }
-                            } catch (Exception e) {
-                                Log.e(TAG, "Could not download survey", e);
-                                PersistentUncaughtExceptionHandler
-                                        .recordException(e);
-                            }
+                    for (Survey survey : surveys) {
+                        try {
+                            downloadSurvey(survey);
+                            databaseAdaptor.saveSurvey(survey);
+                            String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
+                            databaseAdaptor.addLanguages(langs);
+                            downloadHelp(survey);
+                            updateCount++;
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error downloading survey: " + survey.getFileName(), e);
+                            fireNotification(getString(R.string.cannotupdate), FAIL_ID);
+                            PersistentUncaughtExceptionHandler
+                                    .recordException(new TransferException(survey.getId(), null, e));
                         }
-                        if (updateCount > 0) {
-                            fireNotification(updateCount);
-                        }
+                    }
+                    if (updateCount > 0) {
+                        fireNotification(getString(R.string.surveysupdated), COMPLETE_ID);
                     }
                 }
 
@@ -192,17 +174,15 @@ public class SurveyDownloadService extends Service {
                 // don't have their help media pre-cached
                 if (StatusUtil.hasDataConnection(this)) {
                     surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
-                    if (surveys != null) {
-                        for (int i = 0; i < surveys.size(); i++) {
-                            if (!surveys.get(i).isHelpDownloaded()) {
-                                downloadHelp(surveys.get(i));
-                            }
+                    for (Survey survey : surveys) {
+                        if (!survey.isHelpDownloaded()) {
+                            downloadHelp(survey);
                         }
                     }
                 }
-
             } catch (Exception e) {
                 Log.e(TAG, "Could not update surveys", e);
+                fireNotification(getString(R.string.cannotupdate), FAIL_ID);
                 PersistentUncaughtExceptionHandler.recordException(e);
             } finally {
                 databaseAdaptor.close();
@@ -214,8 +194,7 @@ public class SurveyDownloadService extends Service {
             // wait up to 30 minutes to download the media
             downloadExecutor.awaitTermination(1800, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            Log.e(TAG,
-                    "Error while waiting for download executor to terminate", e);
+            Log.e(TAG, "Error while waiting for download executor to terminate", e);
         }
         stopSelf();
     }
@@ -257,34 +236,19 @@ public class SurveyDownloadService extends Service {
      * Downloads the survey based on the ID and then updates the survey object
      * with the filename and location
      */
-    private boolean downloadSurvey(Survey survey) {
-        boolean success = false;
-        try {
-            final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
-            final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-            final File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
-            S3Api s3Api = new S3Api(this);
-            if (s3Api.get(objectKey, file)) {// Download zip file
-                extractAndSave(new FileInputStream(file));
-                survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
-                survey.setType(DEFAULT_TYPE);
-                survey.setLocation(SD_LOC);
-                success = true;
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Could write survey file " + survey.getFileName(), e);
-            String text = getResources().getString(R.string.cannotupdate);
-            ViewUtil.fireNotification(text, text, this, FAIL_ID, null);
-            PersistentUncaughtExceptionHandler.recordException(
-                    new TransferException(survey.getId(), null, e));
-        } catch (Exception e) {
-            Log.e(TAG, "Could not download survey " + survey.getId(), e);
-            String text = getResources().getString(R.string.cannotupdate);
-            ViewUtil.fireNotification(text, text, this, FAIL_ID, null);
-            PersistentUncaughtExceptionHandler.recordException(
-                    new TransferException(survey.getId(), null, e));
-        }
-        return success;
+    private void downloadSurvey(Survey survey) throws IOException {
+        final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
+        final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+        final File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
+
+        S3Api s3Api = new S3Api(this);
+        s3Api.get(objectKey, file); // Download zip file
+
+        extractAndSave(new FileInputStream(file));
+
+        survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
+        survey.setType(DEFAULT_TYPE);
+        survey.setLocation(ConstantUtil.FILE_LOCATION);
     }
 
     /**
@@ -338,39 +302,17 @@ public class SurveyDownloadService extends Service {
                     // collect files in a set just in case the same binary is
                     // used in multiple questions
                     // we only need to download once
-                    HashSet<String> fileSet = new HashSet<String>();
-                    if (hydratedSurvey.getQuestionGroups() != null) {
-                        for (int i = 0; i < hydratedSurvey.getQuestionGroups()
-                                .size(); i++) {
-                            ArrayList<Question> questions = hydratedSurvey
-                                    .getQuestionGroups().get(i).getQuestions();
-                            if (questions != null) {
-                                for (int j = 0; j < questions.size(); j++) {
-                                    if (questions
-                                            .get(j)
-                                            .getHelpByType(
-                                                    ConstantUtil.VIDEO_HELP_TYPE)
-                                            .size() > 0) {
-                                        fileSet.add(questions
-                                                .get(j)
-                                                .getHelpByType(
-                                                        ConstantUtil.VIDEO_HELP_TYPE)
-                                                .get(0).getValue());
-                                    }
-                                    ArrayList<QuestionHelp> helpList = questions
-                                            .get(j)
-                                            .getHelpByType(
-                                                    ConstantUtil.IMAGE_HELP_TYPE);
-                                    ArrayList<String> images = new ArrayList<String>();
-                                    for (int x = 0; x < helpList.size(); x++) {
-                                        images.add(helpList.get(x).getValue());
-                                    }
-                                    if (images != null) {
-                                        for (int k = 0; k < images.size(); k++) {
-                                            fileSet.add(images.get(k));
-                                        }
-                                    }
-                                }
+                    Set<String> fileSet = new HashSet<String>();
+                    for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
+                        for (Question question : group.getQuestions()) {
+                            if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
+                                fileSet.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
+                                        .get(0).getValue());
+                            }
+                            ArrayList<QuestionHelp> helpList = question
+                                    .getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
+                            for (QuestionHelp help : helpList) {
+                                fileSet.add(help.getValue());
                             }
                         }
                     }
@@ -424,24 +366,17 @@ public class SurveyDownloadService extends Service {
      * @param surveyId
      * @return
      */
-    private List<Survey> getSurveyHeader(String serverBase,
-            String surveyId, String deviceId) {
-        String response = null;
+    private List<Survey> getSurveyHeader(String serverBase, String surveyId, String deviceId)
+            throws IOException {
         List<Survey> surveys = new ArrayList<Survey>();
-        try {
-            response = HttpUtil.httpGet(serverBase
-                    + SURVEY_HEADER_SERVICE_PATH
-                    + surveyId
-                    + "&devicePhoneNumber="
-                    + StatusUtil.getPhoneNumber(this)
-                    + (deviceId != null ? (DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8"))
-                            : ""));
-            if (response != null) {
-                surveys = new SurveyMetaParser().parseList(response, true);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Server returned an unexpected response", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+        String response = HttpUtil.httpGet(serverBase
+                + SURVEY_HEADER_SERVICE_PATH
+                + surveyId
+                + "&devicePhoneNumber="
+                + StatusUtil.getPhoneNumber(this)
+                + (deviceId != null ? (DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8")) : ""));
+        if (response != null) {
+            surveys = new SurveyMetaParser().parseList(response, true);
         }
         return surveys;
     }
@@ -453,29 +388,23 @@ public class SurveyDownloadService extends Service {
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
-    private List<Survey> checkForSurveys(String serverBase, String deviceId) {
-        List<Survey> surveys = null;
+    private List<Survey> checkForSurveys(String serverBase, String deviceId) throws IOException {
+        List<Survey> surveys = new ArrayList<Survey>();
         String phoneNumber = StatusUtil.getPhoneNumber(this);
         if (phoneNumber == null) {
             phoneNumber = "";
         }
         String imei = StatusUtil.getImei(this);
         String version = PlatformUtil.getVersionName(this);
-        try {
-            final String url = serverBase
-                    + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
-                    + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
-                    + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
-                    + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
-            String response = HttpUtil.httpGet(url);
-            if (response != null) {
-                surveys = new SurveyMetaParser().parseList(response);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Server returned an unexpected response", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+        final String url = serverBase
+                + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
+                + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
+                + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
+                + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
+        String response = HttpUtil.httpGet(url);
+        if (response != null) {
+            surveys = new SurveyMetaParser().parseList(response);
         }
-        
         return surveys;
     }
 
@@ -485,9 +414,8 @@ public class SurveyDownloadService extends Service {
      * 
      * @param type
      */
-    private void fireNotification(int count) {
-        String text = getResources().getText(R.string.surveysupdated).toString();
-        ViewUtil.fireNotification(text, text, this, COMPLETE_ID, null);
+    private void fireNotification(String text, int notificationID) {
+        ViewUtil.fireNotification(text, text, this, notificationID, null);
     }
 
     /**

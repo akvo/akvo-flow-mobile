@@ -175,8 +175,7 @@ public class HttpUtil {
      * @param file
      * @throws Exception
      */
-    public static void httpDownload(String url, FileOutputStream file)
-            throws Exception {
+    public static void httpDownload(String url, FileOutputStream file) throws IOException {
         DefaultHttpClient client = new DefaultHttpClient();
         HttpResponse response = client.execute(new HttpGet(url));
         if (response.getStatusLine().getStatusCode() < 400) {
@@ -184,8 +183,7 @@ public class HttpUtil {
             BufferedInputStream reader = null;
             try {
                 writer = new BufferedOutputStream(file);
-                reader = new BufferedInputStream(response.getEntity()
-                        .getContent());
+                reader = new BufferedInputStream(response.getEntity().getContent());
 
                 byte[] buffer = new byte[BUF_SIZE];
                 int bytesRead = reader.read(buffer);
@@ -204,8 +202,7 @@ public class HttpUtil {
                 }
             }
         } else {
-            throw new Exception("Error performing httpGet: "
-                    + response.getStatusLine().toString());
+            throw new IOException("Error performing httpGet: " + response.getStatusLine().toString());
         }
     }
 

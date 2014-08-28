@@ -169,7 +169,7 @@ public class ConstantUtil {
     public static final String API_KEY = "apiKey";
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
-    public static final String S3_SECRET = "awsAccessSecret";
+    public static final String S3_SECRET = "awsSecretKey";
 
     /**
      * S3 bucket directories (object prefixes)

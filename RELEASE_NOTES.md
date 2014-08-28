@@ -1,5 +1,10 @@
 Akvo FLOW app 
-Last update 22 August 2014
+Last update 28 August 2014
+
+#ver 2.0.1.1
+
+Features / Bugfixes
+* #151 - In-app locale change might end up in endless 'flickering'
 
 #ver 2.0.1
 

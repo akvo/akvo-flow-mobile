@@ -288,14 +288,6 @@ public class SurveyHandler extends DefaultHandler {
                 currentQuestion.setIsDoubleEntry(false);
             }
 
-            // Double Entry flag
-            if (attributes.getValue(DOUBLE_ENTRY) != null) {
-                currentQuestion.setIsDoubleEntry(Boolean.parseBoolean(attributes
-                        .getValue(DOUBLE_ENTRY)));
-            } else {
-                currentQuestion.setIsDoubleEntry(false);
-            }
-
             currentQuestion.setType(attributes.getValue(TYPE));
             currentQuestion.setId(attributes.getValue(ID));
             String validation = attributes.getValue(VALIDATION_TYPE);

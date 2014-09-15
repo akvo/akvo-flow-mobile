@@ -16,10 +16,7 @@
 
 package org.akvo.flow.activity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -162,53 +159,18 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             return;
         }
 
-        // Check if there are ongoing (non-submitted) responses for this Survey
-        boolean createNew = true;
-        Cursor c =  mDatabase.getSurveyInstances(mRecord.getId(), surveyId, SurveyInstanceStatus.SAVED);
-        if (c != null) {
-            createNew = c.getCount() == 0;
-            c.close();
-        }
+        // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
+        long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId,
+                SurveyInstanceStatus.SAVED);
+        long instance = instances.length > 0 ? instances[0]
+                : mDatabase.createSurveyRespondent(surveyId, mUser.getId(), mRecord.getId());
 
-        if (createNew) {
-            startSurvey(surveyId);
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.choose_response);
-            builder.setMessage(R.string.choose_response_text);
-            builder.setPositiveButton(R.string.start_new_response, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    startSurvey(surveyId);
-                    dialog.dismiss();
-                }
-            });
-            builder.setNegativeButton(R.string.resume_response, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    mPager.setCurrentItem(POSITION_RESPONSES);
-                    dialog.dismiss();
-                }
-            });
-
-            builder.show();
-        }
-    }
-
-    private void startSurvey(String surveyId) {
-        long surveyInstanceId = mDatabase.createSurveyRespondent(surveyId,
-                String.valueOf(mUser.getId()), mRecord.getId());
-
-        startSurvey(surveyId, mRecord.getId(), surveyInstanceId);
-    }
-
-    private void startSurvey(String surveyId, String recordId, long surveyInstanceId) {
         Intent i = new Intent(this, SurveyActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId);
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
+        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, instance);
         startActivityForResult(i, REQUEST_FORM);
     }
 

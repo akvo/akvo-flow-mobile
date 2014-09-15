@@ -61,6 +61,8 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     private static final int POSITION_RESPONSES = 1;
     private static final int POSITION_MAP = 2;
 
+    private static final int REQUEST_FORM = 0;
+
     private User mUser;
     private SurveyedLocale mRecord;
     private SurveyGroup mSurveyGroup;
@@ -142,6 +144,13 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         mDatabase.close();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_FORM && resultCode == RESULT_OK) {
+            finish();
+        }
+    }
+
     private void displayRecord() {
         mRecordTextView.setText(mRecord.getDisplayName(this) + ", " + mRecord.getId());
     }
@@ -200,7 +209,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
         i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
-        startActivity(i);
+        startActivityForResult(i, REQUEST_FORM);
     }
 
     class TabsAdapter extends FragmentPagerAdapter {

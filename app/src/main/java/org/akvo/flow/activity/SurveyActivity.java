@@ -511,6 +511,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         if (dialog != null) {
+                            setResult(RESULT_OK);
                             finish();
                         }
                     }

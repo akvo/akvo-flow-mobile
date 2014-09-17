@@ -905,6 +905,7 @@ public class SurveyDbAdapter {
      */
     public void deleteAllSurveys() {
         database.delete(Tables.SURVEY, null, null);
+        database.delete(Tables.SURVEY_GROUP, null, null);
     }
 
     /**

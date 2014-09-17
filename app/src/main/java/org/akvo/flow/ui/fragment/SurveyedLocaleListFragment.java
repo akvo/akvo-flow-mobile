@@ -23,7 +23,10 @@ import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
@@ -111,6 +114,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onResume() {
         super.onResume();
         mDatabase.open();
+
         // try to find out where we are
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -123,12 +127,18 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             }
         }
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+
+        // Listen for data sync updates, so we can update the UI accordingly
+        getActivity().registerReceiver(dataSyncReceiver,
+                new IntentFilter(getString(R.string.action_data_sync)));
+
         refresh();
     }
     
     @Override
     public void onPause() {
         super.onPause();
+        getActivity().unregisterReceiver(dataSyncReceiver);
         mLocationManager.removeUpdates(this);
         mDatabase.close();
     }
@@ -227,6 +237,18 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
     }
+
+    /**
+     * BroadcastReceiver to notify of data synchronisation. This should be
+     * fired from DataSyncService.
+     */
+    private BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "Survey Instance status has changed. Refreshing UI...");
+            refresh();
+        }
+    };
 
     /**
      * List Adapter to bind the Surveyed Locales into the list items

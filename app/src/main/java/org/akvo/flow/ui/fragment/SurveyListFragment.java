@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -210,7 +211,10 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             TextView surveyVersionView = (TextView)listItem.findViewById(R.id.text2);
             TextView lastSubmissionTitle = (TextView)listItem.findViewById(R.id.date_label);
             TextView lastSubmissionView = (TextView)listItem.findViewById(R.id.date);
-            surveyNameView.setText(surveyInfo.mName);
+
+            String name = !TextUtils.isEmpty(surveyInfo.mName) ?
+                    surveyInfo.mName.toUpperCase() : null;
+            surveyNameView.setText(name);
             surveyVersionView.setText("v" + surveyInfo.mVersion);
 
             final boolean enabled = isEnabled(surveyInfo.mId);

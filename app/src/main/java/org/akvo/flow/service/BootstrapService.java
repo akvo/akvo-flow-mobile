@@ -235,6 +235,8 @@ public class BootstrapService extends Service {
                             continue;
                         }
 
+                        survey.setName(loadedSurvey.getName());
+
                         if (loadedSurvey.getVersion() > 0) {
                             survey.setVersion(loadedSurvey.getVersion());
                         } else {

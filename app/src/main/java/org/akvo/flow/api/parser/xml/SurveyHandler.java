@@ -78,6 +78,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String RANGE_MAX = "rangeHigh";
     private static final String STRENGTH_MIN = "strengthMin";
     private static final String STRENGTH_MAX = "strengthMax";
+    private static final String NAME = "name";
     private static final String VERSION = "version";
     private static final String LOCALE_NAME = "localeNameFlag";
     private static final String LOCALE_LOCATION = "localeLocationFlag";
@@ -223,6 +224,9 @@ public class SurveyHandler extends DefaultHandler {
             Attributes attributes) throws SAXException {
         super.startElement(uri, localName, name, attributes);
         if (localName.equalsIgnoreCase(SURVEY)) {
+            if (attributes.getValue(NAME) != null) {
+                survey.setName(attributes.getValue(NAME));
+            }
             if (attributes.getValue(VERSION) != null) {
                 survey.setVersion(Double.parseDouble(attributes.getValue(VERSION)));
             }

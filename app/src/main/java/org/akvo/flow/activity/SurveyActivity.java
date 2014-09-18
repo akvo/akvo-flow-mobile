@@ -73,6 +73,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
 
+    private static final int MENU_PREFILL  = 101;
+
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
     private static final String IMAGE_SUFFIX = ".jpg";
@@ -131,9 +133,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
         // Initialize new survey or load previous responses
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
-        if (responses.isEmpty()) {
-            displayPrefillDialog();
-        } else {
+        if (!responses.isEmpty()) {
             loadState(responses);
         }
 
@@ -146,10 +146,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
      * to 'clone' responses from the previous response.
      */
     private void displayPrefillDialog() {
-        if (!mSurveyGroup.isMonitored()) {
-            return;// Do nothing, as prefill option is not available in the current context
-        }
-
         final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId());
         if (lastSurveyInstance != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -329,9 +325,14 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.survey_activity, menu);
+        SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
         if (isReadOnly()) {
-            SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
             subMenu.removeItem(R.id.clear);
+        } else if (mSurveyGroup.isMonitored()) {
+            // Add 'pre-fill' option, if applies
+            if (mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId()) != null) {
+                subMenu.add(Menu.NONE, MENU_PREFILL, Menu.NONE, R.string.prefill_title);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -347,6 +348,9 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 return true;
             case R.id.clear:
                 clearSurvey();
+                return true;
+            case MENU_PREFILL:
+                displayPrefillDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -511,6 +515,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         if (dialog != null) {
+                            setResult(RESULT_OK);
                             finish();
                         }
                     }

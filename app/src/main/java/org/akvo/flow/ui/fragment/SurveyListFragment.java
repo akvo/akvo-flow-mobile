@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -21,7 +21,6 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -48,7 +47,6 @@ import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.ViewUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
 public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
@@ -143,22 +141,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final String surveyId = mAdapter.getItem(position).mId;
-        if (mSurveyGroup.isMonitored() && mRegistered &&
-                surveyId.equals(mSurveyGroup.getRegisterSurveyId())) {
-            // Attempting to answer the registration form multiple times displays a warning
-            ViewUtil.showConfirmDialog(R.string.reg_form_warning_title,
-                    R.string.reg_form_warning_text,
-                    getActivity(),
-                    true,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mListener.onSurveyClick(surveyId);
-                        }
-                    });
-        } else {
-            mListener.onSurveyClick(surveyId);
-        }
+        mListener.onSurveyClick(surveyId);
     }
     
     @Override
@@ -190,7 +173,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         
         private boolean isEnabled(String surveyId) {
             if (mSurveyGroup.isMonitored()) {
-                return mRegistered || isRegistrationSurvey(surveyId);
+                return isRegistrationSurvey(surveyId) ? !mRegistered : mRegistered;
             }
             
             return !mRegistered;// Not monitored. Only one response allowed

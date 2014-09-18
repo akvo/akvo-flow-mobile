@@ -730,7 +730,7 @@ public class SurveyDbAdapter {
      * @param surveyId
      * @return
      */
-    public long createSurveyRespondent(String surveyId, String userId, String surveyedLocaleId) {
+    public long createSurveyRespondent(String surveyId, long userId, String surveyedLocaleId) {
         final long time = System.currentTimeMillis();
 
         ContentValues initialValues = new ContentValues();
@@ -1359,31 +1359,6 @@ public class SurveyDbAdapter {
      * Get all the SurveyInstances for a particular Record
      */
     public Cursor getSurveyInstances(String recordId) {
-        return getSurveyInstances(
-                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
-                new String[] { recordId });
-    }
-
-    /**
-     * Get SurveyInstances with a particular status.
-     * If the recordId is not null, results will be filtered by Record.
-     */
-    public Cursor getSurveyInstances(String recordId, String surveyId, int status) {
-        String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
-                " AND " + SurveyInstanceColumns.STATUS + "= ?";
-        List<String> args = new ArrayList<String>();
-        args.add(surveyId);
-        args.add(String.valueOf(status));
-        if (recordId != null) {
-            // filter by Record
-            where += " AND "  + SurveyInstanceColumns.RECORD_ID + "= ?";
-            args.add(recordId);
-        }
-
-        return getSurveyInstances(where, args.toArray(new String[args.size()]));
-    }
-
-    private Cursor getSurveyInstances(String where, String[] args) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 new String[] {
                         Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
@@ -1394,7 +1369,40 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
                         SurveyInstanceColumns.RECORD_ID
                 },
-                where, args, null, null, SurveyInstanceColumns.START_DATE + " DESC");
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
+                new String[] { recordId },
+                null, null, SurveyInstanceColumns.START_DATE + " DESC");
+    }
+
+    /**
+     * Get SurveyInstances with a particular status.
+     * If the recordId is not null, results will be filtered by Record.
+     */
+    public long[] getSurveyInstances(String recordId, String surveyId, int status) {
+        String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
+                " AND " + SurveyInstanceColumns.STATUS + "= ?" +
+                " AND "  + SurveyInstanceColumns.RECORD_ID + "= ?";
+        List<String> args = new ArrayList<String>();
+        args.add(surveyId);
+        args.add(String.valueOf(status));
+        args.add(recordId);
+
+        Cursor c = database.query(Tables.SURVEY_INSTANCE,
+                new String[] { SurveyInstanceColumns._ID },
+                where, args.toArray(new String[args.size()]),
+                null, null, SurveyInstanceColumns.START_DATE + " DESC");
+
+        long[] instances = new long[0];// Avoid null array
+        if (c != null) {
+            instances = new long[c.getCount()];
+            if (c.moveToFirst()) {
+                do {
+                    instances[c.getPosition()] = c.getLong(0);// Single column (ID)
+                } while (c.moveToNext());
+            }
+            c.close();
+        }
+        return instances;
     }
 
     /**

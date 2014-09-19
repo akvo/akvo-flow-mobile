@@ -32,7 +32,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
@@ -401,19 +400,15 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mRequestQuestionId == null) {
+        if (mRequestQuestionId == null || resultCode != RESULT_OK) {
+            mRequestQuestionId = null;
             return;// Move along, nothing to see here
         }
 
-        if (requestCode == PHOTO_ACTIVITY_REQUEST || requestCode == VIDEO_ACTIVITY_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                String fileSuffix;
-                if (requestCode == PHOTO_ACTIVITY_REQUEST) {
-                    fileSuffix = IMAGE_SUFFIX;
-                } else {
-                    fileSuffix = VIDEO_SUFFIX;
-                }
-
+        switch (requestCode) {
+            case PHOTO_ACTIVITY_REQUEST:
+            case VIDEO_ACTIVITY_REQUEST:
+                String fileSuffix = requestCode == PHOTO_ACTIVITY_REQUEST ? IMAGE_SUFFIX : VIDEO_SUFFIX;
                 File tmp = getTmpFile(requestCode == PHOTO_ACTIVITY_REQUEST);
 
                 // Ensure no image is saved in the DCIM folder
@@ -428,10 +423,9 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     maxImgSize = Integer.valueOf(maxImgSizePref);
                 }
 
-                String sizeTxt = getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize];
-
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(), maxImgSize)) {
-                    Toast.makeText(this, "Image resized to " + sizeTxt, Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Image resized to: " +
+                            getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize]);
                     if (!tmp.delete()) { // must check return value to know if it failed
                         Log.e(TAG, "Media file delete failed");
                     }
@@ -443,13 +437,11 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 Bundle photoData = new Bundle();
                 photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
-            } else {
-                Log.e(TAG, "Result of camera op was not ok: " + resultCode);
-            }
-        } else if (requestCode == SCAN_ACTIVITY_REQUEST && resultCode == RESULT_OK) {
-            mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
-        } else if (requestCode == EXTERNAL_SOURCE_REQUEST && resultCode == RESULT_OK) {
-            mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+                break;
+            default:
+                // SCAN_ACTIVITY_REQUEST or EXTERNAL_SOURCE_REQUEST
+                mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+                break;
         }
 
         mRequestQuestionId = null;// Reset the tmp reference

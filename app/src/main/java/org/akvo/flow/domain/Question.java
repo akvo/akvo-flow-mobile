@@ -57,7 +57,8 @@ public class Question {
     private boolean localeLocation = false;
     private String sourceQuestionId;// "Copied-from" question Id
     private boolean isDoubleEntry;
-    
+    private boolean useExternalSource;
+
     public void setIsLocaleName(boolean localeName) {
         this.localeName = localeName;
     }
@@ -299,5 +300,13 @@ public class Question {
 
     public boolean isDoubleEntry() {
         return isDoubleEntry;
+    }
+
+    public void useExternalSource(boolean useExternalSource) {
+        this.useExternalSource = useExternalSource;
+    }
+
+    public boolean useExternalSource() {
+        return useExternalSource;
     }
 }

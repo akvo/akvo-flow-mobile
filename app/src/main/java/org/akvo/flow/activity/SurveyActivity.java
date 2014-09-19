@@ -39,6 +39,7 @@ import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -72,6 +73,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
+    private static final int EXTERNAL_SOURCE_REQUEST  = 4;
 
     private static final int MENU_PREFILL  = 101;
 
@@ -446,6 +448,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             }
         } else if (requestCode == SCAN_ACTIVITY_REQUEST && resultCode == RESULT_OK) {
             mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+        } else if (requestCode == EXTERNAL_SOURCE_REQUEST && resultCode == RESULT_OK) {
+            mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
         }
 
         mRequestQuestionId = null;// Reset the tmp reference
@@ -592,6 +596,14 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 mQuestionResponses.remove(questionId);
             }
             // TODO: Should we save this Response to the DB straightaway?
+        } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
+            final Question q = event.getSource().getQuestion();
+            Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_ID, q.getId());
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_TITLE, q.getText());
+            intent.setType(ConstantUtil.EXTERNAL_SOURCE_MIME);
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
+                    + EXTERNAL_SOURCE_REQUEST);
         }
     }
 

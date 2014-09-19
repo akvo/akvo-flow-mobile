@@ -214,6 +214,15 @@ public class ConstantUtil {
     public static final int NOTIFICATION_DATA_SYNC = 101;
 
     /**
+     + * External Sources
+     + */
+    public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
+    public static final String EXTERNAL_SOURCE_QUESTION_ID = "questionId";
+    public static final String EXTERNAL_SOURCE_QUESTION_TITLE = "questionTitle";
+    public static final String EXTERNAL_SOURCE_RESPONSE = "response";
+    public static final String EXTERNAL_SOURCE_MIME = "text/plain";
+
+    /**
      * prevent instantiation
      */
     private ConstantUtil() {

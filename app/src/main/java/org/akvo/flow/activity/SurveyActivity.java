@@ -589,6 +589,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             }
             // TODO: Should we save this Response to the DB straightaway?
         } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
+            mRequestQuestionId = event.getSource().getQuestion().getId();
             final Question q = event.getSource().getQuestion();
             Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
             intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_ID, q.getId());

@@ -66,12 +66,15 @@ public class SubmitTab extends ListView implements OnClickListener {
         QuestionListAdapter adapter = new QuestionListAdapter(invalidQuestions);
         setAdapter(adapter);
 
-        if (invalidQuestions.isEmpty()) {
-            mHeaderView.setText(R.string.submittext);
-            mSubmitButton.setEnabled(true);
-        } else {
+        if (!invalidQuestions.isEmpty()) {
             mHeaderView.setText(R.string.error_responses);
             mSubmitButton.setEnabled(false);
+        } else if (mListener.getResponses().isEmpty()) {
+            mHeaderView.setText(R.string.error_empty_form);
+            mSubmitButton.setEnabled(false);
+        } else {
+            mHeaderView.setText(R.string.submittext);
+            mSubmitButton.setEnabled(true);
         }
     }
 

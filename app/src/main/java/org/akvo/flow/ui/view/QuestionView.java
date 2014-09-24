@@ -188,7 +188,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     } else {
                         isFirst = false;
                     }
-                    text.append("<font color='").append(sColors[i]).append("'>")
+                    text.append("<font color='").append(sColors[i % sColors.length]).append("'>")
                             .append(txt.getText()).append("</font>");
                 }
             }

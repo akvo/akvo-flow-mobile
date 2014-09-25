@@ -1,5 +1,13 @@
 Akvo FLOW app 
-Last update 19 September 2014
+Last update 25 September 2014
+
+#ver 2.0.3
+
+Features / Bugfixes
+-------------------
+* #167 - Empty forms cannot be submitted
+* #166 - Font colour blends with background
+* #160 - Revert all-caps policy in projects/survey titles
 
 #ver 2.0.2
 

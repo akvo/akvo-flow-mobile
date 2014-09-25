@@ -53,9 +53,9 @@
         <item>hi</item>
         <item>qu</item>
     </string-array>
-    <!-- must have enough colors for all languages -->
+    <!-- NOTE: Main color will suits the light theme. Must have enough colors for all languages -->
     <string-array name="colors">
-        <item>white</item>
+        <item>black</item>
         <item>red</item>
         <item>blue</item>
         <item>yellow</item>

@@ -159,6 +159,7 @@
     <string name="reg_form_warning_title">Registration Survey</string>
     <string name="reg_form_warning_text">This Data Point already contains a response for this form. Any new responses will be used as the most recent values. Do you want to continue?</string>
     <string name="error_img_preview">Can\'t load image preview</string>
+    <string name="error_empty_form">Empty forms cannot be submitted. Please, add the corresponding responses first.</string>
     <!-- RecordList Activity -->
     <string name="create_data_point">CREATE NEW DATA POINT</string>
     <string name="stats_title">Project Stats</string>

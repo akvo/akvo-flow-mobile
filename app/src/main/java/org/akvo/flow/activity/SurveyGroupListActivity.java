@@ -279,11 +279,8 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         public void bindView(View view, Context context, Cursor cursor) {
             final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
 
-            String name = !TextUtils.isEmpty(surveyGroup.getName()) ?
-                    surveyGroup.getName().toUpperCase() : null;
-            
             TextView text1 = (TextView)view.findViewById(R.id.text1);
-            text1.setText(name);
+            text1.setText(surveyGroup.getName());
             text1.setTextColor(getResources().getColorStateList(mTextColor));
 
             // Alternate background

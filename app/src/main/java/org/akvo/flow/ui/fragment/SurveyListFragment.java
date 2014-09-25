@@ -195,9 +195,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             TextView lastSubmissionTitle = (TextView)listItem.findViewById(R.id.date_label);
             TextView lastSubmissionView = (TextView)listItem.findViewById(R.id.date);
 
-            String name = !TextUtils.isEmpty(surveyInfo.mName) ?
-                    surveyInfo.mName.toUpperCase() : null;
-            surveyNameView.setText(name);
+            surveyNameView.setText(surveyInfo.mName);
             surveyVersionView.setText("v" + surveyInfo.mVersion);
 
             final boolean enabled = isEnabled(surveyInfo.mId);

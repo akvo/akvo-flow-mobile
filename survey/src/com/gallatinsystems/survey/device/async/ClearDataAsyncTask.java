@@ -29,7 +29,6 @@ import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
-import com.gallatinsystems.survey.device.util.PropertyUtil;
 
 public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private static final String TAG = ClearDataAsyncTask.class.getSimpleName();
@@ -40,13 +39,9 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private WeakReference<Context> mWeakContext;
 
     private SurveyDbAdapter mDatabase;
-    private boolean mUseInternalStorage;
 
     public ClearDataAsyncTask(Context context) {
         mWeakContext = new WeakReference<Context>(context);
-
-        mUseInternalStorage = new PropertyUtil(context.getResources())
-                .getBoolean(ConstantUtil.USE_INTERNAL_STORAGE);
 
         // Use the Application Context to be held by the Database
         // This will allow the current Activity to be GC if it's finished
@@ -116,7 +111,7 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
         if (!responsesOnly) {
             // Delete downloaded survey xml/zips
             FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                    ConstantUtil.DATA_DIR, mUseInternalStorage)), false);
+                    ConstantUtil.DATA_DIR, false)), false);
 
             // Delete stacktrace files (depending on SD card state,
             // they may be written to both internal and external storage)
@@ -128,11 +123,11 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
             // Delete bootstraps
             FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                    ConstantUtil.BOOTSTRAP_DIR, mUseInternalStorage)), false);
+                    ConstantUtil.BOOTSTRAP_DIR, false)), false);
         }
 
         // Delete exported zip/image files
         FileUtil.deleteFilesInDirectory(new File(FileUtil.getStorageDirectory(
-                ConstantUtil.SURVEYAL_DIR, mUseInternalStorage)), true);
+                ConstantUtil.SURVEYAL_DIR, false)), true);
     }
 }

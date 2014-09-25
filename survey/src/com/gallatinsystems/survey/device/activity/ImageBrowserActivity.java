@@ -32,7 +32,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.gallatinsystems.survey.device.R;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
-import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.view.adapter.HelpImageBrowserAdapter;
 
 /**
@@ -53,14 +52,12 @@ public class ImageBrowserActivity extends Activity implements
     private ArrayList<String> imageUrls;
     private ArrayList<String> captions;
     private String surveyId;
-    private PropertyUtil props;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.imagebrowser);
-        props = new PropertyUtil(getResources());
         gallery = (Gallery) findViewById(R.id.imagebrowsergallery);
         captionTextView = (TextView) findViewById(R.id.captiontextview);
         mainImageView = (ImageView) findViewById(R.id.mainimageview);
@@ -71,8 +68,7 @@ public class ImageBrowserActivity extends Activity implements
                 .getStringArrayList(ConstantUtil.IMAGE_CAPTION_LIST_KEY);
         surveyId = extras.getString(ConstantUtil.SURVEY_ID_KEY);
         imageAdapter = new HelpImageBrowserAdapter(this, imageUrls, FileUtil
-                .getStorageDirectory(ConstantUtil.DATA_DIR + surveyId, props
-                        .getBoolean(ConstantUtil.USE_INTERNAL_STORAGE)));
+                .getStorageDirectory(ConstantUtil.DATA_DIR + surveyId, false));
         if (imageUrls.size() == 1) {
             gallery.setVisibility(View.GONE);
         } else {

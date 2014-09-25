@@ -274,18 +274,23 @@ public class ConstantUtil {
     /**
      * property file keys
      */
-    public static final String S3_ID = "s3Id";
-    public static final String DATA_S3_POLICY = "dataS3Policy";
-    public static final String DATA_S3_SIG = "dataS3Sig";
-    public static final String IMAGE_S3_POLICY = "imageS3Policy";
-    public static final String IMAGE_S3_SIG = "imageS3Sig";
-    public static final String DATA_UPLOAD_URL = "dataUploadUrl";
     public static final String SERVER_BASE = "serverBase";
-    public static final String SURVEY_S3_URL = "surveyS3Url";
-    public static final String USE_INTERNAL_STORAGE = "useInternalStorage";
-    public static final String INCLUDE_OPTIONAL_ICONS = "includeOptionalIcons";
-    public static final String PROMPT_ON_OPT_CHANGE = "promptOnOptionChange";
-    public static final String DEFAULT_SETTINGS = "defaultSettings";
+    public static final String API_KEY = "apiKey";
+    public static final String S3_BUCKET = "awsBucket";
+    public static final String S3_ACCESSKEY = "awsAccessKeyId";
+    public static final String S3_SECRET = "awsSecretKey";
+    
+    /**
+     * Deprecated properties
+     */
+    public static final boolean PROMPT_ON_OPT_CHANGE = false;
+    
+    /**
+    * S3 bucket directories (object prefixes)
+    */
+    public static final String S3_DATA_DIR = "devicezip/";
+    public static final String S3_IMAGE_DIR = "images/";
+    public static final String S3_SURVEYS_DIR = "surveys/";
 
     /**
      * resource related constants

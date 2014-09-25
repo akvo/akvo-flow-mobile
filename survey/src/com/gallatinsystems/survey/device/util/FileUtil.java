@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
@@ -172,6 +174,16 @@ public class FileUtil {
             out.write(buffer, 0, size);
         }
         return out;
+    }
+
+    public static File getFile(String file, String subDir, Context c) 
+            throws FileNotFoundException {
+        String dir = getStorageDirectory(subDir, false);
+        findOrCreateDir(dir);
+        if (dir.endsWith("/")) {
+            return new File(dir + file);
+        }
+        return new File(dir, file);
     }
 
     public static FileOutputStream getFileOutputStream(String file,
@@ -354,16 +366,13 @@ public class FileUtil {
         }
     }
 
-    public static String getMD5Checksum(String path) {
+    public static byte[] getMD5Checksum(String path) {
         return getMD5Checksum(new File(path));
     }
 
-    public static String getMD5Checksum(File file) {
-        StringBuilder stringBuilder = new StringBuilder();
-
+    public static byte[] getMD5Checksum(File file) {
         InputStream in = null;
         MessageDigest md;
-
         try {
             md = MessageDigest.getInstance("MD5");
             in = new BufferedInputStream(new FileInputStream(file));
@@ -375,25 +384,28 @@ public class FileUtil {
                 md.update(buffer, 0, read);
             }
 
-            byte[] rawHash = md.digest();
-
-            for (byte b : rawHash) {
-                stringBuilder.append(String.format("%02x", b));
-            }
-
+            return md.digest();
         } catch (NoSuchAlgorithmException e) {
             Log.e(TAG, e.getMessage());
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         } finally {
-            try {
-                if (in != null)
-                    in.close();
-            } catch (IOException ignored) {
-            }
+            close(in);
         }
 
-        return stringBuilder.toString();
+        return null;
+    }
+
+    public static String hexMd5(File file) {
+        byte[] rawHash = getMD5Checksum(file);
+        if (rawHash != null) {
+            StringBuilder builder = new StringBuilder();
+            for (byte b : rawHash) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        }
+        return null;
     }
 
     /**
@@ -439,14 +451,26 @@ public class FileUtil {
      * @return true if their MD5 checksum is the same, false otherwise.
      */
     public static boolean compareFilesChecksum(String path1, String path2) {
-        final String checksum1 = getMD5Checksum(path1);
-        final String checksum2 = getMD5Checksum(path2);
+        final byte[] checksum1 = getMD5Checksum(path1);
+        final byte[] checksum2 = getMD5Checksum(path2);
 
-        if (!TextUtils.isEmpty(checksum1) && !TextUtils.isEmpty(checksum2)) {
-            return checksum1.equals(checksum2);
+        return Arrays.equals(checksum1, checksum2);
+    }
+
+    /**
+     * Helper function to close a Closeable instance
+     * 
+     * @param closeable
+     */
+    public static void close(Closeable closeable) {
+        if (closeable == null) {
+            return;
         }
-
-        return false;
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
 }

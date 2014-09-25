@@ -16,11 +16,13 @@
 
 package com.gallatinsystems.survey.device.service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -30,7 +32,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.net.URLEncoder;
 
 import org.apache.http.HttpException;
 
@@ -47,13 +48,13 @@ import com.gallatinsystems.survey.device.domain.Question;
 import com.gallatinsystems.survey.device.domain.QuestionHelp;
 import com.gallatinsystems.survey.device.domain.Survey;
 import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHandler;
-import com.gallatinsystems.survey.device.exception.TransferException;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
 import com.gallatinsystems.survey.device.util.LangsPreferenceUtil;
 import com.gallatinsystems.survey.device.util.PlatformUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
+import com.gallatinsystems.survey.device.util.S3Util;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 
@@ -66,8 +67,7 @@ public class SurveyDownloadService extends Service {
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
     private static final String DEFAULT_TYPE = "Survey";
-    private static final int COMPLETE_ID = 2;
-    private static final int FAIL_ID = 3;
+    private static final int COMPLETE_ID = 1;
 
     @SuppressWarnings("unused")
     private static final String NO_SURVEY = "No Survey Found";
@@ -78,7 +78,6 @@ public class SurveyDownloadService extends Service {
     private static final String VERSION_PARAM = "&ver=";
     @SuppressWarnings("unused")
     private static final String SURVEY_SERVICE_SERVICE_PATH = "/surveymanager?surveyId=";
-    private static final String SD_LOC = "sdcard";
 
     private SurveyDbAdapter databaseAdaptor;
     private PropertyUtil props;
@@ -169,14 +168,13 @@ public class SurveyDownloadService extends Service {
                         for (int i = 0; i < surveys.size(); i++) {
                             Survey survey = surveys.get(i);
                             try {
-                                if (downloadSurvey(serverBase, survey)) {
-                                    databaseAdaptor.saveSurvey(survey);
-                                    String[] langs = LangsPreferenceUtil.determineLanguages(this,
-                                            survey);
-                                    databaseAdaptor.addLanguages(langs);
-                                    downloadHelp(survey, precacheOption);
-                                    updateCount++;
-                                }
+                                downloadSurvey(survey);
+                                databaseAdaptor.saveSurvey(survey);
+                                String[] langs = LangsPreferenceUtil.determineLanguages(this,
+                                        survey);
+                                databaseAdaptor.addLanguages(langs);
+                                downloadHelp(survey, precacheOption);
+                                updateCount++;
                             } catch (Exception e) {
                                 Log.e(TAG, "Could not download survey", e);
                                 PersistentUncaughtExceptionHandler
@@ -226,45 +224,20 @@ public class SurveyDownloadService extends Service {
      * Downloads the survey based on the ID and then updates the survey object
      * with the filename and location
      */
-    private boolean downloadSurvey(String serverBase, Survey survey) {
-        boolean success = false;
-        try {
-            HttpUtil.httpDownload(
-                    props.getProperty(ConstantUtil.SURVEY_S3_URL)
-                            + survey.getId() + ConstantUtil.ARCHIVE_SUFFIX,
-                    FileUtil.getFileOutputStream(
-                            survey.getId() + ConstantUtil.ARCHIVE_SUFFIX,
-                            ConstantUtil.DATA_DIR,
-                            props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                            this));
-            extractAndSave(FileUtil.getFileInputStream(survey.getId()
-                    + ConstantUtil.ARCHIVE_SUFFIX, ConstantUtil.DATA_DIR,
-                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this));
-
-            survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
-            survey.setType(DEFAULT_TYPE);
-            survey.setLocation(SD_LOC);
-            success = true;
-        } catch (IOException e) {
-            Log.e(TAG, "Could write survey file " + survey.getFileName(), e);
-            String text = getResources().getString(R.string.cannotupdate);
-            ViewUtil.fireNotification(text, text, this, FAIL_ID, null);
-            PersistentUncaughtExceptionHandler
-                    .recordException(new TransferException(survey.getId(),
-                            null, e));
-
-        } catch (Exception e) {
-            Log.e(TAG, "Could not download survey " + survey.getId(), e);
-
-            String text = getResources().getString(R.string.cannotupdate);
-            ViewUtil.fireNotification(text, text, this, FAIL_ID, null);
-
-            PersistentUncaughtExceptionHandler
-                    .recordException(new TransferException(survey.getId(),
-                            null, e));
-
+    private void downloadSurvey(Survey survey) throws IOException {
+        final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
+        final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+        final File file = FileUtil.getFile(filename, ConstantUtil.DATA_DIR, this);
+        S3Util s3Api = new S3Util(this);
+        s3Api.get(objectKey, file); // Download zip file
+        extractAndSave(new FileInputStream(file));
+        // Compressed file is not needed any more
+        if (!file.delete()) {
+            Log.e(TAG, "Could not delete survey zip file: " + filename);
         }
-        return success;
+        survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
+        survey.setType(DEFAULT_TYPE);
+        survey.setLocation(ConstantUtil.FILE_LOCATION);
     }
 
     /**
@@ -280,8 +253,7 @@ public class SurveyDownloadService extends Service {
         ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
             FileOutputStream fout = FileUtil.getFileOutputStream(
-                    entry.getName(), ConstantUtil.DATA_DIR,
-                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this);
+                    entry.getName(), ConstantUtil.DATA_DIR, false, this);
             byte[] buffer = new byte[2048];
             int size;
             while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
@@ -313,12 +285,8 @@ public class SurveyDownloadService extends Service {
                             ConstantUtil.RESOURCE_PACKAGE));
                 } else {
                     // load from file
-                    in = FileUtil
-                            .getFileInputStream(
-                                    survey.getFileName(),
-                                    ConstantUtil.DATA_DIR,
-                                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
-                                    this);
+                    in = FileUtil.getFileInputStream(survey.getFileName(),
+                            ConstantUtil.DATA_DIR, false, this);
                 }
                 Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);
                 if (hydratedSurvey != null) {
@@ -385,8 +353,7 @@ public class SurveyDownloadService extends Service {
         try {
             final FileOutputStream out = FileUtil.getFileOutputStream(
                     remoteFile.substring(remoteFile.lastIndexOf("/") + 1),
-                    ConstantUtil.DATA_DIR + surveyId + "/",
-                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE), this);
+                    ConstantUtil.DATA_DIR + surveyId + "/", false, this);
             downloadExecutor.execute(new Runnable() {
                 @Override
                 public void run() {

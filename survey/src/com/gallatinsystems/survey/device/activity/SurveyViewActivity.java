@@ -69,7 +69,6 @@ import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.LangsPreferenceData;
 import com.gallatinsystems.survey.device.util.LangsPreferenceUtil;
-import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 import com.gallatinsystems.survey.device.view.OptionQuestionView;
 import com.gallatinsystems.survey.device.view.QuestionView;
@@ -132,7 +131,6 @@ public class SurveyViewActivity extends TabActivity implements
     private TabHost tabHost;
     private int tabCount;
     private String eventSourceQuestionId;
-    private PropertyUtil props;
     private HashSet<String> missingQuestions;
     private boolean hasAddedTabs;
     
@@ -153,19 +151,7 @@ public class SurveyViewActivity extends TabActivity implements
         isTrackRecording = false;
         setContentView(R.layout.main);
         tabCount = 0;
-        props = new PropertyUtil(getResources());
-        boolean promptOnChange = false;
-        String promptOnChangeString = props
-                .getProperty(ConstantUtil.PROMPT_ON_OPT_CHANGE);
-        if (promptOnChangeString != null && promptOnChangeString.length() > 0) {
-            try {
-                promptOnChange = Boolean.parseBoolean(promptOnChangeString);
-            } catch (Exception e) {
-                Log.e(TAG, "Prompt on change property is not a boolean: "
-                        + promptOnChangeString);
-            }
-        }
-        OptionQuestionView.promptOnChange = promptOnChange;
+        OptionQuestionView.promptOnChange = ConstantUtil.PROMPT_ON_OPT_CHANGE;
         QuestionView.screenWidth = getWindowManager().getDefaultDisplay()
                 .getWidth();
 
@@ -530,8 +516,7 @@ public class SurveyViewActivity extends TabActivity implements
 
                     String newFilename = filePrefix + System.nanoTime() + fileSuffix;
                     String newPath = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
-                            newFilename,
-                            props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
+                            newFilename, false);
                     FileUtil.findOrCreateDir(newPath);
                     String absoluteFile = newPath + File.separator + newFilename;
 
@@ -731,15 +716,13 @@ public class SurveyViewActivity extends TabActivity implements
             if (src.toLowerCase().startsWith(HTTP_PREFIX)) {
                 String fileName = src.substring(src.lastIndexOf("/") + 1);
                 if (FileUtil.doesFileExist(fileName, ConstantUtil.DATA_DIR
-                        + surveyId + File.separator,
-                        props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
+                        + surveyId + File.separator, false,
                         this)) {
                     uri = Uri
                             .parse(VIDEO_PREFIX
                                     + FileUtil.getStorageDirectory(
                                             ConstantUtil.DATA_DIR + surveyId
-                                                    + File.separator,
-                                            props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE))
+                                                    + File.separator, false)
                                     + fileName);
                 } else {
                     uri = Uri.parse(src);
@@ -1170,7 +1153,7 @@ public class SurveyViewActivity extends TabActivity implements
                             .getFileInputStream(
                                     surveyFromDb.getFileName(),
                                     ConstantUtil.DATA_DIR,
-                                    props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
+                                    false,
                                     this);
                 }
 

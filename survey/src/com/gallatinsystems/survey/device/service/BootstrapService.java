@@ -41,7 +41,6 @@ import com.gallatinsystems.survey.device.exception.PersistentUncaughtExceptionHa
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.LangsPreferenceUtil;
-import com.gallatinsystems.survey.device.util.PropertyUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
 
 /**
@@ -69,7 +68,6 @@ public class BootstrapService extends Service {
     private Thread workerThread;
     private SurveyDbAdapter databaseAdapter;
     private static final Integer NOTIFICATION_ID = new Integer(123);
-    private PropertyUtil props;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -223,7 +221,7 @@ public class BootstrapService extends Service {
                                 FileUtil.getFileOutputStream(
                                         fileName,
                                         ConstantUtil.DATA_DIR,
-                                        props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
+                                        false,
                                         this));
                         // now read the survey XML back into memory to see if
                         // there is a version
@@ -233,7 +231,7 @@ public class BootstrapService extends Service {
                                     .getFileInputStream(
                                             survey.getFileName(),
                                             ConstantUtil.DATA_DIR,
-                                            props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
+                                            false,
                                             this);
                             loadedSurvey = SurveyDao.loadSurvey(survey, in);
 
@@ -257,9 +255,8 @@ public class BootstrapService extends Service {
                                 zis,
                                 FileUtil.getFileOutputStream(
                                         fileName,
-                                        ConstantUtil.DATA_DIR + id
-                                                + File.separator,
-                                        props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
+                                        ConstantUtil.DATA_DIR + id + File.separator,
+                                        false,
                                         this));
 
                         // record the fact that this survey had media
@@ -347,7 +344,6 @@ public class BootstrapService extends Service {
      */
     public void onCreate() {
         super.onCreate();
-        props = new PropertyUtil(getResources());
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
                 .getInstance());
     }

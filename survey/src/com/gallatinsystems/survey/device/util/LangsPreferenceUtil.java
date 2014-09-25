@@ -123,7 +123,6 @@ public class LangsPreferenceUtil {
     }
 
     public static String[] determineLanguages(Context context, Survey survey) {
-        PropertyUtil props = new PropertyUtil(context.getResources());
         HashSet<String> langs = new HashSet<String>();
         // find languages in the survey
 
@@ -139,8 +138,7 @@ public class LangsPreferenceUtil {
             } else {
                 // load from file
                 in = FileUtil.getFileInputStream(survey.getFileName(),
-                        ConstantUtil.DATA_DIR,
-                        props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE),
+                        ConstantUtil.DATA_DIR, false,
                         context);
             }
             Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);

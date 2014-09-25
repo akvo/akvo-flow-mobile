@@ -21,10 +21,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +39,6 @@ import java.util.zip.ZipOutputStream;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +46,6 @@ import org.json.JSONObject;
 import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -63,9 +59,9 @@ import com.gallatinsystems.survey.device.util.Base64;
 import com.gallatinsystems.survey.device.util.ConstantUtil;
 import com.gallatinsystems.survey.device.util.FileUtil;
 import com.gallatinsystems.survey.device.util.HttpUtil;
-import com.gallatinsystems.survey.device.util.MultipartStream;
 import com.gallatinsystems.survey.device.util.PlatformUtil;
 import com.gallatinsystems.survey.device.util.PropertyUtil;
+import com.gallatinsystems.survey.device.util.S3Util;
 import com.gallatinsystems.survey.device.util.StatusUtil;
 import com.gallatinsystems.survey.device.util.StringUtil;
 import com.gallatinsystems.survey.device.util.ViewUtil;
@@ -104,29 +100,26 @@ public class DataSyncService extends Service {
     private static final String DEVICE_ID_PARAM = "&devId=";
     private static final String VERSION_PARAM = "&ver=";
     private static final String DATA_CONTENT_TYPE = "application/zip";
-    private static final String S3_DATA_FILE_PATH = "devicezip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
     private static final String VIDEO_CONTENT_TYPE = "video/mp4";
-    private static final String S3_IMAGE_FILE_PATH = "images";
-    
+
     private static final String ACTION_SUBMIT = "submit";
-    private static final String ACTION_IMAGE  = "image";
-    
+    private static final String ACTION_IMAGE = "image";
+
     private static final String UTF8 = "UTF-8";
 
     private static final int BUF_SIZE = 2048;
 
-    private static final NumberFormat PCT_FORMAT = NumberFormat.getPercentInstance();
-    
     /**
      * Number of retries to upload a file to S3
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
     private SurveyDbAdapter databaseAdaptor;
-    
+
     /**
-     * Used to have an extra  slash. Semantically  harmless, but made  the DB lookup fail 
+     * Used to have an extra slash. Semantically harmless, but made the DB
+     * lookup fail
      */
     private static final String TEMP_FILE_NAME = "wfp";
     private static final String ZIP_IMAGE_DIR = "images/";
@@ -232,7 +225,7 @@ public class DataSyncService extends Service {
                     databaseAdaptor.markDataAsExported(zipFileData.respondentIDs);
                 }
             }
-            
+
             // Failed images have a new opportunity to reach their destiny!
             if (isAbleToRun(ConstantUtil.SEND, uploadIndex)) {
                 checkMissingFiles(serverBase);
@@ -257,13 +250,12 @@ public class DataSyncService extends Service {
     private void sendData(ZipFileData zipFileData, String fileName, String destName,
             String serverBase, int uploadIndex) {
         databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.IN_PROGRESS_STATUS);
-        boolean isOk = sendFile(fileName, S3_DATA_FILE_PATH,
-                props.getProperty(ConstantUtil.DATA_S3_POLICY),
-                props.getProperty(ConstantUtil.DATA_S3_SIG),
-                DATA_CONTENT_TYPE);
-        if (isOk) {
+        boolean ok = sendFile(fileName, ConstantUtil.S3_DATA_DIR, DATA_CONTENT_TYPE, false, 
+                FILE_UPLOAD_RETRIES);
+        if (ok) {
             // Notify GAE back-end that data is available
-            if (sendProcessingNotification(serverBase, ACTION_SUBMIT, destName, zipFileData.checksum)) {
+            if (sendProcessingNotification(serverBase, ACTION_SUBMIT, destName,
+                    zipFileData.checksum)) {
                 // Mark everything completed
                 databaseAdaptor.markDataAsSent(zipFileData.respondentIDs, String.valueOf(true));
                 // update the transmission history records too
@@ -277,32 +269,30 @@ public class DataSyncService extends Service {
                 // Notification failed, update transmission history
                 // TODO: this could be a different "failed" status
                 databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.FAILED_STATUS);
+                fireNotification(ConstantUtil.ERROR, destName);
             }
         } else {
             // S3 upload failed, update transmission history
             databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.FAILED_STATUS);
+            fireNotification(ConstantUtil.ERROR, destName);
         }
     }
 
     private void uploadImage(String image, boolean notifyServer) {
         databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.IN_PROGRESS_STATUS);
-        
+
         // 'image/jpeg' mime type, unless it contains the 'mp4' suffix.
         String contentType = image.endsWith(ConstantUtil.VIDEO_SUFFIX) ? VIDEO_CONTENT_TYPE
                 : IMAGE_CONTENT_TYPE;
-        
-        boolean ok = sendFile(image,
-                S3_IMAGE_FILE_PATH,
-                props.getProperty(ConstantUtil.IMAGE_S3_POLICY),
-                props.getProperty(ConstantUtil.IMAGE_S3_SIG),
-                contentType);
-        
+        boolean ok = sendFile(image, ConstantUtil.S3_IMAGE_DIR, contentType, true, 
+                FILE_UPLOAD_RETRIES);
         if (ok && notifyServer) {
-            // Notify GAE of the image being upload, before marking it as uploaded
+            // Notify GAE of the image being upload, before marking it as
+            // uploaded
             String filename = getDestName(image);
             ok = sendProcessingNotification(getServerBase(), ACTION_IMAGE, filename, null);
         }
-        
+
         if (ok) {
             databaseAdaptor.updateTransmissionHistory(image, ConstantUtil.COMPLETE_STATUS);
         } else {
@@ -315,7 +305,8 @@ public class DataSyncService extends Service {
             final Long respondentID = Long.valueOf(paths.getKey());
 
             for (String image : paths.getValue()) {
-                FileTransmission transmission = databaseAdaptor.getFileTransmission(respondentID, image);
+                FileTransmission transmission = databaseAdaptor.getFileTransmission(respondentID,
+                        image);
                 if (transmission == null) {
                     databaseAdaptor.createTransmissionHistory(respondentID, image,
                             ConstantUtil.QUEUED_STATUS);// Initial status
@@ -324,12 +315,12 @@ public class DataSyncService extends Service {
                     Log.d(TAG, "Image " + image + " was previously uploaded. Skipping...");
                     continue;
                 }
-                
+
                 uploadImage(image, false);
             }
         }
     }
-    
+
     private String getServerBase() {
         final String serverBase = databaseAdaptor.findPreference(ConstantUtil.SERVER_SETTING_KEY);
         if (!TextUtils.isEmpty(serverBase)) {
@@ -358,7 +349,7 @@ public class DataSyncService extends Service {
 
         return filename;
     }
-    
+
     /**
      * sends a message to the service with the file name that was just uploaded
      * so it can start processing the file
@@ -369,7 +360,7 @@ public class DataSyncService extends Service {
     private boolean sendProcessingNotification(String serverBase, String action,
             String fileName, String checksum) {
         boolean success = false;
-        
+
         String url = serverBase + NOTIFICATION_PATH + action
                 + FILENAME_PARAM + fileName
                 + NOTIFICATION_PN_PARAM + StatusUtil.getPhoneNumber(this)
@@ -405,7 +396,7 @@ public class DataSyncService extends Service {
         } else if (ConstantUtil.ERROR.equals(type)) {
             tickerText = getResources().getText(R.string.uploaderror);
         } else {
-            // This  default  is  unclear  to  user
+            // This default is unclear to user
             tickerText = getResources().getText(R.string.nothingtoexport);
         }
         ViewUtil.fireNotification(tickerText.toString(),
@@ -470,7 +461,8 @@ public class DataSyncService extends Service {
                     // TODO: this does not always work!
                     for (String id : zipFileData.respondentIDs) {
                         databaseAdaptor.createTransmissionHistory(Long.valueOf(id),
-                                fileName, ConstantUtil.QUEUED_STATUS);// Initial status
+                                fileName, ConstantUtil.QUEUED_STATUS);// Initial
+                                                                      // status
                     }
                 }
 
@@ -672,7 +664,7 @@ public class DataSyncService extends Service {
                     buf.append(DELIMITER).append(data.getString(uuid_col));
                     buf.append(DELIMITER).append(surveyal_time);
                     buf.append("\n");
-                    
+
                     if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
                             || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
                         List<String> paths = imagePaths.get(respId);
@@ -718,107 +710,27 @@ public class DataSyncService extends Service {
         } else
             return "";
     }
-    
-    private boolean sendFile(String fileAbsolutePath, String dir,
-            String policy, String sig, String contentType) {
-        return sendFile(fileAbsolutePath, dir, policy, sig, contentType, FILE_UPLOAD_RETRIES);
-    }
 
-    /**
-     * sends the zip file containing data/images to the server via an http
-     * upload
-     * 
-     * @param fileAbsolutePath
-     */
-    private boolean sendFile(String fileAbsolutePath, String dir,
-            String policy, String sig, String contentType, int retries) {
-
+    private boolean sendFile(String fileAbsolutePath, String dir, String contentType,
+            boolean isPublic, int retries) {
+        boolean ok = false;
         try {
             String fileName = fileAbsolutePath;
             if (fileName.contains(File.separator)) {
-                fileName = fileName.substring(fileName
-                        .lastIndexOf(File.separator)); // TODO: Why show
-                                                       // separator?
+                fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
             }
-            final String fileNameForNotification = fileName;
-            fireNotification(ConstantUtil.PROGRESS, fileName);
-
-            // Generate checksum, to be compared against response's ETag
-            final String checksum = FileUtil.getMD5Checksum(fileAbsolutePath);
-
-            MultipartStream stream = new MultipartStream(new URL(
-                    props.getProperty(ConstantUtil.DATA_UPLOAD_URL)));
-
-            stream.addFormField("key", dir + "/${filename}");
-            stream.addFormField("AWSAccessKeyId",
-                    props.getProperty(ConstantUtil.S3_ID));
-            stream.addFormField("acl", "public-read");
-            stream.addFormField("success_action_redirect",
-                    "http://www.gallatinsystems.com/SuccessUpload.html");
-            stream.addFormField("policy", policy);
-            stream.addFormField("signature", sig);
-            stream.addFormField("Content-Type", contentType);
-            stream.addFile("file", fileAbsolutePath, null);
-            int code = stream
-                    .execute(new MultipartStream.MultipartStreamStatusListner() {
-                        @Override
-                        public void uploadProgress(long bytesSent,
-                                long totalBytes) {
-                            double percentComplete = 0.0d;
-                            if (bytesSent > 0 && totalBytes > 0) {
-                                percentComplete = ((double) bytesSent)
-                                        / ((double) totalBytes);
-                            }
-                            if (percentComplete > 1.0d) {
-                                percentComplete = 1.0d;
-                            }
-                            fireNotification(ConstantUtil.PROGRESS,
-                                    PCT_FORMAT.format(percentComplete) + " - "
-                                            + fileNameForNotification);
-                        }
-                    });
-
-            /*
-             * Determine if an upload to Amazon S3 is successful. The response
-             * headers should contain a redirection to a URL, in which query, a
-             * parameter called "etag" will be the md5 checksum of the uploaded
-             * file.
-             */
-            String etag = null;
-            if (code == HttpStatus.SC_SEE_OTHER) {
-                String location = stream.getResponseHeader("Location");
-                Uri uri = Uri.parse(location);
-                etag = uri.getQueryParameter("etag");
-                etag = etag.replaceAll("\"", "");// Remove quotes
-                Log.d(TAG, "ETag: " + etag);
-            } else {
-                Log.e(TAG, "Server returned a bad code after upload: " + code);
+            final String objectKey = dir + fileName;
+            S3Util s3Api = new S3Util(this);
+            ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType, isPublic);
+            if (!ok && retries > 0) {
+                // If we have not expired all the retry attempts, try again.
+                ok = sendFile(fileAbsolutePath, dir, contentType, isPublic, --retries);
             }
-
-            if (etag != null && etag.equals(checksum)) {
-                fireNotification(ConstantUtil.FILE_COMPLETE,
-                        fileNameForNotification);
-            } else {
-                Log.e(TAG, "Server returned a bad checksum after upload: " + etag);
-                
-                if (retries > 0) {
-                    Log.i(TAG, "Retrying upload. Remaining attempts: " + retries);
-                    return sendFile(fileAbsolutePath, dir, policy, sig, contentType, --retries);
-                }
-                
-                Log.e(TAG, "File " + fileName + " upload failed.");
-                fireNotification(ConstantUtil.ERROR, getString(R.string.uploaderror) + " "
-                                + fileNameForNotification);
-                return false;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Could not send upload " + e.getMessage(), e);
-
+        } catch (IOException e) {
+            Log.e(TAG, "Could not send file: " + fileAbsolutePath + ". " + e.getMessage(), e);
             PersistentUncaughtExceptionHandler.recordException(e);
-            return false;
         }
-        Log.d(TAG, "File " + fileAbsolutePath + " successfully uploaded.");
-        return true;
+        return ok;
     }
 
     /**
@@ -830,8 +742,7 @@ public class DataSyncService extends Service {
         // TODO move zip file extension to constantutil
         String fileName = TEMP_FILE_NAME + System.nanoTime() + ".zip";
         String dir = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
-                fileName,
-                props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
+                fileName, false);
         FileUtil.findOrCreateDir(dir);
         if (isAll) {
             fileName = fileName.replace(".zip", "-all.zip");
@@ -863,16 +774,13 @@ public class DataSyncService extends Service {
         }
         return ok;
     }
-    
+
     /**
-     * Request missing files (images) in the datastore.
-     * The server will provide us with a list of missing images,
-     * so we can accordingly update their status in the database.
-     * This will help us fixing the Issue #55
-     * 
-     * Steps:
-     * 1- Request the list of files to the server
-     * 2- Update the status of those files in the local database
+     * Request missing files (images) in the datastore. The server will provide
+     * us with a list of missing images, so we can accordingly update their
+     * status in the database. This will help us fixing the Issue #55 Steps: 1-
+     * Request the list of files to the server 2- Update the status of those
+     * files in the local database
      */
     private void checkMissingFiles(String serverBase) {
         try {
@@ -881,14 +789,16 @@ public class DataSyncService extends Service {
                 JSONObject jResponse = new JSONObject(response);
                 JSONArray jMissingFiles = jResponse.optJSONArray("missingFiles");
                 JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
-                
+
                 // Mark the status of the files as 'Failed'
                 for (String filename : parseFiles(jMissingFiles)) {
                     setFileTransmissionFailed(filename);
                 }
-                
-                // Handle unknown files. If an unknown file exists in the filesystem
-                // it will be marked as failed in the transmission history, so it can
+
+                // Handle unknown files. If an unknown file exists in the
+                // filesystem
+                // it will be marked as failed in the transmission history, so
+                // it can
                 // be handled and retried in the next sync attempt.
                 for (String filename : parseFiles(jMissingUnknown)) {
                     if (new File(filename).exists()) {
@@ -900,17 +810,21 @@ public class DataSyncService extends Service {
             Log.e(TAG, "Could not retrieve missing files", e);
         }
     }
-    
+
     private void setFileTransmissionFailed(String filename) {
         int rows = databaseAdaptor.updateTransmissionHistory(filename, ConstantUtil.FAILED_STATUS);
         if (rows == 0) {
-            // Use a dummy "-1" as respondentId, as the database needs that attribute
-            databaseAdaptor.createTransmissionHistory(Long.valueOf(-1), filename, ConstantUtil.FAILED_STATUS);
+            // Use a dummy "-1" as respondentId, as the database needs that
+            // attribute
+            databaseAdaptor.createTransmissionHistory(Long.valueOf(-1), filename,
+                    ConstantUtil.FAILED_STATUS);
         }
     }
-    
+
     /**
-     * Request the notifications GAE has ready for us, like the list of missing files.
+     * Request the notifications GAE has ready for us, like the list of missing
+     * files.
+     * 
      * @param serverBase
      * @return String body of the HTTP response
      * @throws Exception
@@ -920,9 +834,9 @@ public class DataSyncService extends Service {
         String imei = StatusUtil.getImei(this);
         String deviceId = databaseAdaptor.findPreference(ConstantUtil.DEVICE_IDENT_KEY);
         String version = PlatformUtil.getVersionName(this);
-            
+
         String url = serverBase + DEVICE_NOTIFICATION_PATH
-                + (phoneNumber != null ? 
+                + (phoneNumber != null ?
                         NOTIFICATION_PN_PARAM.substring(1) + URLEncoder.encode(phoneNumber, UTF8)
                         : "")
                 + (imei != null ?
@@ -934,10 +848,11 @@ public class DataSyncService extends Service {
                 + VERSION_PARAM + URLEncoder.encode(version, UTF8);
         return HttpUtil.httpGet(url);
     }
-    
+
     /**
-     * Given a json array, return the list of contained filenames,
-     * formatting the path to match the structure of the sdcard's files.
+     * Given a json array, return the list of contained filenames, formatting
+     * the path to match the structure of the sdcard's files.
+     * 
      * @param jFiles
      * @return
      * @throws JSONException
@@ -945,26 +860,27 @@ public class DataSyncService extends Service {
     private List<String> parseFiles(JSONArray jFiles) throws JSONException {
         List<String> files = new ArrayList<String>();
         if (jFiles != null) {
-            for (int i=0; i<jFiles.length(); i++) {
+            for (int i = 0; i < jFiles.length(); i++) {
                 // Build the sdcard path for each image
                 String filename = jFiles.getString(i);
                 String directory = FileUtil.getStorageDirectory(ConstantUtil.SURVEYAL_DIR,
-                        filename, props.getBoolean(ConstantUtil.USE_INTERNAL_STORAGE));
+                        filename, false);
                 files.add(directory + "/" + filename);
             }
         }
         return files;
     }
-    
+
     /**
-     * Retry to upload images that didn't make it to the server in previous attempts.
-     * This retroactive way of sending files, will ensure files can reach the datastore,
-     * without requiring user interaction.
+     * Retry to upload images that didn't make it to the server in previous
+     * attempts. This retroactive way of sending files, will ensure files can
+     * reach the datastore, without requiring user interaction.
      */
     private void retryUnsentFiles() {
         for (FileTransmission file : databaseAdaptor.listFailedTransmissions()) {
             final String filename = file.getFileName();
-            // Skip zip files. TODO: This could potentially be used for zip files as well
+            // Skip zip files. TODO: This could potentially be used for zip
+            // files as well
             if (!filename.endsWith(".zip")) {
                 uploadImage(filename, true);
             }

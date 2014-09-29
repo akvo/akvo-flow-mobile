@@ -115,8 +115,8 @@ public class S3Api {
             out.flush();
 
             int status = conn.getResponseCode();
-            if (status >= 400) {
-                Log.e(TAG, "Status Code: " + status + ". Expected: 2XX");
+            if (status != 200 && status != 201) {
+                Log.e(TAG, "Status Code: " + status + ". Expected: 200");
                 return false;
             }
             return true;

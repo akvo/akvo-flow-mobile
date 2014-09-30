@@ -85,10 +85,12 @@ public class S3Api {
 
     public boolean put(String objectKey, File file, String type, boolean isPublic) throws IOException {
         // Get date and signature
-        final String md5 = Base64.encodeToString(FileUtil.getMD5Checksum(file), Base64.NO_WRAP);
+        final byte[] rawMd5 = FileUtil.getMD5Checksum(file);
+        final String md5Base64 = Base64.encodeToString(rawMd5, Base64.NO_WRAP);
+        final String md5Hex = FileUtil.hexMd5(rawMd5);
         final String date = getDate();
         String payloadStr = isPublic ? PAYLOAD_PUT_PUBLIC : PAYLOAD_PUT_PRIVATE;
-        final String payload = String.format(payloadStr, md5, type, date, mBucket, objectKey);
+        final String payload = String.format(payloadStr, md5Base64, type, date, mBucket, objectKey);
         final String signature = getSignature(payload);
         final URL url = new URL(String.format(URL, mBucket, objectKey));
 
@@ -99,7 +101,7 @@ public class S3Api {
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("PUT");
-            conn.setRequestProperty("Content-MD5", md5);
+            conn.setRequestProperty("Content-MD5", md5Base64);
             conn.setRequestProperty("Content-Type", type);
             conn.setRequestProperty("Date", date);
             if (isPublic) {
@@ -115,10 +117,18 @@ public class S3Api {
             out.flush();
 
             int status = conn.getResponseCode();
-            if (status >= 400) {
-                Log.e(TAG, "Status Code: " + status + ". Expected: 2XX");
+            if (status != 200 && status != 201) {
+                Log.e(TAG, "Status Code: " + status + ". Expected: 200 or 201");
                 return false;
             }
+            String etag = conn.getHeaderField("ETag");
+            etag = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+            if (!md5Hex.equals(etag)) {
+                Log.e(TAG, "ETag comparison failed. Response ETag: " + etag +
+                        "Locally computed MD5: " + md5Hex);
+                return false;
+            }
+            Log.d(TAG, "File successfully uploaded: " + file.getName());
             return true;
         } finally {
             if (conn != null) {

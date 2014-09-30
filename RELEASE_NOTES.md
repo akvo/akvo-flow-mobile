@@ -1,6 +1,12 @@
 Akvo FLOW app 
 Last update 30 September 2014
 
+#ver 2.0.3.2
+
+Features / Bugfixes
+-------------------
+* #175 - Check file existence before sync (Fixes NPE)
+
 #ver 2.0.3.1
 
 Features / Bugfixes

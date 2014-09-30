@@ -458,6 +458,11 @@ public class DataSyncService extends IntentService {
 
     private boolean sendFile(String fileAbsolutePath, String dir, String contentType,
             boolean isPublic, int retries) {
+        final File file = new File(fileAbsolutePath);
+        if (!file.exists()) {
+            return false;
+        }
+
         boolean ok = false;
         try {
             String fileName = fileAbsolutePath;
@@ -467,7 +472,7 @@ public class DataSyncService extends IntentService {
 
             final String objectKey = dir + fileName;
             S3Api s3Api = new S3Api(this);
-            ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType, isPublic);
+            ok = s3Api.put(objectKey, file, contentType, isPublic);
             if (!ok && retries > 0) {
                 // If we have not expired all the retry attempts, try again.
                 ok = sendFile(fileAbsolutePath, dir, contentType, isPublic, --retries);

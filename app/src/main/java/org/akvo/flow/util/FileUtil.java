@@ -271,8 +271,7 @@ public class FileUtil {
         return null;
     }
 
-    public static String hexMd5(File file) {
-        byte[] rawHash = getMD5Checksum(file);
+    public static String hexMd5(byte[] rawHash) {
         if (rawHash != null) {
             StringBuilder builder = new StringBuilder();
             for (byte b : rawHash) {
@@ -281,6 +280,10 @@ public class FileUtil {
             return builder.toString();
         }
         return null;
+    }
+
+    public static String hexMd5(File file) {
+        return hexMd5(getMD5Checksum(file));
     }
 
     /**

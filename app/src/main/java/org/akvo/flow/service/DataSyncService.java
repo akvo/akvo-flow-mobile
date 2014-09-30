@@ -504,18 +504,13 @@ public class DataSyncService extends IntentService {
             String response = getDeviceNotification(serverBase);
             if (!TextUtils.isEmpty(response)) {
                 JSONObject jResponse = new JSONObject(response);
-                JSONArray jMissingFiles = jResponse.optJSONArray("missingFiles");
-                JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
+                List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
+                files.addAll(parseFiles(jResponse.optJSONArray("missingUnknown")));
 
-                // Mark the status of the files as 'Failed'
-                for (String filename : parseFiles(jMissingFiles)) {
-                    setFileTransmissionFailed(filename);
-                }
-
-                // Handle unknown files. If an unknown file exists in the filesystem
+                // Handle missing files. If an unknown file exists in the filesystem
                 // it will be marked as failed in the transmission history, so it can
                 // be handled and retried in the next sync attempt.
-                for (String filename : parseFiles(jMissingUnknown)) {
+                for (String filename : files) {
                     if (new File(filename).exists()) {
                         setFileTransmissionFailed(filename);
                     }

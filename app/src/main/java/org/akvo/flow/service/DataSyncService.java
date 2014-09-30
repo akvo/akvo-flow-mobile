@@ -418,6 +418,10 @@ public class DataSyncService extends IntentService {
     }
 
     private boolean syncFile(String filename, int status, String serverBase) {
+        if (TextUtils.isEmpty(filename)) {
+            return false;
+        }
+
         String contentType, dir, action;
         boolean isPublic;
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {

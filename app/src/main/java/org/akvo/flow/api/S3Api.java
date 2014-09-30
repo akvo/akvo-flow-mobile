@@ -118,7 +118,7 @@ public class S3Api {
 
             int status = conn.getResponseCode();
             if (status != 200 && status != 201) {
-                Log.e(TAG, "Status Code: " + status + ". Expected: 200");
+                Log.e(TAG, "Status Code: " + status + ". Expected: 200 or 201");
                 return false;
             }
             String etag = conn.getHeaderField("ETag");

@@ -1,5 +1,11 @@
 Akvo FLOW app 
-Last update 25 September 2014
+Last update 30 September 2014
+
+#ver 2.0.3.1
+
+Features / Bugfixes
+-------------------
+* #173 - Make S3 communication stricter (Hotfix)
 
 #ver 2.0.3
 

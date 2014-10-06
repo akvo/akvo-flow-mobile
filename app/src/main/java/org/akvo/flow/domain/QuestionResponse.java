@@ -16,8 +16,6 @@
 
 package org.akvo.flow.domain;
 
-import java.util.StringTokenizer;
-
 import org.akvo.flow.util.ConstantUtil;
 
 public class QuestionResponse {
@@ -83,15 +81,13 @@ public class QuestionResponse {
             if (value == null || value.trim().length() == 0) {
                 return false;
             }
-            // now check that, if it's a geo question, we have something
-            // specified
+            // now check that, if it's a geo question, we have something specified
             if (ConstantUtil.GEO_RESPONSE_TYPE.equals(type)) {
-                // at this point, we know value isn't null
-                StringTokenizer strTok = new StringTokenizer(value, "|");
-                if (strTok.countTokens() >= 2) {
+                String[] tokens = value.split("\\|", -1);
+                if (tokens.length >= 2) {
                     // at least the first 2 tokens must be numeric
                     for (int i = 0; i < 2; i++) {
-                        String token = strTok.nextToken();
+                        String token = tokens[i];
                         try {
                             if (token.trim().length() > 0) {
                                 Double.parseDouble(token);

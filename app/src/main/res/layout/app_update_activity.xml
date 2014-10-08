@@ -36,10 +36,16 @@
             android:layout_marginBottom="8dp"/>
 
         <Button
-            android:id="@+id/cancel_btn"
+            android:id="@+id/install_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/download_and_install"/>
+
+        <Button
+            android:id="@+id/cancel_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cancelbutton"/>
 
     </LinearLayout>
 </LinearLayout>

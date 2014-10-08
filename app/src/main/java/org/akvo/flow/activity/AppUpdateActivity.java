@@ -45,7 +45,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-public class AppUpdateActivity extends Activity implements View.OnClickListener {
+public class AppUpdateActivity extends Activity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
 
@@ -53,7 +53,7 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS = 100;
 
-    private Button mButton;
+    private Button mInstallBtn;
     private ProgressBar mProgress;
     private UpdateAsyncTask mTask;
 
@@ -69,32 +69,41 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
         mVersion = getIntent().getStringExtra(EXTRA_VERSION);
 
         mProgress = (ProgressBar)findViewById(R.id.progress);
-        mButton = (Button)findViewById(R.id.cancel_btn);
-
         mProgress.setMax(MAX_PROGRESS);// Values will be in percentage
-        mButton.setOnClickListener(this);
+
+        mInstallBtn = (Button)findViewById(R.id.install_btn);
+        mInstallBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mInstallBtn.setEnabled(false);
+                mTask = new UpdateAsyncTask();
+                mTask.execute();
+            }
+        });
+
+        Button cancelBtn = (Button)findViewById(R.id.cancel_btn);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancel();
+            }
+        });
+
     }
 
-    @Override
-    public void onClick(View v) {
-        if (!isRunning()) {
-            mButton.setText(R.string.cancelbutton);
-            mTask = new UpdateAsyncTask();
-            mTask.execute();
-        } else {
-            // Stop the update process
-            mButton.setText(R.string.download_and_install);
-            mTask.cancel(true);
-            finish();
+    private void cancel() {
+        if (isRunning()) {
+            mTask.cancel(true);// Stop the update process
         }
+        finish();
     }
 
     @Override
-    public void onBackPressed() {
+    public void onDestroy() {
         if (isRunning()) {
             mTask.cancel(true);
         }
-        super.onBackPressed();
+        super.onDestroy();
     }
 
     private boolean isRunning() {
@@ -137,7 +146,8 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
         protected void onPostExecute(String filename) {
             if (TextUtils.isEmpty(filename)) {
                 Toast.makeText(AppUpdateActivity.this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
-                mButton.setText(R.string.retry);
+                mInstallBtn.setText(R.string.retry);
+                mInstallBtn.setEnabled(true);
                 return;
             }
 
@@ -243,12 +253,8 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
                 if (conn != null) {
                     conn.disconnect();
                 }
-                try {
-                    out.close();
-                } catch (Exception ignored) {}
-                try {
-                    in.close();
-                } catch (Exception ignored) {}
+                FileUtil.close(in);
+                FileUtil.close(out);
             }
 
             return ok;

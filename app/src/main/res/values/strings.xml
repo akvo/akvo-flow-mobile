@@ -134,8 +134,9 @@
     <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
     <!-- Data sync -->
     <string name="data_sync_title">Data Synchronization</string>
-    <string name="data_sync_all">Synced Files: %1$d - Failed: %2$d</string>
-    <string name="data_sync_synced">Synced Files: %1$d</string>
+    <string name="data_sync_text">Uploading data. Please, wait...</string>
+    <string name="data_sync_all">Synced Forms: %1$d - Failed: %2$d</string>
+    <string name="data_sync_synced">Synced Forms: %1$d</string>
     <!-- Localization -->
     <string name="app_language">App Language</string>
     <string name="please_restart">Please, restart the app</string>

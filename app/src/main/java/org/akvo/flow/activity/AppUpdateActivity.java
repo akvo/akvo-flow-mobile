@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -48,6 +49,7 @@ import java.util.Map;
 public class AppUpdateActivity extends Activity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
+    public static final String EXTRA_CHECKSUM = "md5Checksum";
 
     private static final String TAG = AppUpdateActivity.class.getSimpleName();
     private static final int IO_BUFFER_SIZE = 8192;
@@ -57,7 +59,7 @@ public class AppUpdateActivity extends Activity {
     private ProgressBar mProgress;
     private UpdateAsyncTask mTask;
 
-    String mUrl, mVersion;
+    String mUrl, mVersion, mMd5Checksum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,19 +69,33 @@ public class AppUpdateActivity extends Activity {
 
         mUrl = getIntent().getStringExtra(EXTRA_URL);
         mVersion = getIntent().getStringExtra(EXTRA_VERSION);
+        mMd5Checksum = getIntent().getStringExtra(EXTRA_CHECKSUM);
 
+        mInstallBtn = (Button)findViewById(R.id.install_btn);
         mProgress = (ProgressBar)findViewById(R.id.progress);
         mProgress.setMax(MAX_PROGRESS);// Values will be in percentage
 
-        mInstallBtn = (Button)findViewById(R.id.install_btn);
-        mInstallBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mInstallBtn.setEnabled(false);
-                mTask = new UpdateAsyncTask();
-                mTask.execute();
-            }
-        });
+        // If the file is already downloaded, just prompt the install text
+        final String filename = checkLocalFile();
+        if (filename != null) {
+            TextView updateTV = (TextView)findViewById(R.id.update_text);
+            updateTV.setText(R.string.clicktoinstall);
+            mInstallBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
+                }
+            });
+        } else {
+            mInstallBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mInstallBtn.setEnabled(false);
+                    mTask = new UpdateAsyncTask();
+                    mTask.execute();
+                }
+            });
+        }
 
         Button cancelBtn = (Button)findViewById(R.id.cancel_btn);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +104,29 @@ public class AppUpdateActivity extends Activity {
                 cancel();
             }
         });
+    }
 
+    /**
+     * Check out previously downloaded files. If the APK update is already downloaded,
+     * and the MD5 checksum matches, the file is considered downloaded.
+     *
+     * @return filename of the already downloaded file, if exists. Null otherwise
+     */
+    private String checkLocalFile() {
+        final String latestVersion = FileUtil.checkDownloadedVersions(this);
+        if (latestVersion != null) {
+            if (mMd5Checksum != null) {
+                // The file was found, but we need to ensure the checksum matches,
+                // to ensure the download succeeded
+                File file = new File(latestVersion);
+                if (!mMd5Checksum.equals(FileUtil.hexMd5(file))) {
+                    file.delete();// Wipe corrupted files
+                    return null;
+                }
+            }
+            return latestVersion;
+        }
+        return null;
     }
 
     private void cancel() {

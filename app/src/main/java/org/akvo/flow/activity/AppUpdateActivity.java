@@ -274,7 +274,7 @@ public class AppUpdateActivity extends Activity {
                     }
 
                     if (mMd5Checksum == null) {
-                        // If we already have a checksum, use it for the comparison
+                        // If we don't have a checksum yet, try to get it form the ETag header
                         String etag = conn.getHeaderField("ETag");
                         mMd5Checksum = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
                     }

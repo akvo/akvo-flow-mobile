@@ -43,8 +43,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 public class AppUpdateActivity extends Activity {
     public static final String EXTRA_URL = "url";
@@ -270,17 +268,18 @@ public class AppUpdateActivity extends Activity {
                 final int status = conn.getResponseCode();
 
                 if (status == HttpStatus.SC_OK) {
-                    Map<String, List<String>> headers = conn.getHeaderFields();
-                    String etag = headers != null ? getHeader(headers, "ETag") : null;
-                    etag = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
                     final String checksum = FileUtil.hexMd5(new File(localPath));
-
-                    if (etag != null && etag.equals(checksum)) {
-                        ok = true;
-                    } else {
-                        Log.e(TAG, "ETag comparison failed. Remote: " + etag + " Local: " + checksum);
-                        ok = false;
+                    if (TextUtils.isEmpty(checksum)) {
+                        throw new IOException("Downloaded file is not available");
                     }
+
+                    if (mMd5Checksum == null) {
+                        // If we already have a checksum, use it for the comparison
+                        String etag = conn.getHeaderField("ETag");
+                        mMd5Checksum = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+                    }
+                    // Compare the MD5, if found. Otherwise, rely on the 200 status code
+                    ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);
                 } else {
                     Log.e(TAG, "Wrong status code: " + status);
                     ok = false;
@@ -296,20 +295,6 @@ public class AppUpdateActivity extends Activity {
             }
 
             return ok;
-        }
-
-        /**
-         * Helper function to get a particular header field from the header map
-         * @param headers
-         * @param key
-         * @return header value, if found, false otherwise.
-         */
-        private String getHeader(Map<String, List<String>> headers, String key) {
-            List<String> values = headers.get(key);
-            if (values != null && values.size() > 0) {
-                return values.get(0);
-            }
-            return null;
         }
     }
 }

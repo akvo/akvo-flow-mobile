@@ -38,7 +38,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.text.DecimalFormat;
-import java.util.StringTokenizer;
 
 /**
  * Question that can handle geographic location input. This question can also
@@ -183,13 +182,13 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
         if (resp != null && resp.getValue() != null) {
-            StringTokenizer strTok = new StringTokenizer(resp.getValue(), DELIM);
-            if (strTok.countTokens() >= 3) {
-                mLatField.setText(strTok.nextToken());
-                mLonField.setText(strTok.nextToken());
-                mElevationField.setText(strTok.nextToken());
-                if (strTok.hasMoreTokens()) {
-                    mCode = strTok.nextToken();
+            String[] tokens = resp.getValue().split("\\|", -1);
+            if (tokens.length > 2) {
+                mLatField.setText(tokens[0]);
+                mLonField.setText(tokens[1]);
+                mElevationField.setText(tokens[2]);
+                if (tokens.length > 3) {
+                    mCode = tokens[3];
                 }
             }
         }

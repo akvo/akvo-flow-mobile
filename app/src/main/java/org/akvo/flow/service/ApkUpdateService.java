@@ -73,10 +73,14 @@ public class ApkUpdateService extends IntentService {
                     if (PlatformUtil.isNewerVersion(PlatformUtil.getVersionName(this), ver)
                             && !TextUtils.isEmpty(location)) {
                         // There is a newer version. Fire the 'Download and Install' Activity.
+                        String md5Checksum = json.optString("md5Checksum", null);
                         Intent i = new Intent(this, AppUpdateActivity.class);
                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         i.putExtra(AppUpdateActivity.EXTRA_URL, location);
                         i.putExtra(AppUpdateActivity.EXTRA_VERSION, ver);
+                        if (!TextUtils.isEmpty(md5Checksum) && !md5Checksum.equalsIgnoreCase("null")) {
+                            i.putExtra(AppUpdateActivity.EXTRA_CHECKSUM, md5Checksum);
+                        }
                         startActivity(i);
                     }
                 }

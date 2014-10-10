@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -42,22 +43,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
-public class AppUpdateActivity extends Activity implements View.OnClickListener {
+public class AppUpdateActivity extends Activity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
+    public static final String EXTRA_CHECKSUM = "md5Checksum";
 
     private static final String TAG = AppUpdateActivity.class.getSimpleName();
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS = 100;
 
-    private Button mButton;
+    private Button mInstallBtn;
     private ProgressBar mProgress;
     private UpdateAsyncTask mTask;
 
-    String mUrl, mVersion;
+    String mUrl, mVersion, mMd5Checksum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,34 +67,79 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
 
         mUrl = getIntent().getStringExtra(EXTRA_URL);
         mVersion = getIntent().getStringExtra(EXTRA_VERSION);
+        mMd5Checksum = getIntent().getStringExtra(EXTRA_CHECKSUM);
 
+        mInstallBtn = (Button)findViewById(R.id.install_btn);
         mProgress = (ProgressBar)findViewById(R.id.progress);
-        mButton = (Button)findViewById(R.id.cancel_btn);
-
         mProgress.setMax(MAX_PROGRESS);// Values will be in percentage
-        mButton.setOnClickListener(this);
-    }
 
-    @Override
-    public void onClick(View v) {
-        if (!isRunning()) {
-            mButton.setText(R.string.cancelbutton);
-            mTask = new UpdateAsyncTask();
-            mTask.execute();
+        // If the file is already downloaded, just prompt the install text
+        final String filename = checkLocalFile();
+        if (filename != null) {
+            TextView updateTV = (TextView)findViewById(R.id.update_text);
+            updateTV.setText(R.string.clicktoinstall);
+            mInstallBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
+                }
+            });
         } else {
-            // Stop the update process
-            mButton.setText(R.string.download_and_install);
-            mTask.cancel(true);
-            finish();
+            mInstallBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mInstallBtn.setEnabled(false);
+                    mTask = new UpdateAsyncTask();
+                    mTask.execute();
+                }
+            });
         }
+
+        Button cancelBtn = (Button)findViewById(R.id.cancel_btn);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancel();
+            }
+        });
+    }
+
+    /**
+     * Check out previously downloaded files. If the APK update is already downloaded,
+     * and the MD5 checksum matches, the file is considered downloaded.
+     *
+     * @return filename of the already downloaded file, if exists. Null otherwise
+     */
+    private String checkLocalFile() {
+        final String latestVersion = FileUtil.checkDownloadedVersions(this);
+        if (latestVersion != null) {
+            if (mMd5Checksum != null) {
+                // The file was found, but we need to ensure the checksum matches,
+                // to ensure the download succeeded
+                File file = new File(latestVersion);
+                if (!mMd5Checksum.equals(FileUtil.hexMd5(file))) {
+                    file.delete();// Wipe corrupted files
+                    return null;
+                }
+            }
+            return latestVersion;
+        }
+        return null;
+    }
+
+    private void cancel() {
+        if (isRunning()) {
+            mTask.cancel(true);// Stop the update process
+        }
+        finish();
     }
 
     @Override
-    public void onBackPressed() {
+    public void onDestroy() {
         if (isRunning()) {
             mTask.cancel(true);
         }
-        super.onBackPressed();
+        super.onDestroy();
     }
 
     private boolean isRunning() {
@@ -137,7 +182,8 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
         protected void onPostExecute(String filename) {
             if (TextUtils.isEmpty(filename)) {
                 Toast.makeText(AppUpdateActivity.this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
-                mButton.setText(R.string.retry);
+                mInstallBtn.setText(R.string.retry);
+                mInstallBtn.setEnabled(true);
                 return;
             }
 
@@ -222,17 +268,18 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
                 final int status = conn.getResponseCode();
 
                 if (status == HttpStatus.SC_OK) {
-                    Map<String, List<String>> headers = conn.getHeaderFields();
-                    String etag = headers != null ? getHeader(headers, "ETag") : null;
-                    etag = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
                     final String checksum = FileUtil.hexMd5(new File(localPath));
-
-                    if (etag != null && etag.equals(checksum)) {
-                        ok = true;
-                    } else {
-                        Log.e(TAG, "ETag comparison failed. Remote: " + etag + " Local: " + checksum);
-                        ok = false;
+                    if (TextUtils.isEmpty(checksum)) {
+                        throw new IOException("Downloaded file is not available");
                     }
+
+                    if (mMd5Checksum == null) {
+                        // If we don't have a checksum yet, try to get it form the ETag header
+                        String etag = conn.getHeaderField("ETag");
+                        mMd5Checksum = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+                    }
+                    // Compare the MD5, if found. Otherwise, rely on the 200 status code
+                    ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);
                 } else {
                     Log.e(TAG, "Wrong status code: " + status);
                     ok = false;
@@ -243,29 +290,11 @@ public class AppUpdateActivity extends Activity implements View.OnClickListener 
                 if (conn != null) {
                     conn.disconnect();
                 }
-                try {
-                    out.close();
-                } catch (Exception ignored) {}
-                try {
-                    in.close();
-                } catch (Exception ignored) {}
+                FileUtil.close(in);
+                FileUtil.close(out);
             }
 
             return ok;
-        }
-
-        /**
-         * Helper function to get a particular header field from the header map
-         * @param headers
-         * @param key
-         * @return header value, if found, false otherwise.
-         */
-        private String getHeader(Map<String, List<String>> headers, String key) {
-            List<String> values = headers.get(key);
-            if (values != null && values.size() > 0) {
-                return values.get(0);
-            }
-            return null;
         }
     }
 }

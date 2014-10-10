@@ -185,10 +185,11 @@
     <string name="status_exported">Exported</string>
     <!-- APK update -->
     <string name="app_update_activity">Akvo FLOW Update</string>
-    <string name="app_update">A new version of the Akvo FLOW app is available. Click \'Download &amp; Install\' to start the update.</string>
-    <string name="download_and_install">Download &amp; Install</string>
+    <string name="app_update">A new version of the FLOW app is available. Click \'Update\' to download and install the new version.</string>
+    <string name="update">Update</string>
+    <string name="not_now">Not now</string>
     <string name="updatedownloaded">FLOW update has been downloaded</string>
-    <string name="clicktoinstall">New version is downloaded. Click here to install it</string>
+    <string name="clicktoinstall">New FLOW version is downloaded. Do you want to install it now?</string>
     <string name="apk_upgrade_error">Error downloading FLOW update.</string>
     <!-- Misc -->
     <string name="okbutton">OK</string>

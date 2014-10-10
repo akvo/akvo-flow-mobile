@@ -76,6 +76,7 @@
             android:name=".activity.AppUpdateActivity"
             android:label="@string/app_update_activity"
             android:theme="@style/Flow.Dialog"
+            android:launchMode="singleTop"
             android:configChanges="locale|layoutDirection" >
         </activity>
 

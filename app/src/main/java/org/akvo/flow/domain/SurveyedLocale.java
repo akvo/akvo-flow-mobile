@@ -19,12 +19,15 @@ package org.akvo.flow.domain;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 import org.akvo.flow.R;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class SurveyedLocale implements Serializable {
+public class SurveyedLocale implements Serializable, ClusterItem {
     /**
      * 
      */
@@ -37,6 +40,7 @@ public class SurveyedLocale implements Serializable {
     private Double mLatitude;
     private Double mLongitude;
     private List<SurveyInstance> mSurveyInstances = null;
+    private LatLng mLatLng;// FIXME: Just use this var
 
     public SurveyedLocale(String id, String name, long lastModified, long surveyGroupId,
             Double latitude, Double longitude) {
@@ -46,6 +50,14 @@ public class SurveyedLocale implements Serializable {
         mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
+        if (latitude != null && longitude != null) {
+            mLatLng = new LatLng(latitude, longitude);
+        }
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return mLatLng;
     }
 
     public long getSurveyGroupId() {

@@ -19,6 +19,7 @@ package org.akvo.flow.activity;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -64,9 +65,11 @@ public class UserEditActivity extends Activity {
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                saveState();
-                setResult(RESULT_OK);
-                finish();
+                if (validate()) {
+                    saveState();
+                    setResult(RESULT_OK);
+                    finish();
+                }
             }
         });
     }
@@ -119,6 +122,20 @@ public class UserEditActivity extends Activity {
         String name = StringUtil.ControlCommaToSPace(displayName.getText().toString()).trim();
         String email = StringUtil.ControlCommaToSPace(emailAddr.getText().toString()).trim();
         databaseAdaptor.createOrUpdateUser(userId, name, email);
+    }
+
+    /**
+     * Check values and set up any error state accordingly
+     * @return true if no error is found, false otherwise
+     */
+    private boolean validate() {
+        // Validate username. Password can be empty
+        String name = StringUtil.ControlCommaToSPace(displayName.getText().toString()).trim();
+        if (TextUtils.isEmpty(name)) {
+            displayName.setError(getString(R.string.error_value_required));
+            return false;
+        }
+        return true;
     }
 
 }

@@ -581,6 +581,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 response.setRespondentId(mSurveyInstanceId);
                 mDatabase.createOrUpdateSurveyResponse(response);
             } else {
+                event.getSource().setResponse(null, true);// Invalidate previous response
                 mQuestionResponses.remove(questionId);
                 mDatabase.deleteResponse(mSurveyInstanceId, questionId);
             }

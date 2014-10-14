@@ -250,7 +250,7 @@ public class DataSyncService extends Service {
     private void sendData(ZipFileData zipFileData, String fileName, String destName,
             String serverBase, int uploadIndex) {
         databaseAdaptor.updateTransmissionHistory(fileName, ConstantUtil.IN_PROGRESS_STATUS);
-        boolean ok = sendFile(fileName, ConstantUtil.S3_DATA_DIR, DATA_CONTENT_TYPE, false, 
+        boolean ok = sendFile(fileName, ConstantUtil.S3_DATA_DIR, DATA_CONTENT_TYPE, false,
                 FILE_UPLOAD_RETRIES);
         if (ok) {
             // Notify GAE back-end that data is available
@@ -284,7 +284,7 @@ public class DataSyncService extends Service {
         // 'image/jpeg' mime type, unless it contains the 'mp4' suffix.
         String contentType = image.endsWith(ConstantUtil.VIDEO_SUFFIX) ? VIDEO_CONTENT_TYPE
                 : IMAGE_CONTENT_TYPE;
-        boolean ok = sendFile(image, ConstantUtil.S3_IMAGE_DIR, contentType, true, 
+        boolean ok = sendFile(image, ConstantUtil.S3_IMAGE_DIR, contentType, true,
                 FILE_UPLOAD_RETRIES);
         if (ok && notifyServer) {
             // Notify GAE of the image being upload, before marking it as
@@ -713,6 +713,11 @@ public class DataSyncService extends Service {
 
     private boolean sendFile(String fileAbsolutePath, String dir, String contentType,
             boolean isPublic, int retries) {
+        final File file = new File(fileAbsolutePath);
+        if (!file.exists()) {
+            return false;
+        }
+        
         boolean ok = false;
         try {
             String fileName = fileAbsolutePath;
@@ -721,7 +726,7 @@ public class DataSyncService extends Service {
             }
             final String objectKey = dir + fileName;
             S3Util s3Api = new S3Util(this);
-            ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType, isPublic);
+            ok = s3Api.put(objectKey, file, contentType, isPublic);
             if (!ok && retries > 0) {
                 // If we have not expired all the retry attempts, try again.
                 ok = sendFile(fileAbsolutePath, dir, contentType, isPublic, --retries);
@@ -787,20 +792,13 @@ public class DataSyncService extends Service {
             String response = getDeviceNotification(serverBase);
             if (!TextUtils.isEmpty(response)) {
                 JSONObject jResponse = new JSONObject(response);
-                JSONArray jMissingFiles = jResponse.optJSONArray("missingFiles");
-                JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
+                List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
+                files.addAll(parseFiles(jResponse.optJSONArray("missingUnknown")));
 
-                // Mark the status of the files as 'Failed'
-                for (String filename : parseFiles(jMissingFiles)) {
-                    setFileTransmissionFailed(filename);
-                }
-
-                // Handle unknown files. If an unknown file exists in the
-                // filesystem
-                // it will be marked as failed in the transmission history, so
-                // it can
+                // Handle missing files. If an unknown file exists in the filesystem
+                // it will be marked as failed in the transmission history, so it can
                 // be handled and retried in the next sync attempt.
-                for (String filename : parseFiles(jMissingUnknown)) {
+                for (String filename : files) {
                     if (new File(filename).exists()) {
                         setFileTransmissionFailed(filename);
                     }

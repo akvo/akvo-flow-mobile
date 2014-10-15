@@ -112,7 +112,7 @@ public class S3Util {
             out.flush();
 
             int status = conn.getResponseCode();
-            if (status >= 400) {
+            if (status != 200 && status != 201) {
                 Log.e(TAG, "Status Code: " + status + ". Expected: 2XX");
                 return false;
             }

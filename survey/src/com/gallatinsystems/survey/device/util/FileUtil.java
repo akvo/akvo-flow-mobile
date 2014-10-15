@@ -395,17 +395,21 @@ public class FileUtil {
 
         return null;
     }
-
-    public static String hexMd5(File file) {
-        byte[] rawHash = getMD5Checksum(file);
-        if (rawHash != null) {
+    
+    public static String toHex(byte[] data) {
+        if (data != null) {
             StringBuilder builder = new StringBuilder();
-            for (byte b : rawHash) {
+            for (byte b : data) {
                 builder.append(String.format("%02x", b));
             }
             return builder.toString();
         }
         return null;
+    }
+
+    public static String hexMd5(File file) {
+        byte[] rawHash = getMD5Checksum(file);
+        return toHex(rawHash);
     }
 
     /**

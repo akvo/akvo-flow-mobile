@@ -17,7 +17,6 @@
   <string name="savebutton">Enregistrer</string>
   <string name="clearbutton">Effacer</string>
   <string name="submitbutton">Envoyer</string>
-  <string name="geodialog">Le GPS doit être activé. Sélectionner OK pour aller au menu des paramètres. Sélectionner utilisation des satellites GPS et ensuite pressez le bouton de retour. Une fois que le GPS est activé, vous pouvez appuyer à nouveau sur \"Prendre la géolocalisation\" pour avoir votre position.</string>
   <string name="userlabel">Gérer les utilisateurs</string>
   <string name="resize_large_images">Réduire les images trop lourdes</string>
   <string name="settingslabel">Paramètres</string>
@@ -41,7 +40,6 @@
   <string name="aboutlabel">A propos</string>
   <string name="aboutdesc">Information sur les versions.</string>
   <string name="abouttitle">A propos - Application Akvo FLOW</string>
-  <string name="abouttext">Application Akvo FLOW\nDéveloppé par: Akvo Foundation\nTous Droits réservés © 2010-2014 Stichting Akvo\nVersion</string>
   <string name="gpsstatuslabel">Etat du GPS</string>
   <string name="gpsstatusdesc">Démarre l\'application de GPS Status si elle est installée sur cet appareil.</string>
   <string name="nogpsstatus">GPS Status n\'est pas installé sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
@@ -133,8 +131,6 @@
   <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo FLOW</string>
   <!--Data sync-->
   <string name="data_sync_title">Synchronisation des données</string>
-  <string name="data_sync_all">Fichiers synchronisés: %1$d - Échec: %2$d</string>
-  <string name="data_sync_synced">Fichiers synchronisés: %1$d</string>
   <!--Localization-->
   <string name="app_language">Langue de l\'application</string>
   <string name="please_restart">Veuillez redémarrer l\'application</string>
@@ -182,10 +178,7 @@
   <string name="status_exported">Exporté</string>
   <!--APK update-->
   <string name="app_update_activity">Mise à jour de Akvo FLOW</string>
-  <string name="app_update">Une nouvelle version de Akvo FLOW est disponible. Cliquer sur Télécharger et Installer pour commencer la mise à jour.</string>
-  <string name="download_and_install">Télécharger et Installer</string>
   <string name="updatedownloaded">La mise à jour de FLOW a été téléchargé</string>
-  <string name="clicktoinstall">La nouvelle version est téléchargée. Cliquez ici pour l\'installer</string>
   <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de FLOW.</string>
   <!--Misc-->
   <string name="okbutton">OK</string>

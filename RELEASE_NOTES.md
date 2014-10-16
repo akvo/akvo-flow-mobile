@@ -1,5 +1,15 @@
 Akvo FLOW app 
-Last update 30 September 2014
+Last update 16 October 2014
+
+#ver 2.0.4
+
+Features / Bugfixes
+-------------------
+* #179 - Give user possibility to update later
+* #191 - Validate username
+* #187 - Response deletion bug
+* #182 - More intuitive feedback on sync
+* #181 - Fix geolocation question edge case bug
 
 #ver 2.0.3.2
 

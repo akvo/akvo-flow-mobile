@@ -54,6 +54,7 @@ public class Deploy {
     private static final int GAE_PASSWORD = 6;
 
     private static final String BUCKET_NAME = "akvoflow";
+    private static final String APP_CODE = "fieldSurvey";
 
     public static void main(String[] args) throws IOException {
         if (args.length != 7) {
@@ -135,7 +136,7 @@ public class Deploy {
             DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
             
             Entity e = new Entity("DeviceApplication");
-            e.setProperty("appCode", "fieldSurvey");
+            e.setProperty("appCode", APP_CODE);
             e.setProperty("deviceType", "androidPhone");
             e.setProperty("version", version);
             e.setProperty("fileName", url);

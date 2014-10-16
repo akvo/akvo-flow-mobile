@@ -17,14 +17,16 @@ set -e
 # The scripts reads the version number of the apk directly from the versionName 
 # property in AndroidManifest.xml
 
-[[ -n "${FLOW_DEPLOY_JAR}" ]] || { echo "FLOW_DEPLOY_JAR env var needs to be set"; exit 1; }
+# [[ -n "${FLOW_DEPLOY_JAR}" ]] || { echo "FLOW_DEPLOY_JAR env var needs to be set"; exit 1; }
 [[ -n "${FLOW_SERVER_CONFIG}" ]] || { echo "FLOW_SERVER_CONFIG env var needs to be set"; exit 1; }
 [[ -n "${FLOW_S3_ACCESS_KEY}" ]] || { echo "FLOW_S3_ACCESS_KEY env var needs to be set"; exit 1; }
 [[ -n "${FLOW_S3_SECRET_KEY}" ]] || { echo "FLOW_S3_SECRET_KEY env var needs to be set"; exit 1; }
 [[ -n "${FLOW_GAE_USERNAME}" ]] || { echo "FLOW_GAE_USERNAME env var needs to be set"; exit 1; }
 [[ -n "${FLOW_GAE_PASSWORD}" ]] || { echo "FLOW_GAE_PASSWORD env var needs to be set"; exit 1; }
 
-VERSION=$(sed -n '/android:versionName="/{;s///;s/".*$//;p;d;}' AndroidManifest.xml | tr -d ' ')
+FLOW_DEPLOY_JAR=../util/upload-apk/build/deploy.jar
+
+version=$(sed -n '/android:versionName="/{;s///;s/".*$//;p;d;}' AndroidManifest.xml | tr -d ' ')
 
 rm -rf tmp
 rm -rf builds
@@ -43,11 +45,12 @@ for i in $(cat tmp/instances.txt); do
     rm -rf gen
     echo '=================================================='
     if [[ -f $FLOW_SERVER_CONFIG/$i/survey.properties ]]; then
-        echo 'generating apk version' $VERSION 'for instance' $i
-        ant flow-release -Dsurvey.properties=$FLOW_SERVER_CONFIG/$i/survey.properties >> tmp/antout.txt
-        mkdir -p builds/$i/$VERSION
-        mv bin/fieldsurvey-$VERSION.apk builds/$i/$VERSION/
-        java -jar $FLOW_DEPLOY_JAR $FLOW_S3_ACCESS_KEY $FLOW_S3_SECRET_KEY $i builds/$i/$VERSION/fieldsurvey-$VERSION.apk $VERSION $FLOW_GAE_USERNAME $FLOW_GAE_PASSWORD
+        filename=builds/$i/$version/fieldsurvey-$version.apk
+        echo 'generating apk version' $version 'for instance' $i
+        ant flow-release -Dsurvey.properties=$FLOW_SERVER_CONFIG/$i/survey.properties
+        mkdir -p builds/$i/$version
+        mv bin/fieldsurvey-$version.apk $filename
+        java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$FLOW_GAE_USERNAME" "$FLOW_GAE_PASSWORD"
     else
         echo 'Cannot find survey.properties file for instance' $i
     fi

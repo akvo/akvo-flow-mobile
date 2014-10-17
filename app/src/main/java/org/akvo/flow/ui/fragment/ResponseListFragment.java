@@ -53,7 +53,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     private static int SURVEY_ID_KEY          = R.integer.surveyidkey;
     private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
-    private static int USER_ID_KEY            = R.integer.useridkey;
     private static int FINISHED_KEY           = R.integer.finishedkey;
 
     // Loader id
@@ -195,7 +194,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onListItemClick(list, view, position, id);
 
         Intent i = new Intent(view.getContext(), SurveyActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, (Long) view.getTag(USER_ID_KEY));
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, view.getTag(SURVEY_ID_KEY).toString());
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, (Long) view.getTag(SURVEY_INSTANCE_ID_KEY));
 

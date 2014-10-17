@@ -3,6 +3,7 @@ package org.akvo.flow.ui.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.dao.SurveyDbAdapter.Tables;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyColumns;
+import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.util.PlatformUtil;
@@ -21,7 +25,6 @@ import java.util.Date;
 public class ResponseListAdapter extends CursorAdapter {
     public static final int SURVEY_ID_KEY = R.integer.surveyidkey;
     public static final int RESP_ID_KEY = R.integer.respidkey;
-    public static final int USER_ID_KEY = R.integer.useridkey;
     public static final int FINISHED_KEY = R.integer.finishedkey;
     public static final int RECORD_KEY = R.integer.recordkey;
 
@@ -65,9 +68,14 @@ public class ResponseListAdapter extends CursorAdapter {
                 break;
         }
 
+        TextView userView = (TextView) view.findViewById(R.id.text2);
+        TextView dateView = (TextView) view.findViewById(R.id.text3);
+
+        String username = cursor.getString(cursor.getColumnIndexOrThrow(Tables.USER + "." + UserColumns.NAME));
+        userView.setText(!TextUtils.isEmpty(username) ? username : null);
+
         // Format the date string
         Date date = new Date(displayDate);
-        TextView dateView = (TextView) view.findViewById(R.id.text2);
         dateView.setText(statusText
                 + DateFormat.getLongDateFormat(context).format(date) + " "
                 + DateFormat.getTimeFormat(context).format(date));
@@ -77,8 +85,6 @@ public class ResponseListAdapter extends CursorAdapter {
                 .getColumnIndex(SurveyInstanceColumns.SURVEY_ID)));
         view.setTag(RESP_ID_KEY, cursor.getLong(cursor
                 .getColumnIndex(SurveyInstanceColumns._ID)));
-        view.setTag(USER_ID_KEY, cursor.getLong(cursor
-                .getColumnIndex(SurveyInstanceColumns.USER_ID)));
         view.setTag(RECORD_KEY, cursor.getString(cursor
                 .getColumnIndex(SurveyInstanceColumns.RECORD_ID)));
         view.setTag(FINISHED_KEY, finished);

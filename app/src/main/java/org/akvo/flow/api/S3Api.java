@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.crypto.Mac;
@@ -140,7 +141,7 @@ public class S3Api {
     }
 
     private String getDate() {
-        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ");
+        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ", Locale.ENGLISH);
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
         return df.format(new Date()) + "GMT";
     }

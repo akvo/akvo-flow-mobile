@@ -141,7 +141,7 @@ public class S3Api {
     }
 
     private String getDate() {
-        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ", Locale.ENGLISH);
+        final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
         return df.format(new Date()) + "GMT";
     }

@@ -51,15 +51,13 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
     private static final String EXTRA_RECORD       = "record";
 
+    // TODO: Move all id constants to ConstantUtil
     private static int SURVEY_ID_KEY          = R.integer.surveyidkey;
     private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
     private static int FINISHED_KEY           = R.integer.finishedkey;
 
-    // Loader id
-    private static final int ID_SURVEY_INSTANCE_LIST = 0;
-
     // Context menu items
-    private static final int DELETE_ONE = 0;// TODO: Should we allow this? - Record might be synced
+    private static final int DELETE_ONE = 0;
     private static final int VIEW_HISTORY = 1;
 
     private SurveyGroup mSurveyGroup;
@@ -106,7 +104,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     }
 
     private void refresh() {
-        getLoaderManager().restartLoader(ID_SURVEY_INSTANCE_LIST, null, ResponseListFragment.this);
+        getLoaderManager().restartLoader(0, null, ResponseListFragment.this);
     }
 
     @Override
@@ -212,20 +210,12 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case ID_SURVEY_INSTANCE_LIST:
-                return new SurveyInstanceLoader(getActivity(), mDatabase, mRecord.getId());
-        }
-        return null;
+        return new SurveyInstanceLoader(getActivity(), mDatabase, mRecord.getId());
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        switch (loader.getId()) {
-            case ID_SURVEY_INSTANCE_LIST:
-                mAdapter.changeCursor(cursor);
-                break;
-        }
+        mAdapter.changeCursor(cursor);
     }
 
     @Override

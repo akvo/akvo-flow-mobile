@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.Tables;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;

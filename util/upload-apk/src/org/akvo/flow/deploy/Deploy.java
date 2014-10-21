@@ -1,3 +1,4 @@
+
 package org.akvo.flow.deploy;
 
 /*
@@ -14,8 +15,13 @@ package org.akvo.flow.deploy;
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import com.amazonaws.AmazonClientException;
@@ -34,15 +40,11 @@ import com.google.appengine.tools.remoteapi.RemoteApiInstaller;
 import com.google.appengine.tools.remoteapi.RemoteApiOptions;
 
 /**
- * Uploads a single Akvo FLOW APK to s3. 
- * There are seven arguments: 
- * - accessKey - S3 access key
- * - secretKey - S3 secret key
- * - instanceId - name of the instance,
- * - apkPath - the local path to the APK file to be
- * - version - APK version name
- * - username - Google Account username
- * - password - Google Account password
+ * Uploads a single Akvo FLOW APK to s3. There are seven arguments: - accessKey
+ * - S3 access key - secretKey - S3 secret key - instanceId - name of the
+ * instance, - apkPath - the local path to the APK file to be - version - APK
+ * version name - username - Google Account username - password - Google Account
+ * password
  */
 public class Deploy {
     private static final int S3_ACCESS_KEY = 0;
@@ -74,26 +76,29 @@ public class Deploy {
         final String username = args[GAE_USERNAME];
         final String password = args[GAE_PASSWORD];
         final String version = args[VERSION];
-        
+
         final String s3Path = "apk/" + instance + "/" + file.getName();
-        final String s3Url = "http://akvoflow.s3.amazonaws.com/apk/" + instance + '/' + file.getName();
+        final String s3Url = "http://akvoflow.s3.amazonaws.com/apk/" + instance + '/'
+                + file.getName();
         final String host = instance + ".appspot.com";
-        
+
         try {
             uploadS3(accessKey, secretKey, s3Path, file);
-            updateVersion(host, username, password, s3Url, version);
+            updateVersion(host, username, password, s3Url, version, getMD5Checksum(file));
         } catch (AmazonServiceException ase) {
-            System.err.println("Caught an AmazonServiceException, which means your request made it "
-                    + "to Amazon S3, but was rejected with an error response for some reason.");
+            System.err
+                    .println("Caught an AmazonServiceException, which means your request made it "
+                            + "to Amazon S3, but was rejected with an error response for some reason.");
             System.err.println("Error Message:    " + ase.getMessage());
             System.err.println("HTTP Status Code: " + ase.getStatusCode());
             System.err.println("AWS Error Code:   " + ase.getErrorCode());
             System.err.println("Error Type:       " + ase.getErrorType());
             System.err.println("Request ID:       " + ase.getRequestId());
         } catch (AmazonClientException ace) {
-            System.err.println("Caught an AmazonClientException, which means the client encountered "
-                    + "a serious internal problem while trying to communicate with S3, "
-                    + "such as not being able to access the network.");
+            System.err
+                    .println("Caught an AmazonClientException, which means the client encountered "
+                            + "a serious internal problem while trying to communicate with S3, "
+                            + "such as not being able to access the network.");
             System.err.println("Error Message: " + ace.getMessage());
         } catch (IOException e) {
             System.err.println("Error updating APK version in GAE");
@@ -102,7 +107,7 @@ public class Deploy {
 
     }
 
-    private static void uploadS3(String accessKey, String secretKey, String s3Path, File file) 
+    private static void uploadS3(String accessKey, String secretKey, String s3Path, File file)
             throws AmazonServiceException, AmazonClientException {
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         AmazonS3 s3 = new AmazonS3Client(credentials);
@@ -125,21 +130,22 @@ public class Deploy {
         System.out.println("Apk uploaded successfully, with result ETag " + result.getETag());
     }
 
-    private static void updateVersion(String host, String username, String password, String url, 
-            String version) throws IOException {
+    private static void updateVersion(String host, String username, String password, String url,
+            String version, String md5) throws IOException {
         RemoteApiOptions options = new RemoteApiOptions().server(host, 443)
                 .credentials(username, password);
         RemoteApiInstaller installer = new RemoteApiInstaller();
         installer.install(options);
         try {
             DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-            
+
             Entity e = new Entity("DeviceApplication");
             e.setProperty("appCode", "flowapp");
             e.setProperty("deviceType", "androidPhone");
             e.setProperty("version", version);
             e.setProperty("fileName", url);
-            
+            e.setProperty("md5Checksum", md5);
+
             final Date date = new Date();// use the same timestampt
             e.setProperty("createdDateTime", date);
             e.setProperty("lastUpdateDateTime", date);
@@ -148,6 +154,36 @@ public class Deploy {
             installer.uninstall();
         }
         System.out.println("New APK version successfully stored in GAE");
+    }
+
+    private static String getMD5Checksum(File file) {
+        InputStream in = null;
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+            in = new BufferedInputStream(new FileInputStream(file));
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                md.update(buffer, 0, read);
+            }
+            byte[] rawHash = md.digest();
+            
+            StringBuilder builder = new StringBuilder();
+            for (byte b : rawHash) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                in.close();
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 
 }

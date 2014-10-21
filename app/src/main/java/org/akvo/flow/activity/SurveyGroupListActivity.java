@@ -28,7 +28,6 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBarActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -137,31 +136,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
             startService(new Intent(this, DataSyncService.class));
-            checkApkUpdates();
-        }
-    }
-
-    /**
-     * Check if new FLOW versions are available to installAppUpdate.
-     * First we check the local storage, to see if the version is already
-     * downloaded. If so, we display a dialog to request the user to installAppUpdate it.
-     * Otherwise, we trigger the ApkUpdateService to check for updates.
-     */
-    private void checkApkUpdates() {
-        final String latestVersion = FileUtil.checkDownloadedVersions(this);
-        if (latestVersion != null) {
-            // In your face!
-            ViewUtil.showConfirmDialog(R.string.updatedownloaded, R.string.clicktoinstall, this, true,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            PlatformUtil.installAppUpdate(SurveyGroupListActivity.this, latestVersion);
-                        }
-                    }
-            );
-        } else {
-            Intent apkUpdateIntent = new Intent(this, ApkUpdateService.class);
-            startService(apkUpdateIntent);
+            startService(new Intent(this, ApkUpdateService.class));
         }
     }
 
@@ -279,11 +254,8 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         public void bindView(View view, Context context, Cursor cursor) {
             final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
 
-            String name = !TextUtils.isEmpty(surveyGroup.getName()) ?
-                    surveyGroup.getName().toUpperCase() : null;
-            
             TextView text1 = (TextView)view.findViewById(R.id.text1);
-            text1.setText(name);
+            text1.setText(surveyGroup.getName());
             text1.setTextColor(getResources().getColorStateList(mTextColor));
 
             // Alternate background

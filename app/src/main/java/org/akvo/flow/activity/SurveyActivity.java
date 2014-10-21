@@ -241,17 +241,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
     private void saveState() {
         if (!mReadOnly) {
-            for (QuestionResponse response : mQuestionResponses.values()) {
-                // Store the response if it contains a value. Otherwise, delete it
-                if (response.hasValue()) {
-                    response.setRespondentId(mSurveyInstanceId);
-                    mDatabase.createOrUpdateSurveyResponse(response);
-                } else if (response.getId() != null && response.getId() > 0) {
-                    // if we don't have a value BUT there is an ID, we need to
-                    // remove it since the user blanked out their response
-                    mDatabase.deleteResponse(mSurveyInstanceId, response.getQuestionId());
-                }
-            }
             mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
             mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 
@@ -259,7 +248,6 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             if (mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
                 saveRecordMetaData();
             }
-
         }
     }
 
@@ -582,12 +570,17 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         } else if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
             String questionId = event.getSource().getQuestion().getId();
             QuestionResponse response = event.getSource().getResponse();
-            if (response != null) {
+
+            // Store the response if it contains a value. Otherwise, delete it
+            if (response != null && response.hasValue()) {
                 mQuestionResponses.put(questionId, response);
+                response.setRespondentId(mSurveyInstanceId);
+                mDatabase.createOrUpdateSurveyResponse(response);
             } else {
+                event.getSource().setResponse(null, true);// Invalidate previous response
                 mQuestionResponses.remove(questionId);
+                mDatabase.deleteResponse(mSurveyInstanceId, questionId);
             }
-            // TODO: Should we save this Response to the DB straightaway?
         } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
             mRequestQuestionId = event.getSource().getQuestion().getId();
             final Question q = event.getSource().getQuestion();

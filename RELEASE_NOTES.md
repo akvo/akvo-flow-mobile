@@ -1,9 +1,52 @@
 Akvo FLOW app 
-Last update 28 August 2014
+Last update 16 October 2014
+
+#ver 2.0.4
+
+Features / Bugfixes
+-------------------
+* #179 - Give user possibility to update later
+* #191 - Validate username
+* #187 - Response deletion bug
+* #182 - More intuitive feedback on sync
+* #181 - Fix geolocation question edge case bug
+
+#ver 2.0.3.2
+
+Features / Bugfixes
+-------------------
+* #175 - Check file existence before sync (Fixes NPE)
+
+#ver 2.0.3.1
+
+Features / Bugfixes
+-------------------
+* #173 - Make S3 communication stricter (Hotfix)
+
+#ver 2.0.3
+
+Features / Bugfixes
+-------------------
+* #167 - Empty forms cannot be submitted
+* #166 - Font colour blends with background
+* #160 - Revert all-caps policy in projects/survey titles
+
+#ver 2.0.2
+
+Features / Bugfixes
+-------------------
+* #160 - Display uppercase form titles
+* #157 - Automatically refresh Data point list
+* #155 - Enable double entry for number questions
+* #153 - Workflow simplification
+* #154 - Currently possible to submit multiple responses for non monitored surveys
+* #121 - Reading data from S3 buckets requires authentication
+
 
 #ver 2.0.1.1
 
 Features / Bugfixes
+-------------------
 * #151 - In-app locale change might end up in endless 'flickering'
 
 #ver 2.0.1

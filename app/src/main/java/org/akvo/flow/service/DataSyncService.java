@@ -389,23 +389,25 @@ public class DataSyncService extends IntentService {
         Set<Long> syncedSurveys = new HashSet<Long>();// Successful transmissions
         Set<Long> unsyncedSurveys = new HashSet<Long>();// Unsuccessful transmissions
 
-        int synced = 0, failed = 0, total = transmissions.size();
-        displaySyncNotification(synced, failed, total);
+        final int totalFiles = transmissions.size();
+        displayProgressNotification(0, totalFiles);
 
-        for (FileTransmission transmission : transmissions) {
+
+        for (int i = 0; i < totalFiles; i++) {
+            FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
             if (syncFile(transmission.getFileName(), transmission.getStatus(), serverBase)) {
                 syncedSurveys.add(surveyInstanceId);
-                synced++;
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
-                failed++;
             }
-            displaySyncNotification(synced, failed, total);
+            displayProgressNotification(i, totalFiles);// Progress is the % of files handled so far
         }
 
         // Retain successful survey instances, to mark them as SYNCED
         syncedSurveys.removeAll(unsyncedSurveys);
+
+        displaySyncedNotification(syncedSurveys.size(), unsyncedSurveys.size());
 
         for (long surveyInstanceId : syncedSurveys) {
             updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
@@ -418,6 +420,10 @@ public class DataSyncService extends IntentService {
     }
 
     private boolean syncFile(String filename, int status, String serverBase) {
+        if (TextUtils.isEmpty(filename)) {
+            return false;
+        }
+
         String contentType, dir, action;
         boolean isPublic;
         if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
@@ -458,6 +464,11 @@ public class DataSyncService extends IntentService {
 
     private boolean sendFile(String fileAbsolutePath, String dir, String contentType,
             boolean isPublic, int retries) {
+        final File file = new File(fileAbsolutePath);
+        if (!file.exists()) {
+            return false;
+        }
+
         boolean ok = false;
         try {
             String fileName = fileAbsolutePath;
@@ -467,7 +478,7 @@ public class DataSyncService extends IntentService {
 
             final String objectKey = dir + fileName;
             S3Api s3Api = new S3Api(this);
-            ok = s3Api.put(objectKey, new File(fileAbsolutePath), contentType, isPublic);
+            ok = s3Api.put(objectKey, file, contentType, isPublic);
             if (!ok && retries > 0) {
                 // If we have not expired all the retry attempts, try again.
                 ok = sendFile(fileAbsolutePath, dir, contentType, isPublic, --retries);
@@ -495,18 +506,13 @@ public class DataSyncService extends IntentService {
             String response = getDeviceNotification(serverBase);
             if (!TextUtils.isEmpty(response)) {
                 JSONObject jResponse = new JSONObject(response);
-                JSONArray jMissingFiles = jResponse.optJSONArray("missingFiles");
-                JSONArray jMissingUnknown = jResponse.optJSONArray("missingUnknown");
+                List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
+                files.addAll(parseFiles(jResponse.optJSONArray("missingUnknown")));
 
-                // Mark the status of the files as 'Failed'
-                for (String filename : parseFiles(jMissingFiles)) {
-                    setFileTransmissionFailed(filename);
-                }
-
-                // Handle unknown files. If an unknown file exists in the filesystem
+                // Handle missing files. If an unknown file exists in the filesystem
                 // it will be marked as failed in the transmission history, so it can
                 // be handled and retried in the next sync attempt.
-                for (String filename : parseFiles(jMissingUnknown)) {
+                for (String filename : files) {
                     if (new File(filename).exists()) {
                         setFileTransmissionFailed(filename);
                     }
@@ -622,31 +628,52 @@ public class DataSyncService extends IntentService {
         ViewUtil.fireNotification(text, filename, this, ConstantUtil.NOTIFICATION_DATA_SYNC, null);
     }
 
+
     /**
      * Display a notification showing the up-to-date status of the sync
-     * @param synced number of successful transmissions
-     * @param failed number of failed transmissions
+     * @param synced number of handled transmissions so far (either successful or not)
      * @param total number of transmissions in the batch
      */
-    private void displaySyncNotification(int synced, int failed, int total) {
-        final boolean finished = synced + failed == total;
-        int icon = finished ? android.R.drawable.stat_sys_upload_done
-                : android.R.drawable.stat_sys_upload;
-
-        // Do not show failed if there is none
-        String text = failed > 0 ? String.format(getString(R.string.data_sync_all), synced, failed)
-            : String.format(getString(R.string.data_sync_synced), synced);
-
+    private void displayProgressNotification(int synced, int total) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(icon)
+                .setSmallIcon(android.R.drawable.stat_sys_upload)
                 .setContentTitle(getString(R.string.data_sync_title))
-                .setContentText(text)
-                .setTicker(text);
-
-        builder.setOngoing(!finished);// Ongoing if still syncing data
+                .setContentText(getString(R.string.data_sync_text))
+                .setTicker(getString(R.string.data_sync_text))
+                .setOngoing(true);
 
         // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(total, synced + failed, false);
+        builder.setProgress(total, synced, false);
+
+        // Dummy intent. Do nothing when clicked
+        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        builder.setContentIntent(intent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
+    }
+
+    /**
+     * Display a notification showing the final status of the sync
+     * @param syncedForms number of successful transmissions
+     * @param failedForms number of failed transmissions
+     */
+    private void displaySyncedNotification(int syncedForms, int failedForms) {
+        // Do not show failed if there is none
+        String text = failedForms > 0 ? String.format(getString(R.string.data_sync_all),
+                syncedForms, failedForms)
+                : String.format(getString(R.string.data_sync_synced), syncedForms);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.stat_sys_upload_done)
+                .setContentTitle(getString(R.string.data_sync_title))
+                .setContentText(text)
+                .setTicker(text)
+                .setOngoing(false);
+
+        // Progress will only be displayed in Android versions > 4.0
+        builder.setProgress(1, 1, false);
 
         // Dummy intent. Do nothing when clicked
         PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);

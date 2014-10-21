@@ -159,7 +159,7 @@ public class SurveyDownloadService extends Service {
                             downloadHelp(survey);
                             updateCount++;
                         } catch (Exception e) {
-                            Log.e(TAG, "Error downloading survey: " + survey.getFileName(), e);
+                            Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
                             fireNotification(getString(R.string.cannotupdate), FAIL_ID);
                             PersistentUncaughtExceptionHandler
                                     .recordException(new TransferException(survey.getId(), null, e));

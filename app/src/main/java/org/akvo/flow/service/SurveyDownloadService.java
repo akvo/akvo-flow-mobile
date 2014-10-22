@@ -71,6 +71,8 @@ import org.akvo.flow.util.ViewUtil;
 public class SurveyDownloadService extends Service {
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
+    public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated
+
     private static final String DEFAULT_TYPE = "Survey";
     private static final int COMPLETE_ID = 2;
     private static final int FAIL_ID = 3;
@@ -98,8 +100,10 @@ public class SurveyDownloadService extends Service {
         thread = new Thread(new Runnable() {
             public void run() {
                 if (intent != null) {
-                    String surveyId = intent.getStringExtra(ConstantUtil.SURVEY_ID_KEY);
-                    checkAndDownload(surveyId);
+                    String[] surveyIds = intent.getStringArrayExtra(EXTRA_SURVEYS);
+
+                    //String surveyId = intent.getStringExtra(ConstantUtil.SURVEY_ID_KEY);
+                    checkAndDownload(surveyIds);
                     sendBroadcastNotification();
                 }
             }
@@ -117,12 +121,12 @@ public class SurveyDownloadService extends Service {
     }
 
     /**
-     * if no surveyId is passed in, this will check for new surveys and, if
-     * there are some new ones, downloads them to the DATA_DIR. If a surveyId is
-     * passed in, then that specific survey will be downloaded. If it's already
-     * on the device, the survey will be replaced with the new one.
+     * if no surveyIds are passed in, this will check for new surveys and, if
+     * there are some new ones, downloads them to the DATA_DIR. If surveyIds are
+     * passed in, then those specific surveys will be downloaded. If they're already
+     * on the device, the surveys will be replaced with the new ones.
      */
-    private void checkAndDownload(String surveyId) {
+    private void checkAndDownload(String[] surveyIds) {
         if (StatusUtil.hasDataConnection(this)) {
             try {
                 lock.acquire();
@@ -132,17 +136,14 @@ public class SurveyDownloadService extends Service {
                 // Load preferences
                 final String serverBase = StatusUtil.getServerBase(this);
                 final String deviceId = getDeviceId();
-                
+
                 List<Survey> surveys;
-                if (surveyId != null && surveyId.trim().length() > 0) {
-                    surveys = getSurveyHeader(serverBase, surveyId, deviceId);
-                    if (!surveys.isEmpty()) {
-                        // if we already have the survey, delete it first
-                        databaseAdaptor.deleteSurvey(surveyId.trim(), true);
-                    }
+                if (surveyIds != null) {
+                    surveys = getSurveyHeaders(serverBase, surveyIds, deviceId);
                 } else {
                     surveys = checkForSurveys(serverBase, deviceId);
                 }
+
                 if (!surveys.isEmpty()) {
                     // First, sync the SurveyGroups
                     syncSurveyGroups(surveys);
@@ -365,23 +366,30 @@ public class SurveyDownloadService extends Service {
     }
 
     /**
-     * invokes a service call to get the header information for a single survey
+     * invokes a service call to get the header information for multiple surveys
      * 
      * @param serverBase
      * @param surveyId
      * @return
      */
-    private List<Survey> getSurveyHeader(String serverBase, String surveyId, String deviceId)
+    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds, String deviceId)
             throws IOException {
+        final String deviceIdParam = deviceId != null ?
+                DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8")  : "";
+
         List<Survey> surveys = new ArrayList<Survey>();
-        String response = HttpUtil.httpGet(serverBase
-                + SURVEY_HEADER_SERVICE_PATH
-                + surveyId
-                + "&devicePhoneNumber="
-                + StatusUtil.getPhoneNumber(this)
-                + (deviceId != null ? (DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8")) : ""));
-        if (response != null) {
-            surveys = new SurveyMetaParser().parseList(response, true);
+        for (String id : surveyIds) {
+            try {
+                final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id
+                        + "&devicePhoneNumber=" + StatusUtil.getPhoneNumber(this) + deviceIdParam;
+                String response = HttpUtil.httpGet(url);
+                if (response != null) {
+                    surveys.addAll(new SurveyMetaParser().parseList(response, true));
+                }
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+                PersistentUncaughtExceptionHandler.recordException(e);
+            }
         }
         return surveys;
     }

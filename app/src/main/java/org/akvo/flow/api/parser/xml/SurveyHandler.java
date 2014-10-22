@@ -90,6 +90,8 @@ public class SurveyHandler extends DefaultHandler {
     private static final String SURVEY_GROUP_NAME = "surveyGroupName";
     private static final String REGISTRATION_SURVEY = "registrationSurvey";
 
+    private static final String USE_EXTERNAL_SOURCE = "allowExternalSources";
+
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
 
@@ -333,6 +335,12 @@ public class SurveyHandler extends DefaultHandler {
             }
             if (attributes.getValue(SOURCE_QUESTION_ID) != null) {
                 currentQuestion.setSourceQuestionId(attributes.getValue(SOURCE_QUESTION_ID));
+            }
+            if (attributes.getValue(USE_EXTERNAL_SOURCE) != null) {
+                currentQuestion.useExternalSource(Boolean.parseBoolean(attributes
+                        .getValue(USE_EXTERNAL_SOURCE)));
+            } else {
+                currentQuestion.useExternalSource(false);
             }
 
         } else if (localName.equalsIgnoreCase(OPTIONS)) {

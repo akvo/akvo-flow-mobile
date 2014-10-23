@@ -285,6 +285,11 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             return cluster.getSize();
         }
 
+        @Override
+        protected String getClusterText(int bucket) {
+            return String.valueOf(bucket);
+        }
+
     }
 
     private class DynamicallyAddMarkerTask extends AsyncTask<LatLngBounds, Void, Void> {

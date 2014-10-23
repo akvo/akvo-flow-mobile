@@ -131,7 +131,31 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         if (mMap == null) {
             return;
         }
-        new DynamicallyAddMarkerTask().execute(mMap.getProjection().getVisibleRegion().latLngBounds);
+        LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+        LatLng ne = bounds.northeast, sw = bounds.southwest;
+        double latDst = Math.abs(ne.latitude - sw.latitude);
+        double lonDst = Math.abs(ne.longitude - sw.longitude);
+
+        double neLat = ne.latitude + latDst / 2;
+        double neLon = ne.longitude + lonDst / 2;
+        double swLat = sw.latitude - latDst / 2;
+        double swLon = sw.longitude - lonDst / 2;
+
+        /*
+        LatLngBounds.Builder builder = LatLngBounds.builder();
+        builder.include(new LatLng(neLat, neLon));
+        builder.include(new LatLng(swLat, swLon));
+        builder.include(bounds.getCenter());
+        LatLngBounds newBounds = builder.build();
+        */
+        LatLngBounds newBounds = new LatLngBounds(
+                new LatLng(swLat, swLon),
+                new LatLng(neLat, neLon));
+
+        Log.i(TAG, "ne:"+ne.latitude+","+ne.longitude+", sw:"+sw.latitude+","+sw.longitude+"center:"+bounds.getCenter().toString()
+            +"ne':"+neLat+","+neLon+", sw':"+swLat+","+swLon+"center:"+newBounds.getCenter().toString());
+
+        new DynamicallyAddMarkerTask().execute(newBounds);
     }
 
     /**
@@ -298,7 +322,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         protected Void doInBackground(LatLngBounds... bounds) {
             mClusterManager.clearItems();
             for (SurveyedLocale item : mItems) {
-                if (bounds[0].contains(item.getPosition())) {
+                if (item.getPosition() != null && bounds[0].contains(item.getPosition())) {
                     mClusterManager.addItem(item);
                 }
             }

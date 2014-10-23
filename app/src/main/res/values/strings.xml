@@ -169,7 +169,7 @@
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>
     <!-- Record Activity -->
-    <string name="unknown">Unknown</string>
+    <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>
     <string name="last_response">Last Response:</string>
     <string name="choose_response">Choose Response</string>

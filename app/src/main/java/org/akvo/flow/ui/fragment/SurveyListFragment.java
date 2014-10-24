@@ -18,6 +18,7 @@ package org.akvo.flow.ui.fragment;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -42,7 +43,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.async.loader.SurveyInfoLoader;
 import org.akvo.flow.async.loader.SurveyInfoLoader.SurveyQuery;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.PlatformUtil;
@@ -113,32 +113,13 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         super.onResume();
         mDatabase = new SurveyDbAdapter(getActivity());
         mDatabase.open();
-        refresh();
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mDatabase.close();
-    }
-
-    public void refresh() {
-        // Calculate if this record is not registered yet
-        mRegistered = false;
-        Cursor cursor = mDatabase.getSurveyInstances(mRecord.getId());
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                final int col = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
-                do {
-                    if (!cursor.isNull(col)) {
-                        mRegistered = true;
-                    }
-                } while (cursor.moveToNext() && !mRegistered);
-            }
-            cursor.close();
-        }
-
-        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -247,6 +228,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         }
 
         mAdapter.clear();
+        List<SurveyInfo> surveys = new ArrayList<SurveyInfo>();// Buffer items before adapter addition
+        mRegistered = false; // Calculate if this record is registered yet
         if (cursor.moveToFirst()) {
             do {
                 SurveyInfo s = new SurveyInfo();
@@ -255,14 +238,21 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 s.mVersion = String.valueOf(cursor.getFloat(SurveyQuery.VERSION));
                 if (!cursor.isNull(SurveyQuery.SUBMITTED)) {
                     s.mLastSubmission = cursor.getLong(SurveyQuery.SUBMITTED);
+                    mRegistered = true;
                 }
 
                 if (mSurveyGroup.isMonitored() && isRegistrationSurvey(s.mId)) {
-                    mAdapter.insert(s, 0);// Make sure registration survey is at the top
+                    surveys.add(0, s);// Make sure registration survey is at the top
                 } else {
-                    mAdapter.add(s);
+                    surveys.add(s);
                 }
             } while (cursor.moveToNext());
+        }
+
+        // Dump the temporary list into the adapter. This way mRegistered it's been
+        // properly initialized, having looped through all the items first.
+        for (SurveyInfo s : surveys) {
+            mAdapter.add(s);
         }
     }
 

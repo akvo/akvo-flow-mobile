@@ -96,28 +96,32 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
         mRecord = (SurveyedLocale) getArguments().getSerializable(EXTRA_RECORD);
     }
-    
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDatabase.close();
-    }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
-        mDatabase = new SurveyDbAdapter(getActivity());
-        mDatabase.open();
-
         if(mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity());
             setListAdapter(mAdapter);
         }
         getListView().setOnItemClickListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mDatabase = new SurveyDbAdapter(getActivity());
+        mDatabase.open();
         refresh();
     }
-    
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mDatabase.close();
+    }
+
     public void refresh() {
         // Calculate if this record is not registered yet
         mRegistered = false;

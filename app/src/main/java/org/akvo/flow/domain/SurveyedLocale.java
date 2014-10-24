@@ -24,6 +24,8 @@ import com.google.maps.android.clustering.ClusterItem;
 
 import org.akvo.flow.R;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -39,8 +41,8 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     private long mSurveyGroupId;
     private Double mLatitude;
     private Double mLongitude;
+    private transient LatLng mLatLng;// This var won't be serialized, just recreated with the lat/lon values
     private List<SurveyInstance> mSurveyInstances = null;
-    private LatLng mLatLng;// FIXME: Just use this var
 
     public SurveyedLocale(String id, String name, long lastModified, long surveyGroupId,
             Double latitude, Double longitude) {
@@ -90,6 +92,17 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     
     public String getName() {
         return mName;
+    }
+
+    /**
+     * Since LatLng cannot be (automatically) serialized, we'll just populate it with the
+     * denormalized lat/lon
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (mLatitude != null && mLongitude != null) {
+            mLatLng = new LatLng(mLatitude, mLongitude);
+        }
     }
 
     /**

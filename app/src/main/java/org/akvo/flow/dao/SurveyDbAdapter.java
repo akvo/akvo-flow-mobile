@@ -42,6 +42,7 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
@@ -101,6 +102,11 @@ public class SurveyDbAdapter {
         String TIME               = "time";
     }
 
+    /**
+     * Submitter is a denormalized value of the user_id.name in locally created surveys, whereas
+     * on synced surveys, it just represents the name of the submitter (not matching a local user).
+     * This is just a temporary implementation before a more robust login system is integrated.
+     */
     public interface SurveyInstanceColumns {
         String _ID = "_id";
         String UUID = "uuid";
@@ -114,6 +120,7 @@ public class SurveyDbAdapter {
         String SYNC_DATE = "sync_date";
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
         String DURATION = "duration";
+        String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
     }
 
     public interface TransmissionColumns {
@@ -201,7 +208,8 @@ public class SurveyDbAdapter {
     private static final String DATABASE_NAME = "surveydata";
 
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
-    private static final int DATABASE_VERSION = VER_LAUNCH;
+    private static final int VER_FORM_SUBMITTER = 79;
+    private static final int DATABASE_VERSION = VER_FORM_SUBMITTER;
 
     private final Context context;
 
@@ -254,7 +262,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + SurveyInstanceColumns.UUID + " TEXT,"
                     + SurveyInstanceColumns.SURVEY_ID + " TEXT NOT NULL,"// REFERENCES ...
-                    + SurveyInstanceColumns.USER_ID + " INTEGER,"// REFERENCES? beware of the synced records
+                    + SurveyInstanceColumns.USER_ID + " INTEGER,"
                     + SurveyInstanceColumns.START_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SAVED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SUBMITTED_DATE + " INTEGER,"
@@ -263,6 +271,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
                     + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
+                    + SurveyInstanceColumns.SUBMITTER + " TEXT,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -321,8 +330,10 @@ public class SurveyDbAdapter {
             // through to any future upgrade. If no break statement is found,
             // the upgrade will end up in the current version.
             switch (version) {
-                case DATABASE_VERSION:
-                    break;
+                case VER_LAUNCH:
+                    db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
+                            + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
+                    version = DATABASE_VERSION;
             }
 
             if (version != DATABASE_VERSION) {
@@ -727,21 +738,20 @@ public class SurveyDbAdapter {
 
     /**
      * creates a new unsubmitted survey instance
-     * 
-     * @param surveyId
-     * @return
      */
-    public long createSurveyRespondent(String surveyId, long userId, String surveyedLocaleId) {
+    public long createSurveyRespondent(String surveyId, User user, String surveyedLocaleId) {
         final long time = System.currentTimeMillis();
 
         ContentValues initialValues = new ContentValues();
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
-        initialValues.put(SurveyInstanceColumns.USER_ID, userId);
+        initialValues.put(SurveyInstanceColumns.USER_ID, user.getId());
         initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
         initialValues.put(SurveyInstanceColumns.UUID, PlatformUtil.uuid());
         initialValues.put(SurveyInstanceColumns.START_DATE, time);
         initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME
         initialValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
+        // Make submitter field available before submission
+        initialValues.put(SurveyInstanceColumns.SUBMITTER, user.getName());
         return database.insert(Tables.SURVEY_INSTANCE, null, initialValues);
     }
 

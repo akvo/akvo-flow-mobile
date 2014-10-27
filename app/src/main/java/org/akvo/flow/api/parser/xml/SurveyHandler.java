@@ -91,6 +91,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String REGISTRATION_SURVEY = "registrationSurvey";
 
     private static final String USE_EXTERNAL_SOURCE = "allowExternalSources";
+    private static final String SRC = "src";
 
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
@@ -343,6 +344,8 @@ public class SurveyHandler extends DefaultHandler {
                 currentQuestion.useExternalSource(false);
             }
 
+            // Question src. Added in cascading question implementation.
+            currentQuestion.setSrc(attributes.getValue(SRC));
         } else if (localName.equalsIgnoreCase(OPTIONS)) {
             currentOptions = new ArrayList<Option>();
             if (currentQuestion != null) {

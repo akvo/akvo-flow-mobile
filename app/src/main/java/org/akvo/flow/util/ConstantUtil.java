@@ -59,6 +59,7 @@ public class ConstantUtil {
     public static final String SCAN_QUESTION_TYPE = "scan";
     public static final String STRENGTH_QUESTION_TYPE = "strength";
     public static final String DATE_QUESTION_TYPE = "date";
+    public static final String CASCADE_QUESTION_TYPE = "cascade";
 
     /**
      * help types

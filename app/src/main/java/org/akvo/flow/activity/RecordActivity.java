@@ -163,7 +163,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId,
                 SurveyInstanceStatus.SAVED);
         long instance = instances.length > 0 ? instances[0]
-                : mDatabase.createSurveyRespondent(surveyId, mUser.getId(), mRecord.getId());
+                : mDatabase.createSurveyRespondent(surveyId, mUser, mRecord.getId());
 
         Intent i = new Intent(this, SurveyActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());

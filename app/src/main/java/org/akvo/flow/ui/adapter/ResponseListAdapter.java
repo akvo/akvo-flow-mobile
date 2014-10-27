@@ -70,8 +70,13 @@ public class ResponseListAdapter extends CursorAdapter {
         TextView userView = (TextView) view.findViewById(R.id.text2);
         TextView dateView = (TextView) view.findViewById(R.id.text3);
 
-        String username = cursor.getString(cursor.getColumnIndexOrThrow(Tables.USER + "." + UserColumns.NAME));
-        userView.setText(!TextUtils.isEmpty(username) ? username : null);
+        String username = cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTER));
+        if (TextUtils.isEmpty(username)) {
+            userView.setVisibility(View.GONE);
+        } else {
+            userView.setVisibility(View.VISIBLE);
+            userView.setText(username);
+        }
 
         // Format the date string
         Date date = new Date(displayDate);

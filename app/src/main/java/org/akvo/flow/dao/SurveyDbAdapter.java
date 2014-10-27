@@ -70,9 +70,8 @@ public class SurveyDbAdapter {
                 + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
                 + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
 
-        String SURVEY_INSTANCE_JOIN_SURVEY_JOIN_USER = "survey_instance "
-                + "JOIN survey ON (survey_instance.survey_id = survey.survey_id) "
-                + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
+        String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
+                + "JOIN survey ON survey_instance.survey_id = survey.survey_id";
 
         String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
                 + "survey.survey_id=survey_instance.survey_id";
@@ -1370,15 +1369,15 @@ public class SurveyDbAdapter {
      * Get all the SurveyInstances for a particular Record
      */
     public Cursor getSurveyInstances(String recordId) {
-        return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY_JOIN_USER,
+        return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 new String[] {
                         Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
                         Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
                         SurveyColumns.NAME, SurveyInstanceColumns.SAVED_DATE,
-                        SurveyInstanceColumns.SUBMITTED_DATE, SurveyInstanceColumns.UUID,
-                        SurveyInstanceColumns.STATUS, SurveyInstanceColumns.SYNC_DATE,
-                        SurveyInstanceColumns.EXPORTED_DATE, SurveyInstanceColumns.RECORD_ID,
-                        Tables.USER + "." + UserColumns.NAME
+                        SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
+                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
+                        SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
+                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[] { recordId },

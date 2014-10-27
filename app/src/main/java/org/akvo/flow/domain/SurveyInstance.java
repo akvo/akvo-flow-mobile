@@ -5,12 +5,15 @@ import java.util.List;
 public class SurveyInstance {
     private String mUuid;
     private String mSurveyId;
+    private String mSubmitter;
     private long mDate;
     private List<QuestionResponse> mResponses;
     
-    public SurveyInstance(String uuid, String surveyId, long date, List<QuestionResponse> responses) {
+    public SurveyInstance(String uuid, String surveyId, String submitter, long date,
+            List<QuestionResponse> responses) {
         mUuid = uuid;
         mSurveyId = surveyId;
+        mSubmitter = submitter;
         mDate = date;
         mResponses = responses;
     }
@@ -22,7 +25,11 @@ public class SurveyInstance {
     public String getSurveyId() {
         return mSurveyId;
     }
-    
+
+    public String getSubmitter() {
+        return mSubmitter;
+    }
+
     public long getDate() {
         return mDate;
     }

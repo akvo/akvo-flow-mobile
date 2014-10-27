@@ -1615,6 +1615,7 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
             values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
+            values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
 
             if (id != -1) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID

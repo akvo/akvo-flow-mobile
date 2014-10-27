@@ -101,8 +101,6 @@ public class SurveyDownloadService extends Service {
             public void run() {
                 if (intent != null) {
                     String[] surveyIds = intent.getStringArrayExtra(EXTRA_SURVEYS);
-
-                    //String surveyId = intent.getStringExtra(ConstantUtil.SURVEY_ID_KEY);
                     checkAndDownload(surveyIds);
                     sendBroadcastNotification();
                 }
@@ -367,10 +365,6 @@ public class SurveyDownloadService extends Service {
 
     /**
      * invokes a service call to get the header information for multiple surveys
-     * 
-     * @param serverBase
-     * @param surveyId
-     * @return
      */
     private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds, String deviceId)
             throws IOException {

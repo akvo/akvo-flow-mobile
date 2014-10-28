@@ -1298,6 +1298,21 @@ public class SurveyDbAdapter {
         return survey;
     }
 
+    public String[] getSurveyIds() {
+        Cursor c = getSurveys(-1);// All survey groups
+        if (c != null) {
+            String[] ids = new String[c.getCount()];
+            if (c.moveToFirst()) {
+                do {
+                    ids[c.getPosition()] = c.getString(c.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
+                } while (c.moveToNext());
+            }
+            c.close();
+            return ids;
+        }
+        return null;
+    }
+
     public Cursor getSurveys(long surveyGroupId) {
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = null;

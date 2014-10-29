@@ -41,7 +41,6 @@ public class TimeCheckActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.time_check_activity);
 
-
         TextView tv = (TextView)findViewById(R.id.local_time_tv);
         tv.setText(new SimpleDateFormat(PATTERN).format(new Date()));
 
@@ -50,7 +49,6 @@ public class TimeCheckActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivityForResult(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0);
-                //finish();
             }
         });
     }

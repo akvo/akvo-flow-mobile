@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TimeCheckActivity extends Activity {
-    private static final String PATTERN = "HH:mm, yyyy-MM-dd (zzzz)";// ISO 8601
+    private static final String PATTERN = "HH:mm, yyyy-MM-dd (zzzz)";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

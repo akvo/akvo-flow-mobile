@@ -23,6 +23,9 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+
+import com.gallatinsystems.survey.device.dao.SurveyDbAdapter;
 
 /**
  * utilities for checking system state
@@ -130,6 +133,16 @@ public class StatusUtil {
     
     public static boolean hasExternalStorage() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+    }
+    
+    public static String getServerBase(Context context) {
+        SurveyDbAdapter db = new SurveyDbAdapter(context).open();
+        String serverBase = db.findPreference(ConstantUtil.SERVER_SETTING_KEY);
+        if (TextUtils.isEmpty(serverBase)) {
+            serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
+        }
+        db.close();
+        return serverBase;
     }
     
 }

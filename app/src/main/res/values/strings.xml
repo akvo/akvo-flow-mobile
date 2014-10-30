@@ -192,6 +192,10 @@
     <string name="updatedownloaded">FLOW update has been downloaded</string>
     <string name="clicktoinstall">New FLOW version is downloaded. Do you want to install it now?</string>
     <string name="apk_upgrade_error">Error downloading FLOW update.</string>
+    <!-- Time check -->
+    <string name="time_check_activity">Date and Time</string>
+    <string name="time_warning">Your phone time is inaccurate! Adjust your clock and try again. Your phone date and time is:</string>
+    <string name="adjust_date">Adjust time</string>
     <!-- Misc -->
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>

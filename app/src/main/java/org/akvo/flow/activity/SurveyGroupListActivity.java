@@ -52,6 +52,7 @@ import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -137,6 +138,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             startService(new Intent(this, ExceptionReportingService.class));
             startService(new Intent(this, DataSyncService.class));
             startService(new Intent(this, ApkUpdateService.class));
+            startService(new Intent(this, TimeCheckService.class));
         }
     }
 

@@ -176,16 +176,7 @@ public class OptionQuestionView extends QuestionView {
             rb.setOnLongClickListener(new OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle(R.string.optiontext);
-                    builder.setMessage(((RadioButton) v).getText().toString());
-                    builder.setPositiveButton(R.string.okbutton,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    builder.show();
+                    onClearAnswer();
                     return true;
                 }
             });

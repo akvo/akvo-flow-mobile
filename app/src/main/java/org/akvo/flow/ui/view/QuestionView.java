@@ -135,16 +135,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
                 @Override
                 public boolean onLongClick(View v) {
-                    ViewUtil.showConfirmDialog(R.string.clearquestion,
-                            R.string.clearquestiondesc, getContext(), true,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    resetQuestion(true);
-                                    checkMandatory();
-                                }
-                            });
+                    onClearAnswer();
                     return true;
                 }
             });
@@ -154,6 +145,19 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         if (mQuestion.getDependencies() != null && mQuestion.getDependencies().size() > 0) {
             setVisibility(View.GONE);
         }
+    }
+
+    protected void onClearAnswer() {
+        ViewUtil.showConfirmDialog(R.string.clearquestion,
+                R.string.clearquestiondesc, getContext(), true,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        resetQuestion(true);
+                        checkMandatory();
+                    }
+                });
     }
 
     /**

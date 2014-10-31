@@ -93,7 +93,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (RecordListListener) activity;
+            mListener = (RecordListListener)activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SurveyedLocalesFragmentListener");
@@ -131,29 +131,18 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         if (mMap == null) {
             return;
         }
-        LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+
+        final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
         LatLng ne = bounds.northeast, sw = bounds.southwest;
         double latDst = Math.abs(ne.latitude - sw.latitude);
         double lonDst = Math.abs(ne.longitude - sw.longitude);
 
-        double neLat = ne.latitude + latDst / 2;
-        double neLon = ne.longitude + lonDst / 2;
-        double swLat = sw.latitude - latDst / 2;
-        double swLon = sw.longitude - lonDst / 2;
-
-        /*
-        LatLngBounds.Builder builder = LatLngBounds.builder();
-        builder.include(new LatLng(neLat, neLon));
-        builder.include(new LatLng(swLat, swLon));
-        builder.include(bounds.getCenter());
-        LatLngBounds newBounds = builder.build();
-        */
-        LatLngBounds newBounds = new LatLngBounds(
-                new LatLng(swLat, swLon),
-                new LatLng(neLat, neLon));
-
-        Log.i(TAG, "ne:"+ne.latitude+","+ne.longitude+", sw:"+sw.latitude+","+sw.longitude+"center:"+bounds.getCenter().toString()
-            +"ne':"+neLat+","+neLon+", sw':"+swLat+","+swLon+"center:"+newBounds.getCenter().toString());
+        final double scale = 1d;
+        LatLngBounds newBounds = bounds
+                .including(new LatLng(ne.latitude + latDst/scale, ne.longitude + lonDst/scale))
+                .including(new LatLng(sw.latitude - latDst/scale, ne.longitude + lonDst/scale))
+                .including(new LatLng(sw.latitude - latDst/scale, sw.longitude - lonDst/scale))
+                .including(new LatLng(ne.latitude + latDst/scale, sw.longitude - lonDst/scale));
 
         new DynamicallyAddMarkerTask().execute(newBounds);
     }
@@ -212,7 +201,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                Bundle savedInstanceState) {
         View mapView = super.onCreateView(inflater, container, savedInstanceState);
 
         View v = inflater.inflate(R.layout.map_fragment, container, false);
@@ -243,7 +232,6 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
                 }
             } else {
                 getLoaderManager().restartLoader(0, null, this);
-                //centerMap(null);// Careful with this. The activity can also call refresh()
             }
         }
     }

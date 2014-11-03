@@ -278,6 +278,10 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
+    /**
+     * This custom renderer overrides original 'bucketed' names, in order to display the accurate
+     * number of markers within a cluster.
+     */
     class PointRenderer extends DefaultClusterRenderer<SurveyedLocale> {
 
         public PointRenderer() {

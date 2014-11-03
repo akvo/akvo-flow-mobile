@@ -20,6 +20,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
@@ -36,7 +37,15 @@ public class CascadeQuestionView extends QuestionView {
         setQuestionView(R.layout.cascade_question_view);
 
         mTv = (TextView)findViewById(R.id.tv);
-        mTv.setText("" + getQuestion().getSrc());
+
+        // Dump question info
+        StringBuilder builder = new StringBuilder();
+        for (Level level : getQuestion().getLevels()) {
+            builder.append(level.getText()).append(",");
+        }
+        builder.append(getQuestion().getSrc());
+
+        mTv.setText(builder.toString());
     }
 
     @Override

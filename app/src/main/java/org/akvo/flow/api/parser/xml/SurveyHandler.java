@@ -17,7 +17,9 @@
 package org.akvo.flow.api.parser.xml;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.SurveyGroup;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -92,6 +94,8 @@ public class SurveyHandler extends DefaultHandler {
 
     private static final String USE_EXTERNAL_SOURCE = "allowExternalSources";
     private static final String SRC = "src";
+    private static final String LEVELS = "levels";
+    private static final String LEVEL = "level";
 
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
@@ -107,6 +111,8 @@ public class SurveyHandler extends DefaultHandler {
     private QuestionHelp currentHelp;
     private ScoringRule currentScoringRule;
     private String currentScoringType;
+    private Level currentLevel;
+    private List<Level> currentLevels;
 
     private StringBuilder builder;
 
@@ -141,11 +147,14 @@ public class SurveyHandler extends DefaultHandler {
             // <text> can appear multiple places. We need to make sure we're not
             // in the context of an option or help here
             if (localName.equalsIgnoreCase(TEXT) && currentOption == null
-                    && currentHelp == null) {
+                    && currentHelp == null && currentLevel == null) {
                 currentQuestion.setText(builder.toString().trim());
             } else if (localName.equalsIgnoreCase(OPTIONS)) {
                 currentQuestion.setOptions(currentOptions);
                 currentOptions = null;
+            } else if (localName.equalsIgnoreCase(LEVELS)) {
+                currentQuestion.setLevels(currentLevels);
+                currentLevels = null;
             } else if (localName.equalsIgnoreCase(VALIDATION_RULE)) {
                 currentQuestion.setValidationRule(currentValidation);
                 currentValidation = null;
@@ -155,7 +164,6 @@ public class SurveyHandler extends DefaultHandler {
                         currentHelp.setType(ConstantUtil.TIP_HELP_TYPE);
                     }
                     currentQuestion.addQuestionHelp(currentHelp);
-
                 }
                 currentHelp = null;
             } else if (localName.equalsIgnoreCase(SCORE)) {
@@ -188,6 +196,17 @@ public class SurveyHandler extends DefaultHandler {
                 currentOption = null;
             }
         }
+        if (currentLevel != null) {
+            if (localName.equalsIgnoreCase(TEXT)) {
+                currentLevel.setText(builder.toString().trim());
+                if (currentLevels != null) {
+                    currentLevels.add(currentLevel);
+                }
+            } else if (localName.equalsIgnoreCase(LEVEL)) {
+                // close the current option
+                currentLevel = null;
+            }
+        }
         if (currentAltText != null) {
             if (localName.equalsIgnoreCase(ALT_TEXT)) {
                 currentAltText.setText(builder.toString().trim());
@@ -195,6 +214,8 @@ public class SurveyHandler extends DefaultHandler {
                     currentHelp.addAltText(currentAltText);
                 } else if (currentOption != null) {
                     currentOption.addAltText(currentAltText);
+                } else if (currentLevel != null) {
+                    currentLevel.addAltText(currentAltText);
                 } else if (currentQuestion != null) {
                     currentQuestion.addAltText(currentAltText);
                 }
@@ -366,6 +387,10 @@ public class SurveyHandler extends DefaultHandler {
         } else if (localName.equalsIgnoreCase(OPTION)) {
             currentOption = new Option();
             currentOption.setValue(attributes.getValue(VALUE));
+        } else if (localName.equalsIgnoreCase(LEVELS)) {
+            currentLevels = new ArrayList<Level>();
+        } else if (localName.equalsIgnoreCase(LEVEL)) {
+            currentLevel = new Level();
         } else if (localName.equalsIgnoreCase(DEPENDENCY)) {
             currentDependency = new Dependency();
             currentDependency.setQuestion(attributes.getValue(QUESTION));

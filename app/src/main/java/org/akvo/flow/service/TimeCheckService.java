@@ -31,8 +31,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import javax.net.ssl.SSLException;
-
 public class TimeCheckService extends IntentService {
     private static final String TAG = TimeCheckService.class.getSimpleName();
     private static final String TIME_CHECK_PATH = "/devicetimerest";
@@ -48,17 +46,19 @@ public class TimeCheckService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
                 .getInstance());
-        checkTime(true);
+        checkTime();
     }
 
-    private void checkTime(boolean useSSL) {
+    private void checkTime() {
         if (!StatusUtil.hasDataConnection(this)) {
             Log.d(TAG, "No internet connection. Can't perform the time check.");
             return;
         }
 
+        // Since a misconfigured date/time might be considering the SSL certificate as expired,
+        // we'll use HTTP by default, instead of HTTPS
         String serverBase = StatusUtil.getServerBase(this);
-        if (!useSSL && serverBase.startsWith("https")) {
+        if (serverBase.startsWith("https")) {
             serverBase = "http" + serverBase.substring("https".length());
         }
 
@@ -82,10 +82,6 @@ public class TimeCheckService extends IntentService {
                     }
                 }
             }
-        } catch (SSLException e) {
-            // The date/time setting in the device might be considering the SSL certificate as expired
-            Log.e(TAG, e.getMessage());
-            checkTime(false);// Fall back to HTTP
         } catch (Exception e) {
             Log.e(TAG, "Error fetching time: ", e);
             PersistentUncaughtExceptionHandler.recordException(e);

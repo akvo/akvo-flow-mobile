@@ -54,9 +54,16 @@ public class TimeCheckService extends IntentService {
             Log.d(TAG, "No internet connection. Can't perform the time check.");
             return;
         }
+        
+        // Since a misconfigured date/time might be considering the SSL certificate as expired,
+        // we'll use HTTP by default, instead of HTTPS
+        String serverBase = StatusUtil.getServerBase(this);
+        if (serverBase.startsWith("https")) {
+            serverBase = "http" + serverBase.substring("https".length());
+        }
 
         try {
-            final String url = StatusUtil.getServerBase(this) + TIME_CHECK_PATH;
+            final String url = serverBase + TIME_CHECK_PATH;
             String response = HttpUtil.httpGet(url);
             if (!TextUtils.isEmpty(response)) {
                 JSONObject json = new JSONObject(response);

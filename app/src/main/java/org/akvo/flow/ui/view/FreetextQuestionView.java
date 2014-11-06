@@ -17,6 +17,7 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -24,13 +25,14 @@ import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.ValidationRule;
+import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.exception.ValidationException;
 import org.akvo.flow.util.ConstantUtil;
@@ -40,10 +42,8 @@ import org.akvo.flow.util.ConstantUtil;
  * 
  * @author Christopher Fagiani
  */
-public class FreetextQuestionView extends QuestionView {
-    private EditText mEditText;
-    private EditText mDoubleEntryText;
-    private TextView mDoubleEntryTitle;
+public class FreetextQuestionView extends QuestionView implements View.OnClickListener {
+    private EditText mEditText, mDoubleEntryText;
 
     private boolean mCaptureResponse;
 
@@ -57,10 +57,9 @@ public class FreetextQuestionView extends QuestionView {
 
         mEditText = (EditText)findViewById(R.id.input_et);
         mDoubleEntryText = (EditText)findViewById(R.id.double_entry_et);
-        mDoubleEntryTitle = (TextView)findViewById(R.id.double_entry_title);
 
         // Show/Hide double entry title & EditText
-        mDoubleEntryTitle.setVisibility(isDoubleEntry() ? VISIBLE : GONE);
+        findViewById(R.id.double_entry_title).setVisibility(isDoubleEntry() ? VISIBLE : GONE);
         mDoubleEntryText.setVisibility(isDoubleEntry() ? VISIBLE : GONE);
 
         if (isReadOnly()) {
@@ -96,6 +95,16 @@ public class FreetextQuestionView extends QuestionView {
         mEditText.setOnFocusChangeListener(inputListener);
         mDoubleEntryText.addTextChangedListener(extraListener);
         mDoubleEntryText.setOnFocusChangeListener(extraListener);
+
+        Button externalSourceBtn = (Button)findViewById(R.id.external_source_btn);
+        if (mQuestion.useExternalSource()) {
+            externalSourceBtn.setVisibility(VISIBLE);
+            externalSourceBtn.setOnClickListener(this);
+            mEditText.setEnabled(false);
+            mDoubleEntryText.setEnabled(false);
+        } else {
+            externalSourceBtn.setVisibility(GONE);
+        }
     }
 
     @Override
@@ -201,6 +210,21 @@ public class FreetextQuestionView extends QuestionView {
             if (!text.equals(validatedText)) {
                 view.setText(validatedText);// This action will trigger captureResponse again
             }
+        }
+    }
+
+    @Override
+    public void questionComplete(Bundle data) {
+        if (data != null && data.containsKey(ConstantUtil.EXTERNAL_SOURCE_RESPONSE)) {
+            setResponse(new QuestionResponse(data.getString(ConstantUtil.EXTERNAL_SOURCE_RESPONSE),
+                    ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()));
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.external_source_btn) {
+            notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT);
         }
     }
 

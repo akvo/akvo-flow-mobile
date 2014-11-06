@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.flow"
     android:versionCode="1"
-    android:versionName="2.0.4.1" >
+    android:versionName="2.0.5" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="10"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -79,6 +79,13 @@
             android:launchMode="singleTop"
             android:configChanges="locale|layoutDirection" >
         </activity>
+        <activity
+            android:name=".activity.TimeCheckActivity"
+            android:label="@string/time_check_activity"
+            android:theme="@style/Flow.Dialog"
+            android:launchMode="singleTop"
+            android:configChanges="locale|layoutDirection" >
+        </activity>
 
         <service android:name=".service.DataSyncService" />
         <service android:name=".service.SurveyDownloadService" />
@@ -87,6 +94,7 @@
         <service android:name=".service.ExceptionReportingService" />
         <service android:name=".service.ApkUpdateService" />
         <service android:name=".service.SurveyedLocaleSyncService" />
+        <service android:name=".service.TimeCheckService" />
 
         <receiver android:name=".broadcast.SyncDataReceiver" >
             <intent-filter>

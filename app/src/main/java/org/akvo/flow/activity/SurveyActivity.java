@@ -32,13 +32,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -72,6 +72,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
+    private static final int EXTERNAL_SOURCE_REQUEST  = 4;
 
     private static final int MENU_PREFILL  = 101;
 
@@ -387,19 +388,15 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mRequestQuestionId == null) {
+        if (mRequestQuestionId == null || resultCode != RESULT_OK) {
+            mRequestQuestionId = null;
             return;// Move along, nothing to see here
         }
 
-        if (requestCode == PHOTO_ACTIVITY_REQUEST || requestCode == VIDEO_ACTIVITY_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                String fileSuffix;
-                if (requestCode == PHOTO_ACTIVITY_REQUEST) {
-                    fileSuffix = IMAGE_SUFFIX;
-                } else {
-                    fileSuffix = VIDEO_SUFFIX;
-                }
-
+        switch (requestCode) {
+            case PHOTO_ACTIVITY_REQUEST:
+            case VIDEO_ACTIVITY_REQUEST:
+                String fileSuffix = requestCode == PHOTO_ACTIVITY_REQUEST ? IMAGE_SUFFIX : VIDEO_SUFFIX;
                 File tmp = getTmpFile(requestCode == PHOTO_ACTIVITY_REQUEST);
 
                 // Ensure no image is saved in the DCIM folder
@@ -414,10 +411,9 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     maxImgSize = Integer.valueOf(maxImgSizePref);
                 }
 
-                String sizeTxt = getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize];
-
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(), maxImgSize)) {
-                    Toast.makeText(this, "Image resized to " + sizeTxt, Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Image resized to: " +
+                            getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize]);
                     if (!tmp.delete()) { // must check return value to know if it failed
                         Log.e(TAG, "Media file delete failed");
                     }
@@ -429,11 +425,11 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 Bundle photoData = new Bundle();
                 photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
-            } else {
-                Log.e(TAG, "Result of camera op was not ok: " + resultCode);
-            }
-        } else if (requestCode == SCAN_ACTIVITY_REQUEST && resultCode == RESULT_OK) {
-            mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+                break;
+            default:
+                // SCAN_ACTIVITY_REQUEST or EXTERNAL_SOURCE_REQUEST
+                mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+                break;
         }
 
         mRequestQuestionId = null;// Reset the tmp reference
@@ -585,6 +581,15 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 mQuestionResponses.remove(questionId);
                 mDatabase.deleteResponse(mSurveyInstanceId, questionId);
             }
+        } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
+            mRequestQuestionId = event.getSource().getQuestion().getId();
+            final Question q = event.getSource().getQuestion();
+            Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_ID, q.getId());
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_TITLE, q.getText());
+            intent.setType(ConstantUtil.EXTERNAL_SOURCE_MIME);
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
+                    + EXTERNAL_SOURCE_REQUEST);
         }
     }
 

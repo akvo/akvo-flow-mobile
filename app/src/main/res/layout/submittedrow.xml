@@ -29,4 +29,12 @@
         android:textSize="14sp"
         android:layout_toRightOf="@id/xmitstsicon" />
 
+    <TextView
+        android:id="@+id/text3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text2"
+        android:textSize="14sp"
+        android:layout_toRightOf="@id/xmitstsicon" />
+
 </RelativeLayout>

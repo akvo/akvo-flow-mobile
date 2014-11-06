@@ -1,5 +1,17 @@
 Akvo FLOW app 
-Last update 16 October 2014
+Last update 05 November 2014
+
+#ver 2.0.5
+
+Features / Bugfixes
+-------------------
+* #209 - Clear answer on option questions
+* #205 - Timezone check on phone
+* #200 - App rotation bug
+* #196 - Reload all surveys deletes bootstrap surveys
+* #193 - Display username in form instance overview
+* #186 - Clustering
+* #164 - Caddisfly integration
 
 #ver 2.0.4
 

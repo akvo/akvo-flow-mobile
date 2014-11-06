@@ -17,14 +17,16 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -41,8 +43,12 @@ import org.akvo.flow.util.ConstantUtil;
  */
 public class BarcodeQuestionView extends QuestionView implements OnClickListener,
         OnFocusChangeListener {
-    private Button mBarcodeButton;
-    private EditText mBarcodeText;
+    //private List<EditText> mInputFields;
+    private EditText mInputText;
+    private ImageButton mAddBtn;
+    private Button mScanBtn;
+    private LinearLayout mInputContainer;
+    private boolean mMultiple;
 
     public BarcodeQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -52,39 +58,66 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
     private void init() {
         setQuestionView(R.layout.barcode_question_view);
 
-        mBarcodeButton = (Button)findViewById(R.id.scan_btn);
-        mBarcodeText = (EditText)findViewById(R.id.barcode_et);
+        mMultiple = getQuestion().isAllowMultiple();
 
-        mBarcodeText.setOnFocusChangeListener(this);
-        mBarcodeButton.setOnClickListener(this);
+        mInputContainer = (LinearLayout)findViewById(R.id.input_ll);
+        mScanBtn = (Button)findViewById(R.id.scan_btn);
+        mAddBtn = (ImageButton)findViewById(R.id.add_btn);
+        mInputText = (EditText)findViewById(R.id.input_text);
 
-        if (isReadOnly()) {
-            mBarcodeButton.setEnabled(false);
-            mBarcodeText.setEnabled(false);
+        if (!mMultiple || isReadOnly()) {
+            mAddBtn.setVisibility(View.GONE);
         }
-        // Barcode scanning crashes API 7 app, at least on Emulator
-        // ECLAIR_MR1 has code 7, but as we build against 6, it does not know
-        // this name yet
-        if (Build.VERSION.SDK_INT <= 7) {
-            // Maybe change button text as well?
-            mBarcodeButton.setEnabled(false);
-        }
+        mScanBtn.setEnabled(!isReadOnly());
+        mInputText.setEnabled(!isReadOnly());
+
+        mInputText.setOnFocusChangeListener(this);
+        mScanBtn.setOnClickListener(this);
+        mAddBtn.setOnClickListener(this);
+    }
+
+    private void addValue(String text) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        final View view = inflater.inflate(R.layout.barcode_item, mInputContainer, false);
+        EditText et = (EditText)view.findViewById(R.id.input);
+        et.setText(text);
+        view.findViewById(R.id.delete).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mInputContainer.removeView(view);
+            }
+        });
+        mInputContainer.addView(view);
     }
 
     /**
      * handle the action button click
      */
     public void onClick(View v) {
-        notifyQuestionListeners(QuestionInteractionEvent.SCAN_BARCODE_EVENT);
+        switch (v.getId()) {
+            case R.id.scan_btn:
+                notifyQuestionListeners(QuestionInteractionEvent.SCAN_BARCODE_EVENT);
+                break;
+            case R.id.add_btn:
+                final String value = mInputText.getText().toString();
+                if (!TextUtils.isEmpty(value)) {
+                    addValue(value);
+                    mInputText.setText("");
+                }
+                break;
+        }
     }
 
     @Override
     public void questionComplete(Bundle barcodeData) {
         if (barcodeData != null) {
-            mBarcodeText.setText(barcodeData.getString(ConstantUtil.BARCODE_CONTENT));
-            setResponse(new QuestionResponse(
-                    barcodeData.getString(ConstantUtil.BARCODE_CONTENT),
-                    ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()));
+            String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
+            if (mMultiple) {
+                addValue(value);
+            } else {
+                mInputText.setText(value);
+            }
+            captureResponse();
         }
     }
 
@@ -96,7 +129,7 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
         if (resp != null && resp.getValue() != null) {
-            mBarcodeText.setText(resp.getValue());
+            //mBarcodeText.setText(resp.getValue());
         }
     }
 
@@ -106,7 +139,8 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mBarcodeText.setText("");
+        mInputContainer.removeAllViews();
+        mInputText.setText("");
     }
 
     /**
@@ -126,9 +160,11 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
      * possibly suppressing listeners
      */
     public void captureResponse(boolean suppressListeners) {
+        /*
         setResponse(new QuestionResponse(mBarcodeText.getText().toString(),
                 ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
                 suppressListeners);
+                */
     }
 
 }

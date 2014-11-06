@@ -47,7 +47,7 @@ for i in $(cat tmp/instances.txt); do
     if [[ -f $FLOW_SERVER_CONFIG/$i/survey.properties ]]; then
         filename=builds/$i/$version/fieldsurvey-$version.apk
         echo 'generating apk version' $version 'for instance' $i
-        ant flow-release -Dsurvey.properties=$FLOW_SERVER_CONFIG/$i/survey.properties
+        ant flow-release -Dsurvey.properties=$FLOW_SERVER_CONFIG/$i/survey.properties >> antlog.log
         mkdir -p builds/$i/$version
         mv bin/fieldsurvey-$version.apk $filename
         java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$FLOW_GAE_USERNAME" "$FLOW_GAE_PASSWORD"

@@ -17,6 +17,7 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.ViewUtil;
 
 /**
  * Question to handle scanning of a barcode. This question relies on the zxing
@@ -43,7 +45,6 @@ import org.akvo.flow.util.ConstantUtil;
  */
 public class BarcodeQuestionView extends QuestionView implements OnClickListener,
         OnFocusChangeListener {
-    //private List<EditText> mInputFields;
     private EditText mInputText;
     private ImageButton mAddBtn;
     private Button mScanBtn;
@@ -69,25 +70,38 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
             mAddBtn.setVisibility(View.GONE);
         }
         mScanBtn.setEnabled(!isReadOnly());
-        mInputText.setEnabled(!isReadOnly());
+        mInputText.setFocusable(!isReadOnly());
 
         mInputText.setOnFocusChangeListener(this);
         mScanBtn.setOnClickListener(this);
         mAddBtn.setOnClickListener(this);
     }
 
-    private void addValue(String text) {
+    private void addValue(final String text) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         final View view = inflater.inflate(R.layout.barcode_item, mInputContainer, false);
-        EditText et = (EditText)view.findViewById(R.id.input);
-        et.setText(text);
-        view.findViewById(R.id.delete).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mInputContainer.removeView(view);
-            }
-        });
+        ((EditText)view.findViewById(R.id.input)).setText(text);
+        ImageButton btn = (ImageButton)view.findViewById(R.id.delete);
+        if (isReadOnly()) {
+            btn.setVisibility(View.GONE);
+        } else {
+            btn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ViewUtil.showConfirmDialog(R.string.deleteresponse, R.string.clear_value_msg,
+                            getContext(), true, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mInputContainer.removeView(view);
+                                    captureResponse();
+                                }
+                            });
+                }
+            });
+        }
+
         mInputContainer.addView(view);
+        captureResponse();
     }
 
     /**
@@ -128,8 +142,18 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        if (resp != null && resp.getValue() != null) {
-            //mBarcodeText.setText(resp.getValue());
+        mInputContainer.removeAllViews();
+        mInputText.setText("");
+        String answer = resp != null ? resp.getValue() : null;
+        if (!TextUtils.isEmpty(answer)) {
+            if (mMultiple) {
+                String[] values = answer.split("\\|", -1);
+                for (String value : values) {
+                    addValue(value);
+                }
+            } else {
+                mInputText.setText(answer);
+            }
         }
     }
 
@@ -160,11 +184,25 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
      * possibly suppressing listeners
      */
     public void captureResponse(boolean suppressListeners) {
-        /*
-        setResponse(new QuestionResponse(mBarcodeText.getText().toString(),
-                ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
-                suppressListeners);
-                */
+        StringBuilder builder = new StringBuilder();
+        if (mMultiple) {
+            for (int i=0; i<mInputContainer.getChildCount(); i++) {
+                View v = mInputContainer.getChildAt(i);
+                String value = ((EditText)v.findViewById(R.id.input)).getText().toString();
+                if (!TextUtils.isEmpty(value)) {
+                    builder.append(value);
+                    if (i < mInputContainer.getChildCount() - 1) {
+                        builder.append("|");
+                    }
+                }
+            }
+        }
+        String value = mInputText.getText().toString();
+        if (!TextUtils.isEmpty(value)) {
+            builder.append(value);
+        }
+        setResponse(new QuestionResponse(builder.toString(), ConstantUtil.VALUE_RESPONSE_TYPE,
+                getQuestion().getId()), suppressListeners);
     }
 
 }

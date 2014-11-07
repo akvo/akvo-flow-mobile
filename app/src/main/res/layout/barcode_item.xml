@@ -14,11 +14,12 @@
 
     <ImageButton
         android:id="@+id/delete"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:background="@android:color/transparent"
         android:adjustViewBounds="true"
-        android:src="@android:drawable/ic_delete"/>
+        android:scaleType="centerInside"
+        android:src="@android:drawable/ic_menu_delete"/>
 
 </LinearLayout>

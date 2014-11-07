@@ -258,10 +258,6 @@ public class SurveyDownloadService extends Service {
     /**
      * reads the byte array passed in using a zip input stream and extracts the
      * entry to the file specified. This assumes ONE entry per zip
-     * 
-     * @param bytes
-     * @param f
-     * @throws IOException
      */
     private void extractAndSave(FileInputStream zipFile) throws IOException {
         ZipInputStream zis = new ZipInputStream(zipFile);
@@ -340,27 +336,22 @@ public class SurveyDownloadService extends Service {
      * @param surveyId
      */
     private void downloadBinary(final String remoteFile, final String surveyId) {
-        try {
-            String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
-            File dir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            final FileOutputStream out = new FileOutputStream(new File(dir, filename));
-            downloadExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        HttpUtil.httpDownload(remoteFile, out);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Could not download help media file", e);
-                    }
-                }
-            });
-        } catch (FileNotFoundException e1) {
-            Log.e(TAG, "Could not download binary file", e1);
-            PersistentUncaughtExceptionHandler.recordException(e1);
+        String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
+        File dir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
+        if (!dir.exists()) {
+            dir.mkdir();
         }
+        final File file = new File(dir, filename);
+        downloadExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpUtil.httpGet(remoteFile, file);
+                } catch (Exception e) {
+                    Log.e(TAG, "Could not download help media file", e);
+                }
+            }
+        });
     }
 
     /**
@@ -418,8 +409,6 @@ public class SurveyDownloadService extends Service {
     /**
      * displays a notification in the system status bar indicating the
      * completion of the download operation
-     * 
-     * @param type
      */
     private void fireNotification(String text, int notificationID) {
         ViewUtil.fireNotification(text, text, this, notificationID, null);

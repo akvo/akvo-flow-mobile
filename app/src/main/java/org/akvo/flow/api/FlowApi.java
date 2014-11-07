@@ -93,7 +93,7 @@ public class FlowApi {
         return null;
     }
     
-    private String httpGet(String url) throws IOException, ApiException {
+    private String httpGet(String url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) (new URL(url).openConnection());
         final long t0 = System.currentTimeMillis();
         try {

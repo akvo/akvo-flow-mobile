@@ -19,7 +19,6 @@ package org.akvo.flow.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,9 +38,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 /**
  * Simple utility to make http calls and read the responses
@@ -112,62 +108,6 @@ public class HttpUtil {
     }
 
     /**
-     * fetches an image from a remote url and returns it to the caller as a
-     * bitmap
-     * 
-     * @param url
-     * @return
-     * @throws Exception
-     */
-    public static Bitmap getRemoteImage(String url, String cacheDir)
-            throws Exception {
-        BufferedInputStream reader = null;
-        Bitmap bitMap = null;
-        String fileName = url;
-        // extract just the filename portion of the url
-        if (fileName.contains("/")
-                && fileName.lastIndexOf("/") < fileName.length() + 1) {
-            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
-        }
-        // now check the cache
-        if (cacheDir != null && cacheDir.trim().length() > 0) {
-            File f = new File(cacheDir + "/" + fileName);
-            if (f.exists()) {
-                // if the file exists, return the local version
-                bitMap = BitmapFactory.decodeFile(f.getAbsolutePath());
-                return bitMap;
-            }
-        }
-        // if we get here, then we had a cache miss (or aren't using the cache)
-        try {
-            if (cacheDir == null || cacheDir.trim().length() == 0) {
-                // if we aren't using the cache, download directly into the
-                // bitmap
-                DefaultHttpClient client = new DefaultHttpClient();
-                HttpResponse response = client.execute(new HttpGet(url));
-                reader = new BufferedInputStream(response.getEntity()
-                        .getContent());
-                bitMap = BitmapFactory.decodeStream(reader);
-            } else {
-                // if we are using the cache, download the file manually.
-                // we need to do this instead of loading the bitmap and calling
-                // compress since
-                // that may not preserve the original file type so subsequent
-                // call will encounter cache misses.
-                httpDownload(url, cacheDir + "/" + fileName);
-                bitMap = BitmapFactory.decodeFile(cacheDir + "/" + fileName);
-            }
-
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-        
-        return bitMap;
-    }
-
-    /**
      * downloads the resource at url and saves the contents to file. This method
      * will close the write it binds to the fileOutputStream passed in
      * 
@@ -203,27 +143,6 @@ public class HttpUtil {
             }
         } else {
             throw new IOException("Error performing httpGet: " + response.getStatusLine().toString());
-        }
-    }
-
-    /**
-     * downloads the resource at url and saves the contents to file
-     * 
-     * @param url
-     * @param file
-     * @throws Exception
-     */
-    public static void httpDownload(String url, String destFile)
-            throws Exception {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(destFile);
-            httpDownload(url, out);
-
-        } finally {
-            if (out != null) {
-                out.close();
-            }
         }
     }
 

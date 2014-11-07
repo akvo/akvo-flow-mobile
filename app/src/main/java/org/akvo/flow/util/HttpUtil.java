@@ -109,20 +109,20 @@ public class HttpUtil {
             writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
 
             writer.write(getQuery(params));
-            out.flush();
-            out.close();
+            writer.flush();
+            writer.close();
+
+            in = new BufferedInputStream(conn.getInputStream());
 
             int status = getStatusCode(conn);
             if (status != HttpStatus.SC_OK) {
                 throw new HttpException(conn.getResponseMessage(), status);
             }
-            in = new BufferedInputStream(conn.getInputStream());
             return readStream(in);
         } finally {
             if (conn != null) {
                 conn.disconnect();
             }
-            FileUtil.close(writer);
             FileUtil.close(out);
             FileUtil.close(in);
         }

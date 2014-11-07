@@ -45,8 +45,8 @@ import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.exception.ApiException;
-import org.akvo.flow.exception.ApiException.Status;
+import org.akvo.flow.exception.HttpException;
+import org.akvo.flow.exception.HttpException.Status;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.PropertyUtil;
@@ -70,7 +70,7 @@ public class FlowApi {
     }
     
     public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
-            throws IOException, ApiException {
+            throws IOException, HttpException {
         final String query =  PARAM.IMEI + IMEI
                 + "&" + PARAM.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
                 + "&" + PARAM.PHONE_NUMBER + PHONE_NUMBER
@@ -85,7 +85,7 @@ public class FlowApi {
         if (response != null) {
             SurveyedLocalesResponse slRes = new SurveyedLocaleParser().parseResponse(response);
             if (slRes.getError() != null) {
-                throw new ApiException(slRes.getError(), Status.MALFORMED_RESPONSE);
+                throw new HttpException(slRes.getError(), Status.MALFORMED_RESPONSE);
             }
             return slRes.getSurveyedLocales();
         }
@@ -99,7 +99,7 @@ public class FlowApi {
         try {
             int status = getStatusCode(conn);
             if (status != HttpStatus.SC_OK) {
-                throw new ApiException(conn.getResponseMessage(), status);
+                throw new HttpException(conn.getResponseMessage(), status);
             }
             InputStream in = new BufferedInputStream(conn.getInputStream());
             String response = readStream(in);

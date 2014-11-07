@@ -35,7 +35,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.akvo.flow.exception.ApiException;
+import org.akvo.flow.exception.HttpException;
 import org.apache.http.HttpStatus;
 
 /**
@@ -53,7 +53,7 @@ public class HttpUtil {
         try {
             int status = getStatusCode(conn);
             if (status != HttpStatus.SC_OK) {
-                throw new ApiException(conn.getResponseMessage(), status);
+                throw new HttpException(conn.getResponseMessage(), status);
             }
             InputStream in = new BufferedInputStream(conn.getInputStream());
             String response = readStream(in);
@@ -118,7 +118,7 @@ public class HttpUtil {
 
             int status = getStatusCode(conn);
             if (status != HttpStatus.SC_OK) {
-                throw new ApiException(conn.getResponseMessage(), status);
+                throw new HttpException(conn.getResponseMessage(), status);
             }
             in = new BufferedInputStream(conn.getInputStream());
             return readStream(in);

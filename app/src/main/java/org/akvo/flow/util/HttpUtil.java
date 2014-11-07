@@ -94,10 +94,6 @@ public class HttpUtil {
 
     /**
      * does an HTTP Post to the url specified using the params passed in
-     * 
-     * @param url
-     * @param params
-     * @throws IOException
      */
     public static String httpPost(String url, Map<String, String> params) throws IOException {
         OutputStream out = null;
@@ -132,7 +128,7 @@ public class HttpUtil {
         }
     }
 
-    private static int getStatusCode(HttpURLConnection conn) throws IOException {
+    public static int getStatusCode(HttpURLConnection conn) throws IOException {
         try {
             return conn.getResponseCode();
         } catch (IOException e) {
@@ -144,7 +140,7 @@ public class HttpUtil {
         }
     }
 
-    private static String getQuery(Map<String, String> params) {
+    public static String getQuery(Map<String, String> params) {
         if (params == null) {
             return "";
         }
@@ -157,7 +153,7 @@ public class HttpUtil {
         return builder.length() > 0 ? builder.substring(1) : builder.toString();
     }
 
-    private static String readStream(InputStream in) throws IOException {
+    public static String readStream(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder builder = new StringBuilder();
 
@@ -173,7 +169,7 @@ public class HttpUtil {
         return builder.toString();
     }
 
-    private static void copyStream(InputStream in, OutputStream out) throws IOException {
+    public static void copyStream(InputStream in, OutputStream out) throws IOException {
         byte[] b = new byte[BUFFER_SIZE];
         int read;
         while ((read = in.read(b)) != -1) {

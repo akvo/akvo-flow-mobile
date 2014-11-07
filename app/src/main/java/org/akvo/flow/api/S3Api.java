@@ -6,6 +6,7 @@ import android.util.Log;
 
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.apache.http.HttpStatus;
 
@@ -38,8 +39,6 @@ public class S3Api {
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
 
-    private static final int BUFFER_SIZE = 8192;
-
     private String mBucket;
     private String mAccessKey;
     private String mSecret;
@@ -69,7 +68,7 @@ public class S3Api {
             in = new BufferedInputStream(conn.getInputStream());
             out = new BufferedOutputStream(new FileOutputStream(dst));
 
-            copyStream(in, out);
+            HttpUtil.copyStream(in, out);
 
             int status = conn.getResponseCode();
             if (status != HttpStatus.SC_OK) {
@@ -114,7 +113,7 @@ public class S3Api {
             in = new BufferedInputStream(new FileInputStream(file));
             out = new BufferedOutputStream(conn.getOutputStream());
 
-            copyStream(in, out);
+            HttpUtil.copyStream(in, out);
             out.flush();
 
             int status = conn.getResponseCode();
@@ -159,14 +158,6 @@ public class S3Api {
         } catch (InvalidKeyException e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    private void copyStream(InputStream in, OutputStream out) throws IOException {
-        byte[] b = new byte[BUFFER_SIZE];
-        int read;
-        while ((read = in.read(b)) != -1) {
-            out.write(b, 0, read);
         }
     }
 

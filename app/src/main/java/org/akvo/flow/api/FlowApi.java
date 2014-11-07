@@ -16,14 +16,8 @@
 
 package org.akvo.flow.api;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -48,10 +42,9 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.HttpException.Status;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
-import org.apache.http.HttpStatus;
 
 public class FlowApi {
     private static final String TAG = FlowApi.class.getSimpleName();
@@ -81,7 +74,7 @@ public class FlowApi {
                 + "?" + query
                 //+ "&" + PARAM.HMAC + URLEncoder.encode(getAuthorization(query), "UTF-8");
                 + "&" + PARAM.HMAC + getAuthorization(query);
-        String response = httpGet(url);
+        String response = HttpUtil.httpGet(url);
         if (response != null) {
             SurveyedLocalesResponse slRes = new SurveyedLocaleParser().parseResponse(response);
             if (slRes.getError() != null) {
@@ -91,37 +84,6 @@ public class FlowApi {
         }
         
         return null;
-    }
-    
-    private String httpGet(String url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) (new URL(url).openConnection());
-        final long t0 = System.currentTimeMillis();
-        try {
-            int status = getStatusCode(conn);
-            if (status != HttpStatus.SC_OK) {
-                throw new HttpException(conn.getResponseMessage(), status);
-            }
-            InputStream in = new BufferedInputStream(conn.getInputStream());
-            String response = readStream(in);
-            Log.d(TAG, "Request time: " + (System.currentTimeMillis() - t0) + ". URL: " + url);
-            return response;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-    
-    private int getStatusCode(HttpURLConnection conn) throws IOException {
-        try {
-            return conn.getResponseCode();
-        } catch (IOException e) {
-            // HttpUrlConnection will throw an IOException if any 4XX
-            // response is sent. If we request the status again, this
-            // time the internal status will be properly set, and we'll be
-            // able to retrieve it.
-            return conn.getResponseCode();
-        }
     }
 
     private static String getPhoneNumber(Context context) {
@@ -188,22 +150,6 @@ public class FlowApi {
         }
     }
     
-    private String readStream(InputStream in) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        StringBuilder builder = new StringBuilder();
-        
-        try {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line + "\n");
-            }
-        } finally {
-            FileUtil.close(reader);
-        }
-        
-        return builder.toString();
-    }
-
     interface Path {
         String SURVEYED_LOCALE = "/surveyedlocale";
     }

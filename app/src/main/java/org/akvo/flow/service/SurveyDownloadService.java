@@ -243,7 +243,7 @@ public class SurveyDownloadService extends Service {
         S3Api s3Api = new S3Api(this);
         s3Api.get(objectKey, file); // Download zip file
 
-        extractAndSave(new FileInputStream(file));
+        extract(file, FileUtil.getFilesDir(FileType.FORMS));
 
         // Compressed file is not needed any more
         if (!file.delete()) {
@@ -256,16 +256,17 @@ public class SurveyDownloadService extends Service {
     }
 
     /**
-     * reads the byte array passed in using a zip input stream and extracts the
-     * entry to the file specified. This assumes ONE entry per zip
+     * Extract a zipped file contents into the destination directory
+     * @param src File object of the zip file
+     * @param dst directory wherein the contents will be extracted
      */
-    private void extractAndSave(FileInputStream zipFile) throws IOException {
-        ZipInputStream zis = new ZipInputStream(zipFile);
+    private void extract(File src, File dst) throws IOException {
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(src));
         ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
-            File f = new File(FileUtil.getFilesDir(FileType.FORMS), entry.getName());
+            File f = new File(src, entry.getName());
             FileOutputStream fout = new FileOutputStream(f);
-            byte[] buffer = new byte[2048];
+            byte[] buffer = new byte[8192];
             int size;
             while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
                 fout.write(buffer, 0, size);
@@ -309,10 +310,12 @@ public class SurveyDownloadService extends Service {
                                 fileSet.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
                                         .get(0).getValue());
                             }
-                            ArrayList<QuestionHelp> helpList = question
-                                    .getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
-                            for (QuestionHelp help : helpList) {
+                            for (QuestionHelp help : question.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE)) {
                                 fileSet.add(help.getValue());
+                            }
+                            // Question src data (i.e. cascading question resources)
+                            if (question.getSrc() != null) {
+                                fileSet.add(question.getSrc());
                             }
                         }
                     }
@@ -329,15 +332,12 @@ public class SurveyDownloadService extends Service {
     }
 
     /**
-     * uses the thread pool executor to download the remote file passed in via a
-     * background thread
-     * 
-     * @param remoteFile
-     * @param surveyId
+     * Uses the thread pool executor to download the remote file passed in via a
+     * background thread. Any zip file will be uncompressed in the survey resources directory
      */
     private void downloadBinary(final String remoteFile, final String surveyId) {
-        String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
-        File dir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
+        final String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
+        final File dir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
         if (!dir.exists()) {
             dir.mkdir();
         }
@@ -347,6 +347,12 @@ public class SurveyDownloadService extends Service {
             public void run() {
                 try {
                     HttpUtil.httpGet(remoteFile, file);
+                    if (filename.endsWith(ConstantUtil.ARCHIVE_SUFFIX)) {
+                        extract(file, dir);
+                        if (!file.delete()) {
+                            Log.e(TAG, "Error deleting resource zip file");
+                        }
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Could not download help media file", e);
                 }

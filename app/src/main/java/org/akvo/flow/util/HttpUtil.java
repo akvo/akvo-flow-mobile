@@ -16,32 +16,27 @@
 
 package org.akvo.flow.util;
 
+import android.util.Log;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import org.akvo.flow.exception.HttpException;
+import org.apache.http.HttpStatus;
 
 /**
  * Simple utility to make http calls and read the responses
@@ -49,217 +44,136 @@ import android.graphics.BitmapFactory;
  * @author Christopher Fagiani
  */
 public class HttpUtil {
-    private static final int BUF_SIZE = 2048;
-    private static final int PARSE_BUF_SIZE = 8192;
+    private static final String TAG = HttpUtil.class.getSimpleName();
+    private static final int BUFFER_SIZE = 8192;
 
-    /**
-     * executes an HTTP GET and returns the result as a String
-     * 
-     * @param url
-     * @return
-     * @throws Exception
-     */
     public static String httpGet(String url) throws IOException {
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpResponse response = null;
-        String responseString = null;
-        HttpUriRequest request = new HttpGet(url);
-        request.setHeader("Accept-Encoding", "gzip");
-        request.setHeader("User-Agent", "gzip");
-        response = client.execute(request);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("Server error: "
-                    + response.getStatusLine().getStatusCode());
-        } else {
-            responseString = parseResponse(response);
+        HttpURLConnection conn = (HttpURLConnection) (new URL(url).openConnection());
+        final long t0 = System.currentTimeMillis();
+        try {
+            int status = getStatusCode(conn);
+            if (status != HttpStatus.SC_OK) {
+                throw new HttpException(conn.getResponseMessage(), status);
+            }
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            String response = readStream(in);
+            Log.d(TAG, url + ": " + (System.currentTimeMillis() - t0) + " ms");
+            return response;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
-        
-        return responseString;
+    }
+
+    public static void httpGet(String url, File dst) throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) new URL(url).openConnection();
+
+            in = new BufferedInputStream(conn.getInputStream());
+            out = new BufferedOutputStream(new FileOutputStream(dst));
+
+            copyStream(in, out);
+
+            int status = conn.getResponseCode();
+            if (status != HttpStatus.SC_OK) {
+                // TODO: Use custom exception?
+                throw new IOException("Status Code: " + status + ". Expected: 200 - OK");
+            }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+            FileUtil.close(in);
+            FileUtil.close(out);
+        }
     }
 
     /**
      * does an HTTP Post to the url specified using the params passed in
-     * 
-     * @param url
-     * @param params
-     * @return
-     * @throws Exception
      */
-    public static String httpPost(String url, Map<String, String> params)
-            throws IOException {
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-        HttpResponse response = null;
-        String responseString = null;
-
-        if (params != null) {
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            for (Entry<String, String> pair : params.entrySet()) {
-                nameValuePairs.add(new BasicNameValuePair(pair.getKey(), pair
-                        .getValue()));
-            }
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs,
-                    HTTP.UTF_8));
-        }
-        response = httpClient.execute(httpPost);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("Server error: "
-                    + response.getStatusLine().getStatusCode());
-        } else {
-            responseString = parseResponse(response);
-        }
-        return responseString;
-    }
-
-    /**
-     * fetches an image from a remote url and returns it to the caller as a
-     * bitmap
-     * 
-     * @param url
-     * @return
-     * @throws Exception
-     */
-    public static Bitmap getRemoteImage(String url, String cacheDir)
-            throws Exception {
-        BufferedInputStream reader = null;
-        Bitmap bitMap = null;
-        String fileName = url;
-        // extract just the filename portion of the url
-        if (fileName.contains("/")
-                && fileName.lastIndexOf("/") < fileName.length() + 1) {
-            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
-        }
-        // now check the cache
-        if (cacheDir != null && cacheDir.trim().length() > 0) {
-            File f = new File(cacheDir + "/" + fileName);
-            if (f.exists()) {
-                // if the file exists, return the local version
-                bitMap = BitmapFactory.decodeFile(f.getAbsolutePath());
-                return bitMap;
-            }
-        }
-        // if we get here, then we had a cache miss (or aren't using the cache)
+    public static String httpPost(String url, Map<String, String> params) throws IOException {
+        OutputStream out = null;
+        InputStream in = null;
+        Writer writer = null;
+        HttpURLConnection conn = null;
         try {
-            if (cacheDir == null || cacheDir.trim().length() == 0) {
-                // if we aren't using the cache, download directly into the
-                // bitmap
-                DefaultHttpClient client = new DefaultHttpClient();
-                HttpResponse response = client.execute(new HttpGet(url));
-                reader = new BufferedInputStream(response.getEntity()
-                        .getContent());
-                bitMap = BitmapFactory.decodeStream(reader);
-            } else {
-                // if we are using the cache, download the file manually.
-                // we need to do this instead of loading the bitmap and calling
-                // compress since
-                // that may not preserve the original file type so subsequent
-                // call will encounter cache misses.
-                httpDownload(url, cacheDir + "/" + fileName);
-                bitMap = BitmapFactory.decodeFile(cacheDir + "/" + fileName);
-            }
+            conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
 
+            out = new BufferedOutputStream(conn.getOutputStream());
+            writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+
+            writer.write(getQuery(params));
+            writer.flush();
+            writer.close();
+
+            in = new BufferedInputStream(conn.getInputStream());
+
+            int status = getStatusCode(conn);
+            if (status != HttpStatus.SC_OK) {
+                throw new HttpException(conn.getResponseMessage(), status);
+            }
+            return readStream(in);
         } finally {
-            if (reader != null) {
-                reader.close();
+            if (conn != null) {
+                conn.disconnect();
             }
-        }
-        
-        return bitMap;
-    }
-
-    /**
-     * downloads the resource at url and saves the contents to file. This method
-     * will close the write it binds to the fileOutputStream passed in
-     * 
-     * @param url
-     * @param file
-     * @throws Exception
-     */
-    public static void httpDownload(String url, FileOutputStream file) throws IOException {
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpResponse response = client.execute(new HttpGet(url));
-        if (response.getStatusLine().getStatusCode() < 400) {
-            BufferedOutputStream writer = null;
-            BufferedInputStream reader = null;
-            try {
-                writer = new BufferedOutputStream(file);
-                reader = new BufferedInputStream(response.getEntity().getContent());
-
-                byte[] buffer = new byte[BUF_SIZE];
-                int bytesRead = reader.read(buffer);
-
-                while (bytesRead > 0) {
-                    writer.write(buffer, 0, bytesRead);
-                    bytesRead = reader.read(buffer);
-                }
-                writer.flush();
-            } finally {
-                if (writer != null) {
-                    writer.close();
-                }
-                if (reader != null) {
-                    reader.close();
-                }
-            }
-        } else {
-            throw new IOException("Error performing httpGet: " + response.getStatusLine().toString());
+            FileUtil.close(out);
+            FileUtil.close(in);
         }
     }
 
-    /**
-     * downloads the resource at url and saves the contents to file
-     * 
-     * @param url
-     * @param file
-     * @throws Exception
-     */
-    public static void httpDownload(String url, String destFile)
-            throws Exception {
-        FileOutputStream out = null;
+    public static int getStatusCode(HttpURLConnection conn) throws IOException {
         try {
-            out = new FileOutputStream(destFile);
-            httpDownload(url, out);
-
-        } finally {
-            if (out != null) {
-                out.close();
-            }
+            return conn.getResponseCode();
+        } catch (IOException e) {
+            // HttpUrlConnection will throw an IOException if any 4XX
+            // response is sent. If we request the status again, this
+            // time the internal status will be properly set, and we'll be
+            // able to retrieve it.
+            return conn.getResponseCode();
         }
     }
 
-    /**
-     * parses the response from the HttpResponse
-     * 
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    private static String parseResponse(HttpResponse response) throws IOException {
-        String result = null;
-        BufferedReader reader = null;
-        try {
-            Header contentEncoding = response
-                    .getFirstHeader("Content-Encoding");
-            if (contentEncoding != null
-                    && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
-                reader = new BufferedReader(new InputStreamReader(
-                        new GZIPInputStream(response.getEntity().getContent())), PARSE_BUF_SIZE);
-            } else {
-                reader = new BufferedReader(new InputStreamReader(response
-                        .getEntity().getContent()), PARSE_BUF_SIZE);
-            }
-            StringBuilder sb = new StringBuilder();
-            String line = null;
+    public static String getQuery(Map<String, String> params) {
+        if (params == null) {
+            return "";
+        }
 
+        StringBuilder builder = new StringBuilder();
+        for (Entry<String, String> param : params.entrySet()) {
+            builder.append("&").append(param.getKey()).append("=").append(param.getValue());
+        }
+        // Skip the first "&", if found.
+        return builder.length() > 0 ? builder.substring(1) : builder.toString();
+    }
+
+    public static String readStream(InputStream in) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder builder = new StringBuilder();
+
+        try {
+            String line;
             while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
+                builder.append(line).append("\n");
             }
-            result = sb.toString();
         } finally {
-            if (reader != null) {
-                reader.close();
-            }
+            FileUtil.close(reader);
         }
-        return result;
+
+        return builder.toString();
+    }
+
+    public static void copyStream(InputStream in, OutputStream out) throws IOException {
+        byte[] b = new byte[BUFFER_SIZE];
+        int read;
+        while ((read = in.read(b)) != -1) {
+            out.write(b, 0, read);
+        }
     }
 }

@@ -66,7 +66,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     private SurveyDbAdapter mDatabase;
     
     private ViewPager mPager;
-    private TabsAdapter mAdapter;
     private TextView mRecordTextView;
     
     private String[] mTabs;
@@ -77,11 +76,9 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         setContentView(R.layout.record_activity);
         
         mTabs = getResources().getStringArray(R.array.record_tabs);
-        
         mRecordTextView = (TextView) findViewById(R.id.record_text);
-        mAdapter = new TabsAdapter(getSupportFragmentManager());
         mPager = (ViewPager)findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
+        mPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -132,7 +129,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         String recordId = getIntent().getStringExtra(EXTRA_RECORD_ID);
         mRecord = mDatabase.getSurveyedLocale(recordId);
         displayRecord();
-        mAdapter.refresh();
     }
 
     @Override
@@ -163,7 +159,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId,
                 SurveyInstanceStatus.SAVED);
         long instance = instances.length > 0 ? instances[0]
-                : mDatabase.createSurveyRespondent(surveyId, mUser.getId(), mRecord.getId());
+                : mDatabase.createSurveyRespondent(surveyId, mUser, mRecord.getId());
 
         Intent i = new Intent(this, SurveyActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
@@ -185,20 +181,6 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             return mTabs.length;
         }
         
-        private String getFragmentTag(int pos){
-            // Hell of a hack. This should be changed for a more reliable method
-            return "android:switcher:" + R.id.pager + ":" + pos;
-        }
-        
-        public void refresh() {
-            SurveyListFragment surveyListFragment = (SurveyListFragment) getSupportFragmentManager().
-                    findFragmentByTag(getFragmentTag(POSITION_SURVEYS));
-            
-            if (surveyListFragment != null && mSurveyGroup != null) {
-                surveyListFragment.refresh();
-            }
-        }
-
         @Override
         public Fragment getItem(int position) {
             switch (position) {

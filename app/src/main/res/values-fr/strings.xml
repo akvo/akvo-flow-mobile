@@ -167,7 +167,7 @@
   <string name="stats_week">Les 7 derniers jours:</string>
   <string name="stats_today">Aujourd\'hui:</string>
   <!--Record Activity-->
-  <string name="unknown">Inconnu</string>
+  <string name="unknown">Donnée non nommée</string>
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
   <string name="choose_response">Choisissez la réponse</string>

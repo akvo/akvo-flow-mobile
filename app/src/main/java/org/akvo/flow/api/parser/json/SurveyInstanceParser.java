@@ -32,11 +32,12 @@ public class SurveyInstanceParser {
         String uuid = jSurveyInstance.getString(Attrs.UUID);
         String surveyId = jSurveyInstance.getString(Attrs.SURVEY_ID);
         long date = jSurveyInstance.getLong(Attrs.DATE);
+        String submitter = jSurveyInstance.optString(Attrs.SUBMITTER);
 
         JSONArray jQuestionResponses = jSurveyInstance.getJSONArray(Attrs.QUESTION_RESPONSE_LIST);
         List<QuestionResponse> responses = new QuestionResponseParser().parseList(jQuestionResponses);
 
-        return new SurveyInstance(uuid, surveyId, date, responses);
+        return new SurveyInstance(uuid, surveyId, submitter, date, responses);
     }
 
     public List<SurveyInstance> parseList(JSONArray jSurveyInstances) throws JSONException {
@@ -57,6 +58,7 @@ public class SurveyInstanceParser {
         String DATE                   = "collectionDate";
         String SURVEY_ID              = "surveyId";
         String QUESTION_RESPONSE_LIST = "qasList";
+        String SUBMITTER              = "submitter";
     }
 
 }

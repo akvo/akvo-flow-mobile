@@ -34,6 +34,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.MenuItem;
@@ -44,7 +45,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -171,40 +171,31 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                             }
                         });
                 builder.show();
-            } else if (resources.getString(R.string.reloadsurveyslabel).equals(
-                    val)) {
+            } else if (resources.getString(R.string.reloadsurveyslabel).equals(val)) {
                 ViewUtil.showAdminAuthDialog(this,
                         new ViewUtil.AdminAuthDialogListener() {
-
                             @Override
                             public void onAuthenticated() {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(
-                                        SettingsActivity.this);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                                 builder.setTitle(R.string.conftitle);
                                 builder.setMessage(R.string.reloadconftext);
                                 builder.setPositiveButton(R.string.okbutton,
                                         new DialogInterface.OnClickListener() {
-                                            public void onClick(
-                                                    DialogInterface dialog,
-                                                    int id) {
-                                                SurveyDbAdapter database = new SurveyDbAdapter(
-                                                        SettingsActivity.this);
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                Context c = SettingsActivity.this;
+                                                SurveyDbAdapter database = new SurveyDbAdapter(c);
                                                 database.open();
+                                                String[] surveyIds = database.getSurveyIds();
                                                 database.deleteAllSurveys();
                                                 database.close();
-                                                getApplicationContext()
-                                                        .startService(
-                                                                new Intent(
-                                                                        SettingsActivity.this,
-                                                                        SurveyDownloadService.class));
+                                                Intent i = new Intent(c, SurveyDownloadService.class);
+                                                i.putExtra(SurveyDownloadService.EXTRA_SURVEYS, surveyIds);
+                                                c.startService(i);
                                             }
                                         });
-                                builder.setNegativeButton(
-                                        R.string.cancelbutton,
+                                builder.setNegativeButton(R.string.cancelbutton,
                                         new DialogInterface.OnClickListener() {
-                                            public void onClick(
-                                                    DialogInterface dialog,
-                                                    int id) {
+                                            public void onClick(DialogInterface dialog, int id) {
                                                 dialog.cancel();
                                             }
                                         });
@@ -220,48 +211,30 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                             public void onAuthenticated() {
                                 AlertDialog.Builder inputDialog = new AlertDialog.Builder(
                                         SettingsActivity.this);
-                                inputDialog
-                                        .setTitle(R.string.downloadsurveylabel);
-                                inputDialog
-                                        .setMessage(R.string.downloadsurveyinstr);
+                                inputDialog.setTitle(R.string.downloadsurveylabel);
+                                inputDialog.setMessage(R.string.downloadsurveyinstr);
 
                                 // Set an EditText view to get user input
-                                final EditText input = new EditText(
-                                        SettingsActivity.this);
+                                final EditText input = new EditText(SettingsActivity.this);
 
-                                input.setKeyListener(new DigitsKeyListener(
-                                        false, false));
+                                input.setKeyListener(new DigitsKeyListener(false, false));
                                 inputDialog.setView(input);
-
                                 inputDialog.setPositiveButton("Ok",
                                         new DialogInterface.OnClickListener() {
-                                            public void onClick(
-                                                    DialogInterface dialog,
-                                                    int whichButton) {
-                                                String value = input.getText()
-                                                        .toString();
-                                                if (value != null
-                                                        && value.trim()
-                                                                .length() > 0) {
-                                                    if (value.trim()
-                                                            .equals("0")) {
-                                                        SurveyDbAdapter database = new SurveyDbAdapter(
-                                                                SettingsActivity.this);
-                                                        database.open();
-                                                        database.reinstallTestSurvey();
-                                                        database.close();
-                                                    } else {
-                                                        Intent downloadIntent = new Intent(
-                                                                SettingsActivity.this,
-                                                                SurveyDownloadService.class);
-                                                        downloadIntent
-                                                                .putExtra(
-                                                                        ConstantUtil.SURVEY_ID_KEY,
-                                                                        value);
-                                                        getApplicationContext()
-                                                                .startService(
-                                                                        downloadIntent);
-                                                    }
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                String value = input.getText().toString().trim();
+                                                if ("0".equals(value)) {
+                                                    SurveyDbAdapter database = new SurveyDbAdapter(
+                                                            SettingsActivity.this);
+                                                    database.open();
+                                                    database.reinstallTestSurvey();
+                                                    database.close();
+                                                } else if (!TextUtils.isEmpty(value)) {
+                                                    Intent i = new Intent(SettingsActivity.this,
+                                                            SurveyDownloadService.class);
+                                                    i.putExtra(SurveyDownloadService.EXTRA_SURVEYS,
+                                                            new String[]{value});
+                                                    SettingsActivity.this.startService(i);
                                                 }
                                             }
                                         });

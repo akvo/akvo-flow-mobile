@@ -18,7 +18,7 @@ android {
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 10
         targetSdkVersion 19
     }
 
@@ -49,4 +49,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:19.+'
     compile 'com.google.android.gms:play-services:4.0.30'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
+    compile 'com.google.maps.android:android-maps-utils:0.3.3'
 }

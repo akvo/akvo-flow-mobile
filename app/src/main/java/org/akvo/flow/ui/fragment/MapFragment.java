@@ -16,15 +16,13 @@
 
 package org.akvo.flow.ui.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -41,13 +39,22 @@ import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener {
     private static final String TAG = MapFragment.class.getSimpleName();
@@ -57,13 +64,17 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     private SurveyDbAdapter mDatabase;
     private RecordListListener mListener;
 
+    private List<SurveyedLocale> mItems;
+
     private boolean mSingleRecord = false;
-    
+
     private GoogleMap mMap;
+    private ClusterManager<SurveyedLocale> mClusterManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mItems = new ArrayList<SurveyedLocale>();
         Bundle args = getArguments();
         if (args.containsKey(RecordActivity.EXTRA_RECORD_ID)) {
             // Single record mode.
@@ -74,11 +85,11 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             mSurveyGroupId = args.getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
         }
     }
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        
+
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
@@ -88,7 +99,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
                     + " must implement SurveyedLocalesFragmentListener");
         }
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -98,17 +109,48 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             configMap();
         }
     }
-    
+
     private void configMap() {
         if (mMap != null) {
             mMap.setMyLocationEnabled(true);
             mMap.setOnInfoWindowClickListener(this);
+            mClusterManager = new ClusterManager<SurveyedLocale>(getActivity(), mMap);
+            mClusterManager.setRenderer(new PointRenderer());
+            mMap.setOnMarkerClickListener(mClusterManager);
+            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                @Override
+                public void onCameraChange(CameraPosition cameraPosition) {
+                    cluster();
+                }
+            });
+            centerMap(null);
         }
+    }
+
+    private void cluster() {
+        if (mMap == null) {
+            return;
+        }
+
+        final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+        LatLng ne = bounds.northeast, sw = bounds.southwest;
+        double latDst = Math.abs(ne.latitude - sw.latitude);
+        double lonDst = Math.abs(ne.longitude - sw.longitude);
+
+        final double scale = 1d;
+        LatLngBounds newBounds = bounds
+                .including(new LatLng(ne.latitude + latDst/scale, ne.longitude + lonDst/scale))
+                .including(new LatLng(sw.latitude - latDst/scale, ne.longitude + lonDst/scale))
+                .including(new LatLng(sw.latitude - latDst/scale, sw.longitude - lonDst/scale))
+                .including(new LatLng(ne.latitude + latDst/scale, sw.longitude - lonDst/scale));
+
+        new DynamicallyAddMarkerTask().execute(newBounds);
     }
 
     /**
      * Center the map in the given record's coordinates. If no record is provided,
      * the user's location will be used.
+     *
      * @param record
      */
     private void centerMap(SurveyedLocale record) {
@@ -123,7 +165,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             position = new LatLng(record.getLatitude(), record.getLongitude());
         } else {
             // When multiple points are shown, center the map in user's location
-            LocationManager manager = (LocationManager)getActivity()
+            LocationManager manager = (LocationManager) getActivity()
                     .getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -140,30 +182,33 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
         }
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
         mDatabase.open();
-        refresh();
+        if (mItems.isEmpty()) {
+            // Make sure we only fetch the data and center the map once
+            refresh();
+        }
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
         mDatabase.close();
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                Bundle savedInstanceState) {
         View mapView = super.onCreateView(inflater, container, savedInstanceState);
 
         View v = inflater.inflate(R.layout.map_fragment, container, false);
         FrameLayout layout = (FrameLayout) v.findViewById(R.id.map_container);
 
         layout.addView(mapView, 0);
-        
+
         return v;
     }
 
@@ -179,32 +224,16 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
                 if (mMap != null && record != null && record.getLatitude() != null
                         && record.getLongitude() != null) {
                     mMap.clear();
-                    displayRecord(record);
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(record.getLatitude(), record.getLongitude()))
+                            .title(record.getDisplayName(getActivity()))
+                            .snippet(record.getId()));
+                    centerMap(record);
                 }
-                centerMap(record);
             } else {
                 getLoaderManager().restartLoader(0, null, this);
-                centerMap(null);
             }
         }
-    }
-    
-    private void displaySurveyedLocales(List<SurveyedLocale> surveyedLocales) {
-        if (mMap != null) {
-            mMap.clear();
-            for (SurveyedLocale surveyedLocale : surveyedLocales) {
-                if (surveyedLocale.getLatitude() != null && surveyedLocale.getLongitude() != null) {
-                    displayRecord(surveyedLocale);
-                }
-            }
-        }
-    }
-
-    private void displayRecord(SurveyedLocale record) {
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(record.getLatitude(), record.getLongitude()))
-                .title(record.getDisplayName(getActivity()))
-                .snippet(record.getId()));
     }
 
     @Override
@@ -222,7 +251,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, 
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId,
                 ConstantUtil.ORDER_BY_NONE);
     }
 
@@ -232,19 +261,70 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             Log.e(TAG, "onFinished() - Loader returned no data");
             return;
         }
-        
-        List<SurveyedLocale> surveyedLocales = new ArrayList<SurveyedLocale>();
+
         if (cursor.moveToFirst()) {
+            mItems.clear();
             do {
-                surveyedLocales.add(SurveyDbAdapter.getSurveyedLocale(cursor));
+                SurveyedLocale item = SurveyDbAdapter.getSurveyedLocale(cursor);
+                //mClusterManager.addItem(item);
+                mItems.add(item);
             } while (cursor.moveToNext());
         }
         cursor.close();
-        displaySurveyedLocales(surveyedLocales);
+        cluster();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
-    
+
+    /**
+     * This custom renderer overrides original 'bucketed' names, in order to display the accurate
+     * number of markers within a cluster.
+     */
+    class PointRenderer extends DefaultClusterRenderer<SurveyedLocale> {
+
+        public PointRenderer() {
+            super(getActivity(), getMap(), mClusterManager);
+        }
+
+        @Override
+        protected void onBeforeClusterItemRendered(SurveyedLocale item, MarkerOptions markerOptions) {
+            markerOptions
+                    .title(item.getDisplayName(getActivity()))
+                    .snippet(item.getId());
+            super.onBeforeClusterItemRendered(item, markerOptions);
+        }
+
+        @Override
+        protected int getBucket(Cluster<SurveyedLocale> cluster) {
+            return cluster.getSize();
+        }
+
+        @Override
+        protected String getClusterText(int bucket) {
+            return String.valueOf(bucket);
+        }
+
+    }
+
+    private class DynamicallyAddMarkerTask extends AsyncTask<LatLngBounds, Void, Void> {
+
+        @Override
+        protected Void doInBackground(LatLngBounds... bounds) {
+            mClusterManager.clearItems();
+            for (SurveyedLocale item : mItems) {
+                if (item.getPosition() != null && bounds[0].contains(item.getPosition())) {
+                    mClusterManager.addItem(item);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mClusterManager.cluster();
+        }
+    }
+
 }

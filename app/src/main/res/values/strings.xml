@@ -169,7 +169,7 @@
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>
     <!-- Record Activity -->
-    <string name="unknown">Unknown</string>
+    <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>
     <string name="last_response">Last Response:</string>
     <string name="choose_response">Choose Response</string>
@@ -192,6 +192,10 @@
     <string name="updatedownloaded">FLOW update has been downloaded</string>
     <string name="clicktoinstall">New FLOW version is downloaded. Do you want to install it now?</string>
     <string name="apk_upgrade_error">Error downloading FLOW update.</string>
+    <!-- Time check -->
+    <string name="time_check_activity">Date and Time</string>
+    <string name="time_warning">Your phone time is inaccurate! Adjust your clock and try again. Your phone date and time is:</string>
+    <string name="adjust_date">Adjust time</string>
     <!-- Misc -->
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>

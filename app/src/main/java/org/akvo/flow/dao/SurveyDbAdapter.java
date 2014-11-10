@@ -42,6 +42,7 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
@@ -70,7 +71,7 @@ public class SurveyDbAdapter {
                 + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
 
         String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
-                + "JOIN survey ON (survey_instance.survey_id = survey.survey_id)";
+                + "JOIN survey ON survey_instance.survey_id = survey.survey_id";
 
         String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
                 + "survey.survey_id=survey_instance.survey_id";
@@ -100,6 +101,11 @@ public class SurveyDbAdapter {
         String TIME               = "time";
     }
 
+    /**
+     * Submitter is a denormalized value of the user_id.name in locally created surveys, whereas
+     * on synced surveys, it just represents the name of the submitter (not matching a local user).
+     * This is just a temporary implementation before a more robust login system is integrated.
+     */
     public interface SurveyInstanceColumns {
         String _ID = "_id";
         String UUID = "uuid";
@@ -113,6 +119,7 @@ public class SurveyDbAdapter {
         String SYNC_DATE = "sync_date";
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
         String DURATION = "duration";
+        String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
     }
 
     public interface TransmissionColumns {
@@ -200,7 +207,8 @@ public class SurveyDbAdapter {
     private static final String DATABASE_NAME = "surveydata";
 
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
-    private static final int DATABASE_VERSION = VER_LAUNCH;
+    private static final int VER_FORM_SUBMITTER = 79;
+    private static final int DATABASE_VERSION = VER_FORM_SUBMITTER;
 
     private final Context context;
 
@@ -253,7 +261,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + SurveyInstanceColumns.UUID + " TEXT,"
                     + SurveyInstanceColumns.SURVEY_ID + " TEXT NOT NULL,"// REFERENCES ...
-                    + SurveyInstanceColumns.USER_ID + " INTEGER,"// REFERENCES? beware of the synced records
+                    + SurveyInstanceColumns.USER_ID + " INTEGER,"
                     + SurveyInstanceColumns.START_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SAVED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SUBMITTED_DATE + " INTEGER,"
@@ -262,6 +270,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
                     + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
+                    + SurveyInstanceColumns.SUBMITTER + " TEXT,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -320,8 +329,10 @@ public class SurveyDbAdapter {
             // through to any future upgrade. If no break statement is found,
             // the upgrade will end up in the current version.
             switch (version) {
-                case DATABASE_VERSION:
-                    break;
+                case VER_LAUNCH:
+                    db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
+                            + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
+                    version = DATABASE_VERSION;
             }
 
             if (version != DATABASE_VERSION) {
@@ -726,21 +737,20 @@ public class SurveyDbAdapter {
 
     /**
      * creates a new unsubmitted survey instance
-     * 
-     * @param surveyId
-     * @return
      */
-    public long createSurveyRespondent(String surveyId, long userId, String surveyedLocaleId) {
+    public long createSurveyRespondent(String surveyId, User user, String surveyedLocaleId) {
         final long time = System.currentTimeMillis();
 
         ContentValues initialValues = new ContentValues();
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
-        initialValues.put(SurveyInstanceColumns.USER_ID, userId);
+        initialValues.put(SurveyInstanceColumns.USER_ID, user.getId());
         initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
         initialValues.put(SurveyInstanceColumns.UUID, PlatformUtil.uuid());
         initialValues.put(SurveyInstanceColumns.START_DATE, time);
         initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME
         initialValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
+        // Make submitter field available before submission
+        initialValues.put(SurveyInstanceColumns.SUBMITTER, user.getName());
         return database.insert(Tables.SURVEY_INSTANCE, null, initialValues);
     }
 
@@ -1288,6 +1298,21 @@ public class SurveyDbAdapter {
         return survey;
     }
 
+    public String[] getSurveyIds() {
+        Cursor c = getSurveys(-1);// All survey groups
+        if (c != null) {
+            String[] ids = new String[c.getCount()];
+            if (c.moveToFirst()) {
+                do {
+                    ids[c.getPosition()] = c.getString(c.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
+                } while (c.moveToNext());
+            }
+            c.close();
+            return ids;
+        }
+        return null;
+    }
+
     public Cursor getSurveys(long surveyGroupId) {
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = null;
@@ -1367,7 +1392,7 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
                         SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                        SurveyInstanceColumns.RECORD_ID
+                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[] { recordId },
@@ -1605,6 +1630,7 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
             values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
+            values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
 
             if (id != -1) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID

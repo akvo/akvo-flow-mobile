@@ -33,11 +33,10 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.exception.ApiException;
+import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleSyncService extends IntentService {
@@ -81,11 +80,11 @@ public class SurveyedLocaleSyncService extends IntentService {
             displayToast(getString(R.string.network_error));
             displayNotification(getString(R.string.sync_error), 
                     getString(R.string.network_error), true);
-        } catch (ApiException e) {
+        } catch (HttpException e) {
             Log.e(TAG, e.getMessage());
             String message = e.getMessage();
             switch (e.getStatus()) {
-                case ApiException.Status.SC_FORBIDDEN:
+                case HttpException.Status.SC_FORBIDDEN:
                     // A missing assignment might be the issue. Let's hint the user.
                     message = getString(R.string.error_assignment_text);
                     break;
@@ -103,7 +102,7 @@ public class SurveyedLocaleSyncService extends IntentService {
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
     private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
-            throws IOException, ApiException {
+            throws IOException, HttpException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);

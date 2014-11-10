@@ -17,16 +17,29 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.dao.CascadeDB;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+
+import java.io.File;
+import java.util.List;
 
 public class CascadeQuestionView extends QuestionView {
-    private TextView mTv;
+    private String[] mLevels;
+
+    private LinearLayout mContent;
+    private TextView mAnswer;
+
+    private CascadeDB mDatabase;
 
     public CascadeQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -36,16 +49,32 @@ public class CascadeQuestionView extends QuestionView {
     private void init() {
         setQuestionView(R.layout.cascade_question_view);
 
-        mTv = (TextView)findViewById(R.id.tv);
+        mContent = (LinearLayout)findViewById(R.id.cascade_content);
+        mAnswer = (TextView)findViewById(R.id.answer);
 
-        // Dump question info
-        StringBuilder builder = new StringBuilder();
-        for (Level level : getQuestion().getLevels()) {
-            builder.append(level.getText()).append(",");
+        // Load level names
+        List<Level> levels = getQuestion().getLevels();
+        if (levels != null) {
+            mLevels = new String[levels.size()];
+            for (int i=0; i<levels.size(); i++) {
+                mLevels[i] = levels.get(i).getText();
+            }
         }
-        builder.append(getQuestion().getSrc());
 
-        mTv.setText(builder.toString());
+        // Construct local filename (src refers to remote location of the resource)
+        String src = getQuestion().getSrc();
+        if (TextUtils.isEmpty(src)) {
+            throw new IllegalStateException("Cascade question must have a valid src");
+        }
+
+        // TODO: We need to determine whether src contains the URL or just the filename of the resource
+        mDatabase = new CascadeDB(getContext(), new File(FileUtil.getFilesDir(FileType.RES), src).getAbsolutePath());
+        mDatabase.open();
+    }
+
+    @Override
+    public void releaseResources() {
+        mDatabase.close();
     }
 
     @Override

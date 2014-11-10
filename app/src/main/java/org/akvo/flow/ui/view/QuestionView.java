@@ -574,8 +574,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     /**
      * Checks if the dependencies for the question passed in are satisfied
      *
-     * @param q Question to check dependencies for
-     * @param responses All the responses for this survey
      * @return true if no dependency is broken, false otherwise
      */
     public boolean areDependenciesSatisfied() {

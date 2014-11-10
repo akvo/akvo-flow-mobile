@@ -301,9 +301,9 @@ public class SurveyDownloadService extends Service {
                 Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);
                 if (hydratedSurvey != null) {
                     // collect files in a set just in case the same binary is
-                    // used in multiple questions
-                    // we only need to download once
+                    // used in multiple questions we only need to download once
                     Set<String> fileSet = new HashSet<String>();
+                    Set<String> resSet = new HashSet<String>();
                     for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
                         for (Question question : group.getQuestions()) {
                             if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
@@ -315,12 +315,19 @@ public class SurveyDownloadService extends Service {
                             }
                             // Question src data (i.e. cascading question resources)
                             if (question.getSrc() != null) {
-                                fileSet.add(question.getSrc());
+                                resSet.add(question.getSrc());
                             }
                         }
                     }
+                    // Download help media files (images & videos) to the survey folder
+                    File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), survey.getId());
                     for (String file : fileSet) {
-                        downloadBinary(file, survey.getId());
+                        downloadResource(survey.getId(), file, surveyDir);
+                    }
+                    // Download common resources
+                    File resDir = FileUtil.getFilesDir(FileType.RES);
+                    for (String file : resSet) {
+                        downloadResource(survey.getId(), file, resDir);
                     }
                     databaseAdaptor.markSurveyHelpDownloaded(survey.getId(), true);
                 }
@@ -335,26 +342,27 @@ public class SurveyDownloadService extends Service {
      * Uses the thread pool executor to download the remote file passed in via a
      * background thread. Any zip file will be uncompressed in the survey resources directory
      */
-    private void downloadBinary(final String remoteFile, final String surveyId) {
+    private void downloadResource(final String sid, final String remoteFile, final File dst) {
         final String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
-        final File dir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
-        if (!dir.exists()) {
-            dir.mkdir();
+        if (!dst.exists()) {
+            dst.mkdir();
         }
-        final File file = new File(dir, filename);
+        final File file = new File(dst, filename);
         downloadExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    //TODO: Use S3 API to reliably download files
                     HttpUtil.httpGet(remoteFile, file);
                     if (filename.endsWith(ConstantUtil.ARCHIVE_SUFFIX)) {
-                        extract(file, dir);
+                        extract(file, dst);
                         if (!file.delete()) {
                             Log.e(TAG, "Error deleting resource zip file");
                         }
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Could not download help media file", e);
+                    databaseAdaptor.markSurveyHelpDownloaded(sid, false);
+                    Log.e(TAG, "Could not download survey resource: " + remoteFile, e);
                 }
             }
         });

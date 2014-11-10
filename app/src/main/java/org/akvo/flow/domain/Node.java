@@ -15,33 +15,29 @@
  */
 package org.akvo.flow.domain;
 
-import java.util.HashMap;
-
 /**
- * Level represents a cascading question level. It just holds the level name (multilingual)
+ * Node represents a cascading question tree value.
  */
-public class Level {
-    private String text;
-    private HashMap<String, AltText> altTextMap = new HashMap<String, AltText>();
+public class Node {
+    private long mId;
+    private String mValue;
 
-    public void addAltText(AltText altText) {
-        altTextMap.put(altText.getLanguage(), altText);
+    public Node(long id, String value) {
+        mId = id;
+        mValue = value;
     }
 
-    public HashMap<String, AltText> getAltTextMap() {
-        return altTextMap;
+    public long getId() {
+        return mId;
     }
 
-    public AltText getAltText(String lang) {
-        return altTextMap.get(lang);
+    public String getValue() {
+        return mValue;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
+    @Override
+    public String toString() {
+        return mValue;
     }
 
 }

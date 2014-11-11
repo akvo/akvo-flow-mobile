@@ -20,6 +20,6 @@
         android:background="@android:color/transparent"
         android:adjustViewBounds="true"
         android:scaleType="centerInside"
-        android:src="@android:drawable/ic_menu_delete"/>
+        android:src="@drawable/ic_trash"/>
 
 </LinearLayout>

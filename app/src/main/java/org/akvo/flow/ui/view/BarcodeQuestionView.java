@@ -66,7 +66,10 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         mAddBtn = (ImageButton)findViewById(R.id.add_btn);
         mInputText = (EditText)findViewById(R.id.input_text);
 
-        if (!mMultiple || isReadOnly()) {
+        if (isReadOnly() && mMultiple) {
+            mInputText.setVisibility(View.GONE);
+        }
+        if (isReadOnly() || !mMultiple) {
             mAddBtn.setVisibility(View.GONE);
         }
         mScanBtn.setEnabled(!isReadOnly());

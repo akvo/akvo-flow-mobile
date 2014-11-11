@@ -264,7 +264,7 @@ public class SurveyDownloadService extends Service {
         ZipInputStream zis = new ZipInputStream(new FileInputStream(src));
         ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
-            File f = new File(src, entry.getName());
+            File f = new File(dst, entry.getName());
             FileOutputStream fout = new FileOutputStream(f);
             byte[] buffer = new byte[8192];
             int size;
@@ -322,12 +322,12 @@ public class SurveyDownloadService extends Service {
                     // Download help media files (images & videos) to the survey folder
                     File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), survey.getId());
                     for (String file : fileSet) {
-                        downloadResource(survey.getId(), file, surveyDir);
+                        //downloadResource(survey.getId(), file, surveyDir);
                     }
                     // Download common resources
                     File resDir = FileUtil.getFilesDir(FileType.RES);
                     for (String file : resSet) {
-                        downloadResource(survey.getId(), file, resDir);
+                        downloadResource(survey.getId(), file);// Fetch zipped resource
                     }
                     databaseAdaptor.markSurveyHelpDownloaded(survey.getId(), true);
                 }
@@ -342,27 +342,24 @@ public class SurveyDownloadService extends Service {
      * Uses the thread pool executor to download the remote file passed in via a
      * background thread. Any zip file will be uncompressed in the survey resources directory
      */
-    private void downloadResource(final String sid, final String remoteFile, final File dst) {
-        final String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
-        if (!dst.exists()) {
-            dst.mkdir();
-        }
-        final File file = new File(dst, filename);
+    private void downloadResource(final String sid, final String resource) {
         downloadExecutor.execute(new Runnable() {
             @Override
             public void run() {
+                final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
+                final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+                final File resDir = FileUtil.getFilesDir(FileType.RES);
+                final File file = new File(resDir, filename);
                 try {
-                    //TODO: Use S3 API to reliably download files
-                    HttpUtil.httpGet(remoteFile, file);
-                    if (filename.endsWith(ConstantUtil.ARCHIVE_SUFFIX)) {
-                        extract(file, dst);
-                        if (!file.delete()) {
-                            Log.e(TAG, "Error deleting resource zip file");
-                        }
+                    S3Api s3 = new S3Api(SurveyDownloadService.this);
+                    s3.get(objectKey, file);
+                    extract(file, resDir);
+                    if (!file.delete()) {
+                        Log.e(TAG, "Error deleting resource zip file");
                     }
                 } catch (Exception e) {
                     databaseAdaptor.markSurveyHelpDownloaded(sid, false);
-                    Log.e(TAG, "Could not download survey resource: " + remoteFile, e);
+                    Log.e(TAG, "Could not download survey resource: " + filename, e);
                 }
             }
         });

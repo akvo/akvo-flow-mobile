@@ -302,16 +302,15 @@ public class SurveyDownloadService extends Service {
                 if (hydratedSurvey != null) {
                     // collect files in a set just in case the same binary is
                     // used in multiple questions we only need to download once
-                    Set<String> fileSet = new HashSet<String>();
                     Set<String> resSet = new HashSet<String>();
                     for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
                         for (Question question : group.getQuestions()) {
                             if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
-                                fileSet.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
+                                resSet.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
                                         .get(0).getValue());
                             }
                             for (QuestionHelp help : question.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE)) {
-                                fileSet.add(help.getValue());
+                                resSet.add(help.getValue());
                             }
                             // Question src data (i.e. cascading question resources)
                             if (question.getSrc() != null) {
@@ -319,13 +318,7 @@ public class SurveyDownloadService extends Service {
                             }
                         }
                     }
-                    // Download help media files (images & videos) to the survey folder
-                    File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), survey.getId());
-                    for (String file : fileSet) {
-                        //downloadResource(survey.getId(), file, surveyDir);
-                    }
-                    // Download common resources
-                    File resDir = FileUtil.getFilesDir(FileType.RES);
+                    // Download help media files (images & videos) and common resources
                     for (String file : resSet) {
                         downloadResource(survey.getId(), file);// Fetch zipped resource
                     }
@@ -346,20 +339,32 @@ public class SurveyDownloadService extends Service {
         downloadExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
-                final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-                final File resDir = FileUtil.getFilesDir(FileType.RES);
-                final File file = new File(resDir, filename);
                 try {
-                    S3Api s3 = new S3Api(SurveyDownloadService.this);
-                    s3.get(objectKey, file);
-                    extract(file, resDir);
-                    if (!file.delete()) {
-                        Log.e(TAG, "Error deleting resource zip file");
+                    // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
+                    // Naive check to determine whether or not this is an absolute filename
+                    if (resource.startsWith("http")) {
+                        final String filename = new File(resource).getName();
+                        final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
+                        if (!surveyDir.exists()) {
+                            surveyDir.mkdir();
+                        }
+                        HttpUtil.httpGet(resource, new File(surveyDir, filename));
+                    } else {
+                        // resource is just a filename
+                        final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
+                        final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+                        final File resDir = FileUtil.getFilesDir(FileType.RES);
+                        final File file = new File(resDir, filename);
+                        S3Api s3 = new S3Api(SurveyDownloadService.this);
+                        s3.get(objectKey, file);
+                        extract(file, resDir);
+                        if (!file.delete()) {
+                            Log.e(TAG, "Error deleting resource zip file");
+                        }
                     }
                 } catch (Exception e) {
                     databaseAdaptor.markSurveyHelpDownloaded(sid, false);
-                    Log.e(TAG, "Could not download survey resource: " + filename, e);
+                    Log.e(TAG, "Could not download survey resource: " + resource, e);
                 }
             }
         });

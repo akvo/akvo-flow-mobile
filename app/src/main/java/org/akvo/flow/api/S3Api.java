@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
+import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.HttpUtil;
@@ -38,6 +39,7 @@ public class S3Api {
     private static final String PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s";// date, bucket, obj
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
+    private static final String PAYLOAD_HEAD = "HEAD\n\n\n%s\n/%s/%s";// date, bucket, obj
 
     private String mBucket;
     private String mAccessKey;
@@ -48,6 +50,46 @@ public class S3Api {
         mBucket = properties.getProperty(ConstantUtil.S3_BUCKET);
         mAccessKey = properties.getProperty(ConstantUtil.S3_ACCESSKEY);
         mSecret = properties.getProperty(ConstantUtil.S3_SECRET);
+    }
+
+    public String getEtag(String objectKey) throws IOException {
+        // Get date and signature
+        final String date = getDate();
+        final String payload = String.format(PAYLOAD_HEAD, date, mBucket, objectKey);
+        final String signature = getSignature(payload);
+        final URL url = new URL(String.format(URL, mBucket, objectKey));
+
+        HttpURLConnection conn = null;
+        String etag = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Date", date);
+            conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
+            // Handle EOS bug in Android pre Jelly Bean: https://code.google.com/p/android/issues/detail?id=24672
+            conn.setRequestProperty("Accept-Encoding", "");
+            conn.setRequestMethod("HEAD");
+
+            if (conn.getResponseCode() == 200) {
+                etag = getEtag(conn);
+            }
+            return etag;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+
+    public void syncFile(String objectKey, File dst) throws IOException {
+        final String etag = getEtag(objectKey);
+        if (etag == null) {
+            throw new HttpException("Could not read ETag from object: " + objectKey, 404);
+        }
+        if (dst.exists() && etag.equals(FileUtil.hexMd5(dst))) {
+            // No need to re-fetch the file. The integrity of the local copy has been verified
+            return;
+        }
+        get(objectKey, dst);
     }
 
     public void get(String objectKey, File dst) throws IOException {
@@ -121,8 +163,7 @@ public class S3Api {
                 Log.e(TAG, "Status Code: " + status + ". Expected: 200 or 201");
                 return false;
             }
-            String etag = conn.getHeaderField("ETag");
-            etag = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+            String etag = getEtag(conn);
             if (!md5Hex.equals(etag)) {
                 Log.e(TAG, "ETag comparison failed. Response ETag: " + etag +
                         "Locally computed MD5: " + md5Hex);
@@ -159,6 +200,11 @@ public class S3Api {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private String getEtag(HttpURLConnection conn) {
+        String etag = conn.getHeaderField("ETag");
+        return etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
     }
 
 }

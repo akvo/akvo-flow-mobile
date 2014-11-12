@@ -176,6 +176,7 @@
     <string name="choose_response_text">There are unfinished responses for this survey. Do you want to load a saved response, or start a new response?</string>
     <string name="resume_response">Load</string>
     <string name="start_new_response">New</string>
+    <string name="error_missing_resources">Survey resources are not fully downloaded</string>
     <!-- Form & transmission status -->
     <string name="status_queued">Queued</string>
     <string name="status_in_progress">In Progress</string>

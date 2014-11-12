@@ -154,6 +154,10 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
         }
+        if (!mDatabase.getSurvey(surveyId).isHelpDownloaded()) {
+            Toast.makeText(this, R.string.error_missing_resources, Toast.LENGTH_LONG).show();
+            return;
+        }
 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
         long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId,

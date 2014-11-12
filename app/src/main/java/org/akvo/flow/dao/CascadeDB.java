@@ -37,11 +37,6 @@ public class CascadeDB {
         String PARENT = "parent";
     }
 
-    public interface LevelColumns {
-        String _ID = "_id";
-        String NAME = "name";
-    }
-
     private DatabaseHelper mHelper;
     public SQLiteDatabase mDatabase;
 

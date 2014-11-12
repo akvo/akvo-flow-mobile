@@ -77,9 +77,13 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         if (TextUtils.isEmpty(src)) {
             throw new IllegalStateException("Cascade question must have a valid src");
         }
+        final File db = new File(FileUtil.getFilesDir(FileType.RES), src);
+        if (!db.exists()) {
+            throw new IllegalStateException("Cascade resource file doesn't exist at "
+                    + db.getAbsolutePath());
+        }
 
-        // TODO: We need to determine whether src contains the URL or just the filename of the resource
-        mDatabase = new CascadeDB(getContext(), new File(FileUtil.getFilesDir(FileType.RES), src).getAbsolutePath());
+        mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
         mDatabase.open();
         update(POSITION_NONE);
     }

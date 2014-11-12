@@ -116,6 +116,7 @@ public class SurveyDownloadService extends Service {
                 .getInstance());
         downloadExecutor = new ThreadPoolExecutor(1, 3, 5000,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        downloadExecutor.
     }
 
     /**
@@ -302,27 +303,24 @@ public class SurveyDownloadService extends Service {
                 if (hydratedSurvey != null) {
                     // collect files in a set just in case the same binary is
                     // used in multiple questions we only need to download once
-                    Set<String> resSet = new HashSet<String>();
+                    Set<String> resources = new HashSet<String>();
                     for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
                         for (Question question : group.getQuestions()) {
                             if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
-                                resSet.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
+                                resources.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
                                         .get(0).getValue());
                             }
                             for (QuestionHelp help : question.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE)) {
-                                resSet.add(help.getValue());
+                                resources.add(help.getValue());
                             }
                             // Question src data (i.e. cascading question resources)
                             if (question.getSrc() != null) {
-                                resSet.add(question.getSrc());
+                                resources.add(question.getSrc());
                             }
                         }
                     }
                     // Download help media files (images & videos) and common resources
-                    for (String file : resSet) {
-                        downloadResource(survey.getId(), file);// Fetch zipped resource
-                    }
-                    databaseAdaptor.markSurveyHelpDownloaded(survey.getId(), true);
+                    downloadResources(survey.getId(), resources);
                 }
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "Could not parse survey survey file", e);
@@ -335,36 +333,41 @@ public class SurveyDownloadService extends Service {
      * Uses the thread pool executor to download the remote file passed in via a
      * background thread. Any zip file will be uncompressed in the survey resources directory
      */
-    private void downloadResource(final String sid, final String resource) {
+    private void downloadResources(final String sid, final Set<String> resources) {
         downloadExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
-                    // Naive check to determine whether or not this is an absolute filename
-                    if (resource.startsWith("http")) {
-                        final String filename = new File(resource).getName();
-                        final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
-                        if (!surveyDir.exists()) {
-                            surveyDir.mkdir();
-                        }
-                        HttpUtil.httpGet(resource, new File(surveyDir, filename));
-                    } else {
-                        // resource is just a filename
-                        final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
-                        final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-                        final File resDir = FileUtil.getFilesDir(FileType.RES);
-                        final File file = new File(resDir, filename);
-                        S3Api s3 = new S3Api(SurveyDownloadService.this);
-                        s3.get(objectKey, file);
-                        extract(file, resDir);
-                        if (!file.delete()) {
-                            Log.e(TAG, "Error deleting resource zip file");
+                    databaseAdaptor.markSurveyHelpDownloaded(sid, false);
+
+                    for (String resource : resources) {
+                        // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
+                        // Naive check to determine whether or not this is an absolute filename
+                        if (resource.startsWith("http")) {
+                            final String filename = new File(resource).getName();
+                            final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
+                            if (!surveyDir.exists()) {
+                                surveyDir.mkdir();
+                            }
+                            HttpUtil.httpGet(resource, new File(surveyDir, filename));
+                        } else {
+                            // resource is just a filename
+                            final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
+                            final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+                            final File resDir = FileUtil.getFilesDir(FileType.RES);
+                            final File file = new File(resDir, filename);
+                            S3Api s3 = new S3Api(SurveyDownloadService.this);
+                            s3.syncFile(objectKey, file);
+                            extract(file, resDir);
+                            if (!file.delete()) {
+                                Log.e(TAG, "Error deleting resource zip file");
+                            }
                         }
                     }
+                    databaseAdaptor.markSurveyHelpDownloaded(sid, true);
                 } catch (Exception e) {
                     databaseAdaptor.markSurveyHelpDownloaded(sid, false);
-                    Log.e(TAG, "Could not download survey resource: " + resource, e);
+                    Log.e(TAG, "Could not download resources for survey : " + sid, e);
                 }
             }
         });

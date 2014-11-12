@@ -1,5 +1,5 @@
 Akvo FLOW app 
-Last update 05 November 2014
+Last update 12 November 2014
 
 #ver 2.0.5.1
 

@@ -1,5 +1,11 @@
 Akvo FLOW app 
-Last update 05 November 2014
+Last update 12 November 2014
+
+#ver 2.0.5.1
+
+New and noteworthy
+------------------
+* Barcode questions allow batch scans, storing multiple, concatenated values in the same question response [#211]
 
 #ver 2.0.5
 

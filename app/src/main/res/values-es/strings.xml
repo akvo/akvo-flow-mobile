@@ -162,7 +162,11 @@ Version</string>
   <string name="reg_form_warning_title">Encuestra de registro</string>
   <string name="reg_form_warning_text">El Punto de Datos ya contiene una respuesta para este formulario. Si se crea una nueva respuesta se usarán esos valores como los más recientes. ¿Desea continuar?</string>
   <string name="error_img_preview">La imagen no pude ser cargada</string>
+  <string name="use_external_source">Utilizar aplicación externa</string>
   <string name="error_empty_form">Un formulario sin respuestas no puede ser enviado. Por favor, responda a las preguntas antes de enviar.</string>
+  <string name="clear_value_msg">¿Está seguro de que quiere borrar este valor?</string>
+  <string name="type_code">introducir código</string>
+  <string name="or">o</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CREAR NUEVO PUNTO DE DATOS</string>
   <string name="stats_title">Estadísticas del proyecto.</string>
@@ -193,6 +197,10 @@ Version</string>
   <string name="updatedownloaded">La nueva versión de FLOW ha sido descargada</string>
   <string name="clicktoinstall">La nueva versión de FLOW está descargada. ¿Quiere instalarla ahora?</string>
   <string name="apk_upgrade_error">Error descargando la actualización de FLOW</string>
+  <!--Time check-->
+  <string name="time_check_activity">Fecha y hora</string>
+  <string name="time_warning">¡La hora de su dispositivo no es correcta! Ajuste la hora y vuelta a intentar. La hora local de su dispositivo es:</string>
+  <string name="adjust_date">Ajustar hora</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Cancelar</string>

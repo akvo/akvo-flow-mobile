@@ -72,8 +72,7 @@ public class LocationService extends Service {
     public int onStartCommand(final Intent intent, int flags, int startid) {
         // we only need to check this on command start since we'll explicitly
         // call endService if they change the preference to false after we're
-        // already
-        // started
+        // already started
         SurveyDbAdapter database = null;
         final String server = StatusUtil.getServerBase(this);
         try {
@@ -100,9 +99,8 @@ public class LocationService extends Service {
 
                 @Override
                 public void run() {
-                    if (sendBeacon) {
-                        String provider = locMgr.getBestProvider(
-                                locationCriteria, true);
+                    if (sendBeacon && StatusUtil.hasDataConnection(LocationService.this)) {
+                        String provider = locMgr.getBestProvider(locationCriteria, true);
                         if (provider != null) {
                             sendLocation(server, locMgr.getLastKnownLocation(provider));
                         }

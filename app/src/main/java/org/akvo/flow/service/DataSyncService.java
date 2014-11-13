@@ -151,20 +151,11 @@ public class DataSyncService extends IntentService {
     // ================================================================= //
 
     private void exportSurveys() {
-        long[] surveyInstanceIds = new long[0];// Avoid null cases
-        Cursor cursor = mDatabase.getUnexportedSurveyInstances();
-        if (cursor != null) {
-            surveyInstanceIds = new long[cursor.getCount()];
-            if (cursor.moveToFirst()) {
-                do {
-                    surveyInstanceIds[cursor.getPosition()] = cursor.getLong(
-                            cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
+        // First off, ensure surveys marked as 'exported' are indeed found in the external storage.
+        // Missing surveys will be set to 'submitted', so the next step re-creates these files too.
+        checkExportedFiles();
 
-        for (long id : surveyInstanceIds) {
+        for (long id : getUnexportedSurveys()) {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
                 displayExportNotification(getDestName(zipFileData.filename));
@@ -180,6 +171,44 @@ public class DataSyncService extends IntentService {
         }
     }
 
+    private File getSurveyInstanceFile(String uuid) {
+        return new File(FileUtil.getFilesDir(FileType.DATA), uuid + ConstantUtil.ARCHIVE_SUFFIX);
+    }
+
+    private void checkExportedFiles() {
+        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.EXPORTED);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+                    String uuid = cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID));
+                    if (!getSurveyInstanceFile(uuid).exists()) {
+                        Log.d(TAG, "Exported file for survey " + uuid +  " not found. It's status " +
+                                "will be set to 'submitted', and will be reprocessed");
+                        updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
+                    }
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+    }
+
+    private long[] getUnexportedSurveys() {
+        long[] surveyInstanceIds = new long[0];// Avoid null cases
+        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED);
+        if (cursor != null) {
+            surveyInstanceIds = new long[cursor.getCount()];
+            if (cursor.moveToFirst()) {
+                do {
+                    surveyInstanceIds[cursor.getPosition()] = cursor.getLong(
+                            cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return surveyInstanceIds;
+    }
+
     private ZipFileData formZip(long surveyInstanceId) {
         ZipFileData zipFileData = new ZipFileData();
         StringBuilder surveyBuf = new StringBuilder();
@@ -188,7 +217,7 @@ public class DataSyncService extends IntentService {
         String uuid = processSurveyData(surveyInstanceId, surveyBuf, zipFileData.imagePaths);
 
         // THe filename will match the Survey Instance UUID
-        File zipFile = new File(FileUtil.getFilesDir(FileType.DATA), uuid + ConstantUtil.ARCHIVE_SUFFIX);
+        File zipFile = getSurveyInstanceFile(uuid);
 
         // Write the data into the zip file
         try {

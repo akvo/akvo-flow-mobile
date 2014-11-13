@@ -420,8 +420,6 @@ public class SurveyDbAdapter {
 
         /**
          * persists setting to the db
-         * 
-         * @param surveyId
          */
         public void savePreference(SQLiteDatabase db, String key, String value) {
             ContentValues updatedValues = new ContentValues();
@@ -466,11 +464,11 @@ public class SurveyDbAdapter {
         databaseHelper.close();
     }
 
-    public Cursor getUnexportedSurveyInstances() {
+    public Cursor getSurveyInstancesByStatus(int status) {
         return database.query(Tables.SURVEY_INSTANCE,
-                new String[] { SurveyInstanceColumns._ID },
+                new String[] { SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID },
                 SurveyInstanceColumns.STATUS + " = ?",
-                new String[] { String.valueOf(SurveyInstanceStatus.SUBMITTED) },
+                new String[] { String.valueOf(status) },
                 null, null, null);
     }
 
@@ -788,8 +786,6 @@ public class SurveyDbAdapter {
 
     /**
      * updates the survey table by recording the help download flag
-     * 
-     * @param idList
      */
     public void markSurveyHelpDownloaded(String surveyId, boolean isDownloaded) {
         ContentValues updatedValues = new ContentValues();
@@ -903,8 +899,6 @@ public class SurveyDbAdapter {
 
     /**
      * persists setting to the db
-     * 
-     * @param surveyId
      */
     public void savePreference(String key, String value) {
         databaseHelper.savePreference(database, key, value);
@@ -1528,12 +1522,6 @@ public class SurveyDbAdapter {
     
     /**
     * Filters surveyd locales based on the parameters passed in.
-    * @param projectId
-    * @param latitude
-    * @param longitude
-    * @param filterString
-    * @param nearbyRadius
-    * @return
     */
     public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude, int orderBy) {
         // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,

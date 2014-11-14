@@ -32,6 +32,7 @@ import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 
@@ -85,7 +86,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
         mDatabase.open();
-        update(POSITION_NONE);
+        //update(POSITION_NONE);
     }
 
     private void update(int updatedSpinnerIndex) {
@@ -120,43 +121,54 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             }
         }
 
-        // Get next level values
-        List<Node> values = mDatabase.getValues(parent);
-
-        if (!values.isEmpty()) {
-            Spinner spinner = new Spinner(getContext());
-            spinner.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT));
-
-            // Insert a fake value with the title
-            String value = mLevels != null && mLevels.length >= nextLevel ? mLevels[nextLevel]
-                    : "Select Level " + (nextLevel);
-            Node node = new Node(DEFAULT_VALUE, value);
-            values.add(0, node);
-
-            ArrayAdapter<Node> adapter = new ArrayAdapter<Node>(getContext(),
-                    android.R.layout.simple_spinner_item, values);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setTag(nextLevel);
-            spinner.setAdapter(adapter);
-            spinner.setOnItemSelectedListener(this);
-
+        final Spinner spinner = createSpinner(nextLevel, mDatabase.getValues(parent));
+        if (spinner != null) {
             mSpinnerContainer.addView(spinner);
             mSpinners.add(spinner);
         }
+    }
 
+    private Spinner createSpinner(int position, List<Node> values) {
+        if (values.isEmpty()) {
+            return null;
+        }
+
+        final Spinner spinner = new Spinner(getContext());
+        spinner.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT));
+
+        // Insert a fake value with the title
+        String value = mLevels != null && mLevels.length >= position ? mLevels[position] : "";
+        Node node = new Node(DEFAULT_VALUE, value);
+        values.add(0, node);
+
+        ArrayAdapter<Node> adapter = new ArrayAdapter<Node>(getContext(),
+                android.R.layout.simple_spinner_item, values);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setTag(position);
+        spinner.setAdapter(adapter);
+        spinner.setEnabled(!isReadOnly());
+        // Attach listener asynchronously, preventing selection event from being fired off right away
+        spinner.post(new Runnable() {
+            public void run() {
+                spinner.setOnItemSelectedListener(CascadeQuestionView.this);
+            }
+        });
+        return spinner;
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         final int index = (Integer)parent.getTag();
         update(index);
+        captureResponse();
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         final int index = (Integer)parent.getTag();
         update(index);
+        captureResponse();// TODO: Is this needed?
     }
 
     @Override
@@ -167,18 +179,65 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        // TODO:
+        String answer = resp != null ? resp.getValue() : null;
+        if (TextUtils.isEmpty(answer)) {
+            return;
+        }
+        mSpinnerContainer.removeAllViews();
+        mSpinners.clear();
+        String[] values = answer.split("\\|", -1);
+
+        int index = 0;
+        long parentId = 0;
+        while (index < values.length) {
+            int valuePosition = POSITION_NONE;
+            List<Node> spinnerValues = mDatabase.getValues(parentId);
+            for (int pos=0; pos<spinnerValues.size(); pos++) {
+                Node node = spinnerValues.get(pos);
+                if (node.getValue().equals(values[index])) {
+                    valuePosition = pos;
+                    parentId = node.getId();
+                    break;
+                }
+            }
+
+            Spinner spinner = createSpinner(index, spinnerValues);
+
+            if (valuePosition == POSITION_NONE || spinner == null) {
+                return;// Cannot reassemble response
+            }
+            spinner.setSelection(valuePosition+1);// Skip level title item
+            mSpinnerContainer.addView(spinner);
+            mSpinners.add(spinner);
+            index++;
+        }
+        update(index-1);// Last updated item position
+        mAnswer.setText(answer);
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        // TODO:
+        update(POSITION_NONE);
+        mAnswer.setText("");
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        // TODO:
+        // For the path we've got so far
+        StringBuilder builder = new StringBuilder();
+        for (Spinner spinner : mSpinners) {
+            Node node = (Node)spinner.getSelectedItem();
+            if (node.getId() != DEFAULT_VALUE) {
+                builder.append("|").append(node.toString());
+            }
+        }
+        // Skip the first ",", if found.
+        String response = builder.length() > 0 ? builder.substring(1) : "";
+        mAnswer.setText(response);// tmp visualization of the response -- will go away
+
+        setResponse(new QuestionResponse(response, ConstantUtil.VALUE_RESPONSE_TYPE,
+                getQuestion().getId()), suppressListeners);
     }
 
 }

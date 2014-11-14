@@ -1,5 +1,11 @@
 Akvo FLOW app 
-Last update 12 November 2014
+Last update 14 November 2014
+
+#ver 2.0.5.2
+
+New and noteworthy
+------------------
+* Exported files are recreated if the app does not find them in the external storage [#222]
 
 #ver 2.0.5.1
 

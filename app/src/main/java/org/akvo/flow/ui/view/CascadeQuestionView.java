@@ -49,7 +49,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     private String[] mLevels;
     private LinearLayout mSpinnerContainer;
     private TextView mAnswer;
-    private List<Spinner> mSpinners;
 
     private CascadeDB mDatabase;
 
@@ -63,8 +62,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         mSpinnerContainer = (LinearLayout)findViewById(R.id.cascade_content);
         mAnswer = (TextView)findViewById(R.id.answer);
-
-        mSpinners = new ArrayList<Spinner>();
 
         // Load level names
         List<Level> levels = getQuestion().getLevels();
@@ -95,14 +92,13 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         final int nextLevel = updatedSpinnerIndex + 1;
 
         // First, clean up descendant spinners (if any)
-        while (nextLevel < mSpinners.size()) {
-            mSpinners.remove(nextLevel);
+        while (nextLevel < mSpinnerContainer.getChildCount()) {
             mSpinnerContainer.removeViewAt(nextLevel);
         }
 
         long parent = ID_ROOT;
         if (updatedSpinnerIndex != POSITION_NONE) {
-            Node node = (Node)mSpinners.get(updatedSpinnerIndex).getSelectedItem();
+            Node node = (Node)getSpinner(updatedSpinnerIndex).getSelectedItem();
             if (node.getId() == ID_NONE) {
                 return; // Do not load more levels
             } else {
@@ -113,7 +109,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         final Spinner spinner = createSpinner(nextLevel, mDatabase.getValues(parent));
         if (spinner != null) {
             mSpinnerContainer.addView(spinner);
-            mSpinners.add(spinner);
         }
     }
 
@@ -173,7 +168,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             return;
         }
         mSpinnerContainer.removeAllViews();
-        mSpinners.clear();
         String[] values = answer.split("\\|", -1);
 
         int index = 0;
@@ -197,7 +191,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             }
             spinner.setSelection(valuePosition+1);// Skip level title item
             mSpinnerContainer.addView(spinner);
-            mSpinners.add(spinner);
             index++;
         }
         update(index-1);// Last updated item position
@@ -215,13 +208,13 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     public void captureResponse(boolean suppressListeners) {
         // For the path we've got so far
         StringBuilder builder = new StringBuilder();
-        for (Spinner spinner : mSpinners) {
-            Node node = (Node)spinner.getSelectedItem();
+        for (int i=0; i<mSpinnerContainer.getChildCount(); i++) {
+            Node node = (Node)getSpinner(i).getSelectedItem();
             if (node.getId() != ID_NONE) {
                 builder.append("|").append(node.toString());
             }
         }
-        // Skip the first ",", if found.
+        // Skip the first "|", if found.
         String response = builder.length() > 0 ? builder.substring(1) : "";
         mAnswer.setText(response);// tmp visualization of the response -- will go away
 
@@ -229,4 +222,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
                 getQuestion().getId()), suppressListeners);
     }
 
+    private Spinner getSpinner(int position) {
+        return (Spinner)mSpinnerContainer.getChildAt(position);
+    }
 }

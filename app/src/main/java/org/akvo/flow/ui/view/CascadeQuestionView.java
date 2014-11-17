@@ -37,7 +37,6 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CascadeQuestionView extends QuestionView implements AdapterView.OnItemSelectedListener {
@@ -85,10 +84,9 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
         mDatabase.open();
-        //update(POSITION_NONE);
     }
 
-    private void update(int updatedSpinnerIndex) {
+    private void updateSpinners(int updatedSpinnerIndex) {
         final int nextLevel = updatedSpinnerIndex + 1;
 
         // First, clean up descendant spinners (if any)
@@ -129,7 +127,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         ArrayAdapter<Node> adapter = new ArrayAdapter<Node>(getContext(),
                 android.R.layout.simple_spinner_item, values);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setTag(position);
+        spinner.setTag(position);// Tag the spinner with its position within the container
         spinner.setAdapter(adapter);
         spinner.setEnabled(!isReadOnly());
         // Attach listener asynchronously, preventing selection event from being fired off right away
@@ -144,15 +142,12 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         final int index = (Integer)parent.getTag();
-        update(index);
+        updateSpinners(index);
         captureResponse();
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        final int index = (Integer)parent.getTag();
-        update(index);
-        captureResponse();// TODO: Is this needed?
     }
 
     @Override
@@ -170,6 +165,9 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         mSpinnerContainer.removeAllViews();
         String[] values = answer.split("\\|", -1);
 
+        // For each existing token, we load the corresponding level values, and create a spinner
+        // view, automatically selecting the token. On each iteration, we keep track of selected
+        // value's id, in order to fetch the descendant nodes from the DB.
         int index = 0;
         long parentId = 0;
         while (index < values.length) {
@@ -189,18 +187,20 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             if (valuePosition == POSITION_NONE || spinner == null) {
                 return;// Cannot reassemble response
             }
-            spinner.setSelection(valuePosition+1);// Skip level title item
+            spinner.setSelection(valuePosition + 1);// Skip level title item
             mSpinnerContainer.addView(spinner);
             index++;
         }
-        update(index-1);// Last updated item position
+        if (!isReadOnly()) {
+            updateSpinners(index - 1);// Last updated item position
+        }
         mAnswer.setText(answer);
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        update(POSITION_NONE);
+        updateSpinners(POSITION_NONE);
         mAnswer.setText("");
     }
 

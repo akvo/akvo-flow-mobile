@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -41,8 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CascadeQuestionView extends QuestionView implements AdapterView.OnItemSelectedListener {
-    private static final long DEFAULT_VALUE = -1;
-    private static final int POSITION_NONE = -1;
+    private static final int POSITION_NONE = -1;// no spinner position id
+
+    private static final long ID_NONE = -1;// no node id
+    private static final long ID_ROOT = 0;// root node id
 
     private String[] mLevels;
     private LinearLayout mSpinnerContainer;
@@ -98,23 +100,10 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             mSpinnerContainer.removeViewAt(nextLevel);
         }
 
-        // For the path we've got so far
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i <= updatedSpinnerIndex; i++) {
-            Node node = (Node)mSpinners.get(i).getSelectedItem();
-            if (node.getId() != DEFAULT_VALUE) {
-                builder.append(mSpinners.get(i).getSelectedItem().toString());
-                if (i < updatedSpinnerIndex) {
-                    builder.append(",");
-                }
-            }
-        }
-        mAnswer.setText(builder.toString());
-
-        long parent = 0;
-        if (updatedSpinnerIndex >= 0) {
+        long parent = ID_ROOT;
+        if (updatedSpinnerIndex != POSITION_NONE) {
             Node node = (Node)mSpinners.get(updatedSpinnerIndex).getSelectedItem();
-            if (node.getId() == DEFAULT_VALUE) {
+            if (node.getId() == ID_NONE) {
                 return; // Do not load more levels
             } else {
                 parent = node.getId();
@@ -139,7 +128,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         // Insert a fake value with the title
         String value = mLevels != null && mLevels.length >= position ? mLevels[position] : "";
-        Node node = new Node(DEFAULT_VALUE, value);
+        Node node = new Node(ID_NONE, value);
         values.add(0, node);
 
         ArrayAdapter<Node> adapter = new ArrayAdapter<Node>(getContext(),
@@ -228,7 +217,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         StringBuilder builder = new StringBuilder();
         for (Spinner spinner : mSpinners) {
             Node node = (Node)spinner.getSelectedItem();
-            if (node.getId() != DEFAULT_VALUE) {
+            if (node.getId() != ID_NONE) {
                 builder.append("|").append(node.toString());
             }
         }

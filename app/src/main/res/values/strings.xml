@@ -171,6 +171,7 @@
     <string name="stats_total">Total Data Points:</string>
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>
+    <string name="distance_label">Distance:</string>
     <!-- Record Activity -->
     <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>

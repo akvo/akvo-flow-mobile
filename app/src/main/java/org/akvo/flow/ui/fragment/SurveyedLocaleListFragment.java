@@ -260,7 +260,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale) {
-            StringBuilder builder = new StringBuilder("Distance: ");
+            StringBuilder builder = new StringBuilder(getString(R.string.distance_label) + " ");
             
             if (surveyedLocale.getLatitude() != null && surveyedLocale.getLongitude() != null
                     && (mLatitude != 0.0d || mLongitude != 0.0d)) {

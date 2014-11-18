@@ -17,12 +17,16 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -124,11 +128,9 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         Node node = new Node(ID_NONE, value);
         values.add(0, node);
 
-        ArrayAdapter<Node> adapter = new ArrayAdapter<Node>(getContext(),
-                android.R.layout.simple_spinner_item, values);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setTag(position);// Tag the spinner with its position within the container
+        SpinnerAdapter adapter = new CascadeAdapter(getContext(), values);
         spinner.setAdapter(adapter);
+        spinner.setTag(position);// Tag the spinner with its position within the container
         spinner.setEnabled(!isReadOnly());
         // Attach listener asynchronously, preventing selection event from being fired off right away
         spinner.post(new Runnable() {
@@ -224,5 +226,42 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
     private Spinner getSpinner(int position) {
         return (Spinner)mSpinnerContainer.getChildAt(position);
+    }
+
+    class CascadeAdapter extends ArrayAdapter<Node> {
+
+        CascadeAdapter(Context context, List<Node> objects) {
+            super(context, android.R.layout.simple_spinner_item, objects);
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        }
+
+        @Override
+        public View getView (int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            setStyle(view, position);
+            return view;
+        }
+
+        @Override
+        public View getDropDownView (int position, View convertView, ViewGroup parent) {
+            View view = super.getDropDownView(position, convertView, parent);
+            setStyle(view, position);
+            return view;
+        }
+
+        private void setStyle(View view, int position) {
+            try {
+                TextView text = (TextView)view;
+                int flags = text.getPaintFlags();
+                if (position == 0) {
+                    flags |= Paint.FAKE_BOLD_TEXT_FLAG;
+                } else {
+                    flags &= ~Paint.FAKE_BOLD_TEXT_FLAG;
+                }
+                text.setPaintFlags(flags);
+            } catch (ClassCastException e) {
+                Log.e("CascadeAdapter", "View cannot be casted to TextView!");
+            }
+        }
     }
 }

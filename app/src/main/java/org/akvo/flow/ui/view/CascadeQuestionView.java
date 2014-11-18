@@ -52,6 +52,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     private String[] mLevels;
     private LinearLayout mSpinnerContainer;
     private TextView mAnswer;
+    private boolean mFinished;
 
     private CascadeDB mDatabase;
 
@@ -102,6 +103,8 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         if (updatedSpinnerIndex != POSITION_NONE) {
             Node node = (Node)getSpinner(updatedSpinnerIndex).getSelectedItem();
             if (node.getId() == ID_NONE) {
+                // if this is the first level, it means we've got no answer at all
+                mFinished = updatedSpinnerIndex == 0;
                 return; // Do not load more levels
             } else {
                 parent = node.getId();
@@ -111,6 +114,9 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         final Spinner spinner = createSpinner(nextLevel, mDatabase.getValues(parent));
         if (spinner != null) {
             mSpinnerContainer.addView(spinner);
+            mFinished = updatedSpinnerIndex == POSITION_NONE;
+        } else {
+            mFinished = true;// no more levels
         }
     }
 
@@ -146,6 +152,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         final int index = (Integer)parent.getTag();
         updateSpinners(index);
         captureResponse();
+        setError(null);
     }
 
     @Override
@@ -226,6 +233,14 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
     private Spinner getSpinner(int position) {
         return (Spinner)mSpinnerContainer.getChildAt(position);
+    }
+
+    public boolean isValid() {
+        boolean valid = super.isValid() && mFinished;
+        if (!valid) {
+            setError(getResources().getString(R.string.error_question_mandatory));
+        }
+        return valid;
     }
 
     class CascadeAdapter extends ArrayAdapter<Node> {

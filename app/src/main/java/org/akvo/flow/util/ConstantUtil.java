@@ -214,6 +214,11 @@ public class ConstantUtil {
     public static final int NOTIFICATION_RECORD_SYNC = 100;
     public static final int NOTIFICATION_DATA_SYNC = 101;
 
+    public static final int NOTIFICATION_ASSIGNMENT_ERROR = 102;
+    public static final int NOTIFICATION_HEADER_ERROR = 103;
+    public static final int NOTIFICATION_FORM_ERROR = 104;
+    public static final int NOTIFICATION_FORMS_SYNCED = 105;
+
     /**
      + * External Sources
      + */

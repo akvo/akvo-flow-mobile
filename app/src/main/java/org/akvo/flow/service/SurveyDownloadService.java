@@ -69,14 +69,13 @@ public class SurveyDownloadService extends IntentService {
     public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated
 
     private static final String DEFAULT_TYPE = "Survey";
-    private static final int COMPLETE_ID = 2;
-    private static final int FAIL_ID = 3;
 
     private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice&devicePhoneNumber=";
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
     private static final String DEV_ID_PARAM = "&devId=";
     private static final String IMEI_PARAM = "&imei=";
     private static final String VERSION_PARAM = "&ver=";
+    private static final String NUMBER_PARAM = "&devicePhoneNumber=";
 
     private SurveyDbAdapter databaseAdaptor;
 
@@ -94,7 +93,6 @@ public class SurveyDownloadService extends IntentService {
                 checkAndDownload(surveyIds);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
-                fireNotification(getString(R.string.cannotupdate), FAIL_ID);
                 PersistentUncaughtExceptionHandler.recordException(e);
             } finally {
                 databaseAdaptor.close();
@@ -144,13 +142,17 @@ public class SurveyDownloadService extends IntentService {
                     updateCount++;
                 } catch (Exception e) {
                     Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
-                    fireNotification(getString(R.string.cannotupdate), FAIL_ID);
+                    displayNotification(getString(R.string.error_form_sync_title),
+                            getString(R.string.error_form_download),
+                            ConstantUtil.NOTIFICATION_FORM_ERROR);
                     PersistentUncaughtExceptionHandler
                             .recordException(new TransferException(survey.getId(), null, e));
                 }
             }
             if (updateCount > 0) {
-                fireNotification(getString(R.string.surveysupdated), COMPLETE_ID);
+                displayNotification(getString(R.string.surveysupdated),
+                        getString(R.string.surveysupdated),
+                        ConstantUtil.NOTIFICATION_FORMS_SYNCED);
             }
         }
 
@@ -337,22 +339,22 @@ public class SurveyDownloadService extends IntentService {
     /**
      * invokes a service call to get the header information for multiple surveys
      */
-    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds, String deviceId)
-            throws IOException {
-        final String deviceIdParam = deviceId != null ?
-                DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8")  : "";
-
+    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds, String deviceId) {
         List<Survey> surveys = new ArrayList<Survey>();
         for (String id : surveyIds) {
             try {
                 final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id
-                        + "&devicePhoneNumber=" + StatusUtil.getPhoneNumber(this) + deviceIdParam;
+                        + NUMBER_PARAM + StatusUtil.getPhoneNumber(this)
+                        + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
                 String response = HttpUtil.httpGet(url);
                 if (response != null) {
                     surveys.addAll(new SurveyMetaParser().parseList(response, true));
                 }
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
+                displayNotification(getString(R.string.error_form_sync_title),
+                        String.format(getString(R.string.error_form_header), id),
+                        ConstantUtil.NOTIFICATION_HEADER_ERROR);
                 PersistentUncaughtExceptionHandler.recordException(e);
             }
         }
@@ -366,7 +368,7 @@ public class SurveyDownloadService extends IntentService {
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
-    private List<Survey> checkForSurveys(String serverBase, String deviceId) throws IOException {
+    private List<Survey> checkForSurveys(String serverBase, String deviceId) {
         List<Survey> surveys = new ArrayList<Survey>();
         String phoneNumber = StatusUtil.getPhoneNumber(this);
         if (phoneNumber == null) {
@@ -374,24 +376,28 @@ public class SurveyDownloadService extends IntentService {
         }
         String imei = StatusUtil.getImei(this);
         String version = PlatformUtil.getVersionName(this);
-        final String url = serverBase
-                + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
-                + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
-                + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
-                + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
-        String response = HttpUtil.httpGet(url);
-        if (response != null) {
-            surveys = new SurveyMetaParser().parseList(response);
+        try {
+            final String url = serverBase
+                    + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
+                    + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
+                    + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
+                    + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
+            String response = HttpUtil.httpGet(url);
+            if (response != null) {
+                surveys = new SurveyMetaParser().parseList(response);
+            }
+        } catch (IOException e) {
+            displayNotification(getString(R.string.error_form_sync_title),
+                    getString(R.string.error_assignment_read),
+                    ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR);
+            Log.e(TAG, e.getMessage());
+            PersistentUncaughtExceptionHandler.recordException(e);
         }
         return surveys;
     }
 
-    /**
-     * displays a notification in the system status bar indicating the
-     * completion of the download operation
-     */
-    private void fireNotification(String text, int notificationID) {
-        ViewUtil.fireNotification(text, text, this, notificationID, null);
+    private void displayNotification(String title, String msg, int id) {
+        ViewUtil.fireNotification(title, msg, this, id, null);
     }
 
     /**

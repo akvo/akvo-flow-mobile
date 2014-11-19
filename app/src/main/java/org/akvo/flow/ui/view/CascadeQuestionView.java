@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -111,40 +112,46 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             }
         }
 
-        final Spinner spinner = createSpinner(nextLevel, mDatabase.getValues(parent));
-        if (spinner != null) {
-            mSpinnerContainer.addView(spinner);
+        List<Node> values = mDatabase.getValues(parent);
+        if (!values.isEmpty()) {
+            addLevelView(nextLevel, values, POSITION_NONE);
             mFinished = updatedSpinnerIndex == POSITION_NONE;
         } else {
             mFinished = true;// no more levels
         }
     }
 
-    private Spinner createSpinner(int position, List<Node> values) {
+    private void addLevelView(int position, List<Node> values, int selection) {
         if (values.isEmpty()) {
-            return null;
+            return;
         }
 
-        final Spinner spinner = new Spinner(getContext());
-        spinner.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT));
+        LayoutInflater inflater = LayoutInflater.from(getContext());
 
-        // Insert a fake value with the title
-        String value = mLevels != null && mLevels.length >= position ? mLevels[position] : "";
-        Node node = new Node(ID_NONE, value);
+        View view = inflater.inflate(R.layout.cascading_level_item, null);
+        final TextView text = (TextView)view.findViewById(R.id.text);
+        final Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
+
+        text.setText(mLevels != null && mLevels.length >= position ? mLevels[position] : "");
+
+        // Insert a fake 'Select' value
+        Node node = new Node(ID_NONE, getContext().getString(R.string.select));
         values.add(0, node);
 
         SpinnerAdapter adapter = new CascadeAdapter(getContext(), values);
         spinner.setAdapter(adapter);
         spinner.setTag(position);// Tag the spinner with its position within the container
         spinner.setEnabled(!isReadOnly());
+        if (selection != POSITION_NONE) {
+            spinner.setSelection(selection + 1);// Skip level title item
+        }
         // Attach listener asynchronously, preventing selection event from being fired off right away
         spinner.post(new Runnable() {
             public void run() {
                 spinner.setOnItemSelectedListener(CascadeQuestionView.this);
             }
         });
-        return spinner;
+        mSpinnerContainer.addView(view);
     }
 
     @Override
@@ -191,13 +198,12 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
                 }
             }
 
-            Spinner spinner = createSpinner(index, spinnerValues);
 
-            if (valuePosition == POSITION_NONE || spinner == null) {
+            if (valuePosition == POSITION_NONE || spinnerValues.isEmpty()) {
+                mSpinnerContainer.removeAllViews();
                 return;// Cannot reassemble response
             }
-            spinner.setSelection(valuePosition + 1);// Skip level title item
-            mSpinnerContainer.addView(spinner);
+            addLevelView(index, spinnerValues, valuePosition);
             index++;
         }
         if (!isReadOnly()) {
@@ -232,7 +238,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     }
 
     private Spinner getSpinner(int position) {
-        return (Spinner)mSpinnerContainer.getChildAt(position);
+        return (Spinner)mSpinnerContainer.getChildAt(position).findViewById(R.id.spinner);
     }
 
     public boolean isValid() {

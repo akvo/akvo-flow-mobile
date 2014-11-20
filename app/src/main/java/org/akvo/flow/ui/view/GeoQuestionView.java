@@ -38,6 +38,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.text.DecimalFormat;
+import java.util.zip.CRC32;
 
 /**
  * Question that can handle geographic location input. This question can also

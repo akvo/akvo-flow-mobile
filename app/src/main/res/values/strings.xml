@@ -198,6 +198,7 @@
     <string name="time_warning">Your phone time is inaccurate! Adjust your clock and try again. Your phone date and time is:</string>
     <string name="adjust_date">Adjust time</string>
     <!-- Form sync -->
+    <string name="downloading_forms">Downloading forms</string>
     <string name="error_form_sync_title">Error syncing forms</string>
     <string name="error_assignment_read">Form assignments could not be read from the FLOW dashboard.</string>
     <string name="error_form_header">Form %1$s could not be read from FLOW dashboard.</string>

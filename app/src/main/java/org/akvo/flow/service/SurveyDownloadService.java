@@ -33,8 +33,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.akvo.flow.R;
@@ -125,13 +129,15 @@ public class SurveyDownloadService extends IntentService {
             surveys = checkForSurveys(serverBase, deviceId);
         }
 
+        // if there are surveys for this device, see if we need them
+        surveys = databaseAdaptor.checkSurveyVersions(surveys);
+
         if (!surveys.isEmpty()) {
             // First, sync the SurveyGroups
             syncSurveyGroups(surveys);
 
-            // if there are surveys for this device, see if we need them
-            surveys = databaseAdaptor.checkSurveyVersions(surveys);
-            int updateCount = 0;
+            int synced = 0, failed = 0;
+            displayNotification(synced, failed, surveys.size());
             for (Survey survey : surveys) {
                 try {
                     downloadSurvey(survey);
@@ -139,20 +145,16 @@ public class SurveyDownloadService extends IntentService {
                     String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
                     databaseAdaptor.addLanguages(langs);
                     downloadResources(survey);
-                    updateCount++;
+                    synced++;
                 } catch (Exception e) {
+                    failed++;
                     Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
-                    displayNotification(getString(R.string.error_form_sync_title),
-                            getString(R.string.error_form_download),
-                            ConstantUtil.NOTIFICATION_FORM_ERROR);
+                    displayErrorNotification(ConstantUtil.NOTIFICATION_FORM_ERROR,
+                            getString(R.string.error_form_download));
                     PersistentUncaughtExceptionHandler
                             .recordException(new TransferException(survey.getId(), null, e));
                 }
-            }
-            if (updateCount > 0) {
-                displayNotification(getString(R.string.surveysupdated),
-                        getString(R.string.surveysupdated),
-                        ConstantUtil.NOTIFICATION_FORMS_SYNCED);
+                displayNotification(synced, failed, surveys.size());
             }
         }
 
@@ -352,9 +354,8 @@ public class SurveyDownloadService extends IntentService {
                 }
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
-                displayNotification(getString(R.string.error_form_sync_title),
-                        String.format(getString(R.string.error_form_header), id),
-                        ConstantUtil.NOTIFICATION_HEADER_ERROR);
+                displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
+                        String.format(getString(R.string.error_form_header), id));
                 PersistentUncaughtExceptionHandler.recordException(e);
             }
         }
@@ -387,17 +388,47 @@ public class SurveyDownloadService extends IntentService {
                 surveys = new SurveyMetaParser().parseList(response);
             }
         } catch (IOException e) {
-            displayNotification(getString(R.string.error_form_sync_title),
-                    getString(R.string.error_assignment_read),
-                    ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR);
+            displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
+                    getString(R.string.error_assignment_read));
             Log.e(TAG, e.getMessage());
             PersistentUncaughtExceptionHandler.recordException(e);
         }
         return surveys;
     }
 
-    private void displayNotification(String title, String msg, int id) {
-        ViewUtil.fireNotification(title, msg, this, id, null);
+    private void displayErrorNotification(int id, String msg) {
+        ViewUtil.fireNotification(getString(R.string.error_form_sync_title), msg, this, id, null);
+    }
+
+    private void displayNotification(int synced, int failed, int total) {
+        boolean finished = synced + failed >= total;
+        int icon = finished ? android.R.drawable.stat_sys_download_done
+                : android.R.drawable.stat_sys_download;
+
+        String title = getString(R.string.downloading_forms);
+        // Do not show failed if there is none
+        String text = failed > 0 ? String.format(getString(R.string.data_sync_all),
+                synced, failed)
+                : String.format(getString(R.string.data_sync_synced), synced);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(icon)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setTicker(title);
+
+        builder.setOngoing(!finished);// Ongoing if still syncing the records
+
+        // Progress will only be displayed in Android versions > 4.0
+        builder.setProgress(total, synced+failed, false);
+
+        // Dummy intent. Do nothing when clicked
+        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        builder.setContentIntent(intent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(ConstantUtil.NOTIFICATION_FORMS_SYNCED, builder.build());
     }
 
     /**

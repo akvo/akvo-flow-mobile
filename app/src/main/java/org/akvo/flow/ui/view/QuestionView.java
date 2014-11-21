@@ -471,7 +471,14 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * can cause a memory leak or prevent this View from being GC should be
      * freed/notified
      */
-    public void releaseResources() {
+    public void onPause() {
+    }
+
+    /**
+     * Instantiate any resource that depends on the Activity life-cycle (i.e. internal DB connections)
+     * This callback will be invoked *after* the question is instantiated and initialized.
+     */
+    public void onResume() {
     }
 
     public QuestionResponse getResponse() {

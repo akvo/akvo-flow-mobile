@@ -290,6 +290,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     protected void onResume() {
         super.onResume();
+        mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
         if (Boolean.valueOf(mDatabase.getPreference(ConstantUtil.SCREEN_ON_KEY))) {
             mPager.setKeepScreenOn(true);

@@ -92,6 +92,18 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         mDatabase.open();
     }
 
+    @Override
+    public void onResume() {
+        if (!mDatabase.isOpen()) {
+            mDatabase.open();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        mDatabase.close();
+    }
+
     private void updateSpinners(int updatedSpinnerIndex) {
         final int nextLevel = updatedSpinnerIndex + 1;
 
@@ -164,11 +176,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-    }
-
-    @Override
-    public void releaseResources() {
-        mDatabase.close();
     }
 
     @Override

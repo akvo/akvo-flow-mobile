@@ -56,6 +56,11 @@ public class CascadeDB {
 
     public void close() {
         mHelper.close();
+        mDatabase = null;
+    }
+
+    public boolean isOpen() {
+        return mDatabase != null;
     }
 
     public List<Node> getValues(long parent) {

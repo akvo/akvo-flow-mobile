@@ -275,7 +275,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     }
 
     @Override
-    public void releaseResources() {
+    public void onPause() {
         // Remove updates from LocationManager, to allow this object being GC
         // and avoid an unnecessary use of the GPS and battery draining.
         LocationManager locMgr = (LocationManager) getContext()

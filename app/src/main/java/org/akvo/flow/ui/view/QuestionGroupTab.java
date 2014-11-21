@@ -171,9 +171,16 @@ public class QuestionGroupTab extends ScrollView {
     }
 
     public void onPause() {
+        // Propagate onPause callback
         for (QuestionView q : mQuestionViews) {
-            // Notify the View so it can release any system resource (i.e. Location updates)
-            q.releaseResources();
+            q.onPause();
+        }
+    }
+
+    public void onResume() {
+        // Propagate onResume callback
+        for (QuestionView q : mQuestionViews) {
+            q.onResume();
         }
     }
 

@@ -93,7 +93,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String REGISTRATION_SURVEY = "registrationSurvey";
 
     private static final String USE_EXTERNAL_SOURCE = "allowExternalSources";
-    private static final String SRC = "src";
+    private static final String CASCADE_RESOURCE = "cascadeResource";
     private static final String LEVELS = "levels";
     private static final String LEVEL = "level";
 
@@ -366,7 +366,7 @@ public class SurveyHandler extends DefaultHandler {
             }
 
             // Question src. Added in cascading question implementation.
-            currentQuestion.setSrc(attributes.getValue(SRC));
+            currentQuestion.setSrc(attributes.getValue(CASCADE_RESOURCE));
         } else if (localName.equalsIgnoreCase(OPTIONS)) {
             currentOptions = new ArrayList<Option>();
             if (currentQuestion != null) {

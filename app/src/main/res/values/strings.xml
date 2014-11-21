@@ -51,7 +51,6 @@
     <string name="videohelpoption">View Help Video</string>
     <string name="photohelpoption">View Help Photos</string>
     <string name="helpheading">Help Options</string>
-    <string name="surveysupdated">Installed surveys have been updated</string>
     <string name="deleteresponse">Delete Response</string>
     <string name="othertext">Other...</string>
     <string name="savelastuserlabel">Keep the last selected user logged-in between sessions</string>

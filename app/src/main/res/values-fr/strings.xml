@@ -50,7 +50,6 @@
   <string name="videohelpoption">Voir la vidéo d\'aide</string>
   <string name="photohelpoption">Voir les photos d\'aide</string>
   <string name="helpheading">Options d\'aide</string>
-  <string name="surveysupdated">Les enquêtes installées ont été mises à jour</string>
   <string name="deleteresponse">Effacer les réponses</string>
   <string name="othertext">Autre...</string>
   <string name="savelastuserlabel">Garde le dernier utilisateur connecté entre les sessions</string>
@@ -113,7 +112,6 @@
   <string name="sdmounted">La carte SD est activée normalement.</string>
   <string name="sdcardspace">Espace restant (MB):</string>
   <string name="pickdate">Choisir une date</string>
-  <string name="cannotupdate">Les enquêtes n\'ont pas pu être téléchargées. Elles ne sont peut-être pas publiées ou votre carte SD est peut-être encore en mode transfert USB.</string>
   <string name="pleasewaitforbootstrap">Veuillez attendre jusqu\'à ce que le fichier soit prêt.</string>
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>

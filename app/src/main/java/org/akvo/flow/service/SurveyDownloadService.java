@@ -334,6 +334,8 @@ public class SurveyDownloadService extends IntentService {
             databaseAdaptor.markSurveyHelpDownloaded(sid, true);
         } catch (Exception e) {
             databaseAdaptor.markSurveyHelpDownloaded(sid, false);
+            displayErrorNotification(ConstantUtil.NOTIFICATION_RESOURCE_ERROR,
+                    getString(R.string.error_missing_resources));
             Log.e(TAG, "Could not download resources for survey : " + sid, e);
         }
     }

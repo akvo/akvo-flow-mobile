@@ -20,24 +20,24 @@ package org.akvo.flow.domain;
  */
 public class Node {
     private long mId;
-    private String mValue;
+    private String mName;
 
-    public Node(long id, String value) {
+    public Node(long id, String name) {
         mId = id;
-        mValue = value;
+        mName = name;
     }
 
     public long getId() {
         return mId;
     }
 
-    public String getValue() {
-        return mValue;
+    public String getName() {
+        return mName;
     }
 
     @Override
     public String toString() {
-        return mValue;
+        return mName;
     }
 
 }

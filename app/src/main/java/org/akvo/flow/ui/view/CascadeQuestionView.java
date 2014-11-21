@@ -179,19 +179,19 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             return;
         }
         mSpinnerContainer.removeAllViews();
-        String[] values = answer.split("\\|", -1);
+        String[] names = answer.split("\\|", -1);
 
         // For each existing token, we load the corresponding level values, and create a spinner
         // view, automatically selecting the token. On each iteration, we keep track of selected
         // value's id, in order to fetch the descendant nodes from the DB.
         int index = 0;
         long parentId = 0;
-        while (index < values.length) {
+        while (index < names.length) {
             int valuePosition = POSITION_NONE;
             List<Node> spinnerValues = mDatabase.getValues(parentId);
             for (int pos=0; pos<spinnerValues.size(); pos++) {
                 Node node = spinnerValues.get(pos);
-                if (node.getValue().equals(values[index])) {
+                if (node.getName().equals(names[index])) {
                     valuePosition = pos;
                     parentId = node.getId();
                     break;

@@ -27,13 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CascadeDB {
-    public static final String TABLE_PATH = "path";
+    public static final String TABLE_NODE = "nodes";
 
     private String mDBPath;
 
-    public interface PathColumns {
-        String _ID = "_id";
-        String VALUE = "value";
+    public interface NodeColumns {
+        String ID = "id";
+        String NAME = "name";
         String PARENT = "parent";
     }
 
@@ -59,9 +59,9 @@ public class CascadeDB {
     }
 
     public List<Node> getValues(long parent) {
-        Cursor c = mDatabase.query(true, TABLE_PATH,
-                new String[]{PathColumns._ID, PathColumns.VALUE},
-                PathColumns.PARENT + "=?",
+        Cursor c = mDatabase.query(true, TABLE_NODE,
+                new String[]{NodeColumns.ID, NodeColumns.NAME},
+                NodeColumns.PARENT + "=?",
                 new String[]{String.valueOf(parent)},
                 null, null, null, null);
 
@@ -80,7 +80,6 @@ public class CascadeDB {
     static class DatabaseHelper extends SQLiteOpenHelper {
 
         DatabaseHelper(Context context, String dbPath) {
-            //super(context, context.getExternalFilesDir(null) + "/" + DATABASE_NAME, null, VERSION);
             super(context, dbPath, null, VERSION);
         }
 

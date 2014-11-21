@@ -128,7 +128,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
-        View view = inflater.inflate(R.layout.cascading_level_item, null);
+        View view = inflater.inflate(R.layout.cascading_level_item, mSpinnerContainer, false);
         final TextView text = (TextView)view.findViewById(R.id.text);
         final Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
 

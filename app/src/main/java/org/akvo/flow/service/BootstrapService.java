@@ -30,6 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
@@ -66,32 +67,21 @@ import org.akvo.flow.util.ViewUtil;
  * 
  * @author Christopher Fagiani
  */
-public class BootstrapService extends Service {
+public class BootstrapService extends IntentService {
     private static final String TAG = "BOOTSTRAP_SERVICE";
     public static boolean isProcessing = false;
-    private static Semaphore lock = new Semaphore(1);
-    private Thread workerThread;
     private SurveyDbAdapter databaseAdapter;
     private static final Integer NOTIFICATION_ID = new Integer(123);
 
-    @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
+    public BootstrapService() {
+        super(TAG);
     }
 
-    /**
-     * life cycle method for the service. This is called by the system when the
-     * service is started
-     */
-    public int onStartCommand(final Intent intent, int flags, int startid) {
-        workerThread = new Thread(new Runnable() {
-            public void run() {
-                checkAndInstall();
-                stopSelf();
-            }
-        });
-        workerThread.start();
-        return Service.START_STICKY;
+    public void onHandleIntent(Intent intent) {
+        isProcessing = true;
+        checkAndInstall();
+        isProcessing = false;
+        sendBroadcastNotification();
     }
 
     /**
@@ -103,10 +93,8 @@ public class BootstrapService extends Service {
      */
     private void checkAndInstall() {
         try {
-            lock.acquire();
             ArrayList<File> zipFiles = getZipFiles();
             if (zipFiles != null && zipFiles.size() > 0) {
-                isProcessing = true;
                 String startMessage = getString(R.string.bootstrapstart);
                 ViewUtil.fireNotification(startMessage, startMessage, this,
                         NOTIFICATION_ID, android.R.drawable.ic_dialog_info);
@@ -117,23 +105,18 @@ public class BootstrapService extends Service {
                         try {
                             processFile(zipFiles.get(i));
                         } catch (Exception e) {
-                            // try to roll back any database changes (if the zip
-                            // has a rollback file)
+                            // try to roll back any database changes (if the zip has a rollback file)
                             rollback(zipFiles.get(i));
                             String newFilename = zipFiles.get(i)
                                     .getAbsolutePath();
-                            zipFiles.get(i)
-                                    .renameTo(
-                                            new File(
-                                                    newFilename
-                                                            + ConstantUtil.PROCESSED_ERROR_SUFFIX));
+                            zipFiles.get(i).renameTo(
+                                    new File(newFilename + ConstantUtil.PROCESSED_ERROR_SUFFIX));
                             throw (e);
                         }
                     }
                     String endMessage = getString(R.string.bootstrapcomplete);
                     ViewUtil.fireNotification(endMessage, endMessage, this,
                             NOTIFICATION_ID, android.R.drawable.ic_dialog_info);
-                    sendBroadcastNotification();
                 } finally {
                     if (databaseAdapter != null) {
                         databaseAdapter.close();
@@ -145,18 +128,12 @@ public class BootstrapService extends Service {
             ViewUtil.fireNotification(errorMessage, errorMessage, this,
                     NOTIFICATION_ID, android.R.drawable.ic_dialog_alert);
             Log.e(TAG, "Bootstrap error", e);
-        } finally {
-            isProcessing = false;
-            lock.release();
         }
     }
 
     /**
      * looks for the rollback file in the zip and, if it exists, attempts to
      * execute the statements contained therein
-     * 
-     * @param zipFile
-     * @throws Exception
      */
     private void rollback(File zipFile) throws Exception {
         ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
@@ -166,12 +143,8 @@ public class BootstrapService extends Service {
             String fileName = parts[parts.length - 1];
             // make sure we're not processing a hidden file
             if (!fileName.startsWith(".")) {
-                if (entry
-                        .getName()
-                        .toLowerCase()
-                        .endsWith(
-                                ConstantUtil.BOOTSTRAP_ROLLBACK_FILE
-                                        .toLowerCase())) {
+                if (entry.getName().toLowerCase()
+                        .endsWith(ConstantUtil.BOOTSTRAP_ROLLBACK_FILE.toLowerCase())) {
                     processDbInstructions(FileUtil.readText(zis), false);
                 }
             }
@@ -272,8 +245,6 @@ public class BootstrapService extends Service {
     /**
      * tokenizes instructions using the newline character as a delimiter and
      * executes each line as a separate SQL command;
-     * 
-     * @param instructions
      */
     private void processDbInstructions(String instructions, boolean failOnError)
             throws Exception {
@@ -317,8 +288,6 @@ public class BootstrapService extends Service {
     /**
      * returns an ordered list of zip files that exist in the device's bootstrap
      * directory
-     * 
-     * @return
      */
     private ArrayList<File> getZipFiles() {
         ArrayList<File> zipFiles = new ArrayList<File>();

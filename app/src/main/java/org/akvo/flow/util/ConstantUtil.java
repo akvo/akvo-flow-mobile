@@ -36,6 +36,7 @@ public class ConstantUtil {
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
     public static final String STACKTRACE_FILENAME = "err-";
     public static final String STACKTRACE_SUFFIX = ".stacktrace";
+    public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
 
     /**
      * survey file locations

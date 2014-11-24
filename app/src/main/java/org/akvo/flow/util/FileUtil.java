@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.zip.ZipInputStream;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -161,18 +160,12 @@ public class FileUtil {
     }
 
     /**
-     * reads data from a zipInputStream into a string. The ZipInputStream must
-     * already be positioned at the correct ZipEntry prior to invoking this
-     * method.
-     * 
-     * @param zis
-     * @return
-     * @throws IOException
+     * reads data from an InputStream into a string.
      */
-    public static String readTextFromZip(ZipInputStream zis) throws IOException {
+    public static String readText(InputStream is) throws IOException {
         ByteArrayOutputStream out = null;
         try {
-            out = readZipEntry(zis);
+            out = read(is);
             return out.toString();
         } finally {
             close(out);
@@ -180,19 +173,13 @@ public class FileUtil {
     }
 
     /**
-     * reads binary data from a zipInputSream and saves it to the
-     * destinationFile passed in. The ZipInputStream must already be positioned
-     * at the ZipEntry for the file to be saved.
-     * 
-     * @param zip
-     * @param destinationFile
-     * @throws IOException
+     * reads binary data from an InputStream and saves it to the destinationFile passed in.
      */
-    public static void extractAndSaveFile(ZipInputStream zip,
+    public static void extractAndSaveFile(InputStream is,
             FileOutputStream destinationFile) throws IOException {
         ByteArrayOutputStream out = null;
         try {
-            out = readZipEntry(zip);
+            out = read(is);
             destinationFile.write(out.toByteArray());
         } finally {
             close(out);
@@ -201,19 +188,13 @@ public class FileUtil {
     }
 
     /**
-     * reads the contents of a ZipEntry into a ByteArrayOutputStream. The
-     * ZipInputStream passed in must be positioned at the desired ZipEntry prior
-     * to being passed to this method
-     * 
-     * @param zis
-     * @return
-     * @throws IOException
+     * reads the contents of an InputStream into a ByteArrayOutputStream.
      */
-    public static ByteArrayOutputStream readZipEntry(ZipInputStream zis) throws IOException {
+    public static ByteArrayOutputStream read(InputStream is) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[BUFFER_SIZE];
         int size;
-        while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
+        while ((size = is.read(buffer, 0, buffer.length)) != -1) {
             out.write(buffer, 0, size);
         }
         return out;

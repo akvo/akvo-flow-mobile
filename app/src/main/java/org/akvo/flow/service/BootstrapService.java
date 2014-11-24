@@ -20,12 +20,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Enumeration;
 import java.util.concurrent.Semaphore;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import android.app.Service;
@@ -170,7 +172,7 @@ public class BootstrapService extends Service {
                         .endsWith(
                                 ConstantUtil.BOOTSTRAP_ROLLBACK_FILE
                                         .toLowerCase())) {
-                    processDbInstructions(FileUtil.readTextFromZip(zis), false);
+                    processDbInstructions(FileUtil.readText(zis), false);
                 }
             }
         }
@@ -178,105 +180,93 @@ public class BootstrapService extends Service {
 
     /**
      * processes a bootstrap zip file
-     * 
-     * @param zipFile
-     * @throws Exception
      */
-    private void processFile(File zipFile) throws Exception {
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-        ZipEntry entry = null;
-        HashSet<String> surveysWithImages = new HashSet<String>();
-        while ((entry = zis.getNextEntry()) != null) {
+    private void processFile(File file) throws Exception {
+        final ZipFile zipFile = new ZipFile(file);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            Log.d(TAG, "Processing entry: " + entry.getName());
             String parts[] = entry.getName().split("/");
-            String fileName = parts[parts.length - 1];
-            // make sure we're not processing a hidden file
-            if (!fileName.startsWith(".")) {
-                if (entry.getName().toLowerCase()
-                        .endsWith(ConstantUtil.BOOTSTRAP_DB_FILE.toLowerCase())) {
-                    processDbInstructions(FileUtil.readTextFromZip(zis), true);
+            String filename = parts[parts.length - 1];
+            String id = parts.length > 1 ? parts[parts.length - 2] : "";
 
-                } else if (!entry.isDirectory()
-                        && !ConstantUtil.BOOTSTRAP_ROLLBACK_FILE
-                                .equalsIgnoreCase(fileName)) {
-                    String id = parts[parts.length - 2];
-                    if (entry.getName().toLowerCase()
-                            .endsWith(ConstantUtil.XML_SUFFIX.toLowerCase())) {
-                        String surveyName = fileName;
-                        if (surveyName.contains(".")) {
-                            surveyName = surveyName.substring(0,
-                                    surveyName.indexOf("."));
-                        }
-                        Survey survey = databaseAdapter.getSurvey(id);
-                        if (survey == null) {
-                            survey = new Survey();
-                            survey.setId(id);
-                            survey.setName(surveyName);
-                            survey.setHelpDownloaded(false);
-                            survey.setType(ConstantUtil.SURVEY_TYPE);
-                        }
-                        survey.setLocation(ConstantUtil.FILE_LOCATION);
-                        survey.setFileName(fileName);
+            // Skip directories and hidden/unwanted files
+            if (entry.isDirectory() || filename.startsWith(".") ||
+                    ConstantUtil.BOOTSTRAP_ROLLBACK_FILE.equalsIgnoreCase(filename)) {
+                continue;
+            }
 
-                        // in both cases (new survey and existing), we need to update the xml
-                        File file = new File(FileUtil.getFilesDir(FileType.FORMS), fileName);
-                        FileUtil.extractAndSaveFile(zis, new FileOutputStream(file));
-                        // now read the survey XML back into memory to see if
-                        // there is a version
-                        Survey loadedSurvey = null;
-                        try {
-                            InputStream in = new FileInputStream(file);
-                            loadedSurvey = SurveyDao.loadSurvey(survey, in);
-                        } catch (FileNotFoundException e) {
-                            Log.e(TAG, "Could not load survey xml file");
-                        }
+            if (filename.endsWith(ConstantUtil.BOOTSTRAP_DB_FILE)) {
+                // DB instructions
+                processDbInstructions(FileUtil.readText(zipFile.getInputStream(entry)), true);
+            } else if (filename.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
+                // Cascade resource
+                processCascadeResource(new ZipInputStream(zipFile.getInputStream(entry)));
+            } else if (filename.endsWith(ConstantUtil.XML_SUFFIX)) {
+                // Survey file
+                String surveyName = filename;
+                if (surveyName.contains(".")) {
+                    surveyName = surveyName.substring(0, surveyName.indexOf("."));
+                }
+                Survey survey = databaseAdapter.getSurvey(id);
+                if (survey == null) {
+                    survey = new Survey();
+                    survey.setId(id);
+                    survey.setName(surveyName);
+                    survey.setHelpDownloaded(true);// Resources are always attached to the zip file
+                    survey.setType(ConstantUtil.SURVEY_TYPE);
+                }
+                survey.setLocation(ConstantUtil.FILE_LOCATION);
+                survey.setFileName(filename);
 
-                        if (loadedSurvey == null) {
-                            // Something went wrong, we cannot continue with this survey
-                            continue;
-                        }
+                // in both cases (new survey and existing), we need to update the xml
+                File surveyFile = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
+                FileUtil.extractAndSaveFile(zipFile.getInputStream(entry),
+                        new FileOutputStream(surveyFile));
+                // now read the survey XML back into memory to see if there is a version
+                Survey loadedSurvey = null;
+                try {
+                    InputStream in = new FileInputStream(surveyFile);
+                    loadedSurvey = SurveyDao.loadSurvey(survey, in);
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, "Could not load survey xml file");
+                }
+                if (loadedSurvey == null) {
+                    // Something went wrong, we cannot continue with this survey
+                    continue;
+                }
 
-                        survey.setName(loadedSurvey.getName());
+                survey.setName(loadedSurvey.getName());
 
-                        if (loadedSurvey.getVersion() > 0) {
-                            survey.setVersion(loadedSurvey.getVersion());
-                        } else {
-                            survey.setVersion(1d);
-                        }
+                if (loadedSurvey.getVersion() > 0) {
+                    survey.setVersion(loadedSurvey.getVersion());
+                } else {
+                    survey.setVersion(1d);
+                }
 
-                        // Process SurveyGroup, and save it to the DB
-                        SurveyGroup group = parseSurveyGroup(loadedSurvey);
-                        survey.setSurveyGroup(group);
-                        databaseAdapter.addSurveyGroup(group);
+                // Process SurveyGroup, and save it to the DB
+                SurveyGroup group = parseSurveyGroup(loadedSurvey);
+                survey.setSurveyGroup(group);
+                databaseAdapter.addSurveyGroup(group);
 
-                        // now save the survey and add the languages
-                        databaseAdapter.saveSurvey(survey);
-                        String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
-                        databaseAdapter.addLanguages(langs);
-                    } else {
-                        // if it's not a sql file and its not a survey, it must
-                        // be help media
-                        File helpDir = new File(FileUtil.getFilesDir(FileType.FORMS), id);
-                        if (!helpDir.exists()) {
-                            helpDir.mkdir();
-                        }
-                        File file = new File(helpDir, fileName);
-                        FileUtil.extractAndSaveFile(zis, new FileOutputStream(file));
-                        // record the fact that this survey had media
-                        surveysWithImages.add(id);
-                    }
+                // now save the survey and add the languages
+                databaseAdapter.saveSurvey(survey);
+                String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
+                databaseAdapter.addLanguages(langs);
+            } else {
+                // Help media file
+                File helpDir = new File(FileUtil.getFilesDir(FileType.FORMS), id);
+                if (!helpDir.exists()) {
+                    helpDir.mkdir();
+                }
+                FileUtil.extractAndSaveFile(zipFile.getInputStream(entry),
+                        new FileOutputStream(new File(helpDir, filename)));
                 }
             }
-        }
-        // update survey record so the system knows not to bother trying to
-        // re-download media (since it was in the file)
-        for (String sid : surveysWithImages) {
-            databaseAdapter.markSurveyHelpDownloaded(sid, true);
-        }
 
         // now rename the zip file so we don't process it again
-        String newFilename = zipFile.getAbsolutePath();
-        zipFile.renameTo(new File(newFilename
-                + ConstantUtil.PROCESSED_OK_SUFFIX));
+        file.renameTo(new File(file.getAbsolutePath() + ConstantUtil.PROCESSED_OK_SUFFIX));
     }
 
     /**
@@ -303,6 +293,25 @@ public class BootstrapService extends Service {
                 }
             }
         }
+    }
+
+    private void processCascadeResource(ZipInputStream zis) throws IOException {
+        // FIXME: refactor this in FileUtil -- same process is done in SurveyDownloadService
+        final File resDir = FileUtil.getFilesDir(FileType.RES);
+        ZipEntry entry;
+        while ((entry = zis.getNextEntry()) != null) {
+            File f = new File(resDir, entry.getName());
+            FileOutputStream fout = new FileOutputStream(f);
+            byte[] buffer = new byte[8192];
+            int size;
+            while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
+                fout.write(buffer, 0, size);
+            }
+            fout.close();
+            zis.closeEntry();
+        }
+        zis.close();
+
     }
 
     /**

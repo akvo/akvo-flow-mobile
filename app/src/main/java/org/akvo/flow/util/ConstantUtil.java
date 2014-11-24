@@ -221,6 +221,8 @@ public class ConstantUtil {
     public static final int NOTIFICATION_FORM_ERROR = 105;
     public static final int NOTIFICATION_RESOURCE_ERROR = 105;
 
+    public static final int NOTIFICATION_BOOTSTRAP = 106;
+
     /**
      + * External Sources
      + */

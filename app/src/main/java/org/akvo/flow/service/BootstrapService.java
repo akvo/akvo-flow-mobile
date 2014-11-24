@@ -20,21 +20,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.concurrent.Semaphore;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import android.app.IntentService;
-import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
-import android.os.IBinder;
 import android.util.Log;
 
 import org.akvo.flow.R;
@@ -69,9 +65,8 @@ import org.akvo.flow.util.ViewUtil;
  */
 public class BootstrapService extends IntentService {
     private static final String TAG = "BOOTSTRAP_SERVICE";
-    public static boolean isProcessing = false;
+    public volatile static boolean isProcessing = false;
     private SurveyDbAdapter databaseAdapter;
-    private static final Integer NOTIFICATION_ID = new Integer(123);
 
     public BootstrapService() {
         super(TAG);
@@ -94,39 +89,39 @@ public class BootstrapService extends IntentService {
     private void checkAndInstall() {
         try {
             ArrayList<File> zipFiles = getZipFiles();
-            if (zipFiles != null && zipFiles.size() > 0) {
-                String startMessage = getString(R.string.bootstrapstart);
-                ViewUtil.fireNotification(startMessage, startMessage, this,
-                        NOTIFICATION_ID, android.R.drawable.ic_dialog_info);
-                databaseAdapter = new SurveyDbAdapter(this);
-                databaseAdapter.open();
-                try {
-                    for (int i = 0; i < zipFiles.size(); i++) {
-                        try {
-                            processFile(zipFiles.get(i));
-                        } catch (Exception e) {
-                            // try to roll back any database changes (if the zip has a rollback file)
-                            rollback(zipFiles.get(i));
-                            String newFilename = zipFiles.get(i)
-                                    .getAbsolutePath();
-                            zipFiles.get(i).renameTo(
-                                    new File(newFilename + ConstantUtil.PROCESSED_ERROR_SUFFIX));
-                            throw (e);
-                        }
+            if (zipFiles.isEmpty()) {
+                return;
+            }
+
+            String startMessage = getString(R.string.bootstrapstart);
+            ViewUtil.fireNotification(startMessage, startMessage, this,
+                    ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
+            databaseAdapter = new SurveyDbAdapter(this);
+            databaseAdapter.open();
+            try {
+                for (File file : zipFiles) {
+                    try {
+                        processFile(file);
+                    } catch (Exception e) {
+                        // try to roll back any database changes (if the zip has a rollback file)
+                        rollback(file);
+                        String newFilename = file.getAbsolutePath();
+                        file.renameTo(new File(newFilename + ConstantUtil.PROCESSED_ERROR_SUFFIX));
+                        throw (e);
                     }
-                    String endMessage = getString(R.string.bootstrapcomplete);
-                    ViewUtil.fireNotification(endMessage, endMessage, this,
-                            NOTIFICATION_ID, android.R.drawable.ic_dialog_info);
-                } finally {
-                    if (databaseAdapter != null) {
-                        databaseAdapter.close();
-                    }
+                }
+                String endMessage = getString(R.string.bootstrapcomplete);
+                ViewUtil.fireNotification(endMessage, endMessage, this,
+                        ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
+            } finally {
+                if (databaseAdapter != null) {
+                    databaseAdapter.close();
                 }
             }
         } catch (Exception e) {
             String errorMessage = getString(R.string.bootstraperror);
             ViewUtil.fireNotification(errorMessage, errorMessage, this,
-                    NOTIFICATION_ID, android.R.drawable.ic_dialog_alert);
+                    ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_alert);
             Log.e(TAG, "Bootstrap error", e);
         }
     }
@@ -175,7 +170,8 @@ public class BootstrapService extends IntentService {
                 processDbInstructions(FileUtil.readText(zipFile.getInputStream(entry)), true);
             } else if (filename.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
                 // Cascade resource
-                processCascadeResource(new ZipInputStream(zipFile.getInputStream(entry)));
+                FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
+                        FileUtil.getFilesDir(FileType.RES));
             } else if (filename.endsWith(ConstantUtil.XML_SUFFIX)) {
                 // Survey file
                 String surveyName = filename;
@@ -195,8 +191,7 @@ public class BootstrapService extends IntentService {
 
                 // in both cases (new survey and existing), we need to update the xml
                 File surveyFile = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
-                FileUtil.extractAndSaveFile(zipFile.getInputStream(entry),
-                        new FileOutputStream(surveyFile));
+                FileUtil.copy(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
                 // now read the survey XML back into memory to see if there is a version
                 Survey loadedSurvey = null;
                 try {
@@ -233,7 +228,7 @@ public class BootstrapService extends IntentService {
                 if (!helpDir.exists()) {
                     helpDir.mkdir();
                 }
-                FileUtil.extractAndSaveFile(zipFile.getInputStream(entry),
+                FileUtil.copy(zipFile.getInputStream(entry),
                         new FileOutputStream(new File(helpDir, filename)));
                 }
             }
@@ -250,8 +245,8 @@ public class BootstrapService extends IntentService {
             throws Exception {
         if (instructions != null && instructions.trim().length() > 0) {
             String[] instructionList = instructions.split("\n");
-            for (int i = 0; i < instructionList.length; i++) {
-                String command = instructionList[i].trim();
+            for (String instruction : instructionList) {
+                String command = instruction.trim();
                 if (!command.endsWith(";")) {
                     command = command + ";";
                 }
@@ -266,25 +261,6 @@ public class BootstrapService extends IntentService {
         }
     }
 
-    private void processCascadeResource(ZipInputStream zis) throws IOException {
-        // FIXME: refactor this in FileUtil -- same process is done in SurveyDownloadService
-        final File resDir = FileUtil.getFilesDir(FileType.RES);
-        ZipEntry entry;
-        while ((entry = zis.getNextEntry()) != null) {
-            File f = new File(resDir, entry.getName());
-            FileOutputStream fout = new FileOutputStream(f);
-            byte[] buffer = new byte[8192];
-            int size;
-            while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-                fout.write(buffer, 0, size);
-            }
-            fout.close();
-            zis.closeEntry();
-        }
-        zis.close();
-
-    }
-
     /**
      * returns an ordered list of zip files that exist in the device's bootstrap
      * directory
@@ -297,13 +273,10 @@ public class BootstrapService extends IntentService {
             File dir = FileUtil.getFilesDir(FileType.INBOX);
             File[] fileList = dir.listFiles();
             if (fileList != null) {
-                for (int i = 0; i < fileList.length; i++) {
-                    if (fileList[i].isFile()
-                            && fileList[i]
-                                    .getName()
-                                    .toLowerCase()
-                                    .endsWith(ConstantUtil.ARCHIVE_SUFFIX.toLowerCase())) {
-                        zipFiles.add(fileList[i]);
+                for (File file : fileList) {
+                    if (file.isFile() && file.getName().toLowerCase()
+                                .endsWith(ConstantUtil.ARCHIVE_SUFFIX)) {
+                        zipFiles.add(file);
                     }
                 }
             }
@@ -326,13 +299,12 @@ public class BootstrapService extends IntentService {
     }
 
     /**
-     * sets up the uncaught exeption handler for this thread so we can report
+     * sets up the uncaught exception handler for this thread so we can report
      * errors to the server.
      */
     public void onCreate() {
         super.onCreate();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-                .getInstance());
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**

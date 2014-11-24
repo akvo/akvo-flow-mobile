@@ -19,7 +19,6 @@ package org.akvo.flow.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -29,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import android.app.IntentService;
@@ -213,7 +211,8 @@ public class SurveyDownloadService extends IntentService {
         S3Api s3Api = new S3Api(this);
         s3Api.get(objectKey, file); // Download zip file
 
-        extract(file, FileUtil.getFilesDir(FileType.FORMS));
+        FileUtil.extract(new ZipInputStream(new FileInputStream(file)),
+                FileUtil.getFilesDir(FileType.FORMS));
 
         // Compressed file is not needed any more
         if (!file.delete()) {
@@ -223,28 +222,6 @@ public class SurveyDownloadService extends IntentService {
         survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
         survey.setType(DEFAULT_TYPE);
         survey.setLocation(ConstantUtil.FILE_LOCATION);
-    }
-
-    /**
-     * Extract a zipped file contents into the destination directory
-     * @param src File object of the zip file
-     * @param dst directory wherein the contents will be extracted
-     */
-    private void extract(File src, File dst) throws IOException {
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(src));
-        ZipEntry entry;
-        while ((entry = zis.getNextEntry()) != null) {
-            File f = new File(dst, entry.getName());
-            FileOutputStream fout = new FileOutputStream(f);
-            byte[] buffer = new byte[8192];
-            int size;
-            while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-                fout.write(buffer, 0, size);
-            }
-            fout.close();
-            zis.closeEntry();
-        }
-        zis.close();
     }
 
     private Survey loadSurvey(Survey survey) {
@@ -325,7 +302,7 @@ public class SurveyDownloadService extends IntentService {
                     final File file = new File(resDir, filename);
                     S3Api s3 = new S3Api(SurveyDownloadService.this);
                     s3.syncFile(objectKey, file);
-                    extract(file, resDir);
+                    FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
                     if (!file.delete()) {
                         Log.e(TAG, "Error deleting resource zip file");
                     }

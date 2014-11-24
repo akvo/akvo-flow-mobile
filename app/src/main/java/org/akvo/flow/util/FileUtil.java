@@ -27,9 +27,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -122,10 +125,6 @@ public class FileUtil {
 
     /**
      * writes the contents string to the file indicated by filePath
-     * 
-     * @param contents
-     * @param filePath
-     * @throws IOException
      */
     public static void writeStringToFile(String contents,
             FileOutputStream filePath) throws IOException {
@@ -139,10 +138,6 @@ public class FileUtil {
 
     /**
      * reads the contents of a file into a string.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
      */
     public static String readFileAsString(File file) throws IOException {
         StringBuilder contents = new StringBuilder();
@@ -172,18 +167,11 @@ public class FileUtil {
         }
     }
 
-    /**
-     * reads binary data from an InputStream and saves it to the destinationFile passed in.
-     */
-    public static void extractAndSaveFile(InputStream is,
-            FileOutputStream destinationFile) throws IOException {
-        ByteArrayOutputStream out = null;
-        try {
-            out = read(is);
-            destinationFile.write(out.toByteArray());
-        } finally {
-            close(out);
-            destinationFile.close();
+    public static void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int size;
+        while ((size = in.read(buffer, 0, buffer.length)) != -1) {
+            out.write(buffer, 0, size);
         }
     }
 
@@ -201,10 +189,26 @@ public class FileUtil {
     }
 
     /**
+     * extract zip file contents into destination folder.
+     */
+    public static void extract(ZipInputStream zis, File dst) throws IOException {
+        ZipEntry entry;
+        try {
+            while ((entry = zis.getNextEntry()) != null) {
+                File f = new File(dst, entry.getName());
+                FileOutputStream fout = new FileOutputStream(f);
+                FileUtil.copy(zis, fout);
+                fout.close();
+                zis.closeEntry();
+            }
+        } finally {
+            close(zis);
+        }
+    }
+
+    /**
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
-     * 
-     * @param dir
      */
     public static void deleteFilesInDirectory(File dir, boolean deleteDir) {
         if (dir != null && dir.isDirectory()) {

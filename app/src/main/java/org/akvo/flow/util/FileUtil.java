@@ -194,7 +194,7 @@ public class FileUtil {
     public static void extract(ZipInputStream zis, File dst) throws IOException {
         ZipEntry entry;
         try {
-            while ((entry = zis.getNextEntry()) != null) {
+            while ((entry = zis.getNextEntry()) != null && !entry.isDirectory()) {
                 File f = new File(dst, entry.getName());
                 FileOutputStream fout = new FileOutputStream(f);
                 FileUtil.copy(zis, fout);

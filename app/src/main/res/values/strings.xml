@@ -76,16 +76,16 @@
     <string name="langmandatorytitle">Invalid Selection</string>
     <string name="langmandatorytext">You must select at least one language</string>
     <string name="pleasewait">Please wait</string>
-    <string name="downloadsurveylabel">Download Survey</string>
+    <string name="downloadsurveylabel">Download Form</string>
     <string name="downloadsurveydesc">Downloads arbitrary surveys (only run if instructed)</string>
-    <string name="downloadsurveyinstr">Enter the survey id you wish to download.</string>
+    <string name="downloadsurveyinstr">Enter the form id you wish to download.</string>
     <string name="deleteallwarning">This will permanently delete all survey responses (saved AND submitted) on the device. Click OK to proceed or cancel to abort.</string>
     <string name="deletealldatawarning">This will permanently delete all data (surveys, responses, images, and users) on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="delete_responses_warning">This will permanently delete responses, images, and zip files on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="unsentdatawarning">Some responses are not submitted. Make sure you export them before deletion. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="deleteonewarning">This will permanently delete this survey response. Click OK to proceed or cancel to abort.</string>
     <string name="nextbutton">Next</string>
-    <string name="submittext">If you are finished with the survey, press submit to send the data. Once you press submit, you can review the data but you will not be able to edit it.</string>
+    <string name="submittext">If you are finished with the form, press submit to send the data. Once you press submit, you can review the data but you will not be able to edit it.</string>
     <string name="cleartitle">Clear Survey Answers</string>
     <string name="cleardesc">Are you sure you want to clear your responses?</string>
     <string name="authtitle">Authorization Required</string>
@@ -144,14 +144,14 @@
     <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the FLOW dashboard</string>
     <string name="no_records_text">You have no Data Points yet. Click on \'CREATE NEW DATA POINT\' to get started</string>
     <!-- Activity Labels -->
-    <string name="survey_groups_activity">Projects</string>
+    <string name="survey_groups_activity">Surveys</string>
     <string name="record_list_activity">Select Data Point</string>
     <!-- ActionBar -->
     <string name="more">More</string>
     <!-- Search -->
     <string name="search_hint">Search Data Point</string>
     <!-- Project List (Survey Group) Activity -->
-    <string name="delete_project_text">This will permanently delete this Project. Click OK to proceed or cancel to abort.</string>
+    <string name="delete_project_text">This will permanently delete this Survey. Click OK to proceed or cancel to abort.</string>
     <!-- Survey Activity -->
     <string name="error_responses">Some responses contain errors. You must review the following questions before you can submit:</string>
     <string name="error_question_mandatory">This response is required</string>
@@ -167,7 +167,7 @@
     <string name="or">or</string>
     <!-- RecordList Activity -->
     <string name="create_data_point">CREATE NEW DATA POINT</string>
-    <string name="stats_title">Project Stats</string>
+    <string name="stats_title">Survey Stats</string>
     <string name="stats_total">Total Data Points:</string>
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>

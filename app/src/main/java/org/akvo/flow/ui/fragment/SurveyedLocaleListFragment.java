@@ -38,6 +38,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -260,7 +261,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale) {
-            StringBuilder builder = new StringBuilder("Distance: ");
+            StringBuilder builder = new StringBuilder(getString(R.string.distance_label) + " ");
             
             if (surveyedLocale.getLatitude() != null && surveyedLocale.getLongitude() != null
                     && (mLatitude != 0.0d || mLongitude != 0.0d)) {
@@ -281,18 +282,27 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 }
                 double dist = distance * factor;
                 builder.append(df.format(dist)).append(" ").append(unit);
-            } else {
-                builder.append(getString(R.string.unknown));
+
+                return builder.toString();
             }
-            
-            return builder.toString();
+
+            return null;
         }
-        
+
         private void displayDateText(TextView tv, Long time) {
             if (time != null && time > 0) {
                 tv.setVisibility(View.VISIBLE);
                 tv.setText(getString(R.string.last_modified) + " " +
                         new PrettyTime().format(new Date(time)));
+            } else {
+                tv.setVisibility(View.GONE);
+            }
+        }
+
+        private void displayDistanceText(TextView tv, String distance) {
+            if (!TextUtils.isEmpty(distance)) {
+                tv.setVisibility(View.VISIBLE);
+                tv.setText(distance);
             } else {
                 tv.setVisibility(View.GONE);
             }
@@ -312,7 +322,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
             nameView.setText(surveyedLocale.getDisplayName(context));
             idView.setText(surveyedLocale.getId());
-            distanceView.setText(getDistanceText(surveyedLocale));
+
+            displayDistanceText(distanceView, getDistanceText(surveyedLocale));
             displayDateText(dateView, surveyedLocale.getLastModified());
 
             int statusRes = 0;

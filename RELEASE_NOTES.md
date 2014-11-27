@@ -1,17 +1,32 @@
 Akvo FLOW app 
-Last update 05 November 2014
+Last update 14 November 2014
+
+#ver 2.0.5.2
+
+New and noteworthy
+------------------
+* Exported files are recreated if the app does not find them in the external storage [#222]
+
+#ver 2.0.5.1
+
+New and noteworthy
+------------------
+* Barcode questions allow batch scans, storing multiple, concatenated values in the same question response [#211]
 
 #ver 2.0.5
 
-Features / Bugfixes
--------------------
-* #209 - Clear answer on option questions
-* #205 - Timezone check on phone
-* #200 - App rotation bug
-* #196 - Reload all surveys deletes bootstrap surveys
-* #193 - Display username in form instance overview
-* #186 - Clustering
-* #164 - Caddisfly integration
+New and noteworthy
+---------------------------
+* App warns users of date/time setting misconfiguration. An accurate date is mandatory for proper data synchronization [#205]
+* *History* tab now displays form submitter name [#193]
+* Clustering integration in the *map* tab. This makes data point browsing much friendlier [#186]
+* Questions can define an *external source* attribute, which enables third party apps to answer FLOW questions. This has been primarily implemented to integrate the Caddisfly software workflow with FLOW [#164]
+
+Resolved issues
+----------------------
+* App rotation bug [#200]
+* *Reload all surveys* now handled any survey synced in the app, regardless of its original sync method (assignment, manual download or bootstrap) [#196]
+* Clear answer on option questions [#209]
 
 #ver 2.0.4
 

@@ -23,6 +23,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -156,9 +157,14 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
      * @return
      */
     private String generateCode(double lat, double lon) {
-        Long code = Long.parseLong((int) ((Math.abs(lat) * 100000d)) + ""
-                + (int) ((Math.abs(lon) * 10000d)));
-        return Long.toString(code, 36);
+        try {
+            Long code = Long.parseLong((int) ((Math.abs(lat) * 100000d)) + ""
+                    + (int) ((Math.abs(lon) * 10000d)));
+            return Long.toString(code, 36);
+        } catch (NumberFormatException e) {
+            Log.e("GeoQuestionView", "Code cannot be generated: " + e.getMessage());
+            return "";
+        }
     }
 
     /**

@@ -157,7 +157,11 @@
   <string name="reg_form_warning_title">Questionnaire d\'enregistrement</string>
   <string name="reg_form_warning_text">Ce point contient déjà une réponse pour ce formulaire. Toute nouvelle réponse sera considérée comme la plus récente. Voulez-vous continuer?</string>
   <string name="error_img_preview">Impossible de charger l\'image</string>
+  <string name="use_external_source">Utiliser source externe</string>
   <string name="error_empty_form">Les formulaires vides ne peuvent être envoyés. Veuillez répondre aux questions.</string>
+  <string name="clear_value_msg">Voulez-vous supprimer cette valeur?</string>
+  <string name="type_code">entrez code</string>
+  <string name="or">ou</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CRÉER UN NOUVEAU POINT</string>
   <string name="stats_title">Statistiques du projet</string>
@@ -188,6 +192,10 @@
   <string name="updatedownloaded">La mise à jour de FLOW a été téléchargé</string>
   <string name="clicktoinstall">La mise à jour est téléchargée. Voulez vous l\'installer maintenant?</string>
   <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de FLOW.</string>
+  <!--Time check-->
+  <string name="time_check_activity">Date et heure</string>
+  <string name="time_warning">Votre date de téléphone est inexacte! Réglez votre horloge et essayer à nouveau. Votre date et l\'heure téléphone est le:</string>
+  <string name="adjust_date">Ajuster heure</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Annuler</string>

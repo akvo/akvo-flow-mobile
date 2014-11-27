@@ -161,12 +161,16 @@
     <string name="use_external_source">Use External Source</string>
     <string name="error_empty_form">Empty forms cannot be submitted. Please, add the corresponding responses first.</string>
     <string name="select">please select</string>
+    <string name="clear_value_msg">Do you want to delete this value?</string>
+    <string name="type_code">type code</string>
+    <string name="or">or</string>
     <!-- RecordList Activity -->
     <string name="create_data_point">CREATE NEW DATA POINT</string>
     <string name="stats_title">Project Stats</string>
     <string name="stats_total">Total Data Points:</string>
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>
+    <string name="distance_label">Distance:</string>
     <!-- Record Activity -->
     <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>

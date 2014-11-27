@@ -18,11 +18,12 @@
 
     <ImageButton
         android:id="@+id/tip_ib"
-        android:layout_width="40dp"
+        android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
+        android:scaleType="centerInside"
         android:visibility="gone"
         android:background="@android:color/transparent"
-        android:src="@android:drawable/ic_dialog_info"/>
+        android:src="@drawable/info"/>
 
 </LinearLayout>

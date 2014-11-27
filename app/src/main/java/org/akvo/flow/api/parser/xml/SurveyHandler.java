@@ -316,6 +316,10 @@ public class SurveyHandler extends DefaultHandler {
                 currentQuestion.setIsDoubleEntry(false);
             }
 
+            // 'allowMultiple' flag can be found at the <question> and <options> scopes. In option
+            // questions, the latter will be used. For the rest, the flag will be set in <question>
+            currentQuestion.setAllowMultiple(Boolean.parseBoolean(attributes.getValue(ALLOW_MULT)));
+
             currentQuestion.setType(attributes.getValue(TYPE));
             currentQuestion.setId(attributes.getValue(ID));
             String validation = attributes.getValue(VALIDATION_TYPE);

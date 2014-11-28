@@ -52,7 +52,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
     private String[] mLevels;
     private LinearLayout mSpinnerContainer;
-    private TextView mAnswer;
     private boolean mFinished;
 
     private CascadeDB mDatabase;
@@ -66,7 +65,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         setQuestionView(R.layout.cascade_question_view);
 
         mSpinnerContainer = (LinearLayout)findViewById(R.id.cascade_content);
-        mAnswer = (TextView)findViewById(R.id.answer);
 
         // Load level names
         List<Level> levels = getQuestion().getLevels();
@@ -216,14 +214,12 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         if (!isReadOnly()) {
             updateSpinners(index - 1);// Last updated item position
         }
-        mAnswer.setText(answer);
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         updateSpinners(POSITION_NONE);
-        mAnswer.setText("");
     }
 
     @Override
@@ -238,8 +234,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         }
         // Skip the first "|", if found.
         String response = builder.length() > 0 ? builder.substring(1) : "";
-        mAnswer.setText(response);// tmp visualization of the response -- will go away
-
         setResponse(new QuestionResponse(response, ConstantUtil.VALUE_RESPONSE_TYPE,
                 getQuestion().getId()), suppressListeners);
     }

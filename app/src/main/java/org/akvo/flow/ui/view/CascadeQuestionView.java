@@ -234,7 +234,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         }
         // Skip the first "|", if found.
         String response = builder.length() > 0 ? builder.substring(1) : "";
-        setResponse(new QuestionResponse(response, ConstantUtil.VALUE_RESPONSE_TYPE,
+        setResponse(new QuestionResponse(response, ConstantUtil.CASCADE_RESPONSE_TYPE,
                 getQuestion().getId()), suppressListeners);
     }
 

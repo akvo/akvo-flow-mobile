@@ -83,6 +83,7 @@ public class ConstantUtil {
     public static final String VIDEO_RESPONSE_TYPE = "VIDEO";
     public static final String GEO_RESPONSE_TYPE = "GEO";
     public static final String DATE_RESPONSE_TYPE = "DATE";
+    public static final String CASCADE_RESPONSE_TYPE = "CASCADE";
     public static final String OTHER_RESPONSE_TYPE = "OTHER";
 
     /**

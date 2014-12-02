@@ -53,7 +53,6 @@ Version</string>
   <string name="videohelpoption">Ver ayuda video</string>
   <string name="photohelpoption">Ver ayuda imágenes</string>
   <string name="helpheading">Opciones de ayuda</string>
-  <string name="surveysupdated">Las encuestas instaladas han sido actualizadas</string>
   <string name="deleteresponse">Eliminar respuesta</string>
   <string name="othertext">Otros...</string>
   <string name="savelastuserlabel">Mantener entre sesiones el último usuario activo </string>
@@ -116,7 +115,6 @@ Version</string>
   <string name="sdmounted">La tarjeta SD está montada correctamente.</string>
   <string name="sdcardspace">Espacio disponible (MB):</string>
   <string name="pickdate">Seleccione fecha</string>
-  <string name="cannotupdate">La encuesta no ha podido ser descargada. Podría no esta publicada o su tarjeta SD podría estar configurada para transferir archivos mediante USB.</string>
   <string name="pleasewaitforbootstrap">Por favor, espere a que el archivo bootstrap haya sido procesado.</string>
   <string name="clear_data_success">Los datos han sido correctamente eliminados del dispositivo</string>
   <string name="clear_data_error">Ha ocurrido un error borrando los datos</string>

@@ -39,6 +39,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.text.DecimalFormat;
+import java.util.zip.CRC32;
 
 /**
  * Question that can handle geographic location input. This question can also
@@ -280,7 +281,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     }
 
     @Override
-    public void releaseResources() {
+    public void onPause() {
         // Remove updates from LocationManager, to allow this object being GC
         // and avoid an unnecessary use of the GPS and battery draining.
         LocationManager locMgr = (LocationManager) getContext()

@@ -471,7 +471,14 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * can cause a memory leak or prevent this View from being GC should be
      * freed/notified
      */
-    public void releaseResources() {
+    public void onPause() {
+    }
+
+    /**
+     * Instantiate any resource that depends on the Activity life-cycle (i.e. internal DB connections)
+     * This callback will be invoked *after* the question is instantiated and initialized.
+     */
+    public void onResume() {
     }
 
     public QuestionResponse getResponse() {
@@ -574,8 +581,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     /**
      * Checks if the dependencies for the question passed in are satisfied
      *
-     * @param q Question to check dependencies for
-     * @param responses All the responses for this survey
      * @return true if no dependency is broken, false otherwise
      */
     public boolean areDependenciesSatisfied() {

@@ -6,7 +6,7 @@ import org.apache.http.HttpStatus;
  * Exception to represent a problem in the FLOW API
  * TODO: Implement error codes for known messages from the API
  */
-public class ApiException extends RuntimeException {
+public class HttpException extends RuntimeException {
 
     /**
      * This error codes extend the already existent HTTP status codes, in order to communicate
@@ -19,7 +19,7 @@ public class ApiException extends RuntimeException {
 
     private int mStatus;
 
-    public ApiException(String message, int status) {
+    public HttpException(String message, int status) {
         super(message);
         mStatus = status;
     }

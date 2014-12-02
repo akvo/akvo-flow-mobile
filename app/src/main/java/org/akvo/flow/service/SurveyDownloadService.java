@@ -19,7 +19,6 @@ package org.akvo.flow.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -29,17 +28,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import android.app.Service;
+import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.akvo.flow.R;
@@ -64,58 +61,52 @@ import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 /**
- * this activity will check for new surveys on the device and install as needed
+ * This activity will check for new surveys on the device and install as needed
  * 
  * @author Christopher Fagiani
  */
-public class SurveyDownloadService extends Service {
+public class SurveyDownloadService extends IntentService {
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
     public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated
 
     private static final String DEFAULT_TYPE = "Survey";
-    private static final int COMPLETE_ID = 2;
-    private static final int FAIL_ID = 3;
 
     private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice&devicePhoneNumber=";
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
     private static final String DEV_ID_PARAM = "&devId=";
     private static final String IMEI_PARAM = "&imei=";
     private static final String VERSION_PARAM = "&ver=";
+    private static final String NUMBER_PARAM = "&devicePhoneNumber=";
 
     private SurveyDbAdapter databaseAdaptor;
-    private Thread thread;
-    private ThreadPoolExecutor downloadExecutor;
-    private static Semaphore lock = new Semaphore(1);
 
-    public IBinder onBind(Intent intent) {
-        return null;
+    public SurveyDownloadService() {
+        super(TAG);
     }
 
-    /**
-     * life cycle method for the service. This is called by the system when the
-     * service is started
-     */
-    public int onStartCommand(final Intent intent, int flags, int startid) {
-        thread = new Thread(new Runnable() {
-            public void run() {
-                if (intent != null) {
-                    String[] surveyIds = intent.getStringArrayExtra(EXTRA_SURVEYS);
-                    checkAndDownload(surveyIds);
-                    sendBroadcastNotification();
-                }
+    public void onHandleIntent(Intent intent) {
+        if (StatusUtil.hasDataConnection(this)) {
+            try {
+                databaseAdaptor = new SurveyDbAdapter(this);
+                databaseAdaptor.open();
+
+                String[] surveyIds = intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
+                checkAndDownload(surveyIds);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                PersistentUncaughtExceptionHandler.recordException(e);
+            } finally {
+                databaseAdaptor.close();
             }
-        });
-        thread.start();
-        return Service.START_REDELIVER_INTENT;
+        }
+
+        sendBroadcastNotification();
     }
 
     public void onCreate() {
         super.onCreate();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-                .getInstance());
-        downloadExecutor = new ThreadPoolExecutor(1, 3, 5000,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**
@@ -124,78 +115,55 @@ public class SurveyDownloadService extends Service {
      * passed in, then those specific surveys will be downloaded. If they're already
      * on the device, the surveys will be replaced with the new ones.
      */
-    private void checkAndDownload(String[] surveyIds) {
-        if (StatusUtil.hasDataConnection(this)) {
-            try {
-                lock.acquire();
-                databaseAdaptor = new SurveyDbAdapter(this);
-                databaseAdaptor.open();
-                
-                // Load preferences
-                final String serverBase = StatusUtil.getServerBase(this);
-                final String deviceId = getDeviceId();
+    private void checkAndDownload(String[] surveyIds) throws IOException {
+        // Load preferences
+        final String serverBase = StatusUtil.getServerBase(this);
+        final String deviceId = getDeviceId();
 
-                List<Survey> surveys;
-                if (surveyIds != null) {
-                    surveys = getSurveyHeaders(serverBase, surveyIds, deviceId);
-                } else {
-                    surveys = checkForSurveys(serverBase, deviceId);
-                }
+        List<Survey> surveys;
+        if (surveyIds != null) {
+            surveys = getSurveyHeaders(serverBase, surveyIds, deviceId);
+        } else {
+            surveys = checkForSurveys(serverBase, deviceId);
+        }
 
-                if (!surveys.isEmpty()) {
-                    // First, sync the SurveyGroups
-                    syncSurveyGroups(surveys);
-                    
-                    // if there are surveys for this device, see if we need them
-                    surveys = databaseAdaptor.checkSurveyVersions(surveys);
-                    int updateCount = 0;
-                    for (Survey survey : surveys) {
-                        try {
-                            downloadSurvey(survey);
-                            databaseAdaptor.saveSurvey(survey);
-                            String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
-                            databaseAdaptor.addLanguages(langs);
-                            downloadHelp(survey);
-                            updateCount++;
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
-                            fireNotification(getString(R.string.cannotupdate), FAIL_ID);
-                            PersistentUncaughtExceptionHandler
-                                    .recordException(new TransferException(survey.getId(), null, e));
-                        }
-                    }
-                    if (updateCount > 0) {
-                        fireNotification(getString(R.string.surveysupdated), COMPLETE_ID);
-                    }
-                }
+        // if there are surveys for this device, see if we need them
+        surveys = databaseAdaptor.checkSurveyVersions(surveys);
 
-                // now check if any previously downloaded surveys still need
-                // don't have their help media pre-cached
-                if (StatusUtil.hasDataConnection(this)) {
-                    surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
-                    for (Survey survey : surveys) {
-                        if (!survey.isHelpDownloaded()) {
-                            downloadHelp(survey);
-                        }
-                    }
+        if (!surveys.isEmpty()) {
+            // First, sync the SurveyGroups
+            syncSurveyGroups(surveys);
+
+            int synced = 0, failed = 0;
+            displayNotification(synced, failed, surveys.size());
+            for (Survey survey : surveys) {
+                try {
+                    downloadSurvey(survey);
+                    databaseAdaptor.saveSurvey(survey);
+                    String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
+                    databaseAdaptor.addLanguages(langs);
+                    downloadResources(survey);
+                    synced++;
+                } catch (Exception e) {
+                    failed++;
+                    Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
+                    displayErrorNotification(ConstantUtil.NOTIFICATION_FORM_ERROR,
+                            getString(R.string.error_form_download));
+                    PersistentUncaughtExceptionHandler
+                            .recordException(new TransferException(survey.getId(), null, e));
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "Could not update surveys", e);
-                fireNotification(getString(R.string.cannotupdate), FAIL_ID);
-                PersistentUncaughtExceptionHandler.recordException(e);
-            } finally {
-                databaseAdaptor.close();
-                lock.release();
+                displayNotification(synced, failed, surveys.size());
             }
         }
-        try {
-            downloadExecutor.shutdown();
-            // wait up to 30 minutes to download the media
-            downloadExecutor.awaitTermination(1800, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Error while waiting for download executor to terminate", e);
+
+        // now check if any previously downloaded surveys still need
+        // don't have their help media pre-cached
+        surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
+        for (Survey survey : surveys) {
+            if (!survey.isHelpDownloaded()) {
+                downloadResources(survey);
+            }
         }
-        stopSelf();
     }
 
     private String getDeviceId() {
@@ -243,7 +211,8 @@ public class SurveyDownloadService extends Service {
         S3Api s3Api = new S3Api(this);
         s3Api.get(objectKey, file); // Download zip file
 
-        extractAndSave(new FileInputStream(file));
+        FileUtil.extract(new ZipInputStream(new FileInputStream(file)),
+                FileUtil.getFilesDir(FileType.FORMS));
 
         // Compressed file is not needed any more
         if (!file.delete()) {
@@ -255,29 +224,28 @@ public class SurveyDownloadService extends Service {
         survey.setLocation(ConstantUtil.FILE_LOCATION);
     }
 
-    /**
-     * reads the byte array passed in using a zip input stream and extracts the
-     * entry to the file specified. This assumes ONE entry per zip
-     * 
-     * @param bytes
-     * @param f
-     * @throws IOException
-     */
-    private void extractAndSave(FileInputStream zipFile) throws IOException {
-        ZipInputStream zis = new ZipInputStream(zipFile);
-        ZipEntry entry;
-        while ((entry = zis.getNextEntry()) != null) {
-            File f = new File(FileUtil.getFilesDir(FileType.FORMS), entry.getName());
-            FileOutputStream fout = new FileOutputStream(f);
-            byte[] buffer = new byte[2048];
-            int size;
-            while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-                fout.write(buffer, 0, size);
+    private Survey loadSurvey(Survey survey) {
+        InputStream in = null;
+        Survey hydratedDurvey = null;
+        try {
+            if (ConstantUtil.RESOURCE_LOCATION.equalsIgnoreCase(survey.getLocation())) {
+                // load from resource
+                Resources res = getResources();
+                in = res.openRawResource(res.getIdentifier(survey.getFileName(),
+                        ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
+            } else {
+                // load from file
+                File f = new File(FileUtil.getFilesDir(FileType.FORMS), survey.getFileName());
+                in = new FileInputStream(f);
             }
-            fout.close();
-            zis.closeEntry();
+            hydratedDurvey = SurveyDao.loadSurvey(survey, in);
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "Could not parse survey survey file", e);
+            PersistentUncaughtExceptionHandler.recordException(e);
+        } finally {
+            FileUtil.close(in);
         }
-        zis.close();
+        return hydratedDurvey;
     }
 
     /**
@@ -286,102 +254,87 @@ public class SurveyDownloadService extends Service {
      * 
      * @param survey
      */
-    private void downloadHelp(Survey survey) {
-        // first, see if we should even bother trying to download
-        if (StatusUtil.hasDataConnection(this)) {
-            try {
-                InputStream in = null;
-                if (ConstantUtil.RESOURCE_LOCATION.equalsIgnoreCase(survey.getLocation())) {
-                    // load from resource
-                    Resources res = getResources();
-                    in = res.openRawResource(res.getIdentifier(survey.getFileName(),
-                            ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
-                } else {
-                    // load from file
-                    File f = new File(FileUtil.getFilesDir(FileType.FORMS), survey.getFileName());
-                    in = new FileInputStream(f);
-                }
-                Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);
-                if (hydratedSurvey != null) {
-                    // collect files in a set just in case the same binary is
-                    // used in multiple questions
-                    // we only need to download once
-                    Set<String> fileSet = new HashSet<String>();
-                    for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
-                        for (Question question : group.getQuestions()) {
-                            if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
-                                fileSet.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
-                                        .get(0).getValue());
-                            }
-                            ArrayList<QuestionHelp> helpList = question
-                                    .getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
-                            for (QuestionHelp help : helpList) {
-                                fileSet.add(help.getValue());
-                            }
-                        }
+    private void downloadResources(Survey survey) {
+        Survey hydratedSurvey = loadSurvey(survey);
+        if (hydratedSurvey != null) {
+            // collect files in a set just in case the same binary is
+            // used in multiple questions we only need to download once
+            Set<String> resources = new HashSet<String>();
+            for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
+                for (Question question : group.getQuestions()) {
+                    if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
+                        resources.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
+                                .get(0).getValue());
                     }
-                    for (String file : fileSet) {
-                        downloadBinary(file, survey.getId());
+                    for (QuestionHelp help : question.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE)) {
+                        resources.add(help.getValue());
                     }
-                    databaseAdaptor.markSurveyHelpDownloaded(survey.getId(), true);
+                    // Question src data (i.e. cascading question resources)
+                    if (question.getSrc() != null) {
+                        resources.add(question.getSrc());
+                    }
                 }
-            } catch (FileNotFoundException e) {
-                Log.e(TAG, "Could not parse survey survey file", e);
-                PersistentUncaughtExceptionHandler.recordException(e);
             }
+            // Download help media files (images & videos) and common resources
+            downloadResources(survey.getId(), resources);
         }
     }
 
-    /**
-     * uses the thread pool executor to download the remote file passed in via a
-     * background thread
-     * 
-     * @param remoteFile
-     * @param surveyId
-     */
-    private void downloadBinary(final String remoteFile, final String surveyId) {
+    private void downloadResources(final String sid, final Set<String> resources) {
+        databaseAdaptor.markSurveyHelpDownloaded(sid, false);
         try {
-            String filename = remoteFile.substring(remoteFile.lastIndexOf("/") + 1);
-            File dir = new File(FileUtil.getFilesDir(FileType.FORMS), surveyId);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            final FileOutputStream out = new FileOutputStream(new File(dir, filename));
-            downloadExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        HttpUtil.httpDownload(remoteFile, out);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Could not download help media file", e);
+            for (String resource : resources) {
+                Log.i(TAG, "Downloading resource: " + resource);
+                // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
+                // Naive check to determine whether or not this is an absolute filename
+                if (resource.startsWith("http")) {
+                    final String filename = new File(resource).getName();
+                    final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
+                    if (!surveyDir.exists()) {
+                        surveyDir.mkdir();
+                    }
+                    HttpUtil.httpGet(resource, new File(surveyDir, filename));
+                } else {
+                    // resource is just a filename
+                    final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
+                    final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+                    final File resDir = FileUtil.getFilesDir(FileType.RES);
+                    final File file = new File(resDir, filename);
+                    S3Api s3 = new S3Api(SurveyDownloadService.this);
+                    s3.syncFile(objectKey, file);
+                    FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
+                    if (!file.delete()) {
+                        Log.e(TAG, "Error deleting resource zip file");
                     }
                 }
-            });
-        } catch (FileNotFoundException e1) {
-            Log.e(TAG, "Could not download binary file", e1);
-            PersistentUncaughtExceptionHandler.recordException(e1);
+            }
+            databaseAdaptor.markSurveyHelpDownloaded(sid, true);
+        } catch (Exception e) {
+            databaseAdaptor.markSurveyHelpDownloaded(sid, false);
+            displayErrorNotification(ConstantUtil.NOTIFICATION_RESOURCE_ERROR,
+                    getString(R.string.error_missing_resources));
+            Log.e(TAG, "Could not download resources for survey : " + sid, e);
         }
     }
 
     /**
      * invokes a service call to get the header information for multiple surveys
      */
-    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds, String deviceId)
-            throws IOException {
-        final String deviceIdParam = deviceId != null ?
-                DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8")  : "";
-
+    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds, String deviceId) {
         List<Survey> surveys = new ArrayList<Survey>();
         for (String id : surveyIds) {
             try {
                 final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id
-                        + "&devicePhoneNumber=" + StatusUtil.getPhoneNumber(this) + deviceIdParam;
+                        + NUMBER_PARAM + StatusUtil.getPhoneNumber(this)
+                        + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
                 String response = HttpUtil.httpGet(url);
                 if (response != null) {
                     surveys.addAll(new SurveyMetaParser().parseList(response, true));
                 }
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
+                displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
+                        String.format(getString(R.string.error_form_header), id));
                 PersistentUncaughtExceptionHandler.recordException(e);
             }
         }
@@ -395,7 +348,7 @@ public class SurveyDownloadService extends Service {
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
-    private List<Survey> checkForSurveys(String serverBase, String deviceId) throws IOException {
+    private List<Survey> checkForSurveys(String serverBase, String deviceId) {
         List<Survey> surveys = new ArrayList<Survey>();
         String phoneNumber = StatusUtil.getPhoneNumber(this);
         if (phoneNumber == null) {
@@ -403,26 +356,58 @@ public class SurveyDownloadService extends Service {
         }
         String imei = StatusUtil.getImei(this);
         String version = PlatformUtil.getVersionName(this);
-        final String url = serverBase
-                + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
-                + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
-                + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
-                + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
-        String response = HttpUtil.httpGet(url);
-        if (response != null) {
-            surveys = new SurveyMetaParser().parseList(response);
+        try {
+            final String url = serverBase
+                    + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
+                    + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
+                    + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
+                    + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
+            String response = HttpUtil.httpGet(url);
+            if (response != null) {
+                surveys = new SurveyMetaParser().parseList(response);
+            }
+        } catch (IOException e) {
+            displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
+                    getString(R.string.error_assignment_read));
+            Log.e(TAG, e.getMessage());
+            PersistentUncaughtExceptionHandler.recordException(e);
         }
         return surveys;
     }
 
-    /**
-     * displays a notification in the system status bar indicating the
-     * completion of the download operation
-     * 
-     * @param type
-     */
-    private void fireNotification(String text, int notificationID) {
-        ViewUtil.fireNotification(text, text, this, notificationID, null);
+    private void displayErrorNotification(int id, String msg) {
+        ViewUtil.fireNotification(getString(R.string.error_form_sync_title), msg, this, id, null);
+    }
+
+    private void displayNotification(int synced, int failed, int total) {
+        boolean finished = synced + failed >= total;
+        int icon = finished ? android.R.drawable.stat_sys_download_done
+                : android.R.drawable.stat_sys_download;
+
+        String title = getString(R.string.downloading_forms);
+        // Do not show failed if there is none
+        String text = failed > 0 ? String.format(getString(R.string.data_sync_all),
+                synced, failed)
+                : String.format(getString(R.string.data_sync_synced), synced);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(icon)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setTicker(title);
+
+        builder.setOngoing(!finished);// Ongoing if still syncing the records
+
+        // Progress will only be displayed in Android versions > 4.0
+        builder.setProgress(total, synced+failed, false);
+
+        // Dummy intent. Do nothing when clicked
+        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        builder.setContentIntent(intent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(ConstantUtil.NOTIFICATION_FORMS_SYNCED, builder.build());
     }
 
     /**

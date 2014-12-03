@@ -331,7 +331,7 @@ public class SurveyDownloadService extends IntentService {
                 if (response != null) {
                     surveys.addAll(new SurveyMetaParser().parseList(response, true));
                 }
-            } catch (IOException e) {
+            } catch (IllegalArgumentException | IOException e) {
                 Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         String.format(getString(R.string.error_form_header), id));
@@ -366,7 +366,7 @@ public class SurveyDownloadService extends IntentService {
             if (response != null) {
                 surveys = new SurveyMetaParser().parseList(response);
             }
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
                     getString(R.string.error_assignment_read));
             Log.e(TAG, e.getMessage());

@@ -8,11 +8,18 @@
         android:icon="@drawable/ic_action_users"
         android:title="@string/userlabel"
         flowapp:showAsAction="always" />
+
     <item
         android:id="@+id/settings"
         android:orderInCategory="101"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/settingslabel"
+        flowapp:showAsAction="always" />
+
+    <item
+        android:id="@+id/plotting"
+        android:orderInCategory="102"
+        android:title="Plotting"
         flowapp:showAsAction="always" />
 
 </menu>

@@ -75,6 +75,12 @@ public class PlotActivity extends ActionBarActivity {
     private void initMap() {
         if (mMap != null) {
             mMap.setMyLocationEnabled(true);
+            mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(LatLng latLng) {
+                    addPoint(latLng);
+                }
+            });
         }
     }
 

@@ -23,6 +23,7 @@
         android:orderInCategory="100"
         android:title="Finish Feature"
         android:icon="@android:drawable/ic_menu_save"
+        android:visible="false"
         flowapp:showAsAction="always"/>
 
     <item

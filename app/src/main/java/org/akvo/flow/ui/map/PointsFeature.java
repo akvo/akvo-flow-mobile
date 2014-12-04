@@ -1,15 +1,15 @@
 package org.akvo.flow.ui.map;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.List;
 
 public class PointsFeature extends Feature {
 
     public PointsFeature(GoogleMap map) {
         super(map);
+        mMarkerAnchorV = 1.0f;
     }
 
     @Override
@@ -18,10 +18,16 @@ public class PointsFeature extends Feature {
     }
 
     @Override
-    public MarkerOptions getMarkerOptions(LatLng point) {
-        return new MarkerOptions()
-                .position(point)
-                .title(point.toString());
+    protected BitmapDescriptor getMarkerBitmapDescriptor() {
+        if (mSelected) {
+            return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
+        }
+        return BitmapDescriptorFactory.defaultMarker();
+    }
+
+    @Override
+    public String getTitle() {
+        return "Points";
     }
 
 }

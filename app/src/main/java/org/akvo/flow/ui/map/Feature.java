@@ -16,7 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Feature {
-    private static final int POINT_SIZE = 20;
+    protected static final int POINT_SIZE = 20;
+    protected static final int SELECTED_COLOR = Color.BLUE;
+    protected static final int UNSELECTED_COLOR = Color.BLACK;
+
+    protected boolean mSelected;
+    protected float mMarkerAnchorU = 0.5f;
+    protected float mMarkerAnchorV = 0.5f;
 
     protected GoogleMap mMap;
     protected List<LatLng> mPoints;
@@ -28,33 +34,52 @@ public abstract class Feature {
         mMarkers = new ArrayList<Marker>();
     }
 
+    public boolean contains(Marker marker) {
+        return mMarkers.contains(marker);
+    }
+
     public void addPoint(LatLng point) {
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title(point.toString())
+                .anchor(mMarkerAnchorU, mMarkerAnchorV)
+                .icon(getMarkerBitmapDescriptor()));
+        mMarkers.add(marker);
         mPoints.add(point);
-        mMarkers.add(mMap.addMarker(getMarkerOptions(point)));
     }
 
     public void delete() {
         for (Marker marker : mMarkers) {
             marker.remove();
         }
+        mMarkers.clear();
     }
 
-    protected MarkerOptions getMarkerOptions(LatLng point) {
+    public abstract String getTitle();
+
+    public void setSelected(boolean selected) {
+        mSelected = selected;
+        invalidate();
+    }
+
+    protected void invalidate() {
+        // Recompute icons, depending on selection status
+        for (Marker marker : mMarkers) {
+            marker.setIcon(getMarkerBitmapDescriptor());
+        }
+    }
+
+    protected BitmapDescriptor getMarkerBitmapDescriptor() {
         Bitmap bmp = Bitmap.createBitmap(POINT_SIZE, POINT_SIZE, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bmp);
 
         Paint color = new Paint();
-        color.setColor(Color.BLACK);
+        color.setColor(mSelected ? SELECTED_COLOR : UNSELECTED_COLOR);
 
         float center = POINT_SIZE / 2f;
 
         canvas.drawCircle(center, center, center, color);
-
-        return new MarkerOptions()
-                .position(point)
-                .title(point.toString())
-                .anchor(0.5f, 0.5f)
-                .icon(BitmapDescriptorFactory.fromBitmap(bmp));
+        return BitmapDescriptorFactory.fromBitmap(bmp);
     }
 
 }

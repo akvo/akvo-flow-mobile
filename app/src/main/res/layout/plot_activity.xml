@@ -15,7 +15,7 @@
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/ab_solid_flow"
-        >
+        android:visibility="gone" >
 
         <TextView
             android:id="@+id/feature_name"

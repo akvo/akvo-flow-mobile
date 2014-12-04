@@ -18,6 +18,7 @@ package org.akvo.flow.activity;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import org.akvo.flow.R;
 import org.akvo.flow.ui.map.Feature;
@@ -38,10 +40,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlotActivity extends ActionBarActivity {
-    public static final String EXTRA__PLOT_ID = "plot_id";
+    // public static final String EXTRA__PLOT_ID = "plot_id";
 
     private static final String TAG = PlotActivity.class.getSimpleName();
-    private static final float ACCURACY_THRESHOLD = 20f;
+    // private static final float ACCURACY_THRESHOLD = 20f;
 
     private List<Feature> mFeatures;// Saved features
     private Feature mCurrentFeature;// Ongoing feature
@@ -76,6 +78,38 @@ public class PlotActivity extends ActionBarActivity {
                     addPoint(latLng);
                 }
             });
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    // We need to figure out which feature contains this marker.
+                    // For now, a naive linear search will do the trick
+                    // TODO: Select marker index, extending the feature from this marker
+                    for (Feature feature : mFeatures) {
+                        if (feature.contains(marker)) {
+                            Log.d(TAG, "Marker found!");
+                            selectFeature(feature);
+                            break;
+                        }
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    private void selectFeature(Feature feature) {
+        // Remove current selection, if any
+        if (mCurrentFeature != null && mCurrentFeature != feature) {
+            mCurrentFeature.setSelected(false);
+        }
+
+        mCurrentFeature = feature;
+        if (mCurrentFeature != null) {
+            mCurrentFeature.setSelected(true);
+            mFeatureName.setText(mCurrentFeature.getTitle());
+            mFeatureMenu.setVisibility(View.VISIBLE);
+        } else {
+            mFeatureMenu.setVisibility(View.GONE);
         }
     }
 
@@ -86,26 +120,9 @@ public class PlotActivity extends ActionBarActivity {
         mCurrentFeature.addPoint(point);
     }
 
-    private void finishFeature() {
-        if (mCurrentFeature == null || mMap == null) {
-            return;
-        }
-
-        mFeatures.add(mCurrentFeature);
-        mCurrentFeature = null;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.plot_activity, menu);
-        /*
-        if (mCurrentFeature != null) {
-            menu.findItem(R.id.add_feature).setVisible(false);
-        } else {
-            menu.findItem(R.id.finish_feature).setVisible(false);
-        }
-        */
-        menu.findItem(R.id.finish_feature).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -117,17 +134,20 @@ public class PlotActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.add_line:
                 Toast.makeText(this, "Adding new line", Toast.LENGTH_LONG).show();
-                mCurrentFeature = new PolylineFeature(mMap);
+                selectFeature(new PolylineFeature(mMap));
+                mFeatures.add(mCurrentFeature);
                 mFeatureName.setText("Line");
                 break;
             case R.id.add_points:
                 Toast.makeText(this, "Adding points", Toast.LENGTH_LONG).show();
-                mCurrentFeature = new PointsFeature(mMap);
+                selectFeature(new PointsFeature(mMap));
+                mFeatures.add(mCurrentFeature);
                 mFeatureName.setText("Points");
                 break;
             case R.id.add_polygon:
                 Toast.makeText(this, "Adding new area", Toast.LENGTH_LONG).show();
-                mCurrentFeature = new PolygonFeature(mMap);
+                selectFeature(new PolygonFeature(mMap));
+                mFeatures.add(mCurrentFeature);
                 mFeatureName.setText("Area");
                 break;
             case R.id.clear:
@@ -137,8 +157,6 @@ public class PlotActivity extends ActionBarActivity {
                 break;
         }
 
-        mFeatureMenu.setVisibility(mCurrentFeature != null ? View.VISIBLE : View.GONE);
-        //supportInvalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
     }
 
@@ -163,15 +181,13 @@ public class PlotActivity extends ActionBarActivity {
                     }
                     break;
                 case R.id.save_feature_btn:
-                    finishFeature();
+                    selectFeature(null);
                     break;
                 case R.id.clear_feature_btn:
                     mCurrentFeature.delete();
-                    mCurrentFeature = null;
+                    selectFeature(null);
                     break;
             }
-
-            mFeatureMenu.setVisibility(mCurrentFeature != null ? View.VISIBLE : View.GONE);
         }
     };
 

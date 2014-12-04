@@ -17,6 +17,7 @@ public class PolylineFeature extends Feature {
         super.addPoint(point);
         if (mPolyline == null) {
             PolylineOptions polylineOptions = new PolylineOptions();
+            polylineOptions.color(mSelected ? SELECTED_COLOR : UNSELECTED_COLOR);
             mPolyline = mMap.addPolyline(polylineOptions);
         }
         mPolyline.setPoints(mPoints);
@@ -28,6 +29,19 @@ public class PolylineFeature extends Feature {
         if (mPolyline != null) {
             mPolyline.remove();
         }
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        if (mPolyline != null) {
+            mPolyline.setColor(mSelected ? SELECTED_COLOR : UNSELECTED_COLOR);
+        }
+    }
+
+    @Override
+    public String getTitle() {
+        return "Line";
     }
 
 }

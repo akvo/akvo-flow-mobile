@@ -58,7 +58,6 @@
   <string name="beaconlabel">Envoyer la localisation</string>
   <string name="scanbarcode">Scanner le code barre</string>
   <string name="barcodeerror">Le scanner n\'est pas installé. Veuillez installer l\'application de code barre sur Android Market.</string>
-  <string name="imagehelpviewmessage">Cliquer sur une icone pour agrandir l\'image. Appuyer sur retour pour revenir à l\'enquête.</string>
   <string name="toosmallerr">La valeur est trop petite. Valeur minimum: </string>
   <string name="toolargeerr">La valeur est trop grande. valeur maximum: </string>
   <string name="baddatatypeerr">La réponse doit être numérique</string>
@@ -77,7 +76,6 @@
   <string name="downloadsurveylabel">Télécharger une enquête</string>
   <string name="downloadsurveydesc">Télécharger une enquête choisie (effectuer seulement si demandé)</string>
   <string name="downloadsurveyinstr">Entrer l\'id de l\'enquête que vous souhaitez charger.</string>
-  <string name="deleteallwarning">Cela va effacer définitivement les données de l\'enquête (enregistrées et envoyées) de l\'appareil. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="deletealldatawarning">Cela va effacer définitivement toutes les données (enquêtes, données, images, et utilisateurs) de l\'appareil. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="delete_responses_warning">Cela va effacer définitivement toutes les données, images et fichier .zip de l\'appareil de l\'appareil. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="unsentdatawarning">Certaines données n\'ont pas été envoyées. Soyez sûr de les exporter avant de les effacer. This operation is not reversible. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
@@ -123,11 +121,9 @@
   <string name="synced_records">%1$d des enregistrements synchronisés</string>
   <string name="sync_error">La synchronisation des enregistrements à échouer</string>
   <string name="network_error">Erreur de réseau</string>
-  <string name="select_record">Veuillez sélectionner un enregistrement</string>
   <string name="loading">Chargement...</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
-  <string name="error_assignment_title">L\'enquête ne peut pas être téléchargée</string>
   <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo FLOW</string>
   <!--Data sync-->
   <string name="data_sync_title">Synchronisation des données</string>
@@ -154,8 +150,6 @@
   <string name="error_question_mandatory">Cette réponse est obligatoire</string>
   <string name="repeat_answer">Veuillez répéter la réponse</string>
   <string name="error_answer_match">Les réponses ne correspondent pas</string>
-  <string name="reg_form_warning_title">Questionnaire d\'enregistrement</string>
-  <string name="reg_form_warning_text">Ce point contient déjà une réponse pour ce formulaire. Toute nouvelle réponse sera considérée comme la plus récente. Voulez-vous continuer?</string>
   <string name="error_img_preview">Impossible de charger l\'image</string>
   <string name="use_external_source">Utiliser source externe</string>
   <string name="error_empty_form">Les formulaires vides ne peuvent être envoyés. Veuillez répondre aux questions.</string>
@@ -172,10 +166,6 @@
   <string name="unknown">Donnée non nommée</string>
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
-  <string name="choose_response">Choisissez la réponse</string>
-  <string name="choose_response_text">Il y a des réponses inachevées dans ce questionnaire. Voulez-vous charger une réponse enregistrée, ou commencer une nouvelle?</string>
-  <string name="resume_response">Chargement</string>
-  <string name="start_new_response">Nouveau</string>
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>
@@ -189,7 +179,6 @@
   <string name="app_update">Une mise à jour de FLOW est disponible. Cliquez \"mettre à jour\" pour télécharger et installer la nouvelle version.</string>
   <string name="update">Mise à jour</string>
   <string name="not_now">Pas maintenant</string>
-  <string name="updatedownloaded">La mise à jour de FLOW a été téléchargé</string>
   <string name="clicktoinstall">La mise à jour est téléchargée. Voulez vous l\'installer maintenant?</string>
   <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de FLOW.</string>
   <!--Time check-->

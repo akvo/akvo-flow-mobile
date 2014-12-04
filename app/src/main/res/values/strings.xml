@@ -59,7 +59,6 @@
     <string name="beaconlabel">Send Location Beacons</string>
     <string name="scanbarcode">Scan Barcode</string>
     <string name="barcodeerror">Scanner not installed. Please install the Barcode Scanner app from the Android Market.</string>
-    <string name="imagehelpviewmessage">Click a thumbnail to view larger image. Press back key to return to survey.</string>
     <string name="toosmallerr">Value is too small. Minimum value: </string>
     <string name="toolargeerr">Value is too large. Maximum value: </string>
     <string name="baddatatypeerr">Answer must be numeric</string>
@@ -78,7 +77,6 @@
     <string name="downloadsurveylabel">Download Form</string>
     <string name="downloadsurveydesc">Downloads arbitrary surveys (only run if instructed)</string>
     <string name="downloadsurveyinstr">Enter the form id you wish to download.</string>
-    <string name="deleteallwarning">This will permanently delete all survey responses (saved AND submitted) on the device. Click OK to proceed or cancel to abort.</string>
     <string name="deletealldatawarning">This will permanently delete all data (surveys, responses, images, and users) on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="delete_responses_warning">This will permanently delete responses, images, and zip files on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="unsentdatawarning">Some responses are not submitted. Make sure you export them before deletion. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
@@ -124,11 +122,9 @@
     <string name="synced_records">Synced %1$d Data Points</string>
     <string name="sync_error">Data Points Sync failed</string>
     <string name="network_error">Network Error</string>
-    <string name="select_record">Please, select a Data Point</string>
     <string name="loading">Loading...</string>
     <string name="prefill_title">Pre-fill Responses</string>
     <string name="prefill_text">Pre-fill form with previous answers?</string>
-    <string name="error_assignment_title">Survey could not be downloaded</string>
     <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
     <!-- Data sync -->
     <string name="data_sync_title">Data Synchronization</string>
@@ -155,8 +151,6 @@
     <string name="error_question_mandatory">This response is required</string>
     <string name="repeat_answer">Please, repeat answer</string>
     <string name="error_answer_match">Answers do not match</string>
-    <string name="reg_form_warning_title">Registration Survey</string>
-    <string name="reg_form_warning_text">This Data Point already contains a response for this form. Any new responses will be used as the most recent values. Do you want to continue?</string>
     <string name="error_img_preview">Can\'t load image preview</string>
     <string name="use_external_source">Use External Source</string>
     <string name="error_empty_form">Empty forms cannot be submitted. Please, add the corresponding responses first.</string>
@@ -175,10 +169,6 @@
     <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>
     <string name="last_response">Last Response:</string>
-    <string name="choose_response">Choose Response</string>
-    <string name="choose_response_text">There are unfinished responses for this survey. Do you want to load a saved response, or start a new response?</string>
-    <string name="resume_response">Load</string>
-    <string name="start_new_response">New</string>
     <string name="error_missing_resources">Survey resources are not fully downloaded</string>
     <!-- Form & transmission status -->
     <string name="status_queued">Queued</string>
@@ -193,7 +183,6 @@
     <string name="app_update">A new version of the FLOW app is available. Click \'Update\' to download and install the new version.</string>
     <string name="update">Update</string>
     <string name="not_now">Not now</string>
-    <string name="updatedownloaded">FLOW update has been downloaded</string>
     <string name="clicktoinstall">New FLOW version is downloaded. Do you want to install it now?</string>
     <string name="apk_upgrade_error">Error downloading FLOW update.</string>
     <!-- Time check -->

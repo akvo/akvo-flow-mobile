@@ -61,7 +61,6 @@ Version</string>
   <string name="beaconlabel">Enviar localización</string>
   <string name="scanbarcode">Escanear código de barras</string>
   <string name="barcodeerror">Barcode Scanner no está instalado. Por favor, instale Barcode Scanner a través de Play Store.</string>
-  <string name="imagehelpviewmessage">Pulse una imagen para verla en tamaño grande. Pulse atrás para volver a la encuesta.</string>
   <string name="toosmallerr">El valor es demasiado pequeño. Valor mínimo: </string>
   <string name="toolargeerr">El valor es demasiado grande. Valor máximo: </string>
   <string name="baddatatypeerr">La respuesta ha de ser numérica</string>
@@ -80,7 +79,6 @@ Version</string>
   <string name="downloadsurveylabel">Descargar encuesta</string>
   <string name="downloadsurveydesc">Descargar una encuesta particular (sólo en caso de instrucción)</string>
   <string name="downloadsurveyinstr">Introduzca el identificador de la encuesta que desea descargar.</string>
-  <string name="deleteallwarning">Esta acción borrará todas las respuestas (guardadas y enviadas) en el dispositivo. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="deletealldatawarning">Esta acción borrará permanentemente todos los datos (encuestas, respuestas, imágenes y usuarios) en el dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="delete_responses_warning">Esta acción borrará permanentemente las respuestas, imágenes y archivos zip del dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="unsentdatawarning">Algunas respuestas no han sido enviadas. Asegúrese de exportarlas antes de borrarlas. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
@@ -126,11 +124,9 @@ Version</string>
   <string name="synced_records">%1$d Puntos de Datos sincronizados</string>
   <string name="sync_error">Sincronización de Puntos de Datos fallida</string>
   <string name="network_error">Error de conexión</string>
-  <string name="select_record">Por favor, seleccione un Punto de Datos</string>
   <string name="loading">Cargando...</string>
   <string name="prefill_title">Pre-llenar respuestas</string>
   <string name="prefill_text">Pre-llenar respuestas con previos valores de las mismas preguntas</string>
-  <string name="error_assignment_title">La encuesta no pudo ser descargada</string>
   <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control FLOW</string>
   <!--Data sync-->
   <string name="data_sync_title">Sincronización de datos</string>
@@ -157,8 +153,6 @@ Version</string>
   <string name="error_question_mandatory">Esta respuesta es obligatoria</string>
   <string name="repeat_answer">Por favor, repita la respuesta</string>
   <string name="error_answer_match">Las respuestas no son iguales</string>
-  <string name="reg_form_warning_title">Encuestra de registro</string>
-  <string name="reg_form_warning_text">El Punto de Datos ya contiene una respuesta para este formulario. Si se crea una nueva respuesta se usarán esos valores como los más recientes. ¿Desea continuar?</string>
   <string name="error_img_preview">La imagen no pude ser cargada</string>
   <string name="use_external_source">Utilizar aplicación externa</string>
   <string name="error_empty_form">Un formulario sin respuestas no puede ser enviado. Por favor, responda a las preguntas antes de enviar.</string>
@@ -175,10 +169,6 @@ Version</string>
   <string name="unknown">Punto sin nombre</string>
   <string name="last_modified">Última modificación:</string>
   <string name="last_response">Última respuesta:</string>
-  <string name="choose_response">Elija respuesta</string>
-  <string name="choose_response_text">Ésta encuesta contiene respuestas sin terminar. ¿Quiere cargar una encuesta guardada, o comenzar una nueva?</string>
-  <string name="resume_response">Cargar</string>
-  <string name="start_new_response">Nueva</string>
   <!--Form & transmission status-->
   <string name="status_queued">En espera</string>
   <string name="status_in_progress">En curso</string>
@@ -192,7 +182,6 @@ Version</string>
   <string name="app_update">Hay una nueva versión de la aplicación FLOW disponible. Pulse \'Actualizar\' para descargar e instalar la nueva versión.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Ahora no</string>
-  <string name="updatedownloaded">La nueva versión de FLOW ha sido descargada</string>
   <string name="clicktoinstall">La nueva versión de FLOW está descargada. ¿Quiere instalarla ahora?</string>
   <string name="apk_upgrade_error">Error descargando la actualización de FLOW</string>
   <!--Time check-->

@@ -14,7 +14,7 @@
             <item android:id="@+id/add_line"
                 android:title="Line"/>
             <item android:id="@+id/add_polygon"
-                android:title="Polygon"/>
+                android:title="Area"/>
         </menu>
     </item>
 

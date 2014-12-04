@@ -22,4 +22,12 @@ public class PolylineFeature extends Feature {
         mPolyline.setPoints(mPoints);
     }
 
+    @Override
+    public void delete() {
+        super.delete();
+        if (mPolyline != null) {
+            mPolyline.remove();
+        }
+    }
+
 }

@@ -26,4 +26,12 @@ public class PolygonFeature extends Feature {
         }
     }
 
+    @Override
+    public void delete() {
+        super.delete();
+        if (mPolygon != null) {
+            mPolygon.remove();
+        }
+    }
+
 }

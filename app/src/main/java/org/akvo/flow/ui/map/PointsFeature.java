@@ -4,6 +4,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.List;
+
 public class PointsFeature extends Feature {
 
     public PointsFeature(GoogleMap map) {
@@ -16,10 +18,10 @@ public class PointsFeature extends Feature {
     }
 
     @Override
-    public void drawPoint(LatLng point) {
-        mMap.addMarker(new MarkerOptions()
+    public MarkerOptions getMarkerOptions(LatLng point) {
+        return new MarkerOptions()
                 .position(point)
-                .title(point.toString()));
+                .title(point.toString());
     }
 
 }

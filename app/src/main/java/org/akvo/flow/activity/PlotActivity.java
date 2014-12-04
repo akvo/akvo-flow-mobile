@@ -21,7 +21,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -46,7 +46,8 @@ public class PlotActivity extends ActionBarActivity {
     private List<Feature> mFeatures;// Saved features
     private Feature mCurrentFeature;// Ongoing feature
 
-    private Button mAddPointBtn;
+    private View mFeatureMenu;
+    private TextView mFeatureName;
     private GoogleMap mMap;
 
     @Override
@@ -57,17 +58,11 @@ public class PlotActivity extends ActionBarActivity {
         mFeatures = new ArrayList<Feature>();
         mMap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
 
-        mAddPointBtn = (Button)findViewById(R.id.add_point_btn);
-        mAddPointBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Location location = mMap.getMyLocation();
-                // TODO: Check accuracy
-                if (location != null) {
-                    addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
-                }
-            }
-        });
+        mFeatureMenu = findViewById(R.id.feature_menu);
+        mFeatureName = (TextView)findViewById(R.id.feature_name);
+        findViewById(R.id.add_point_btn).setOnClickListener(mFeatureMenuListener);
+        findViewById(R.id.save_feature_btn).setOnClickListener(mFeatureMenuListener);
+        findViewById(R.id.clear_feature_btn).setOnClickListener(mFeatureMenuListener);
 
         initMap();
     }
@@ -123,32 +118,27 @@ public class PlotActivity extends ActionBarActivity {
             case R.id.add_line:
                 Toast.makeText(this, "Adding new line", Toast.LENGTH_LONG).show();
                 mCurrentFeature = new PolylineFeature(mMap);
+                mFeatureName.setText("Line");
                 break;
             case R.id.add_points:
                 Toast.makeText(this, "Adding points", Toast.LENGTH_LONG).show();
                 mCurrentFeature = new PointsFeature(mMap);
-                mAddPointBtn.setVisibility(View.VISIBLE);
+                mFeatureName.setText("Points");
                 break;
             case R.id.add_polygon:
-                Toast.makeText(this, "Adding new polygon", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Adding new area", Toast.LENGTH_LONG).show();
                 mCurrentFeature = new PolygonFeature(mMap);
+                mFeatureName.setText("Area");
                 break;
             case R.id.clear:
                 mFeatures.clear();
                 mMap.clear();
                 mCurrentFeature = null;
                 break;
-            case R.id.finish_feature:
-                finishFeature();
-                break;
         }
 
-        if (mCurrentFeature != null) {
-            mAddPointBtn.setVisibility(View.VISIBLE);
-        } else {
-            mAddPointBtn.setVisibility(View.GONE);
-        }
-        supportInvalidateOptionsMenu();
+        mFeatureMenu.setVisibility(mCurrentFeature != null ? View.VISIBLE : View.GONE);
+        //supportInvalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
     }
 
@@ -156,5 +146,33 @@ public class PlotActivity extends ActionBarActivity {
     public void onResume() {
         super.onResume();
     }
+
+    private View.OnClickListener mFeatureMenuListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mCurrentFeature == null) {
+                return;
+            }
+
+            switch (v.getId()) {
+                case R.id.add_point_btn:
+                    Location location = mMap.getMyLocation();
+                    // TODO: Check accuracy
+                    if (location != null) {
+                        addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
+                    }
+                    break;
+                case R.id.save_feature_btn:
+                    finishFeature();
+                    break;
+                case R.id.clear_feature_btn:
+                    mCurrentFeature.delete();
+                    mCurrentFeature = null;
+                    break;
+            }
+
+            mFeatureMenu.setVisibility(mCurrentFeature != null ? View.VISIBLE : View.GONE);
+        }
+    };
 
 }

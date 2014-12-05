@@ -21,8 +21,7 @@ public abstract class Feature {
     protected static final int UNSELECTED_COLOR = Color.BLACK;
 
     protected boolean mSelected;
-    protected float mMarkerAnchorU = 0.5f;
-    protected float mMarkerAnchorV = 0.5f;
+    protected Marker mSelectedMarker;
 
     protected GoogleMap mMap;
     protected List<LatLng> mPoints;
@@ -39,13 +38,35 @@ public abstract class Feature {
     }
 
     public void addPoint(LatLng point) {
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(point)
-                .title(point.toString())
-                .anchor(mMarkerAnchorU, mMarkerAnchorV)
-                .icon(getMarkerBitmapDescriptor()));
-        mMarkers.add(marker);
-        mPoints.add(point);
+        Marker marker = mMap.addMarker(getMarkerOptions(point));
+
+        // Insert new point just after the currently selected marker (if any)
+        if (mSelectedMarker != null) {
+            int index =  mMarkers.indexOf(mSelectedMarker) + 1;
+            mMarkers.add(index, marker);
+            mPoints.add(index, point);
+        } else {
+            mMarkers.add(marker);
+            mPoints.add(point);
+        }
+
+        // Automatically select the new point
+        marker.showInfoWindow();
+        mSelectedMarker = marker;
+    }
+
+    /**
+     * Delete selected point
+     */
+    public void removePoint() {
+        if (mSelectedMarker == null) {
+            return;
+        }
+
+        int index =  mMarkers.indexOf(mSelectedMarker);
+        mSelectedMarker.remove();
+        mPoints.remove(index);
+        mMarkers.remove(index);
     }
 
     public void delete() {
@@ -53,12 +74,14 @@ public abstract class Feature {
             marker.remove();
         }
         mMarkers.clear();
+        mPoints.clear();
     }
 
     public abstract String getTitle();
 
-    public void setSelected(boolean selected) {
+    public void setSelected(boolean selected, Marker marker) {
         mSelected = selected;
+        mSelectedMarker = selected ? marker: null;
         invalidate();
     }
 
@@ -67,6 +90,14 @@ public abstract class Feature {
         for (Marker marker : mMarkers) {
             marker.setIcon(getMarkerBitmapDescriptor());
         }
+    }
+
+    protected MarkerOptions getMarkerOptions(LatLng point) {
+        return new MarkerOptions()
+                .position(point)
+                .title(point.toString())
+                .anchor(0.5f, 0.5f)
+                .icon(getMarkerBitmapDescriptor());
     }
 
     protected BitmapDescriptor getMarkerBitmapDescriptor() {

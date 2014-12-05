@@ -19,11 +19,10 @@
     </item>
 
     <item
-        android:id="@+id/finish_feature"
-        android:orderInCategory="100"
-        android:title="Finish Feature"
+        android:id="@+id/save"
+        android:orderInCategory="101"
+        android:title="SAVE"
         android:icon="@android:drawable/ic_menu_save"
-        android:visible="false"
         flowapp:showAsAction="always"/>
 
     <item

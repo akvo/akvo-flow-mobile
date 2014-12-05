@@ -36,16 +36,16 @@
             android:gravity="center">
 
             <ImageButton
+                android:id="@+id/clear_point_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+
+            <ImageButton
                 android:id="@+id/add_point_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_menu_myplaces" />
-
-            <ImageButton
-                android:id="@+id/save_feature_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_menu_save" />
 
             <ImageButton
                 android:id="@+id/clear_feature_btn"

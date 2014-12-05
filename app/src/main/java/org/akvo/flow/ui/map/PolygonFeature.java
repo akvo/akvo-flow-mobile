@@ -2,7 +2,6 @@ package org.akvo.flow.ui.map;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
@@ -23,6 +22,17 @@ public class PolygonFeature extends Feature {
             polygonOptions.fillColor(FILL_COLOR);
             polygonOptions.add(point);// Polygon cannot be created without points
             mPolygon = mMap.addPolygon(polygonOptions);
+        } else {
+            mPolygon.setPoints(mPoints);
+        }
+    }
+
+    @Override
+    public void removePoint() {
+        super.removePoint();
+        if (mPoints.isEmpty()) {
+            mPolygon.remove();
+            mPolygon = null;
         } else {
             mPolygon.setPoints(mPoints);
         }

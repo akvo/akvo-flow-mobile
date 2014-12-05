@@ -49,6 +49,7 @@ public class PlotActivity extends ActionBarActivity {
     private Feature mCurrentFeature;// Ongoing feature
 
     private View mFeatureMenu;
+    private View mClearPointBtn;
     private TextView mFeatureName;
     private GoogleMap mMap;
 
@@ -62,8 +63,9 @@ public class PlotActivity extends ActionBarActivity {
 
         mFeatureMenu = findViewById(R.id.feature_menu);
         mFeatureName = (TextView)findViewById(R.id.feature_name);
+        mClearPointBtn = findViewById(R.id.clear_point_btn);
+        mClearPointBtn.setOnClickListener(mFeatureMenuListener);
         findViewById(R.id.add_point_btn).setOnClickListener(mFeatureMenuListener);
-        findViewById(R.id.save_feature_btn).setOnClickListener(mFeatureMenuListener);
         findViewById(R.id.clear_feature_btn).setOnClickListener(mFeatureMenuListener);
 
         initMap();
@@ -86,31 +88,38 @@ public class PlotActivity extends ActionBarActivity {
                     // TODO: Select marker index, extending the feature from this marker
                     for (Feature feature : mFeatures) {
                         if (feature.contains(marker)) {
-                            Log.d(TAG, "Marker found!");
-                            selectFeature(feature);
+                            selectFeature(feature, marker);
                             break;
                         }
                     }
                     return false;
                 }
             });
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    selectFeature(null, null);
+                }
+            });
         }
     }
 
-    private void selectFeature(Feature feature) {
+    private void selectFeature(Feature feature, Marker marker) {
         // Remove current selection, if any
         if (mCurrentFeature != null && mCurrentFeature != feature) {
-            mCurrentFeature.setSelected(false);
+            mCurrentFeature.setSelected(false, null);
         }
 
         mCurrentFeature = feature;
         if (mCurrentFeature != null) {
-            mCurrentFeature.setSelected(true);
+            mCurrentFeature.setSelected(true, marker);
             mFeatureName.setText(mCurrentFeature.getTitle());
             mFeatureMenu.setVisibility(View.VISIBLE);
         } else {
             mFeatureMenu.setVisibility(View.GONE);
         }
+
+        mClearPointBtn.setVisibility(marker != null ? View.VISIBLE : View.GONE);
     }
 
     private void addPoint(LatLng point) {
@@ -118,6 +127,7 @@ public class PlotActivity extends ActionBarActivity {
             return;
         }
         mCurrentFeature.addPoint(point);
+        mClearPointBtn.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -134,21 +144,22 @@ public class PlotActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.add_line:
                 Toast.makeText(this, "Adding new line", Toast.LENGTH_LONG).show();
-                selectFeature(new PolylineFeature(mMap));
+                selectFeature(new PolylineFeature(mMap), null);
                 mFeatures.add(mCurrentFeature);
-                mFeatureName.setText("Line");
                 break;
             case R.id.add_points:
                 Toast.makeText(this, "Adding points", Toast.LENGTH_LONG).show();
-                selectFeature(new PointsFeature(mMap));
+                selectFeature(new PointsFeature(mMap), null);
                 mFeatures.add(mCurrentFeature);
-                mFeatureName.setText("Points");
                 break;
             case R.id.add_polygon:
                 Toast.makeText(this, "Adding new area", Toast.LENGTH_LONG).show();
-                selectFeature(new PolygonFeature(mMap));
+                selectFeature(new PolygonFeature(mMap), null);
                 mFeatures.add(mCurrentFeature);
-                mFeatureName.setText("Area");
+                break;
+            case R.id.save:
+                selectFeature(null, null);
+                Toast.makeText(this, "Saved", Toast.LENGTH_LONG).show();
                 break;
             case R.id.clear:
                 mFeatures.clear();
@@ -180,12 +191,13 @@ public class PlotActivity extends ActionBarActivity {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
                     }
                     break;
-                case R.id.save_feature_btn:
-                    selectFeature(null);
+                case R.id.clear_point_btn:
+                    mCurrentFeature.removePoint();
+                    selectFeature(mCurrentFeature, null);
                     break;
                 case R.id.clear_feature_btn:
                     mCurrentFeature.delete();
-                    selectFeature(null);
+                    selectFeature(null, null);
                     break;
             }
         }

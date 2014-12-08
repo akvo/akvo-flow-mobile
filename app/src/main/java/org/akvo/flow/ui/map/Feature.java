@@ -33,8 +33,15 @@ public abstract class Feature {
         mMarkers = new ArrayList<Marker>();
     }
 
+    public abstract String getTitle();
+    public abstract String geoGeometryType();
+
     public boolean contains(Marker marker) {
         return mMarkers.contains(marker);
+    }
+
+    public List<LatLng> getPoints() {
+        return mPoints;
     }
 
     public void addPoint(LatLng point) {
@@ -77,8 +84,6 @@ public abstract class Feature {
         mPoints.clear();
     }
 
-    public abstract String getTitle();
-
     public void setSelected(boolean selected, Marker marker) {
         mSelected = selected;
         mSelectedMarker = selected ? marker: null;
@@ -111,6 +116,10 @@ public abstract class Feature {
 
         canvas.drawCircle(center, center, center, color);
         return BitmapDescriptorFactory.fromBitmap(bmp);
+    }
+
+    public void load(List<LatLng> points) {
+        // TODO
     }
 
 }

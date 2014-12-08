@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class PointsFeature extends Feature {
+    public static final String GEOMETRY_TYPE = "MultiPoint";
 
     public PointsFeature(GoogleMap map) {
         super(map);
@@ -36,6 +37,11 @@ public class PointsFeature extends Feature {
     @Override
     public String getTitle() {
         return "Points";
+    }
+
+    @Override
+    public String geoGeometryType() {
+        return GEOMETRY_TYPE;
     }
 
 }

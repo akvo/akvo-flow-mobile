@@ -6,6 +6,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 public class PolylineFeature extends Feature {
+    public static final String GEOMETRY_TYPE = "LineString";
+
     private Polyline mPolyline;
 
     public PolylineFeature(GoogleMap map) {
@@ -48,6 +50,11 @@ public class PolylineFeature extends Feature {
     @Override
     public String getTitle() {
         return "Line";
+    }
+
+    @Override
+    public String geoGeometryType() {
+        return GEOMETRY_TYPE;
     }
 
 }

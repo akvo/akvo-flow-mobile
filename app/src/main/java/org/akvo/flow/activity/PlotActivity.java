@@ -15,6 +15,7 @@
  */
 package org.akvo.flow.activity;
 
+import android.app.AlertDialog;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -35,12 +36,23 @@ import org.akvo.flow.ui.map.Feature;
 import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
 import org.akvo.flow.ui.map.PolylineFeature;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlotActivity extends ActionBarActivity {
     // public static final String EXTRA__PLOT_ID = "plot_id";
+
+    private static final String JSON_TYPE = "type";
+    private static final String JSON_GEOMETRY = "geometry";
+    private static final String JSON_COORDINATES = "coordinates";
+    private static final String JSON_FEATURES = "features";
+    // private static final String JSON_PROPERTIES = "properties";
+    private static final String TYPE_FEATURE = "Feature";
+    private static final String TYPE_FEATURE_COLLECTION = "FeatureCollection";
 
     private static final String TAG = PlotActivity.class.getSimpleName();
     // private static final float ACCURACY_THRESHOLD = 20f;
@@ -159,7 +171,10 @@ public class PlotActivity extends ActionBarActivity {
                 break;
             case R.id.save:
                 selectFeature(null, null);
-                Toast.makeText(this, "Saved", Toast.LENGTH_LONG).show();
+                new AlertDialog.Builder(this)
+                        .setTitle("Plot GeoJSON")
+                        .setMessage(geoJson())
+                        .show();
                 break;
             case R.id.clear:
                 mFeatures.clear();
@@ -202,5 +217,78 @@ public class PlotActivity extends ActionBarActivity {
             }
         }
     };
+
+    private String geoJson() {
+        JSONObject jObject = new JSONObject();
+        try {
+            jObject.put(JSON_TYPE, TYPE_FEATURE_COLLECTION);
+            JSONArray jFeatures = new JSONArray();
+            for (Feature feature : mFeatures) {
+                JSONObject jFeature = new JSONObject();
+                jFeature.put(JSON_TYPE, TYPE_FEATURE);// Top level type (always "Feature")
+
+                // Geometry
+                JSONObject jGeometry = new JSONObject();
+                jGeometry.put(JSON_TYPE, feature.geoGeometryType());
+
+                // Coordinates
+                JSONArray jCoordinates = new JSONArray();
+                for (LatLng point : feature.getPoints()) {
+                    JSONArray jCoordinate = new JSONArray();
+                    jCoordinate.put(point.longitude);
+                    jCoordinate.put(point.latitude);
+                    jCoordinates.put(jCoordinate);
+                }
+                jGeometry.put(JSON_COORDINATES, jCoordinates);
+                jFeature.put(JSON_GEOMETRY, jGeometry);
+                // TODO: handle properties
+                jFeatures.put(jFeature);
+            }
+            jObject.put(JSON_FEATURES, jFeatures);
+        } catch (JSONException e) {
+            Log.e(TAG, "geoJSON() - " + e.getMessage());
+            return null;
+        }
+        return jObject.toString();
+    }
+
+    private void load(String geoJSON) {
+        try {
+            JSONObject jObject = new JSONObject(geoJSON);
+            JSONArray jFeatures = jObject.getJSONArray(JSON_FEATURES);
+            for (int i=0; i<jFeatures.length(); i++) {
+                JSONObject jFeature = jFeatures.getJSONObject(i);
+                JSONObject jGeometry = jFeature.getJSONObject(JSON_GEOMETRY);
+                JSONArray jPoints = jGeometry.getJSONArray(JSON_COORDINATES);
+                // Load point list
+                List<LatLng> points = new ArrayList<LatLng>();
+                for (int j=0; j<jPoints.length(); j++) {
+                    JSONArray jPoint = jPoints.getJSONArray(j);
+                    points.add(new LatLng(jPoint.getDouble(1), jPoint.getDouble(0)));// [lon, lat] -> LatLng(lat, lon)
+                }
+
+                Feature feature;
+                switch (jGeometry.getString(JSON_TYPE)) {
+                    case PointsFeature.GEOMETRY_TYPE:
+                        feature = new PointsFeature(mMap);
+                        break;
+                    case PolylineFeature.GEOMETRY_TYPE:
+                        feature = new PolylineFeature(mMap);
+                        break;
+                    case PolygonFeature.GEOMETRY_TYPE:
+                        feature = new PolygonFeature(mMap);
+                        break;
+                    default:
+                        continue;// Unknown geometry type.
+                }
+                feature.load(points);
+                mFeatures.add(feature);
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this, "Features could not be loaded", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "geoJSON() - " + e.getMessage());
+            // TODO: Remove features?
+        }
+    }
 
 }

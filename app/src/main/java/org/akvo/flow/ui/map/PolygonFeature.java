@@ -6,7 +6,10 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 public class PolygonFeature extends Feature {
+    public static final String GEOMETRY_TYPE = "Polygon";
+
     private static final int FILL_COLOR = 0xAA77AFFF;
+
     private Polygon mPolygon;
 
     public PolygonFeature(GoogleMap map) {
@@ -57,6 +60,11 @@ public class PolygonFeature extends Feature {
     @Override
     public String getTitle() {
         return "Area";
+    }
+
+    @Override
+    public String geoGeometryType() {
+        return GEOMETRY_TYPE;
     }
 
 }

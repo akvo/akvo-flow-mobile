@@ -57,9 +57,10 @@ public abstract class Feature {
             mPoints.add(point);
         }
 
-        // Automatically select the new point
-        marker.showInfoWindow();
         mSelectedMarker = marker;
+        if (mSelected) {
+            marker.showInfoWindow();
+        }
     }
 
     /**
@@ -119,7 +120,9 @@ public abstract class Feature {
     }
 
     public void load(List<LatLng> points) {
-        // TODO
+        for (LatLng point : points) {
+            addPoint(point);
+        }
     }
 
 }

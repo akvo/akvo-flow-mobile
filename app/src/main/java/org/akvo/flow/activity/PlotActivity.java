@@ -254,6 +254,8 @@ public class PlotActivity extends ActionBarActivity {
 
     private void load(String geoJSON) {
         try {
+            // Keep track of all points, so we can later center the map
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
             JSONObject jObject = new JSONObject(geoJSON);
             JSONArray jFeatures = jObject.getJSONArray(JSON_FEATURES);
             for (int i=0; i<jFeatures.length(); i++) {
@@ -264,7 +266,9 @@ public class PlotActivity extends ActionBarActivity {
                 List<LatLng> points = new ArrayList<LatLng>();
                 for (int j=0; j<jPoints.length(); j++) {
                     JSONArray jPoint = jPoints.getJSONArray(j);
-                    points.add(new LatLng(jPoint.getDouble(1), jPoint.getDouble(0)));// [lon, lat] -> LatLng(lat, lon)
+                    LatLng point = new LatLng(jPoint.getDouble(1), jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)
+                    points.add(point);
+                    builder.include(point);
                 }
 
                 Feature feature;
@@ -284,6 +288,13 @@ public class PlotActivity extends ActionBarActivity {
                 feature.load(points);
                 mFeatures.add(feature);
             }
+            final LatLngBounds bounds = builder.build();
+            mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
+                }
+            });
         } catch (JSONException e) {
             Toast.makeText(this, "Features could not be loaded", Toast.LENGTH_LONG).show();
             Log.e(TAG, "geoJSON() - " + e.getMessage());

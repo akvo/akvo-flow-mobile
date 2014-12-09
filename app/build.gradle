@@ -1,11 +1,11 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0'
     }
 }
 
@@ -46,7 +46,9 @@ android {
 }
 
 android.applicationVariants.all { variant ->
-    variant.outputFile = file("bin/flow.apk")
+    variant.outputs.each { output ->
+        output.outputFile = file("bin/flow.apk")
+    }
 }
 
 dependencies {

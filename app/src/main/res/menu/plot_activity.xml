@@ -5,7 +5,7 @@
     <item
         android:id="@+id/add_feature"
         android:orderInCategory="100"
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/ic_add_feature"
         android:title="Add feature"
         flowapp:showAsAction="always">
         <menu>
@@ -22,14 +22,14 @@
         android:id="@+id/save"
         android:orderInCategory="101"
         android:title="SAVE"
-        android:icon="@android:drawable/ic_menu_save"
+        android:icon="@drawable/ic_save"
         flowapp:showAsAction="always"/>
 
     <item
         android:id="@+id/clear"
         android:orderInCategory="102"
         android:title="CLEAR"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:icon="@drawable/ic_clear_map"
         flowapp:showAsAction="always"/>
 
 </menu>

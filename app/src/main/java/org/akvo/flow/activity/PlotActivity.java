@@ -133,7 +133,7 @@ public class PlotActivity extends ActionBarActivity {
             mFeatureMenu.setVisibility(View.GONE);
         }
 
-        mClearPointBtn.setVisibility(marker != null ? View.VISIBLE : View.GONE);
+        mClearPointBtn.setEnabled(marker != null);
     }
 
     private void addPoint(LatLng point) {
@@ -141,7 +141,7 @@ public class PlotActivity extends ActionBarActivity {
             return;
         }
         mCurrentFeature.addPoint(point);
-        mClearPointBtn.setVisibility(View.VISIBLE);
+        mClearPointBtn.setEnabled(true);
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.akvo.flow.ui.map;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -16,9 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Feature {
-    protected static final int POINT_SIZE = 20;
-    protected static final int SELECTED_COLOR = Color.BLUE;
-    protected static final int UNSELECTED_COLOR = Color.BLACK;
+    protected static final int POINT_SIZE = 40;// Default marker size (px).
+    protected static final int POINT_SIZE_SELECTED = 50;// Selected marker size (px).
+
+    protected static final int POINT_COLOR = 0xEE736357;
+    protected static final int POINT_COLOR_ACTIVE = 0xFFE27C00;
+    protected static final int POINT_COLOR_SELECTED = 0xFF00A79D;
+    protected static final int POINT_COLOR_FILL = 0x55FFFFFF;
+
+    protected static final int STROKE_COLOR = 0xEE736357;
+    protected static final int STROKE_COLOR_SELECTED = 0xFF736357;
 
     protected boolean mSelected;
     protected Marker mSelectedMarker;
@@ -27,10 +33,24 @@ public abstract class Feature {
     protected List<LatLng> mPoints;
     protected List<Marker> mMarkers;
 
+    private static final BitmapDescriptor MARKER_UNSELECTED, MARKER_ACTIVE, MARKER_SELECTED;
+
+    static {
+        MARKER_UNSELECTED = getMarkerBitmapDescriptor(PointStatus.UNSELECTED);
+        MARKER_ACTIVE = getMarkerBitmapDescriptor(PointStatus.ACTIVE);
+        MARKER_SELECTED = getMarkerBitmapDescriptor(PointStatus.SELECTED);
+    }
+
+    private enum PointStatus {
+        UNSELECTED, // Unselected Feature. Normal mode.
+        SELECTED, // Currently selected marker.
+        ACTIVE // Selected Feature, but marker is not selected (just 'active').
+    }
+
     public Feature(GoogleMap map) {
         mMap = map;
-        mPoints = new ArrayList<LatLng>();
-        mMarkers = new ArrayList<Marker>();
+        mPoints = new ArrayList<>();
+        mMarkers = new ArrayList<>();
     }
 
     public abstract String getTitle();
@@ -45,7 +65,11 @@ public abstract class Feature {
     }
 
     public void addPoint(LatLng point) {
-        Marker marker = mMap.addMarker(getMarkerOptions(point));
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title(String.format("lat/lng: %.5f, %.5f", point.latitude, point.longitude))
+                .anchor(0.5f, 0.5f)
+                .icon(MARKER_UNSELECTED));
 
         // Insert new point just after the currently selected marker (if any)
         if (mSelectedMarker != null) {
@@ -58,9 +82,7 @@ public abstract class Feature {
         }
 
         mSelectedMarker = marker;
-        if (mSelected) {
-            marker.showInfoWindow();
-        }
+        invalidate();
     }
 
     /**
@@ -94,35 +116,56 @@ public abstract class Feature {
     protected void invalidate() {
         // Recompute icons, depending on selection status
         for (Marker marker : mMarkers) {
-            marker.setIcon(getMarkerBitmapDescriptor());
+            if (mSelected && marker.equals(mSelectedMarker)) {
+                marker.setIcon(MARKER_SELECTED);
+                marker.showInfoWindow();
+            } else if (mSelected) {
+                marker.setIcon(MARKER_ACTIVE);
+            } else {
+                marker.setIcon(MARKER_UNSELECTED);
+            }
         }
-    }
-
-    protected MarkerOptions getMarkerOptions(LatLng point) {
-        return new MarkerOptions()
-                .position(point)
-                .title(point.toString())
-                .anchor(0.5f, 0.5f)
-                .icon(getMarkerBitmapDescriptor());
-    }
-
-    protected BitmapDescriptor getMarkerBitmapDescriptor() {
-        Bitmap bmp = Bitmap.createBitmap(POINT_SIZE, POINT_SIZE, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bmp);
-
-        Paint color = new Paint();
-        color.setColor(mSelected ? SELECTED_COLOR : UNSELECTED_COLOR);
-
-        float center = POINT_SIZE / 2f;
-
-        canvas.drawCircle(center, center, center, color);
-        return BitmapDescriptorFactory.fromBitmap(bmp);
     }
 
     public void load(List<LatLng> points) {
         for (LatLng point : points) {
             addPoint(point);
         }
+    }
+
+    protected static BitmapDescriptor getMarkerBitmapDescriptor(PointStatus status) {
+        int size, color;
+        switch (status) {
+            case SELECTED:
+                size = POINT_SIZE_SELECTED;
+                color = POINT_COLOR_SELECTED;
+                break;
+            case ACTIVE:
+                size = POINT_SIZE;
+                color = POINT_COLOR_ACTIVE;
+                break;
+            case UNSELECTED:
+            default:
+                size = POINT_SIZE;
+                color = POINT_COLOR;
+        }
+
+        Bitmap bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmp);
+
+        Paint solid = new Paint();
+        solid.setColor(color);
+        solid.setAntiAlias(true);
+        Paint fill = new Paint();
+        fill.setAntiAlias(true);
+        fill.setColor(POINT_COLOR_FILL);
+
+        final float center = size / 2f;
+        canvas.drawCircle(center, center, center, solid);// Outer circle
+        canvas.drawCircle(center, center, center * 0.9f, fill);// Fill circle
+        canvas.drawCircle(center, center, center * 0.25f, solid);// Inner circle
+
+        return BitmapDescriptorFactory.fromBitmap(bmp);
     }
 
 }

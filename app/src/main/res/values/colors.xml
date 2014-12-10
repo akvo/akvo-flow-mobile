@@ -22,4 +22,6 @@
 
     <color name="record_name_background">#CEC6BC</color>
 
+    <color name="plotting_menu_background">#E0736357</color>
+
 </resources>

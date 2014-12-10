@@ -8,7 +8,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 public class PolygonFeature extends Feature {
     public static final String GEOMETRY_TYPE = "Polygon";
 
-    private static final int FILL_COLOR = 0xAA77AFFF;
+    private static final int FILL_COLOR = 0x88736357;
 
     private Polygon mPolygon;
 
@@ -21,7 +21,7 @@ public class PolygonFeature extends Feature {
         super.addPoint(point);
         if (mPolygon == null) {
             PolygonOptions polygonOptions = new PolygonOptions();
-            polygonOptions.strokeColor(mSelected ? SELECTED_COLOR : UNSELECTED_COLOR);
+            polygonOptions.strokeColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
             polygonOptions.fillColor(FILL_COLOR);
             polygonOptions.add(point);// Polygon cannot be created without points
             mPolygon = mMap.addPolygon(polygonOptions);
@@ -53,7 +53,7 @@ public class PolygonFeature extends Feature {
     public void invalidate() {
         super.invalidate();
         if (mPolygon != null) {
-            mPolygon.setStrokeColor(mSelected ? SELECTED_COLOR : UNSELECTED_COLOR);
+            mPolygon.setStrokeColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
         }
     }
 

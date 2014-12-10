@@ -72,7 +72,7 @@ public class PlotActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plot_activity);
 
-        mFeatures = new ArrayList<Feature>();
+        mFeatures = new ArrayList<>();
         mMap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
 
         mFeatureMenu = findViewById(R.id.feature_menu);
@@ -265,7 +265,7 @@ public class PlotActivity extends ActionBarActivity {
                 JSONObject jGeometry = jFeature.getJSONObject(JSON_GEOMETRY);
                 JSONArray jPoints = jGeometry.getJSONArray(JSON_COORDINATES);
                 // Load point list
-                List<LatLng> points = new ArrayList<LatLng>();
+                List<LatLng> points = new ArrayList<>();
                 for (int j=0; j<jPoints.length(); j++) {
                     JSONArray jPoint = jPoints.getJSONArray(j);
                     LatLng point = new LatLng(jPoint.getDouble(1), jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)

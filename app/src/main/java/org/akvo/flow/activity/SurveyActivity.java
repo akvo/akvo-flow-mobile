@@ -245,7 +245,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 
             // Record meta-data, if applies
-            if (mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
+            if (!mSurveyGroup.isMonitored() ||
+                    mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
                 saveRecordMetaData();
             }
         }

@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import org.akvo.flow.ui.map.Feature;
 import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
 import org.akvo.flow.ui.map.PolylineFeature;
+import org.akvo.flow.util.FileUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -302,6 +304,16 @@ public class PlotActivity extends ActionBarActivity {
             Log.e(TAG, "geoJSON() - " + e.getMessage());
             // TODO: Remove features?
         }
+    }
+
+    private static String encode(String geoJSON) {
+        byte[] deflated = FileUtil.deflate(geoJSON);
+        return Base64.encodeToString(deflated, Base64.NO_WRAP);
+    }
+
+    private static String decode(String encodedGeoJSON) {
+        byte[] decoded = Base64.decode(encodedGeoJSON, Base64.NO_WRAP);
+        return FileUtil.inflate(decoded);
     }
 
 }

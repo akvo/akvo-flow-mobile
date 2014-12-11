@@ -123,10 +123,6 @@ public class FileUtil {
 
     /**
      * writes the contents string to the file indicated by filePath
-     * 
-     * @param contents
-     * @param filePath
-     * @throws IOException
      */
     public static void writeStringToFile(String contents,
             FileOutputStream filePath) throws IOException {
@@ -140,10 +136,6 @@ public class FileUtil {
 
     /**
      * reads the contents of a file into a string.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
      */
     public static String readFileAsString(File file) throws IOException {
         StringBuilder contents = new StringBuilder();
@@ -164,10 +156,6 @@ public class FileUtil {
      * reads data from a zipInputStream into a string. The ZipInputStream must
      * already be positioned at the correct ZipEntry prior to invoking this
      * method.
-     * 
-     * @param zis
-     * @return
-     * @throws IOException
      */
     public static String readTextFromZip(ZipInputStream zis) throws IOException {
         ByteArrayOutputStream out = null;
@@ -183,10 +171,6 @@ public class FileUtil {
      * reads binary data from a zipInputSream and saves it to the
      * destinationFile passed in. The ZipInputStream must already be positioned
      * at the ZipEntry for the file to be saved.
-     * 
-     * @param zip
-     * @param destinationFile
-     * @throws IOException
      */
     public static void extractAndSaveFile(ZipInputStream zip,
             FileOutputStream destinationFile) throws IOException {
@@ -204,26 +188,16 @@ public class FileUtil {
      * reads the contents of a ZipEntry into a ByteArrayOutputStream. The
      * ZipInputStream passed in must be positioned at the desired ZipEntry prior
      * to being passed to this method
-     * 
-     * @param zis
-     * @return
-     * @throws IOException
      */
     public static ByteArrayOutputStream readZipEntry(ZipInputStream zis) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int size;
-        while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-            out.write(buffer, 0, size);
-        }
+        copy(zis, out);
         return out;
     }
 
     /**
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
-     * 
-     * @param dir
      */
     public static void deleteFilesInDirectory(File dir, boolean deleteDir) {
         if (dir != null && dir.isDirectory()) {
@@ -245,10 +219,16 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Compute MD5 checksum of the given path's file
+     */
     public static byte[] getMD5Checksum(String path) {
         return getMD5Checksum(new File(path));
     }
 
+    /**
+     * Compute MD5 checksum of the given file
+     */
     public static byte[] getMD5Checksum(File file) {
         InputStream in = null;
         MessageDigest md;
@@ -427,7 +407,6 @@ public class FileUtil {
 
     /**
      * Helper function to close a Closeable instance
-     * @param closeable
      */
     public static void close(Closeable closeable) {
         if (closeable == null) {
@@ -440,6 +419,9 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Copy bytes from in to out, using the default buffer size.
+     */
     public static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[BUFFER_SIZE];
         int read;
@@ -449,6 +431,9 @@ public class FileUtil {
         out.flush();
     }
 
+    /**
+     * Compress string using the ZLIB compression library
+     */
     public static byte[] deflate(String s) {
         ByteArrayInputStream in = null;
         ByteArrayOutputStream out = null;
@@ -471,6 +456,9 @@ public class FileUtil {
         return null;
     }
 
+    /**
+     * Decompress byte array using the ZLIB compression library.
+     */
     public static String inflate(byte[] data) {
         ByteArrayInputStream in = null;
         ByteArrayOutputStream out = null;

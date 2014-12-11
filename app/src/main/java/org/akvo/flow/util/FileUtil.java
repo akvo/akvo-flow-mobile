@@ -19,6 +19,7 @@ package org.akvo.flow.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -27,9 +28,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
@@ -434,6 +438,58 @@ public class FileUtil {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    public static void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+        out.flush();
+    }
+
+    public static byte[] deflate(String s) {
+        ByteArrayInputStream in = null;
+        ByteArrayOutputStream out = null;
+        DeflaterOutputStream deflater = null;
+        try {
+            in = new ByteArrayInputStream(s.getBytes("UTF-8"));
+            out = new ByteArrayOutputStream();
+            deflater = new DeflaterOutputStream(out);
+
+            copy(in, deflater);
+            deflater.finish();
+            return out.toByteArray();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        } finally {
+            close(deflater);
+            close(out);
+            close(in);
+        }
+        return null;
+    }
+
+    public static String inflate(byte[] data) {
+        ByteArrayInputStream in = null;
+        ByteArrayOutputStream out = null;
+        InflaterInputStream inflater = null;
+        try {
+            in = new ByteArrayInputStream(data);
+            inflater = new InflaterInputStream(in);
+            out = new ByteArrayOutputStream();
+
+            copy(inflater, out);
+            return new String(out.toByteArray(), "UTF-8");
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        } finally {
+            close(inflater);
+            close(in);
+            close(out);
+        }
+        return null;
     }
 
 }

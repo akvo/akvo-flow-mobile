@@ -80,6 +80,8 @@ public class QuestionGroupTab extends ScrollView {
                 questionView = new BarcodeQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new DateQuestionView(context, q, mSurveyListener);
+            } else if (ConstantUtil.PLOT_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new PlotQuestionView(context, q, mSurveyListener);
             } else {
                 questionView = new QuestionHeaderView(context, q, mSurveyListener);
             }

@@ -73,6 +73,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
     private static final int EXTERNAL_SOURCE_REQUEST  = 4;
+    private static final int PLOTTING_REQUEST  = 5;
 
     private static final int MENU_PREFILL  = 101;
 
@@ -590,6 +591,11 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             intent.setType(ConstantUtil.EXTERNAL_SOURCE_MIME);
             startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
                     + EXTERNAL_SOURCE_REQUEST);
+        } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
+            Intent i = new Intent(this, PlotActivity.class);
+            // TODO: Extend QuestionInteractionEvent and support arbitrary data (Bundle), passing the response from the PlotQuestionView
+            mRequestQuestionId = event.getSource().getQuestion().getId();
+            startActivityForResult(i, PLOTTING_REQUEST);
         }
     }
 

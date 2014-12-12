@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <include layout="@layout/question_header" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/or"
+        android:textSize="12sp"
+        android:textColor="@color/black_diabled" />
+
+    <Button
+        android:id="@+id/plotting_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Capture Plot" />
+
+</merge>

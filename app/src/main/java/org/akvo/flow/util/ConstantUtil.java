@@ -59,6 +59,7 @@ public class ConstantUtil {
     public static final String SCAN_QUESTION_TYPE = "scan";
     public static final String STRENGTH_QUESTION_TYPE = "strength";
     public static final String DATE_QUESTION_TYPE = "date";
+    public static final String PLOT_QUESTION_TYPE = "plot";
 
     /**
      * help types
@@ -104,6 +105,11 @@ public class ConstantUtil {
      * media question support
      */
     public static final String MEDIA_FILE_KEY = "filename";
+
+    /**
+     * Plot measurement result data
+     */
+    public static final String PLOTTING_RESULT = "plottingResult";
 
     /**
      * keys for saved state and bundle extras

@@ -427,8 +427,10 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
                 break;
+            case EXTERNAL_SOURCE_REQUEST:
+            case SCAN_ACTIVITY_REQUEST:
+            case PLOTTING_REQUEST:
             default:
-                // SCAN_ACTIVITY_REQUEST or EXTERNAL_SOURCE_REQUEST
                 mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
                 break;
         }

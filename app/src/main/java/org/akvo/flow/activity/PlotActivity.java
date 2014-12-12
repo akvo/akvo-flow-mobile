@@ -15,7 +15,7 @@
  */
 package org.akvo.flow.activity;
 
-import android.app.AlertDialog;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -39,6 +39,7 @@ import org.akvo.flow.ui.map.Feature;
 import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
 import org.akvo.flow.ui.map.PolylineFeature;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -174,11 +175,10 @@ public class PlotActivity extends ActionBarActivity {
                 mFeatures.add(mCurrentFeature);
                 break;
             case R.id.save:
-                selectFeature(null, null);
-                new AlertDialog.Builder(this)
-                        .setTitle("Plot GeoJSON")
-                        .setMessage(geoJson())
-                        .show();
+                Intent intent = new Intent();
+                intent.putExtra(ConstantUtil.PLOTTING_RESULT, geoJson());// TODO: Check empty data?
+                setResult(RESULT_OK, intent);
+                finish();
                 break;
             case R.id.clear:
                 mFeatures.clear();

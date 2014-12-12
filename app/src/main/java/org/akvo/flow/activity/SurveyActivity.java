@@ -595,7 +595,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     + EXTERNAL_SOURCE_REQUEST);
         } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
             Intent i = new Intent(this, PlotActivity.class);
-            // TODO: Extend QuestionInteractionEvent and support arbitrary data (Bundle), passing the response from the PlotQuestionView
+            i.putExtras(event.getData());
             mRequestQuestionId = event.getSource().getQuestion().getId();
             startActivityForResult(i, PLOTTING_REQUEST);
         }

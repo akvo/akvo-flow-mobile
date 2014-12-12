@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -86,6 +87,11 @@ public class PlotActivity extends ActionBarActivity {
         findViewById(R.id.clear_feature_btn).setOnClickListener(mFeatureMenuListener);
 
         initMap();
+
+        String geoJSON = getIntent().getStringExtra(ConstantUtil.PLOTTING_RESULT);
+        if (!TextUtils.isEmpty(geoJSON)) {
+            load(geoJSON);
+        }
     }
 
     private void initMap() {

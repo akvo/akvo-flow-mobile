@@ -18,6 +18,7 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -45,6 +46,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
         setQuestionView(R.layout.plot_question_view);
 
         mInputText = (EditText)findViewById(R.id.input_text);
+        mMapBtn = (Button)findViewById(R.id.plotting_btn);
 
         if (isReadOnly()) {
             mMapBtn.setVisibility(View.GONE);
@@ -59,7 +61,12 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.plotting_btn:
-                notifyQuestionListeners(QuestionInteractionEvent.PLOTTING_EVENT);
+                Bundle data = null;
+                if (!TextUtils.isEmpty(mValue)) {
+                    data = new Bundle();
+                    data.putString(ConstantUtil.PLOTTING_RESULT, mValue);
+                }
+                notifyQuestionListeners(QuestionInteractionEvent.PLOTTING_EVENT, data);
                 break;
         }
     }

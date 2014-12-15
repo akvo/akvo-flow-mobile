@@ -234,6 +234,10 @@ public class PlotActivity extends ActionBarActivity {
             jObject.put(JSON_TYPE, TYPE_FEATURE_COLLECTION);
             JSONArray jFeatures = new JSONArray();
             for (Feature feature : mFeatures) {
+                if (feature.getPoints().isEmpty()) {
+                    continue;
+                }
+
                 JSONObject jFeature = new JSONObject();
                 jFeature.put(JSON_TYPE, TYPE_FEATURE);// Top level type (always "Feature")
 
@@ -268,6 +272,9 @@ public class PlotActivity extends ActionBarActivity {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             JSONObject jObject = new JSONObject(geoJSON);
             JSONArray jFeatures = jObject.getJSONArray(JSON_FEATURES);
+            if (jFeatures == null || jFeatures.length() == 0) {
+                return;
+            }
             for (int i=0; i<jFeatures.length(); i++) {
                 JSONObject jFeature = jFeatures.getJSONObject(i);
                 JSONObject jGeometry = jFeature.getJSONObject(JSON_GEOMETRY);

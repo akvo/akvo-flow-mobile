@@ -309,7 +309,7 @@ public class PlotActivity extends ActionBarActivity {
             mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                 @Override
                 public void onMapLoaded() {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 60));
                 }
             });
         } catch (JSONException e) {

@@ -1,7 +1,8 @@
-Akvo FLOW app 
-Last update 15 December 2014
+Akvo FLOW app release notes
+===========================
 
 #ver 2.1.0
+Date: 15 December 2014
 
 New and noteworthy
 ------------------

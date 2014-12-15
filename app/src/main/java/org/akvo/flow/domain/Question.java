@@ -18,6 +18,7 @@ package org.akvo.flow.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.akvo.flow.util.ConstantUtil;
 
@@ -58,6 +59,10 @@ public class Question {
     private String sourceQuestionId;// "Copied-from" question Id
     private boolean isDoubleEntry;
     private boolean useExternalSource;
+
+    // cascading question specific attrs
+    private String src;
+    private List<Level> levels;
 
     public void setIsLocaleName(boolean localeName) {
         this.localeName = localeName;
@@ -308,5 +313,21 @@ public class Question {
 
     public boolean useExternalSource() {
         return useExternalSource;
+    }
+
+    public void setSrc(String src) {
+        this.src = src;
+    }
+
+    public String getSrc() {
+        return src;
+    }
+
+    public List<Level> getLevels() {
+        return levels;
+    }
+
+    public void setLevels(List<Level> levels) {
+        this.levels = levels;
     }
 }

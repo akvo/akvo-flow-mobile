@@ -27,9 +27,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
@@ -60,10 +62,11 @@ public class FileUtil {
     private static final String DIR_STACKTRACE = "stacktrace"; // Crash reports
     private static final String DIR_TMP = "tmp"; // Temporary files
     private static final String DIR_APK = "apk"; // App upgrades
+    private static final String DIR_RES = "res"; // Survey resources (i.e. cascading DB)
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK};
+    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK, RES};
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -96,6 +99,9 @@ public class FileUtil {
             case APK:
                 path = getFilesStorageDir(true) + File.separator + DIR_APK;
                 break;
+            case RES:
+                path = getFilesStorageDir(true) + File.separator + DIR_RES;
+                break;
         }
         File dir = new File(path);
         if (!dir.exists()) {
@@ -119,10 +125,6 @@ public class FileUtil {
 
     /**
      * writes the contents string to the file indicated by filePath
-     * 
-     * @param contents
-     * @param filePath
-     * @throws IOException
      */
     public static void writeStringToFile(String contents,
             FileOutputStream filePath) throws IOException {
@@ -136,10 +138,6 @@ public class FileUtil {
 
     /**
      * reads the contents of a file into a string.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
      */
     public static String readFileAsString(File file) throws IOException {
         StringBuilder contents = new StringBuilder();
@@ -157,69 +155,60 @@ public class FileUtil {
     }
 
     /**
-     * reads data from a zipInputStream into a string. The ZipInputStream must
-     * already be positioned at the correct ZipEntry prior to invoking this
-     * method.
-     * 
-     * @param zis
-     * @return
-     * @throws IOException
+     * reads data from an InputStream into a string.
      */
-    public static String readTextFromZip(ZipInputStream zis) throws IOException {
+    public static String readText(InputStream is) throws IOException {
         ByteArrayOutputStream out = null;
         try {
-            out = readZipEntry(zis);
+            out = read(is);
             return out.toString();
         } finally {
             close(out);
         }
     }
 
-    /**
-     * reads binary data from a zipInputSream and saves it to the
-     * destinationFile passed in. The ZipInputStream must already be positioned
-     * at the ZipEntry for the file to be saved.
-     * 
-     * @param zip
-     * @param destinationFile
-     * @throws IOException
-     */
-    public static void extractAndSaveFile(ZipInputStream zip,
-            FileOutputStream destinationFile) throws IOException {
-        ByteArrayOutputStream out = null;
-        try {
-            out = readZipEntry(zip);
-            destinationFile.write(out.toByteArray());
-        } finally {
-            close(out);
-            destinationFile.close();
+    public static void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int size;
+        while ((size = in.read(buffer, 0, buffer.length)) != -1) {
+            out.write(buffer, 0, size);
         }
     }
 
     /**
-     * reads the contents of a ZipEntry into a ByteArrayOutputStream. The
-     * ZipInputStream passed in must be positioned at the desired ZipEntry prior
-     * to being passed to this method
-     * 
-     * @param zis
-     * @return
-     * @throws IOException
+     * reads the contents of an InputStream into a ByteArrayOutputStream.
      */
-    public static ByteArrayOutputStream readZipEntry(ZipInputStream zis) throws IOException {
+    public static ByteArrayOutputStream read(InputStream is) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[BUFFER_SIZE];
         int size;
-        while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
+        while ((size = is.read(buffer, 0, buffer.length)) != -1) {
             out.write(buffer, 0, size);
         }
         return out;
     }
 
     /**
+     * extract zip file contents into destination folder.
+     */
+    public static void extract(ZipInputStream zis, File dst) throws IOException {
+        ZipEntry entry;
+        try {
+            while ((entry = zis.getNextEntry()) != null && !entry.isDirectory()) {
+                File f = new File(dst, entry.getName());
+                FileOutputStream fout = new FileOutputStream(f);
+                FileUtil.copy(zis, fout);
+                fout.close();
+                zis.closeEntry();
+            }
+        } finally {
+            close(zis);
+        }
+    }
+
+    /**
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
-     * 
-     * @param dir
      */
     public static void deleteFilesInDirectory(File dir, boolean deleteDir) {
         if (dir != null && dir.isDirectory()) {

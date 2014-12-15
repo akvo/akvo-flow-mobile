@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.flow"
     android:versionCode="1"
-    android:versionName="2.0.5.2" >
+    android:versionName="2.1.0" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -67,8 +67,6 @@
             android:configChanges="locale|layoutDirection"
             android:label="@string/settingslabel" />
         <activity android:name=".activity.PreferencesActivity"
-            android:configChanges="locale|layoutDirection" />
-        <activity android:name=".activity.ImageBrowserActivity"
             android:configChanges="locale|layoutDirection" />
         <activity android:name=".activity.TransmissionHistoryActivity"
             android:configChanges="locale|layoutDirection" />

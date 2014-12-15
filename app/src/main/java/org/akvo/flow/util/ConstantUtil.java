@@ -36,6 +36,7 @@ public class ConstantUtil {
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
     public static final String STACKTRACE_FILENAME = "err-";
     public static final String STACKTRACE_SUFFIX = ".stacktrace";
+    public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
 
     /**
      * survey file locations
@@ -59,6 +60,7 @@ public class ConstantUtil {
     public static final String SCAN_QUESTION_TYPE = "scan";
     public static final String STRENGTH_QUESTION_TYPE = "strength";
     public static final String DATE_QUESTION_TYPE = "date";
+    public static final String CASCADE_QUESTION_TYPE = "cascade";
 
     /**
      * help types
@@ -81,6 +83,7 @@ public class ConstantUtil {
     public static final String VIDEO_RESPONSE_TYPE = "VIDEO";
     public static final String GEO_RESPONSE_TYPE = "GEO";
     public static final String DATE_RESPONSE_TYPE = "DATE";
+    public static final String CASCADE_RESPONSE_TYPE = "CASCADE";
     public static final String OTHER_RESPONSE_TYPE = "OTHER";
 
     /**
@@ -212,6 +215,14 @@ public class ConstantUtil {
 
     public static final int NOTIFICATION_RECORD_SYNC = 100;
     public static final int NOTIFICATION_DATA_SYNC = 101;
+
+    public static final int NOTIFICATION_FORMS_SYNCED = 102;
+    public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
+    public static final int NOTIFICATION_HEADER_ERROR = 104;
+    public static final int NOTIFICATION_FORM_ERROR = 105;
+    public static final int NOTIFICATION_RESOURCE_ERROR = 105;
+
+    public static final int NOTIFICATION_BOOTSTRAP = 106;
 
     /**
      + * External Sources

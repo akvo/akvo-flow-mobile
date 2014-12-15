@@ -1,5 +1,22 @@
-Akvo FLOW app 
-Last update 14 November 2014
+Akvo FLOW app release notes
+===========================
+
+#ver 2.1.0
+Date: 15 December 2014
+
+New and noteworthy
+------------------
+* Form download errors are more accurately displayed, showing plain English notifications depending on the error type [#206]
+* Cascading question type is fully integrated, automatically managing dependent resources. Form offline synchronisation (bootstrap) also handles these resources [#204]
+* 'Projects' are now called 'Surveys', according to the new project structure design in FLOW [#233]
+
+Resolved issues
+---------------
+* Minor wording regression [#216]
+* Refactor HttpUtil [#217]
+* Help icon is barely visible [#230]
+* Read survey name from survey assignments [#232]
+* Check connectivity status before issuing the location beacon [#223]
 
 #ver 2.0.5.2
 

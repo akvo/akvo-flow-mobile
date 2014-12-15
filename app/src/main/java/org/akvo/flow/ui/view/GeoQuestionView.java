@@ -23,6 +23,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -38,6 +39,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.text.DecimalFormat;
+import java.util.zip.CRC32;
 
 /**
  * Question that can handle geographic location input. This question can also
@@ -155,9 +157,14 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
      * @return
      */
     private String generateCode(double lat, double lon) {
-        Long code = Long.parseLong((int) ((Math.abs(lat) * 100000d)) + ""
-                + (int) ((Math.abs(lon) * 10000d)));
-        return Long.toString(code, 36);
+        try {
+            Long code = Long.parseLong((int) ((Math.abs(lat) * 100000d)) + ""
+                    + (int) ((Math.abs(lon) * 10000d)));
+            return Long.toString(code, 36);
+        } catch (NumberFormatException e) {
+            Log.e("GeoQuestionView", "Code cannot be generated: " + e.getMessage());
+            return "";
+        }
     }
 
     /**
@@ -274,7 +281,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     }
 
     @Override
-    public void releaseResources() {
+    public void onPause() {
         // Remove updates from LocationManager, to allow this object being GC
         // and avoid an unnecessary use of the GPS and battery draining.
         LocationManager locMgr = (LocationManager) getContext()

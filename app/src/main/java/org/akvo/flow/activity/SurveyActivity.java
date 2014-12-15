@@ -245,7 +245,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 
             // Record meta-data, if applies
-            if (mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
+            if (!mSurveyGroup.isMonitored() ||
+                    mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
                 saveRecordMetaData();
             }
         }
@@ -290,6 +291,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     protected void onResume() {
         super.onResume();
+        mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
         if (Boolean.valueOf(mDatabase.getPreference(ConstantUtil.SCREEN_ON_KEY))) {
             mPager.setKeepScreenOn(true);

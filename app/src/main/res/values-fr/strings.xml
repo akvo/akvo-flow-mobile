@@ -73,15 +73,15 @@
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
   <string name="pleasewait">Veuillez attendre</string>
-  <string name="downloadsurveylabel">Télécharger une enquête</string>
+  <string name="downloadsurveylabel">Téléchargement du formulaire</string>
   <string name="downloadsurveydesc">Télécharger une enquête choisie (effectuer seulement si demandé)</string>
-  <string name="downloadsurveyinstr">Entrer l\'id de l\'enquête que vous souhaitez charger.</string>
+  <string name="downloadsurveyinstr">Entrer l\'identifiant du formulaire que vous voulez télécharger.</string>
   <string name="deletealldatawarning">Cela va effacer définitivement toutes les données (enquêtes, données, images, et utilisateurs) de l\'appareil. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="delete_responses_warning">Cela va effacer définitivement toutes les données, images et fichier .zip de l\'appareil de l\'appareil. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="unsentdatawarning">Certaines données n\'ont pas été envoyées. Soyez sûr de les exporter avant de les effacer. This operation is not reversible. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="deleteonewarning">Cela va effacer définitivement les données. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="nextbutton">Suivant</string>
-  <string name="submittext">Si vous avez terminé avec l\'enquête, choisir Envoyer pour envoyer les données. Une fois que Envoyer est choisi, vous pouvez revoir les données mais vous ne pourrez plus les changer.</string>
+  <string name="submittext">Si vous avez terminé avec le formulaire, appuyez sur \'envoyer les données\'. Une fois que vous pressez envoyer, vous pouvez revoir les données mais vous ne pourrez plus les éditer.</string>
   <string name="cleartitle">Effacer les réponses de l\'enquête</string>
   <string name="cleardesc">Etes-vous sûr de vouloir effacer les réponses?</string>
   <string name="authtitle">Autorisation nécessaire</string>
@@ -137,14 +137,14 @@
   <string name="no_surveys_text">Vous n\'avez pas d\'enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord FLOW</string>
   <string name="no_records_text">Vous n\'avez pas d\'enregistrement synchronisé. Pour éditer des enregistrements, vous devez les synchroniser, ou en créer de nouveaux</string>
   <!--Activity Labels-->
-  <string name="survey_groups_activity">Groupe d\'enquête</string>
+  <string name="survey_groups_activity">Enquêtes</string>
   <string name="record_list_activity">Sélectionner un enregistrement</string>
   <!--ActionBar-->
   <string name="more">Plus</string>
   <!--Search-->
   <string name="search_hint">Chercher un enregistrement</string>
   <!--Project List (Survey Group) Activity-->
-  <string name="delete_project_text">La suppression est definitive. Cliquez OK pour continuer ou annuler.</string>
+  <string name="delete_project_text">Cela supprimera l\'enquête de manière permanente. Cliquez Ok pour continuer ou annuler pour abandonner</string>
   <!--Survey Activity-->
   <string name="error_responses">Certaines réponses contiennent des erreurs. Vous devez vérifier les questions suivantes avant d\'envoyer</string>
   <string name="error_question_mandatory">Cette réponse est obligatoire</string>
@@ -153,19 +153,22 @@
   <string name="error_img_preview">Impossible de charger l\'image</string>
   <string name="use_external_source">Utiliser source externe</string>
   <string name="error_empty_form">Les formulaires vides ne peuvent être envoyés. Veuillez répondre aux questions.</string>
+  <string name="select">Veuillez sélectionner</string>
   <string name="clear_value_msg">Voulez-vous supprimer cette valeur?</string>
   <string name="type_code">entrez code</string>
   <string name="or">ou</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CRÉER UN NOUVEAU POINT</string>
-  <string name="stats_title">Statistiques du projet</string>
+  <string name="stats_title">Statistiques de l\'enquête</string>
   <string name="stats_total">Total de points:</string>
   <string name="stats_week">Les 7 derniers jours:</string>
   <string name="stats_today">Aujourd\'hui:</string>
+  <string name="distance_label">Distance: </string>
   <!--Record Activity-->
   <string name="unknown">Donnée non nommée</string>
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
+  <string name="error_missing_resources">Les ressources de l\'enquêtes ne sont pas complètement téléchargées</string>
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>
@@ -185,6 +188,12 @@
   <string name="time_check_activity">Date et heure</string>
   <string name="time_warning">Votre date de téléphone est inexacte! Réglez votre horloge et essayer à nouveau. Votre date et l\'heure téléphone est le:</string>
   <string name="adjust_date">Ajuster heure</string>
+  <!--Form sync-->
+  <string name="downloading_forms">Téléchargement des formulaires</string>
+  <string name="error_form_sync_title">Error en synchronisant les formulaires</string>
+  <string name="error_assignment_read">Les affectations des formulaires n\'ont pas pas pu être lu du tableau de bord FLOW</string>
+  <string name="error_form_header">Le formulaire %1$s n\'a pas pu être lu depuis le tableau de bord FLOW.</string>
+  <string name="error_form_download">Rassurez vous que le formulaire est publié, et que les paramères d\' heure/date sont ok.</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Annuler</string>

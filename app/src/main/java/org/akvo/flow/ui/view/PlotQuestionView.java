@@ -51,8 +51,6 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
         if (isReadOnly()) {
             mMapBtn.setVisibility(View.GONE);
         }
-        mInputText.setFocusable(false);
-        mInputText.setEnabled(false);
 
         mMapBtn.setOnClickListener(this);
     }

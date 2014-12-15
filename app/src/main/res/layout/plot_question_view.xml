@@ -4,13 +4,13 @@
 
     <include layout="@layout/question_header" />
 
-    <TextView
+    <EditText
+        android:id="@+id/input_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/or"
-        android:textSize="12sp"
-        android:textColor="@color/black_diabled" />
+        android:singleLine="true"
+        android:enabled="false"
+        android:focusable="false"/>
 
     <Button
         android:id="@+id/plotting_btn"

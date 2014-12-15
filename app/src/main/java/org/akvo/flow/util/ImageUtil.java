@@ -112,8 +112,6 @@ public class ImageUtil {
             }
         } catch (FileNotFoundException e) {
             Log.e(TAG, e.getMessage());
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
         } finally {
             if (out != null) {
                 try {

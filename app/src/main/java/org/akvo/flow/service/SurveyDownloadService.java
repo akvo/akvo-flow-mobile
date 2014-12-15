@@ -23,10 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
@@ -131,14 +129,12 @@ public class SurveyDownloadService extends IntentService {
         surveys = databaseAdaptor.checkSurveyVersions(surveys);
 
         if (!surveys.isEmpty()) {
-            // First, sync the SurveyGroups
-            syncSurveyGroups(surveys);
-
             int synced = 0, failed = 0;
             displayNotification(synced, failed, surveys.size());
             for (Survey survey : surveys) {
                 try {
                     downloadSurvey(survey);
+                    databaseAdaptor.addSurveyGroup(survey.getSurveyGroup());
                     databaseAdaptor.saveSurvey(survey);
                     String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
                     databaseAdaptor.addLanguages(langs);
@@ -168,35 +164,6 @@ public class SurveyDownloadService extends IntentService {
 
     private String getDeviceId() {
         return databaseAdaptor.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-    }
-    
-    private void syncSurveyGroups(List<Survey> surveys) {
-        // First, form the groups
-        Map<Long, SurveyGroup> surveyGroups = new HashMap<Long, SurveyGroup>();
-        for (Survey survey : surveys) {
-            SurveyGroup group = survey.getSurveyGroup();
-
-            // Temporary hack to support the concept of 'Project', where a non-monitored
-            // project (current SurveyGroup) can only hold one survey.
-            // See https://github.com/akvo/akvo-flow-mobile/issues/100
-            if (!group.isMonitored()) {
-                // TODO: Use String for SurveyGroup ids
-                try {
-                    long id = Long.valueOf(survey.getId());
-                    group = new SurveyGroup(id, survey.getName(), survey.getId(), false);
-                    survey.setSurveyGroup(group);
-                } catch (NumberFormatException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-            }
-
-            surveyGroups.put(group.getId(), group);
-        }
-        
-        // Now, add them to the database
-        for (SurveyGroup surveyGroup : surveyGroups.values()) {
-            databaseAdaptor.addSurveyGroup(surveyGroup);
-        }
     }
 
     /**
@@ -331,7 +298,7 @@ public class SurveyDownloadService extends IntentService {
                 if (response != null) {
                     surveys.addAll(new SurveyMetaParser().parseList(response, true));
                 }
-            } catch (IOException e) {
+            } catch (IllegalArgumentException | IOException e) {
                 Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         String.format(getString(R.string.error_form_header), id));
@@ -366,7 +333,7 @@ public class SurveyDownloadService extends IntentService {
             if (response != null) {
                 surveys = new SurveyMetaParser().parseList(response);
             }
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
                     getString(R.string.error_assignment_read));
             Log.e(TAG, e.getMessage());

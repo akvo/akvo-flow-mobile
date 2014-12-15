@@ -206,6 +206,7 @@ public class BootstrapService extends IntentService {
                 }
 
                 survey.setName(loadedSurvey.getName());
+                survey.setSurveyGroup(loadedSurvey.getSurveyGroup());
 
                 if (loadedSurvey.getVersion() > 0) {
                     survey.setVersion(loadedSurvey.getVersion());
@@ -213,12 +214,8 @@ public class BootstrapService extends IntentService {
                     survey.setVersion(1d);
                 }
 
-                // Process SurveyGroup, and save it to the DB
-                SurveyGroup group = parseSurveyGroup(loadedSurvey);
-                survey.setSurveyGroup(group);
-                databaseAdapter.addSurveyGroup(group);
-
-                // now save the survey and add the languages
+                // Save the Survey, SurveyGroup, and languages.
+                databaseAdapter.addSurveyGroup(survey.getSurveyGroup());
                 databaseAdapter.saveSurvey(survey);
                 String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
                 databaseAdapter.addLanguages(langs);
@@ -283,19 +280,6 @@ public class BootstrapService extends IntentService {
             Collections.sort(zipFiles);
         }
         return zipFiles;
-    }
-
-    private SurveyGroup parseSurveyGroup(Survey survey) {
-        // Temporary hack to support the concept of 'Project', where a non-monitored
-        // project (current SurveyGroup) can only hold one survey.
-        // See https://github.com/akvo/akvo-flow-mobile/issues/100
-        SurveyGroup group = survey.getSurveyGroup();
-        if (group != null && group.isMonitored()) {
-            return group; // Do nothing. The group remains unmodified
-        }
-
-        long id = Long.valueOf(survey.getId());
-        return new SurveyGroup(id, survey.getName(), survey.getId(), false);
     }
 
     /**

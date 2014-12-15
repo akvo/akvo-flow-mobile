@@ -61,7 +61,7 @@ public class ConstantUtil {
     public static final String STRENGTH_QUESTION_TYPE = "strength";
     public static final String DATE_QUESTION_TYPE = "date";
     public static final String CASCADE_QUESTION_TYPE = "cascade";
-    public static final String PLOT_QUESTION_TYPE = "plot";
+    public static final String GEOSHAPE_QUESTION_TYPE = "geoshape";
 
     /**
      * help types
@@ -112,7 +112,7 @@ public class ConstantUtil {
     /**
      * Plot measurement result data
      */
-    public static final String PLOTTING_RESULT = "plottingResult";
+    public static final String GEOSHAPE_RESULT = "geoshapeResult";
 
     /**
      * keys for saved state and bundle extras

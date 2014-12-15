@@ -64,7 +64,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
                 Bundle data = null;
                 if (!TextUtils.isEmpty(mValue)) {
                     data = new Bundle();
-                    data.putString(ConstantUtil.PLOTTING_RESULT, mValue);
+                    data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
                 }
                 notifyQuestionListeners(QuestionInteractionEvent.PLOTTING_EVENT, data);
                 break;
@@ -74,7 +74,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void questionComplete(Bundle data) {
         if (data != null) {
-            mValue = data.getString(ConstantUtil.PLOTTING_RESULT);
+            mValue = data.getString(ConstantUtil.GEOSHAPE_RESULT);
             mInputText.setText(mValue);
             captureResponse();
         }

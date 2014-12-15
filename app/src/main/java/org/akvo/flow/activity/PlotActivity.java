@@ -88,7 +88,7 @@ public class PlotActivity extends ActionBarActivity {
 
         initMap();
 
-        String geoJSON = getIntent().getStringExtra(ConstantUtil.PLOTTING_RESULT);
+        String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
         if (!TextUtils.isEmpty(geoJSON)) {
             load(geoJSON);
         }
@@ -182,7 +182,7 @@ public class PlotActivity extends ActionBarActivity {
                 break;
             case R.id.save:
                 Intent intent = new Intent();
-                intent.putExtra(ConstantUtil.PLOTTING_RESULT, geoJson());// TODO: Check empty data?
+                intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());// TODO: Check empty data?
                 setResult(RESULT_OK, intent);
                 finish();
                 break;

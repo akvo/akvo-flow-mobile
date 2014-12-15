@@ -81,7 +81,7 @@ public class QuestionGroupTab extends ScrollView {
                 questionView = new DateQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.CASCADE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new CascadeQuestionView(context, q, mSurveyListener);
-            } else if (ConstantUtil.PLOT_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+            } else if (ConstantUtil.GEOSHAPE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new PlotQuestionView(context, q, mSurveyListener);
             } else {
                 questionView = new QuestionHeaderView(context, q, mSurveyListener);

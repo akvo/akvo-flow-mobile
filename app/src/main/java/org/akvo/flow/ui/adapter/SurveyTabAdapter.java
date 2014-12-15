@@ -110,8 +110,16 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     }
 
     public void onPause() {
+        // Propagate onPause callback
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             questionGroupTab.onPause();
+        }
+    }
+
+    public void onResume() {
+        // Propagate onResume callback
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.onResume();
         }
     }
 

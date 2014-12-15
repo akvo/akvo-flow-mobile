@@ -50,7 +50,6 @@
   <string name="videohelpoption">Voir la vidéo d\'aide</string>
   <string name="photohelpoption">Voir les photos d\'aide</string>
   <string name="helpheading">Options d\'aide</string>
-  <string name="surveysupdated">Les enquêtes installées ont été mises à jour</string>
   <string name="deleteresponse">Effacer les réponses</string>
   <string name="othertext">Autre...</string>
   <string name="savelastuserlabel">Garde le dernier utilisateur connecté entre les sessions</string>
@@ -59,7 +58,6 @@
   <string name="beaconlabel">Envoyer la localisation</string>
   <string name="scanbarcode">Scanner le code barre</string>
   <string name="barcodeerror">Le scanner n\'est pas installé. Veuillez installer l\'application de code barre sur Android Market.</string>
-  <string name="imagehelpviewmessage">Cliquer sur une icone pour agrandir l\'image. Appuyer sur retour pour revenir à l\'enquête.</string>
   <string name="toosmallerr">La valeur est trop petite. Valeur minimum: </string>
   <string name="toolargeerr">La valeur est trop grande. valeur maximum: </string>
   <string name="baddatatypeerr">La réponse doit être numérique</string>
@@ -75,16 +73,15 @@
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
   <string name="pleasewait">Veuillez attendre</string>
-  <string name="downloadsurveylabel">Télécharger une enquête</string>
+  <string name="downloadsurveylabel">Téléchargement du formulaire</string>
   <string name="downloadsurveydesc">Télécharger une enquête choisie (effectuer seulement si demandé)</string>
-  <string name="downloadsurveyinstr">Entrer l\'id de l\'enquête que vous souhaitez charger.</string>
-  <string name="deleteallwarning">Cela va effacer définitivement les données de l\'enquête (enregistrées et envoyées) de l\'appareil. Choisir OK pour continuer ou annuler pour arrêter.</string>
+  <string name="downloadsurveyinstr">Entrer l\'identifiant du formulaire que vous voulez télécharger.</string>
   <string name="deletealldatawarning">Cela va effacer définitivement toutes les données (enquêtes, données, images, et utilisateurs) de l\'appareil. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="delete_responses_warning">Cela va effacer définitivement toutes les données, images et fichier .zip de l\'appareil de l\'appareil. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="unsentdatawarning">Certaines données n\'ont pas été envoyées. Soyez sûr de les exporter avant de les effacer. This operation is not reversible. Cette opération n\'est pas réversible. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="deleteonewarning">Cela va effacer définitivement les données. Choisir OK pour continuer ou annuler pour arrêter.</string>
   <string name="nextbutton">Suivant</string>
-  <string name="submittext">Si vous avez terminé avec l\'enquête, choisir Envoyer pour envoyer les données. Une fois que Envoyer est choisi, vous pouvez revoir les données mais vous ne pourrez plus les changer.</string>
+  <string name="submittext">Si vous avez terminé avec le formulaire, appuyez sur \'envoyer les données\'. Une fois que vous pressez envoyer, vous pouvez revoir les données mais vous ne pourrez plus les éditer.</string>
   <string name="cleartitle">Effacer les réponses de l\'enquête</string>
   <string name="cleardesc">Etes-vous sûr de vouloir effacer les réponses?</string>
   <string name="authtitle">Autorisation nécessaire</string>
@@ -113,7 +110,6 @@
   <string name="sdmounted">La carte SD est activée normalement.</string>
   <string name="sdcardspace">Espace restant (MB):</string>
   <string name="pickdate">Choisir une date</string>
-  <string name="cannotupdate">Les enquêtes n\'ont pas pu être téléchargées. Elles ne sont peut-être pas publiées ou votre carte SD est peut-être encore en mode transfert USB.</string>
   <string name="pleasewaitforbootstrap">Veuillez attendre jusqu\'à ce que le fichier soit prêt.</string>
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
@@ -125,11 +121,9 @@
   <string name="synced_records">%1$d des enregistrements synchronisés</string>
   <string name="sync_error">La synchronisation des enregistrements à échouer</string>
   <string name="network_error">Erreur de réseau</string>
-  <string name="select_record">Veuillez sélectionner un enregistrement</string>
   <string name="loading">Chargement...</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
-  <string name="error_assignment_title">L\'enquête ne peut pas être téléchargée</string>
   <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo FLOW</string>
   <!--Data sync-->
   <string name="data_sync_title">Synchronisation des données</string>
@@ -143,41 +137,38 @@
   <string name="no_surveys_text">Vous n\'avez pas d\'enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord FLOW</string>
   <string name="no_records_text">Vous n\'avez pas d\'enregistrement synchronisé. Pour éditer des enregistrements, vous devez les synchroniser, ou en créer de nouveaux</string>
   <!--Activity Labels-->
-  <string name="survey_groups_activity">Groupe d\'enquête</string>
+  <string name="survey_groups_activity">Enquêtes</string>
   <string name="record_list_activity">Sélectionner un enregistrement</string>
   <!--ActionBar-->
   <string name="more">Plus</string>
   <!--Search-->
   <string name="search_hint">Chercher un enregistrement</string>
   <!--Project List (Survey Group) Activity-->
-  <string name="delete_project_text">La suppression est definitive. Cliquez OK pour continuer ou annuler.</string>
+  <string name="delete_project_text">Cela supprimera l\'enquête de manière permanente. Cliquez Ok pour continuer ou annuler pour abandonner</string>
   <!--Survey Activity-->
   <string name="error_responses">Certaines réponses contiennent des erreurs. Vous devez vérifier les questions suivantes avant d\'envoyer</string>
   <string name="error_question_mandatory">Cette réponse est obligatoire</string>
   <string name="repeat_answer">Veuillez répéter la réponse</string>
   <string name="error_answer_match">Les réponses ne correspondent pas</string>
-  <string name="reg_form_warning_title">Questionnaire d\'enregistrement</string>
-  <string name="reg_form_warning_text">Ce point contient déjà une réponse pour ce formulaire. Toute nouvelle réponse sera considérée comme la plus récente. Voulez-vous continuer?</string>
   <string name="error_img_preview">Impossible de charger l\'image</string>
   <string name="use_external_source">Utiliser source externe</string>
   <string name="error_empty_form">Les formulaires vides ne peuvent être envoyés. Veuillez répondre aux questions.</string>
+  <string name="select">Veuillez sélectionner</string>
   <string name="clear_value_msg">Voulez-vous supprimer cette valeur?</string>
   <string name="type_code">entrez code</string>
   <string name="or">ou</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CRÉER UN NOUVEAU POINT</string>
-  <string name="stats_title">Statistiques du projet</string>
+  <string name="stats_title">Statistiques de l\'enquête</string>
   <string name="stats_total">Total de points:</string>
   <string name="stats_week">Les 7 derniers jours:</string>
   <string name="stats_today">Aujourd\'hui:</string>
+  <string name="distance_label">Distance: </string>
   <!--Record Activity-->
   <string name="unknown">Donnée non nommée</string>
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
-  <string name="choose_response">Choisissez la réponse</string>
-  <string name="choose_response_text">Il y a des réponses inachevées dans ce questionnaire. Voulez-vous charger une réponse enregistrée, ou commencer une nouvelle?</string>
-  <string name="resume_response">Chargement</string>
-  <string name="start_new_response">Nouveau</string>
+  <string name="error_missing_resources">Les ressources de l\'enquêtes ne sont pas complètement téléchargées</string>
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>
@@ -191,13 +182,18 @@
   <string name="app_update">Une mise à jour de FLOW est disponible. Cliquez \"mettre à jour\" pour télécharger et installer la nouvelle version.</string>
   <string name="update">Mise à jour</string>
   <string name="not_now">Pas maintenant</string>
-  <string name="updatedownloaded">La mise à jour de FLOW a été téléchargé</string>
   <string name="clicktoinstall">La mise à jour est téléchargée. Voulez vous l\'installer maintenant?</string>
   <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de FLOW.</string>
   <!--Time check-->
   <string name="time_check_activity">Date et heure</string>
   <string name="time_warning">Votre date de téléphone est inexacte! Réglez votre horloge et essayer à nouveau. Votre date et l\'heure téléphone est le:</string>
   <string name="adjust_date">Ajuster heure</string>
+  <!--Form sync-->
+  <string name="downloading_forms">Téléchargement des formulaires</string>
+  <string name="error_form_sync_title">Error en synchronisant les formulaires</string>
+  <string name="error_assignment_read">Les affectations des formulaires n\'ont pas pas pu être lu du tableau de bord FLOW</string>
+  <string name="error_form_header">Le formulaire %1$s n\'a pas pu être lu depuis le tableau de bord FLOW.</string>
+  <string name="error_form_download">Rassurez vous que le formulaire est publié, et que les paramères d\' heure/date sont ok.</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Annuler</string>

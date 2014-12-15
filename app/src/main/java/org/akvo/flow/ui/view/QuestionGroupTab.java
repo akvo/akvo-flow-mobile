@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -80,6 +79,8 @@ public class QuestionGroupTab extends ScrollView {
                 questionView = new BarcodeQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new DateQuestionView(context, q, mSurveyListener);
+            } else if (ConstantUtil.CASCADE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new CascadeQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PLOT_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new PlotQuestionView(context, q, mSurveyListener);
             } else {
@@ -172,9 +173,16 @@ public class QuestionGroupTab extends ScrollView {
     }
 
     public void onPause() {
+        // Propagate onPause callback
         for (QuestionView q : mQuestionViews) {
-            // Notify the View so it can release any system resource (i.e. Location updates)
-            q.releaseResources();
+            q.onPause();
+        }
+    }
+
+    public void onResume() {
+        // Propagate onResume callback
+        for (QuestionView q : mQuestionViews) {
+            q.onResume();
         }
     }
 

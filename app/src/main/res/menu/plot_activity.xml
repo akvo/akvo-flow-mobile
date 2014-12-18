@@ -25,11 +25,4 @@
         android:icon="@drawable/ic_save"
         flowapp:showAsAction="always"/>
 
-    <item
-        android:id="@+id/clear"
-        android:orderInCategory="102"
-        android:title="CLEAR"
-        android:icon="@drawable/ic_clear_map"
-        flowapp:showAsAction="always"/>
-
 </menu>

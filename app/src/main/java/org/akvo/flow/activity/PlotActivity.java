@@ -211,11 +211,6 @@ public class PlotActivity extends ActionBarActivity {
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
-            case R.id.clear:
-                mFeatures.clear();
-                mMap.clear();
-                mCurrentFeature = null;
-                break;
         }
 
         return super.onOptionsItemSelected(item);

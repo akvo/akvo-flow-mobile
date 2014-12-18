@@ -15,6 +15,7 @@
  */
 package org.akvo.flow.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
 import org.akvo.flow.ui.map.PolylineFeature;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.ViewUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -237,12 +239,26 @@ public class PlotActivity extends ActionBarActivity {
                     }
                     break;
                 case R.id.clear_point_btn:
-                    mCurrentFeature.removePoint();
-                    selectFeature(mCurrentFeature, null);
+                    ViewUtil.showConfirmDialog(R.string.clear_point_title,
+                            R.string.clear_point_text, PlotActivity.this, true,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mCurrentFeature.removePoint();
+                                    selectFeature(mCurrentFeature, null);
+                                }
+                            });
                     break;
                 case R.id.clear_feature_btn:
-                    selectFeature(null, null);
-                    mCurrentFeature.delete();
+                    ViewUtil.showConfirmDialog(R.string.clear_feature_title,
+                            R.string.clear_feature_text, PlotActivity.this, true,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mCurrentFeature.delete();
+                                    selectFeature(null, null);
+                                }
+                            });
                     break;
             }
         }

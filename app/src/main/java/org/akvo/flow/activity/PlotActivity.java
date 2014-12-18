@@ -66,6 +66,8 @@ public class PlotActivity extends ActionBarActivity {
     private List<Feature> mFeatures;// Saved features
     private Feature mCurrentFeature;// Ongoing feature
 
+    private boolean mAllowPoints, mAllowLine, mAllowPolygon;
+
     private View mFeatureMenu;
     private View mClearPointBtn;
     private TextView mFeatureName;
@@ -88,6 +90,9 @@ public class PlotActivity extends ActionBarActivity {
 
         initMap();
 
+        mAllowPoints = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POINTS, true);
+        mAllowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
+        mAllowPolygon = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POLYGON, true);
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
         if (!TextUtils.isEmpty(geoJSON)) {
             load(geoJSON);
@@ -156,6 +161,15 @@ public class PlotActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.plot_activity, menu);
+        if (!mAllowPoints) {
+            menu.findItem(R.id.add_points).setVisible(false);
+        }
+        if (!mAllowLine) {
+            menu.findItem(R.id.add_line).setVisible(false);
+        }
+        if (!mAllowPolygon) {
+            menu.findItem(R.id.add_polygon).setVisible(false);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 

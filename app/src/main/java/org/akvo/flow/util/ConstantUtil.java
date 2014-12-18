@@ -113,6 +113,9 @@ public class ConstantUtil {
      * Plot measurement result data
      */
     public static final String GEOSHAPE_RESULT = "geoshapeResult";
+    public static final String EXTRA_ALLOW_POINTS = "allowPoints";
+    public static final String EXTRA_ALLOW_LINE = "allowLine";
+    public static final String EXTRA_ALLOW_POLYGON = "allowPolygon";
 
     /**
      * keys for saved state and bundle extras

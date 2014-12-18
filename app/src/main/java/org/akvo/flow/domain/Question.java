@@ -59,6 +59,7 @@ public class Question {
     private String sourceQuestionId;// "Copied-from" question Id
     private boolean isDoubleEntry;
     private boolean useExternalSource;
+    private boolean allowPoints, allowLine, allowPolygon;
 
     // cascading question specific attrs
     private String src;
@@ -329,5 +330,29 @@ public class Question {
 
     public void setLevels(List<Level> levels) {
         this.levels = levels;
+    }
+
+    public void setAllowPoints(boolean allowPoints) {
+        this.allowPoints = allowPoints;
+    }
+
+    public boolean isAllowPoints() {
+        return allowPoints;
+    }
+
+    public void setAllowLine(boolean allowLine) {
+        this.allowLine = allowLine;
+    }
+
+    public boolean isAllowLine() {
+        return allowLine;
+    }
+
+    public void setAllowPolygon(boolean allowPolygon) {
+        this.allowPolygon = allowPolygon;
+    }
+
+    public boolean isAllowPolygon() {
+        return allowPolygon;
     }
 }

@@ -192,9 +192,6 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
-            case R.id.plotting:
-                startActivity(new Intent(this, PlotActivity.class));
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

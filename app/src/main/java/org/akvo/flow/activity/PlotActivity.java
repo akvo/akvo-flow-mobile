@@ -278,6 +278,12 @@ public class PlotActivity extends ActionBarActivity {
                     jCoordinate.put(point.latitude);
                     jCoordinates.put(jCoordinate);
                 }
+                if (PolygonFeature.GEOMETRY_TYPE.equals(feature.geoGeometryType())) {
+                    // Polygon features enclose coordinates in a 'LinearRing'
+                    JSONArray ring = jCoordinates;
+                    jCoordinates = new JSONArray();
+                    jCoordinates.put(ring);
+                }
                 jGeometry.put(JSON_COORDINATES, jCoordinates);
                 jFeature.put(JSON_GEOMETRY, jGeometry);
                 // TODO: handle properties
@@ -303,11 +309,15 @@ public class PlotActivity extends ActionBarActivity {
             for (int i=0; i<jFeatures.length(); i++) {
                 JSONObject jFeature = jFeatures.getJSONObject(i);
                 JSONObject jGeometry = jFeature.getJSONObject(JSON_GEOMETRY);
-                JSONArray jPoints = jGeometry.getJSONArray(JSON_COORDINATES);
+                JSONArray jCoordinates = jGeometry.getJSONArray(JSON_COORDINATES);
+                if (PolygonFeature.GEOMETRY_TYPE.equals(jGeometry.getString(JSON_TYPE))) {
+                    // Polygon features enclose coordinates in a 'LinearRing'
+                    jCoordinates = jCoordinates.getJSONArray(0);
+                }
                 // Load point list
                 List<LatLng> points = new ArrayList<>();
-                for (int j=0; j<jPoints.length(); j++) {
-                    JSONArray jPoint = jPoints.getJSONArray(j);
+                for (int j=0; j<jCoordinates.length(); j++) {
+                    JSONArray jPoint = jCoordinates.getJSONArray(j);
                     LatLng point = new LatLng(jPoint.getDouble(1), jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)
                     points.add(point);
                     builder.include(point);

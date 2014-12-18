@@ -124,6 +124,25 @@ public class PlotActivity extends ActionBarActivity {
                     selectFeature(null, null);
                 }
             });
+            mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+                }
+
+                @Override
+                public void onMarkerDrag(Marker marker) {
+                }
+
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+                    for (Feature feature : mFeatures) {
+                        if (feature.contains(marker)) {
+                            feature.onDrag(marker);
+                            break;
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -227,8 +246,8 @@ public class PlotActivity extends ActionBarActivity {
                     selectFeature(mCurrentFeature, null);
                     break;
                 case R.id.clear_feature_btn:
-                    mCurrentFeature.delete();
                     selectFeature(null, null);
+                    mCurrentFeature.delete();
                     break;
             }
         }

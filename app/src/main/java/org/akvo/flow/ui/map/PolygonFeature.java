@@ -54,6 +54,9 @@ public class PolygonFeature extends Feature {
         super.invalidate();
         if (mPolygon != null) {
             mPolygon.setStrokeColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
+            if (!mPoints.isEmpty()) {
+                mPolygon.setPoints(mPoints);
+            }
         }
     }
 

@@ -44,6 +44,7 @@ public class PolylineFeature extends Feature {
         super.invalidate();
         if (mPolyline != null) {
             mPolyline.setColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
+            mPolyline.setPoints(mPoints);
         }
     }
 

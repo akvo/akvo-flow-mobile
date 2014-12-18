@@ -69,6 +69,7 @@ public abstract class Feature {
                 .position(point)
                 .title(String.format("lat/lng: %.5f, %.5f", point.latitude, point.longitude))
                 .anchor(0.5f, 0.5f)
+                .draggable(true)
                 .icon(MARKER_UNSELECTED));
 
         // Insert new point just after the currently selected marker (if any)
@@ -105,6 +106,17 @@ public abstract class Feature {
         }
         mMarkers.clear();
         mPoints.clear();
+    }
+
+    public void onDrag(Marker marker) {
+        int index =  mMarkers.indexOf(marker);
+        if (index == -1) {
+            return;
+        }
+
+        mPoints.remove(index);
+        mPoints.add(index, marker.getPosition());
+        invalidate();
     }
 
     public void setSelected(boolean selected, Marker marker) {

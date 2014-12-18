@@ -20,7 +20,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +40,6 @@ import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
 import org.akvo.flow.ui.map.PolylineFeature;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,8 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlotActivity extends ActionBarActivity {
-    // public static final String EXTRA__PLOT_ID = "plot_id";
-
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
     private static final String JSON_COORDINATES = "coordinates";
@@ -113,7 +109,6 @@ public class PlotActivity extends ActionBarActivity {
                 public boolean onMarkerClick(Marker marker) {
                     // We need to figure out which feature contains this marker.
                     // For now, a naive linear search will do the trick
-                    // TODO: Select marker index, extending the feature from this marker
                     for (Feature feature : mFeatures) {
                         if (feature.contains(marker)) {
                             selectFeature(feature, marker);
@@ -180,23 +175,20 @@ public class PlotActivity extends ActionBarActivity {
         }
         switch (item.getItemId()) {
             case R.id.add_line:
-                Toast.makeText(this, "Adding new line", Toast.LENGTH_LONG).show();
                 selectFeature(new PolylineFeature(mMap), null);
                 mFeatures.add(mCurrentFeature);
                 break;
             case R.id.add_points:
-                Toast.makeText(this, "Adding points", Toast.LENGTH_LONG).show();
                 selectFeature(new PointsFeature(mMap), null);
                 mFeatures.add(mCurrentFeature);
                 break;
             case R.id.add_polygon:
-                Toast.makeText(this, "Adding new area", Toast.LENGTH_LONG).show();
                 selectFeature(new PolygonFeature(mMap), null);
                 mFeatures.add(mCurrentFeature);
                 break;
             case R.id.save:
                 Intent intent = new Intent();
-                intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());// TODO: Check empty data?
+                intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
@@ -327,20 +319,10 @@ public class PlotActivity extends ActionBarActivity {
                 }
             });
         } catch (JSONException e) {
-            Toast.makeText(this, "Features could not be loaded", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
             Log.e(TAG, "geoJSON() - " + e.getMessage());
             // TODO: Remove features?
         }
-    }
-
-    private static String encode(String geoJSON) {
-        byte[] deflated = FileUtil.deflate(geoJSON);
-        return Base64.encodeToString(deflated, Base64.NO_WRAP);
-    }
-
-    private static String decode(String encodedGeoJSON) {
-        byte[] decoded = Base64.decode(encodedGeoJSON, Base64.NO_WRAP);
-        return FileUtil.inflate(decoded);
     }
 
 }

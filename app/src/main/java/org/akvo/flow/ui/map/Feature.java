@@ -33,18 +33,23 @@ public abstract class Feature {
     protected List<LatLng> mPoints;
     protected List<Marker> mMarkers;
 
-    private static final BitmapDescriptor MARKER_UNSELECTED, MARKER_ACTIVE, MARKER_SELECTED;
+    private static final BitmapDescriptor MARKER_DISABLED;
+    private static final BitmapDescriptor MARKER_ENABLED;
+    private static final BitmapDescriptor MARKER_SELECTED;
+    private static final BitmapDescriptor MARKER_HIGHLIGHTED;
 
     static {
-        MARKER_UNSELECTED = getMarkerBitmapDescriptor(PointStatus.UNSELECTED);
-        MARKER_ACTIVE = getMarkerBitmapDescriptor(PointStatus.ACTIVE);
+        MARKER_DISABLED = getMarkerBitmapDescriptor(PointStatus.DISABLED);
+        MARKER_ENABLED = getMarkerBitmapDescriptor(PointStatus.ENABLED);
         MARKER_SELECTED = getMarkerBitmapDescriptor(PointStatus.SELECTED);
+        MARKER_HIGHLIGHTED = getMarkerBitmapDescriptor(PointStatus.HIGHLIGHTED);
     }
 
     private enum PointStatus {
-        UNSELECTED, // Unselected Feature. Normal mode.
+        DISABLED, // Unselected Feature. Normal mode.
+        ENABLED, // Selected Feature, but marker is not selected (just 'active').
         SELECTED, // Currently selected marker.
-        ACTIVE // Selected Feature, but marker is not selected (just 'active').
+        HIGHLIGHTED // Highlighted point, used to show the descendant of the selected point.
     }
 
     public Feature(GoogleMap map) {
@@ -70,7 +75,7 @@ public abstract class Feature {
                 .title(String.format("lat/lng: %.5f, %.5f", point.latitude, point.longitude))
                 .anchor(0.5f, 0.5f)
                 .draggable(true)
-                .icon(MARKER_UNSELECTED));
+                .icon(MARKER_DISABLED));
 
         // Insert new point just after the currently selected marker (if any)
         if (mSelectedMarker != null) {
@@ -126,15 +131,24 @@ public abstract class Feature {
     }
 
     protected void invalidate() {
-        // Recompute icons, depending on selection status
-        for (Marker marker : mMarkers) {
-            if (mSelected && marker.equals(mSelectedMarker)) {
+        // Recompute icons, depending on point status
+        long selected = -1, previous = -1;
+        if (mSelected && mSelectedMarker != null && mMarkers.contains(mSelectedMarker)) {
+            selected = mMarkers.indexOf(mSelectedMarker);
+            previous = selected > 0 ? (selected - 1) % mMarkers.size() : mMarkers.size() - 1;
+        }
+
+        for (int i=0; i<mMarkers.size(); i++) {
+            Marker marker = mMarkers.get(i);
+            if (!mSelected) {
+                marker.setIcon(MARKER_DISABLED);
+            } else if (i == selected) {
                 marker.setIcon(MARKER_SELECTED);
                 marker.showInfoWindow();
-            } else if (mSelected) {
-                marker.setIcon(MARKER_ACTIVE);
+            } else if (i == previous) {
+                marker.setIcon(MARKER_HIGHLIGHTED);
             } else {
-                marker.setIcon(MARKER_UNSELECTED);
+                marker.setIcon(MARKER_ENABLED);
             }
         }
     }
@@ -152,11 +166,15 @@ public abstract class Feature {
                 size = POINT_SIZE_SELECTED;
                 color = POINT_COLOR_SELECTED;
                 break;
-            case ACTIVE:
+            case HIGHLIGHTED:
+                size = POINT_SIZE;
+                color = POINT_COLOR_SELECTED;
+                break;
+            case ENABLED:
                 size = POINT_SIZE;
                 color = POINT_COLOR_ACTIVE;
                 break;
-            case UNSELECTED:
+            case DISABLED:
             default:
                 size = POINT_SIZE;
                 color = POINT_COLOR;

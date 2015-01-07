@@ -60,6 +60,7 @@ public abstract class Feature {
 
     public abstract String getTitle();
     public abstract String geoGeometryType();
+    public abstract boolean highlightPrevious(int position);
 
     public boolean contains(Marker marker) {
         return mMarkers.contains(marker);
@@ -145,7 +146,7 @@ public abstract class Feature {
             } else if (i == selected) {
                 marker.setIcon(MARKER_SELECTED);
                 marker.showInfoWindow();
-            } else if (i == previous) {
+            } else if (i == previous && highlightPrevious(i)) {
                 marker.setIcon(MARKER_HIGHLIGHTED);
             } else {
                 marker.setIcon(MARKER_ENABLED);

@@ -25,4 +25,9 @@ public class PointsFeature extends Feature {
         return GEOMETRY_TYPE;
     }
 
+    @Override
+    public boolean highlightPrevious(int position) {
+        return false;
+    }
+
 }

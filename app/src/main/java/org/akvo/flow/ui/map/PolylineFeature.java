@@ -58,4 +58,9 @@ public class PolylineFeature extends Feature {
         return GEOMETRY_TYPE;
     }
 
+    @Override
+    public boolean highlightPrevious(int position) {
+        return position < mMarkers.size() - 1;// Do not highlight polyline tail
+    }
+
 }

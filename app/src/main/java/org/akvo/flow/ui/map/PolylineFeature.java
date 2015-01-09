@@ -5,6 +5,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.akvo.flow.R;
+
 public class PolylineFeature extends Feature {
     public static final String GEOMETRY_TYPE = "LineString";
 
@@ -19,7 +21,7 @@ public class PolylineFeature extends Feature {
         super.addPoint(point);
         if (mPolyline == null) {
             PolylineOptions polylineOptions = new PolylineOptions();
-            polylineOptions.color(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
+            polylineOptions.color(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR_DEFAULT);
             mPolyline = mMap.addPolyline(polylineOptions);
         }
         mPolyline.setPoints(mPoints);
@@ -43,14 +45,14 @@ public class PolylineFeature extends Feature {
     public void invalidate() {
         super.invalidate();
         if (mPolyline != null) {
-            mPolyline.setColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
+            mPolyline.setColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR_DEFAULT);
             mPolyline.setPoints(mPoints);
         }
     }
 
     @Override
-    public String getTitle() {
-        return "Line";
+    public int getTitle() {
+        return R.string.geoshape_line;
     }
 
     @Override

@@ -15,15 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Feature {
-    protected static final int POINT_SIZE = 40;// Default marker size (px).
+    protected static final int POINT_SIZE_DEFAULT = 40;// Default marker size (px).
     protected static final int POINT_SIZE_SELECTED = 50;// Selected marker size (px).
 
-    protected static final int POINT_COLOR = 0xEE736357;
+    protected static final int POINT_COLOR_DEFAULT = 0xEE736357;
     protected static final int POINT_COLOR_ACTIVE = 0xFFE27C00;
     protected static final int POINT_COLOR_SELECTED = 0xFF00A79D;
     protected static final int POINT_COLOR_FILL = 0x55FFFFFF;
 
-    protected static final int STROKE_COLOR = 0xEE736357;
+    protected static final int STROKE_COLOR_DEFAULT = 0xEE736357;
     protected static final int STROKE_COLOR_SELECTED = 0xFF736357;
 
     protected boolean mSelected;
@@ -58,7 +58,7 @@ public abstract class Feature {
         mMarkers = new ArrayList<>();
     }
 
-    public abstract String getTitle();
+    public abstract int getTitle();
     public abstract String geoGeometryType();
     public abstract boolean highlightPrevious(int position);
 
@@ -70,6 +70,11 @@ public abstract class Feature {
         return mPoints;
     }
 
+    /**
+     * Add point to the map. A new marker will be created based on the point,
+     * and the underlying overlays recomputed.
+     * @param point LatLng value of the new point.
+     */
     public void addPoint(LatLng point) {
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(point)
@@ -93,7 +98,7 @@ public abstract class Feature {
     }
 
     /**
-     * Delete selected point
+     * Delete selected point.
      */
     public void removePoint() {
         if (mSelectedMarker == null) {
@@ -106,6 +111,9 @@ public abstract class Feature {
         mMarkers.remove(index);
     }
 
+    /**
+     * Delete the whole feature from the map.
+     */
     public void delete() {
         for (Marker marker : mMarkers) {
             marker.remove();
@@ -131,6 +139,10 @@ public abstract class Feature {
         invalidate();
     }
 
+    /**
+     * Recompute geoshape and redraw the corresponding markers. Subclasses should add any extra
+     * step to this process by overriding this method.
+     */
     protected void invalidate() {
         // Recompute icons, depending on point status
         long selected = -1, previous = -1;
@@ -160,6 +172,11 @@ public abstract class Feature {
         }
     }
 
+    /**
+     * Programmatically creates Bitmap based on point status
+     * @param status PointStatus of the feature point.
+     * @return BitmapDescriptor of the newly created Bitmap.
+     */
     protected static BitmapDescriptor getMarkerBitmapDescriptor(PointStatus status) {
         int size, color;
         switch (status) {
@@ -168,17 +185,17 @@ public abstract class Feature {
                 color = POINT_COLOR_SELECTED;
                 break;
             case HIGHLIGHTED:
-                size = POINT_SIZE;
+                size = POINT_SIZE_DEFAULT;
                 color = POINT_COLOR_SELECTED;
                 break;
             case ENABLED:
-                size = POINT_SIZE;
+                size = POINT_SIZE_DEFAULT;
                 color = POINT_COLOR_ACTIVE;
                 break;
             case DISABLED:
             default:
-                size = POINT_SIZE;
-                color = POINT_COLOR;
+                size = POINT_SIZE_DEFAULT;
+                color = POINT_COLOR_DEFAULT;
         }
 
         Bitmap bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);

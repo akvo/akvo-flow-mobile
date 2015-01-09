@@ -5,6 +5,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import org.akvo.flow.R;
+
 public class PolygonFeature extends Feature {
     public static final String GEOMETRY_TYPE = "Polygon";
 
@@ -21,7 +23,7 @@ public class PolygonFeature extends Feature {
         super.addPoint(point);
         if (mPolygon == null) {
             PolygonOptions polygonOptions = new PolygonOptions();
-            polygonOptions.strokeColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
+            polygonOptions.strokeColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR_DEFAULT);
             polygonOptions.fillColor(FILL_COLOR);
             polygonOptions.add(point);// Polygon cannot be created without points
             mPolygon = mMap.addPolygon(polygonOptions);
@@ -53,7 +55,7 @@ public class PolygonFeature extends Feature {
     public void invalidate() {
         super.invalidate();
         if (mPolygon != null) {
-            mPolygon.setStrokeColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR);
+            mPolygon.setStrokeColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR_DEFAULT);
             if (!mPoints.isEmpty()) {
                 mPolygon.setPoints(mPoints);
             }
@@ -61,8 +63,8 @@ public class PolygonFeature extends Feature {
     }
 
     @Override
-    public String getTitle() {
-        return "Area";
+    public int getTitle() {
+        return R.string.geoshape_area;
     }
 
     @Override

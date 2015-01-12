@@ -15,9 +15,12 @@
  */
 package org.akvo.flow.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -147,6 +150,19 @@ public class PlotActivity extends ActionBarActivity {
                     }
                 }
             });
+
+            // If user location is known, center map
+            LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            String provider = manager.getBestProvider(criteria, true);
+            if (provider != null) {
+                Location location = manager.getLastKnownLocation(provider);
+                if (location != null) {
+                    LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
+                }
+            }
         }
     }
 

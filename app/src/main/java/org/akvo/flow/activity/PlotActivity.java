@@ -33,6 +33,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -52,7 +56,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlotActivity extends ActionBarActivity {
+public class PlotActivity extends ActionBarActivity implements OnMapClickListener,
+        OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener {
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
     private static final String JSON_COORDINATES = "coordinates";
@@ -105,51 +110,10 @@ public class PlotActivity extends ActionBarActivity {
     private void initMap() {
         if (mMap != null) {
             mMap.setMyLocationEnabled(true);
-            mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-                @Override
-                public void onMapLongClick(LatLng latLng) {
-                    addPoint(latLng);
-                }
-            });
-            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-                    // We need to figure out which feature contains this marker.
-                    // For now, a naive linear search will do the trick
-                    for (Feature feature : mFeatures) {
-                        if (feature.contains(marker)) {
-                            selectFeature(feature, marker);
-                            break;
-                        }
-                    }
-                    return false;
-                }
-            });
-            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(LatLng latLng) {
-                    selectFeature(null, null);
-                }
-            });
-            mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-                @Override
-                public void onMarkerDragStart(Marker marker) {
-                }
-
-                @Override
-                public void onMarkerDrag(Marker marker) {
-                }
-
-                @Override
-                public void onMarkerDragEnd(Marker marker) {
-                    for (Feature feature : mFeatures) {
-                        if (feature.contains(marker)) {
-                            feature.onDrag(marker);
-                            break;
-                        }
-                    }
-                }
-            });
+            mMap.setOnMapLongClickListener(this);
+            mMap.setOnMarkerClickListener(this);
+            mMap.setOnMapClickListener(this);
+            mMap.setOnMarkerDragListener(this);
 
             // If user location is known, center map
             LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -392,6 +356,47 @@ public class PlotActivity extends ActionBarActivity {
             Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
             Log.e(TAG, "geoJSON() - " + e.getMessage());
             // TODO: Remove features?
+        }
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        selectFeature(null, null);
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        addPoint(latLng);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        // We need to figure out which feature contains this marker.
+        // For now, a naive linear search will do the trick
+        for (Feature feature : mFeatures) {
+            if (feature.contains(marker)) {
+                selectFeature(feature, marker);
+                break;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        for (Feature feature : mFeatures) {
+            if (feature.contains(marker)) {
+                feature.onDrag(marker);
+                break;
+            }
         }
     }
 

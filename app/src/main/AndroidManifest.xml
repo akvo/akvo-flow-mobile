@@ -71,7 +71,7 @@
         <activity android:name=".activity.TransmissionHistoryActivity"
             android:configChanges="locale|layoutDirection" />
         <activity android:name=".activity.PlotActivity"
-            android:configChanges="locale|layoutDirection" />
+            android:configChanges="locale|layoutDirection|orientation|screenSize" />
         <activity
             android:name=".activity.AppUpdateActivity"
             android:label="@string/app_update_activity"

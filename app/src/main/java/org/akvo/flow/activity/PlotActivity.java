@@ -197,6 +197,15 @@ public class PlotActivity extends ActionBarActivity {
             return false;
         }
         switch (item.getItemId()) {
+            case R.id.map_normal:
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case R.id.map_satellite:
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+            case R.id.map_terrain:
+                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
             case R.id.add_line:
                 selectFeature(new PolylineFeature(mMap), null);
                 mFeatures.add(mCurrentFeature);

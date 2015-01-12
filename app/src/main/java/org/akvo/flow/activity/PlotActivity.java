@@ -76,6 +76,8 @@ public class PlotActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plot_activity);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mFeatures = new ArrayList<>();
         mMap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
 
@@ -212,6 +214,9 @@ public class PlotActivity extends ActionBarActivity {
                 intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());
                 setResult(RESULT_OK, intent);
                 finish();
+                break;
+            case android.R.id.home:
+                onBackPressed();
                 break;
         }
 

@@ -63,6 +63,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POINTS, getQuestion().isAllowPoints());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POLYGON, getQuestion().isAllowPolygon());
+                data.putBoolean(ConstantUtil.EXTRA_MANUAL_INPUT, !getQuestion().isLocked());
                 if (!TextUtils.isEmpty(mValue)) {
                     data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
                 }

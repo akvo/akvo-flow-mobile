@@ -116,6 +116,7 @@ public class ConstantUtil {
     public static final String EXTRA_ALLOW_POINTS = "allowPoints";
     public static final String EXTRA_ALLOW_LINE = "allowLine";
     public static final String EXTRA_ALLOW_POLYGON = "allowPolygon";
+    public static final String EXTRA_MANUAL_INPUT = "manualInput";
 
     /**
      * keys for saved state and bundle extras

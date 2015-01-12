@@ -73,6 +73,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
     private Feature mCurrentFeature;// Ongoing feature
 
     private boolean mAllowPoints, mAllowLine, mAllowPolygon;
+    private boolean mManualInput;
 
     private View mFeatureMenu;
     private View mClearPointBtn;
@@ -96,11 +97,13 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
         findViewById(R.id.add_point_btn).setOnClickListener(mFeatureMenuListener);
         findViewById(R.id.clear_feature_btn).setOnClickListener(mFeatureMenuListener);
 
-        initMap();
-
         mAllowPoints = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POINTS, true);
         mAllowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
         mAllowPolygon = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POLYGON, true);
+        mManualInput = getIntent().getBooleanExtra(ConstantUtil.EXTRA_MANUAL_INPUT, true);
+
+        initMap();
+
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
         if (!TextUtils.isEmpty(geoJSON)) {
             load(geoJSON);
@@ -110,10 +113,12 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
     private void initMap() {
         if (mMap != null) {
             mMap.setMyLocationEnabled(true);
-            mMap.setOnMapLongClickListener(this);
             mMap.setOnMarkerClickListener(this);
             mMap.setOnMapClickListener(this);
-            mMap.setOnMarkerDragListener(this);
+            if (mManualInput) {
+                mMap.setOnMapLongClickListener(this);
+                mMap.setOnMarkerDragListener(this);
+            }
 
             // If user location is known, center map
             LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);

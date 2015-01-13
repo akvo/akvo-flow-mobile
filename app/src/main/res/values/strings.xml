@@ -204,6 +204,8 @@
     <string name="geoshape_area">Area</string>
     <string name="geoshape_line">Line</string>
     <string name="geoshape_points">Points</string>
+    <string name="location_unknown">Location is not known</string>
+    <string name="location_inaccurate">Location reading is not accurate enough</string>
     <!-- Misc -->
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>

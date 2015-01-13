@@ -67,7 +67,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
     private static final String TYPE_FEATURE_COLLECTION = "FeatureCollection";
 
     private static final String TAG = PlotActivity.class.getSimpleName();
-    // private static final float ACCURACY_THRESHOLD = 20f;
+    private static final float ACCURACY_THRESHOLD = 20f;
 
     private List<Feature> mFeatures;// Saved features
     private Feature mCurrentFeature;// Ongoing feature
@@ -232,9 +232,12 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
             switch (v.getId()) {
                 case R.id.add_point_btn:
                     Location location = mMap.getMyLocation();
-                    // TODO: Check accuracy
-                    if (location != null) {
+                    if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
+                    } else {
+                        Toast.makeText(PlotActivity.this,
+                                location != null ? R.string.location_inaccurate : R.string.location_unknown,
+                                Toast.LENGTH_LONG).show();
                     }
                     break;
                 case R.id.clear_point_btn:

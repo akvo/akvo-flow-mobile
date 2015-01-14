@@ -285,6 +285,10 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                 .show();
     }
 
+    /**
+     * Marshall GeoJSON string, storing all the features collected so far.
+     * GeoJSON reference: http://geojson.org/geojson-spec.html
+     */
     private String geoJson() {
         JSONObject jObject = new JSONObject();
         try {
@@ -337,6 +341,10 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
         return jObject.toString();
     }
 
+    /**
+     * Unmarshall a GeoJSON string into a features collection. Note that properties are ignored,
+     * for they will be recomputed anyway while loading the data.
+     */
     private void load(String geoJSON) {
         try {
             // Keep track of all points, so we can later center the map

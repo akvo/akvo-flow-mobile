@@ -1,5 +1,7 @@
 package org.akvo.flow.ui.map;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
@@ -60,6 +62,21 @@ public class PolygonFeature extends Feature {
                 mPolygon.setPoints(mPoints);
             }
         }
+
+        // Properties
+        float length = 0f;
+        // Init previous with last point, so we compute the last-first distance as well
+        LatLng previous = mPoints.size() > 2 ? mPoints.get(mPoints.size()-1) : null;
+        for (LatLng point : mPoints) {
+            if (previous != null) {
+                float[] distance = new float[1];
+                Location.distanceBetween(previous.latitude, previous.longitude, point.latitude, point.longitude, distance);
+                length += distance[0];
+            }
+            previous = point;
+        }
+        String lengthVal = String.format("%.2f", length);
+        mProperties.add(new Property("length", lengthVal, "Length", lengthVal + "m"));
     }
 
     @Override

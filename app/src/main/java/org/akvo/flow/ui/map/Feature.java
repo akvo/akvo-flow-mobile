@@ -32,6 +32,7 @@ public abstract class Feature {
     protected GoogleMap mMap;
     protected List<LatLng> mPoints;
     protected List<Marker> mMarkers;
+    protected List<Property> mProperties;
 
     private static final BitmapDescriptor MARKER_DISABLED;
     private static final BitmapDescriptor MARKER_ENABLED;
@@ -56,6 +57,7 @@ public abstract class Feature {
         mMap = map;
         mPoints = new ArrayList<>();
         mMarkers = new ArrayList<>();
+        mProperties = new ArrayList<>();
     }
 
     public abstract int getTitle();
@@ -164,6 +166,15 @@ public abstract class Feature {
                 marker.setIcon(MARKER_ENABLED);
             }
         }
+
+        // Compute properties
+        mProperties.clear();
+        String count = String.valueOf(mMarkers.size());
+        mProperties.add(new Property("pointCount", count, "Point Count", count));
+    }
+
+    public List<Property> getProperties() {
+        return mProperties;
     }
 
     public void load(List<LatLng> points) {
@@ -214,6 +225,20 @@ public abstract class Feature {
         canvas.drawCircle(center, center, center * 0.25f, solid);// Inner circle
 
         return BitmapDescriptorFactory.fromBitmap(bmp);
+    }
+
+    public static class Property {
+        public String mKey;
+        public String mValue;
+        public String mDisplayName;
+        public String mDisplayValue;
+
+        public Property(String key, String value, String displayName, String displayValue) {
+            mKey = key;
+            mValue = value;
+            mDisplayName = displayName;
+            mDisplayValue = displayValue;
+        }
     }
 
 }

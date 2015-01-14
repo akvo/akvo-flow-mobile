@@ -1,5 +1,7 @@
 package org.akvo.flow.ui.map;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
@@ -48,6 +50,20 @@ public class PolylineFeature extends Feature {
             mPolyline.setColor(mSelected ? STROKE_COLOR_SELECTED : STROKE_COLOR_DEFAULT);
             mPolyline.setPoints(mPoints);
         }
+
+        // Compute line length
+        float length = 0f;
+        LatLng previous = null;
+        for (LatLng point : mPoints) {
+            if (previous != null) {
+                float[] distance = new float[1];
+                Location.distanceBetween(previous.latitude, previous.longitude, point.latitude, point.longitude, distance);
+                length += distance[0];
+            }
+            previous = point;
+        }
+        String lengthVal = String.format("%.2f", length);
+        mProperties.add(new Property("length", lengthVal, "Length", lengthVal + "m"));
     }
 
     @Override

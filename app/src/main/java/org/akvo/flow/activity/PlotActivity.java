@@ -15,6 +15,7 @@
  */
 package org.akvo.flow.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,6 +98,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
         mClearPointBtn.setOnClickListener(mFeatureMenuListener);
         findViewById(R.id.add_point_btn).setOnClickListener(mFeatureMenuListener);
         findViewById(R.id.clear_feature_btn).setOnClickListener(mFeatureMenuListener);
+        findViewById(R.id.properties).setOnClickListener(mFeatureMenuListener);
 
         mAllowPoints = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POINTS, true);
         mAllowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
@@ -262,9 +265,25 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                                 }
                             });
                     break;
+                case R.id.properties:
+                    displayProperties();
+                    break;
             }
         }
     };
+
+    private void displayProperties() {
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line);
+        for (Feature.Property property : mCurrentFeature.getProperties()) {
+            adapter.add(String.format("%s: %s", property.mDisplayName, property.mDisplayValue));
+        }
+
+        new AlertDialog.Builder(PlotActivity.this)
+                .setTitle("Properties")
+                .setAdapter(adapter, null)
+                .show();
+    }
 
     private String geoJson() {
         JSONObject jObject = new JSONObject();

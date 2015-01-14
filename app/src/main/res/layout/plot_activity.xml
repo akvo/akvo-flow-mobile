@@ -37,6 +37,12 @@
             android:gravity="center">
 
             <ImageButton
+                android:id="@+id/properties"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_dialog_info" />
+
+            <ImageButton
                 android:id="@+id/add_point_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

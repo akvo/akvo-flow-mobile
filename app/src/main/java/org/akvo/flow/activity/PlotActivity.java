@@ -64,7 +64,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
     private static final String JSON_GEOMETRY = "geometry";
     private static final String JSON_COORDINATES = "coordinates";
     private static final String JSON_FEATURES = "features";
-    // private static final String JSON_PROPERTIES = "properties";
+    private static final String JSON_PROPERTIES = "properties";
     private static final String TYPE_FEATURE = "Feature";
     private static final String TYPE_FEATURE_COLLECTION = "FeatureCollection";
 
@@ -295,6 +295,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                     continue;
                 }
 
+                // Type
                 JSONObject jFeature = new JSONObject();
                 jFeature.put(JSON_TYPE, TYPE_FEATURE);// Top level type (always "Feature")
 
@@ -318,7 +319,14 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                 }
                 jGeometry.put(JSON_COORDINATES, jCoordinates);
                 jFeature.put(JSON_GEOMETRY, jGeometry);
-                // TODO: handle properties
+
+                // Properties
+                JSONObject jProperties = new JSONObject();
+                for (Feature.Property property : feature.getProperties()) {
+                    jProperties.put(property.mKey, property.mValue);
+                }
+                jFeature.put(JSON_PROPERTIES, jProperties);
+
                 jFeatures.put(jFeature);
             }
             jObject.put(JSON_FEATURES, jFeatures);

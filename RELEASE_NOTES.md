@@ -1,6 +1,14 @@
 Akvo FLOW app release notes
 ===========================
 
+#ver 2.1.0.1
+Date: 15 January 2015
+
+New and noteworthy
+------------------
+* Dependent questions whose parent question allows multiple values had some hidden visibility issues. This is fixed now [#239]
+* Cascade resource's inconsistent level number caused an app crash [#246]
+
 #ver 2.1.0
 Date: 15 December 2014
 

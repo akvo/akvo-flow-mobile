@@ -6,13 +6,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.maps.android.geometry.Point;
 
 import org.akvo.flow.R;
+
+import java.util.List;
 
 public class PolygonFeature extends Feature {
     public static final String GEOMETRY_TYPE = "Polygon";
 
     private static final int FILL_COLOR = 0x88736357;
+    private static final int EARTH_RADIUS = 6371000; // meters
+    private static final double LATITUDE_SIZE = Math.PI * EARTH_RADIUS / 180;
 
     private Polygon mPolygon;
 
@@ -92,6 +97,18 @@ public class PolygonFeature extends Feature {
     @Override
     public boolean highlightPrevious(int position) {
         return true;
+    }
+
+    private Point project(LatLng location) {
+        // Sinusoidal projection (equal-area)
+        double y = location.latitude * LATITUDE_SIZE;
+        double x = location.longitude * LATITUDE_SIZE * Math.cos(Math.toRadians(location.latitude));
+        return new Point(x, y);
+    }
+
+    private float area(List<Point> points) {
+        // TODO: calculate area
+        return 0;
     }
 
 }

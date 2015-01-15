@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.geometry.Point;
 
 import org.akvo.flow.R;
+import org.akvo.flow.util.GeoUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,11 +84,12 @@ public class PolygonFeature extends Feature {
             previous = point;
         }
         String lengthVal = String.format("%.2f", length);
-        mProperties.add(new Property("length", lengthVal, "Length", lengthVal + "m"));
+        mProperties.add(new Property("length", lengthVal, "Length", GeoUtil.getDisplayLength(length)));
 
         // Area
-        String areaVal = String.format("%.2f", area());
-        mProperties.add(new Property("area", areaVal, "Area", areaVal + "m²"));
+        final double area = area();
+        String areaVal = String.format("%.2f", area);
+        mProperties.add(new Property("area", areaVal, "Area", GeoUtil.getDisplayArea(area)));
     }
 
     @Override

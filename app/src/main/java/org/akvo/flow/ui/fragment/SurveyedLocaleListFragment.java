@@ -19,6 +19,7 @@ package org.akvo.flow.ui.fragment;
 import java.text.DecimalFormat;
 import java.util.Date;
 
+import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -268,21 +269,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 float[] results = new float[1];
                 Location.distanceBetween(mLatitude, mLongitude, surveyedLocale.getLatitude(), surveyedLocale.getLongitude(), results);
                 final double distance = results[0];
-            
-                // default: no decimal point, km as unit
-                DecimalFormat df = new DecimalFormat("#.#");
-                String unit = "km";
-                Double factor = 0.001; // convert from meters to km
-    
-                // for distances smaller than 1 km, use meters as unit
-                if (distance < 1000.0) {
-                    factor = 1.0;
-                    unit = "m";
-                    df = new DecimalFormat("#"); // only whole meters
-                }
-                double dist = distance * factor;
-                builder.append(df.format(dist)).append(" ").append(unit);
 
+                builder.append(GeoUtil.getDisplayLength(distance));
                 return builder.toString();
             }
 

@@ -20,6 +20,8 @@ import android.location.Location;
 
 import com.google.android.maps.GeoPoint;
 
+import java.text.DecimalFormat;
+
 /**
  * simple utility class for handling Locations
  * 
@@ -86,6 +88,38 @@ public class GeoUtil {
                 - point2.getLatitudeE6(), 2d)
                 + Math.pow(point1.getLongitudeE6() - point2.getLongitudeE6(),
                         2d));
+    }
+
+    public static String getDisplayLength(double distance) {
+        // default: km
+        DecimalFormat df = new DecimalFormat("#.#");
+        String unit = "km";
+        Double factor = 0.001; // convert from meters to km
+
+        // for distances smaller than 1 km, use meters as unit
+        if (distance < 1000.0) {
+            factor = 1.0;
+            unit = "m";
+            //df = new DecimalFormat("#"); // only whole meters
+        }
+        double dist = distance * factor;
+        return df.format(dist) + " " + unit;
+    }
+
+    public static String getDisplayArea(double area) {
+        // default: square km
+        DecimalFormat df = new DecimalFormat("#.#");
+        String unit = "km²";
+        Double factor = 0.000001; // convert from m² to km²
+
+        // for distances smaller than 1 km², use m² as unit
+        if (area < 1000000.0) {
+            factor = 1.0;
+            unit = "m²";
+            //df = new DecimalFormat("#"); // only whole meters
+        }
+        double dist = area * factor;
+        return df.format(dist) + " " + unit;
     }
 
 }

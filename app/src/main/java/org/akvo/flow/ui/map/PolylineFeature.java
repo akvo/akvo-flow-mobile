@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.akvo.flow.R;
+import org.akvo.flow.util.GeoUtil;
 
 public class PolylineFeature extends Feature {
     public static final String GEOMETRY_TYPE = "LineString";
@@ -63,7 +64,7 @@ public class PolylineFeature extends Feature {
             previous = point;
         }
         String lengthVal = String.format("%.2f", length);
-        mProperties.add(new Property("length", lengthVal, "Length", lengthVal + "m"));
+        mProperties.add(new Property("length", lengthVal, "Length", GeoUtil.getDisplayLength(length)));
     }
 
     @Override

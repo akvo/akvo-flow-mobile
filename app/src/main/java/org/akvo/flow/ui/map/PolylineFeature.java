@@ -78,8 +78,8 @@ public class PolylineFeature extends Feature {
     }
 
     @Override
-    public boolean highlightPrevious(int position) {
-        return position < mMarkers.size() - 1;// Do not highlight polyline tail
+    public boolean highlightNext(int position) {
+        return position > 0; // Never highlight foremost point (no loops)
     }
 
 }

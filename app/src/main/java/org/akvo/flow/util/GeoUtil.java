@@ -92,7 +92,7 @@ public class GeoUtil {
 
     public static String getDisplayLength(double distance) {
         // default: km
-        DecimalFormat df = new DecimalFormat("#.#");
+        DecimalFormat df = new DecimalFormat("###,###.##");
         String unit = "km";
         Double factor = 0.001; // convert from meters to km
 
@@ -108,7 +108,7 @@ public class GeoUtil {
 
     public static String getDisplayArea(double area) {
         // default: square km
-        DecimalFormat df = new DecimalFormat("#.#");
+        DecimalFormat df = new DecimalFormat("###,###.##");
         String unit = "km²";
         Double factor = 0.000001; // convert from m² to km²
 

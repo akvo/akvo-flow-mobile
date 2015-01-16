@@ -62,7 +62,7 @@ public abstract class Feature {
 
     public abstract int getTitle();
     public abstract String geoGeometryType();
-    public abstract boolean highlightPrevious(int position);
+    public abstract boolean highlightNext(int position);
 
     public boolean contains(Marker marker) {
         return mMarkers.contains(marker);
@@ -147,10 +147,10 @@ public abstract class Feature {
      */
     protected void invalidate() {
         // Recompute icons, depending on point status
-        long selected = -1, previous = -1;
+        long selected = -1, next = -1;
         if (mSelected && mSelectedMarker != null && mMarkers.contains(mSelectedMarker)) {
             selected = mMarkers.indexOf(mSelectedMarker);
-            previous = selected > 0 ? (selected - 1) % mMarkers.size() : mMarkers.size() - 1;
+            next = selected > -1 ? (selected + 1) % mMarkers.size() : mMarkers.size() - 1;
         }
 
         for (int i=0; i<mMarkers.size(); i++) {
@@ -160,7 +160,7 @@ public abstract class Feature {
             } else if (i == selected) {
                 marker.setIcon(MARKER_SELECTED);
                 marker.showInfoWindow();
-            } else if (i == previous && highlightPrevious(i)) {
+            } else if (i == next && highlightNext(i)) {
                 marker.setIcon(MARKER_HIGHLIGHTED);
             } else {
                 marker.setIcon(MARKER_ENABLED);

@@ -28,7 +28,7 @@ public class PointsFeature extends Feature {
     }
 
     @Override
-    public boolean highlightPrevious(int position) {
+    public boolean highlightNext(int position) {
         return false;
     }
 

@@ -68,7 +68,7 @@ public class CascadeDB {
                 new String[]{NodeColumns.ID, NodeColumns.NAME},
                 NodeColumns.PARENT + "=?",
                 new String[]{String.valueOf(parent)},
-                null, null, null, null);
+                null, null, NodeColumns.NAME, null);
 
         final List<Node> result = new ArrayList<Node>();
         if (c != null) {

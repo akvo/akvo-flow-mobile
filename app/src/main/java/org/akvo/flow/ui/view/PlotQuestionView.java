@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -22,7 +22,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -32,7 +32,7 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 public class PlotQuestionView extends QuestionView implements OnClickListener {
-    private EditText mInputText;
+    private TextView mResponseView;
     private Button mMapBtn;
 
     private String mValue;
@@ -45,7 +45,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
     private void init() {
         setQuestionView(R.layout.plot_question_view);
 
-        mInputText = (EditText)findViewById(R.id.input_text);
+        mResponseView = (TextView)findViewById(R.id.response_view);
         mMapBtn = (Button)findViewById(R.id.plotting_btn);
 
         if (isReadOnly()) {
@@ -53,6 +53,10 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
         }
 
         mMapBtn.setOnClickListener(this);
+    }
+
+    private void displayResponseView() {
+        mResponseView.setVisibility(TextUtils.isEmpty(mValue) ? GONE : VISIBLE);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
     public void questionComplete(Bundle data) {
         if (data != null) {
             mValue = data.getString(ConstantUtil.GEOSHAPE_RESULT);
-            mInputText.setText(mValue);
+            displayResponseView();
             captureResponse();
         }
     }
@@ -85,14 +89,14 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
         mValue = resp.getValue();
-        mInputText.setText(mValue);
+        displayResponseView();
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mInputText.setText("");
         mValue = null;
+        displayResponseView();
     }
 
     @Override

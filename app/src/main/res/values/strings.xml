@@ -206,6 +206,7 @@
     <string name="geoshape_points">Points</string>
     <string name="location_unknown">Location is not known</string>
     <string name="location_inaccurate">Location reading is not accurate enough</string>
+    <string name="geoshape_response">You have a saved response for this question. Click \'capture shape\' to carry on with the geoshape data collection</string>
     <!-- Misc -->
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>

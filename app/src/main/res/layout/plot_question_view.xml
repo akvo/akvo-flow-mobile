@@ -4,13 +4,11 @@
 
     <include layout="@layout/question_header" />
 
-    <EditText
-        android:id="@+id/input_text"
+    <TextView
+        android:id="@+id/response_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:enabled="false"
-        android:focusable="false"/>
+        android:text="@string/geoshape_response"/>
 
     <Button
         android:id="@+id/plotting_btn"

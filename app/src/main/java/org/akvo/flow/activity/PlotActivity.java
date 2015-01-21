@@ -316,7 +316,9 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                     jCoordinates.put(jCoordinate);
                 }
                 if (PolygonFeature.GEOMETRY_TYPE.equals(feature.geoGeometryType())) {
-                    // Polygon features enclose coordinates in a 'LinearRing'
+                    // Polygon features enclose coordinates in a 'LinearRing'.
+                    // It also 'closes' the feature, duplicating the first point at the end
+                    jCoordinates.put(jCoordinates.get(0));
                     JSONArray ring = jCoordinates;
                     jCoordinates = new JSONArray();
                     jCoordinates.put(ring);
@@ -360,7 +362,9 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                 JSONArray jCoordinates = jGeometry.getJSONArray(JSON_COORDINATES);
                 if (PolygonFeature.GEOMETRY_TYPE.equals(jGeometry.getString(JSON_TYPE))) {
                     // Polygon features enclose coordinates in a 'LinearRing'
+                    // It also 'closes' the feature, duplicating the first point at the end
                     jCoordinates = jCoordinates.getJSONArray(0);
+                    jCoordinates.remove(jCoordinates.length()-1);
                 }
                 // Load point list
                 List<LatLng> points = new ArrayList<>();

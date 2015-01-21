@@ -109,6 +109,20 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
+    public int displayQuestion(String questionId) {
+        for (int i=0; i<mQuestionGroupTabs.size(); i++) {
+            QuestionGroupTab questionGroupTab = mQuestionGroupTabs.get(i);
+            QuestionView questionView = questionGroupTab.getQuestionView(questionId);
+            if (questionView != null) {
+                int x = questionView.getLeft();
+                int y = questionView.getTop();
+                questionGroupTab.scrollTo(x, y);
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public void onPause() {
         // Propagate onPause callback
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {

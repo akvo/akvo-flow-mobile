@@ -56,7 +56,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     private QuestionResponse mResponse;
 
     private List<QuestionInteractionListener> mListeners;
-    private SurveyListener mSurveyListener;
+    protected SurveyListener mSurveyListener;
 
     private TextView mQuestionText;
     private ImageButton mTipImage;

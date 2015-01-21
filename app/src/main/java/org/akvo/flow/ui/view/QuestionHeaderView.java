@@ -17,20 +17,38 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
 
-public class QuestionHeaderView extends QuestionView {
+public class QuestionHeaderView extends QuestionView implements View.OnClickListener {
+    private boolean mDisplayShortcut;
 
     public QuestionHeaderView(Context context, Question q, SurveyListener surveyListener) {
+        this(context, q, surveyListener, false);
+    }
+
+    public QuestionHeaderView(Context context, Question q, SurveyListener surveyListener,
+            boolean displayShortcut) {
         super(context, q, surveyListener);
+        mDisplayShortcut = displayShortcut;
         init();
     }
 
     private void init() {
-        setQuestionView(R.layout.question_header);
+        setQuestionView(R.layout.invalid_question_view);
+        if (mDisplayShortcut) {
+            findViewById(R.id.open_btn).setOnClickListener(this);
+        } else {
+            findViewById(R.id.open_btn).setVisibility(GONE);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        mSurveyListener.openQuestion(getQuestion().getId());
     }
 
     @Override

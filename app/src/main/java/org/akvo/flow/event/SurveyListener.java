@@ -13,5 +13,6 @@ public interface SurveyListener {
     public boolean isReadOnly();
     public void onSurveySubmit();
     public void nextTab();
+    public void openQuestion(String questionId);
     public Map<String, QuestionResponse> getResponses();
 }

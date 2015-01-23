@@ -110,19 +110,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
         if (!TextUtils.isEmpty(geoJSON)) {
             load(geoJSON);
-        }
-    }
-
-    private void initMap() {
-        if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
-            mMap.setOnMarkerClickListener(this);
-            mMap.setOnMapClickListener(this);
-            if (mManualInput) {
-                mMap.setOnMapLongClickListener(this);
-                mMap.setOnMarkerDragListener(this);
-            }
-
+        } else {
             // If user location is known, center map
             LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
@@ -134,6 +122,18 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
                     LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
                 }
+            }
+        }
+    }
+
+    private void initMap() {
+        if (mMap != null) {
+            mMap.setMyLocationEnabled(true);
+            mMap.setOnMarkerClickListener(this);
+            mMap.setOnMapClickListener(this);
+            if (mManualInput) {
+                mMap.setOnMapLongClickListener(this);
+                mMap.setOnMarkerDragListener(this);
             }
         }
     }

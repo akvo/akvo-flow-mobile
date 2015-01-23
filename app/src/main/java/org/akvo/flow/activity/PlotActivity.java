@@ -422,6 +422,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
         // For now, a naive linear search will do the trick
         for (Feature feature : mFeatures) {
             if (feature.contains(marker)) {
+                marker.setDraggable(true);
                 selectFeature(feature, marker);
                 break;
             }

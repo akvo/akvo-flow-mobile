@@ -16,7 +16,7 @@ import java.util.List;
 
 public abstract class Feature {
     protected static final int POINT_SIZE_DEFAULT = 40;// Default marker size (px).
-    protected static final int POINT_SIZE_SELECTED = 50;// Selected marker size (px).
+    protected static final int POINT_SIZE_SELECTED = 60;// Selected marker size (px).
 
     protected static final int POINT_COLOR_DEFAULT = 0xEE736357;
     protected static final int POINT_COLOR_ACTIVE = 0xFFE27C00;
@@ -82,7 +82,7 @@ public abstract class Feature {
                 .position(point)
                 .title(String.format("lat/lng: %.5f, %.5f", point.latitude, point.longitude))
                 .anchor(0.5f, 0.5f)
-                .draggable(true)
+                .draggable(false)
                 .icon(MARKER_DISABLED));
 
         // Insert new point just after the currently selected marker (if any)
@@ -95,8 +95,7 @@ public abstract class Feature {
             mPoints.add(point);
         }
 
-        mSelectedMarker = marker;
-        invalidate();
+        setSelected(true, marker);
     }
 
     /**
@@ -136,8 +135,16 @@ public abstract class Feature {
     }
 
     public void setSelected(boolean selected, Marker marker) {
+        if (mSelectedMarker != null) {
+            mSelectedMarker.setDraggable(false);
+        }
+
         mSelected = selected;
         mSelectedMarker = selected ? marker: null;
+
+        if (mSelectedMarker != null) {
+            mSelectedMarker.setDraggable(true);
+        }
         invalidate();
     }
 

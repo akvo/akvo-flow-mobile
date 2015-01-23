@@ -124,6 +124,11 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
+    /**
+     * Attempt to display a particular question, based on the given ID.
+     * If the question is found, the containing tab will be scrolled to the question's position.
+     * Upon success the tab position will be returned, -1 otherwise
+     */
     public int displayQuestion(String questionId) {
         for (int i=0; i<mQuestionGroupTabs.size(); i++) {
             QuestionGroupTab questionGroupTab = mQuestionGroupTabs.get(i);

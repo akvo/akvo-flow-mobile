@@ -22,7 +22,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -32,7 +31,7 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 public class PlotQuestionView extends QuestionView implements OnClickListener {
-    private TextView mResponseView;
+    private View mResponseView;
     private Button mMapBtn;
 
     private String mValue;
@@ -45,7 +44,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
     private void init() {
         setQuestionView(R.layout.plot_question_view);
 
-        mResponseView = (TextView)findViewById(R.id.response_view);
+        mResponseView = findViewById(R.id.response_view);
         mMapBtn = (Button)findViewById(R.id.plotting_btn);
 
         if (isReadOnly()) {

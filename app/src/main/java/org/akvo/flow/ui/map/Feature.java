@@ -110,7 +110,7 @@ public abstract class Feature {
             mPoints.add(point);
         }
 
-        setSelected(true, marker);
+        setSelected(mSelected, marker);
     }
 
     /**

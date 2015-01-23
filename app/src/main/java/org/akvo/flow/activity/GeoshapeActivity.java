@@ -58,7 +58,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlotActivity extends ActionBarActivity implements OnMapClickListener,
+public class GeoshapeActivity extends ActionBarActivity implements OnMapClickListener,
         OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener {
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
@@ -68,7 +68,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
     private static final String TYPE_FEATURE = "Feature";
     private static final String TYPE_FEATURE_COLLECTION = "FeatureCollection";
 
-    private static final String TAG = PlotActivity.class.getSimpleName();
+    private static final String TAG = GeoshapeActivity.class.getSimpleName();
     private static final float ACCURACY_THRESHOLD = 20f;
 
     private List<Feature> mFeatures;// Saved features
@@ -85,7 +85,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.plot_activity);
+        setContentView(R.layout.geoshape_activity);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -166,7 +166,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.plot_activity, menu);
+        getMenuInflater().inflate(R.menu.geoshape_activity, menu);
         if (!mAllowPoints) {
             menu.findItem(R.id.add_points).setVisible(false);
         }
@@ -238,14 +238,14 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                     if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
                     } else {
-                        Toast.makeText(PlotActivity.this,
+                        Toast.makeText(GeoshapeActivity.this,
                                 location != null ? R.string.location_inaccurate : R.string.location_unknown,
                                 Toast.LENGTH_LONG).show();
                     }
                     break;
                 case R.id.clear_point_btn:
                     ViewUtil.showConfirmDialog(R.string.clear_point_title,
-                            R.string.clear_point_text, PlotActivity.this, true,
+                            R.string.clear_point_text, GeoshapeActivity.this, true,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -256,7 +256,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                     break;
                 case R.id.clear_feature_btn:
                     ViewUtil.showConfirmDialog(R.string.clear_feature_title,
-                            R.string.clear_feature_text, PlotActivity.this, true,
+                            R.string.clear_feature_text, GeoshapeActivity.this, true,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -279,7 +279,7 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
             adapter.add(String.format("%s: %s", property.mDisplayName, property.mDisplayValue));
         }
 
-        new AlertDialog.Builder(PlotActivity.this)
+        new AlertDialog.Builder(GeoshapeActivity.this)
                 .setTitle("Properties")
                 .setAdapter(adapter, null)
                 .show();

@@ -33,7 +33,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/plotting_btn"
+        android:id="@+id/capture_shape_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/capture_shape" />

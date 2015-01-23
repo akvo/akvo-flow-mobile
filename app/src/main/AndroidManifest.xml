@@ -70,7 +70,7 @@
             android:configChanges="locale|layoutDirection" />
         <activity android:name=".activity.TransmissionHistoryActivity"
             android:configChanges="locale|layoutDirection" />
-        <activity android:name=".activity.PlotActivity"
+        <activity android:name=".activity.GeoshapeActivity"
             android:configChanges="locale|layoutDirection|orientation|screenSize" />
         <activity
             android:name=".activity.AppUpdateActivity"

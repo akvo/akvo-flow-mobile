@@ -30,22 +30,22 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
-public class PlotQuestionView extends QuestionView implements OnClickListener {
+public class GeoshapeQuestionView extends QuestionView implements OnClickListener {
     private View mResponseView;
     private Button mMapBtn;
 
     private String mValue;
 
-    public PlotQuestionView(Context context, Question q, SurveyListener surveyListener) {
+    public GeoshapeQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
         init();
     }
 
     private void init() {
-        setQuestionView(R.layout.plot_question_view);
+        setQuestionView(R.layout.geoshape_question_view);
 
         mResponseView = findViewById(R.id.response_view);
-        mMapBtn = (Button)findViewById(R.id.plotting_btn);
+        mMapBtn = (Button)findViewById(R.id.capture_shape_btn);
 
         if (isReadOnly()) {
             mMapBtn.setVisibility(View.GONE);
@@ -61,7 +61,7 @@ public class PlotQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.plotting_btn:
+            case R.id.capture_shape_btn:
                 Bundle data = new Bundle();
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POINTS, getQuestion().isAllowPoints());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());

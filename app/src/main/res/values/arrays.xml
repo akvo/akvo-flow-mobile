@@ -102,14 +102,6 @@
         <item>meters</item>
         <item>kilometers</item>
     </string-array>
-    <string-array name="plotintervals">
-        <item>30 Seconds</item>
-        <item>60 Seconds</item>
-        <item>2 Minutes</item>
-        <item>5 Minutes</item>
-        <item>10 Minutes</item>
-    </string-array>
-
     <string-array name="max_image_size_pref">
         <item>320x240px</item>
         <item>640x480px</item>

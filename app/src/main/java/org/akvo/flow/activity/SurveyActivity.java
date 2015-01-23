@@ -596,7 +596,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
                     + EXTERNAL_SOURCE_REQUEST);
         } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
-            Intent i = new Intent(this, PlotActivity.class);
+            Intent i = new Intent(this, GeoshapeActivity.class);
             if (event.getData() != null) {
                 i.putExtras(event.getData());
             }

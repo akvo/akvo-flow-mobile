@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -58,7 +58,7 @@ public class SurveyInfoLoader extends DataLoader<Cursor> {
                 new String[] { String.valueOf(mSurveyGroupId) },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
                 null,
-                SurveyInstanceColumns.SUBMITTED_DATE + " DESC");
+                SurveyColumns.NAME);
     }
 
     public interface SurveyQuery {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -15,7 +15,6 @@
  */
 
 package org.akvo.flow.async.loader;
-
 
 import android.content.Context;
 import android.database.Cursor;
@@ -38,11 +37,7 @@ public class SurveyGroupLoader extends DataLoader<Cursor> {
 
     @Override
     protected Cursor loadData(SurveyDbAdapter database) {
-        if (SurveyGroup.ID_NONE == mSurveyGroupId) {
-            return database.getSurveyGroup(mSurveyGroupId);
-        }
-        // Load all
-        return database.getSurveyGroups();
+        return database.getSurveyGroup(mSurveyGroupId);
     }
 
 }

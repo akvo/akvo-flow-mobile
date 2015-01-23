@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -1202,15 +1202,6 @@ public class SurveyDbAdapter {
         return new SurveyGroup(id, name, registerSurveyId, monitored);
     }
     
-    public Cursor getSurveyGroups() {
-        return database.query(Tables.SURVEY_GROUP,
-                new String[] {
-                        SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
-                        SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
-                },
-                null, null, null, null, null);
-    }
-    
     public Cursor getSurveyGroup(long id) {
         String where = null;
         String[] selectionArgs = null;
@@ -1226,7 +1217,7 @@ public class SurveyDbAdapter {
                         SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
                 },
                 where, selectionArgs,
-                null, null, null);
+                null, null, SurveyGroupColumns.NAME);
     }
     
     public String createSurveyedLocale(long surveyGroupId) {

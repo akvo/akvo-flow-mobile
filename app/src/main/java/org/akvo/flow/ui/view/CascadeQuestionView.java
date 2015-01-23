@@ -142,7 +142,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         final TextView text = (TextView)view.findViewById(R.id.text);
         final Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
 
-        text.setText(mLevels != null && mLevels.length >= position ? mLevels[position] : "");
+        text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
         // Insert a fake 'Select' value
         Node node = new Node(ID_NONE, getContext().getString(R.string.select));

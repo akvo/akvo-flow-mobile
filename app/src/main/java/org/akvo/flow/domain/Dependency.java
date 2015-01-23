@@ -46,18 +46,18 @@ public class Dependency {
     }
 
     public boolean isMatch(String val) {
-        boolean isMatch = false;
-        if (answer != null) {
-            String[] tokens = answer.split("\\|");
-            for (int i = 0; i < tokens.length; i++) {
-                if (tokens[i].trim().equals(val.trim())) {
-                    isMatch = true;
-                    break;
+        if (answer == null || val == null) {
+            return answer == val;
+        }
+
+        for (String v : val.split("\\|", -1)) {
+            for (String a : answer.split("\\|", -1)) {
+                if (v.equals(a)) {
+                    return true;
                 }
             }
-        } else if (val == null) {
-            isMatch = true;
         }
-        return isMatch;
+
+        return false;
     }
 }

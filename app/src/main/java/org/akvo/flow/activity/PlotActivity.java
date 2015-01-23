@@ -360,15 +360,16 @@ public class PlotActivity extends ActionBarActivity implements OnMapClickListene
                 JSONObject jFeature = jFeatures.getJSONObject(i);
                 JSONObject jGeometry = jFeature.getJSONObject(JSON_GEOMETRY);
                 JSONArray jCoordinates = jGeometry.getJSONArray(JSON_COORDINATES);
+                int lastCoordinate = jCoordinates.length();
                 if (PolygonFeature.GEOMETRY_TYPE.equals(jGeometry.getString(JSON_TYPE))) {
                     // Polygon features enclose coordinates in a 'LinearRing'
                     // It also 'closes' the feature, duplicating the first point at the end
                     jCoordinates = jCoordinates.getJSONArray(0);
-                    jCoordinates.remove(jCoordinates.length()-1);
+                    lastCoordinate = jCoordinates.length() - 1;
                 }
                 // Load point list
                 List<LatLng> points = new ArrayList<>();
-                for (int j=0; j<jCoordinates.length(); j++) {
+                for (int j=0; j<lastCoordinate; j++) {
                     JSONArray jPoint = jCoordinates.getJSONArray(j);
                     LatLng point = new LatLng(jPoint.getDouble(1), jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)
                     points.add(point);

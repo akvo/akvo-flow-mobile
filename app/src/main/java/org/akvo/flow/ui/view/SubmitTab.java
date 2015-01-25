@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -50,6 +50,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         final int padding = (int)PlatformUtil.dp2Pixel(context, 8);
         mHeaderView.setPadding(padding, padding, padding, padding);
         mHeaderView.setTextSize(18);
+        mHeaderView.setClickable(false);
         mSubmitButton = new Button(context);
         mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
@@ -106,14 +107,14 @@ public class SubmitTab extends ListView implements OnClickListener {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            QuestionView qv = new QuestionHeaderView(getContext(), mQuestions.get(position),
-                    mListener);
+            final QuestionView qv = new QuestionHeaderView(getContext(), mQuestions.get(position),
+                    mListener, true);
             // force the view to be visible (if the question has
             // dependencies, it'll be hidden by default)
+            qv.setTag(mQuestions.get(position).getId());
             qv.setVisibility(View.VISIBLE);
             return qv;
         }
-
     }
 
 }

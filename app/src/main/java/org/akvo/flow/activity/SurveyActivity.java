@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -47,6 +47,8 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
+import org.akvo.flow.ui.view.QuestionGroupTab;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -511,6 +513,14 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     public void nextTab() {
         mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
+    }
+
+    @Override
+    public void openQuestion(String questionId) {
+        int tab = mAdapter.displayQuestion(questionId);
+        if (tab != -1) {
+            mPager.setCurrentItem(tab, true);
+        }
     }
 
     /**

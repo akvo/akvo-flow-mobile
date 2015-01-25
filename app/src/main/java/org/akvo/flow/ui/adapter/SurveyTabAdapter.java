@@ -1,3 +1,18 @@
+/*
+ *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
 package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
@@ -107,6 +122,25 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
                 questionGroupTab.loadState();
             }
         }
+    }
+
+    /**
+     * Attempt to display a particular question, based on the given ID.
+     * If the question is found, the containing tab will be scrolled to the question's position.
+     * Upon success the tab position will be returned, -1 otherwise
+     */
+    public int displayQuestion(String questionId) {
+        for (int i=0; i<mQuestionGroupTabs.size(); i++) {
+            QuestionGroupTab questionGroupTab = mQuestionGroupTabs.get(i);
+            QuestionView questionView = questionGroupTab.getQuestionView(questionId);
+            if (questionView != null) {
+                int x = questionView.getLeft();
+                int y = questionView.getTop();
+                questionGroupTab.scrollTo(x, y);
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void onPause() {

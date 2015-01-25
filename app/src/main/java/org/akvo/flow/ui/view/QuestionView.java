@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -56,7 +56,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     private QuestionResponse mResponse;
 
     private List<QuestionInteractionListener> mListeners;
-    private SurveyListener mSurveyListener;
+    protected SurveyListener mSurveyListener;
 
     private TextView mQuestionText;
     private ImageButton mTipImage;

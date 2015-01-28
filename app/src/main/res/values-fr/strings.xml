@@ -157,6 +157,11 @@
   <string name="clear_value_msg">Voulez-vous supprimer cette valeur?</string>
   <string name="type_code">entrez code</string>
   <string name="or">ou</string>
+  <string name="capture_shape">Capturer la surface</string>
+  <string name="clear_point_title">Supprimer point</string>
+  <string name="clear_point_text">Voulez vous effacer ce point?</string>
+  <string name="clear_feature_title">Supprimer cette fonction</string>
+  <string name="clear_feature_text">Voulez vous supprimer cette fonction?</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CRÉER UN NOUVEAU POINT</string>
   <string name="stats_title">Statistiques de l\'enquête</string>
@@ -194,6 +199,13 @@
   <string name="error_assignment_read">Les affectations des formulaires n\'ont pas pas pu être lu du tableau de bord FLOW</string>
   <string name="error_form_header">Le formulaire %1$s n\'a pas pu être lu depuis le tableau de bord FLOW.</string>
   <string name="error_form_download">Rassurez vous que le formulaire est publié, et que les paramères d\' heure/date sont ok.</string>
+  <!--Plotting-->
+  <string name="geoshape_area">Surface</string>
+  <string name="geoshape_line">Ligne</string>
+  <string name="geoshape_points">Points</string>
+  <string name="location_unknown">Cet endroit n\'est pas reconnu</string>
+  <string name="location_inaccurate">La location n\'est pas assez précise.</string>
+  <string name="geoshape_response">Surface enregistrée avec succès </string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Annuler</string>

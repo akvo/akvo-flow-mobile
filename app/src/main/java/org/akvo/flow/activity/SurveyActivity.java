@@ -75,6 +75,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
     private static final int EXTERNAL_SOURCE_REQUEST  = 4;
+    private static final int PLOTTING_REQUEST  = 5;
 
     private static final int MENU_PREFILL  = 101;
 
@@ -430,8 +431,10 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
                 break;
+            case EXTERNAL_SOURCE_REQUEST:
+            case SCAN_ACTIVITY_REQUEST:
+            case PLOTTING_REQUEST:
             default:
-                // SCAN_ACTIVITY_REQUEST or EXTERNAL_SOURCE_REQUEST
                 mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
                 break;
         }
@@ -602,6 +605,13 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             intent.setType(ConstantUtil.EXTERNAL_SOURCE_MIME);
             startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
                     + EXTERNAL_SOURCE_REQUEST);
+        } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
+            Intent i = new Intent(this, GeoshapeActivity.class);
+            if (event.getData() != null) {
+                i.putExtras(event.getData());
+            }
+            mRequestQuestionId = event.getSource().getQuestion().getId();
+            startActivityForResult(i, PLOTTING_REQUEST);
         }
     }
 

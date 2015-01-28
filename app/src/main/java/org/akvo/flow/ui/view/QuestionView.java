@@ -328,16 +328,18 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     /**
      * notifies each QuestionInteractionListener registered with this question.
      * This is done serially on the calling thread.
-     *
-     * @param type
      */
-    protected void notifyQuestionListeners(String type) {
+    protected void notifyQuestionListeners(String type, Bundle data) {
         if (mListeners != null) {
-            QuestionInteractionEvent event = new QuestionInteractionEvent(type, this);
+            QuestionInteractionEvent event = new QuestionInteractionEvent(type, this, data);
             for (int i = 0; i < mListeners.size(); i++) {
                 mListeners.get(i).onQuestionInteraction(event);
             }
         }
+    }
+
+    protected void notifyQuestionListeners(String type) {
+        notifyQuestionListeners(type, null);
     }
 
     /**

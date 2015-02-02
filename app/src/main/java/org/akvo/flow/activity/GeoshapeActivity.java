@@ -437,6 +437,9 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
 
     @Override
     public void onMarkerDrag(Marker marker) {
+        LatLng position = marker.getPosition();
+        marker.setTitle(String.format("lat/lng: %.5f, %.5f", position.latitude, position.longitude));
+        marker.showInfoWindow();
     }
 
     @Override

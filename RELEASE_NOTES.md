@@ -1,6 +1,19 @@
 Akvo FLOW app release notes
 ===========================
 
+#ver 2.1.1
+Date: 28 January 2015
+
+New and noteworthy
+------------------
+* Integration of geographic shapes. This allows the user to collect points, lines and polygons in a map [#236]
+* Missing (and invalid) responses shortcut from *submit tab*. Click the new **edit** button, which will take you directly to the relevant survey group [#251]
+
+Resolved issues
+---------------
+* Alphabetically order surveys and forms [#244]
+* Alphabetically order cascade values [#245]
+
 #ver 2.1.0.1
 Date: 15 January 2015
 

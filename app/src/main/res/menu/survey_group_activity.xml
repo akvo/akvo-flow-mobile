@@ -8,6 +8,7 @@
         android:icon="@drawable/ic_action_users"
         android:title="@string/userlabel"
         flowapp:showAsAction="always" />
+
     <item
         android:id="@+id/settings"
         android:orderInCategory="101"

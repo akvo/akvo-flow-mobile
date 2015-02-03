@@ -97,6 +97,10 @@ public class SurveyHandler extends DefaultHandler {
     private static final String LEVELS = "levels";
     private static final String LEVEL = "level";
 
+    private static final String ALLOW_POINTS = "allowPoints";
+    private static final String ALLOW_LINE = "allowLine";
+    private static final String ALLOW_POLYGON = "allowPolygon";
+
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
 
@@ -371,6 +375,11 @@ public class SurveyHandler extends DefaultHandler {
 
             // Question src. Added in cascading question implementation.
             currentQuestion.setSrc(attributes.getValue(CASCADE_RESOURCE));
+
+            // Geoshape options (question scope)
+            currentQuestion.setAllowPoints(Boolean.parseBoolean(attributes.getValue(ALLOW_POINTS)));
+            currentQuestion.setAllowLine(Boolean.parseBoolean(attributes.getValue(ALLOW_LINE)));
+            currentQuestion.setAllowPolygon(Boolean.parseBoolean(attributes.getValue(ALLOW_POLYGON)));
         } else if (localName.equalsIgnoreCase(OPTIONS)) {
             currentOptions = new ArrayList<Option>();
             if (currentQuestion != null) {

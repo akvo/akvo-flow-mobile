@@ -180,11 +180,7 @@ public class FileUtil {
      */
     public static ByteArrayOutputStream read(InputStream is) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int size;
-        while ((size = is.read(buffer, 0, buffer.length)) != -1) {
-            out.write(buffer, 0, size);
-        }
+        copy(is, out);
         return out;
     }
 
@@ -230,10 +226,16 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Compute MD5 checksum of the given path's file
+     */
     public static byte[] getMD5Checksum(String path) {
         return getMD5Checksum(new File(path));
     }
 
+    /**
+     * Compute MD5 checksum of the given file
+     */
     public static byte[] getMD5Checksum(File file) {
         InputStream in = null;
         MessageDigest md;
@@ -412,7 +414,6 @@ public class FileUtil {
 
     /**
      * Helper function to close a Closeable instance
-     * @param closeable
      */
     public static void close(Closeable closeable) {
         if (closeable == null) {

@@ -61,6 +61,7 @@ public class ConstantUtil {
     public static final String STRENGTH_QUESTION_TYPE = "strength";
     public static final String DATE_QUESTION_TYPE = "date";
     public static final String CASCADE_QUESTION_TYPE = "cascade";
+    public static final String GEOSHAPE_QUESTION_TYPE = "geoshape";
 
     /**
      * help types
@@ -107,6 +108,15 @@ public class ConstantUtil {
      * media question support
      */
     public static final String MEDIA_FILE_KEY = "filename";
+
+    /**
+     * Plot measurement result data
+     */
+    public static final String GEOSHAPE_RESULT = "geoshapeResult";
+    public static final String EXTRA_ALLOW_POINTS = "allowPoints";
+    public static final String EXTRA_ALLOW_LINE = "allowLine";
+    public static final String EXTRA_ALLOW_POLYGON = "allowPolygon";
+    public static final String EXTRA_MANUAL_INPUT = "manualInput";
 
     /**
      * keys for saved state and bundle extras

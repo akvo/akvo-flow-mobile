@@ -16,6 +16,8 @@
 
 package org.akvo.flow.event;
 
+import android.os.Bundle;
+
 import org.akvo.flow.ui.view.QuestionView;
 
 /**
@@ -34,22 +36,24 @@ public class QuestionInteractionEvent {
     public static final String ACTIVITY_TIP_VIEW = "ACTIVITYTIP";
     public static final String SCAN_BARCODE_EVENT = "SCAN";
     public static final String EXTERNAL_SOURCE_EVENT = "EXTERNALSOURCE";
-
+    public static final String PLOTTING_EVENT = "PLOTTING";
 
     private String eventType;
     private QuestionView source;
+    private Bundle data;// Arbitrary data associated with the event, if any
 
-    public QuestionInteractionEvent(String type, QuestionView source) {
+    public QuestionInteractionEvent(String type, QuestionView source, Bundle data) {
         this.eventType = type;
         this.source = source;
+        this.data = data;
     }
 
     public String getEventType() {
         return eventType;
     }
 
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
+    public Bundle getData() {
+        return data;
     }
 
     public QuestionView getSource() {

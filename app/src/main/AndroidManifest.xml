@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.flow"
     android:versionCode="1"
-    android:versionName="2.1.0.1" >
+    android:versionName="2.1.1" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -70,6 +70,8 @@
             android:configChanges="locale|layoutDirection" />
         <activity android:name=".activity.TransmissionHistoryActivity"
             android:configChanges="locale|layoutDirection" />
+        <activity android:name=".activity.GeoshapeActivity"
+            android:configChanges="locale|layoutDirection|orientation|screenSize" />
         <activity
             android:name=".activity.AppUpdateActivity"
             android:label="@string/app_update_activity"

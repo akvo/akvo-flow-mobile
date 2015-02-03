@@ -64,11 +64,11 @@ public class CascadeDB {
     }
 
     public List<Node> getValues(long parent) {
-        Cursor c = mDatabase.query(true, TABLE_NODE,
+        Cursor c = mDatabase.query(TABLE_NODE,
                 new String[]{NodeColumns.ID, NodeColumns.NAME},
                 NodeColumns.PARENT + "=?",
                 new String[]{String.valueOf(parent)},
-                null, null, null, null);
+                null, null, NodeColumns.NAME);
 
         final List<Node> result = new ArrayList<Node>();
         if (c != null) {

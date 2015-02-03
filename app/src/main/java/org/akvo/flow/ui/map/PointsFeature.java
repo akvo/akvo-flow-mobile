@@ -13,21 +13,38 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
-package org.akvo.flow.event;
+package org.akvo.flow.ui.map;
 
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.QuestionResponse;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 
-import java.util.List;
-import java.util.Map;
+import org.akvo.flow.R;
 
-public interface SurveyListener {
-    public List<QuestionGroup> getQuestionGroups();
-    public String getDefaultLanguage();
-    public String[] getLanguages();
-    public boolean isReadOnly();
-    public void onSurveySubmit();
-    public void nextTab();
-    public void openQuestion(String questionId);
-    public Map<String, QuestionResponse> getResponses();
+public class PointsFeature extends Feature {
+    public static final String GEOMETRY_TYPE = "MultiPoint";
+
+    public PointsFeature(GoogleMap map) {
+        super(map);
+    }
+
+    @Override
+    public void addPoint(LatLng point) {
+        super.addPoint(point);
+    }
+
+    @Override
+    public int getTitle() {
+        return R.string.geoshape_points;
+    }
+
+    @Override
+    public String geoGeometryType() {
+        return GEOMETRY_TYPE;
+    }
+
+    @Override
+    public boolean highlightNext(int position) {
+        return false;
+    }
+
 }

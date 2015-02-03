@@ -160,6 +160,11 @@ Version</string>
   <string name="clear_value_msg">¿Está seguro de que quiere borrar este valor?</string>
   <string name="type_code">introducir código</string>
   <string name="or">o</string>
+  <string name="capture_shape">capturar figura</string>
+  <string name="clear_point_title">Borrar punto</string>
+  <string name="clear_point_text">¿Quiere borrar este punto?</string>
+  <string name="clear_feature_title">Borrar figura</string>
+  <string name="clear_feature_text">¿Quiere borrar esta figura?</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CREAR NUEVO PUNTO DE DATOS</string>
   <string name="stats_title">Estadísticas de la encuesta</string>
@@ -197,6 +202,13 @@ Version</string>
   <string name="error_assignment_read">Las asignaciones de encuesta no se han podido recibir desde el panel de control FLOW</string>
   <string name="error_form_header">El formulario %1$s no se ha podido recibir desde el panel de control.</string>
   <string name="error_form_download">Asegúrese que el formulario está publicado, y que la hora/fecha del dispositivo es correcta.</string>
+  <!--Plotting-->
+  <string name="geoshape_area">Área</string>
+  <string name="geoshape_line">Línea</string>
+  <string name="geoshape_points">Puntos</string>
+  <string name="location_unknown">Posición desconocida</string>
+  <string name="location_inaccurate">La geoposición no no es lo suficientemente precisa</string>
+  <string name="geoshape_response">FIgura capturada correctamente</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Cancelar</string>

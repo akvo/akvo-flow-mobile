@@ -27,6 +27,7 @@ import java.util.List;
 public class QuestionGroup {
     private int order;
     private String heading;
+    private boolean repeatable;
     private ArrayList<Question> questions;
 
     public QuestionGroup() {
@@ -55,6 +56,14 @@ public class QuestionGroup {
 
     public void addQuestion(Question q) {
         questions.add(q);
+    }
+
+    public void setRepeatable(boolean repeatable) {
+        this.repeatable = repeatable;
+    }
+
+    public boolean isRepeatable() {
+        return repeatable;
     }
     
     public List<String> getLocaleNameQuestions() {

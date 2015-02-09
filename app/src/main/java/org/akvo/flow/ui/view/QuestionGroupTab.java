@@ -17,6 +17,7 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class QuestionGroupTab extends ScrollView {
     private QuestionInteractionListener mQuestionListener;
     private SurveyListener mSurveyListener;
 
-    private List<QuestionView> mQuestionViews;
+    private Map<String, QuestionView> mQuestionViews;
     private LinearLayout mContainer;
     private boolean mLoaded;
 
@@ -35,7 +36,7 @@ public class QuestionGroupTab extends ScrollView {
         mQuestionGroup = group;
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
-        mQuestionViews = new ArrayList<QuestionView>();
+        mQuestionViews = new HashMap<>();
         mLoaded = false;
         init();
     }
@@ -90,7 +91,7 @@ public class QuestionGroupTab extends ScrollView {
             // Add question interaction listener
             questionView.addQuestionInteractionListener(mQuestionListener);
 
-            mQuestionViews.add(questionView);// Store the reference to the View
+            mQuestionViews.put(q.getId(), questionView);// Store the reference to the View
 
             // Add divider (within the View)
             inflater.inflate(R.layout.divider, questionView);
@@ -119,16 +120,16 @@ public class QuestionGroupTab extends ScrollView {
     }
 
     public void notifyOptionsChanged() {
-        for (QuestionView view : mQuestionViews) {
-            view.notifyOptionsChanged();
+        for (QuestionView qv : mQuestionViews.values()) {
+            qv.notifyOptionsChanged();
         }
     }
 
     public void onQuestionComplete(String questionId, Bundle data) {
-        for (QuestionView view : mQuestionViews) {
-            if (questionId.equals(view.getQuestion().getId())) {
+        for (QuestionView qv : mQuestionViews.values()) {
+            if (questionId.equals(qv.getQuestion().getId())) {
                 // TODO: Optimize this lookup (Map)
-                view.questionComplete(data);
+                qv.questionComplete(data);
             }
         }
     }
@@ -140,11 +141,11 @@ public class QuestionGroupTab extends ScrollView {
      */
     public List<Question> checkInvalidQuestions() {
         List<Question> missingQuestions = new ArrayList<Question>();
-        for (QuestionView view : mQuestionViews) {
-            view.checkMandatory();
-            if (!view.isValid() && view.areDependenciesSatisfied()) {
+        for (QuestionView qv : mQuestionViews.values()) {
+            qv.checkMandatory();
+            if (!qv.isValid() && qv.areDependenciesSatisfied()) {
                 // Only considered invalid if the dependencies are fulfilled
-                missingQuestions.add(view.getQuestion());
+                missingQuestions.add(qv.getQuestion());
             }
         }
         return missingQuestions;
@@ -152,37 +153,32 @@ public class QuestionGroupTab extends ScrollView {
 
     public void loadState() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
-        for (QuestionView questionView : mQuestionViews) {
-            questionView.resetQuestion(false);// Clean start
-            final String questionId = questionView.getQuestion().getId();
+        for (QuestionView qv : mQuestionViews.values()) {
+            qv.resetQuestion(false);// Clean start
+            final String questionId = qv.getQuestion().getId();
             if (responses.containsKey(questionId)) {
                 final QuestionResponse response = responses.get(questionId);
                 // Update the question view to reflect the loaded data
-                questionView.rehydrate(response);
+                qv.rehydrate(response);
             }
         }
     }
 
     public QuestionView getQuestionView(String questionId) {
-        for (QuestionView questionView : mQuestionViews) {
-            if (questionId.equals(questionView.getQuestion().getId())) {
-                return questionView;
-            }
-        }
-        return null;
+        return mQuestionViews.get(questionId);
     }
 
     public void onPause() {
         // Propagate onPause callback
-        for (QuestionView q : mQuestionViews) {
-            q.onPause();
+        for (QuestionView qv : mQuestionViews.values()) {
+            qv.onPause();
         }
     }
 
     public void onResume() {
         // Propagate onResume callback
-        for (QuestionView q : mQuestionViews) {
-            q.onResume();
+        for (QuestionView qv : mQuestionViews.values()) {
+            qv.onResume();
         }
     }
 

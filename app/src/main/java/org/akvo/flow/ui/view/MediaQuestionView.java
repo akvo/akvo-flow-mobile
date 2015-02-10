@@ -30,6 +30,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -51,6 +52,8 @@ import java.io.File;
 public class MediaQuestionView extends QuestionView implements OnClickListener {
     private Button mMediaButton;
     private ImageView mImage;
+    private ProgressBar mProgressBar;
+    private View mDownloadBtn;
     private String mMediaType;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
@@ -64,7 +67,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         setQuestionView(R.layout.media_question_view);
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
-        mImage = (ImageView)findViewById(R.id.completed_iv);
+        mImage = (ImageView)findViewById(R.id.image);
+        mProgressBar = (ProgressBar)findViewById(R.id.progress);
+        mDownloadBtn = findViewById(R.id.download);
 
         if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
@@ -77,13 +82,21 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         }
 
         mImage.setOnClickListener(this);
-        mImage.setVisibility(View.INVISIBLE);
+        mDownloadBtn.setOnClickListener(this);
+
+        hideDownloadOptions();
+    }
+
+    private void hideDownloadOptions() {
+        mProgressBar.setVisibility(View.GONE);
+        mDownloadBtn.setVisibility(View.GONE);
     }
 
     /**
      * handle the action button click
      */
     public void onClick(View v) {
+        // TODO: Use switch instead of if-else
         if (v == mImage) {
             String filename = getResponse() != null ? getResponse().getValue() : null;
             if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
@@ -111,6 +124,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             } else {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
             }
+        } else if (v == mDownloadBtn) {
+            mDownloadBtn.setVisibility(GONE);
+            mProgressBar.setVisibility(VISIBLE);
         }
     }
 
@@ -145,7 +161,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mImage.setVisibility(View.GONE);
+        mImage.setImageDrawable(null);
+        hideDownloadOptions();
     }
 
     @Override
@@ -153,6 +170,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     }
 
     private void displayThumbnail() {
+        hideDownloadOptions();
+
         String filename = getResponse() != null ? getResponse().getValue() : null;
         if (TextUtils.isEmpty(filename)) {
             return;
@@ -160,7 +179,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         if (!new File(filename).exists()) {
             // Looks like the image is not present in the filesystem (i.e. remote URL)
             // TODO: Handle image downloads
-            mImage.setImageResource(R.drawable.checkmark);
+            mImage.setImageResource(R.drawable.app_icon);
+            mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {
             // Image thumbnail
             ImageUtil.displayImage(mImage, filename);
@@ -169,7 +189,6 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             mImage.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
                     filename, MediaStore.Video.Thumbnails.MINI_KIND));
         }
-        mImage.setVisibility(View.VISIBLE);
     }
 
     private boolean isImage() {

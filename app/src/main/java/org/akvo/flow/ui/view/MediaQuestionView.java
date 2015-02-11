@@ -34,11 +34,13 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
 
 import java.io.File;
@@ -49,7 +51,7 @@ import java.io.File;
  * 
  * @author Christopher Fagiani
  */
-public class MediaQuestionView extends QuestionView implements OnClickListener {
+public class MediaQuestionView extends QuestionView implements OnClickListener, MediaSyncTask.DownloadListener {
     private Button mMediaButton;
     private ImageView mImage;
     private ProgressBar mProgressBar;
@@ -127,6 +129,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         } else if (v == mDownloadBtn) {
             mDownloadBtn.setVisibility(GONE);
             mProgressBar.setVisibility(VISIBLE);
+
+            MediaSyncTask downloadTask = new MediaSyncTask(getContext(), new File(getResponse().getValue()), this);
+            downloadTask.execute();
         }
     }
 
@@ -176,9 +181,16 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         if (TextUtils.isEmpty(filename)) {
             return;
         }
-        if (!new File(filename).exists()) {
+        File imgFile = new File(filename);
+        if (!imgFile.exists()) {
             // Looks like the image is not present in the filesystem (i.e. remote URL)
-            // TODO: Handle image downloads
+            // Update response, matching the local path. Note: In the future, media responses should
+            // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
+            imgFile = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), imgFile.getName());
+            setResponse(new QuestionResponse(imgFile.getAbsolutePath(),
+                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                    getQuestion().getId()));
+
             mImage.setImageResource(R.drawable.app_icon);
             mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {
@@ -193,6 +205,12 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
 
     private boolean isImage() {
         return ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType);
+    }
+
+    @Override
+    public void onResourceDownload(boolean done) {
+        // TODO: Error message and retry
+        displayThumbnail();
     }
 
 }

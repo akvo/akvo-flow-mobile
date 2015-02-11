@@ -28,6 +28,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+/**
+ * Download media files (images, videos) from synced forms.
+ */
 public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = MediaSyncTask.class.getSimpleName();
 
@@ -35,13 +38,13 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
         public void onResourceDownload(boolean done);
     }
 
-    /**
-     * Use a WeakReferences to avoid memory leaks
-     */
-    private WeakReference<DownloadListener> mListener;
+    private WeakReference<DownloadListener> mListener;// Use a WeakReferences to avoid memory leaks
     private Context mContext;
     private File mFile;
 
+    /**
+     * Download a media file. Provided file must be already updated to use the local filesystem path.
+     */
     public MediaSyncTask(Context context, File file, DownloadListener listener) {
         mContext = context.getApplicationContext();
         mListener = new WeakReference<>(listener);
@@ -50,20 +53,21 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        // Download resource and return success status
-        // Upon error, launch notification?
         if (!StatusUtil.hasDataConnection(mContext)) {
             Log.d(TAG, "No internet connection. Can't perform the requested operation");
             return false;
         }
 
         try {
+            // Download resource and return success status
             S3Api s3 = new S3Api(mContext);
             s3.get(ConstantUtil.S3_IMAGE_DIR + mFile.getName(), mFile);
             return true;
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
-            // TODO: Clean up potentially corrupted files
+            if (mFile.exists()) {
+                mFile.delete();
+            }
         }
         return false;
     }

@@ -209,7 +209,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
 
     @Override
     public void onResourceDownload(boolean done) {
-        // TODO: Error message and retry
+        if (!done) {
+            Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
+        }
         displayThumbnail();
     }
 

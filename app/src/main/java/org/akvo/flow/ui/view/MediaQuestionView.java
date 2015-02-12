@@ -157,6 +157,20 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
+
+        // We now check whether the file is found in the local filesystem, and update the path if it's not
+        String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (!TextUtils.isEmpty(filename)) {
+            File file = new File(filename);
+            if (!file.exists() && isReadOnly())
+                // Looks like the image is not present in the filesystem (i.e. remote URL)
+                // Update response, matching the local path. Note: In the future, media responses should
+                // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
+                file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
+                setResponse(new QuestionResponse(file.getAbsolutePath(),
+                        isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                        getQuestion().getId()));
+        }
         displayThumbnail();
     }
 
@@ -181,16 +195,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
         if (TextUtils.isEmpty(filename)) {
             return;
         }
-        File imgFile = new File(filename);
-        if (!imgFile.exists()) {
-            // Looks like the image is not present in the filesystem (i.e. remote URL)
-            // Update response, matching the local path. Note: In the future, media responses should
-            // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
-            imgFile = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), imgFile.getName());
-            setResponse(new QuestionResponse(imgFile.getAbsolutePath(),
-                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
-
+        if (!new File(filename).exists()) {
             mImage.setImageResource(R.drawable.app_icon);
             mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {

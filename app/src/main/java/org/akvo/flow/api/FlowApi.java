@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -43,6 +43,7 @@ import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.HttpException.Status;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.HttpUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 
@@ -50,23 +51,18 @@ public class FlowApi {
     private static final String TAG = FlowApi.class.getSimpleName();
     
     private static final String BASE_URL;
-    private static final String PHONE_NUMBER;
-    private static final String IMEI;
     private static final String API_KEY;
 
     static {
         Context context = FlowApp.getApp();
         BASE_URL = StatusUtil.getServerBase(context);
-        PHONE_NUMBER = getPhoneNumber(context);
-        IMEI = getImei(context);
         API_KEY = getApiKey(context);
     }
     
     public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
             throws IOException, HttpException {
-        final String query =  PARAM.IMEI + IMEI
+        final String query = getDeviceParams()
                 + "&" + PARAM.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
-                + "&" + PARAM.PHONE_NUMBER + PHONE_NUMBER
                 + "&" + PARAM.SURVEY_GROUP + surveyGroup
                 + "&" + PARAM.TIMESTAMP + getTimestamp();
             
@@ -86,32 +82,18 @@ public class FlowApi {
         return null;
     }
 
-    private static String getPhoneNumber(Context context) {
-        try {
-            String phoneNumber = StatusUtil.getPhoneNumber(context);
-            if (phoneNumber != null) {
-                return URLEncoder.encode(phoneNumber, "UTF-8");
-            }
+    private static String URLEncode(String param) {
+        if (TextUtils.isEmpty(param)) {
             return "";
+        }
+        try {
+            return URLEncoder.encode(param, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, e.getMessage());
-            return null;
+            return "";
         }
     }
 
-    private static String getImei(Context context) {
-        try {
-            String imei = StatusUtil.getImei(context);
-            if (imei != null) {
-                return URLEncoder.encode(StatusUtil.getImei(context), "UTF-8");
-            }
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
-        }
-    }
-    
     private static String getApiKey(Context context) {
         PropertyUtil props = new PropertyUtil(context.getResources());
         return props.getProperty(ConstantUtil.API_KEY);
@@ -128,9 +110,7 @@ public class FlowApi {
             byte[] rawHmac = mac.doFinal(query.getBytes());
 
             authorization = Base64.encodeToString(rawHmac, Base64.DEFAULT);
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, e.getMessage());
-        } catch (InvalidKeyException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Log.e(TAG, e.getMessage());
         }
         
@@ -149,6 +129,15 @@ public class FlowApi {
             return null;
         }
     }
+
+    public static String getDeviceParams() {
+        Context context = FlowApp.getApp();
+        return PARAM.PHONE_NUMBER + URLEncode(StatusUtil.getPhoneNumber(context))
+                + "&" + PARAM.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID())
+                + "&" + PARAM.IMEI + URLEncode(StatusUtil.getImei(context))
+                + "&" + PARAM.VERSION + URLEncode(PlatformUtil.getVersionName(context))
+                + "&" + PARAM.DEVICE_ID + URLEncode(StatusUtil.getDeviceId(context));
+    }
     
     interface Path {
         String SURVEYED_LOCALE = "/surveyedlocale";
@@ -161,5 +150,8 @@ public class FlowApi {
         String TIMESTAMP    = "ts=";
         String LAST_UPDATED = "lastUpdateTime=";
         String HMAC         = "h=";
+        String VERSION      = "ver=";
+        String DEVICE_ID    = "devId=";
+        String ANDROID_ID   = "androidId=";
     }
 }

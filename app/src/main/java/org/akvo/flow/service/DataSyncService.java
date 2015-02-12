@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.akvo.flow.R;
+import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
@@ -41,7 +42,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
@@ -54,7 +54,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -99,14 +98,10 @@ public class DataSyncService extends IntentService {
     private static final String SIG_FILE_NAME = ".sig";
 
     // Sync constants
-    private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification?";
+    private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification";
     private static final String NOTIFICATION_PATH = "/processor?action=";
     private static final String FILENAME_PARAM = "&fileName=";
-    private static final String NOTIFICATION_PN_PARAM = "&phoneNumber=";
     private static final String CHECKSUM_PARAM = "&checksum=";
-    private static final String IMEI_PARAM = "&imei=";
-    private static final String DEVICE_ID_PARAM = "&devId=";
-    private static final String VERSION_PARAM = "&ver=";
 
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
@@ -114,8 +109,6 @@ public class DataSyncService extends IntentService {
 
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
-
-    private static final String UTF8 = "UTF-8";
 
     /**
      * Number of retries to upload a file to S3
@@ -587,22 +580,7 @@ public class DataSyncService extends IntentService {
      * @throws Exception
      */
     private String getDeviceNotification(String serverBase) throws Exception {
-        String phoneNumber = StatusUtil.getPhoneNumber(this);
-        String imei = StatusUtil.getImei(this);
-        String deviceId = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-        String version = PlatformUtil.getVersionName(this);
-
-        String url = serverBase + DEVICE_NOTIFICATION_PATH
-                + (phoneNumber != null ?
-                NOTIFICATION_PN_PARAM.substring(1) + URLEncoder.encode(phoneNumber, UTF8)
-                : "")
-                + (imei != null ?
-                IMEI_PARAM + URLEncoder.encode(imei, UTF8)
-                : "")
-                + (deviceId != null ?
-                DEVICE_ID_PARAM + URLEncoder.encode(deviceId, UTF8)
-                : "")
-                + VERSION_PARAM + URLEncoder.encode(version, UTF8);
+        String url = serverBase + DEVICE_NOTIFICATION_PATH + "?" + FlowApi.getDeviceParams();
         return HttpUtil.httpGet(url);
     }
 
@@ -617,10 +595,8 @@ public class DataSyncService extends IntentService {
             String checksum) {
         boolean success = false;
         String url = serverBase + NOTIFICATION_PATH + action
-                + FILENAME_PARAM + fileName
-                + NOTIFICATION_PN_PARAM + StatusUtil.getPhoneNumber(this)
-                + IMEI_PARAM + StatusUtil.getImei(this)
-                + (checksum != null ? CHECKSUM_PARAM + checksum : "");
+                + FILENAME_PARAM + fileName + CHECKSUM_PARAM + checksum
+                + "&" + FlowApi.getDeviceParams();
         try {
             HttpUtil.httpGet(url);
             success = true;

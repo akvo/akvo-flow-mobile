@@ -153,6 +153,8 @@ public class ExceptionReportingService extends Service {
                     File f = new File(dir, list[i]);
                     String trace = FileUtil.readFileAsString(f);
 
+                    // We cannot use the standard FlowApi.getDeviceParams, fot this service uses
+                    // a different naming convention...
                     Map<String, String> params = new HashMap<String, String>();
                     params.put(ACTION_PARAM, ACTION_VALUE);
                     params.put(PHONE_PARAM, phoneNumber);

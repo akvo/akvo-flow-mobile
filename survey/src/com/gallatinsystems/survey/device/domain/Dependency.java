@@ -52,7 +52,7 @@ public class Dependency {
 
         for (String v : val.split("\\|", -1)) {
             for (String a : answer.split("\\|", -1)) {
-                if (v.equals(a)) {
+                if (v.trim().equals(a.trim())) {
                     return true;
                 }
             }

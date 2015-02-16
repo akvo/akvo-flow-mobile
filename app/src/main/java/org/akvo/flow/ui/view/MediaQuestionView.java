@@ -196,7 +196,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
             return;
         }
         if (!new File(filename).exists()) {
-            mImage.setImageResource(R.drawable.app_icon);
+            mImage.setImageResource(R.drawable.blurry_image);
             mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {
             // Image thumbnail

@@ -101,7 +101,6 @@ public class DataSyncService extends IntentService {
     private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification";
     private static final String NOTIFICATION_PATH = "/processor?action=";
     private static final String FILENAME_PARAM = "&fileName=";
-    private static final String CHECKSUM_PARAM = "&checksum=";
 
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
@@ -469,7 +468,8 @@ public class DataSyncService extends IntentService {
 
         if (ok && action != null) {
             // If action is not null, notify GAE back-end that data is available
-            ok = sendProcessingNotification(serverBase, action, destName, null);// TODO: checksum
+            // TODO: Do we need to send the checksum?
+            ok = sendProcessingNotification(serverBase, action, destName);
         }
 
         // Update database and display notification
@@ -591,12 +591,10 @@ public class DataSyncService extends IntentService {
      * @param fileName
      * @return
      */
-    private boolean sendProcessingNotification(String serverBase, String action, String fileName,
-            String checksum) {
+    private boolean sendProcessingNotification(String serverBase, String action, String fileName) {
         boolean success = false;
         String url = serverBase + NOTIFICATION_PATH + action
-                + FILENAME_PARAM + fileName + CHECKSUM_PARAM + checksum
-                + "&" + FlowApi.getDeviceParams();
+                + FILENAME_PARAM + fileName + "&" + FlowApi.getDeviceParams();
         try {
             HttpUtil.httpGet(url);
             success = true;

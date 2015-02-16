@@ -133,7 +133,7 @@ public class FlowApi {
     public static String getDeviceParams() {
         Context context = FlowApp.getApp();
         return PARAM.PHONE_NUMBER + URLEncode(StatusUtil.getPhoneNumber(context))
-                + "&" + PARAM.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID())
+                + "&" + PARAM.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
                 + "&" + PARAM.IMEI + URLEncode(StatusUtil.getImei(context))
                 + "&" + PARAM.VERSION + URLEncode(PlatformUtil.getVersionName(context))
                 + "&" + PARAM.DEVICE_ID + URLEncode(StatusUtil.getDeviceId(context));

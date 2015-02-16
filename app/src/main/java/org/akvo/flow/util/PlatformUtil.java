@@ -22,7 +22,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.net.Uri;
-import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -121,8 +121,8 @@ public class PlatformUtil {
         return base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
     }
 
-    public static String getAndroidID() {
-        return Settings.Secure.ANDROID_ID;
+    public static String getAndroidID(Context context) {
+        return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
     }
 
 }

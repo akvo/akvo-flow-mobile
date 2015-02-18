@@ -102,11 +102,9 @@ public class QuestionGroupTab extends ScrollView {
     }
 
     public void onQuestionComplete(String questionId, Bundle data) {
-        for (QuestionView qv : mQuestionViews.values()) {
-            if (questionId.equals(qv.getQuestion().getId())) {
-                // TODO: Optimize this lookup (Map)
-                qv.questionComplete(data);
-            }
+        QuestionView qv = mQuestionViews.get(questionId);
+        if (qv != null) {
+            qv.questionComplete(data);
         }
     }
 

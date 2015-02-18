@@ -59,6 +59,7 @@ public class ExceptionReportingService extends Service {
     private static final String DEV_ID_PARAM = "deviceIdentifier";
     private static final String DATE_PARAM = "date";
     private static final String TRACE_PARAM = "trace";
+    private static final String ANDROID_ID_PARAM = "androidId";
     private static final long INITIAL_DELAY = 60000;
     private static final long INTERVAL = 300000;
 
@@ -164,6 +165,7 @@ public class ExceptionReportingService extends Service {
                             DATE_FMT.get().format(new Date(f.lastModified())));
                     params.put(DEV_ID_PARAM, deviceId);
                     params.put(TRACE_PARAM, trace);
+                    params.put(ANDROID_ID_PARAM, PlatformUtil.getAndroidID(this));
 
                     String response = HttpUtil.httpPost(server + EXCEPTION_SERVICE_PATH, params);
                     if (response == null

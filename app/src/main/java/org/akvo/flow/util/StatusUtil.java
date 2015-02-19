@@ -148,6 +148,13 @@ public class StatusUtil {
         return use3G;
     }
 
+    public static String getDeviceId(Context context) {
+        SurveyDbAdapter db = new SurveyDbAdapter(context).open();
+        String value = db.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
+        db.close();
+        return value;
+    }
+
     /**
      * Get the specified server URL. If no custom server has been set (debug),
      * the default one will be returned.

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -21,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +37,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.akvo.flow.R;
+import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.api.parser.csv.SurveyMetaParser;
 import org.akvo.flow.dao.SurveyDao;
@@ -54,7 +54,6 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -70,12 +69,8 @@ public class SurveyDownloadService extends IntentService {
 
     private static final String DEFAULT_TYPE = "Survey";
 
-    private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice&devicePhoneNumber=";
+    private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice";
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
-    private static final String DEV_ID_PARAM = "&devId=";
-    private static final String IMEI_PARAM = "&imei=";
-    private static final String VERSION_PARAM = "&ver=";
-    private static final String NUMBER_PARAM = "&devicePhoneNumber=";
 
     private SurveyDbAdapter databaseAdaptor;
 
@@ -116,13 +111,12 @@ public class SurveyDownloadService extends IntentService {
     private void checkAndDownload(String[] surveyIds) throws IOException {
         // Load preferences
         final String serverBase = StatusUtil.getServerBase(this);
-        final String deviceId = getDeviceId();
 
         List<Survey> surveys;
         if (surveyIds != null) {
-            surveys = getSurveyHeaders(serverBase, surveyIds, deviceId);
+            surveys = getSurveyHeaders(serverBase, surveyIds);
         } else {
-            surveys = checkForSurveys(serverBase, deviceId);
+            surveys = checkForSurveys(serverBase);
         }
 
         // if there are surveys for this device, see if we need them
@@ -160,10 +154,6 @@ public class SurveyDownloadService extends IntentService {
                 downloadResources(survey);
             }
         }
-    }
-
-    private String getDeviceId() {
-        return databaseAdaptor.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
     }
 
     /**
@@ -287,13 +277,11 @@ public class SurveyDownloadService extends IntentService {
     /**
      * invokes a service call to get the header information for multiple surveys
      */
-    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds, String deviceId) {
+    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds) {
         List<Survey> surveys = new ArrayList<Survey>();
         for (String id : surveyIds) {
             try {
-                final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id
-                        + NUMBER_PARAM + StatusUtil.getPhoneNumber(this)
-                        + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
+                final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id + "&" + FlowApi.getDeviceParams();
                 String response = HttpUtil.httpGet(url);
                 if (response != null) {
                     surveys.addAll(new SurveyMetaParser().parseList(response, true));
@@ -315,20 +303,10 @@ public class SurveyDownloadService extends IntentService {
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
-    private List<Survey> checkForSurveys(String serverBase, String deviceId) {
+    private List<Survey> checkForSurveys(String serverBase) {
         List<Survey> surveys = new ArrayList<Survey>();
-        String phoneNumber = StatusUtil.getPhoneNumber(this);
-        if (phoneNumber == null) {
-            phoneNumber = "";
-        }
-        String imei = StatusUtil.getImei(this);
-        String version = PlatformUtil.getVersionName(this);
         try {
-            final String url = serverBase
-                    + SURVEY_LIST_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
-                    + IMEI_PARAM + URLEncoder.encode(imei, "UTF-8")
-                    + VERSION_PARAM + URLEncoder.encode(version, "UTF-8")
-                    + (deviceId != null ? DEV_ID_PARAM + URLEncoder.encode(deviceId, "UTF-8") : "");
+            final String url = serverBase + SURVEY_LIST_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
             String response = HttpUtil.httpGet(url);
             if (response != null) {
                 surveys = new SurveyMetaParser().parseList(response);

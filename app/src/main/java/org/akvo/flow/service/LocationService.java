@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -28,11 +28,11 @@ import android.location.LocationManager;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 
 /**
@@ -48,17 +48,12 @@ public class LocationService extends Service {
     private static final long INITIAL_DELAY = 60000;
     private static final long INTERVAL = 1800000;
     private static boolean sendBeacon = true;
-    private static final String BEACON_SERVICE_PATH = "/locationBeacon?action=beacon&phoneNumber=";
-    private static final String IMEI = "&imei=";
-    private static final String VER = "&ver=";
+    private static final String BEACON_SERVICE_PATH = "/locationBeacon?action=beacon";
     private static final String LAT = "&lat=";
     private static final String LON = "&lon=";
     private static final String ACC = "&acc=";
-    private static final String DEV_ID = "&devId=";
     private static final String OS_VERSION = "&osVersion=";
     private static final String TAG = "LocationService";
-    private String version;
-    private String deviceId;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -79,13 +74,10 @@ public class LocationService extends Service {
             database = new SurveyDbAdapter(this);
 
             database.open();
-            String val = database
-                    .getPreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY);
-            deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
+            String val = database.getPreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY);
             if (val != null) {
                 sendBeacon = Boolean.parseBoolean(val);
             }
-            version = PlatformUtil.getVersionName(this);
         } finally {
             if (database != null) {
                 database.close();
@@ -128,23 +120,12 @@ public class LocationService extends Service {
     private void sendLocation(String serverBase, Location loc) {
         if (serverBase != null) {
             try {
-                String phoneNumber = StatusUtil.getPhoneNumber(this);
-                if (phoneNumber != null) {
-                    String url = serverBase
-                            + BEACON_SERVICE_PATH + URLEncoder.encode(phoneNumber, "UTF-8")
-                            + IMEI + URLEncoder.encode(StatusUtil.getImei(this), "UTF-8");
-                    if (loc != null) {
-                        url += LAT + loc.getLatitude() + LON + loc.getLongitude()
-                                + ACC + loc.getAccuracy();
-                    }
-                    url += VER + version;
-                    url += OS_VERSION
-                            + URLEncoder.encode("Android " + android.os.Build.VERSION.RELEASE);
-                    if (deviceId != null) {
-                        url += DEV_ID + URLEncoder.encode(deviceId, "UTF-8");
-                    }
-                    HttpUtil.httpGet(url);
+                String url = serverBase + BEACON_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
+                if (loc != null) {
+                    url += LAT + loc.getLatitude() + LON + loc.getLongitude() + ACC + loc.getAccuracy();
                 }
+                url += OS_VERSION + URLEncoder.encode("Android " + android.os.Build.VERSION.RELEASE);
+                HttpUtil.httpGet(url);
             } catch (Exception e) {
                 Log.e(TAG, "Could not send location beacon", e);
                 PersistentUncaughtExceptionHandler.recordException(e);

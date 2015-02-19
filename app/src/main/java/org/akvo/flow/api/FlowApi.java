@@ -52,24 +52,29 @@ public class FlowApi {
     
     private static final String BASE_URL;
     private static final String API_KEY;
+    private static final String PHONE_NUMBER;
+    private static final String IMEI;
 
     static {
         Context context = FlowApp.getApp();
         BASE_URL = StatusUtil.getServerBase(context);
         API_KEY = getApiKey(context);
+        PHONE_NUMBER = StatusUtil.getPhoneNumber(context);
+        IMEI = StatusUtil.getImei(context);
     }
     
     public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
             throws IOException, HttpException {
-        final String query = getDeviceParams()
-                + "&" + PARAM.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
-                + "&" + PARAM.SURVEY_GROUP + surveyGroup
-                + "&" + PARAM.TIMESTAMP + getTimestamp();
-            
+        final String query = Param.IMEI + IMEI
+                + "&" + Param.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
+                + "&" + Param.PHONE_NUMBER + PHONE_NUMBER
+                + "&" + Param.SURVEY_GROUP + surveyGroup
+                + "&" + Param.TIMESTAMP + getTimestamp();
+
         final String url = BASE_URL + Path.SURVEYED_LOCALE 
                 + "?" + query
                 //+ "&" + PARAM.HMAC + URLEncoder.encode(getAuthorization(query), "UTF-8");
-                + "&" + PARAM.HMAC + getAuthorization(query);
+                + "&" + Param.HMAC + getAuthorization(query);
         String response = HttpUtil.httpGet(url);
         if (response != null) {
             SurveyedLocalesResponse slRes = new SurveyedLocaleParser().parseResponse(response);
@@ -132,18 +137,18 @@ public class FlowApi {
 
     public static String getDeviceParams() {
         Context context = FlowApp.getApp();
-        return PARAM.PHONE_NUMBER + URLEncode(StatusUtil.getPhoneNumber(context))
-                + "&" + PARAM.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
-                + "&" + PARAM.IMEI + URLEncode(StatusUtil.getImei(context))
-                + "&" + PARAM.VERSION + URLEncode(PlatformUtil.getVersionName(context))
-                + "&" + PARAM.DEVICE_ID + URLEncode(StatusUtil.getDeviceId(context));
+        return Param.PHONE_NUMBER + URLEncode(StatusUtil.getPhoneNumber(context))
+                + "&" + Param.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
+                + "&" + Param.IMEI + URLEncode(StatusUtil.getImei(context))
+                + "&" + Param.VERSION + URLEncode(PlatformUtil.getVersionName(context))
+                + "&" + Param.DEVICE_ID + URLEncode(StatusUtil.getDeviceId(context));
     }
     
     interface Path {
         String SURVEYED_LOCALE = "/surveyedlocale";
     }
     
-    interface PARAM {
+    interface Param {
         String SURVEY_GROUP = "surveyGroupId=";
         String PHONE_NUMBER = "phoneNumber=";
         String IMEI         = "imei=";

@@ -16,16 +16,35 @@
             android:layout_height="wrap_content"
             android:text="Take Photo" />
 
-        <ImageView
-            android:id="@+id/completed_iv"
+        <RelativeLayout
+            android:id="@+id/preview_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:maxHeight="150dp"
-            android:layout_gravity="center_horizontal"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:src="@drawable/checkmark"/>
+            android:layout_gravity="center"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="150dp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside"/>
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                />
+            <ImageButton
+                android:id="@+id/download"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:background="@android:color/transparent"
+                android:src="@drawable/download"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </merge>

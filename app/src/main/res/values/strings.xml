@@ -207,6 +207,8 @@
     <string name="location_unknown">Location is not known</string>
     <string name="location_inaccurate">Location reading is not accurate enough</string>
     <string name="geoshape_response">Shape captured successfully</string>
+    <string name="add_point_title">Add Point</string>
+    <string name="add_point_text">Do you want to add a new point at this location?</string>
     <!-- Misc -->
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>

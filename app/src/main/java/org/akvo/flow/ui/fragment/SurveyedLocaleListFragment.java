@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,7 +16,6 @@
 
 package org.akvo.flow.ui.fragment;
 
-import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.akvo.flow.util.GeoUtil;
@@ -127,8 +126,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 mLatitude = loc.getLatitude();
                 mLongitude = loc.getLongitude();
             }
+            mLocationManager.requestLocationUpdates(provider, 1000, 0, this);
         }
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
 
         // Listen for data sync updates, so we can update the UI accordingly
         getActivity().registerReceiver(dataSyncReceiver,

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -30,14 +30,17 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
 
 import java.io.File;
@@ -48,9 +51,11 @@ import java.io.File;
  * 
  * @author Christopher Fagiani
  */
-public class MediaQuestionView extends QuestionView implements OnClickListener {
+public class MediaQuestionView extends QuestionView implements OnClickListener, MediaSyncTask.DownloadListener {
     private Button mMediaButton;
     private ImageView mImage;
+    private ProgressBar mProgressBar;
+    private View mDownloadBtn;
     private String mMediaType;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
@@ -64,7 +69,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         setQuestionView(R.layout.media_question_view);
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
-        mImage = (ImageView)findViewById(R.id.completed_iv);
+        mImage = (ImageView)findViewById(R.id.image);
+        mProgressBar = (ProgressBar)findViewById(R.id.progress);
+        mDownloadBtn = findViewById(R.id.download);
 
         if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
@@ -77,13 +84,21 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
         }
 
         mImage.setOnClickListener(this);
-        mImage.setVisibility(View.INVISIBLE);
+        mDownloadBtn.setOnClickListener(this);
+
+        hideDownloadOptions();
+    }
+
+    private void hideDownloadOptions() {
+        mProgressBar.setVisibility(View.GONE);
+        mDownloadBtn.setVisibility(View.GONE);
     }
 
     /**
      * handle the action button click
      */
     public void onClick(View v) {
+        // TODO: Use switch instead of if-else
         if (v == mImage) {
             String filename = getResponse() != null ? getResponse().getValue() : null;
             if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
@@ -111,6 +126,12 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             } else {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
             }
+        } else if (v == mDownloadBtn) {
+            mDownloadBtn.setVisibility(GONE);
+            mProgressBar.setVisibility(VISIBLE);
+
+            MediaSyncTask downloadTask = new MediaSyncTask(getContext(), new File(getResponse().getValue()), this);
+            downloadTask.execute();
         }
     }
 
@@ -136,6 +157,20 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
+
+        // We now check whether the file is found in the local filesystem, and update the path if it's not
+        String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (!TextUtils.isEmpty(filename)) {
+            File file = new File(filename);
+            if (!file.exists() && isReadOnly())
+                // Looks like the image is not present in the filesystem (i.e. remote URL)
+                // Update response, matching the local path. Note: In the future, media responses should
+                // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
+                file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
+                setResponse(new QuestionResponse(file.getAbsolutePath(),
+                        isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                        getQuestion().getId()));
+        }
         displayThumbnail();
     }
 
@@ -145,7 +180,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mImage.setVisibility(View.GONE);
+        mImage.setImageDrawable(null);
+        hideDownloadOptions();
     }
 
     @Override
@@ -153,14 +189,15 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
     }
 
     private void displayThumbnail() {
+        hideDownloadOptions();
+
         String filename = getResponse() != null ? getResponse().getValue() : null;
         if (TextUtils.isEmpty(filename)) {
             return;
         }
         if (!new File(filename).exists()) {
-            // Looks like the image is not present in the filesystem (i.e. remote URL)
-            // TODO: Handle image downloads
-            mImage.setImageResource(R.drawable.checkmark);
+            mImage.setImageResource(R.drawable.blurry_image);
+            mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {
             // Image thumbnail
             ImageUtil.displayImage(mImage, filename);
@@ -169,11 +206,18 @@ public class MediaQuestionView extends QuestionView implements OnClickListener {
             mImage.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
                     filename, MediaStore.Video.Thumbnails.MINI_KIND));
         }
-        mImage.setVisibility(View.VISIBLE);
     }
 
     private boolean isImage() {
         return ConstantUtil.PHOTO_QUESTION_TYPE.equals(mMediaType);
+    }
+
+    @Override
+    public void onResourceDownload(boolean done) {
+        if (!done) {
+            Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
+        }
+        displayThumbnail();
     }
 
 }

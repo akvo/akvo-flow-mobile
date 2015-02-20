@@ -1,6 +1,20 @@
 Akvo FLOW app release notes
 ===========================
 
+#ver 2.1.2
+Date: 20 February 2015
+
+New and noteworthy
+------------------
+* Synchronised datapoints (monitoring surveys) can now get the media responses downloaded (images and videos) [#96]
+
+Resolved issues
+---------------
+* Lack of GPS results no longer in an app crash [#262]
+* Option values trailing spaces are now handled correctly. This caused some dependent questions to not be displayed [#261]
+* Manual entries in geoshape features display a confirmation dialog [#236]
+* Add `androidId` unique identifier to device attributes [#259]
+
 #ver 2.1.1
 Date: 28 January 2015
 

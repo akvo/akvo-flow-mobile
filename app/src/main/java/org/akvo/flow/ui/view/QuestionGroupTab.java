@@ -20,8 +20,10 @@ import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class QuestionGroupTab extends ScrollView {
     private QuestionGroup mQuestionGroup;
@@ -124,14 +126,26 @@ public class QuestionGroupTab extends ScrollView {
     }
 
     public void loadState() {
-        Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
         for (QuestionView qv : mQuestionViews.values()) {
             qv.resetQuestion(false);// Clean start
+        }
+
+        // If the group is repeatable, delete multiple iterations
+        if (mQuestionGroup.isRepeatable()) {
+            mContainer.removeAllViews();
+            mQuestionViews.clear();
+            mRepeatCount = -1;
+            for (int iteration=0; iteration<getIterationCount(); iteration++) {
+                loadGroup();
+            }
+        }
+
+        Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
+        for (QuestionView qv : mQuestionViews.values()) {
             final String questionId = qv.getQuestion().getId();
             if (responses.containsKey(questionId)) {
-                final QuestionResponse response = responses.get(questionId);
                 // Update the question view to reflect the loaded data
-                qv.rehydrate(response);
+                qv.rehydrate(responses.get(questionId));
             }
         }
     }
@@ -220,6 +234,30 @@ public class QuestionGroupTab extends ScrollView {
         header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
 
         return header;
+    }
+
+    /**
+     * getIterationCount calculates the number of iterations in the ongoing form for the current question group.
+     * FIXME: Naive implementation that requires a scan through the response map. Should be refactored. Should we store this count in the DB?
+     */
+    private int getIterationCount() {
+        int iterations = -1;
+
+        // Map group's questions for a quick look-up
+        Set<String> qids = new HashSet<>();
+        for (Question q : mQuestionGroup.getQuestions()) {
+            qids.add(q.getId());
+        }
+
+        for (QuestionResponse qr : mSurveyListener.getResponses().values()) {
+            String[] qid = qr.getQuestionId().split("\\|", -1);
+            if (qid.length == 2 && qids.contains(qid[0])) {
+                int iteration = Integer.parseInt(qid[1]);
+                iterations = Math.max(iterations, iteration);
+            }
+        }
+
+        return iterations + 1;
     }
 
 }

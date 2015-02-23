@@ -59,6 +59,7 @@ public class ExceptionReportingService extends Service {
     private static final String DEV_ID_PARAM = "deviceIdentifier";
     private static final String DATE_PARAM = "date";
     private static final String TRACE_PARAM = "trace";
+    private static final String ANDROID_ID_PARAM = "androidId";
     private static final long INITIAL_DELAY = 60000;
     private static final long INTERVAL = 300000;
 
@@ -153,6 +154,8 @@ public class ExceptionReportingService extends Service {
                     File f = new File(dir, list[i]);
                     String trace = FileUtil.readFileAsString(f);
 
+                    // We cannot use the standard FlowApi.getDeviceParams, fot this service uses
+                    // a different naming convention...
                     Map<String, String> params = new HashMap<String, String>();
                     params.put(ACTION_PARAM, ACTION_VALUE);
                     params.put(PHONE_PARAM, phoneNumber);
@@ -162,6 +165,7 @@ public class ExceptionReportingService extends Service {
                             DATE_FMT.get().format(new Date(f.lastModified())));
                     params.put(DEV_ID_PARAM, deviceId);
                     params.put(TRACE_PARAM, trace);
+                    params.put(ANDROID_ID_PARAM, PlatformUtil.getAndroidID(this));
 
                     String response = HttpUtil.httpPost(server + EXCEPTION_SERVICE_PATH, params);
                     if (response == null

@@ -157,9 +157,6 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
     }
 
     private void addPoint(LatLng point) {
-        if (mCurrentFeature == null) {
-            return;
-        }
         mCurrentFeature.addPoint(point);
         mClearPointBtn.setEnabled(true);
     }
@@ -413,8 +410,18 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
     }
 
     @Override
-    public void onMapLongClick(LatLng latLng) {
-        addPoint(latLng);
+    public void onMapLongClick(final LatLng latLng) {
+        if (mCurrentFeature == null) {
+            return;
+        }
+        ViewUtil.showConfirmDialog(R.string.add_point_title,
+                R.string.add_point_text, GeoshapeActivity.this, true,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        addPoint(latLng);
+                    }
+                });
     }
 
     @Override

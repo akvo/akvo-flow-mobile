@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -52,7 +52,7 @@ public class Dependency {
 
         for (String v : val.split("\\|", -1)) {
             for (String a : answer.split("\\|", -1)) {
-                if (v.equals(a)) {
+                if (v.trim().equals(a.trim())) {
                     return true;
                 }
             }

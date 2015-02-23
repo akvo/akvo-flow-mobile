@@ -361,7 +361,12 @@ public class Question {
         return allowPolygon;
     }
 
-    public Question copy(Question question, String questionId) {
+    /**
+     * "Deep copy" a question and update the question ID. This is only relevant for repeat-question-groups,
+     * which require different instances of the question for each iteration.
+     * Note: Non-primitive variables are *not* deep-copied. TODO: This can be done in a better way probably
+     */
+    public static Question copy(Question question, String questionId) {
         Question q = new Question();
         q.id = questionId;
         q.text = question.getText();

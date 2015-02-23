@@ -166,6 +166,11 @@ public class QuestionGroupTab extends ScrollView {
 
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
+
+            if (mQuestionGroup.isRepeatable()) {
+                q = Question.copy(q, q.getId() + "|" + mRepeatCount);// compound id. (qid|iteration)
+            }
+
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new OptionQuestionView(context, q, mSurveyListener);

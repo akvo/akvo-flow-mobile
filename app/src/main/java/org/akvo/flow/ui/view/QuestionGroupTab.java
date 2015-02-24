@@ -135,9 +135,7 @@ public class QuestionGroupTab extends ScrollView {
             mContainer.removeAllViews();
             mQuestionViews.clear();
             mRepeatCount = -1;
-            for (int iteration=0; iteration<getIterationCount(); iteration++) {
-                loadGroup();
-            }
+            loadGroup(getIterationCount());
         }
 
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
@@ -170,6 +168,12 @@ public class QuestionGroupTab extends ScrollView {
 
     public boolean isLoaded() {
         return mLoaded;
+    }
+
+    private void loadGroup(int iterations) {
+        for (int i=0; i<iterations; i++) {
+            loadGroup();
+        }
     }
 
     public void loadGroup() {

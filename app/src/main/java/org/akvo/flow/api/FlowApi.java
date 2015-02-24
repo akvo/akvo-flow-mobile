@@ -65,9 +65,9 @@ public class FlowApi {
     
     public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
             throws IOException, HttpException {
-        final String query = Param.IMEI + IMEI
+        final String query = Param.IMEI + URLEncode(IMEI)
                 + "&" + Param.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
-                + "&" + Param.PHONE_NUMBER + PHONE_NUMBER
+                + "&" + Param.PHONE_NUMBER + URLEncode(PHONE_NUMBER)
                 + "&" + Param.SURVEY_GROUP + surveyGroup
                 + "&" + Param.TIMESTAMP + getTimestamp();
 
@@ -137,9 +137,9 @@ public class FlowApi {
 
     public static String getDeviceParams() {
         Context context = FlowApp.getApp();
-        return Param.PHONE_NUMBER + URLEncode(StatusUtil.getPhoneNumber(context))
+        return Param.PHONE_NUMBER + URLEncode(PHONE_NUMBER)
                 + "&" + Param.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
-                + "&" + Param.IMEI + URLEncode(StatusUtil.getImei(context))
+                + "&" + Param.IMEI + URLEncode(IMEI)
                 + "&" + Param.VERSION + URLEncode(PlatformUtil.getVersionName(context))
                 + "&" + Param.DEVICE_ID + URLEncode(StatusUtil.getDeviceId(context));
     }

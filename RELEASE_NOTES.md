@@ -1,6 +1,13 @@
 Akvo FLOW app release notes
 ===========================
 
+#ver 2.1.2.1
+Date: 24 February 2015
+
+New and noteworthy
+------------------
+* This hotfix release fixes a monitoring survey sync issue that arises when no SIM card is present [#270]
+
 #ver 2.1.2
 Date: 20 February 2015
 

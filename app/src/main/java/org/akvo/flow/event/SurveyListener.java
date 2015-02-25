@@ -17,6 +17,7 @@ package org.akvo.flow.event;
 
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.ui.view.QuestionView;
 
 import java.util.List;
 import java.util.Map;
@@ -30,4 +31,5 @@ public interface SurveyListener {
     public void nextTab();
     public void openQuestion(String questionId);
     public Map<String, QuestionResponse> getResponses();
+    public QuestionView getQuestionView(String questionId);
 }

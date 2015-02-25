@@ -472,6 +472,11 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     @Override
+    public QuestionView getQuestionView(String questionId) {
+        return mAdapter.getQuestionView(questionId);
+    }
+
+    @Override
     public String getDefaultLanguage() {
         return getDefaultLang();
     }

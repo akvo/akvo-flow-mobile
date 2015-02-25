@@ -158,10 +158,6 @@ public class Question {
         return dependencies;
     }
 
-    public void setDependencies(ArrayList<Dependency> dependencies) {
-        this.dependencies = dependencies;
-    }
-
     public String getId() {
         return id;
     }

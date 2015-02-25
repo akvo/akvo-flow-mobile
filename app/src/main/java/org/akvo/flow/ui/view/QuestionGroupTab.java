@@ -47,6 +47,7 @@ public class QuestionGroupTab extends ScrollView {
     private SurveyListener mSurveyListener;
 
     private Map<String, QuestionView> mQuestionViews;
+    private final Set<String> mQuestions;// Map group's questions for a quick look-up
     private LinearLayout mContainer;
     private boolean mLoaded;
 
@@ -63,6 +64,10 @@ public class QuestionGroupTab extends ScrollView {
         mLoaded = false;
         mRepeatCount = -1;
         mInflater = LayoutInflater.from(context);
+        mQuestions = new HashSet<>();
+        for (Question q : mQuestionGroup.getQuestions()) {
+            mQuestions.add(q.getId());
+        }
         init();
     }
 
@@ -86,6 +91,7 @@ public class QuestionGroupTab extends ScrollView {
                 @Override
                 public void onClick(View v) {
                     loadGroup();// TODO
+                    setupDependencies();
                 }
             });
         }
@@ -263,15 +269,9 @@ public class QuestionGroupTab extends ScrollView {
     private int getIterationCount() {
         int iterations = -1;
 
-        // Map group's questions for a quick look-up
-        Set<String> qids = new HashSet<>();
-        for (Question q : mQuestionGroup.getQuestions()) {
-            qids.add(q.getId());
-        }
-
         for (QuestionResponse qr : mSurveyListener.getResponses().values()) {
             String[] qid = qr.getQuestionId().split("\\|", -1);
-            if (qid.length == 2 && qids.contains(qid[0])) {
+            if (qid.length == 2 && mQuestions.contains(qid[0])) {
                 int iteration = Integer.parseInt(qid[1]);
                 iterations = Math.max(iterations, iteration);
             }
@@ -288,17 +288,34 @@ public class QuestionGroupTab extends ScrollView {
 
     private void setupDependencies(QuestionView qv) {
         final List<Dependency> dependencies = qv.getQuestion().getDependencies();
-
         if (dependencies == null) {
             return;// No dependencies for this question
         }
 
         for (Dependency dependency : dependencies) {
-            QuestionView parentQ = mSurveyListener.getQuestionView(dependency.getQuestion());
+            QuestionView parentQ;
+            String parentQId = dependency.getQuestion();
+            if (mQuestionGroup.isRepeatable() && mQuestions.contains(parentQId)) {
+                // Internal dependencies need to compound the inner question ID (questionId|iteration)
+                parentQId += "|" + getIteration(qv.getQuestion().getId());
+                parentQ = getQuestionView(parentQId);// Local search
+            } else {
+                parentQ = mSurveyListener.getQuestionView(parentQId);// Global search
+            }
+
             if (parentQ != null && qv != parentQ) {
                 parentQ.addQuestionInteractionListener(qv);
+                qv.checkDependencies();
             }
         }
+    }
+
+    private int getIteration(String questionId) {
+        String[] qid = questionId.split("\\|", -1);
+        if (qid.length == 2) {
+            return Integer.parseInt(qid[1]);
+        }
+        return -1;
     }
 
 }

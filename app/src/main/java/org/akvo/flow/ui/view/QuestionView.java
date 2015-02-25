@@ -360,7 +360,13 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_CLEAR_EVENT);
         }
 
-        // Show/Hide the Question, according to the dependencies
+        checkDependencies();
+    }
+
+    /**
+     * Show/Hide the Question, according to the dependencies
+     */
+    public void checkDependencies() {
         if (areDependenciesSatisfied()) {
             setVisibility(View.VISIBLE);
         } else {

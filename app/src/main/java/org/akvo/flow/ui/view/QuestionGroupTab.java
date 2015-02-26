@@ -50,7 +50,7 @@ public class QuestionGroupTab extends ScrollView {
     private LinearLayout mContainer;
     private boolean mLoaded;
 
-    private int mRepeatCount;
+    private int mIterations;
     private LayoutInflater mInflater;
 
     public QuestionGroupTab(Context context, QuestionGroup group,  SurveyListener surveyListener,
@@ -61,7 +61,7 @@ public class QuestionGroupTab extends ScrollView {
         mQuestionListener = questionListener;
         mQuestionViews = new HashMap<>();
         mLoaded = false;
-        mRepeatCount = -1;
+        mIterations = 0;// Repeatable group's instances so far
         mInflater = LayoutInflater.from(context);
         mQuestions = new HashSet<>();
         for (Question q : mQuestionGroup.getQuestions()) {
@@ -155,7 +155,7 @@ public class QuestionGroupTab extends ScrollView {
         if (mQuestionGroup.isRepeatable()) {
             mContainer.removeAllViews();
             mQuestionViews.clear();
-            mRepeatCount = -1;
+            mIterations = 0;
             loadGroup(getIterationCount());
         }
 
@@ -199,7 +199,7 @@ public class QuestionGroupTab extends ScrollView {
 
     public void loadGroup() {
         if (mQuestionGroup.isRepeatable()) {
-            mRepeatCount++;
+            mIterations++;
             mContainer.addView(getRepeatHeader());
         }
 
@@ -207,7 +207,7 @@ public class QuestionGroupTab extends ScrollView {
         for (Question q : mQuestionGroup.getQuestions()) {
 
             if (mQuestionGroup.isRepeatable()) {
-                q = Question.copy(q, q.getId() + "|" + mRepeatCount);// compound id. (qid|iteration)
+                q = Question.copy(q, q.getId() + "|" + mIterations);// compound id. (qid|iteration)
             }
 
             QuestionView questionView;
@@ -249,7 +249,7 @@ public class QuestionGroupTab extends ScrollView {
     private View getRepeatHeader() {
         TextView header = (TextView)LayoutInflater.from(getContext()).inflate(R.layout.itemlistrow, null);
         header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        header.setText(mQuestionGroup.getHeading() + " - " + mRepeatCount);
+        header.setText(mQuestionGroup.getHeading() + " - " + mIterations);
         header.setTextColor(getResources().getColor(R.color.text_color_orange));
 
         header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
@@ -261,7 +261,7 @@ public class QuestionGroupTab extends ScrollView {
      * getIterationCount calculates the number of iterations in the ongoing form for the current question group.
      */
     private int getIterationCount() {
-        int iterations = -1;
+        int iterations = 0;
 
         for (QuestionResponse qr : mSurveyListener.getResponses().values()) {
             String[] qid = qr.getQuestionId().split("\\|", -1);
@@ -271,7 +271,7 @@ public class QuestionGroupTab extends ScrollView {
             }
         }
 
-        return iterations + 1;
+        return iterations;
     }
 
     public void setupDependencies() {

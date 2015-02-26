@@ -292,6 +292,7 @@ public class QuestionGroupTab extends ScrollView {
             if (mQuestionGroup.isRepeatable() && mQuestions.contains(parentQId)) {
                 // Internal dependencies need to compound the inner question ID (questionId|iteration)
                 parentQId += "|" + getIteration(qv.getQuestion().getId());
+                dependency.setQuestion(parentQId);
                 parentQ = getQuestionView(parentQId);// Local search
             } else {
                 parentQ = mSurveyListener.getQuestionView(parentQId);// Global search

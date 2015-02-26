@@ -358,40 +358,47 @@ public class Question {
     }
 
     /**
-     * "Deep copy" a question and update the question ID. This is only relevant for repeat-question-groups,
+     * Clone a question and update the question ID. This is only relevant for repeat-question-groups,
      * which require different instances of the question for each iteration.
-     * Note: Non-primitive variables are *not* deep-copied. TODO: This can be done in a better way probably
+     * Note: Excluding dependencies, all non-primitive variables are *not* deep-copied.
      */
     public static Question copy(Question question, String questionId) {
         Question q = new Question();
         q.id = questionId;
         q.text = question.getText();
         q.order = question.getOrder();
-        q.validationRule = question.getValidationRule();
         q.renderType = question.getRenderType();
-        q.questionHelp = question.getQuestionHelp();
         q.mandatory = question.isMandatory();
         q.type = question.getType();
-        q.options = question.getOptions();
         q.allowOther = question.isAllowOther();
         q.allowMultiple = question.isAllowMultiple();
         q.locked = question.isLocked();
-        q.altTextMap = question.altTextMap;
-        q.dependencies = question.getDependencies();
-        q.scoringRules = question.getScoringRules();
         q.useStrength = question.useStrength();
         q.strengthMin = question.getStrengthMin();
         q.strengthMax = question.getStrengthMax();
         q.localeName = question.isLocaleName();
         q.localeLocation = question.isLocaleLocation();
-        q.sourceQuestionId = question.getSourceQuestionId();// "Copied-from" question Id
+        q.sourceQuestionId = question.getSourceQuestionId();
         q.isDoubleEntry = question.isDoubleEntry();
         q.useExternalSource = question.useExternalSource();
         q.allowPoints = question.isAllowPoints();
         q.allowLine = question.isAllowLine();
         q.allowPolygon = question.isAllowPolygon();
         q.src = question.getSrc();
-        q.levels = question.getLevels();
+        q.validationRule = question.getValidationRule();// Shallow copy
+        q.options = question.getOptions();// Shallow copy
+        q.questionHelp = question.getQuestionHelp();// Shallow copy
+        q.altTextMap = question.getAltTextMap();// Shallow copy
+        q.scoringRules = question.getScoringRules();// Shallow copy
+        q.levels = question.getLevels();// Shallow copy
+
+        // Deep-copy dependencies
+        if (question.dependencies != null) {
+            q.dependencies = new ArrayList<>();
+            for (Dependency d : question.getDependencies()) {
+                q.dependencies.add(new Dependency(d));
+            }
+        }
         return q;
     }
 }

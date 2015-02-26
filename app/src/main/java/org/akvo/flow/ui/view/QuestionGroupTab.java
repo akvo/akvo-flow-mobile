@@ -17,9 +17,9 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -32,7 +32,6 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,7 +89,7 @@ public class QuestionGroupTab extends ScrollView {
             repeatBtn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    loadGroup();// TODO
+                    loadGroup();
                     setupDependencies();
                 }
             });
@@ -248,15 +247,11 @@ public class QuestionGroupTab extends ScrollView {
     }
 
     private View getRepeatHeader() {
-        View header = LayoutInflater.from(getContext()).inflate(R.layout.question_header, null);// TODO: Refactor
-        TextView tv = (TextView)header.findViewById(R.id.question_tv);
-        tv.setText(mQuestionGroup.getHeading() + " - " + mRepeatCount);
-        tv.setTextColor(getResources().getColor(R.color.text_color_orange));
-        header.findViewById(R.id.tip_ib).setVisibility(VISIBLE);
-        ((ImageButton)header.findViewById(R.id.tip_ib)).setImageResource(R.drawable.red_cross);
+        TextView header = (TextView)LayoutInflater.from(getContext()).inflate(R.layout.itemlistrow, null);
+        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        header.setText(mQuestionGroup.getHeading() + " - " + mRepeatCount);
+        header.setTextColor(getResources().getColor(R.color.text_color_orange));
 
-        int padding = (int) PlatformUtil.dp2Pixel(getContext(), 8);
-        header.setPadding(padding, padding, padding, padding);
         header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
 
         return header;
@@ -264,7 +259,6 @@ public class QuestionGroupTab extends ScrollView {
 
     /**
      * getIterationCount calculates the number of iterations in the ongoing form for the current question group.
-     * FIXME: Naive implementation that requires a scan through the response map. Should be refactored. Should we store this count in the DB?
      */
     private int getIterationCount() {
         int iterations = -1;

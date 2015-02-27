@@ -58,8 +58,11 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
@@ -285,6 +288,8 @@ public class DataSyncService extends IntentService {
     private String processSurveyData(long surveyInstanceId, StringBuilder buf, List<String> imagePaths) {
         String uuid = null;
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
+        Map<String, List<String>> multipleValues = new HashMap<>();// qid - response values
+        Map<String, String[]> responses = new HashMap<>();// qid - data.txt values (columns)
 
         if (data != null) {
             if (data.moveToFirst()) {
@@ -295,67 +300,108 @@ public class DataSyncService extends IntentService {
                 } else {
                     deviceIdentifier = cleanVal(deviceIdentifier);
                 }
-                // evaluate indices once, outside the loop
-                int survey_fk_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);
-                int question_fk_col = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
-                int answer_type_col = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
-                int answer_col = data.getColumnIndexOrThrow(ResponseColumns.ANSWER);
-                int disp_name_col = data.getColumnIndexOrThrow(UserColumns.NAME);
-                int email_col = data.getColumnIndexOrThrow(UserColumns.EMAIL);
-                int submitted_date_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
-                int scored_val_col = data.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL);
-                int strength_col = data.getColumnIndexOrThrow(ResponseColumns.STRENGTH);
-                int uuid_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.UUID);
-                int duration_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.DURATION);
-                int localeId_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.RECORD_ID);
-                // Note: No need to query the surveyInstanceId, we already have that value
 
                 do {
-                    // Sanitize answer value. No newlines or tabs!
-                    String value = data.getString(answer_col);
-                    if (value != null) {
-                        value = value.replace("\n", SPACE);
-                        value = value.replace(DELIMITER, SPACE);
-                        value = value.trim();
+                    String[] columns = getResponseColumns(String.valueOf(surveyInstanceId), deviceIdentifier, data);
+                    if (columns == null) {
+                        continue;
+                    } else if (uuid == null) {
+                        uuid = columns[DataColumns.UUID];
                     }
-                    // never send empty answers
-                    if (value == null || value.length() == 0) {
+
+                    final String type = columns[DataColumns.TYPE];
+                    final String value = columns[DataColumns.VALUE];
+
+                    String[] qid = columns[DataColumns.QUESTION_ID].split("\\|", -1);
+                    if (qid.length == 2) {
+                        String questionId = qid[0];
+                        int pos = Integer.parseInt(qid[1]) - 1;// 0-based index
+                        if (!multipleValues.containsKey(questionId)) {
+                            multipleValues.put(questionId, new ArrayList<String>());
+                            responses.put(questionId, columns);// Store response just once per question
+                        }
+                        List<String> values = multipleValues.get(questionId);
+                        if (values.size() < pos) {
+                            values.addAll(Collections.<String>nCopies(pos-values.size(), null));
+                        }
+                        values.add(pos, value);
+
                         continue;
                     }
-                    final long submitted_date = data.getLong(submitted_date_col);
-                    final long surveyal_time = (data.getLong(duration_col)) / 1000;
 
-                    if (uuid == null) {
-                        uuid = data.getString(uuid_col);// Parse it just once
+                    for (int i=0; i<columns.length; i++) {
+                        buf.append(columns[i]);
+                        buf.append(i == columns.length - 1 ? "\n" : DELIMITER);
                     }
 
-                    buf.append(data.getString(survey_fk_col));
-                    buf.append(DELIMITER).append(String.valueOf(surveyInstanceId));
-                    buf.append(DELIMITER).append(data.getString(question_fk_col));
-                    String type = data.getString(answer_type_col);
-                    buf.append(DELIMITER).append(type);
-                    buf.append(DELIMITER).append(value);
-                    buf.append(DELIMITER).append(cleanVal(data.getString(disp_name_col)));
-                    buf.append(DELIMITER).append(cleanVal(data.getString(email_col)));
-                    buf.append(DELIMITER).append(submitted_date);
-                    buf.append(DELIMITER).append(deviceIdentifier);
-                    buf.append(DELIMITER).append(neverNull(data.getString(scored_val_col)));
-                    buf.append(DELIMITER).append(neverNull(data.getString(strength_col)));
-                    buf.append(DELIMITER).append(uuid);
-                    buf.append(DELIMITER).append(surveyal_time);
-                    buf.append(DELIMITER).append(data.getString(localeId_col));
-                    buf.append("\n");
-
-                    if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
-                            || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
+                    if (isMedia(type)) {
                         imagePaths.add(value);
                     }
                 } while (data.moveToNext());
             }
-
             data.close();
+
+            // Now process multiple responses, adding one response row per question,
+            // and a JSON-formatted String with the list of values
+            for (String questionId : responses.keySet()) {
+                String[] columns = responses.get(questionId);
+                final boolean isMedia = isMedia(columns[DataColumns.TYPE]);
+                JSONArray jValues = new JSONArray();
+                for (String value : multipleValues.get(questionId)) {
+                    jValues.put(value);
+                    if (isMedia) {
+                        imagePaths.add(value);
+                    }
+                }
+                columns[DataColumns.QUESTION_ID] = questionId; // Restore original question ID
+                columns[DataColumns.VALUE] = jValues.toString();
+                columns[DataColumns.MULTIPLE] = Boolean.toString(true);
+
+                // Write contents into the buffer
+                for (int i=0; i<columns.length; i++) {
+                    buf.append(columns[i]);
+                    buf.append(i == columns.length - 1 ? "\n" : DELIMITER);
+                }
+            }
         }
         return uuid;
+    }
+
+    private boolean isMedia(String type) {
+        return ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
+                || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type);
+    }
+
+    private String[] getResponseColumns(String surveyInstanceId, String deviceId, Cursor cursor) {
+        // Sanitize answer value. No newlines or tabs!
+        String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER));
+        if (value != null) {
+            value = value.replace("\n", SPACE);
+            value = value.replace(DELIMITER, SPACE);
+            value = value.trim();
+        }
+        // never send empty answers
+        if (value == null || value.length() == 0) {
+            return null;
+        }
+
+        return new String[]{
+            cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID)),
+            surveyInstanceId,
+            cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID)),
+            cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE)),
+            value,
+            cursor.getString(cursor.getColumnIndexOrThrow(UserColumns.NAME)),
+            cursor.getString(cursor.getColumnIndexOrThrow(UserColumns.EMAIL)),
+            cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE)),
+            deviceId,
+            neverNull(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL))),
+            neverNull(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH))),
+            cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID)),
+            "" + ((cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.DURATION))) / 1000),
+            cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.RECORD_ID)),
+            Boolean.toString(false)// not multiple yet
+        };
     }
 
     // replace troublesome chars in user-provided values
@@ -585,11 +631,8 @@ public class DataSyncService extends IntentService {
     }
 
     /**
-     * sends a message to the service with the file name that was just uploaded
+     * Sends a message to the service with the file name that was just uploaded
      * so it can start processing the file
-     *
-     * @param fileName
-     * @return
      */
     private boolean sendProcessingNotification(String serverBase, String action, String fileName) {
         boolean success = false;
@@ -698,6 +741,24 @@ public class DataSyncService extends IntentService {
     class ZipFileData {
         String filename = null;
         List<String> imagePaths = new ArrayList<String>();
+    }
+
+    interface DataColumns {
+        int SURVEY_ID = 0;
+        int SURVEY_INSTANCE_ID = 1;
+        int QUESTION_ID = 2;
+        int TYPE = 3;
+        int VALUE = 4;
+        int NAME = 5;
+        int EMAIL = 6;
+        int SUBMITTED_DATE = 7;
+        int DEVICE_ID = 8;
+        int SCORE = 9;
+        int STRENGTH = 10;
+        int UUID = 11;
+        int DURATION = 12;
+        int DATAPOINT = 13;
+        int MULTIPLE = 14;
     }
 
 }

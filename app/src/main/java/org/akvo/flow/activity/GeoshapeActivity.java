@@ -16,12 +16,10 @@
 package org.akvo.flow.activity;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Criteria;
+import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -39,6 +37,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -55,11 +54,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GeoshapeActivity extends ActionBarActivity implements OnMapClickListener,
-        OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener {
+        OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener {
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
     private static final String JSON_COORDINATES = "coordinates";
@@ -76,10 +76,12 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
 
     private boolean mAllowPoints, mAllowLine, mAllowPolygon;
     private boolean mManualInput;
+    private boolean mCentered;// We only want to center the map once
 
     private View mFeatureMenu;
     private View mClearPointBtn;
     private TextView mFeatureName;
+    private TextView mAccuracy;
     private GoogleMap mMap;
 
     @Override
@@ -94,6 +96,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
 
         mFeatureMenu = findViewById(R.id.feature_menu);
         mFeatureName = (TextView)findViewById(R.id.feature_name);
+        mAccuracy = (TextView)findViewById(R.id.accuracy);
         mClearPointBtn = findViewById(R.id.clear_point_btn);
         mClearPointBtn.setOnClickListener(mFeatureMenuListener);
         findViewById(R.id.add_point_btn).setOnClickListener(mFeatureMenuListener);
@@ -110,19 +113,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
         if (!TextUtils.isEmpty(geoJSON)) {
             load(geoJSON);
-        } else {
-            // If user location is known, center map
-            LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            String provider = manager.getBestProvider(criteria, true);
-            if (provider != null) {
-                Location location = manager.getLastKnownLocation(provider);
-                if (location != null) {
-                    LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
-                }
-            }
+            mCentered = true;
         }
     }
 
@@ -131,6 +122,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
             mMap.setMyLocationEnabled(true);
             mMap.setOnMarkerClickListener(this);
             mMap.setOnMapClickListener(this);
+            mMap.setOnMyLocationChangeListener(this);
             if (mManualInput) {
                 mMap.setOnMapLongClickListener(this);
                 mMap.setOnMarkerDragListener(this);
@@ -220,6 +212,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
     @Override
     public void onResume() {
         super.onResume();
+
     }
 
     private View.OnClickListener mFeatureMenuListener = new View.OnClickListener() {
@@ -459,4 +452,22 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
         }
     }
 
+    @Override
+    public void onMyLocationChange(Location location) {
+        Log.i(TAG, "onMyLocationChange() - " + location);
+        if (location != null && location.hasAccuracy()) {
+            mAccuracy.setText(getString(R.string.accuracy) + ": "
+                    + new DecimalFormat("#").format(location.getAccuracy()) + "m");
+            if (location.getAccuracy() <= ACCURACY_THRESHOLD) {
+                mAccuracy.setTextColor(getResources().getColor(R.color.button_green));
+            } else {
+                mAccuracy.setTextColor(Color.RED);
+            }
+            if (!mCentered) {
+                LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
+                mCentered = true;
+            }
+        }
+    }
 }

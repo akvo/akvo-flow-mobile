@@ -46,6 +46,9 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
         mResponseView = findViewById(R.id.response_view);
         mMapBtn = (Button)findViewById(R.id.capture_shape_btn);
         mMapBtn.setOnClickListener(this);
+        if (isReadOnly()) {
+            mMapBtn.setText(R.string.view_shape);
+        }
     }
 
     private void displayResponseView() {
@@ -85,13 +88,8 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
         mValue = resp.getValue();
         displayResponseView();
 
-        if (isReadOnly()) {
-            mMapBtn.setText("view shape");
-            if (TextUtils.isEmpty(mValue)) {
-                mMapBtn.setVisibility(GONE);
-            } else {
-                mMapBtn.setVisibility(VISIBLE);
-            }
+        if (isReadOnly() && !TextUtils.isEmpty(mValue)) {
+            mMapBtn.setVisibility(VISIBLE);
         }
     }
 

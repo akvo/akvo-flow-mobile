@@ -77,6 +77,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
     private boolean mAllowPoints, mAllowLine, mAllowPolygon;
     private boolean mManualInput;
     private boolean mCentered;// We only want to center the map once
+    private boolean mReadOnly;
 
     private View mFeatureMenu;
     private View mClearPointBtn;
@@ -94,19 +95,29 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
         mFeatures = new ArrayList<>();
         mMap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
 
+        View addPointBtn = findViewById(R.id.add_point_btn);
+        View clearFeatureBtn = findViewById(R.id.clear_feature_btn);
         mFeatureMenu = findViewById(R.id.feature_menu);
         mFeatureName = (TextView)findViewById(R.id.feature_name);
         mAccuracy = (TextView)findViewById(R.id.accuracy);
         mClearPointBtn = findViewById(R.id.clear_point_btn);
-        mClearPointBtn.setOnClickListener(mFeatureMenuListener);
-        findViewById(R.id.add_point_btn).setOnClickListener(mFeatureMenuListener);
-        findViewById(R.id.clear_feature_btn).setOnClickListener(mFeatureMenuListener);
         findViewById(R.id.properties).setOnClickListener(mFeatureMenuListener);
 
         mAllowPoints = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POINTS, true);
         mAllowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
         mAllowPolygon = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POLYGON, true);
         mManualInput = getIntent().getBooleanExtra(ConstantUtil.EXTRA_MANUAL_INPUT, true);
+        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
+
+        if (!mReadOnly) {
+            mClearPointBtn.setOnClickListener(mFeatureMenuListener);
+            addPointBtn.setOnClickListener(mFeatureMenuListener);
+            clearFeatureBtn.setOnClickListener(mFeatureMenuListener);
+        } else {
+            mClearPointBtn.setVisibility(View.GONE);
+            addPointBtn.setVisibility(View.GONE);
+            clearFeatureBtn.setVisibility(View.GONE);
+        }
 
         initMap();
 
@@ -156,6 +167,11 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.geoshape_activity, menu);
+        if (mReadOnly) {
+            menu.findItem(R.id.add_feature).setVisible(false);
+            menu.findItem(R.id.save).setVisible(false);
+        }
+
         if (!mAllowPoints) {
             menu.findItem(R.id.add_points).setVisible(false);
         }

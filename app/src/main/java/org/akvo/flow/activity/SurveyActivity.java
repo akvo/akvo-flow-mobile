@@ -272,7 +272,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     } else {
                         first = false;
                     }
-                    builder.append(answer);
+                    builder.append(answer.trim());
                 }
             }
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),

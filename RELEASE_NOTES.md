@@ -1,6 +1,17 @@
 Akvo FLOW app release notes
 ===========================
 
+#ver 2.1.3
+Date: 17 March 2015
+
+New and noteworthy
+------------------
+* Geoshapes editor displays a GPS position accuracy indicator, with a green/red color based on the accuracy threshold [#272]
+
+Resolved issues
+---------------
+* Datapoint name generation removes leading/trailing hyphens and space characters [#273]
+
 #ver 2.1.2.1
 Date: 24 February 2015
 

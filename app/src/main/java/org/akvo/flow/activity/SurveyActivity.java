@@ -47,8 +47,6 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
-import org.akvo.flow.ui.view.QuestionGroupTab;
-import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -262,18 +260,19 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
 
         // Check the responses given to these questions (marked as name)
         // and concatenate them so it becomes the Locale name.
-        if (localeNameQuestions.size() > 0) {
-            for (int i=0; i<localeNameQuestions.size(); i++) {
-                QuestionResponse questionResponse = mDatabase.getResponse(mSurveyInstanceId,
-                        localeNameQuestions.get(i));
-
+        if (!localeNameQuestions.isEmpty()) {
+            boolean first = true;
+            for (String questionId : localeNameQuestions) {
+                QuestionResponse questionResponse = mDatabase.getResponse(mSurveyInstanceId, questionId);
                 String answer = questionResponse != null ? questionResponse.getValue() : null;
 
                 if (!TextUtils.isEmpty(answer)) {
-                    if (i > 0) {
+                    if (!first) {
                         builder.append(" - ");
+                    } else {
+                        first = false;
                     }
-                    builder.append(answer);
+                    builder.append(answer.trim());
                 }
             }
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),

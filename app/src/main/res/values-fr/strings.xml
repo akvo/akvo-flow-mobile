@@ -158,6 +158,7 @@
   <string name="type_code">entrez code</string>
   <string name="or">ou</string>
   <string name="capture_shape">Capturer la surface</string>
+  <string name="view_shape">voir la forme</string>
   <string name="clear_point_title">Supprimer point</string>
   <string name="clear_point_text">Voulez vous effacer ce point?</string>
   <string name="clear_feature_title">Supprimer cette fonction</string>
@@ -206,6 +207,8 @@
   <string name="location_unknown">Cet endroit n\'est pas reconnu</string>
   <string name="location_inaccurate">La location n\'est pas assez précise.</string>
   <string name="geoshape_response">Surface enregistrée avec succès </string>
+  <string name="add_point_title">Créer un point</string>
+  <string name="add_point_text">Voulez vous ajouter un point a cet endroit?</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Annuler</string>

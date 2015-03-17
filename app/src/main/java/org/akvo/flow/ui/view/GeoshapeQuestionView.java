@@ -43,15 +43,12 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
 
     private void init() {
         setQuestionView(R.layout.geoshape_question_view);
-
         mResponseView = findViewById(R.id.response_view);
         mMapBtn = (Button)findViewById(R.id.capture_shape_btn);
-
-        if (isReadOnly()) {
-            mMapBtn.setVisibility(View.GONE);
-        }
-
         mMapBtn.setOnClickListener(this);
+        if (isReadOnly()) {
+            mMapBtn.setText(R.string.view_shape);
+        }
     }
 
     private void displayResponseView() {
@@ -67,6 +64,7 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POLYGON, getQuestion().isAllowPolygon());
                 data.putBoolean(ConstantUtil.EXTRA_MANUAL_INPUT, !getQuestion().isLocked());
+                data.putBoolean(ConstantUtil.READONLY_KEY, isReadOnly());
                 if (!TextUtils.isEmpty(mValue)) {
                     data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
                 }
@@ -89,6 +87,10 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
         super.rehydrate(resp);
         mValue = resp.getValue();
         displayResponseView();
+
+        if (isReadOnly() && !TextUtils.isEmpty(mValue)) {
+            mMapBtn.setVisibility(VISIBLE);
+        }
     }
 
     @Override
@@ -96,6 +98,9 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
         super.resetQuestion(fireEvent);
         mValue = null;
         displayResponseView();
+        if (isReadOnly()) {
+            mMapBtn.setVisibility(GONE);
+        }
     }
 
     @Override

@@ -161,6 +161,7 @@ Version</string>
   <string name="type_code">introducir código</string>
   <string name="or">o</string>
   <string name="capture_shape">capturar figura</string>
+  <string name="view_shape">ver figura</string>
   <string name="clear_point_title">Borrar punto</string>
   <string name="clear_point_text">¿Quiere borrar este punto?</string>
   <string name="clear_feature_title">Borrar figura</string>
@@ -209,6 +210,8 @@ Version</string>
   <string name="location_unknown">Posición desconocida</string>
   <string name="location_inaccurate">La geoposición no no es lo suficientemente precisa</string>
   <string name="geoshape_response">FIgura capturada correctamente</string>
+  <string name="add_point_title">Añadir punto</string>
+  <string name="add_point_text">¿Quiere añadir un punto en esta posición?</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Cancelar</string>

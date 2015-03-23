@@ -270,7 +270,7 @@ public class SurveyDownloadService extends IntentService {
                 // Display cascade-specific error message. If at any point we include support for
                 // more resource types, this message should be accordingly customized.
                 displayErrorNotification(ConstantUtil.NOTIFICATION_RESOURCE_ERROR,
-                        getString(R.string.error_missing_resources));
+                        getString(R.string.error_missing_cascade));
                 Log.e(TAG, "Could not download resource " + resource + " for survey " + sid, e);
             }
         }

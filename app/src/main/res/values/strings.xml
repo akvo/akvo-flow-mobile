@@ -175,7 +175,7 @@
     <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>
     <string name="last_response">Last Response:</string>
-    <string name="error_missing_resources">Survey resources are not fully downloaded</string>
+    <string name="error_missing_cascade">Cascade files are not downloaded</string>
     <!-- Form & transmission status -->
     <string name="status_queued">Queued</string>
     <string name="status_in_progress">In Progress</string>

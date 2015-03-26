@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -24,8 +24,12 @@ import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.akvo.flow.dao.SurveyDbAdapter;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * utilities for checking system state
@@ -170,6 +174,26 @@ public class StatusUtil {
         db.close();
 
         return serverBase;
+    }
+
+    /**
+     * Get the application (FLOW instance) id.
+     */
+    public static String getApplicationId(Context context) {
+        // Directly fetch the server from the properties file. A local serverBase found in the DB
+        // will cause a permanent mismatch for all surveys, since XML files will contain original application
+        String serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
+        try {
+            // Match instance name from server base, for example:
+            // https://akvoflow-X.appspot.com --> akvoflow-X
+            String host = new URL(serverBase).getHost();
+            if (!TextUtils.isEmpty(host) && host.contains(".")) {
+                return host.substring(0, host.indexOf("."));
+            }
+        } catch (MalformedURLException e) {
+            Log.e("getApplicationId() - ", e.getMessage());
+        }
+        return null;
     }
     
 }

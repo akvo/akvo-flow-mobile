@@ -174,7 +174,6 @@
   <string name="unknown">Donnée non nommée</string>
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
-  <string name="error_missing_resources">Les ressources de l\'enquêtes ne sont pas complètement téléchargées</string>
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>

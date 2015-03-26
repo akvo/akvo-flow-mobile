@@ -239,9 +239,10 @@ public class SurveyDownloadService extends IntentService {
 
     private void downloadResources(final String sid, final Set<String> resources) {
         databaseAdaptor.markSurveyHelpDownloaded(sid, false);
-        try {
-            for (String resource : resources) {
-                Log.i(TAG, "Downloading resource: " + resource);
+        boolean ok = true;
+        for (String resource : resources) {
+            Log.i(TAG, "Downloading resource: " + resource);
+            try {
                 // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
                 // Naive check to determine whether or not this is an absolute filename
                 if (resource.startsWith("http")) {
@@ -264,13 +265,18 @@ public class SurveyDownloadService extends IntentService {
                         Log.e(TAG, "Error deleting resource zip file");
                     }
                 }
+            } catch (Exception e) {
+                ok = false;
+                // Display cascade-specific error message. If at any point we include support for
+                // more resource types, this message should be accordingly customized.
+                displayErrorNotification(ConstantUtil.NOTIFICATION_RESOURCE_ERROR,
+                        getString(R.string.error_missing_cascade));
+                Log.e(TAG, "Could not download resource " + resource + " for survey " + sid, e);
             }
+        }
+        // Mark help (survey resources) as downloaded if ALL files succeeded.
+        if (ok) {
             databaseAdaptor.markSurveyHelpDownloaded(sid, true);
-        } catch (Exception e) {
-            databaseAdaptor.markSurveyHelpDownloaded(sid, false);
-            displayErrorNotification(ConstantUtil.NOTIFICATION_RESOURCE_ERROR,
-                    getString(R.string.error_missing_resources));
-            Log.e(TAG, "Could not download resources for survey : " + sid, e);
         }
     }
 

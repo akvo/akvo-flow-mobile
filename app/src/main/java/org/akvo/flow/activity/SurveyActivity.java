@@ -275,6 +275,9 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                     builder.append(answer.trim());
                 }
             }
+            // Make sure the value is not larger than 500 chars
+            builder.setLength(Math.min(builder.length(), 500));
+            
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
                     SurveyedLocaleMeta.NAME);
         }

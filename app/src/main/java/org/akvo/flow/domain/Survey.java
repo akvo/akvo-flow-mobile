@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -39,6 +39,7 @@ public class Survey {
     private boolean helpDownloaded;
     private String language;
     private String sourceSurveyId;// "Copied-from" survey Id
+    private String app;// FLOW instance ID
 
     public Survey() {
         questionGroups = new ArrayList<QuestionGroup>();
@@ -140,13 +141,21 @@ public class Survey {
     public void setQuestionGroups(List<QuestionGroup> questionGroups) {
         this.questionGroups = questionGroups;
     }
-    
+
     public void setSourceSurveyId(String sourceSurveyId) {
         this.sourceSurveyId = sourceSurveyId;
     }
-    
+
     public String getSourceSurveyId() {
         return this.sourceSurveyId;
+    }
+
+    public void setApp(String app) {
+        this.app = app;
+    }
+    
+    public String getApp() {
+        return this.app;
     }
 
     /**

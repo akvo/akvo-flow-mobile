@@ -177,7 +177,6 @@ Version</string>
   <string name="unknown">Punto sin nombre</string>
   <string name="last_modified">Última modificación:</string>
   <string name="last_response">Última respuesta:</string>
-  <string name="error_missing_resources">Los recursos de la encuesta no se han podido descargar</string>
   <!--Form & transmission status-->
   <string name="status_queued">En espera</string>
   <string name="status_in_progress">En curso</string>

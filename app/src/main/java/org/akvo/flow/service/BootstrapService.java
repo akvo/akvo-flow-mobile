@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -31,18 +31,21 @@ import java.util.zip.ZipInputStream;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Environment;
+import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 /**
@@ -67,6 +70,7 @@ public class BootstrapService extends IntentService {
     private static final String TAG = "BOOTSTRAP_SERVICE";
     public volatile static boolean isProcessing = false;
     private SurveyDbAdapter databaseAdapter;
+    private Handler mHandler;
 
     public BootstrapService() {
         super(TAG);
@@ -205,6 +209,15 @@ public class BootstrapService extends IntentService {
                     continue;
                 }
 
+                // Check form app id. Reject the form if it does not belong to the one set up
+                final String app = StatusUtil.getApplicationId(this);
+                final String formApp = loadedSurvey.getApp();
+                if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
+                    displayToast(getString(R.string.bootstrap_invalid_app));
+                    throw new IllegalArgumentException("Form belongs to a different instance." +
+                            " Expected: " + app + ". Got: " + formApp);
+                }
+
                 survey.setName(loadedSurvey.getName());
                 survey.setSurveyGroup(loadedSurvey.getSurveyGroup());
 
@@ -288,6 +301,7 @@ public class BootstrapService extends IntentService {
      */
     public void onCreate() {
         super.onCreate();
+        mHandler = new Handler();
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
@@ -299,6 +313,19 @@ public class BootstrapService extends IntentService {
     private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
         sendBroadcast(intentBroadcast);
+    }
+
+    /**
+     * Display a UI Toast using the Handler's thread (main thread)
+     * @param msg message to display
+     */
+    private void displayToast(final String msg) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(BootstrapService.this, msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }

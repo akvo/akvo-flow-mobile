@@ -1,6 +1,14 @@
 Akvo FLOW app release notes
 ===========================
 
+#ver 2.1.4
+Date: 2 April 2015
+
+New and noteworthy
+------------------
+* Form download process display more meaningfull error messages [#276]
+* Datapoint names are truncated if the resulting size is larger than 500 characters [#278]
+
 #ver 2.1.3
 Date: 17 March 2015
 

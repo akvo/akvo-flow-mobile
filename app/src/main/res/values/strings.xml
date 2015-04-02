@@ -96,6 +96,7 @@
     <string name="bootstrapstart">Loading survey data from SD card</string>
     <string name="bootstrapcomplete">Done loading data from SD card</string>
     <string name="bootstraperror">Error processing bootstrap zip file</string>
+    <string name="bootstrap_invalid_app">Error: Form doesn\'t belong to this FLOW instance</string>
     <string name="transmissionhist">Transmission History</string>
     <string name="transstartdate">Transmission Started:</string>
     <string name="transenddate">Transmission Finished:</string>
@@ -175,7 +176,7 @@
     <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>
     <string name="last_response">Last Response:</string>
-    <string name="error_missing_resources">Survey resources are not fully downloaded</string>
+    <string name="error_missing_cascade">Cascade files are not downloaded</string>
     <!-- Form & transmission status -->
     <string name="status_queued">Queued</string>
     <string name="status_in_progress">In Progress</string>

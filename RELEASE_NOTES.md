@@ -8,6 +8,7 @@ New and noteworthy
 ------------------
 * Form download process display more meaningfull error messages [#276]
 * Datapoint names are truncated if the resulting size is larger than 500 characters [#278]
+* Prevent form imports from the wrong instance [#242]
 
 #ver 2.1.3
 Date: 17 March 2015

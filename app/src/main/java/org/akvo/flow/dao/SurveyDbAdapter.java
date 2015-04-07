@@ -37,6 +37,7 @@ import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
@@ -1126,7 +1127,35 @@ public class SurveyDbAdapter {
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
         database.insert(Tables.SURVEY_GROUP, null, values);
     }
-    
+
+    public static Instance getInstance(Cursor cursor) {
+        return new Instance(
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.NAME)),
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.ALIAS)),
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.SERVER_BASE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_BUCKET)),
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_ACCESS_KEY_ID)),
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_SECRET_KEY)),
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.API_KEY))
+
+        );
+    }
+
+    public Cursor getInstance(String name) {
+        String where = null;
+        String[] selectionArgs = null;
+        if (!TextUtils.isEmpty(name)) {
+            where = InstanceColumns.NAME + "= ?";
+            selectionArgs = new String[] {name};
+        }
+
+        return database.query(Tables.INSTANCE, null, where, selectionArgs, null, null, InstanceColumns.NAME);
+    }
+
+    public Cursor getInstances() {
+        return getInstance("");
+    }
+
     public static SurveyGroup getSurveyGroup(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.NAME));

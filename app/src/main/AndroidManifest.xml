@@ -86,6 +86,11 @@
             android:launchMode="singleTop"
             android:configChanges="locale|layoutDirection" >
         </activity>
+        <activity
+            android:name=".activity.InstanceSetupActivity"
+            android:label="Instance Manager"
+            android:configChanges="locale|layoutDirection" >
+        </activity>
 
         <service android:name=".service.DataSyncService" />
         <service android:name=".service.SurveyDownloadService" />

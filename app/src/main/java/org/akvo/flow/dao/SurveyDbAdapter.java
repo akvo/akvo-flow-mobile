@@ -62,9 +62,10 @@ public class SurveyDbAdapter {
         String RESPONSE = "response";
         String USER = "user";
         String TRANSMISSION = "transmission";
-        String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
-        String RECORD = "record";// Introduced in Point Updates
-        String SYNC_TIME = "sync_time";// Introduced in Point Updates
+        String SURVEY_GROUP = "survey_group";
+        String RECORD = "record";
+        String SYNC_TIME = "sync_time";
+        String INSTANCE = "instance";
 
         String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
                 + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
@@ -77,12 +78,24 @@ public class SurveyDbAdapter {
                 + "survey.survey_id=survey_instance.survey_id";
     }
 
+    public interface InstanceColumns {
+        String _ID               = "_id";
+        String NAME              = "name";// Unique ID
+        String ALIAS             = "alias";// Friendly name
+        String AWS_BUCKET        = "aws_bucket";
+        String AWS_ACCESS_KEY_ID = "aws_access_key_id";
+        String AWS_SECRET_KEY    = "aws_secret_key";
+        String SERVER_BASE       = "server_base";
+        String API_KEY           = "api_key";
+    }
+
     public interface SurveyGroupColumns {
         String _ID                = "_id";
         String SURVEY_GROUP_ID    = "survey_group_id";
         String NAME               = "name";
         String REGISTER_SURVEY_ID = "register_survey_id";
         String MONITORED          = "monitored";
+        String INSTANCE           = "instance";
     }
     
     public interface RecordColumns {
@@ -93,12 +106,14 @@ public class SurveyDbAdapter {
         String LATITUDE           = "latitude";
         String LONGITUDE          = "longitude";
         String LAST_MODIFIED      = "last_modified";
+        String INSTANCE           = "instance";
     }
     
     public interface SyncTimeColumns {
         String _ID                 = "_id";
         String SURVEY_GROUP_ID    = "survey_group_id";
         String TIME               = "time";
+        String INSTANCE           = "instance";
     }
 
     /**
@@ -120,6 +135,7 @@ public class SurveyDbAdapter {
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
         String DURATION = "duration";
         String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
+        String INSTANCE = "instance";
     }
 
     public interface TransmissionColumns {
@@ -150,6 +166,7 @@ public class SurveyDbAdapter {
         String LANGUAGE = "language";
         String HELP_DOWNLOADED = "help_downloaded_flag";
         String DELETED = "deleted";
+        String INSTANCE = "instance";
     }
 
     public interface ResponseColumns {
@@ -161,11 +178,6 @@ public class SurveyDbAdapter {
         String INCLUDE = "include";
         String SCORED_VAL = "scored_val";
         String STRENGTH = "strength";
-    }
-
-    public interface PreferencesColumns {
-        String KEY = "key";
-        String VALUE = "value";
     }
 
     public interface SurveyInstanceStatus {
@@ -187,28 +199,12 @@ public class SurveyDbAdapter {
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
-    /**
-     * TODO: Double check these inserts, and use Constants!
-    private static final String[] DEFAULT_INSERTS = new String[] {
-            "INSERT INTO preferences VALUES('survey.language','')",
-            "INSERT INTO preferences VALUES('survey.languagespresent','')",
-            "INSERT INTO preferences VALUES('user.storelast','false')",
-            "INSERT INTO preferences VALUES('data.cellular.upload','true')",
-            "INSERT INTO preferences VALUES('user.lastuser.id','')",
-            "INSERT INTO preferences VALUES('location.sendbeacon','true')",
-            "INSERT INTO preferences VALUES('backend.server','')",
-            "INSERT INTO preferences VALUES('screen.keepon','true')",
-            "INSERT INTO preferences VALUES('survey.textsize','LARGE')",
-            "INSERT INTO preferences VALUES('" + ConstantUtil.MAX_IMG_SIZE + "',"
-                    + String.valueOf(ConstantUtil.IMAGE_SIZE_320_240) + ")"
-    };
-     */
-
     private static final String DATABASE_NAME = "surveydata";
 
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
     private static final int VER_FORM_SUBMITTER = 79;
-    private static final int DATABASE_VERSION = VER_FORM_SUBMITTER;
+    private static final int VER_SINGLE_APP = 80;
+    private static final int DATABASE_VERSION = VER_SINGLE_APP;
 
     private final Context context;
 
@@ -247,6 +243,7 @@ public class SurveyDbAdapter {
                     + SurveyColumns.LANGUAGE + " TEXT,"
                     + SurveyColumns.HELP_DOWNLOADED + " INTEGER NOT NULL DEFAULT 0,"
                     + SurveyColumns.DELETED + " INTEGER NOT NULL DEFAULT 0,"
+                    + SurveyColumns.INSTANCE + " TEXT,"
                     + "UNIQUE (" + SurveyColumns.SURVEY_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY_GROUP + " ("
@@ -255,6 +252,7 @@ public class SurveyDbAdapter {
                     + SurveyGroupColumns.NAME + " TEXT,"
                     + SurveyGroupColumns.REGISTER_SURVEY_ID + " TEXT,"
                     + SurveyGroupColumns.MONITORED + " INTEGER NOT NULL DEFAULT 0,"
+                    + SurveyGroupColumns.INSTANCE + " TEXT,"
                     + "UNIQUE (" + SurveyGroupColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY_INSTANCE + " ("
@@ -271,6 +269,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
                     + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
                     + SurveyInstanceColumns.SUBMITTER + " TEXT,"
+                    + SurveyInstanceColumns.INSTANCE + " TEXT,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -291,6 +290,7 @@ public class SurveyDbAdapter {
                     + RecordColumns.LATITUDE + " REAL,"// REFERENCES ...
                     + RecordColumns.LONGITUDE + " REAL,"// REFERENCES ...
                     + RecordColumns.LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0,"
+                    + RecordColumns.INSTANCE + " TEXT,"
                     + "UNIQUE (" + RecordColumns.RECORD_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.TRANSMISSION + " ("
@@ -306,7 +306,19 @@ public class SurveyDbAdapter {
                     + SyncTimeColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
                     + SyncTimeColumns.TIME + " TEXT,"
+                    + SyncTimeColumns.INSTANCE + " TEXT,"
                     + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
+
+            db.execSQL("CREATE TABLE " + Tables.INSTANCE + " ("
+                    + InstanceColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + InstanceColumns.NAME + " TEXT NOT NULL,"
+                    + InstanceColumns.ALIAS + " TEXT,"
+                    + InstanceColumns.SERVER_BASE + " TEXT NOT NULL,"
+                    + InstanceColumns.AWS_BUCKET + " TEXT NOT NULL,"
+                    + InstanceColumns.AWS_ACCESS_KEY_ID + " TEXT NOT NULL,"
+                    + InstanceColumns.AWS_SECRET_KEY + " TEXT NOT NULL,"
+                    + InstanceColumns.API_KEY + " TEXT NOT NULL,"
+                    + "UNIQUE (" + InstanceColumns.NAME + ") ON CONFLICT REPLACE)");
 
             createIndexes(db);
         }
@@ -323,9 +335,13 @@ public class SurveyDbAdapter {
             // the upgrade will end up in the current version.
             switch (version) {
                 case VER_LAUNCH:
+                    // Add form submitter
                     db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
                             + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
-                    version = DATABASE_VERSION;
+                    version = VER_FORM_SUBMITTER;
+                case VER_FORM_SUBMITTER:
+                    // TODO: Add 'instance' table, 'instance' columns in existing tables
+                    version = VER_SINGLE_APP;
             }
 
             if (version != DATABASE_VERSION) {
@@ -339,6 +355,7 @@ public class SurveyDbAdapter {
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
+                db.execSQL("DROP TABLE IF EXISTS " + Tables.INSTANCE);
 
                 onCreate(db);
             }

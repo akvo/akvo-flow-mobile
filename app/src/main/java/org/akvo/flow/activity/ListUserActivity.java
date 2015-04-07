@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -42,6 +42,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.Prefs;
 
 /**
  * This activity will list all the users in the database and present them in
@@ -154,12 +155,10 @@ public class ListUserActivity extends ActionBarActivity {
     }
 
     private void handleDelete(long id) {
-        String savedId = mDatabase.getPreference(ConstantUtil.LAST_USER_SETTING_KEY);
-        mDatabase.deleteUser(id);
-        if (savedId != null && savedId.equals(id)) {
-            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY, "");
+        if (id == Prefs.getLong(this, Prefs.KEY_USER_ID, -1)) {
+            Prefs.setLong(this, Prefs.KEY_USER_ID, -1);
         }
-
+        mDatabase.deleteUser(id);
         display();
     }
     
@@ -211,8 +210,7 @@ public class ListUserActivity extends ActionBarActivity {
             // Set the user in the App, and finish the Activity
             User user = (User) view.getTag();
             FlowApp.getApp().setUser(user);
-            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
-                    String.valueOf(user.getId()));// Save the last id for future sessions
+            Prefs.setLong(ListUserActivity.this, Prefs.KEY_USER_ID, user.getId());
             display();
             finish();
         }

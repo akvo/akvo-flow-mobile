@@ -26,8 +26,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.akvo.flow.dao.SurveyDbAdapter;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -141,22 +139,11 @@ public class StatusUtil {
      * @return true if the flag is enabled, false otherwise
      */
     private static boolean syncOver3G(Context context) {
-        SurveyDbAdapter db = new SurveyDbAdapter(context);
-        db.open();
-
-        String value = db.getPreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
-        boolean use3G = value != null && Boolean.valueOf(value);
-
-        db.close();
-
-        return use3G;
+        return Prefs.getBoolean(context, Prefs.KEY_DATA_ENABLED, Prefs.DEFAULT_DATA_ENABLED);
     }
 
     public static String getDeviceId(Context context) {
-        SurveyDbAdapter db = new SurveyDbAdapter(context).open();
-        String value = db.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-        db.close();
-        return value;
+        return Prefs.getString(context, Prefs.KEY_DEVICE_ID, "");
     }
 
     /**
@@ -166,13 +153,10 @@ public class StatusUtil {
      * @return server URL string
      */
     public static String getServerBase(Context context) {
-        SurveyDbAdapter db = new SurveyDbAdapter(context).open();
-        String serverBase = db.getPreference(ConstantUtil.SERVER_SETTING_KEY);
+        String serverBase =  Prefs.getString(context, Prefs.KEY_APP_SERVER, null);
         if (TextUtils.isEmpty(serverBase)) {
             serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
         }
-        db.close();
-
         return serverBase;
     }
 

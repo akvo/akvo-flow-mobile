@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,14 +16,13 @@
 
 package org.akvo.flow.activity;
 
-import java.util.HashMap;
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -35,11 +34,11 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
@@ -66,15 +65,12 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     private TextView maxImgSizeTextView;
     private TextView localeTextView;
 
-    private SurveyDbAdapter database;
-
     private LangsPreferenceData langsPrefData;
     private String[] langsSelectedNameArray;
     private boolean[] langsSelectedBooleanArray;
     private int[] langsSelectedMasterIndexArray;
 
     private String[] maxImgSizes;
-    private PropertyUtil props;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,10 +87,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         maxImgSizeTextView = (TextView) findViewById(R.id.max_img_size_txt);
         localeTextView = (TextView) findViewById(R.id.locale_name);
 
-        Resources res = getResources();
-        props = new PropertyUtil(res);
-
-        maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
+        maxImgSizes = getResources().getStringArray(R.array.max_image_size_pref);
 
         // Setup event listeners
         saveUserCheckbox.setOnCheckedChangeListener(this);
@@ -112,58 +105,35 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      * loads the preferences from the DB and sets their current value in the UI
      */
     private void populateFields() {
-        HashMap<String, String> settings = database.getPreferences();
-        String val = settings.get(ConstantUtil.USER_SAVE_SETTING_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            saveUserCheckbox.setChecked(true);
-        } else {
-            saveUserCheckbox.setChecked(false);
-        }
+        boolean keepLogin = Prefs.getBoolean(this, Prefs.KEY_KEEP_LOGIN, Prefs.DEFAULT_KEEP_LOGIN);
+        saveUserCheckbox.setChecked(keepLogin);
 
-        val = settings.get(ConstantUtil.SCREEN_ON_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            screenOnCheckbox.setChecked(true);
-        } else {
-            screenOnCheckbox.setChecked(false);
-        }
+        boolean screenOn = Prefs.getBoolean(this, Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_SCREEN_ON);
+        screenOnCheckbox.setChecked(screenOn);
 
-        val = settings.get(ConstantUtil.LOCATION_BEACON_SETTING_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            beaconCheckbox.setChecked(true);
-        } else {
-            beaconCheckbox.setChecked(false);
-        }
+        boolean sendBeacon = Prefs.getBoolean(this, Prefs.KEY_SEND_BEACONS, Prefs.DEFAULT_SEND_BEACONS);
+        beaconCheckbox.setChecked(sendBeacon);
 
-        val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
-        mobileDataCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
+        boolean cellData = Prefs.getBoolean(this, Prefs.KEY_DATA_ENABLED, Prefs.DEFAULT_DATA_ENABLED);
+        mobileDataCheckbox.setChecked(cellData);
 
-        val = settings.get(ConstantUtil.SURVEY_LANG_SETTING_KEY);
-        String langsPresentIndexes = settings.get(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
-        langsPrefData = LangsPreferenceUtil.createLangPrefData(this, val, langsPresentIndexes);
-
+        langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
+                Prefs.getString(this, Prefs.KEY_LANGUAGE, ""),
+                Prefs.getString(this, Prefs.KEY_LANGUAGES_PRESENT, ""));
         languageTextView.setText(ArrayPreferenceUtil.formSelectedItemString(
                 langsPrefData.getLangsSelectedNameArray(),
                 langsPrefData.getLangsSelectedBooleanArray()));
 
-        val = settings.get(ConstantUtil.SERVER_SETTING_KEY);
-        if (val != null && val.trim().length() > 0) {
-            serverTextView.setText(val);
-        } else {
-            serverTextView.setText(props.getProperty(ConstantUtil.SERVER_BASE));
+        String server = Prefs.getString(this, Prefs.KEY_APP_SERVER, null);
+        if (TextUtils.isEmpty(server)) {
+            server = new PropertyUtil(getResources()).getProperty(ConstantUtil.SERVER_BASE);
         }
+        serverTextView.setText(server);
 
-        val = settings.get(ConstantUtil.MAX_IMG_SIZE);
-        if (val != null && val.trim().length() > 0) {
-            maxImgSizeTextView.setText(maxImgSizes[Integer.parseInt(val)]);
-        } else {
-            maxImgSizeTextView.setText(maxImgSizes[0]);
-        }
+        int imgSize = Prefs.getInt(this, Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_MAX_IMG_SIZE);
+        maxImgSizeTextView.setText(maxImgSizes[imgSize]);
 
-        val = settings.get(ConstantUtil.DEVICE_IDENT_KEY);
-        if (val != null) {
-            identTextView.setText(val);
-        }
-
+        identTextView.setText(Prefs.getString(this, Prefs.KEY_DEVICE_ID, ""));
         localeTextView.setText(FlowApp.getApp().getAppDisplayLanguage());
     }
 
@@ -173,14 +143,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     public void onResume() {
         super.onResume();
-        database = new SurveyDbAdapter(this);
-        database.open();
         populateFields();
-    }
-
-    public void onPause() {
-        database.close();
-        super.onPause();
     }
 
     /**
@@ -189,6 +152,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     @Override
     public void onClick(View v) {
+        final Context context = this;
         switch (v.getId()) {
             case R.id.pref_surveylang:
                 langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
@@ -199,12 +163,9 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                         langsSelectedBooleanArray,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int clicked) {
-                                database.savePreference(
-                                        ConstantUtil.SURVEY_LANG_SETTING_KEY,
-                                        LangsPreferenceUtil
-                                                .formLangPreferenceString(langsSelectedBooleanArray,
-                                                        langsSelectedMasterIndexArray)
-                                );
+                                String lang = LangsPreferenceUtil.formLangPreferenceString(
+                                        langsSelectedBooleanArray, langsSelectedMasterIndexArray);
+                                Prefs.setString(context, Prefs.KEY_LANGUAGE, lang);
 
                                 languageTextView.setText(ArrayPreferenceUtil
                                         .formSelectedItemString(langsSelectedNameArray,
@@ -233,11 +194,9 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            String s = StringUtil.ControlToSPace(inputView
-                                                    .getText().toString());
                                             // drop any control chars, especially tabs
-                                            database.savePreference(
-                                                    ConstantUtil.SERVER_SETTING_KEY, s);
+                                            String s = StringUtil.ControlToSPace(inputView.getText().toString());
+                                            Prefs.setString(context, Prefs.KEY_APP_SERVER, s);
                                             serverTextView.setText(StatusUtil.getServerBase(PreferencesActivity.this));
                                         }
                                     }
@@ -261,13 +220,10 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                                         new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                String s = StringUtil.ControlToSPace(inputView
-                                                        .getText().toString());
-                                                // drop any control chars,
-                                                // especially tabs
+                                                String s = StringUtil.ControlToSPace(inputView.getText().toString());
+                                                // drop any control chars, especially tabs
                                                 identTextView.setText(s);
-                                                database.savePreference(
-                                                        ConstantUtil.DEVICE_IDENT_KEY, s);
+                                                Prefs.setString(context, Prefs.KEY_DEVICE_ID, s);
                                                 // Trigger the SurveySync Service, in order to force
                                                 // a backend connection with the new Device ID
                                                 startService(new Intent(PreferencesActivity.this,
@@ -280,64 +236,48 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                 );
                 break;
             case R.id.pref_resize:
-                String[] keys = new String[maxImgSizes.length];
-                for (int i = 0; i < maxImgSizes.length; i++) {
-                    keys[i] = String.valueOf(i);
-                }
-                showPreferenceDialogBase(R.string.resize_large_images,
-                        ConstantUtil.MAX_IMG_SIZE,
-                        keys, maxImgSizes, maxImgSizeTextView);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle(R.string.resize_large_images).setItems(maxImgSizes,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Prefs.setInt(context, Prefs.KEY_MAX_IMG_SIZE, which);
+                                maxImgSizeTextView.setText(maxImgSizes[which]);
+                                if (dialog != null) {
+                                    dialog.dismiss();
+                                }
+                            }
+                        }
+                );
+                builder.show();
                 break;
         }
     }
 
     /**
-     * displays a dialog that allows the user to choose a setting from a string
-     * array
-     *
-     * @param titleId        - resource id of dialog title
-     * @param settingKey     - key of setting to edit
-     * @param keys           - string array containing keys (to be stored in the DB)
-     * @param values         - string array containing values (text mapping of the key)
-     * @param currentValView - view to update with value selected
-     */
-    private void showPreferenceDialogBase(int titleId, final String settingKey,
-            final String[] keys, final String[] values, final TextView currentValView) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(titleId).setItems(values,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        database.savePreference(settingKey, keys[which]);
-                        currentValView.setText(values[which]);
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
-                    }
-                }
-        );
-        builder.show();
-    }
-
-    /**
-     * saves the value of the checkbox to the database
+     * Saves the value of the checkbox to the preferences
      */
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView == saveUserCheckbox) {
-            database.savePreference(ConstantUtil.USER_SAVE_SETTING_KEY, "" + isChecked);
-        } else if (buttonView == beaconCheckbox) {
-            database.savePreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY, "" + isChecked);
-            if (isChecked) {
-                // if the option changed, kick the service so it reflects the change
-                startService(new Intent(this, LocationService.class));
-            } else {
-                stopService(new Intent(this, LocationService.class));
-            }
-        } else if (buttonView == screenOnCheckbox) {
-            database.savePreference(ConstantUtil.SCREEN_ON_KEY, "" + isChecked);
-        } else if (buttonView == mobileDataCheckbox) {
-            database.savePreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY, "" + isChecked);
+        switch (buttonView.getId()) {
+            case R.id.lastusercheckbox:
+                Prefs.setBoolean(this, Prefs.KEY_KEEP_LOGIN, isChecked);
+                break;
+            case R.id.beaconcheckbox:
+                Prefs.setBoolean(this, Prefs.KEY_SEND_BEACONS, isChecked);
+                if (isChecked) {
+                    // if the option changed, kick the service so it reflects the change
+                    startService(new Intent(this, LocationService.class));
+                } else {
+                    stopService(new Intent(this, LocationService.class));
+                }
+                break;
+            case R.id.screenoptcheckbox:
+                Prefs.setBoolean(this, Prefs.KEY_SCREEN_ON, isChecked);
+                break;
+            case R.id.uploadoptioncheckbox:
+                Prefs.setBoolean(this, Prefs.KEY_DATA_ENABLED, isChecked);
+                break;
         }
     }
 

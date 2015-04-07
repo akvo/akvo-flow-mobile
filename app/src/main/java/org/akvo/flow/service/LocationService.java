@@ -29,10 +29,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.HttpUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 
 /**
@@ -68,33 +67,19 @@ public class LocationService extends Service {
         // we only need to check this on command start since we'll explicitly
         // call endService if they change the preference to false after we're
         // already started
-        SurveyDbAdapter database = null;
-        final String server = StatusUtil.getServerBase(this);
-        try {
-            database = new SurveyDbAdapter(this);
-
-            database.open();
-            String val = database.getPreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY);
-            if (val != null) {
-                sendBeacon = Boolean.parseBoolean(val);
-            }
-        } finally {
-            if (database != null) {
-                database.close();
-            }
-        }
+        sendBeacon = Prefs.getBoolean(this, Prefs.KEY_SEND_BEACONS, Prefs.DEFAULT_SEND_BEACONS);
         // Safe to lazy initialize the static field, since this method
         // will always be called in the Main Thread
         if (timer == null && sendBeacon) {
             timer = new Timer(true);
             timer.scheduleAtFixedRate(new TimerTask() {
-
                 @Override
                 public void run() {
                     if (sendBeacon && StatusUtil.hasDataConnection(LocationService.this)) {
                         String provider = locMgr.getBestProvider(locationCriteria, true);
                         if (provider != null) {
-                            sendLocation(server, locMgr.getLastKnownLocation(provider));
+                            sendLocation(StatusUtil.getServerBase(LocationService.this),
+                                    locMgr.getLastKnownLocation(provider));
                         }
                     }
                 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -39,6 +39,7 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 
 /**
@@ -95,7 +96,7 @@ public class ExceptionReportingService extends Service {
         try {
             database = new SurveyDbAdapter(this);
             database.open();
-            deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
+            deviceId = Prefs.getString(this, Prefs.KEY_DEVICE_ID, "");
             version = PlatformUtil.getVersionName(this);
             phoneNumber = StatusUtil.getPhoneNumber(this);
             imei = StatusUtil.getImei(this);

@@ -45,6 +45,7 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.Prefs;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well
@@ -60,7 +61,6 @@ public class SurveyDbAdapter {
         String SURVEY_INSTANCE = "survey_instance";
         String RESPONSE = "response";
         String USER = "user";
-        String PREFERENCES = "preferences";
         String TRANSMISSION = "transmission";
         String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
         String RECORD = "record";// Introduced in Point Updates
@@ -189,7 +189,6 @@ public class SurveyDbAdapter {
 
     /**
      * TODO: Double check these inserts, and use Constants!
-     */
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
             "INSERT INTO preferences VALUES('survey.languagespresent','')",
@@ -203,6 +202,7 @@ public class SurveyDbAdapter {
             "INSERT INTO preferences VALUES('" + ConstantUtil.MAX_IMG_SIZE + "',"
                     + String.valueOf(ConstantUtil.IMAGE_SIZE_320_240) + ")"
     };
+     */
 
     private static final String DATABASE_NAME = "surveydata";
 
@@ -302,10 +302,6 @@ public class SurveyDbAdapter {
                     + TransmissionColumns.END_DATE + " INTEGER,"
                     + "UNIQUE (" + TransmissionColumns.FILENAME + ") ON CONFLICT REPLACE)");
 
-            db.execSQL("CREATE TABLE " + Tables.PREFERENCES + " ("
-                    + PreferencesColumns.KEY + " TEXT PRIMARY KEY,"
-                    + PreferencesColumns.VALUE + " TEXT)");
-
             db.execSQL("CREATE TABLE " + Tables.SYNC_TIME + " ("
                     + SyncTimeColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
@@ -313,9 +309,6 @@ public class SurveyDbAdapter {
                     + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
             createIndexes(db);
-            for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
-                db.execSQL(DEFAULT_INSERTS[i]);
-            }
         }
 
         @Override
@@ -341,7 +334,6 @@ public class SurveyDbAdapter {
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.SYNC_TIME);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.USER);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_GROUP);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
@@ -395,45 +387,6 @@ public class SurveyDbAdapter {
                     + "(" + SurveyInstanceColumns.SUBMITTED_DATE +")");
         }
 
-        /**
-         * returns the value of a single setting identified by the key passed in
-         */
-        public String findPreference(SQLiteDatabase db, String key) {
-            String value = null;
-            Cursor cursor = db.query(Tables.PREFERENCES,
-                    new String[] {
-                        PreferencesColumns.KEY,
-                        PreferencesColumns.VALUE
-                    }, PreferencesColumns.KEY + " = ?",
-                    new String[] {
-                        key
-                    }, null, null, null);
-            if (cursor != null) {
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    value = cursor.getString(cursor.getColumnIndexOrThrow(PreferencesColumns.VALUE));
-                }
-                cursor.close();
-            }
-            return value;
-        }
-
-        /**
-         * persists setting to the db
-         */
-        public void savePreference(SQLiteDatabase db, String key, String value) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(PreferencesColumns.VALUE, value);
-            int updated = db.update(Tables.PREFERENCES, updatedValues, PreferencesColumns.KEY
-                    + " = ?",
-                    new String[] {
-                        key
-                    });
-            if (updated <= 0) {
-                updatedValues.put(PreferencesColumns.KEY, key);
-                db.insert(Tables.PREFERENCES, null, updatedValues);
-            }
-        }
     }
 
     /**
@@ -869,42 +822,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * returns the value of a single setting identified by the key passed in
-     */
-    public String getPreference(String key) {
-        return databaseHelper.findPreference(database, key);
-    }
-
-    /**
-     * Lists all settings from the database
-     */
-    public HashMap<String, String> getPreferences () {
-        HashMap<String, String> settings = new HashMap<String, String>();
-        Cursor cursor = database.query(Tables.PREFERENCES, new String[] {
-                PreferencesColumns.KEY, PreferencesColumns.VALUE
-        }, null, null, null, null, null);
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                do {
-                    settings.put(cursor.getString(cursor
-                            .getColumnIndexOrThrow(PreferencesColumns.KEY)), cursor
-                            .getString(cursor.getColumnIndexOrThrow(PreferencesColumns.VALUE)));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return settings;
-    }
-
-    /**
-     * persists setting to the db
-     */
-    public void savePreference(String key, String value) {
-        databaseHelper.savePreference(database, key, value);
-    }
-
-    /**
      * deletes all the surveys from the database
      */
     public void deleteAllSurveys() {
@@ -1092,7 +1009,7 @@ public class SurveyDbAdapter {
         executeSql("DELETE FROM " + Tables.SURVEY);
         executeSql("DELETE FROM " + Tables.SURVEY_GROUP);
         executeSql("DELETE FROM " + Tables.USER);
-        executeSql("UPDATE preferences SET value = '' WHERE key = 'user.lastuser.id'");
+        Prefs.setLong(context, Prefs.KEY_USER_ID, -1);
     }
 
     /**
@@ -1162,8 +1079,8 @@ public class SurveyDbAdapter {
             }
         }
 
-        String langsSelection = getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
-        String langsPresentIndexes = getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
+        String langsSelection = Prefs.getString(context, Prefs.KEY_LANGUAGE, "");
+        String langsPresentIndexes = Prefs.getString(context, Prefs.KEY_LANGUAGES_PRESENT, "");
 
         HashSet<String> langsSelectionSet = stringToSet(langsSelection);
         HashSet<String> langsPresentIndexesSet = stringToSet(langsPresentIndexes);
@@ -1180,9 +1097,8 @@ public class SurveyDbAdapter {
         String newLangsSelection = setToString(langsSelectionSet);
         String newLangsPresentIndexes = setToString(langsPresentIndexesSet);
 
-        savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY, newLangsSelection);
-        savePreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY,
-                newLangsPresentIndexes);
+        Prefs.setString(context, Prefs.KEY_LANGUAGE, newLangsSelection);
+        Prefs.setString(context, Prefs.KEY_LANGUAGES_PRESENT, newLangsPresentIndexes);
     }
     
     public void addSurveyGroup(SurveyGroup surveyGroup) {

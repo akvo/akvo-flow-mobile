@@ -54,6 +54,7 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
@@ -298,7 +299,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
         super.onResume();
         mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
-        if (Boolean.valueOf(mDatabase.getPreference(ConstantUtil.SCREEN_ON_KEY))) {
+        if (Prefs.getBoolean(this, Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_SCREEN_ON)) {
             mPager.setKeepScreenOn(true);
         }
     }
@@ -367,8 +368,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private void displayLanguagesDialog() {
         // TODO: language management should be simplified
         LangsPreferenceData langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
-                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY),
-                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY));
+                Prefs.getString(this, Prefs.KEY_LANGUAGE, ""),
+                Prefs.getString(this, Prefs.KEY_LANGUAGES_PRESENT, ""));
 
         final String[] langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
         final boolean[] langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
@@ -382,7 +383,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                             dialog.dismiss();
                         }
 
-                        mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
+                        Prefs.setString(SurveyActivity.this, Prefs.KEY_LANGUAGE,
                                 LangsPreferenceUtil.formLangPreferenceString(
                                         langsSelectedBooleanArray,
                                         langsSelectedMasterIndexArray));
@@ -412,12 +413,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 String filename = PlatformUtil.uuid() + fileSuffix;
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
-                int maxImgSize = ConstantUtil.IMAGE_SIZE_320_240;
-                String maxImgSizePref = mDatabase.getPreference(ConstantUtil.MAX_IMG_SIZE);
-                if (!TextUtils.isEmpty(maxImgSizePref)) {
-                    maxImgSize = Integer.valueOf(maxImgSizePref);
-                }
-
+                int maxImgSize = Prefs.getInt(this, Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_MAX_IMG_SIZE);
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(), maxImgSize)) {
                     Log.i(TAG, "Image resized to: " +
                             getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize]);
@@ -453,8 +449,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     private void loadLanguages() {
-        String langsSelection = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
-        String langsPresentIndexes = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
+        String langsSelection = Prefs.getString(this, Prefs.KEY_LANGUAGE, "");
+        String langsPresentIndexes = Prefs.getString(this, Prefs.KEY_LANGUAGES_PRESENT, "");
         LangsPreferenceData langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
                 langsSelection, langsPresentIndexes);
         mLanguages = LangsPreferenceUtil.getSelectedLangCodes(this,

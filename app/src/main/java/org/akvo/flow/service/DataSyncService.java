@@ -42,6 +42,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
@@ -289,8 +290,8 @@ public class DataSyncService extends IntentService {
         if (data != null) {
             if (data.moveToFirst()) {
                 Log.i(TAG, "There is data to send. Forming contents");
-                String deviceIdentifier = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-                if (deviceIdentifier == null) {
+                String deviceIdentifier = Prefs.getString(this, Prefs.KEY_DEVICE_ID, "");
+                if (TextUtils.isEmpty(deviceIdentifier)) {
                     deviceIdentifier = "unset";
                 } else {
                     deviceIdentifier = cleanVal(deviceIdentifier);

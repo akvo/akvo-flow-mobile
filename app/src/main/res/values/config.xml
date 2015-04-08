@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="flowServicesUrl" type="string">http://services.akvoflow.org</item>
+</resources>

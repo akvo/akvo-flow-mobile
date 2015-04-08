@@ -35,9 +35,12 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import org.akvo.flow.R;
+import org.akvo.flow.api.parser.json.InstanceParser;
 import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
 import org.akvo.flow.api.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.HttpException.Status;
@@ -46,17 +49,20 @@ import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
+import org.json.JSONException;
 
 public class FlowApi {
     private static final String TAG = FlowApi.class.getSimpleName();
     
     private static final String BASE_URL;
+    private static final String FLOW_SERVICES_URL;
     private static final String API_KEY;
     private static final String PHONE_NUMBER;
     private static final String IMEI;
 
     static {
         Context context = FlowApp.getApp();
+        FLOW_SERVICES_URL = context.getResources().getString(R.string.flowServicesUrl);
         BASE_URL = StatusUtil.getServerBase(context);
         API_KEY = getApiKey(context);
         PHONE_NUMBER = StatusUtil.getPhoneNumber(context);
@@ -85,6 +91,19 @@ public class FlowApi {
         }
         
         return null;
+    }
+
+    public Instance getInstance(String appcode) throws IOException, HttpException {
+        // TODO: validate appcode using the control digit
+        final String url = FLOW_SERVICES_URL + String.format(Path.APP_CONFIG, appcode);
+
+        String response = HttpUtil.httpGet(url);
+        try {
+            return new InstanceParser().parseResponse(response);
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+            throw new HttpException("Invalid JSON response", Status.MALFORMED_RESPONSE);
+        }
     }
 
     private static String URLEncode(String param) {
@@ -145,7 +164,11 @@ public class FlowApi {
     }
     
     interface Path {
+        // GAE endpoints
         String SURVEYED_LOCALE = "/surveyedlocale";
+
+        // FLOW services
+        String APP_CONFIG = "/appcode/appconfig/%s";
     }
     
     interface Param {

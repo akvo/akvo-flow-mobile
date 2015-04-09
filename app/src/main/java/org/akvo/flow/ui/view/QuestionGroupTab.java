@@ -109,15 +109,6 @@ public class QuestionGroupTab extends ScrollView {
         mContainer.addView(next);
     }
 
-    @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        // We set the ScrollView focusable in order to catch the focus when scrolling.
-        // This will prevent weird behaviors when errors are present in focused
-        // QuestionViews (scroll gets stuck at that position)
-        requestFocus();
-        super.onScrollChanged(l, t, oldl, oldt);
-    }
-
     public void notifyOptionsChanged() {
         for (QuestionView view : mQuestionViews) {
             view.notifyOptionsChanged();

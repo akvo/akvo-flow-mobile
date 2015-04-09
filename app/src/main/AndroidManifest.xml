@@ -54,7 +54,7 @@
         <activity
             android:name=".activity.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|locale|layoutDirection"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.ListUserActivity"
             android:configChanges="locale|layoutDirection"

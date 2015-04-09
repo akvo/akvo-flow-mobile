@@ -21,23 +21,18 @@ import android.database.Cursor;
 
 import org.akvo.flow.async.loader.base.DataLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.SurveyGroup;
 
 public class SurveyGroupLoader extends DataLoader<Cursor> {
-    private long mSurveyGroupId;
+    private String mAppId;
     
-    public SurveyGroupLoader(Context context, SurveyDbAdapter db) {
-        this(context, db, SurveyGroup.ID_NONE);
-    }
-    
-    public SurveyGroupLoader(Context context, SurveyDbAdapter db, long surveyGroupId) {
+    public SurveyGroupLoader(Context context, SurveyDbAdapter db, String appId) {
         super(context, db);
-        mSurveyGroupId = surveyGroupId;
+        mAppId = appId;
     }
 
     @Override
     protected Cursor loadData(SurveyDbAdapter database) {
-        return database.getSurveyGroup(mSurveyGroupId);
+        return database.getSurveyGroup(mAppId);
     }
 
 }

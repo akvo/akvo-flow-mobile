@@ -799,7 +799,7 @@ public class SurveyDbAdapter {
                 .getLanguage().toLowerCase() : ConstantUtil.ENGLISH_CODE);
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, surveyGroupId);
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, survey.isHelpDownloaded() ? 1 : 0);
-        //updatedValues.put(SurveyColumns., ConstantUtil.NOT_DELETED);
+        updatedValues.put(SurveyColumns.INSTANCE, survey.getAppId());
 
         if (cursor != null && cursor.getCount() > 0) {
             // if we found an item, it's an update, otherwise, it's an insert
@@ -1125,6 +1125,7 @@ public class SurveyDbAdapter {
         values.put(SurveyGroupColumns.NAME, surveyGroup.getName());
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
+        values.put(SurveyGroupColumns.INSTANCE, surveyGroup.getAppId());
         database.insert(Tables.SURVEY_GROUP, null, values);
     }
 
@@ -1173,25 +1174,15 @@ public class SurveyDbAdapter {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.NAME));
         String registerSurveyId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.REGISTER_SURVEY_ID));
+        String appId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.INSTANCE));
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.MONITORED)) > 0;
-        return new SurveyGroup(id, name, registerSurveyId, monitored);
+        return new SurveyGroup(id, name, registerSurveyId, monitored, appId);
     }
     
-    public Cursor getSurveyGroup(long id) {
-        String where = null;
-        String[] selectionArgs = null;
-        
-        if (id != SurveyGroup.ID_NONE) {
-            where = SurveyGroupColumns.SURVEY_GROUP_ID + "= ?";
-            selectionArgs = new String[] {String.valueOf(id)};
-        }
-        
-        return database.query(Tables.SURVEY_GROUP,
-                new String[] {
-                        SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
-                        SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
-                },
-                where, selectionArgs,
+    public Cursor getSurveyGroup(String appId) {
+        return database.query(Tables.SURVEY_GROUP, null,
+                SurveyGroupColumns.INSTANCE + "= ?",
+                new String[] {appId},
                 null, null, SurveyGroupColumns.NAME);
     }
     

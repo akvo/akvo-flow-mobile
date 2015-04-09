@@ -30,6 +30,11 @@ import org.akvo.flow.util.ConstantUtil;
  *
  */
 public class SurveyMetaParser {
+    private String mAppId;
+
+    public SurveyMetaParser(String appId) {
+        mAppId = appId;
+    }
 
     public Survey parse(String response) {
         String[] touple = response.split(",");
@@ -37,6 +42,7 @@ public class SurveyMetaParser {
             throw new IllegalArgumentException("Survey list response is in an unrecognized format");
         }
         Survey survey = new Survey();
+        survey.setAppId(mAppId);
         survey.setId(touple[Attr.ID]);
         survey.setName(touple[Attr.NAME]);
         survey.setLanguage(touple[Attr.LANGUAGE]);
@@ -47,7 +53,7 @@ public class SurveyMetaParser {
         String groupName = touple[Attr.GROUP_NAME];
         boolean monitored = Boolean.valueOf(touple[Attr.GROUP_MONITORED]);
         String registerSurveyId = touple[Attr.GROUP_REGISTRATION_SURVEY];
-        SurveyGroup group = new SurveyGroup(groupId, groupName, registerSurveyId, monitored);
+        SurveyGroup group = new SurveyGroup(groupId, groupName, registerSurveyId, monitored, mAppId);
         
         survey.setSurveyGroup(group);
         

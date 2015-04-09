@@ -44,29 +44,35 @@ import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.HttpException.Status;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.PropertyUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.json.JSONException;
 
 public class FlowApi {
     private static final String TAG = FlowApi.class.getSimpleName();
     
-    private static final String BASE_URL;
     private static final String FLOW_SERVICES_URL;
-    private static final String API_KEY;
     private static final String PHONE_NUMBER;
     private static final String IMEI;
+
+    private Instance mInstance;
+    private String mBaseUrl;
 
     static {
         Context context = FlowApp.getApp();
         FLOW_SERVICES_URL = context.getResources().getString(R.string.flowServicesUrl);
-        BASE_URL = StatusUtil.getServerBase(context);
-        API_KEY = getApiKey(context);
         PHONE_NUMBER = StatusUtil.getPhoneNumber(context);
         IMEI = StatusUtil.getImei(context);
+    }
+
+    public FlowApi(Instance instance) {
+        mInstance = instance;
+        mBaseUrl = Prefs.getString(FlowApp.getApp(), Prefs.KEY_APP_SERVER, null);
+        if (TextUtils.isEmpty(mBaseUrl)) {
+            mBaseUrl = mInstance.getServerBase();
+        }
     }
     
     public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
@@ -77,7 +83,7 @@ public class FlowApi {
                 + "&" + Param.SURVEY_GROUP + surveyGroup
                 + "&" + Param.TIMESTAMP + getTimestamp();
 
-        final String url = BASE_URL + Path.SURVEYED_LOCALE 
+        final String url = mBaseUrl + Path.SURVEYED_LOCALE
                 + "?" + query
                 //+ "&" + PARAM.HMAC + URLEncoder.encode(getAuthorization(query), "UTF-8");
                 + "&" + Param.HMAC + getAuthorization(query);
@@ -118,15 +124,10 @@ public class FlowApi {
         }
     }
 
-    private static String getApiKey(Context context) {
-        PropertyUtil props = new PropertyUtil(context.getResources());
-        return props.getProperty(ConstantUtil.API_KEY);
-    }
-    
     private String getAuthorization(String query) {
         String authorization = null;
         try {
-            SecretKeySpec signingKey = new SecretKeySpec(API_KEY.getBytes(), "HmacSHA1");
+            SecretKeySpec signingKey = new SecretKeySpec(mInstance.getApiKey().getBytes(), "HmacSHA1");
 
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(signingKey);

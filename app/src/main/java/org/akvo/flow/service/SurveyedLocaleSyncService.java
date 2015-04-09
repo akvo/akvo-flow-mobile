@@ -33,7 +33,9 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
@@ -54,9 +56,14 @@ public class SurveyedLocaleSyncService extends IntentService {
     
     @Override
     protected void onHandleIntent(Intent intent) {
+        Instance instance = FlowApp.getApp().getInstance();
+        if (instance == null) {
+            return;
+        }
+
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         int syncedRecords = 0;
-        FlowApi api = new FlowApi();
+        FlowApi api = new FlowApi(instance);
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         displayNotification(getString(R.string.syncing_records), 
                 getString(R.string.pleasewait), false);

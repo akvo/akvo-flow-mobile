@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -37,9 +36,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.LangsPreferenceData;
@@ -124,10 +121,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
                 langsPrefData.getLangsSelectedNameArray(),
                 langsPrefData.getLangsSelectedBooleanArray()));
 
-        String server = Prefs.getString(this, Prefs.KEY_APP_SERVER, null);
-        if (TextUtils.isEmpty(server)) {
-            server = new PropertyUtil(getResources()).getProperty(ConstantUtil.SERVER_BASE);
-        }
+        String server = StatusUtil.getServerBase(this);
         serverTextView.setText(server);
 
         int imgSize = Prefs.getInt(this, Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_MAX_IMG_SIZE);

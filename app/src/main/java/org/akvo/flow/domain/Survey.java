@@ -39,7 +39,7 @@ public class Survey {
     private boolean helpDownloaded;
     private String language;
     private String sourceSurveyId;// "Copied-from" survey Id
-    private String app;// FLOW instance ID
+    private String appId;// FLOW instance ID
 
     public Survey() {
         questionGroups = new ArrayList<QuestionGroup>();
@@ -150,12 +150,12 @@ public class Survey {
         return this.sourceSurveyId;
     }
 
-    public void setApp(String app) {
-        this.app = app;
+    public void setAppId(String app) {
+        this.appId = app;
     }
     
-    public String getApp() {
-        return this.app;
+    public String getAppId() {
+        return this.appId;
     }
 
     /**

@@ -40,8 +40,10 @@ import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.api.parser.csv.SurveyMetaParser;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
@@ -73,13 +75,15 @@ public class SurveyDownloadService extends IntentService {
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
 
     private SurveyDbAdapter databaseAdaptor;
+    private Instance mInstance;
 
     public SurveyDownloadService() {
         super(TAG);
     }
 
     public void onHandleIntent(Intent intent) {
-        if (StatusUtil.hasDataConnection(this)) {
+        mInstance = FlowApp.getApp().getInstance();
+        if (StatusUtil.hasDataConnection(this) && mInstance != null) {
             try {
                 databaseAdaptor = new SurveyDbAdapter(this);
                 databaseAdaptor.open();
@@ -165,7 +169,7 @@ public class SurveyDownloadService extends IntentService {
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
         final File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
 
-        S3Api s3Api = new S3Api(this);
+        S3Api s3Api = new S3Api(mInstance);
         s3Api.get(objectKey, file); // Download zip file
 
         FileUtil.extract(new ZipInputStream(new FileInputStream(file)),
@@ -258,7 +262,7 @@ public class SurveyDownloadService extends IntentService {
                     final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
                     final File resDir = FileUtil.getFilesDir(FileType.RES);
                     final File file = new File(resDir, filename);
-                    S3Api s3 = new S3Api(SurveyDownloadService.this);
+                    S3Api s3 = new S3Api(mInstance);
                     s3.syncFile(objectKey, file);
                     FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
                     if (!file.delete()) {
@@ -290,7 +294,7 @@ public class SurveyDownloadService extends IntentService {
                 final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id + "&" + FlowApi.getDeviceParams();
                 String response = HttpUtil.httpGet(url);
                 if (response != null) {
-                    surveys.addAll(new SurveyMetaParser().parseList(response, true));
+                    surveys.addAll(new SurveyMetaParser(mInstance.getName()).parseList(response, true));
                 }
             } catch (IllegalArgumentException | IOException e) {
                 Log.e(TAG, e.getMessage());
@@ -315,7 +319,7 @@ public class SurveyDownloadService extends IntentService {
             final String url = serverBase + SURVEY_LIST_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
             String response = HttpUtil.httpGet(url);
             if (response != null) {
-                surveys = new SurveyMetaParser().parseList(response);
+                surveys = new SurveyMetaParser(mInstance.getName()).parseList(response);
             }
         } catch (IllegalArgumentException | IOException e) {
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,

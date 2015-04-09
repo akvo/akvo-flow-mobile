@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StatusUtil;
 
@@ -53,14 +54,14 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        if (!StatusUtil.hasDataConnection(mContext)) {
+        if (!StatusUtil.hasDataConnection(mContext) || FlowApp.getApp().getInstance() == null) {
             Log.d(TAG, "No internet connection. Can't perform the requested operation");
             return false;
         }
 
         try {
             // Download resource and return success status
-            S3Api s3 = new S3Api(mContext);
+            S3Api s3 = new S3Api(FlowApp.getApp().getInstance());
             s3.get(ConstantUtil.S3_IMAGE_DIR + mFile.getName(), mFile);
             return true;
         } catch (IOException e) {

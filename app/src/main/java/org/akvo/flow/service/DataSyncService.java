@@ -29,6 +29,7 @@ import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
@@ -36,16 +37,14 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.Base64;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.Prefs;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import org.json.JSONArray;
@@ -55,9 +54,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,9 +62,6 @@ import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  *
@@ -91,12 +84,7 @@ public class DataSyncService extends IntentService {
     private static final String TAG = "SyncService";
     private static final String DELIMITER = "\t";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
-
-    private static final String SIGNING_KEY_PROP = "signingKey";
-    private static final String SIGNING_ALGORITHM = "HmacSHA1";
-
     private static final String SURVEY_DATA_FILE = "data.txt";
-    private static final String SIG_FILE_NAME = ".sig";
 
     // Sync constants
     private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification";
@@ -115,8 +103,8 @@ public class DataSyncService extends IntentService {
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
-    private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
+    private Instance mInstance;
 
     public DataSyncService() {
         super(TAG);
@@ -124,9 +112,13 @@ public class DataSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        mInstance = FlowApp.getApp().getInstance();
+        if (mInstance == null) {
+            return;
+        }
+
         Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
 
-        mProps = new PropertyUtil(getResources());
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -220,33 +212,11 @@ public class DataSyncService extends IntentService {
             FileOutputStream fout = new FileOutputStream(zipFile);
             CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
             ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
-
             writeTextToZip(zos, surveyBuf.toString(), SURVEY_DATA_FILE);
-            String signingKeyString = mProps.getProperty(SIGNING_KEY_PROP);
-            if (!StringUtil.isNullOrEmpty(signingKeyString)) {
-                MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
-                byte[] digest = sha1Digest.digest(surveyBuf.toString().getBytes("UTF-8"));
-                SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes("UTF-8"),
-                        SIGNING_ALGORITHM);
-                Mac mac = Mac.getInstance(SIGNING_ALGORITHM);
-                mac.init(signingKey);
-                byte[] hmac = mac.doFinal(digest);
-                String encodedHmac = Base64.encodeBytes(hmac);
-                writeTextToZip(zos, encodedHmac, SIG_FILE_NAME);
-            }
-
             final String checksum = "" + checkedOutStream.getChecksum().getValue();
             zos.close();
             Log.i(TAG, "Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
         } catch (IOException e) {
-            PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
-            zipFileData = null;
-        } catch (NoSuchAlgorithmException e) {
-            PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
-            zipFileData = null;
-        } catch (InvalidKeyException e) {
             PersistentUncaughtExceptionHandler.recordException(e);
             Log.e(TAG, e.getMessage());
             zipFileData = null;
@@ -500,7 +470,7 @@ public class DataSyncService extends IntentService {
             }
 
             final String objectKey = dir + fileName;
-            S3Api s3Api = new S3Api(this);
+            S3Api s3Api = new S3Api(mInstance);
             ok = s3Api.put(objectKey, file, contentType, isPublic);
             if (!ok && retries > 0) {
                 // If we have not expired all the retry attempts, try again.

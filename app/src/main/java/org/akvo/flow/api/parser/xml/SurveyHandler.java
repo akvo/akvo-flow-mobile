@@ -273,9 +273,10 @@ public class SurveyHandler extends DefaultHandler {
                 long sgid = Long.valueOf(attributes.getValue(SURVEY_GROUP_ID));
                 String sgname = attributes.getValue(SURVEY_GROUP_NAME);
                 String regform = attributes.getValue(REGISTRATION_SURVEY);
-                survey.setSurveyGroup(new SurveyGroup(sgid, sgname, regform, regform != null));
+                String appId = attributes.getValue(APP);
+                survey.setSurveyGroup(new SurveyGroup(sgid, sgname, regform, regform != null, appId));
             }
-            survey.setApp(attributes.getValue(APP));
+            survey.setAppId(attributes.getValue(APP));
         } else if (localName.equalsIgnoreCase(QUESTION_GROUP)) {
             currentQuestionGroup = new QuestionGroup();
             if (attributes.getValue(ORDER) != null) {

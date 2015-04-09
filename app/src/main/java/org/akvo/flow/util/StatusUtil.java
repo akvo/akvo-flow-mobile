@@ -26,6 +26,9 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.Instance;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -149,13 +152,11 @@ public class StatusUtil {
     /**
      * Get the specified server URL. If no custom server has been set (debug),
      * the default one will be returned.
-     * @param context
-     * @return server URL string
      */
     public static String getServerBase(Context context) {
         String serverBase =  Prefs.getString(context, Prefs.KEY_APP_SERVER, null);
-        if (TextUtils.isEmpty(serverBase)) {
-            serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
+        if (TextUtils.isEmpty(serverBase) && FlowApp.getApp().getInstance() != null) {
+            serverBase = FlowApp.getApp().getInstance().getServerBase();
         }
         return serverBase;
     }
@@ -163,10 +164,13 @@ public class StatusUtil {
     /**
      * Get the application (FLOW instance) id.
      */
-    public static String getApplicationId(Context context) {
+    public static String getApplicationId() {
         // Directly fetch the server from the properties file. A local serverBase found in the DB
         // will cause a permanent mismatch for all surveys, since XML files will contain original application
-        String serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
+        if (FlowApp.getApp().getInstance() == null) {
+            return null;
+        }
+        String serverBase = FlowApp.getApp().getInstance().getServerBase();
         try {
             // Match instance name from server base, for example:
             // https://akvoflow-X.appspot.com --> akvoflow-X

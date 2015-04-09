@@ -201,7 +201,8 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Instance instance = (Instance)view.getTag();
             FlowApp.getApp().setInstance(instance);
-            display(); //TODO: Finish activity?
+            display();
+            finish();
         }
 
     }

@@ -210,8 +210,8 @@ public class BootstrapService extends IntentService {
                 }
 
                 // Check form app id. Reject the form if it does not belong to the one set up
-                final String app = StatusUtil.getApplicationId(this);
-                final String formApp = loadedSurvey.getApp();
+                final String app = StatusUtil.getApplicationId();
+                final String formApp = loadedSurvey.getAppId();
                 if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
                     displayToast(getString(R.string.bootstrap_invalid_app));
                     throw new IllegalArgumentException("Form belongs to a different instance." +

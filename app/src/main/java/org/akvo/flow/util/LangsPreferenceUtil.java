@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -47,9 +47,6 @@ public class LangsPreferenceUtil {
 
     /**
      * returns an arrayList of language codes that are active.
-     * 
-     * @param bs
-     * @return
      */
     public static String[] getSelectedLangCodes(Context context, int[] indexes,
             boolean[] selectedItems, int codeResourceId) {
@@ -67,9 +64,6 @@ public class LangsPreferenceUtil {
     /**
      * forms a comma-delimited string of array index values used to persist the
      * selected items to the db.
-     * 
-     * @param
-     * @return
      */
     public static String formLangPreferenceString(boolean[] selectedItems,
             int[] langIndexes) {
@@ -125,7 +119,6 @@ public class LangsPreferenceUtil {
     }
 
     public static String[] determineLanguages(Context context, Survey survey) {
-        PropertyUtil props = new PropertyUtil(context.getResources());
         HashSet<String> langs = new HashSet<String>();
         // find languages in the survey
 

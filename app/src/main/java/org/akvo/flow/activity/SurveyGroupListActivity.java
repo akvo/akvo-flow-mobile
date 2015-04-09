@@ -45,6 +45,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyGroupLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
@@ -53,16 +54,12 @@ import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
-import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class SurveyGroupListActivity extends ActionBarActivity implements LoaderCallbacks<Cursor> {
     private static final String TAG = SurveyGroupListActivity.class.getSimpleName();
-    
-    // Loader IDs
-    private static final int ID_SURVEY_GROUP_LIST = 0;
 
     // Menu Item IDs
     private static final int ITEM_DELETE = 0;
@@ -91,13 +88,13 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         registerForContextMenu(mListView);
         
         mEmptyView.setText(R.string.loading);// Be friendly
-        init();// No external storage will finish the application
     }
     
     @Override
     public void onResume() {
         super.onResume();
         mDatabase.open();
+        init();// Check instance status, and start services
         loadData();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
@@ -131,7 +128,10 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
                     }
                 }, 
                 null);
+        } else if (FlowApp.getApp().getInstance() == null) {
+            startActivity(new Intent(this, InstanceSetupActivity.class));
         } else {
+            setTitle(FlowApp.getApp().getInstance().getAlias());
             startService(new Intent(this, SurveyDownloadService.class));
             startService(new Intent(this, LocationService.class));
             startService(new Intent(this, BootstrapService.class));
@@ -143,7 +143,9 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     }
 
     private void loadData() {
-        getSupportLoaderManager().restartLoader(ID_SURVEY_GROUP_LIST, null, this);
+        if (FlowApp.getApp().getInstance() != null) {
+            getSupportLoaderManager().restartLoader(0, null, this);
+        }
     }
 
     // ==================================== //
@@ -152,20 +154,12 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case ID_SURVEY_GROUP_LIST:
-                return new SurveyGroupLoader(this, mDatabase);
-        }
-        return null;
+        return new SurveyGroupLoader(this, mDatabase, FlowApp.getApp().getInstance().getName());
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        switch (loader.getId()) {
-            case ID_SURVEY_GROUP_LIST:
-                mAdapter.changeCursor(cursor);
-                break;
-        }
+        mAdapter.changeCursor(cursor);
     }
 
     @Override
@@ -302,5 +296,5 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
             loadData();
         }
     };
-    
+
 }

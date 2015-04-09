@@ -30,12 +30,14 @@ public class SurveyGroup implements Serializable {
     private String mName;
     private boolean mMonitored;
     private String mRegisterSurveyId;
+    private String mAppId;
 
-    public SurveyGroup (long id, String name, String registerSurveyId, boolean monitored) {
+    public SurveyGroup (long id, String name, String registerSurveyId, boolean monitored, String appId) {
         mId = id;
         mName = name;
         mRegisterSurveyId = registerSurveyId;
         mMonitored = monitored;
+        mAppId = appId;
     }
     
     public String getRegisterSurveyId() {
@@ -49,7 +51,11 @@ public class SurveyGroup implements Serializable {
     public String getName() {
         return mName;
     }
-    
+
+    public String getAppId() {
+        return mAppId;
+    }
+
     public boolean isMonitored() {
         return mMonitored;
     }

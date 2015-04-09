@@ -1128,6 +1128,19 @@ public class SurveyDbAdapter {
         database.insert(Tables.SURVEY_GROUP, null, values);
     }
 
+    public void addInstance(Instance instance) {
+        ContentValues values = new ContentValues();
+        values.put(InstanceColumns.NAME, instance.getName());
+        values.put(InstanceColumns.ALIAS, instance.getAlias());
+        values.put(InstanceColumns.SERVER_BASE, instance.getServerBase());
+        values.put(InstanceColumns.AWS_BUCKET, instance.getAWSBucket());
+        values.put(InstanceColumns.AWS_ACCESS_KEY_ID, instance.getAWSAccessKeyId());
+        values.put(InstanceColumns.AWS_SECRET_KEY, instance.getAWSSecretKey());
+        values.put(InstanceColumns.API_KEY, instance.getApiKey());
+
+        database.insert(Tables.INSTANCE, null, values);
+    }
+
     public static Instance getInstance(Cursor cursor) {
         return new Instance(
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.NAME)),

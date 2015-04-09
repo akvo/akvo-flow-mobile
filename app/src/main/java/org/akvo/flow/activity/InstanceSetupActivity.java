@@ -21,8 +21,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBarActivity;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,9 +36,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.async.loader.InstanceLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.util.PlatformUtil;
 
 /**
@@ -46,7 +52,7 @@ import org.akvo.flow.util.PlatformUtil;
  *
  * @author Christopher Fagiani
  */
-public class InstanceSetupActivity extends ActionBarActivity {
+public class InstanceSetupActivity extends ActionBarActivity  implements LoaderCallbacks<Instance> {
 
     private SurveyDbAdapter mDatabase;
     private InstanceListAdapter mAdapter;
@@ -109,6 +115,7 @@ public class InstanceSetupActivity extends ActionBarActivity {
 
     private void addInstance() {
         final EditText et = new EditText(this);
+        et.setInputType(InputType.TYPE_CLASS_NUMBER);
         et.setSingleLine();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -118,7 +125,13 @@ public class InstanceSetupActivity extends ActionBarActivity {
                 .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO
+                        String code = et.getText().toString();
+                        Toast.makeText(InstanceSetupActivity.this, "Loading (" + code + ") ...", Toast.LENGTH_LONG).show();
+
+                        Bundle args = new Bundle();
+                        args.putString("code", code);
+
+                        getSupportLoaderManager().restartLoader(0, args, InstanceSetupActivity.this);
                     }
                 })
                 .setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
@@ -127,6 +140,30 @@ public class InstanceSetupActivity extends ActionBarActivity {
                     }
                 });
         builder.show();
+    }
+
+    // ==================================== //
+    // ========= Loader Callbacks ========= //
+    // ==================================== //
+
+    @Override
+    public Loader<Instance> onCreateLoader(int id, Bundle args) {
+        return new InstanceLoader(this, args.getString("code"));
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Instance> loader, Instance instance) {
+        if (instance == null) {
+            Toast.makeText(this, "Error loading instance", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Toast.makeText(this, instance.toString(), Toast.LENGTH_LONG).show();
+        mDatabase.addInstance(instance);
+        display();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Instance> loader) {
     }
 
     class InstanceListAdapter extends CursorAdapter implements OnItemClickListener {

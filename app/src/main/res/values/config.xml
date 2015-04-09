@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="flowServicesUrl" type="string">http://services.akvoflow.org</item>
+    <!-- <item name="flowServicesUrl" type="string">http://services.akvoflow.org</item> -->
+    <item name="flowServicesUrl" type="string">http://192.168.1.234:3000</item>
 </resources>

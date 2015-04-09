@@ -43,13 +43,13 @@ public class InstanceParser {
     
     interface Attrs {
         // TODO: Validate names
-        String NAME              = "name";// Unique ID
+        String NAME              = "appId";// Unique ID
         String ALIAS             = "alias";// Friendly name
-        String AWS_BUCKET        = "aws_bucket";
-        String AWS_ACCESS_KEY_ID = "aws_access_key_id";
-        String AWS_SECRET_KEY    = "aws_secret_key";
-        String SERVER_BASE       = "server_base";
-        String API_KEY           = "api_key";
+        String AWS_BUCKET        = "s3bucket";
+        String AWS_ACCESS_KEY_ID = "access-key";
+        String AWS_SECRET_KEY    = "secret-key";
+        String SERVER_BASE       = "serverBase";
+        String API_KEY           = "apiKey";
     }
 
 }

@@ -85,17 +85,15 @@ public class FlowApp extends Application {
 
         SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this).open();
 
-        // Load user, if applies. First check if they want to keep users logged in
-        if (Prefs.getBoolean(this, Prefs.KEY_KEEP_LOGIN, Prefs.DEFAULT_KEEP_LOGIN)) {
-            long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
-            if (id != -1) {
-                Cursor cur = database.getUser(id);
-                if (cur != null && cur.getCount() > 0) {
-                    String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
-                    String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
-                    mUser = new User(id, userName, email);
-                    cur.close();
-                }
+        // Load user
+        long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
+        if (id != -1) {
+            Cursor cur = database.getUser(id);
+            if (cur != null && cur.getCount() > 0) {
+                String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
+                String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
+                mUser = new User(id, userName, email);
+                cur.close();
             }
         }
 

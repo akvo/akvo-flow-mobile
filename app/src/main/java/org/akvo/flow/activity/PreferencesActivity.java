@@ -52,7 +52,6 @@ import org.akvo.flow.util.ViewUtil;
  */
 public class PreferencesActivity extends Activity implements OnClickListener,
         OnCheckedChangeListener {
-    private CheckBox saveUserCheckbox;
     private CheckBox beaconCheckbox;
     private CheckBox screenOnCheckbox;
     private CheckBox mobileDataCheckbox;
@@ -74,7 +73,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.preferences);
 
-        saveUserCheckbox = (CheckBox) findViewById(R.id.lastusercheckbox);
         beaconCheckbox = (CheckBox) findViewById(R.id.beaconcheckbox);
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
         mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
@@ -87,7 +85,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         maxImgSizes = getResources().getStringArray(R.array.max_image_size_pref);
 
         // Setup event listeners
-        saveUserCheckbox.setOnCheckedChangeListener(this);
         beaconCheckbox.setOnCheckedChangeListener(this);
         screenOnCheckbox.setOnCheckedChangeListener(this);
         mobileDataCheckbox.setOnCheckedChangeListener(this);
@@ -102,9 +99,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      * loads the preferences from the DB and sets their current value in the UI
      */
     private void populateFields() {
-        boolean keepLogin = Prefs.getBoolean(this, Prefs.KEY_KEEP_LOGIN, Prefs.DEFAULT_KEEP_LOGIN);
-        saveUserCheckbox.setChecked(keepLogin);
-
         boolean screenOn = Prefs.getBoolean(this, Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_SCREEN_ON);
         screenOnCheckbox.setChecked(screenOn);
 
@@ -254,9 +248,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
-            case R.id.lastusercheckbox:
-                Prefs.setBoolean(this, Prefs.KEY_KEEP_LOGIN, isChecked);
-                break;
             case R.id.beaconcheckbox:
                 Prefs.setBoolean(this, Prefs.KEY_SEND_BEACONS, isChecked);
                 if (isChecked) {

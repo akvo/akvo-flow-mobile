@@ -12,30 +12,6 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/listitem_row_1"
-            android:padding="8dp"
-            android:gravity="center_vertical" >
-
-            <CheckBox
-                android:id="@+id/lastusercheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:saveEnabled="false"/>
-
-            <TextView
-                android:id="@+id/lastuserlabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/lastusercheckbox"
-                android:text="@string/savelastuserlabel"
-                android:textSize="20sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
             android:padding="8dp"
             android:background="@drawable/listitem_row_2"
             android:gravity="center_vertical" >

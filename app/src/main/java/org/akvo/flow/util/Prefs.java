@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 public class Prefs {
     public static final String KEY_LANGUAGE = "language";
     public static final String KEY_LANGUAGES_PRESENT = "languages_present";
-    public static final String KEY_KEEP_LOGIN = "keep_login";
     public static final String KEY_DATA_ENABLED = "data_enabled";
     public static final String KEY_USER_ID = "user_id";
     public static final String KEY_SEND_BEACONS = "send_beacons";
@@ -22,7 +21,6 @@ public class Prefs {
     public static final String KEY_DEVICE_ID = "device_id";
 
     // Default preferences
-    public static final boolean DEFAULT_KEEP_LOGIN = false;
     public static final boolean DEFAULT_DATA_ENABLED = true;
     public static final boolean DEFAULT_SEND_BEACONS = true;
     public static final boolean DEFAULT_SCREEN_ON = true;

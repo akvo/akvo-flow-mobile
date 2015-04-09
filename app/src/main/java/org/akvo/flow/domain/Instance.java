@@ -19,8 +19,6 @@ package org.akvo.flow.domain;
 import java.io.Serializable;
 
 public class Instance implements Serializable {
-    public static final long ID_NONE = -1;
-
     private String mName;
     private String mAlias;
     private String mServerBase;
@@ -71,5 +69,12 @@ public class Instance implements Serializable {
     @Override
     public String toString() {
         return mName;
+    }
+
+    @Override
+    public boolean equals(Object instance) {
+        return instance != null &&
+                instance instanceof Instance &&
+                ((Instance) instance).getName().equals(mName);
     }
 }

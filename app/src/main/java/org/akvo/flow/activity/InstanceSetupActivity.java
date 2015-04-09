@@ -39,19 +39,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.InstanceLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Instance;
 import org.akvo.flow.util.PlatformUtil;
 
-/**
- * This activity will list all the users in the database and present them in
- * list form. From the list they can be either edited or selected for use as the
- * "current user". New users can also be added to the system using this activity
- * by activating the menu.
- *
- * @author Christopher Fagiani
- */
 public class InstanceSetupActivity extends ActionBarActivity  implements LoaderCallbacks<Instance> {
 
     private SurveyDbAdapter mDatabase;
@@ -185,23 +178,17 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.InstanceColumns._ID));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.InstanceColumns.NAME));
-
-            //final Instance instance = ...
-            //view.setTag(instance);
+            final Instance instance = SurveyDbAdapter.getInstance(cursor);
+            view.setTag(instance);
 
             TextView nameView = (TextView) view.findViewById(R.id.itemheader);
-            nameView.setText(name);
+            nameView.setText(instance.getName());
 
             int colorRes = regularColor;
-            /*
-            final User loggedUser = FlowApp.getApp().getUser();
-            if (loggedUser != null && loggedUser.getId() == id) {
+            if (instance.equals(FlowApp.getApp().getInstance())) {
                 colorRes = selectedColor;
             }
             nameView.setTextColor(getResources().getColorStateList(colorRes));
-            */
 
             // Alternate background
             int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1
@@ -212,7 +199,9 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            //TODO
+            Instance instance = (Instance)view.getTag();
+            FlowApp.getApp().setInstance(instance);
+            display(); //TODO: Finish activity?
         }
 
     }

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
@@ -37,6 +38,7 @@ public class FlowApp extends Application {
 
     private Locale mLocale;
     private User mUser;
+    private Instance mInstance;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
 
     @Override
@@ -80,15 +82,56 @@ public class FlowApp extends Application {
             }
         }
         setAppLanguage(language, false);
-        loadLastUser();
+
+        SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this).open();
+
+        // Load user, if applies. First check if they want to keep users logged in
+        if (Prefs.getBoolean(this, Prefs.KEY_KEEP_LOGIN, Prefs.DEFAULT_KEEP_LOGIN)) {
+            long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
+            if (id != -1) {
+                Cursor cur = database.getUser(id);
+                if (cur != null && cur.getCount() > 0) {
+                    String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
+                    String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
+                    mUser = new User(id, userName, email);
+                    cur.close();
+                }
+            }
+        }
+
+        // Load instance
+        String appId = Prefs.getString(this, Prefs.KEY_APP_ID, "");
+        if (TextUtils.isEmpty(appId)) {
+            Cursor c = database.getInstance(appId);
+            if (c != null && c.getCount() > 0) {
+                mInstance = SurveyDbAdapter.getInstance(c);
+                c.close();
+            }
+        }
+
+        database.close();
     }
     
     public void setUser(User user) {
         mUser = user;
+        if (user != null) {
+            Prefs.setLong(this, Prefs.KEY_USER_ID, user.getId());
+        }
     }
     
     public User getUser() {
         return mUser;
+    }
+
+    public void setInstance(Instance instance) {
+        mInstance = instance;
+        if (instance != null) {
+            Prefs.setString(this, Prefs.KEY_APP_ID, instance.getName());
+        }
+    }
+
+    public Instance getInstance() {
+        return mInstance;
     }
     
     public void setSurveyGroupId(long surveyGroupId) {
@@ -108,30 +151,6 @@ public class FlowApp extends Application {
             lang = new String(strArray);
         }
         return lang;
-    }
-
-    /**
-     * Checks if the user preference to persist logged-in users is set and, if
-     * so, loads the last logged-in user from the DB
-     */
-    private void loadLastUser() {
-        // First check if they want to keep users logged in
-        if (Prefs.getBoolean(this, Prefs.KEY_KEEP_LOGIN, Prefs.DEFAULT_KEEP_LOGIN)) {
-            long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
-            if (id == -1) {
-                return;
-            }
-            SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
-            database.open();
-            Cursor cur = database.getUser(id);
-            if (cur != null && cur.getCount() > 0) {
-                String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
-                String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
-                mUser = new User(id, userName, email);
-                cur.close();
-            }
-            database.close();
-        }
     }
 
     public void setAppLanguage(String language, boolean requireRestart) {

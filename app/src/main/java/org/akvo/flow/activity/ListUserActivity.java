@@ -210,7 +210,6 @@ public class ListUserActivity extends ActionBarActivity {
             // Set the user in the App, and finish the Activity
             User user = (User) view.getTag();
             FlowApp.getApp().setUser(user);
-            Prefs.setLong(ListUserActivity.this, Prefs.KEY_USER_ID, user.getId());
             display();
             finish();
         }

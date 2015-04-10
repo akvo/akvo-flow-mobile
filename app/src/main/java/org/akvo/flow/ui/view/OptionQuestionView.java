@@ -542,7 +542,7 @@ public class OptionQuestionView extends QuestionView {
                                     .getType()) && mIdToValueMap.get(key)
                                     .equals(OTHER_TEXT))) {
                         mOptionGroup.check(key);
-                        if (mIdToValueMap.get(key).equals(OTHER_TEXT)) {
+                        if (mIdToValueMap.get(key).equals(OTHER_TEXT) && mQuestion.isAllowOther()) {
                             String txt = resp.getValue();
                             if (txt != null) {
                                 mOtherText.setText(txt);
@@ -562,9 +562,9 @@ public class OptionQuestionView extends QuestionView {
                     for (Integer key : mIdToValueMap.keySet()) {
                         if (valList.contains(mIdToValueMap.get(key))) {
                             mCheckBoxes.get(key.intValue()).setChecked(true);
-                        } else if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp
-                                .getType())
-                                && OTHER_TEXT.equals(mIdToValueMap.get(key))) {
+                        } else if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType()) &&
+                                OTHER_TEXT.equals(mIdToValueMap.get(key)) &&
+                                mQuestion.isAllowOther()) {
                             mCheckBoxes.get(key.intValue()).setChecked(true);
                             // the last token is always the Other text (even if
                             // it's blank)
@@ -577,7 +577,7 @@ public class OptionQuestionView extends QuestionView {
             }
             if (mSpinner != null && resp.getValue() != null) {
                 List<Option> options = mQuestion.getOptions();
-                if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType())) {
+                if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType()) && mQuestion.isAllowOther()) {
                     // since OTHER is the last option and the response is of
                     // OTHER type, select the last option in the spinner which
                     // is size +1 (accounting for the initial BLANK and the

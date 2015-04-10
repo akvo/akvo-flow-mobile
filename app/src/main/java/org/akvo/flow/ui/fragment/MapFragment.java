@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -35,6 +35,7 @@ import android.widget.FrameLayout;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.RecordListActivity;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -251,8 +252,11 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId,
-                ConstantUtil.ORDER_BY_NONE);
+        if (FlowApp.getApp().getInstance() == null) {
+            return null;
+        }
+        return new SurveyedLocaleLoader(getActivity(), mDatabase,
+                FlowApp.getApp().getInstance().getName(), mSurveyGroupId, ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override

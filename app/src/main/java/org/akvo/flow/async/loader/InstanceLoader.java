@@ -19,8 +19,7 @@ package org.akvo.flow.async.loader;
 import android.content.Context;
 import android.util.Log;
 
-import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.api.FlowServices;
 import org.akvo.flow.async.loader.base.AsyncLoader;
 import org.akvo.flow.domain.Instance;
 import org.akvo.flow.exception.HttpException;
@@ -47,7 +46,7 @@ public class InstanceLoader extends AsyncLoader<Instance> {
                 "akvoflowsandbox", "aaaa", "bbb", "ccc");
                 */
         try {
-            return new FlowApi(FlowApp.getApp().getInstance()).getInstance(mAppCode);
+            return new FlowServices().getInstance(mAppCode);
         } catch (IOException | HttpException e) {
             Log.e(TAG, e.getMessage());
             return null;

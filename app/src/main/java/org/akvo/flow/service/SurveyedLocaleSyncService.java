@@ -47,6 +47,7 @@ public class SurveyedLocaleSyncService extends IntentService {
     public static final String SURVEY_GROUP = "survey_group";
     
     private Handler mHandler = new Handler();
+    private Instance mInstance;
     
     public SurveyedLocaleSyncService() {
         super(TAG);
@@ -56,14 +57,14 @@ public class SurveyedLocaleSyncService extends IntentService {
     
     @Override
     protected void onHandleIntent(Intent intent) {
-        Instance instance = FlowApp.getApp().getInstance();
-        if (instance == null) {
+        mInstance = FlowApp.getApp().getInstance();
+        if (mInstance == null) {
             return;
         }
 
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         int syncedRecords = 0;
-        FlowApi api = new FlowApi(instance);
+        FlowApi api = new FlowApi(mInstance);
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         displayNotification(getString(R.string.syncing_records), 
                 getString(R.string.pleasewait), false);
@@ -110,13 +111,13 @@ public class SurveyedLocaleSyncService extends IntentService {
      */
     private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
             throws IOException, HttpException {
-        final String syncTime = database.getSyncTime(surveyGroupId);
+        final String syncTime = database.getSyncTime(surveyGroupId, mInstance.getName());
         Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         List<SurveyedLocale> locales = api.getSurveyedLocales(surveyGroupId, syncTime);
         if (locales != null) {
             for (SurveyedLocale locale : locales) {
-                database.syncSurveyedLocale(locale);
+                database.syncSurveyedLocale(locale, mInstance.getName());
                 records.add(locale.getId());
             }
         }

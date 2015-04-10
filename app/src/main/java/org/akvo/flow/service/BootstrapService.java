@@ -37,8 +37,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
@@ -71,12 +73,18 @@ public class BootstrapService extends IntentService {
     public volatile static boolean isProcessing = false;
     private SurveyDbAdapter databaseAdapter;
     private Handler mHandler;
+    private Instance mInstance;
 
     public BootstrapService() {
         super(TAG);
     }
 
     public void onHandleIntent(Intent intent) {
+        mInstance = FlowApp.getApp().getInstance();
+        if (mInstance == null) {
+            return;
+        }
+
         isProcessing = true;
         checkAndInstall();
         isProcessing = false;
@@ -182,7 +190,7 @@ public class BootstrapService extends IntentService {
                 if (surveyName.contains(".")) {
                     surveyName = surveyName.substring(0, surveyName.indexOf("."));
                 }
-                Survey survey = databaseAdapter.getSurvey(id);
+                Survey survey = databaseAdapter.getSurvey(id, mInstance.getName());
                 if (survey == null) {
                     survey = new Survey();
                     survey.setId(id);

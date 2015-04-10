@@ -36,7 +36,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.MapFragment;
@@ -59,6 +61,7 @@ public class RecordListActivity extends ActionBarActivity implements
     
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
+    private Instance mInstance;
 
     private ViewPager mPager;
     private TabsAdapter mAdapter;
@@ -69,12 +72,14 @@ public class RecordListActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record_list_activity);
 
+        mInstance = FlowApp.getApp().getInstance();
+
         // New record click listener
         findViewById(R.id.new_record).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Create new record and return the ID
-                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId(), mInstance.getName());
                 onRecordSelected(newLocaleId);
             }
         });

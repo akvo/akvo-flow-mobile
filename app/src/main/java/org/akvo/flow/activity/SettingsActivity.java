@@ -18,9 +18,12 @@ package org.akvo.flow.activity;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -51,6 +54,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ConstantUtil;
@@ -67,11 +71,23 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     private static final String LABEL = "label";
     private static final String DESC = "desc";
 
+    private Set<String> INSTANCE_DEPENDENT_OPTIONS;
+
+    private SettingsAdapter mAdapter;
+    private Instance mInstance;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settingsmenu);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        INSTANCE_DEPENDENT_OPTIONS = new HashSet<>(
+                Arrays.asList(new String[]{
+                        getString(R.string.sendoptlabel),
+                        getString(R.string.reloadsurveyslabel),
+                })
+        );
 
         ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
         Resources resources = getResources();
@@ -104,9 +120,17 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                 R.id.optionLabel, R.id.optionDesc
         };
 
+        mAdapter = new SettingsAdapter(this, list, R.layout.settingsdetail, fromKeys, toIds);
         ListView lv = (ListView)findViewById(android.R.id.list);
-        lv.setAdapter(new SettingsAdapter(this, list, R.layout.settingsdetail, fromKeys, toIds));
+        lv.setAdapter(mAdapter);
         lv.setOnItemClickListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mInstance = FlowApp.getApp().getInstance();
+        mAdapter.notifyDataSetInvalidated();
     }
 
     /**
@@ -183,10 +207,13 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                                 builder.setPositiveButton(R.string.okbutton,
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
+                                                if (mInstance == null) {
+                                                    return;
+                                                }
                                                 Context c = SettingsActivity.this;
                                                 SurveyDbAdapter database = new SurveyDbAdapter(c);
                                                 database.open();
-                                                String[] surveyIds = database.getSurveyIds();
+                                                String[] surveyIds = database.getSurveyIds(mInstance.getName());
                                                 database.deleteAllSurveys();
                                                 database.close();
                                                 Intent i = new Intent(c, SurveyDownloadService.class);
@@ -322,7 +349,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
         SurveyDbAdapter db = new SurveyDbAdapter(this);
         try {
             db.open();
-            return db.getUnsyncedTransmissions().size() > 0;
+            return db.getUnsyncedTransmissions(mInstance.getName()).size() > 0;
         } finally {
             if (db != null) {
                 db.close();
@@ -403,6 +430,13 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
+
+            TextView label = (TextView) view.findViewById(R.id.optionLabel);
+            if (mInstance == null && INSTANCE_DEPENDENT_OPTIONS.contains(label.getText().toString())) {
+                view.setEnabled(false);
+            } else {
+                view.setEnabled(true);
+            }
 
             // Alternate background
             int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;

@@ -24,15 +24,18 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 
 public class SurveyInstanceLoader extends DataLoader<Cursor> {
     private String mSurveyedLocaleId;
+    private String mAppId;
 
-    public SurveyInstanceLoader(Context context, SurveyDbAdapter db,  String surveyedLocaleId) {
+    public SurveyInstanceLoader(Context context, SurveyDbAdapter db, String surveyedLocaleId,
+            String appId) {
         super(context, db);
         mSurveyedLocaleId = surveyedLocaleId;
+        mAppId = appId;
     }
 
     @Override
     public Cursor loadData(SurveyDbAdapter database) {
-        return database.getSurveyInstances(mSurveyedLocaleId);
+        return database.getSurveyInstances(mSurveyedLocaleId, mAppId);
     }
 
 }

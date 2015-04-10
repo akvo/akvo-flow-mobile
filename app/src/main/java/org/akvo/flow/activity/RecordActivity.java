@@ -36,6 +36,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
@@ -61,6 +62,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     private static final int REQUEST_FORM = 0;
 
     private User mUser;
+    private Instance mInstance;
     private SurveyedLocale mRecord;
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
@@ -125,6 +127,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         mDatabase.deleteEmptySurveyInstances();
 
         mUser = FlowApp.getApp().getUser();
+        mInstance = FlowApp.getApp().getInstance();
         // Record might have changed while answering a registration survey
         String recordId = getIntent().getStringExtra(EXTRA_RECORD_ID);
         mRecord = mDatabase.getSurveyedLocale(recordId);
@@ -154,16 +157,16 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
         }
-        if (!mDatabase.getSurvey(surveyId).isHelpDownloaded()) {
+        if (!mDatabase.getSurvey(surveyId, mInstance.getName()).isHelpDownloaded()) {
             Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
             return;
         }
 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId,
+        long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId, mInstance.getName(),
                 SurveyInstanceStatus.SAVED);
         long instance = instances.length > 0 ? instances[0]
-                : mDatabase.createSurveyRespondent(surveyId, mUser, mRecord.getId());
+                : mDatabase.createSurveyRespondent(surveyId, mUser, mRecord.getId(), mInstance.getName());
 
         Intent i = new Intent(this, SurveyActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());

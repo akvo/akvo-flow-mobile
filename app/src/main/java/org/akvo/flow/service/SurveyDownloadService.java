@@ -91,7 +91,8 @@ public class SurveyDownloadService extends IntentService {
                 String[] surveyIds = intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
                 checkAndDownload(surveyIds);
             } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
+                e.printStackTrace();
+                Log.e(TAG, "onHandleIntent() - " + e.getMessage());
                 PersistentUncaughtExceptionHandler.recordException(e);
             } finally {
                 databaseAdaptor.close();
@@ -124,7 +125,7 @@ public class SurveyDownloadService extends IntentService {
         }
 
         // if there are surveys for this device, see if we need them
-        surveys = databaseAdaptor.checkSurveyVersions(surveys);
+        surveys = databaseAdaptor.checkSurveyVersions(surveys, mInstance.getName());
 
         if (!surveys.isEmpty()) {
             int synced = 0, failed = 0;
@@ -152,7 +153,7 @@ public class SurveyDownloadService extends IntentService {
 
         // now check if any previously downloaded surveys still need
         // don't have their help media pre-cached
-        surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
+        surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE, mInstance.getName());
         for (Survey survey : surveys) {
             if (!survey.isHelpDownloaded()) {
                 downloadResources(survey);
@@ -242,7 +243,8 @@ public class SurveyDownloadService extends IntentService {
     }
 
     private void downloadResources(final String sid, final Set<String> resources) {
-        databaseAdaptor.markSurveyHelpDownloaded(sid, false);
+        // TODO: We need to add the appID context, possibly by creating a subdirectory per instance.
+        databaseAdaptor.markSurveyHelpDownloaded(sid, mInstance.getName(), false);
         boolean ok = true;
         for (String resource : resources) {
             Log.i(TAG, "Downloading resource: " + resource);
@@ -280,7 +282,7 @@ public class SurveyDownloadService extends IntentService {
         }
         // Mark help (survey resources) as downloaded if ALL files succeeded.
         if (ok) {
-            databaseAdaptor.markSurveyHelpDownloaded(sid, true);
+            databaseAdaptor.markSurveyHelpDownloaded(sid, mInstance.getName(), true);
         }
     }
 
@@ -297,7 +299,7 @@ public class SurveyDownloadService extends IntentService {
                     surveys.addAll(new SurveyMetaParser(mInstance.getName()).parseList(response, true));
                 }
             } catch (IllegalArgumentException | IOException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, "getSurveyHeaders() - " + e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         String.format(getString(R.string.error_form_header), id));
                 PersistentUncaughtExceptionHandler.recordException(e);
@@ -324,7 +326,7 @@ public class SurveyDownloadService extends IntentService {
         } catch (IllegalArgumentException | IOException e) {
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
                     getString(R.string.error_assignment_read));
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "checkForSurveys() - " + e.getMessage());
             PersistentUncaughtExceptionHandler.recordException(e);
         }
         return surveys;

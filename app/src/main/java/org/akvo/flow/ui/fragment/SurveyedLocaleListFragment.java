@@ -18,6 +18,7 @@ package org.akvo.flow.ui.fragment;
 
 import java.util.Date;
 
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -196,7 +197,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
+        if (FlowApp.getApp().getInstance() == null) {
+            return null;
+        }
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, FlowApp.getApp().getInstance().getName(),
+                mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
     }
 
     @Override

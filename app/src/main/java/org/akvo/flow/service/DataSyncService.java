@@ -161,7 +161,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void checkExportedFiles() {
-        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.EXPORTED);
+        Cursor cursor = mDatabase.getSurveyInstancesByStatus(mInstance.getName(), SurveyInstanceStatus.EXPORTED);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
@@ -180,7 +180,7 @@ public class DataSyncService extends IntentService {
 
     private long[] getUnexportedSurveys() {
         long[] surveyInstanceIds = new long[0];// Avoid null cases
-        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED);
+        Cursor cursor = mDatabase.getSurveyInstancesByStatus(mInstance.getName(), SurveyInstanceStatus.SUBMITTED);
         if (cursor != null) {
             surveyInstanceIds = new long[cursor.getCount()];
             if (cursor.moveToFirst()) {
@@ -372,7 +372,7 @@ public class DataSyncService extends IntentService {
         // Sync missing files. This will update the status of the transmissions if necessary
         checkMissingFiles(serverBase);
 
-        List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
+        List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions(mInstance.getName());
 
         if (transmissions.isEmpty()) {
             return;
@@ -432,7 +432,7 @@ public class DataSyncService extends IntentService {
             isPublic = false;
         }
 
-        mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
+        mDatabase.updateTransmissionHistory(filename, mInstance.getName(), TransmissionStatus.IN_PROGRESS);
 
         boolean ok = sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES);
         final String destName = getDestName(filename);
@@ -447,9 +447,9 @@ public class DataSyncService extends IntentService {
         // TODO: Ensure no Exception can be thrown from previous steps, to avoid leaking IN_PROGRESS status
         if (ok) {
             // Mark everything completed
-            mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
+            mDatabase.updateTransmissionHistory(filename, mInstance.getName(), TransmissionStatus.SYNCED);
         } else {
-            mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+            mDatabase.updateTransmissionHistory(filename, mInstance.getName(), TransmissionStatus.FAILED);
         }
 
         return ok;
@@ -537,7 +537,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void setFileTransmissionFailed(String filename) {
-        int rows = mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+        int rows = mDatabase.updateTransmissionHistory(filename, mInstance.getName(), TransmissionStatus.FAILED);
         if (rows == 0) {
             // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
             mDatabase.createTransmission(-1, filename, TransmissionStatus.FAILED);

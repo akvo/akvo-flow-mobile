@@ -34,10 +34,12 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
@@ -99,6 +101,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
     private SurveyDbAdapter mDatabase;
+    private Instance mInstance;
 
     private String[] mLanguages;
 
@@ -108,6 +111,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
+
+        mInstance = FlowApp.getApp().getInstance();
 
         // Read all the params. Note that the survey instance id is now mandatory
         final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
@@ -149,7 +154,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
      * to 'clone' responses from the previous response.
      */
     private void displayPrefillDialog() {
-        final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId());
+        final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId(), mInstance.getName());
         if (lastSurveyInstance != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.prefill_title);
@@ -184,7 +189,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     private void loadSurvey(String surveyId) {
-        Survey surveyMeta = mDatabase.getSurvey(surveyId);
+        Survey surveyMeta = mDatabase.getSurvey(surveyId, mInstance.getName());
         InputStream in = null;
         try {
             // load from file
@@ -244,7 +249,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private void saveState() {
         if (!mReadOnly) {
             mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
-            mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
+            mDatabase.updateRecordModifiedDate(mRecordId, mInstance.getName(), System.currentTimeMillis());
 
             // Record meta-data, if applies
             if (!mSurveyGroup.isMonitored() ||
@@ -327,7 +332,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             subMenu.removeItem(R.id.clear);
         } else if (mSurveyGroup.isMonitored()) {
             // Add 'pre-fill' option, if applies
-            if (mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId()) != null) {
+            if (mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId(), mInstance.getName()) != null) {
                 subMenu.add(Menu.NONE, MENU_PREFILL, Menu.NONE, R.string.prefill_title);
             }
         }
@@ -358,7 +363,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
+                        mDatabase.deleteResponses(mSurveyInstanceId);
                         loadState();
                         spaceLeftOnCard();
                     }

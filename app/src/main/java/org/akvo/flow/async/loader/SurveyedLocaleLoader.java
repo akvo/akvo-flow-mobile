@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -24,25 +24,29 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleLoader extends DataLoader<Cursor> {
+    private String mAppId;
     private long mSurveyGroupId;
     private double mLatitude;
     private double mLongitude;
 
     private int mOrderBy;
 
-    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, long surveyGroupId,
-            double latitude, double longitude, int orderBy) {
+    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, String appId,
+            long surveyGroupId, double latitude, double longitude, int orderBy) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
+        mAppId = appId;
         mLatitude = latitude;
         mLongitude = longitude;
         mOrderBy = orderBy;
     }
     
-    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, long surveyGroupId, int orderBy) {
+    public SurveyedLocaleLoader(Context context, SurveyDbAdapter db, String appId,
+            long surveyGroupId, int orderBy) {
         super(context, db);
         mSurveyGroupId = surveyGroupId;
         mOrderBy = orderBy;
+        mAppId = appId;
     }
 
     @Override
@@ -53,9 +57,9 @@ public class SurveyedLocaleLoader extends DataLoader<Cursor> {
             case ConstantUtil.ORDER_BY_STATUS:
             case ConstantUtil.ORDER_BY_NAME:
                 // TODO: Compute filter here in the Loader, instead of the DB
-                return database.getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
+                return database.getFilteredSurveyedLocales(mSurveyGroupId, mAppId, mLatitude, mLongitude, mOrderBy);
             case ConstantUtil.ORDER_BY_NONE:
-                return database.getSurveyedLocales(mSurveyGroupId);
+                return database.getSurveyedLocales(mSurveyGroupId, mAppId);
             default:
                 return null;
         }

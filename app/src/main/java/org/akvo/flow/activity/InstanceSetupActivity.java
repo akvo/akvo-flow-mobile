@@ -182,7 +182,7 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
             view.setTag(instance);
 
             TextView nameView = (TextView) view.findViewById(R.id.itemheader);
-            nameView.setText(instance.getName());
+            nameView.setText(instance.getAppId());
 
             int colorRes = regularColor;
             if (instance.equals(FlowApp.getApp().getInstance())) {

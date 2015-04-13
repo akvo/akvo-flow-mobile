@@ -84,7 +84,7 @@ public class SurveyDbAdapter {
 
     public interface InstanceColumns {
         String _ID               = "_id";
-        String NAME              = "name";// Unique ID
+        String APP_ID            = "app_id";// Unique ID
         String ALIAS             = "alias";// Friendly name
         String AWS_BUCKET        = "aws_bucket";
         String AWS_ACCESS_KEY_ID = "aws_access_key_id";
@@ -99,7 +99,7 @@ public class SurveyDbAdapter {
         String NAME               = "name";
         String REGISTER_SURVEY_ID = "register_survey_id";
         String MONITORED          = "monitored";
-        String INSTANCE           = "instance";
+        String APP_ID             = "app_id";
     }
     
     public interface RecordColumns {
@@ -110,14 +110,14 @@ public class SurveyDbAdapter {
         String LATITUDE           = "latitude";
         String LONGITUDE          = "longitude";
         String LAST_MODIFIED      = "last_modified";
-        String INSTANCE           = "instance";
+        String APP_ID             = "app_id";
     }
     
     public interface SyncTimeColumns {
-        String _ID                 = "_id";
-        String SURVEY_GROUP_ID    = "survey_group_id";
-        String TIME               = "time";
-        String INSTANCE           = "instance";
+        String _ID             = "_id";
+        String SURVEY_GROUP_ID = "survey_group_id";
+        String TIME            = "time";
+        String APP_ID          = "app_id";
     }
 
     /**
@@ -139,7 +139,7 @@ public class SurveyDbAdapter {
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
         String DURATION = "duration";
         String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
-        String INSTANCE = "instance";
+        String APP_ID = "app_id";
     }
 
     public interface TransmissionColumns {
@@ -170,7 +170,7 @@ public class SurveyDbAdapter {
         String LANGUAGE = "language";
         String HELP_DOWNLOADED = "help_downloaded_flag";
         String DELETED = "deleted";
-        String INSTANCE = "instance";
+        String APP_ID = "app_id";
     }
 
     public interface ResponseColumns {
@@ -247,7 +247,7 @@ public class SurveyDbAdapter {
                     + SurveyColumns.LANGUAGE + " TEXT,"
                     + SurveyColumns.HELP_DOWNLOADED + " INTEGER NOT NULL DEFAULT 0,"
                     + SurveyColumns.DELETED + " INTEGER NOT NULL DEFAULT 0,"
-                    + SurveyColumns.INSTANCE + " TEXT NOT NULL,"
+                    + SurveyColumns.APP_ID + " TEXT NOT NULL,"
                     + "UNIQUE (" + SurveyColumns.SURVEY_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY_GROUP + " ("
@@ -256,7 +256,7 @@ public class SurveyDbAdapter {
                     + SurveyGroupColumns.NAME + " TEXT,"
                     + SurveyGroupColumns.REGISTER_SURVEY_ID + " TEXT,"
                     + SurveyGroupColumns.MONITORED + " INTEGER NOT NULL DEFAULT 0,"
-                    + SurveyGroupColumns.INSTANCE + " TEXT NOT NULL,"
+                    + SurveyGroupColumns.APP_ID + " TEXT NOT NULL,"
                     + "UNIQUE (" + SurveyGroupColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.SURVEY_INSTANCE + " ("
@@ -273,7 +273,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
                     + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
                     + SurveyInstanceColumns.SUBMITTER + " TEXT,"
-                    + SurveyInstanceColumns.INSTANCE + " TEXT NOT NULL,"
+                    + SurveyInstanceColumns.APP_ID + " TEXT NOT NULL,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -294,7 +294,7 @@ public class SurveyDbAdapter {
                     + RecordColumns.LATITUDE + " REAL,"// REFERENCES ...
                     + RecordColumns.LONGITUDE + " REAL,"// REFERENCES ...
                     + RecordColumns.LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0,"
-                    + RecordColumns.INSTANCE + " TEXT NOT NULL,"
+                    + RecordColumns.APP_ID + " TEXT NOT NULL,"
                     + "UNIQUE (" + RecordColumns.RECORD_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.TRANSMISSION + " ("
@@ -310,19 +310,19 @@ public class SurveyDbAdapter {
                     + SyncTimeColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
                     + SyncTimeColumns.TIME + " TEXT,"
-                    + SyncTimeColumns.INSTANCE + " TEXT NOT NULL,"
+                    + SyncTimeColumns.APP_ID + " TEXT NOT NULL,"
                     + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.INSTANCE + " ("
                     + InstanceColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + InstanceColumns.NAME + " TEXT NOT NULL,"
+                    + InstanceColumns.APP_ID + " TEXT NOT NULL,"
                     + InstanceColumns.ALIAS + " TEXT,"
                     + InstanceColumns.SERVER_BASE + " TEXT NOT NULL,"
                     + InstanceColumns.AWS_BUCKET + " TEXT NOT NULL,"
                     + InstanceColumns.AWS_ACCESS_KEY_ID + " TEXT NOT NULL,"
                     + InstanceColumns.AWS_SECRET_KEY + " TEXT NOT NULL,"
                     + InstanceColumns.API_KEY + " TEXT NOT NULL,"
-                    + "UNIQUE (" + InstanceColumns.NAME + ") ON CONFLICT REPLACE)");
+                    + "UNIQUE (" + InstanceColumns.APP_ID + ") ON CONFLICT REPLACE)");
 
             createIndexes(db);
         }
@@ -441,7 +441,7 @@ public class SurveyDbAdapter {
     public Cursor getSurveyInstancesByStatus(String appId, int status) {
         return database.query(Tables.SURVEY_INSTANCE,
                 new String[] { SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID },
-                SurveyInstanceColumns.INSTANCE + "=? AND " + SurveyInstanceColumns.STATUS + "=?",
+                SurveyInstanceColumns.APP_ID + "=? AND " + SurveyInstanceColumns.STATUS + "=?",
                 new String[] { appId, String.valueOf(status) },
                 null, null, null);
     }
@@ -721,7 +721,7 @@ public class SurveyDbAdapter {
         initialValues.put(SurveyInstanceColumns.START_DATE, time);
         initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME
         initialValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
-        initialValues.put(SurveyInstanceColumns.INSTANCE, appId);
+        initialValues.put(SurveyInstanceColumns.APP_ID, appId);
         // Make submitter field available before submission
         initialValues.put(SurveyInstanceColumns.SUBMITTER, user.getName());
         return database.insert(Tables.SURVEY_INSTANCE, null, initialValues);
@@ -739,7 +739,7 @@ public class SurveyDbAdapter {
                     new String[] {
                         SurveyColumns.SURVEY_ID
                     },
-                    SurveyColumns.SURVEY_ID + "=? AND " + SurveyColumns.INSTANCE + "=? AND (" +
+                    SurveyColumns.SURVEY_ID + "=? AND " + SurveyColumns.APP_ID + "=? AND (" +
                             SurveyColumns.VERSION + " >= ? or " + SurveyColumns.DELETED + " = ?)",
                     new String[] {
                             surveys.get(i).getId(),
@@ -766,7 +766,7 @@ public class SurveyDbAdapter {
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, isDownloaded ? 1 : 0);
 
         if (database.update(Tables.SURVEY, updatedValues,
-                SurveyColumns.SURVEY_ID + "=? AND " + SurveyColumns.INSTANCE + "=?",
+                SurveyColumns.SURVEY_ID + "=? AND " + SurveyColumns.APP_ID + "=?",
                 new String[] {
                     surveyId, appId
                 }) < 1) {
@@ -803,7 +803,7 @@ public class SurveyDbAdapter {
                 .getLanguage().toLowerCase() : ConstantUtil.ENGLISH_CODE);
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, surveyGroupId);
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, survey.isHelpDownloaded() ? 1 : 0);
-        updatedValues.put(SurveyColumns.INSTANCE, survey.getAppId());
+        updatedValues.put(SurveyColumns.APP_ID, survey.getAppId());
 
         if (cursor != null && cursor.getCount() > 0) {
             // if we found an item, it's an update, otherwise, it's an insert
@@ -828,8 +828,8 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.SURVEY, new String[] {
                 SurveyColumns.SURVEY_ID, SurveyColumns.NAME, SurveyColumns.LOCATION,
                 SurveyColumns.FILENAME, SurveyColumns.TYPE, SurveyColumns.LANGUAGE,
-                SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION, SurveyColumns.INSTANCE
-        }, SurveyColumns.SURVEY_ID + "=? AND " + SurveyColumns.INSTANCE + "=?",
+                SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION, SurveyColumns.APP_ID
+        }, SurveyColumns.SURVEY_ID + "=? AND " + SurveyColumns.APP_ID + "=?",
                 new String[] {
                     surveyId, appId
                 }, null, null, null);
@@ -869,8 +869,8 @@ public class SurveyDbAdapter {
     public void deleteSurveyInstance(long surveyInstanceId) {
         deleteResponses(surveyInstanceId);
         database.delete(Tables.SURVEY_INSTANCE, SurveyInstanceColumns._ID + "=?",
-                new String[] {
-                    String.valueOf(surveyInstanceId)
+                new String[]{
+                        String.valueOf(surveyInstanceId)
                 });
     }
 
@@ -928,7 +928,7 @@ public class SurveyDbAdapter {
         return database.update(Tables.TRANSMISSION,
                 vals,
                 TransmissionColumns.FILENAME + "=? AND " + TransmissionColumns.SURVEY_INSTANCE_ID
-                    + " IN (SELECT _id FROM survey_instance WHERE instance=?)",
+                    + " IN (SELECT _id FROM survey_instance WHERE app_id=?)",
                 new String[] {fileName, appId});
     }
 
@@ -998,7 +998,7 @@ public class SurveyDbAdapter {
                 },
 
 
-                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.INSTANCE + "=? AND "
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.APP_ID + "=? AND "
                     + Tables.TRANSMISSION + "." + TransmissionColumns.STATUS + " IN (?, ?, ?)",
                 new String[] {
                         appId,
@@ -1138,13 +1138,13 @@ public class SurveyDbAdapter {
         values.put(SurveyGroupColumns.NAME, surveyGroup.getName());
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
-        values.put(SurveyGroupColumns.INSTANCE, surveyGroup.getAppId());
+        values.put(SurveyGroupColumns.APP_ID, surveyGroup.getAppId());
         database.insert(Tables.SURVEY_GROUP, null, values);
     }
 
     public void addInstance(Instance instance) {
         ContentValues values = new ContentValues();
-        values.put(InstanceColumns.NAME, instance.getName());
+        values.put(InstanceColumns.APP_ID, instance.getAppId());
         values.put(InstanceColumns.ALIAS, instance.getAlias());
         values.put(InstanceColumns.SERVER_BASE, instance.getServerBase());
         values.put(InstanceColumns.AWS_BUCKET, instance.getAWSBucket());
@@ -1156,15 +1156,21 @@ public class SurveyDbAdapter {
     }
 
     public static Instance getInstance(Cursor cursor) {
+        String appid = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.APP_ID));
+        String alias = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.ALIAS));
+        String server = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.SERVER_BASE));
+        String buck = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_BUCKET));
+        String acc = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_ACCESS_KEY_ID));
+        String sec = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_SECRET_KEY));
+        String apik = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.API_KEY));
         return new Instance(
-                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.NAME)),
+                cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.APP_ID)),
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.ALIAS)),
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.SERVER_BASE)),
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_BUCKET)),
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_ACCESS_KEY_ID)),
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_SECRET_KEY)),
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.API_KEY))
-
         );
     }
 
@@ -1172,11 +1178,11 @@ public class SurveyDbAdapter {
         String where = null;
         String[] selectionArgs = null;
         if (!TextUtils.isEmpty(name)) {
-            where = InstanceColumns.NAME + "= ?";
+            where = InstanceColumns.APP_ID + "= ?";
             selectionArgs = new String[] {name};
         }
 
-        return database.query(Tables.INSTANCE, null, where, selectionArgs, null, null, InstanceColumns.NAME);
+        return database.query(Tables.INSTANCE, null, where, selectionArgs, null, null, InstanceColumns.APP_ID);
     }
 
     public Cursor getInstances() {
@@ -1187,14 +1193,14 @@ public class SurveyDbAdapter {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.NAME));
         String registerSurveyId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.REGISTER_SURVEY_ID));
-        String appId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.INSTANCE));
+        String appId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.APP_ID));
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.MONITORED)) > 0;
         return new SurveyGroup(id, name, registerSurveyId, monitored, appId);
     }
     
     public Cursor getSurveyGroup(String appId) {
         return database.query(Tables.SURVEY_GROUP, null,
-                SurveyGroupColumns.INSTANCE + "= ?",
+                SurveyGroupColumns.APP_ID + "= ?",
                 new String[] {appId},
                 null, null, SurveyGroupColumns.NAME);
     }
@@ -1204,7 +1210,7 @@ public class SurveyDbAdapter {
         ContentValues values = new ContentValues();
         values.put(RecordColumns.RECORD_ID, id);
         values.put(RecordColumns.SURVEY_GROUP_ID, surveyGroupId);
-        values.put(RecordColumns.INSTANCE, appId);
+        values.put(RecordColumns.APP_ID, appId);
         database.insert(Tables.RECORD, null, values);
         
         return id;
@@ -1228,7 +1234,7 @@ public class SurveyDbAdapter {
 
     public Cursor getSurveyedLocales(long surveyGroupId, String appId) {
         return database.query(Tables.RECORD, RecordQuery.PROJECTION,
-                RecordColumns.SURVEY_GROUP_ID + "=? AND " + RecordColumns.INSTANCE + "=?",
+                RecordColumns.SURVEY_GROUP_ID + "=? AND " + RecordColumns.APP_ID + "=?",
                 new String[] {String.valueOf(surveyGroupId), appId},
                 null, null, null);
     }
@@ -1257,7 +1263,7 @@ public class SurveyDbAdapter {
         survey.setType(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.TYPE)));
         survey.setLanguage(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LANGUAGE)));
         survey.setVersion(cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyColumns.VERSION)));
-        survey.setAppId(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.INSTANCE)));
+        survey.setAppId(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.APP_ID)));
 
         int helpDownloaded = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED));
         survey.setHelpDownloaded(helpDownloaded == 1);
@@ -1280,7 +1286,7 @@ public class SurveyDbAdapter {
     }
 
     public Cursor getSurveys(long surveyGroupId, String appId) {
-        String whereClause = SurveyColumns.INSTANCE + "=? AND " + SurveyColumns.DELETED + " <> 1";
+        String whereClause = SurveyColumns.APP_ID + "=? AND " + SurveyColumns.DELETED + " <> 1";
         String[] whereParams = new String[]{appId};
         if (surveyGroupId > 0) {
             whereClause += " AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?";
@@ -1354,7 +1360,7 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "=? AND "
-                        + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.INSTANCE + "=?",
+                        + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.APP_ID + "=?",
                 new String[] { recordId, appId },
                 null, null, SurveyInstanceColumns.START_DATE + " DESC");
     }
@@ -1366,7 +1372,7 @@ public class SurveyDbAdapter {
     public long[] getSurveyInstances(String recordId, String surveyId, String appId, int status) {
         String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.STATUS + "= ?" +
-                " AND " + SurveyInstanceColumns.INSTANCE + "= ?" +
+                " AND " + SurveyInstanceColumns.APP_ID + "= ?" +
                 " AND "  + SurveyInstanceColumns.RECORD_ID + "= ?";
         List<String> args = new ArrayList<String>();
         args.add(surveyId);
@@ -1407,7 +1413,7 @@ public class SurveyDbAdapter {
                 },
                 SurveyInstanceColumns.RECORD_ID + "=? AND "
                         + SurveyInstanceColumns.SURVEY_ID + "= ? AND "
-                        + SurveyInstanceColumns.INSTANCE + "=? AND "
+                        + SurveyInstanceColumns.APP_ID + "=? AND "
                         + SurveyInstanceColumns.SUBMITTED_DATE + " IS NOT NULL",
                 new String[]{surveyedLocaleId, surveyId, appId},
                 null, null,
@@ -1486,7 +1492,7 @@ public class SurveyDbAdapter {
         ContentValues values = new ContentValues();
         values.put(RecordColumns.LAST_MODIFIED, timestamp);
         database.update(Tables.RECORD, values,
-                RecordColumns.RECORD_ID + "=? AND " + RecordColumns.INSTANCE + "=? AND "
+                RecordColumns.RECORD_ID + "=? AND " + RecordColumns.APP_ID + "=? AND "
                         + RecordColumns.LAST_MODIFIED + "<?",
                 new String[]{recordId, appId, String.valueOf(timestamp)});
     }
@@ -1503,7 +1509,7 @@ public class SurveyDbAdapter {
                 + " FROM "
                 + Tables.RECORD + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
                 + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;
-        String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =? AND sl." + RecordColumns.INSTANCE + "=?";
+        String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =? AND sl." + RecordColumns.APP_ID + "=?";
         String groupBy = " GROUP BY sl." + RecordColumns.RECORD_ID;
 
         String orderByStr = "";
@@ -1573,7 +1579,7 @@ public class SurveyDbAdapter {
         for (SurveyInstance surveyInstance : surveyInstances) {
             Cursor cursor = database.query(Tables.SURVEY_INSTANCE, new String[] {
                     SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID},
-                    SurveyInstanceColumns.UUID + "=? AND " + SurveyInstanceColumns.INSTANCE + "=?",
+                    SurveyInstanceColumns.UUID + "=? AND " + SurveyInstanceColumns.APP_ID + "=?",
                     new String[] { surveyInstance.getUuid(), appId},
                     null, null, null);
                 
@@ -1590,7 +1596,7 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
             values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
-            values.put(SurveyInstanceColumns.INSTANCE, appId);
+            values.put(SurveyInstanceColumns.APP_ID, appId);
 
             if (id != -1) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
@@ -1644,7 +1650,7 @@ public class SurveyDbAdapter {
     public String getSyncTime(long surveyGroupId, String appId) {
         Cursor cursor = database.query(Tables.SYNC_TIME, 
                 new String[] {SyncTimeColumns.SURVEY_GROUP_ID, SyncTimeColumns.TIME},
-                SyncTimeColumns.SURVEY_GROUP_ID + "=? AND " + SyncTimeColumns.INSTANCE + "=?",
+                SyncTimeColumns.SURVEY_GROUP_ID + "=? AND " + SyncTimeColumns.APP_ID + "=?",
                 new String[] {String.valueOf(surveyGroupId), appId},
                 null, null, null);
         
@@ -1664,7 +1670,7 @@ public class SurveyDbAdapter {
     public void setSyncTime(long surveyGroupId, String appId, String time) {
         ContentValues values = new ContentValues();
         values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
-        values.put(SyncTimeColumns.INSTANCE, appId);
+        values.put(SyncTimeColumns.APP_ID, appId);
         values.put(SyncTimeColumns.TIME, time);
         database.insert(Tables.SYNC_TIME, null, values);
     }

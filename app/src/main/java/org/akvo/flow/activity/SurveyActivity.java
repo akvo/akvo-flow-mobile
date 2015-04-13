@@ -154,7 +154,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
      * to 'clone' responses from the previous response.
      */
     private void displayPrefillDialog() {
-        final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId(), mInstance.getName());
+        final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId(), mInstance.getAppId());
         if (lastSurveyInstance != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.prefill_title);
@@ -189,7 +189,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     private void loadSurvey(String surveyId) {
-        Survey surveyMeta = mDatabase.getSurvey(surveyId, mInstance.getName());
+        Survey surveyMeta = mDatabase.getSurvey(surveyId, mInstance.getAppId());
         InputStream in = null;
         try {
             // load from file
@@ -249,7 +249,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     private void saveState() {
         if (!mReadOnly) {
             mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
-            mDatabase.updateRecordModifiedDate(mRecordId, mInstance.getName(), System.currentTimeMillis());
+            mDatabase.updateRecordModifiedDate(mRecordId, mInstance.getAppId(), System.currentTimeMillis());
 
             // Record meta-data, if applies
             if (!mSurveyGroup.isMonitored() ||
@@ -332,7 +332,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             subMenu.removeItem(R.id.clear);
         } else if (mSurveyGroup.isMonitored()) {
             // Add 'pre-fill' option, if applies
-            if (mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId(), mInstance.getName()) != null) {
+            if (mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId(), mInstance.getAppId()) != null) {
                 subMenu.add(Menu.NONE, MENU_PREFILL, Menu.NONE, R.string.prefill_title);
             }
         }

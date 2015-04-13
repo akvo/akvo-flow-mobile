@@ -213,7 +213,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                                                 Context c = SettingsActivity.this;
                                                 SurveyDbAdapter database = new SurveyDbAdapter(c);
                                                 database.open();
-                                                String[] surveyIds = database.getSurveyIds(mInstance.getName());
+                                                String[] surveyIds = database.getSurveyIds(mInstance.getAppId());
                                                 database.deleteAllSurveys();
                                                 database.close();
                                                 Intent i = new Intent(c, SurveyDownloadService.class);
@@ -349,7 +349,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
         SurveyDbAdapter db = new SurveyDbAdapter(this);
         try {
             db.open();
-            return db.getUnsyncedTransmissions(mInstance.getName()).size() > 0;
+            return db.getUnsyncedTransmissions(mInstance.getAppId()).size() > 0;
         } finally {
             if (db != null) {
                 db.close();

@@ -45,7 +45,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyGroupLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
@@ -154,7 +153,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyGroupLoader(this, mDatabase, FlowApp.getApp().getInstance().getName());
+        return new SurveyGroupLoader(this, mDatabase, FlowApp.getApp().getInstance().getAppId());
     }
 
     @Override

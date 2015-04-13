@@ -111,13 +111,13 @@ public class SurveyedLocaleSyncService extends IntentService {
      */
     private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
             throws IOException, HttpException {
-        final String syncTime = database.getSyncTime(surveyGroupId, mInstance.getName());
+        final String syncTime = database.getSyncTime(surveyGroupId, mInstance.getAppId());
         Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         List<SurveyedLocale> locales = api.getSurveyedLocales(surveyGroupId, syncTime);
         if (locales != null) {
             for (SurveyedLocale locale : locales) {
-                database.syncSurveyedLocale(locale, mInstance.getName());
+                database.syncSurveyedLocale(locale, mInstance.getAppId());
                 records.add(locale.getId());
             }
         }

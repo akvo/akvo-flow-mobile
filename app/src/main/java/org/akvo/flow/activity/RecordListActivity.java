@@ -79,7 +79,7 @@ public class RecordListActivity extends ActionBarActivity implements
             @Override
             public void onClick(View v) {
                 // Create new record and return the ID
-                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId(), mInstance.getName());
+                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId(), mInstance.getAppId());
                 onRecordSelected(newLocaleId);
             }
         });

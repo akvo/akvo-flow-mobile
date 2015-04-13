@@ -19,7 +19,7 @@ package org.akvo.flow.domain;
 import java.io.Serializable;
 
 public class Instance implements Serializable {
-    private String mName;
+    private String mAppId;
     private String mAlias;
     private String mServerBase;
     private String mAWSBucket;
@@ -27,9 +27,9 @@ public class Instance implements Serializable {
     private String mAWSSecretKey;
     private String mApiKey;
 
-    public Instance(String name, String alias, String serverBase, String awsBucket,
+    public Instance(String appId, String alias, String serverBase, String awsBucket,
             String awsAccessKeyId, String awsSecretKey, String apiKey) {
-        mName = name;
+        mAppId = appId;
         mAlias = alias;
         mServerBase = serverBase;
         mAWSBucket = awsBucket;
@@ -38,8 +38,8 @@ public class Instance implements Serializable {
         mApiKey = apiKey;
     }
 
-    public String getName() {
-        return mName;
+    public String getAppId() {
+        return mAppId;
     }
 
     public String getAlias() {
@@ -68,13 +68,13 @@ public class Instance implements Serializable {
 
     @Override
     public String toString() {
-        return mName;
+        return mAppId;
     }
 
     @Override
     public boolean equals(Object instance) {
         return instance != null &&
                 instance instanceof Instance &&
-                ((Instance) instance).getName().equals(mName);
+                ((Instance) instance).getAppId().equals(mAppId);
     }
 }

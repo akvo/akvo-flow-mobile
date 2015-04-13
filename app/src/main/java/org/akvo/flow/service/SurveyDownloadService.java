@@ -125,7 +125,7 @@ public class SurveyDownloadService extends IntentService {
         }
 
         // if there are surveys for this device, see if we need them
-        surveys = databaseAdaptor.checkSurveyVersions(surveys, mInstance.getName());
+        surveys = databaseAdaptor.checkSurveyVersions(surveys, mInstance.getAppId());
 
         if (!surveys.isEmpty()) {
             int synced = 0, failed = 0;
@@ -153,7 +153,7 @@ public class SurveyDownloadService extends IntentService {
 
         // now check if any previously downloaded surveys still need
         // don't have their help media pre-cached
-        surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE, mInstance.getName());
+        surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE, mInstance.getAppId());
         for (Survey survey : surveys) {
             if (!survey.isHelpDownloaded()) {
                 downloadResources(survey);
@@ -244,7 +244,7 @@ public class SurveyDownloadService extends IntentService {
 
     private void downloadResources(final String sid, final Set<String> resources) {
         // TODO: We need to add the appID context, possibly by creating a subdirectory per instance.
-        databaseAdaptor.markSurveyHelpDownloaded(sid, mInstance.getName(), false);
+        databaseAdaptor.markSurveyHelpDownloaded(sid, mInstance.getAppId(), false);
         boolean ok = true;
         for (String resource : resources) {
             Log.i(TAG, "Downloading resource: " + resource);
@@ -282,7 +282,7 @@ public class SurveyDownloadService extends IntentService {
         }
         // Mark help (survey resources) as downloaded if ALL files succeeded.
         if (ok) {
-            databaseAdaptor.markSurveyHelpDownloaded(sid, mInstance.getName(), true);
+            databaseAdaptor.markSurveyHelpDownloaded(sid, mInstance.getAppId(), true);
         }
     }
 
@@ -296,7 +296,7 @@ public class SurveyDownloadService extends IntentService {
                 final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id + "&" + FlowApi.getDeviceParams();
                 String response = HttpUtil.httpGet(url);
                 if (response != null) {
-                    surveys.addAll(new SurveyMetaParser(mInstance.getName()).parseList(response, true));
+                    surveys.addAll(new SurveyMetaParser(mInstance.getAppId()).parseList(response, true));
                 }
             } catch (IllegalArgumentException | IOException e) {
                 Log.e(TAG, "getSurveyHeaders() - " + e.getMessage());
@@ -321,7 +321,7 @@ public class SurveyDownloadService extends IntentService {
             final String url = serverBase + SURVEY_LIST_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
             String response = HttpUtil.httpGet(url);
             if (response != null) {
-                surveys = new SurveyMetaParser(mInstance.getName()).parseList(response);
+                surveys = new SurveyMetaParser(mInstance.getAppId()).parseList(response);
             }
         } catch (IllegalArgumentException | IOException e) {
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,

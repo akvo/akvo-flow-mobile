@@ -190,7 +190,7 @@ public class BootstrapService extends IntentService {
                 if (surveyName.contains(".")) {
                     surveyName = surveyName.substring(0, surveyName.indexOf("."));
                 }
-                Survey survey = databaseAdapter.getSurvey(id, mInstance.getName());
+                Survey survey = databaseAdapter.getSurvey(id, mInstance.getAppId());
                 if (survey == null) {
                     survey = new Survey();
                     survey.setId(id);

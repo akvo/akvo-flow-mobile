@@ -200,7 +200,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         if (FlowApp.getApp().getInstance() == null) {
             return null;
         }
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, FlowApp.getApp().getInstance().getName(),
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, FlowApp.getApp().getInstance().getAppId(),
                 mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
     }
 

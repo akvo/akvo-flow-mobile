@@ -99,9 +99,9 @@ public class FlowApp extends Application {
 
         // Load instance
         String appId = Prefs.getString(this, Prefs.KEY_APP_ID, "");
-        if (TextUtils.isEmpty(appId)) {
+        if (!TextUtils.isEmpty(appId)) {
             Cursor c = database.getInstance(appId);
-            if (c != null && c.getCount() > 0) {
+            if (c != null && c.moveToFirst()) {
                 mInstance = SurveyDbAdapter.getInstance(c);
                 c.close();
             }
@@ -124,7 +124,7 @@ public class FlowApp extends Application {
     public void setInstance(Instance instance) {
         mInstance = instance;
         if (instance != null) {
-            Prefs.setString(this, Prefs.KEY_APP_ID, instance.getName());
+            Prefs.setString(this, Prefs.KEY_APP_ID, instance.getAppId());
         }
     }
 

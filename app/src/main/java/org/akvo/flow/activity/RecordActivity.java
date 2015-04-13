@@ -157,16 +157,16 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
         }
-        if (!mDatabase.getSurvey(surveyId, mInstance.getName()).isHelpDownloaded()) {
+        if (!mDatabase.getSurvey(surveyId, mInstance.getAppId()).isHelpDownloaded()) {
             Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
             return;
         }
 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId, mInstance.getName(),
+        long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId, mInstance.getAppId(),
                 SurveyInstanceStatus.SAVED);
         long instance = instances.length > 0 ? instances[0]
-                : mDatabase.createSurveyRespondent(surveyId, mUser, mRecord.getId(), mInstance.getName());
+                : mDatabase.createSurveyRespondent(surveyId, mUser, mRecord.getId(), mInstance.getAppId());
 
         Intent i = new Intent(this, SurveyActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());

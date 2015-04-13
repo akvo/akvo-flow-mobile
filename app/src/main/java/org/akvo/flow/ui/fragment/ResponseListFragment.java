@@ -215,7 +215,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             return null;
         }
         return new SurveyInstanceLoader(getActivity(), mDatabase, mRecord.getId(),
-                FlowApp.getApp().getInstance().getName());
+                FlowApp.getApp().getInstance().getAppId());
     }
 
     @Override

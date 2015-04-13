@@ -1156,13 +1156,6 @@ public class SurveyDbAdapter {
     }
 
     public static Instance getInstance(Cursor cursor) {
-        String appid = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.APP_ID));
-        String alias = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.ALIAS));
-        String server = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.SERVER_BASE));
-        String buck = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_BUCKET));
-        String acc = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_ACCESS_KEY_ID));
-        String sec = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.AWS_SECRET_KEY));
-        String apik = cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.API_KEY));
         return new Instance(
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.APP_ID)),
                 cursor.getString(cursor.getColumnIndexOrThrow(InstanceColumns.ALIAS)),

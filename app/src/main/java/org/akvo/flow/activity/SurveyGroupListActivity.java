@@ -53,6 +53,7 @@ import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -66,7 +67,6 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     private SurveyGroupListAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
     
-    private ListView mListView;
     private TextView mEmptyView;
     
     @Override
@@ -78,32 +78,32 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
         mDatabase = new SurveyDbAdapter(getApplicationContext());
         mDatabase.open();
         
-        mListView = (ListView) findViewById(R.id.list_view);
+        ListView lv = (ListView) findViewById(R.id.list_view);
         mEmptyView = (TextView) findViewById(android.R.id.empty);
         mAdapter = new SurveyGroupListAdapter(this, null);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(mAdapter);
-        mListView.setEmptyView(mEmptyView);
-        registerForContextMenu(mListView);
+        lv.setAdapter(mAdapter);
+        lv.setOnItemClickListener(mAdapter);
+        lv.setEmptyView(mEmptyView);
+        registerForContextMenu(lv);
         
         mEmptyView.setText(R.string.loading);// Be friendly
+
+        init();// Check instance status, and start services
     }
     
     @Override
     public void onResume() {
         super.onResume();
         mDatabase.open();
-        init();// Check instance status, and start services
         loadData();
-        registerReceiver(mSurveysSyncReceiver,
-                new IntentFilter(getString(R.string.action_surveys_sync)));
+        registerReceiver(mReceiver, new IntentFilter(ConstantUtil.ACTION_SURVEYS_SYNC));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mDatabase.close();
-        unregisterReceiver(mSurveysSyncReceiver);
+        unregisterReceiver(mReceiver);
     }
     
     @Override
@@ -129,6 +129,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
                 null);
         } else if (FlowApp.getApp().getInstance() == null) {
             startActivity(new Intent(this, InstanceSetupActivity.class));
+            finish();
         } else {
             setTitle(FlowApp.getApp().getInstance().getAlias());
             startService(new Intent(this, SurveyDownloadService.class));
@@ -284,10 +285,9 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     }
 
     /**
-     * BroadcastReceiver to notify of surveys synchronisation. This should be
-     * fired from SurveyDownloadService.
+     * BroadcastReceiver to notify survey and instance updates.
      */
-    private BroadcastReceiver mSurveysSyncReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");

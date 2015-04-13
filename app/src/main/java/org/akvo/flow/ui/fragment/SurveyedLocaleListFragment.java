@@ -132,7 +132,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
         // Listen for data sync updates, so we can update the UI accordingly
         getActivity().registerReceiver(dataSyncReceiver,
-                new IntentFilter(getString(R.string.action_data_sync)));
+                new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
         refresh();
     }

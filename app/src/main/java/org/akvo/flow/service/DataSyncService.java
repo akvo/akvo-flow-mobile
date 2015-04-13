@@ -593,8 +593,7 @@ public class DataSyncService extends IntentService {
         mDatabase.updateSurveyStatus(surveyInstanceId, status);
 
         // Dispatch a Broadcast notification to notify of survey instances status change
-        Intent intentBroadcast = new Intent(getString(R.string.action_data_sync));
-        sendBroadcast(intentBroadcast);
+        sendBroadcast(new Intent(ConstantUtil.ACTION_DATA_SYNC));
     }
 
     private void displayExportNotification(String filename) {

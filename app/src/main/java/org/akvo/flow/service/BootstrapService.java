@@ -319,8 +319,7 @@ public class BootstrapService extends IntentService {
      * refresh its data
      */
     private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
-        sendBroadcast(intentBroadcast);
+        sendBroadcast(new Intent(ConstantUtil.ACTION_SURVEYS_SYNC));
     }
 
     /**

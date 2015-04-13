@@ -19,6 +19,7 @@ package org.akvo.flow.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -49,7 +50,6 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
 
     private SurveyDbAdapter mDatabase;
     private InstanceListAdapter mAdapter;
-    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +60,11 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
 
         mDatabase = new SurveyDbAdapter(getApplicationContext());
 
-        mListView = (ListView) findViewById(android.R.id.list);
+        ListView lv = (ListView) findViewById(android.R.id.list);
         mAdapter = new InstanceListAdapter(this, null);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(mAdapter);
-        mListView.setEmptyView(findViewById(android.R.id.empty));
-        //registerForContextMenu(mListView);
+        lv.setAdapter(mAdapter);
+        lv.setOnItemClickListener(mAdapter);
+        lv.setEmptyView(findViewById(android.R.id.empty));
     }
 
     @Override
@@ -202,6 +201,9 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
             Instance instance = (Instance)view.getTag();
             FlowApp.getApp().setInstance(instance);
             display();
+            Intent i = new Intent(InstanceSetupActivity.this, SurveyGroupListActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
             finish();
         }
 

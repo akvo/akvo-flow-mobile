@@ -162,8 +162,7 @@ public class SurveyedLocaleSyncService extends IntentService {
      * refresh its data
      */
     private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_locales_sync));
-        sendBroadcast(intentBroadcast);
+        sendBroadcast(new Intent(ConstantUtil.ACTION_LOCALES_SYNC));
     }
 
 }

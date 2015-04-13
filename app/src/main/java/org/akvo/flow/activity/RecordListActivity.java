@@ -46,6 +46,7 @@ import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.StatsDialogFragment;
 import org.akvo.flow.ui.fragment.SurveyedLocaleListFragment;
 import org.akvo.flow.service.SurveyedLocaleSyncService;
+import org.akvo.flow.util.ConstantUtil;
 
 public class RecordListActivity extends ActionBarActivity implements
         RecordListListener, ActionBar.TabListener {
@@ -108,7 +109,7 @@ public class RecordListActivity extends ActionBarActivity implements
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
         mDatabase.deleteEmptyRecords();
         registerReceiver(surveyedLocalesSyncReceiver,
-                new IntentFilter(getString(R.string.action_locales_sync)));
+                new IntentFilter(ConstantUtil.ACTION_LOCALES_SYNC));
     }
     
     @Override

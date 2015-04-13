@@ -88,7 +88,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onResume();
         refresh();
         getActivity().registerReceiver(dataSyncReceiver,
-                new IntentFilter(getString(R.string.action_data_sync)));
+                new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
     }
 
     @Override

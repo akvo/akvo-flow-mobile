@@ -235,13 +235,20 @@ public class ConstantUtil {
     public static final int NOTIFICATION_BOOTSTRAP = 106;
 
     /**
-     + * External Sources
-     + */
+     * External Sources
+     */
     public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
     public static final String EXTERNAL_SOURCE_QUESTION_ID = "questionId";
     public static final String EXTERNAL_SOURCE_QUESTION_TITLE = "questionTitle";
     public static final String EXTERNAL_SOURCE_RESPONSE = "response";
     public static final String EXTERNAL_SOURCE_MIME = "text/plain";
+
+    /**
+     * Intent actions
+     */
+    public static final String ACTION_SURVEYS_SYNC = "org.akvo.flow.action.surveyssync";
+    public static final String ACTION_LOCALES_SYNC = "org.akvo.flow.action.localessync";
+    public static final String ACTION_DATA_SYNC = "org.akvo.flow.action.datasync";
 
     /**
      * prevent instantiation

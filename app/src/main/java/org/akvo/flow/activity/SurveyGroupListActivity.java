@@ -154,7 +154,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyGroupLoader(this, mDatabase, FlowApp.getApp().getInstance().getAppId());
+        return new SurveyGroupLoader(this, mDatabase, FlowApp.getApp().getAppId());
     }
 
     @Override

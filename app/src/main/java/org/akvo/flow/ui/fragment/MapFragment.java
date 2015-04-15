@@ -256,7 +256,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             return null;
         }
         return new SurveyedLocaleLoader(getActivity(), mDatabase,
-                FlowApp.getApp().getInstance().getAppId(), mSurveyGroupId, ConstantUtil.ORDER_BY_NONE);
+                FlowApp.getApp().getAppId(), mSurveyGroupId, ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override

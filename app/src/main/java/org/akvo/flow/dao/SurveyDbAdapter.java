@@ -1619,6 +1619,7 @@ public class SurveyDbAdapter {
             values.put(RecordColumns.NAME, surveyedLocale.getName());
             values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
             values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
+            values.put(RecordColumns.APP_ID, appId);
             database.insert(Tables.RECORD, null, values);
 
             syncSurveyInstances(surveyedLocale.getSurveyInstances(), id, appId);

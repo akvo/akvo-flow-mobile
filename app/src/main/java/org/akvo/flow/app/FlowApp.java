@@ -131,6 +131,10 @@ public class FlowApp extends Application {
     public Instance getInstance() {
         return mInstance;
     }
+
+    public String getAppId() {
+        return mInstance != null ? mInstance.getAppId() : null;
+    }
     
     public void setSurveyGroupId(long surveyGroupId) {
         mSurveyGroupId = surveyGroupId;

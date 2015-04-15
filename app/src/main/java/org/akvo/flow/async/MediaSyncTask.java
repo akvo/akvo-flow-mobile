@@ -55,7 +55,6 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         if (!StatusUtil.hasDataConnection(mContext) || FlowApp.getApp().getInstance() == null) {
-            Log.d(TAG, "No internet connection. Can't perform the requested operation");
             return false;
         }
 

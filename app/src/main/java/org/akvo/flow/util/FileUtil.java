@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -53,16 +53,16 @@ public class FileUtil {
     private static final String TAG = FileUtil.class.getSimpleName();
 
     // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
-    private static final String DIR_DATA = "akvoflow/data/files"; // form responses zip files
-    private static final String DIR_MEDIA = "akvoflow/data/media"; // form responses media files
-    private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
+    private static final String DIR_DATA = "/akvoflow/data/%s/files"; // form responses zip files
+    private static final String DIR_MEDIA = "/akvoflow/data/%s/media"; // form responses media files
+    private static final String DIR_INBOX = "/akvoflow/inbox"; // Bootstrap files
 
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
-    private static final String DIR_FORMS = "forms"; // Form definitions
-    private static final String DIR_STACKTRACE = "stacktrace"; // Crash reports
-    private static final String DIR_TMP = "tmp"; // Temporary files
-    private static final String DIR_APK = "apk"; // App upgrades
-    private static final String DIR_RES = "res"; // Survey resources (i.e. cascading DB)
+    private static final String DIR_FORMS = "/%s/forms"; // Form definitions
+    private static final String DIR_STACKTRACE = "/%s/stacktrace"; // Crash reports
+    private static final String DIR_RES = "/%s/res"; // Survey resources (i.e. cascading DB)
+    private static final String DIR_TMP = "/tmp"; // Temporary files
+    private static final String DIR_APK = "/apk"; // App upgrades
 
     private static final int BUFFER_SIZE = 2048;
 
@@ -76,31 +76,32 @@ public class FileUtil {
      * @return File representing the root directory for the given FileType.
      */
     public static File getFilesDir(FileType type) {
+        final String appId = FlowApp.getApp().getAppId();
         String path = null;
         switch (type) {
             case DATA:
-                path = getFilesStorageDir(false) + File.separator + DIR_DATA;
+                path = getFilesStorageDir(false) + String.format(DIR_DATA, appId);
                 break;
             case MEDIA:
-                path = getFilesStorageDir(false) + File.separator + DIR_MEDIA;
+                path = getFilesStorageDir(false) + String.format(DIR_MEDIA, appId);
                 break;
             case INBOX:
-                path = getFilesStorageDir(false) + File.separator + DIR_INBOX;
+                path = getFilesStorageDir(false) + DIR_INBOX;
                 break;
             case FORMS:
-                path = getFilesStorageDir(true) + File.separator + DIR_FORMS;
+                path = getFilesStorageDir(true) + String.format(DIR_FORMS, appId);
                 break;
             case STACKTRACE:
-                path = getFilesStorageDir(true) + File.separator + DIR_STACKTRACE;
-                break;
-            case TMP:
-                path = getFilesStorageDir(true) + File.separator + DIR_TMP;
-                break;
-            case APK:
-                path = getFilesStorageDir(true) + File.separator + DIR_APK;
+                path = getFilesStorageDir(true) + String.format(DIR_STACKTRACE, appId);
                 break;
             case RES:
-                path = getFilesStorageDir(true) + File.separator + DIR_RES;
+                path = getFilesStorageDir(true) + String.format(DIR_RES, appId);
+                break;
+            case TMP:
+                path = getFilesStorageDir(true) + DIR_TMP;
+                break;
+            case APK:
+                path = getFilesStorageDir(true) + DIR_APK;
                 break;
         }
         File dir = new File(path);

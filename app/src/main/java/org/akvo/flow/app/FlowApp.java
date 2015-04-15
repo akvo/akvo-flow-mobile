@@ -20,6 +20,7 @@ import android.app.Application;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -28,12 +29,19 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.domain.Instance;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.Prefs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Properties;
 
 public class FlowApp extends Application {
+    private static final String TAG = FlowApp.class.getSimpleName();
+
     private static FlowApp app;// Singleton
 
     private Locale mLocale;
@@ -105,6 +113,19 @@ public class FlowApp extends Application {
                 mInstance = SurveyDbAdapter.getInstance(c);
                 c.close();
             }
+        } else {
+            // Older versions of the app have a survey.properties file, with the instance properties.
+            // We'll attempt to load that file, if found. This will be part of the upgrade process,
+            // wherein the user will have the existing instance already available and set up.
+            // Additionally, any existing file will be moved to the new app-specific directory.
+            Instance i = getRawInstance();
+            if (i != null && !Prefs.getBoolean(this, Prefs.KEY_UPGRADED, false)) {
+                database.addInstance(i);
+                FileUtil.onSingleAppUpgrade(this, i.getAppId());
+                database.onSingleAppUpgrade(i.getAppId());
+                setInstance(i);
+                Prefs.setBoolean(this, Prefs.KEY_UPGRADED, true);
+            }
         }
 
         database.close();
@@ -170,6 +191,36 @@ public class FlowApp extends Application {
             Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
                     .show();
         }
+    }
+
+    private Instance getRawInstance() {
+        //int id = getResources().getIdentifier("org.akvo.flow:raw/survey.properties", null, null);
+        int id = getResources().getIdentifier("survey", "raw", getPackageName());
+        if (id != 0) {
+            Properties properties = new Properties();
+            try {
+                InputStream is = getResources().openRawResource(id);
+                properties.load(is);
+
+                String s3Bucket = properties.getProperty(ConstantUtil.S3_BUCKET);
+                String s3AccessKey = properties.getProperty(ConstantUtil.S3_ACCESSKEY);
+                String s3SecretKey = properties.getProperty(ConstantUtil.S3_SECRET);
+                String serverBase = properties.getProperty(ConstantUtil.SERVER_BASE);
+                String apiKey = properties.getProperty(ConstantUtil.API_KEY);
+
+                // Match instance name from server base, for example:
+                // https://akvoflow-X.appspot.com --> akvoflow-X
+                String host = new URL(serverBase).getHost();
+                if (TextUtils.isEmpty(host) || !host.contains(".")) {
+                    return null;
+                }
+                String appId = host.substring(0, host.indexOf("."));
+                return new Instance(appId, appId, serverBase, s3Bucket, s3AccessKey, s3SecretKey, apiKey);
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+        return null;
     }
 
 }

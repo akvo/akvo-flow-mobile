@@ -19,6 +19,7 @@ public class Prefs {
     public static final String KEY_APP_SERVER = "app_server";
     public static final String KEY_LOCALE = "locale";
     public static final String KEY_DEVICE_ID = "device_id";
+    public static final String KEY_UPGRADED = "upgraded";
 
     // Default preferences
     public static final boolean DEFAULT_DATA_ENABLED = true;

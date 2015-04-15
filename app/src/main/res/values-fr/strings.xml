@@ -52,7 +52,6 @@
   <string name="helpheading">Options d\'aide</string>
   <string name="deleteresponse">Effacer les réponses</string>
   <string name="othertext">Autre...</string>
-  <string name="savelastuserlabel">Garde le dernier utilisateur connecté entre les sessions</string>
   <string name="uploadoptionlabel">Envoyer les données avec le réseau mobile</string>
   <string name="surveylanglabel">Langues de l\'enquête</string>
   <string name="beaconlabel">Envoyer la localisation</string>

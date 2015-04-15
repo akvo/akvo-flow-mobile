@@ -68,6 +68,10 @@ public class FileUtil {
 
     public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK, RES};
 
+    public static File getFilesDir(FileType type) {
+        return getFilesDir(FlowApp.getApp(), FlowApp.getApp().getAppId(), type);
+    }
+
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
      * not be in the app-specific External Storage. The caller cannot assume anything about
@@ -75,33 +79,32 @@ public class FileUtil {
      * @param type FileType to determine the type of resource attempting to use.
      * @return File representing the root directory for the given FileType.
      */
-    public static File getFilesDir(FileType type) {
-        final String appId = FlowApp.getApp().getAppId();
+    public static File getFilesDir(Context context, String appId, FileType type) {
         String path = null;
         switch (type) {
             case DATA:
-                path = getFilesStorageDir(false) + String.format(DIR_DATA, appId);
+                path = getFilesStorageDir(context, false) + String.format(DIR_DATA, appId);
                 break;
             case MEDIA:
-                path = getFilesStorageDir(false) + String.format(DIR_MEDIA, appId);
+                path = getFilesStorageDir(context, false) + String.format(DIR_MEDIA, appId);
                 break;
             case INBOX:
-                path = getFilesStorageDir(false) + DIR_INBOX;
+                path = getFilesStorageDir(context, false) + DIR_INBOX;
                 break;
             case FORMS:
-                path = getFilesStorageDir(true) + String.format(DIR_FORMS, appId);
+                path = getFilesStorageDir(context, true) + String.format(DIR_FORMS, appId);
                 break;
             case STACKTRACE:
-                path = getFilesStorageDir(true) + String.format(DIR_STACKTRACE, appId);
+                path = getFilesStorageDir(context, true) + String.format(DIR_STACKTRACE, appId);
                 break;
             case RES:
-                path = getFilesStorageDir(true) + String.format(DIR_RES, appId);
+                path = getFilesStorageDir(context, true) + String.format(DIR_RES, appId);
                 break;
             case TMP:
-                path = getFilesStorageDir(true) + DIR_TMP;
+                path = getFilesStorageDir(context, true) + DIR_TMP;
                 break;
             case APK:
-                path = getFilesStorageDir(true) + DIR_APK;
+                path = getFilesStorageDir(context, true) + DIR_APK;
                 break;
         }
         File dir = new File(path);
@@ -117,9 +120,9 @@ public class FileUtil {
      * @param internal true for app specific resources, false otherwise
      * @return The root directory for this kind of resources
      */
-    private static final String getFilesStorageDir(boolean internal) {
+    private static final String getFilesStorageDir(Context context, boolean internal) {
         if (internal) {
-            return FlowApp.getApp().getExternalFilesDir(null).getAbsolutePath();
+            return context.getExternalFilesDir(null).getAbsolutePath();
         }
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
@@ -425,6 +428,24 @@ public class FileUtil {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    public static void move(File src, File dst) {
+        if (src.renameTo(dst)) {
+            Log.i(TAG, "file " + src + " moved to " + dst);
+        } else {
+            Log.e(TAG, "cannot move file - src:" + src + " dst: " + dst);
+        }
+    }
+
+    public static void onSingleAppUpgrade(Context context, String appId) {
+        // Load older versions' directories, and move them to the new locations
+        // TODO: handle mv failures
+        move(new File(getFilesStorageDir(context, false)+"/akvoflow/data/files"), getFilesDir(context, appId, FileType.DATA));
+        move(new File(getFilesStorageDir(context, false)+"/akvoflow/data/media"), getFilesDir(context, appId, FileType.MEDIA));
+        move(new File(getFilesStorageDir(context, true)+"/forms"), getFilesDir(context, appId, FileType.FORMS));
+        move(new File(getFilesStorageDir(context, true)+"/stacktrace"), getFilesDir(context, appId, FileType.STACKTRACE));
+        move(new File(getFilesStorageDir(context, true)+"/res"), getFilesDir(context, appId, FileType.RES));
     }
 
 }

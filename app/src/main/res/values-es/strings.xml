@@ -55,7 +55,6 @@ Version</string>
   <string name="helpheading">Opciones de ayuda</string>
   <string name="deleteresponse">Eliminar respuesta</string>
   <string name="othertext">Otros...</string>
-  <string name="savelastuserlabel">Mantener entre sesiones el último usuario activo </string>
   <string name="uploadoptionlabel">Enviar datos mediante red móvil</string>
   <string name="surveylanglabel">Idiomas de la encuesta</string>
   <string name="beaconlabel">Enviar localización</string>

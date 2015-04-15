@@ -344,7 +344,27 @@ public class SurveyDbAdapter {
                             + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
                     version = VER_FORM_SUBMITTER;
                 case VER_FORM_SUBMITTER:
-                    // TODO: Add 'instance' table, 'instance' columns in existing tables
+                    db.execSQL("ALTER TABLE " + Tables.SURVEY
+                            + " ADD COLUMN " + SurveyColumns.APP_ID + " TEXT");
+                    db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
+                            + " ADD COLUMN " + SurveyInstanceColumns.APP_ID + " TEXT");
+                    db.execSQL("ALTER TABLE " + Tables.RECORD
+                            + " ADD COLUMN " + RecordColumns.APP_ID + " TEXT");
+                    db.execSQL("ALTER TABLE " + Tables.SURVEY_GROUP
+                            + " ADD COLUMN " + SurveyGroupColumns.APP_ID + " TEXT");
+                    db.execSQL("ALTER TABLE " + Tables.SYNC_TIME
+                            + " ADD COLUMN " + SyncTimeColumns.APP_ID + " TEXT");
+
+                    db.execSQL("CREATE TABLE " + Tables.INSTANCE + " ("
+                            + InstanceColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            + InstanceColumns.APP_ID + " TEXT NOT NULL,"
+                            + InstanceColumns.ALIAS + " TEXT,"
+                            + InstanceColumns.SERVER_BASE + " TEXT NOT NULL,"
+                            + InstanceColumns.AWS_BUCKET + " TEXT NOT NULL,"
+                            + InstanceColumns.AWS_ACCESS_KEY_ID + " TEXT NOT NULL,"
+                            + InstanceColumns.AWS_SECRET_KEY + " TEXT NOT NULL,"
+                            + InstanceColumns.API_KEY + " TEXT NOT NULL,"
+                            + "UNIQUE (" + InstanceColumns.APP_ID + ") ON CONFLICT REPLACE)");
                     version = VER_SINGLE_APP;
             }
 
@@ -1642,10 +1662,10 @@ public class SurveyDbAdapter {
      * @return time if exists for this key, null otherwise
      */
     public String getSyncTime(long surveyGroupId, String appId) {
-        Cursor cursor = database.query(Tables.SYNC_TIME, 
-                new String[] {SyncTimeColumns.SURVEY_GROUP_ID, SyncTimeColumns.TIME},
+        Cursor cursor = database.query(Tables.SYNC_TIME,
+                new String[]{SyncTimeColumns.SURVEY_GROUP_ID, SyncTimeColumns.TIME},
                 SyncTimeColumns.SURVEY_GROUP_ID + "=? AND " + SyncTimeColumns.APP_ID + "=?",
-                new String[] {String.valueOf(surveyGroupId), appId},
+                new String[]{String.valueOf(surveyGroupId), appId},
                 null, null, null);
         
         String time = null;
@@ -1674,7 +1694,7 @@ public class SurveyDbAdapter {
      */
     public void deleteEmptySurveyInstances() {
         executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE
-                + " WHERE "  + SurveyInstanceColumns._ID + " NOT IN "
+                + " WHERE " + SurveyInstanceColumns._ID + " NOT IN "
                 + "(SELECT DISTINCT " + ResponseColumns.SURVEY_INSTANCE_ID
                 + " FROM " + Tables.RESPONSE + ")");
     }
@@ -1695,6 +1715,34 @@ public class SurveyDbAdapter {
     public Cursor query(String table, String[] columns, String selection, String[] selectionArgs,
         String groupBy, String having, String orderBy) {
         return database.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+    }
+
+    /**
+     * Upgrade the database data to enable app-specific support. This implies the addition of "app_id"
+     * columns to all relevant tables, as well as physical file reference updates.
+     * @param appId The instance being set up.
+     */
+    public void onSingleAppUpgrade(String appId) {
+        ContentValues values = new ContentValues();
+        values.put(InstanceColumns.APP_ID, appId);
+        database.update(Tables.SURVEY, values, null, null);
+        database.update(Tables.SURVEY_INSTANCE, values, null, null);
+        database.update(Tables.SURVEY_GROUP, values, null, null);
+        database.update(Tables.RECORD, values, null, null);
+        database.update(Tables.SYNC_TIME, values, null, null);
+        // TODO: Add DB "NOT NULL" constraints at this point?
+
+        // Update file paths
+        final String replace = "replace(%s,'akvoflow/data','akvoflow/%s/data')";
+
+        String query = "UPDATE " + Tables.RESPONSE + " SET "
+                + ResponseColumns.ANSWER + " = " + String.format(replace, ResponseColumns.ANSWER, appId)
+                + " WHERE " + ResponseColumns.TYPE + " IN (?,?)";
+        database.execSQL(query, new String[]{ConstantUtil.IMAGE_RESPONSE_TYPE, ConstantUtil.VIDEO_RESPONSE_TYPE});
+
+        query = "UPDATE " + Tables.TRANSMISSION + " SET "
+                + TransmissionColumns.FILENAME + " = " + String.format(replace, TransmissionColumns.FILENAME, appId);
+        database.execSQL(query);
     }
 
     // Wrap DB projections and column indexes.

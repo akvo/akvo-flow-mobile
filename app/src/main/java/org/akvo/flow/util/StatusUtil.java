@@ -163,10 +163,10 @@ public class StatusUtil {
 
     /**
      * Get the application (FLOW instance) id.
-     */
     public static String getApplicationId() {
         // Directly fetch the server from the properties file. A local serverBase found in the DB
         // will cause a permanent mismatch for all surveys, since XML files will contain original application
+
         if (FlowApp.getApp().getInstance() == null) {
             return null;
         }
@@ -183,5 +183,6 @@ public class StatusUtil {
         }
         return null;
     }
-    
+     */
+
 }

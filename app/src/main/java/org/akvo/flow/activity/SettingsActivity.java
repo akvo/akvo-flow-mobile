@@ -93,7 +93,8 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
         Resources resources = getResources();
         list.add(createMap(resources.getString(R.string.prefoptlabel),
                 resources.getString(R.string.prefoptdesc)));
-        list.add(createMap("Instance Manager", "Setup and manage FLOW instances"));
+        list.add(createMap(getString(R.string.dashboards_label),
+                getString(R.string.dashboards_desc)));
         list.add(createMap(resources.getString(R.string.sendoptlabel),
                 resources.getString(R.string.sendoptdesc)));
         list.add(createMap(resources.getString(R.string.reloadsurveyslabel),
@@ -334,7 +335,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
                             }
                         });
                 dialog.show();
-            } else if ("Instance Manager".equals(val)) {
+            } else if (getString(R.string.dashboards_label).equals(val)) {
                 startActivity(new Intent(this, InstanceSetupActivity.class));
             } else {
                 Intent i = new Intent(view.getContext(), DataSyncService.class);

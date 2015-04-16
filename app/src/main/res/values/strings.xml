@@ -33,6 +33,8 @@
     <string name="exportcomplete">Data has been exported to SD card</string>
     <string name="prefoptlabel">Preferences</string>
     <string name="prefoptdesc">Set default survey language and other preference data</string>
+    <string name="dashboards_label">Dashboard manager</string>
+    <string name="dashboards_desc">Set up and manage the FLOW dashboard associated with the app</string>
     <string name="sendoptlabel">Sync Data</string>
     <string name="sendoptdesc">Syncs survey data. You must have data access (mobile or wi-fi) to perform this operation.</string>
     <string name="poweroptlabel">Power Management</string>

@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -109,7 +110,12 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ok_button:
-                String code = mPasscodeInput.getText().toString();
+                final String code = mPasscodeInput.getText().toString();
+                if (!validateCode(code)) {
+                    Toast.makeText(InstanceSetupActivity.this, "Invalid code", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 Toast.makeText(InstanceSetupActivity.this, "Loading (" + code + ") ...", Toast.LENGTH_SHORT).show();
 
                 Bundle args = new Bundle();
@@ -140,6 +146,35 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
         return onOptionsItemSelected(item);
     }
 
+    private boolean validateCode(String code) {
+        // Perform a check-digit validation, using Luhn algorithm: http://en.wikipedia.org/wiki/Luhn_algorithm
+        code = code != null ? code.trim() : null;
+        if (TextUtils.isEmpty(code) || code.length() < 2) {
+            return false;
+        }
+        int n = code.length();
+        final int checkDigit = Character.getNumericValue(code.charAt(n-1));
+
+        int luhnSum = 0;
+        for (int i=0; i<n-1; i++) {
+            int digit = Character.getNumericValue(code.charAt(i));
+            if (digit < 0 || digit > 9) {
+                return false;
+            }
+            if (i % 2 == n % 2) {
+                digit = digit * 2;
+                if (digit > 9) {
+                    digit = 1 + (digit % 10);
+                }
+            }
+            luhnSum += digit;
+        }
+
+        if (luhnSum % 10 == 0) {
+            return checkDigit == 0;
+        }
+        return checkDigit == 10 - (luhnSum % 10);
+    }
 
     // ==================================== //
     // ========= Loader Callbacks ========= //

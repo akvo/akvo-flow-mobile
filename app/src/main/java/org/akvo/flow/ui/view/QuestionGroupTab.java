@@ -1,3 +1,18 @@
+/*
+ *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
@@ -107,15 +122,6 @@ public class QuestionGroupTab extends ScrollView {
             }
         });
         mContainer.addView(next);
-    }
-
-    @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        // We set the ScrollView focusable in order to catch the focus when scrolling.
-        // This will prevent weird behaviors when errors are present in focused
-        // QuestionViews (scroll gets stuck at that position)
-        requestFocus();
-        super.onScrollChanged(l, t, oldl, oldt);
     }
 
     public void notifyOptionsChanged() {

@@ -43,6 +43,11 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
 }
 
 android.applicationVariants.all { variant ->
@@ -57,4 +62,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:4.0.30'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
 }

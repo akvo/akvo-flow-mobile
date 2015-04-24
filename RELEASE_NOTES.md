@@ -1,6 +1,13 @@
 Akvo FLOW app release notes
 ===========================
 
+# 2.1.5
+Date: 24 April 2015
+
+Resolved issues
+---------------
+* Fix two unexpected app crashes [#287 and #285]
+
 #ver 2.1.4
 Date: 2 April 2015
 

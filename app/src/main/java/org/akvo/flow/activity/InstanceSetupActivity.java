@@ -16,8 +16,10 @@
 
 package org.akvo.flow.activity;
 
+import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -41,6 +43,8 @@ import org.akvo.flow.util.PlatformUtil;
 public class InstanceSetupActivity extends ActionBarActivity  implements LoaderCallbacks<Instance>,
         View.OnClickListener {
     private LinearLayout mInstances;
+    private View mAddButton;
+    private View mForm;
     private EditText mPasscodeInput;
 
     private SurveyDbAdapter mDatabase;
@@ -50,6 +54,14 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.instance_setup_activity);
 
+        // Perform smooth transitions if possible
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ((LinearLayout)(findViewById(R.id.main_ll))).setLayoutTransition(new LayoutTransition());
+        }
+
+        mAddButton = findViewById(R.id.add_dashboard);
+        mAddButton.setOnClickListener(this);
+        mForm = findViewById(R.id.form);
         mInstances = (LinearLayout)findViewById(R.id.instances);
         mPasscodeInput = (EditText)findViewById(R.id.passcode_et);
         findViewById(R.id.ok_button).setOnClickListener(this);
@@ -80,12 +92,12 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
             int selectedColor = PlatformUtil.getResource(this, R.attr.textColorSecondary);
             LayoutInflater inflater = LayoutInflater.from(this);
             do {
-                View view = inflater.inflate(R.layout.itemlistrow, null);
+                View view = inflater.inflate(R.layout.instance_list_item, null);
 
                 final Instance instance = SurveyDbAdapter.getInstance(cursor);
                 view.setTag(instance);
 
-                TextView nameView = (TextView) view.findViewById(R.id.itemheader);
+                TextView nameView = (TextView) view.findViewById(R.id.tv);
                 nameView.setText(instance.getAppId());
 
                 int colorRes = regularColor;
@@ -104,11 +116,16 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
             } while (cursor.moveToNext());
             cursor.close();
         }
+
+        displayInput(mInstances.getChildCount() == 0);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.add_dashboard:
+                displayInput(true);
+                break;
             case R.id.ok_button:
                 final String code = mPasscodeInput.getText().toString();
                 if (!validateCode(code)) {
@@ -193,11 +210,22 @@ public class InstanceSetupActivity extends ActionBarActivity  implements LoaderC
         }
         Toast.makeText(this, instance.toString(), Toast.LENGTH_LONG).show();
         mDatabase.addInstance(instance);
+        mPasscodeInput.getText().clear();
         display();
     }
 
     @Override
     public void onLoaderReset(Loader<Instance> loader) {
+    }
+
+    private void displayInput(boolean display) {
+        if (display) {
+            mAddButton.setVisibility(View.GONE);
+            mForm.setVisibility(View.VISIBLE);
+        } else {
+            mForm.setVisibility(View.GONE);
+            mAddButton.setVisibility(View.VISIBLE);
+        }
     }
 
 }

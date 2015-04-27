@@ -339,8 +339,8 @@ public class DataSyncService extends IntentService {
                     if (uuid == null) {
                         uuid = data.getString(uuid_col);// Parse it just once
 
-                        formInstance.setFormInstanceId(uuid);
-                        formInstance.setFormId(data.getString(survey_fk_col));
+                        formInstance.setUUID(uuid);
+                        formInstance.setFormId(data.getLong(survey_fk_col));
                         formInstance.setDataPointId(data.getString(localeId_col));
                         formInstance.setDeviceId(deviceIdentifier);
                         formInstance.setSubmissionDate(submitted_date);

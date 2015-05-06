@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.service.DataSyncService;
@@ -230,113 +229,6 @@ public class ViewUtil {
         notifcationMgr.notify(id, notification);
     }
 
-    public static void fireNotification(String headline, String body,
-            Context context, int id, Integer iconId, PendingIntent pendingIntent,
-            boolean includeSound) {
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager notifcationMgr = (NotificationManager) context
-                .getSystemService(ns);
-        int icon = R.drawable.info;
-        if (iconId != null) {
-            icon = iconId;
-        }
-        Notification notification = new Notification(icon, headline,
-                System.currentTimeMillis());
-        notification.defaults |= Notification.DEFAULT_SOUND;
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notification.setLatestEventInfo(context, headline, body, pendingIntent);
-        notifcationMgr.notify(id, notification);
-    }
-    
-
-    /**
-     * cancels a previously fired notification
-     * 
-     * @param id
-     */
-    public static void cancelNotification(int id, Context context) {
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager notifcationMgr = (NotificationManager) context
-                .getSystemService(ns);
-        notifcationMgr.cancel(id);
-    }
-
-    /**
-     * displays a dialog box for allowing selection of values from an array
-     * resource
-     * 
-     * @param context
-     * @param selections
-     * @param listener
-     * @param labelResourceId
-     * @param valueArrayResourceId
-     * @param selectionMandatory
-     * @param mandatoryTitleResourceId
-     * @param mandatoryTextResourceId
-     */
-    private static void displaySelectionDialog(final Context context,
-            final boolean[] selections,
-            final DialogInterface.OnClickListener listener,
-            final int labelResourceId, final int valueArrayResourceId,
-            final boolean selectionMandatory,
-            final int mandatoryTitleResourceId,
-            final int mandatoryTextResourceId) {
-        AlertDialog dia = new AlertDialog.Builder(context)
-                .setTitle(labelResourceId)
-                .setMultiChoiceItems(valueArrayResourceId, selections,
-                        new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int which, boolean isChecked) {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        break;
-                                }
-                            }
-                        })
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        boolean isValid = false;
-                        if (selectionMandatory) {
-                            for (int i = 0; i < selections.length; i++) {
-                                if (selections[i]) {
-                                    isValid = true;
-                                    break;
-                                }
-                            }
-                        } else {
-                            isValid = true;
-                        }
-                        if (isValid) {
-                            listener.onClick(dialog, which);
-                        } else {
-                            showConfirmDialog(mandatoryTitleResourceId,
-                                    mandatoryTextResourceId, context, false,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface dialog,
-                                                int which) {
-                                            if (dialog != null) {
-                                                dialog.dismiss();
-                                            }
-                                            displaySelectionDialog(context,
-                                                    selections, listener,
-                                                    labelResourceId,
-                                                    valueArrayResourceId,
-                                                    selectionMandatory,
-                                                    mandatoryTitleResourceId,
-                                                    mandatoryTextResourceId);
-                                        }
-                                    });
-                        }
-                    }
-                }).create();
-        dia.show();
-    }
-
     /**
      * displays a dialog box for selection of one or more survey languages
      */
@@ -352,15 +244,6 @@ public class ViewUtil {
 
     /**
      * displays a dialog box for allowing selection of countries from a list
-     * 
-     * @param context
-     * @param selections
-     * @param listener
-     * @param labelResourceId
-     * @param valueArray
-     * @param selectionMandatory
-     * @param mandatoryTitleResourceId
-     * @param mandatoryTextResourceId
      */
     private static void displayLanguageSelectionDialog(final Context context,
             final boolean[] selections,
@@ -427,9 +310,6 @@ public class ViewUtil {
 
     /**
      * shows an authentication dialog that asks for the administrator passcode
-     * 
-     * @param parentContext
-     * @param listener
      */
     public static void showAdminAuthDialog(final Context parentContext,
             final AdminAuthDialogListener listener) {
@@ -460,11 +340,6 @@ public class ViewUtil {
     /**
      * shows a dialog that prompts the user to enter a single text value as
      * input
-     * 
-     * @param parentContext
-     * @param title
-     * @param text
-     * @param clickListener
      */
     public static void ShowTextInputDialog(final Context parentContext,
             int title, int text, EditText inputView,

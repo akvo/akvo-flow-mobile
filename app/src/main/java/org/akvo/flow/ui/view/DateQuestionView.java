@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -20,7 +20,6 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
@@ -45,9 +44,8 @@ import java.util.GregorianCalendar;
  * 
  * @author Christohper Fagiani
  */
-public class DateQuestionView extends QuestionView {
+public class DateQuestionView extends QuestionView implements View.OnClickListener {
     private EditText mDateTextEdit;
-    private Button mPickButton;
     private int mYear;
     private int mMonth;
     private int mDay;
@@ -69,29 +67,30 @@ public class DateQuestionView extends QuestionView {
         setQuestionView(R.layout.date_question_view);
 
         mDateTextEdit = (EditText)findViewById(R.id.date_et);
-        mPickButton = (Button)findViewById(R.id.date_btn);
 
-        mPickButton.setOnClickListener(new OnClickListener() {
+        View pickButton = findViewById(R.id.date_btn);
+        pickButton.setOnClickListener(this);
+        pickButton.setEnabled(!isReadOnly());
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (mSelectedDate != null) {
+            Calendar c = new GregorianCalendar();
+            c.setTime(mSelectedDate);
+            mDay = c.get(Calendar.DAY_OF_MONTH);
+            mYear = c.get(Calendar.YEAR);
+            mMonth = c.get(Calendar.MONTH);
+        }
+        DatePickerDialog dia = new DatePickerDialog(getContext(), new OnDateSetListener() {
             @Override
-            public void onClick(View v) {
-                if (mSelectedDate != null) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(mSelectedDate);
-                    mDay = c.get(Calendar.DAY_OF_MONTH);
-                    mYear = c.get(Calendar.YEAR);
-                    mMonth = c.get(Calendar.MONTH);
-                }
-                DatePickerDialog dia = new DatePickerDialog(getContext(), new OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        mSelectedDate = new GregorianCalendar(year, monthOfYear, dayOfMonth).getTime();
-                        mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
-                        captureResponse();
-                    }
-                }, mYear, mMonth, mDay);
-                dia.show();
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                mSelectedDate = new GregorianCalendar(year, monthOfYear, dayOfMonth).getTime();
+                mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
+                captureResponse();
             }
-        });
+        }, mYear, mMonth, mDay);
+        dia.show();
     }
 
     @Override

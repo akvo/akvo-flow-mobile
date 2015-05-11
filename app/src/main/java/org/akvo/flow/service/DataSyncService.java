@@ -26,9 +26,14 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.api.response.FormInstance;
+import org.akvo.flow.api.response.Response;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
@@ -94,7 +99,7 @@ public class DataSyncService extends IntentService {
     private static final String SIGNING_KEY_PROP = "signingKey";
     private static final String SIGNING_ALGORITHM = "HmacSHA1";
 
-    private static final String SURVEY_DATA_FILE = "data.txt";
+    private static final String SURVEY_DATA_FILE_JSON = "data.json";
     private static final String SIG_FILE_NAME = ".sig";
 
     // Sync constants
@@ -203,10 +208,10 @@ public class DataSyncService extends IntentService {
 
     private ZipFileData formZip(long surveyInstanceId) {
         ZipFileData zipFileData = new ZipFileData();
-        StringBuilder surveyBuf = new StringBuilder();
+        StringBuilder jsonBuf = new StringBuilder();
 
         // Hold the responses in the StringBuilder
-        String uuid = processSurveyData(surveyInstanceId, surveyBuf, zipFileData.imagePaths);
+        String uuid = processSurveyData(surveyInstanceId, jsonBuf, zipFileData.imagePaths);
 
         // THe filename will match the Survey Instance UUID
         File zipFile = getSurveyInstanceFile(uuid);
@@ -220,11 +225,11 @@ public class DataSyncService extends IntentService {
             CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
             ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
 
-            writeTextToZip(zos, surveyBuf.toString(), SURVEY_DATA_FILE);
+            writeTextToZip(zos, jsonBuf.toString(), SURVEY_DATA_FILE_JSON);
             String signingKeyString = mProps.getProperty(SIGNING_KEY_PROP);
             if (!StringUtil.isNullOrEmpty(signingKeyString)) {
                 MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
-                byte[] digest = sha1Digest.digest(surveyBuf.toString().getBytes("UTF-8"));
+                byte[] digest = sha1Digest.digest(jsonBuf.toString().getBytes("UTF-8"));
                 SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes("UTF-8"),
                         SIGNING_ALGORITHM);
                 Mac mac = Mac.getInstance(SIGNING_ALGORITHM);
@@ -278,11 +283,13 @@ public class DataSyncService extends IntentService {
      * string builder and collections passed in with the requisite information.
      *
      * @param surveyInstanceId - Survey Instance Id
-     * @param buf - IN param. After execution this will contain the data to be sent
+     * @param jsonBuf - IN param. After execution this will contain the data to be sent
      * @param imagePaths - IN param. After execution this will contain the list of photo paths to send
      * @return Survey Instance UUID
      */
-    private String processSurveyData(long surveyInstanceId, StringBuilder buf, List<String> imagePaths) {
+    private String processSurveyData(long surveyInstanceId, StringBuilder jsonBuf, List<String> imagePaths) {
+        FormInstance formInstance = new FormInstance();
+        List<Response> responses = new ArrayList<>();
         String uuid = null;
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
@@ -303,8 +310,6 @@ public class DataSyncService extends IntentService {
                 int disp_name_col = data.getColumnIndexOrThrow(UserColumns.NAME);
                 int email_col = data.getColumnIndexOrThrow(UserColumns.EMAIL);
                 int submitted_date_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
-                int scored_val_col = data.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL);
-                int strength_col = data.getColumnIndexOrThrow(ResponseColumns.STRENGTH);
                 int uuid_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.UUID);
                 int duration_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.DURATION);
                 int localeId_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.RECORD_ID);
@@ -327,34 +332,42 @@ public class DataSyncService extends IntentService {
 
                     if (uuid == null) {
                         uuid = data.getString(uuid_col);// Parse it just once
+
+                        formInstance.setUUID(uuid);
+                        formInstance.setFormId(data.getLong(survey_fk_col));
+                        formInstance.setDataPointId(data.getString(localeId_col));
+                        formInstance.setDeviceId(deviceIdentifier);
+                        formInstance.setSubmissionDate(submitted_date);
+                        formInstance.setDuration(surveyal_time);
+                        formInstance.setUsername(cleanVal(data.getString(disp_name_col)));
+                        formInstance.setEmail(cleanVal(data.getString(email_col)));
                     }
 
-                    buf.append(data.getString(survey_fk_col));
-                    buf.append(DELIMITER).append(String.valueOf(surveyInstanceId));
-                    buf.append(DELIMITER).append(data.getString(question_fk_col));
                     String type = data.getString(answer_type_col);
-                    buf.append(DELIMITER).append(type);
-                    buf.append(DELIMITER).append(value);
-                    buf.append(DELIMITER).append(cleanVal(data.getString(disp_name_col)));
-                    buf.append(DELIMITER).append(cleanVal(data.getString(email_col)));
-                    buf.append(DELIMITER).append(submitted_date);
-                    buf.append(DELIMITER).append(deviceIdentifier);
-                    buf.append(DELIMITER).append(neverNull(data.getString(scored_val_col)));
-                    buf.append(DELIMITER).append(neverNull(data.getString(strength_col)));
-                    buf.append(DELIMITER).append(uuid);
-                    buf.append(DELIMITER).append(surveyal_time);
-                    buf.append(DELIMITER).append(data.getString(localeId_col));
-                    buf.append("\n");
-
                     if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
                             || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
                         imagePaths.add(value);
                     }
+
+                    Response response = new Response();
+                    response.setQuestionId(data.getString(question_fk_col));
+                    response.setAnswerType(type);
+                    response.setValue(value);
+                    responses.add(response);
                 } while (data.moveToNext());
             }
 
             data.close();
         }
+
+        formInstance.setResponses(responses);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            jsonBuf.append(mapper.writeValueAsString(formInstance));
+        } catch (JsonProcessingException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
         return uuid;
     }
 
@@ -373,13 +386,6 @@ public class DataSyncService extends IntentService {
             }
         }
         return val;
-    }
-
-    private String neverNull(String val) {
-        if (val != null) {
-            return val;
-        } else
-            return "";
     }
 
     // ================================================================= //

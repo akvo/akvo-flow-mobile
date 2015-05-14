@@ -1,6 +1,18 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.6
+Date: 14 May 2015
+
+New and noteworthy
+------------------
+* Data is now serialized using JSON encoding [#291]
+* Tetum language is now available in survey translations [#294]
+
+Resolved issues
+---------------
+* Date question responses cannot be modified on submitted forms [#295]
+
 # ver 2.1.5
 Date: 24 April 2015
 

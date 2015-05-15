@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -19,7 +19,9 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -65,6 +67,32 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         mScanBtn = (Button)findViewById(R.id.scan_btn);
         mAddBtn = (ImageButton)findViewById(R.id.add_btn);
         mInputText = (EditText)findViewById(R.id.input_text);
+
+        if (mMultiple) {
+            mInputText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String[] tokens =  s.toString().split("\\s+", -1);
+                    if (tokens.length > 1) {
+                        for (int i=0; i<tokens.length-1; i++) {
+                            addValue(tokens[i]);
+                        }
+                        mInputText.setText(tokens[tokens.length-1]);
+                    }
+                }
+            });
+            if (isReadOnly()) {
+                mInputText.setVisibility(View.GONE);
+            }
+        }
 
         if (isReadOnly() && mMultiple) {
             mInputText.setVisibility(View.GONE);

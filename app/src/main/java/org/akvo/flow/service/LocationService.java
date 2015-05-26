@@ -16,6 +16,7 @@
 
 package org.akvo.flow.service;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -105,8 +106,7 @@ public class LocationService extends Service {
 
     public void onCreate() {
         super.onCreate();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-                .getInstance());
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         locMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationCriteria = new Criteria();
         locationCriteria.setAccuracy(Criteria.NO_REQUIREMENT);
@@ -114,8 +114,6 @@ public class LocationService extends Service {
 
     /**
      * sends the location beacon to the server
-     * 
-     * @param loc
      */
     private void sendLocation(String serverBase, Location loc) {
         if (serverBase != null) {
@@ -126,9 +124,8 @@ public class LocationService extends Service {
                 }
                 url += OS_VERSION + URLEncoder.encode("Android " + android.os.Build.VERSION.RELEASE);
                 HttpUtil.httpGet(url);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Log.e(TAG, "Could not send location beacon", e);
-                PersistentUncaughtExceptionHandler.recordException(e);
             }
         }
     }

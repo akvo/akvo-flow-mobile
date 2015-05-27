@@ -348,11 +348,20 @@ public class DataSyncService extends IntentService {
                             || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
                         imagePaths.add(value);
                     }
+                    int iteration = 0;
+                    String qid = data.getString(question_fk_col);
+                    String[] tokens = qid.split("\\|", -1);
+                    if (tokens.length == 1) {
+                        // This is a compound ID from a repeatable question
+                        qid = tokens[0];
+                        iteration = Integer.parseInt(tokens[1]) - 1;// 0-based index
+                    }
 
                     Response response = new Response();
-                    response.setQuestionId(data.getString(question_fk_col));
+                    response.setQuestionId(qid);
                     response.setAnswerType(type);
                     response.setValue(value);
+                    response.setIteration(iteration);
                     responses.add(response);
                 } while (data.moveToNext());
             }

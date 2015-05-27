@@ -251,7 +251,6 @@ public class QuestionGroupTab extends ScrollView {
         header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         header.setText(mQuestionGroup.getHeading() + " - " + mIterations);
         header.setTextColor(getResources().getColor(R.color.text_color_orange));
-
         header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
 
         return header;

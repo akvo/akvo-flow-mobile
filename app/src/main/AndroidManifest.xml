@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.flow"
     android:versionCode="1"
-    android:versionName="2.1.2" >
+    android:versionName="2.1.6" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -54,7 +54,7 @@
         <activity
             android:name=".activity.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|locale|layoutDirection"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.ListUserActivity"
             android:configChanges="locale|layoutDirection"

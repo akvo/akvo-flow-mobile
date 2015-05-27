@@ -1,6 +1,52 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.6
+Date: 14 May 2015
+
+New and noteworthy
+------------------
+* Data is now serialized using JSON encoding [#291]
+* Tetum language is now available in survey translations [#294]
+
+Resolved issues
+---------------
+* Date question responses cannot be modified on submitted forms [#295]
+
+# ver 2.1.5
+Date: 24 April 2015
+
+Resolved issues
+---------------
+* Fix two unexpected app crashes [#287 and #285]
+
+#ver 2.1.4
+Date: 2 April 2015
+
+New and noteworthy
+------------------
+* Form download process display more meaningfull error messages [#276]
+* Datapoint names are truncated if the resulting size is larger than 500 characters [#278]
+* Prevent form imports from the wrong instance [#242]
+
+#ver 2.1.3
+Date: 17 March 2015
+
+New and noteworthy
+------------------
+* Geoshapes editor displays a GPS position accuracy indicator, with a green/red color based on the accuracy threshold [#272]
+
+Resolved issues
+---------------
+* Datapoint name generation removes leading/trailing hyphens and space characters [#273]
+
+#ver 2.1.2.1
+Date: 24 February 2015
+
+New and noteworthy
+------------------
+* This hotfix release fixes a monitoring survey sync issue that arises when no SIM card is present [#270]
+
 #ver 2.1.2
 Date: 20 February 2015
 

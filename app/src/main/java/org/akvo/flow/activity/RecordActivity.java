@@ -155,7 +155,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
             return;
         }
         if (!mDatabase.getSurvey(surveyId).isHelpDownloaded()) {
-            Toast.makeText(this, R.string.error_missing_resources, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
             return;
         }
 

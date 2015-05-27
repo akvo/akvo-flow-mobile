@@ -50,6 +50,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String HEADING = "heading";
     private static final String QUESTION = "question";
     private static final String SURVEY = "survey";
+    private static final String APP = "app";
     private static final String ORDER = "order";
     private static final String MANDATORY = "mandatory";
     private static final String TYPE = "type";
@@ -275,6 +276,7 @@ public class SurveyHandler extends DefaultHandler {
                 String regform = attributes.getValue(REGISTRATION_SURVEY);
                 survey.setSurveyGroup(new SurveyGroup(sgid, sgname, regform, regform != null));
             }
+            survey.setApp(attributes.getValue(APP));
         } else if (localName.equalsIgnoreCase(QUESTION_GROUP)) {
             currentQuestionGroup = new QuestionGroup();
             if (attributes.getValue(ORDER) != null) {

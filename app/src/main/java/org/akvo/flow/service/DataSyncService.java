@@ -351,7 +351,7 @@ public class DataSyncService extends IntentService {
                     int iteration = 0;
                     String qid = data.getString(question_fk_col);
                     String[] tokens = qid.split("\\|", -1);
-                    if (tokens.length == 1) {
+                    if (tokens.length == 2) {
                         // This is a compound ID from a repeatable question
                         qid = tokens[0];
                         iteration = Integer.parseInt(tokens[1]) - 1;// 0-based index

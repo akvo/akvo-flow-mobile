@@ -147,7 +147,7 @@ public class QuestionGroupTab extends ScrollView {
             mContainer.removeAllViews();
             mQuestionViews.clear();
             mIterations = 0;
-            loadGroup(getIterationCount());
+            loadGroup();// Leave one iteration by default
         }
 
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();

@@ -108,8 +108,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         if (!tab.isLoaded()) {
             Log.d(TAG, "Loading Tab #" + position);
             tab.load();
-            setupDependencies();// Dependencies might occur across tabs
             tab.loadState();
+            setupDependencies();// Dependencies might occur across tabs
         }
     }
 

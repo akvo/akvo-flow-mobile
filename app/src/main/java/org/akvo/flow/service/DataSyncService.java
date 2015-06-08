@@ -242,15 +242,7 @@ public class DataSyncService extends IntentService {
             final String checksum = "" + checkedOutStream.getChecksum().getValue();
             zos.close();
             Log.i(TAG, "Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
-        } catch (IOException e) {
-            PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
-            zipFileData = null;
-        } catch (NoSuchAlgorithmException e) {
-            PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
-            zipFileData = null;
-        } catch (InvalidKeyException e) {
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             PersistentUncaughtExceptionHandler.recordException(e);
             Log.e(TAG, e.getMessage());
             zipFileData = null;

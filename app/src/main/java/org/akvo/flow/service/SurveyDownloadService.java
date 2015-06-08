@@ -48,7 +48,6 @@ import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.exception.TransferException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -134,13 +133,11 @@ public class SurveyDownloadService extends IntentService {
                     databaseAdaptor.addLanguages(langs);
                     downloadResources(survey);
                     synced++;
-                } catch (Exception e) {
+                } catch (IOException e) {
                     failed++;
                     Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
                     displayErrorNotification(ConstantUtil.NOTIFICATION_FORM_ERROR,
                             getString(R.string.error_form_download));
-                    PersistentUncaughtExceptionHandler
-                            .recordException(new TransferException(survey.getId(), null, e));
                 }
                 displayNotification(synced, failed, surveys.size());
             }
@@ -293,10 +290,12 @@ public class SurveyDownloadService extends IntentService {
                     surveys.addAll(new SurveyMetaParser().parseList(response, true));
                 }
             } catch (IllegalArgumentException | IOException e) {
+                if (e instanceof IllegalArgumentException) {
+                    PersistentUncaughtExceptionHandler.recordException(e);
+                }
                 Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         String.format(getString(R.string.error_form_header), id));
-                PersistentUncaughtExceptionHandler.recordException(e);
             }
         }
         return surveys;
@@ -318,10 +317,12 @@ public class SurveyDownloadService extends IntentService {
                 surveys = new SurveyMetaParser().parseList(response);
             }
         } catch (IllegalArgumentException | IOException e) {
+            if (e instanceof IllegalArgumentException) {
+                PersistentUncaughtExceptionHandler.recordException(e);
+            }
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
                     getString(R.string.error_assignment_read));
             Log.e(TAG, e.getMessage());
-            PersistentUncaughtExceptionHandler.recordException(e);
         }
         return surveys;
     }

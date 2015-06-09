@@ -85,7 +85,7 @@ public class QuestionGroupTab extends ScrollView {
 
         if (mQuestionGroup.isRepeatable()) {
             View repeatBtn = findViewById(R.id.repeat_btn);
-            repeatBtn.setVisibility(VISIBLE);// GONE by default
+            repeatBtn.setVisibility(VISIBLE);
             repeatBtn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

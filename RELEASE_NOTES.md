@@ -1,6 +1,12 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.7
+Date: 10 Jun 2015
+
+Resolved issues:
+* Reduce expected error (network issues) reports [#290] 
+
 # ver 2.1.6
 Date: 14 May 2015
 

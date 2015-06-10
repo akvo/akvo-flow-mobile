@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
 *
 * This file is part of Akvo FLOW.
 *
@@ -25,9 +25,12 @@ import org.akvo.flow.activity.TimeCheckActivity;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.StatusUtil;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -44,8 +47,7 @@ public class TimeCheckService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler
-                .getInstance());
+        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         checkTime();
     }
 
@@ -82,9 +84,8 @@ public class TimeCheckService extends IntentService {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | JSONException | ParseException e) {
             Log.e(TAG, "Error fetching time: ", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
         }
     }
 

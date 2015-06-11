@@ -106,6 +106,7 @@ public class DataSyncService extends IntentService {
     private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification";
     private static final String NOTIFICATION_PATH = "/processor?action=";
     private static final String FILENAME_PARAM = "&fileName=";
+    private static final String FORMID_PARAM = "&formID=";
 
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
@@ -128,19 +129,26 @@ public class DataSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
+        try {
+            mProps = new PropertyUtil(getResources());
+            mDatabase = new SurveyDbAdapter(this);
+            mDatabase.open();
 
-        mProps = new PropertyUtil(getResources());
-        mDatabase = new SurveyDbAdapter(this);
-        mDatabase.open();
+            exportSurveys();// Create zip files, if necessary
 
-        exportSurveys();// Create zip files, if necessary
+            if (StatusUtil.hasDataConnection(this)) {
+                syncFiles();// Sync everything
+            }
 
-        if (StatusUtil.hasDataConnection(this)) {
-            syncFiles();// Sync everything
+            mDatabase.close();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            PersistentUncaughtExceptionHandler.recordException(e);
+        } finally {
+            if (mDatabase != null) {
+                mDatabase.close();
+            }
         }
-
-        mDatabase.close();
     }
 
     // ================================================================= //
@@ -207,17 +215,21 @@ public class DataSyncService extends IntentService {
     }
 
     private ZipFileData formZip(long surveyInstanceId) {
-        ZipFileData zipFileData = new ZipFileData();
-        StringBuilder jsonBuf = new StringBuilder();
-
-        // Hold the responses in the StringBuilder
-        String uuid = processSurveyData(surveyInstanceId, jsonBuf, zipFileData.imagePaths);
-
-        // THe filename will match the Survey Instance UUID
-        File zipFile = getSurveyInstanceFile(uuid);
-
-        // Write the data into the zip file
         try {
+            ZipFileData zipFileData = new ZipFileData();
+            // Process form instance data and collect image filenames
+            FormInstance formInstance = processFormInstance(surveyInstanceId, zipFileData.imagePaths);
+
+            if (formInstance == null) {
+                return null;
+            }
+
+            // Serialize form instance as JSON
+            zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
+
+            File zipFile = getSurveyInstanceFile(zipFileData.uuid);// The filename will match the Survey Instance UUID
+
+            // Write the data into the zip file
             String fileName = zipFile.getAbsolutePath();// Will normalize filename.
             zipFileData.filename = fileName;
             Log.i(TAG, "Creating zip file: " + fileName);
@@ -225,11 +237,11 @@ public class DataSyncService extends IntentService {
             CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
             ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
 
-            writeTextToZip(zos, jsonBuf.toString(), SURVEY_DATA_FILE_JSON);
+            writeTextToZip(zos, zipFileData.data, SURVEY_DATA_FILE_JSON);
             String signingKeyString = mProps.getProperty(SIGNING_KEY_PROP);
             if (!StringUtil.isNullOrEmpty(signingKeyString)) {
                 MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
-                byte[] digest = sha1Digest.digest(jsonBuf.toString().getBytes("UTF-8"));
+                byte[] digest = sha1Digest.digest(zipFileData.data.getBytes("UTF-8"));
                 SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes("UTF-8"),
                         SIGNING_ALGORITHM);
                 Mac mac = Mac.getInstance(SIGNING_ALGORITHM);
@@ -242,13 +254,12 @@ public class DataSyncService extends IntentService {
             final String checksum = "" + checkedOutStream.getChecksum().getValue();
             zos.close();
             Log.i(TAG, "Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
+            return zipFileData;
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             PersistentUncaughtExceptionHandler.recordException(e);
             Log.e(TAG, e.getMessage());
-            zipFileData = null;
+            return null;
         }
-
-        return zipFileData;
     }
 
     /**
@@ -271,96 +282,78 @@ public class DataSyncService extends IntentService {
     }
 
     /**
-     * iterate over the survey data returned from the database and populate the
-     * string builder and collections passed in with the requisite information.
-     *
-     * @param surveyInstanceId - Survey Instance Id
-     * @param jsonBuf - IN param. After execution this will contain the data to be sent
-     * @param imagePaths - IN param. After execution this will contain the list of photo paths to send
-     * @return Survey Instance UUID
+     * Iterate over the survey data returned from the database and populate the
+     * ZipFileData information, setting the UUID, Survey ID, image paths, and String data.
      */
-    private String processSurveyData(long surveyInstanceId, StringBuilder jsonBuf, List<String> imagePaths) {
+    private FormInstance processFormInstance(long surveyInstanceId, List<String> imagePaths) throws IOException {
         FormInstance formInstance = new FormInstance();
         List<Response> responses = new ArrayList<>();
-        String uuid = null;
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
-        if (data != null) {
-            if (data.moveToFirst()) {
-                Log.i(TAG, "There is data to send. Forming contents");
-                String deviceIdentifier = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-                if (deviceIdentifier == null) {
-                    deviceIdentifier = "unset";
-                } else {
-                    deviceIdentifier = cleanVal(deviceIdentifier);
-                }
-                // evaluate indices once, outside the loop
-                int survey_fk_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);
-                int question_fk_col = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
-                int answer_type_col = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
-                int answer_col = data.getColumnIndexOrThrow(ResponseColumns.ANSWER);
-                int disp_name_col = data.getColumnIndexOrThrow(UserColumns.NAME);
-                int email_col = data.getColumnIndexOrThrow(UserColumns.EMAIL);
-                int submitted_date_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
-                int uuid_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.UUID);
-                int duration_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.DURATION);
-                int localeId_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.RECORD_ID);
-                // Note: No need to query the surveyInstanceId, we already have that value
-
-                do {
-                    // Sanitize answer value. No newlines or tabs!
-                    String value = data.getString(answer_col);
-                    if (value != null) {
-                        value = value.replace("\n", SPACE);
-                        value = value.replace(DELIMITER, SPACE);
-                        value = value.trim();
-                    }
-                    // never send empty answers
-                    if (value == null || value.length() == 0) {
-                        continue;
-                    }
-                    final long submitted_date = data.getLong(submitted_date_col);
-                    final long surveyal_time = (data.getLong(duration_col)) / 1000;
-
-                    if (uuid == null) {
-                        uuid = data.getString(uuid_col);// Parse it just once
-
-                        formInstance.setUUID(uuid);
-                        formInstance.setFormId(data.getLong(survey_fk_col));
-                        formInstance.setDataPointId(data.getString(localeId_col));
-                        formInstance.setDeviceId(deviceIdentifier);
-                        formInstance.setSubmissionDate(submitted_date);
-                        formInstance.setDuration(surveyal_time);
-                        formInstance.setUsername(cleanVal(data.getString(disp_name_col)));
-                        formInstance.setEmail(cleanVal(data.getString(email_col)));
-                    }
-
-                    String type = data.getString(answer_type_col);
-                    if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
-                            || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
-                        imagePaths.add(value);
-                    }
-
-                    Response response = new Response();
-                    response.setQuestionId(data.getString(question_fk_col));
-                    response.setAnswerType(type);
-                    response.setValue(value);
-                    responses.add(response);
-                } while (data.moveToNext());
+        if (data != null && data.moveToFirst()) {
+            String deviceIdentifier = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
+            if (deviceIdentifier == null) {
+                deviceIdentifier = "unset";
+            } else {
+                deviceIdentifier = cleanVal(deviceIdentifier);
             }
+            // evaluate indices once, outside the loop
+            int survey_fk_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);
+            int question_fk_col = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
+            int answer_type_col = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
+            int answer_col = data.getColumnIndexOrThrow(ResponseColumns.ANSWER);
+            int disp_name_col = data.getColumnIndexOrThrow(UserColumns.NAME);
+            int email_col = data.getColumnIndexOrThrow(UserColumns.EMAIL);
+            int submitted_date_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
+            int uuid_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.UUID);
+            int duration_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.DURATION);
+            int localeId_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.RECORD_ID);
+            // Note: No need to query the surveyInstanceId, we already have that value
 
+            do {
+                // Sanitize answer value. No newlines or tabs!
+                String value = data.getString(answer_col);
+                if (value != null) {
+                    value = value.replace("\n", SPACE);
+                    value = value.replace(DELIMITER, SPACE);
+                    value = value.trim();
+                }
+                // never send empty answers
+                if (value == null || value.length() == 0) {
+                    continue;
+                }
+                final long submitted_date = data.getLong(submitted_date_col);
+                final long surveyal_time = (data.getLong(duration_col)) / 1000;
+
+                if (formInstance.getUUID() == null) {
+                    formInstance.setUUID(data.getString(uuid_col));
+                    formInstance.setFormId(data.getLong(survey_fk_col));// FormInstance uses a number for this attr
+                    formInstance.setDataPointId(data.getString(localeId_col));
+                    formInstance.setDeviceId(deviceIdentifier);
+                    formInstance.setSubmissionDate(submitted_date);
+                    formInstance.setDuration(surveyal_time);
+                    formInstance.setUsername(cleanVal(data.getString(disp_name_col)));
+                    formInstance.setEmail(cleanVal(data.getString(email_col)));
+                }
+
+                String type = data.getString(answer_type_col);
+                if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
+                        || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
+                    imagePaths.add(value);
+                }
+
+                Response response = new Response();
+                response.setQuestionId(data.getString(question_fk_col));
+                response.setAnswerType(type);
+                response.setValue(value);
+                responses.add(response);
+            } while (data.moveToNext());
+
+            formInstance.setResponses(responses);
             data.close();
         }
 
-        formInstance.setResponses(responses);
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            jsonBuf.append(mapper.writeValueAsString(formInstance));
-        } catch (JsonProcessingException e) {
-            Log.e(TAG, e.getMessage());
-        }
-
-        return uuid;
+        return formInstance;
     }
 
     // replace troublesome chars in user-provided values
@@ -694,7 +687,10 @@ public class DataSyncService extends IntentService {
      * </ul>
      */
     class ZipFileData {
+        String uuid = null;
+        String surveyId = null;
         String filename = null;
+        String data = null;
         List<String> imagePaths = new ArrayList<String>();
     }
 

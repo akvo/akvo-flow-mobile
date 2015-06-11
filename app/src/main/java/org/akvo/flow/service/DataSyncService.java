@@ -166,11 +166,11 @@ public class DataSyncService extends IntentService {
                 displayExportNotification(getDestName(zipFileData.filename));
 
                 // Create new entries in the transmission queue
-                mDatabase.createTransmission(id, zipFileData.filename);
+                mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
                 updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
 
                 for (String image : zipFileData.imagePaths) {
-                    mDatabase.createTransmission(id, image);
+                    mDatabase.createTransmission(id, zipFileData.formId, image);
                 }
             }
         }
@@ -226,6 +226,8 @@ public class DataSyncService extends IntentService {
 
             // Serialize form instance as JSON
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
+            zipFileData.uuid = formInstance.getUUID();
+            zipFileData.formId = String.valueOf(formInstance.getFormId());
 
             File zipFile = getSurveyInstanceFile(zipFileData.uuid);// The filename will match the Survey Instance UUID
 
@@ -408,7 +410,7 @@ public class DataSyncService extends IntentService {
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission.getFileName(), transmission.getStatus(), serverBase)) {
+            if (syncFile(transmission.getFileName(), transmission.getFormId(), transmission.getStatus(), serverBase)) {
                 syncedSurveys.add(surveyInstanceId);
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
@@ -431,7 +433,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(String filename, int status, String serverBase) {
+    private boolean syncFile(String filename, String formId, int status, String serverBase) {
         if (TextUtils.isEmpty(filename)) {
             return false;
         }
@@ -460,7 +462,7 @@ public class DataSyncService extends IntentService {
         if (ok && action != null) {
             // If action is not null, notify GAE back-end that data is available
             // TODO: Do we need to send the checksum?
-            ok = sendProcessingNotification(serverBase, action, destName);
+            ok = sendProcessingNotification(serverBase, formId, action, destName);
         }
 
         // Update database and display notification
@@ -560,7 +562,7 @@ public class DataSyncService extends IntentService {
         int rows = mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
         if (rows == 0) {
             // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            mDatabase.createTransmission(-1, filename, TransmissionStatus.FAILED);
+            mDatabase.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
         }
     }
 
@@ -582,9 +584,10 @@ public class DataSyncService extends IntentService {
      * @param fileName
      * @return
      */
-    private boolean sendProcessingNotification(String serverBase, String action, String fileName) {
+    private boolean sendProcessingNotification(String serverBase, String formId, String action, String fileName) {
         boolean success = false;
         String url = serverBase + NOTIFICATION_PATH + action
+                + FORMID_PARAM + formId
                 + FILENAME_PARAM + fileName + "&" + FlowApi.getDeviceParams();
         try {
             HttpUtil.httpGet(url);
@@ -688,7 +691,7 @@ public class DataSyncService extends IntentService {
      */
     class ZipFileData {
         String uuid = null;
-        String surveyId = null;
+        String formId = null;
         String filename = null;
         String data = null;
         List<String> imagePaths = new ArrayList<String>();

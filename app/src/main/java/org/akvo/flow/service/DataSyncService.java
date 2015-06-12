@@ -26,7 +26,6 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.akvo.flow.R;
@@ -267,13 +266,8 @@ public class DataSyncService extends IntentService {
     }
 
     /**
-     * writes the contents of text to a zip entry within the Zip file behind zos
+     * Writes the contents of text to a zip entry within the Zip file behind zos
      * named fileName
-     *
-     * @param zos
-     * @param text
-     * @param fileName
-     * @throws java.io.IOException
      */
     private void writeTextToZip(ZipOutputStream zos, String text,
             String fileName) throws IOException {
@@ -543,9 +537,6 @@ public class DataSyncService extends IntentService {
     /**
      * Given a json array, return the list of contained filenames,
      * formatting the path to match the structure of the sdcard's files.
-     * @param jFiles
-     * @return
-     * @throws JSONException
      */
     private List<String> parseFiles(JSONArray jFiles) throws JSONException {
         List<String> files = new ArrayList<String>();
@@ -580,11 +571,8 @@ public class DataSyncService extends IntentService {
     }
 
     /**
-     * sends a message to the service with the file name that was just uploaded
+     * Sends a message to the service with the file name that was just uploaded
      * so it can start processing the file
-     *
-     * @param fileName
-     * @return
      */
     private boolean sendProcessingNotification(String serverBase, String formId, String action, String fileName) {
         boolean success = false;
@@ -617,9 +605,6 @@ public class DataSyncService extends IntentService {
         return filename;
     }
 
-    /**
-     *
-     */
     private void updateSurveyStatus(long surveyInstanceId, int status) {
         // First off, update the status
         mDatabase.updateSurveyStatus(surveyInstanceId, status);
@@ -689,12 +674,7 @@ public class DataSyncService extends IntentService {
     }
 
     /**
-     * Helper class to wrap zip file's meta-data.<br>
-     * It will contain:
-     * <ul>
-     * <li>filename</li>
-     * <li>Image Paths</li>
-     * </ul>
+     * Helper class to wrap zip file's meta-data
      */
     class ZipFileData {
         String uuid = null;

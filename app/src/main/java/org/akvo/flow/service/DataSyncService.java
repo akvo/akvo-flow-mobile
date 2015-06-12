@@ -41,6 +41,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.Base64;
 import org.akvo.flow.util.ConstantUtil;
@@ -52,6 +53,7 @@ import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.ViewUtil;
 
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -163,7 +165,7 @@ public class DataSyncService extends IntentService {
         for (long id : getUnexportedSurveys()) {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
-                displayExportNotification(getDestName(zipFileData.filename));
+                displayNotification(id, getString(R.string.exportcomplete), getDestName(zipFileData.filename));
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
@@ -592,6 +594,13 @@ public class DataSyncService extends IntentService {
         try {
             HttpUtil.httpGet(url);
             success = true;
+        } catch (HttpException e) {
+            if (e.getStatus() == HttpStatus.SC_NOT_FOUND) {
+                // This form has probably been deleted.
+                Log.e(TAG, "404 response for formId: " + formId);
+                displayNotification(Integer.valueOf(formId),
+                        "Form " + formId + " does not exist", "It has probably been deleted");
+            }
         } catch (Exception e) {
             Log.e(TAG, "GAE sync notification failed for file: " + fileName);
         }
@@ -620,11 +629,9 @@ public class DataSyncService extends IntentService {
         sendBroadcast(intentBroadcast);
     }
 
-    private void displayExportNotification(String filename) {
-        String text = getString(R.string.exportcomplete);
-        ViewUtil.fireNotification(text, filename, this, ConstantUtil.NOTIFICATION_DATA_SYNC, null);
+    private void displayNotification(long id, String title, String text) {
+        ViewUtil.fireNotification(title, text, this, (int)id, null);
     }
-
 
     /**
      * Display a notification showing the up-to-date status of the sync

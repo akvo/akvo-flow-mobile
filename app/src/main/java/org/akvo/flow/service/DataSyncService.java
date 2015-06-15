@@ -566,7 +566,12 @@ public class DataSyncService extends IntentService {
      * @throws Exception
      */
     private String getDeviceNotification(String serverBase) throws Exception {
-        String url = serverBase + DEVICE_NOTIFICATION_PATH + "?" + FlowApi.getDeviceParams();
+        // Send the list of surveys we've got downloaded, getting notified of the deleted ones
+        StringBuilder surveyIds = new StringBuilder();
+        for (String id : mDatabase.getSurveyIds()) {
+            surveyIds.append("&formId=" + id);
+        }
+        String url = serverBase + DEVICE_NOTIFICATION_PATH + "?" + FlowApi.getDeviceParams() + surveyIds.toString();
         return HttpUtil.httpGet(url);
     }
 

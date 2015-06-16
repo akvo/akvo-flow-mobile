@@ -33,6 +33,7 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.api.response.FormInstance;
 import org.akvo.flow.api.response.Response;
+import org.akvo.flow.broadcast.FormDeletedReceiver;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
@@ -698,6 +699,14 @@ public class DataSyncService extends IntentService {
                 .setContentText(text)
                 .setTicker(text)
                 .setOngoing(false);
+
+        // Delete intent. Once the user dismisses the notification, we'll delete the form.
+        Intent intent = new Intent(this, FormDeletedReceiver.class);
+        intent.putExtra(FormDeletedReceiver.FORM_ID, formId);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
+                notificationId, intent, 0);
+        builder.setDeleteIntent(pendingIntent);
+
         // Dummy intent. Do nothing when clicked
         PendingIntent dummyIntent = PendingIntent.getActivity(this, 0, new Intent(), 0);
         builder.setContentIntent(dummyIntent);

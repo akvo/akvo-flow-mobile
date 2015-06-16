@@ -528,6 +528,13 @@ public class DataSyncService extends IntentService {
                         setFileTransmissionFailed(filename);
                     }
                 }
+
+                JSONArray jForms = jResponse.optJSONArray("deletedForms");
+                if (jForms != null) {
+                    for (int i=0; i<jForms.length(); i++) {
+                        displayFormDeletedNotification(jForms.getString(i));
+                    }
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Could not retrieve missing files", e);
@@ -620,7 +627,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void displayNotification(long id, String title, String text) {
-        ViewUtil.fireNotification(title, text, this, (int)id, null);
+        ViewUtil.fireNotification(title, text, this, (int) id, null);
     }
 
     /**
@@ -677,6 +684,41 @@ public class DataSyncService extends IntentService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
     }
+
+    private void displayFormDeletedNotification(String formId) {
+        // Create a unique ID for this form's delete notification
+        final int notificationId = (int)formId(formId);
+
+        // Do not show failed if there is none
+        String text = "Form " + formId + " has been deleted";
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.info)
+                .setContentTitle("Form deleted")
+                .setContentText(text)
+                .setTicker(text)
+                .setOngoing(false);
+        // Dummy intent. Do nothing when clicked
+        PendingIntent dummyIntent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        builder.setContentIntent(dummyIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(notificationId, builder.build());
+    }
+
+    /**
+     * Coerce a form id into its numeric format
+     */
+    public static long formId(String id) {
+        try {
+            return Long.valueOf(id);
+        } catch (NumberFormatException e ){
+            Log.e(TAG, id + " is not a valid form id");
+            return 0;
+        }
+    }
+
 
     /**
      * Helper class to wrap zip file's meta-data

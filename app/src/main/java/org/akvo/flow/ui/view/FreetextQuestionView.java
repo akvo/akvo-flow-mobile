@@ -64,6 +64,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
 
         if (isReadOnly()) {
             mEditText.setFocusable(false);
+            mDoubleEntryText.setFocusable(false);
         }
         
         int maxLength = ValidationRule.DEFAULT_MAX_LENGTH;

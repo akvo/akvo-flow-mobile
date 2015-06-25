@@ -15,7 +15,9 @@
  */
 package org.akvo.flow.ui.view;
 
+import android.animation.LayoutTransition;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -75,6 +77,11 @@ public class QuestionGroupTab extends ScrollView {
         // FIXME: Would it make more sense to initialize this attrs in the XML file?
         mInflater.inflate(R.layout.question_group_tab, this);
         mContainer = (LinearLayout)findViewById(R.id.question_list);
+
+        // Animate view additions/removals if possible
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            mContainer.setLayoutTransition(new LayoutTransition());
+        }
 
         findViewById(R.id.next_btn).setOnClickListener(new OnClickListener() {
             @Override

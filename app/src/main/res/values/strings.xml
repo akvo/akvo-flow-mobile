@@ -172,11 +172,19 @@
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>
     <string name="distance_label">Distance:</string>
+    <string name="tab_datapoints">DATA POINTS</string>
+    <string name="tab_map">MAP</string>
+    <string name="order_date">Date</string>
+    <string name="order_distance">Distance</string>
+    <string name="order_status">Status</string>
+    <string name="order_name">Name</string>
     <!-- Record Activity -->
     <string name="unknown">Unnamed data point</string>
     <string name="last_modified">Last Modified:</string>
     <string name="last_response">Last Response:</string>
     <string name="error_missing_cascade">Cascade files are not downloaded</string>
+    <string name="tab_forms">FORMS</string>
+    <string name="tab_history">HISTORY</string>
     <!-- Form & transmission status -->
     <string name="status_queued">Queued</string>
     <string name="status_in_progress">In Progress</string>

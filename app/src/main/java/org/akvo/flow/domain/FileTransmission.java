@@ -26,6 +26,7 @@ import java.util.Date;
 public class FileTransmission {
     private Long id;
     private Long respondentId;
+    private String formId;
     private String fileName;
     private Date startDate;
     private Date endDate;
@@ -79,4 +80,11 @@ public class FileTransmission {
         this.endDate = endDate;
     }
 
+    public String getFormId() {
+        return formId;
+    }
+
+    public void setFormId(String formId) {
+        this.formId = formId;
+    }
 }

@@ -93,7 +93,7 @@ public class SurveyDownloadService extends IntentService {
             }
         }
 
-        sendBroadcastNotification();
+        sendBroadcastNotification(this);
     }
 
     public void onCreate() {
@@ -375,9 +375,9 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
-        sendBroadcast(intentBroadcast);
+    public static void sendBroadcastNotification(Context context) {
+        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
+        context.sendBroadcast(intentBroadcast);
     }
 
 }

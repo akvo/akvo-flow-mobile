@@ -98,6 +98,7 @@ Version</string>
   <string name="bootstrapstart">Cargando datos de la encuesta desde la tarjeta SD</string>
   <string name="bootstrapcomplete">Datos cargados desde la tarjeta SD</string>
   <string name="bootstraperror">Ha ocurrido un error procesando el archivo zip bootstrap</string>
+  <string name="bootstrap_invalid_app">Error: El formulario no pertenece a esta instancia FLOW</string>
   <string name="transmissionhist">Historial de transmisión</string>
   <string name="transstartdate">Transmisión comenzada:</string>
   <string name="transenddate">Transmisión terminada:</string>
@@ -175,10 +176,17 @@ Version</string>
   <string name="distance_label">Distancia:</string>
   <string name="tab_datapoints">PUNTOS DE DATOS</string>
   <string name="tab_map">MAPA</string>
+  <string name="order_date">Fecha</string>
+  <string name="order_distance">Distancia</string>
+  <string name="order_status">Estado</string>
+  <string name="order_name">Nombre</string>
   <!--Record Activity-->
   <string name="unknown">Punto sin nombre</string>
   <string name="last_modified">Última modificación:</string>
   <string name="last_response">Última respuesta:</string>
+  <string name="error_missing_cascade">Los recursos cascada no han sido descargados</string>
+  <string name="tab_forms">ENCUESTAS</string>
+  <string name="tab_history">RESPUESTAS</string>
   <!--Form & transmission status-->
   <string name="status_queued">En espera</string>
   <string name="status_in_progress">En curso</string>

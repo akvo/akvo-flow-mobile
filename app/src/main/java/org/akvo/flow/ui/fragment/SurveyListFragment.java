@@ -183,7 +183,12 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             surveyNameView.setText(surveyInfo.mName);
             surveyVersionView.setText("v" + surveyInfo.mVersion);
 
-            final boolean enabled = !surveyInfo.mDeleted && isEnabled(surveyInfo.mId);
+            boolean enabled = isEnabled(surveyInfo.mId);
+            if (surveyInfo.mDeleted) {
+                enabled = false;
+                surveyVersionView.append(" - " + getString(R.string.form_deleted));
+            }
+
             listItem.setEnabled(enabled);
             surveyNameView.setEnabled(enabled);
             surveyVersionView.setEnabled(enabled);

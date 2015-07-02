@@ -178,10 +178,11 @@ public class SurveyDbAdapter {
     }
 
     public interface TransmissionStatus {
-        int QUEUED      = 0;
-        int IN_PROGRESS = 1;
-        int SYNCED      = 2;
-        int FAILED      = 3;
+        int QUEUED       = 0;
+        int IN_PROGRESS  = 1;
+        int SYNCED       = 2;
+        int FAILED       = 3;
+        int FORM_DELETED = 4;
     }
 
     private static final String TAG = "SurveyDbAdapter";

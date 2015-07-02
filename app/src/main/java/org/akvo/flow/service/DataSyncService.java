@@ -122,6 +122,8 @@ public class DataSyncService extends IntentService {
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
+    private static final int ERROR_UNKNOWN = -1;
+
     private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
 
@@ -459,16 +461,23 @@ public class DataSyncService extends IntentService {
         if (ok && action != null) {
             // If action is not null, notify GAE back-end that data is available
             // TODO: Do we need to send the checksum?
-            ok = sendProcessingNotification(serverBase, formId, action, destName);
-        }
-
-        // Update database and display notification
-        // TODO: Ensure no Exception can be thrown from previous steps, to avoid leaking IN_PROGRESS status
-        if (ok) {
-            // Mark everything completed
-            mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
-        } else {
-            mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+            switch (sendProcessingNotification(serverBase, formId, action, destName)) {
+                case HttpStatus.SC_OK:
+                    // Mark everything completed
+                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
+                    break;
+                case HttpStatus.SC_NOT_FOUND:
+                    // This form has been deleted in the dashboard, thus we cannot sync it
+                    displayNotification(Integer.valueOf(formId),
+                            "Form " + formId + " does not exist", "It has probably been deleted");
+                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FORM_DELETED);
+                    ok = false;// Consider this a failed transmission
+                    break;
+                default:// Any error code
+                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+                    ok = false;// Consider this a failed transmission
+                    break;
+            }
         }
 
         return ok;
@@ -587,25 +596,20 @@ public class DataSyncService extends IntentService {
      * Sends a message to the service with the file name that was just uploaded
      * so it can start processing the file
      */
-    private boolean sendProcessingNotification(String serverBase, String formId, String action, String fileName) {
-        boolean success = false;
+    private int sendProcessingNotification(String serverBase, String formId, String action, String fileName) {
         String url = serverBase + NOTIFICATION_PATH + action
                 + FORMID_PARAM + formId
                 + FILENAME_PARAM + fileName + "&" + FlowApi.getDeviceParams();
         try {
             HttpUtil.httpGet(url);
-            success = true;
+            return HttpStatus.SC_OK;
         } catch (HttpException e) {
-            if (e.getStatus() == HttpStatus.SC_NOT_FOUND) {
-                // This form has probably been deleted.
-                Log.e(TAG, "404 response for formId: " + formId);
-                displayNotification(Integer.valueOf(formId),
-                        "Form " + formId + " does not exist", "It has probably been deleted");
-            }
+            Log.e(TAG, e.getStatus() + " response for formId: " + formId);
+            return e.getStatus();
         } catch (Exception e) {
             Log.e(TAG, "GAE sync notification failed for file: " + fileName);
+            return ERROR_UNKNOWN;
         }
-        return success;
     }
 
     private static String getDestName(String filename) {

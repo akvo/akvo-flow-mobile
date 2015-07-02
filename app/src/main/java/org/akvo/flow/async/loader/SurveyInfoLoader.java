@@ -54,7 +54,7 @@ public class SurveyInfoLoader extends DataLoader<Cursor> {
 
         return database.query(table,
                 SurveyQuery.PROJECTION,
-                SurveyColumns.DELETED + " <> 1 AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?",
+                SurveyColumns.SURVEY_GROUP_ID + " = ?",
                 new String[] { String.valueOf(mSurveyGroupId) },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
                 null,
@@ -66,12 +66,14 @@ public class SurveyInfoLoader extends DataLoader<Cursor> {
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
                 Tables.SURVEY + "." + SurveyColumns.NAME,
                 Tables.SURVEY + "." + SurveyColumns.VERSION,
+                Tables.SURVEY + "." + SurveyColumns.DELETED,
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SUBMITTED_DATE
         };
 
         int SURVEY_ID = 0;
         int NAME      = 1;
         int VERSION   = 2;
-        int SUBMITTED = 3;
+        int DELETED   = 3;
+        int SUBMITTED = 4;
     }
 }

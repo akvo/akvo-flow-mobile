@@ -1365,16 +1365,11 @@ public class SurveyDbAdapter {
      *
      * @param surveyId
      */
-    public void deleteSurvey(String surveyId, boolean physicalDelete) {
-        if (!physicalDelete) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(SurveyColumns.DELETED, 1);
-            database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                    new String[] { surveyId });
-        } else {
-            database.delete(Tables.SURVEY, SurveyColumns.SURVEY_ID + " = ? ",
-                    new String[] { surveyId });
-        }
+    public void deleteSurvey(String surveyId) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyColumns.DELETED, 1);
+        database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
+                new String[] { surveyId });
     }
 
     /**

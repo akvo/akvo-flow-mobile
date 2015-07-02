@@ -33,7 +33,6 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.api.response.FormInstance;
 import org.akvo.flow.api.response.Response;
-import org.akvo.flow.broadcast.FormDeletedReceiver;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
@@ -390,8 +389,9 @@ public class DataSyncService extends IntentService {
      */
     private void syncFiles() {
         final String serverBase = StatusUtil.getServerBase(this);
-        // Sync missing files. This will update the status of the transmissions if necessary
-        checkMissingFiles(serverBase);
+        // Check notifications for this device. This will update the status of the transmissions
+        // if necessary, or mark form as deleted.
+        checkDeviceNotifications(serverBase);
 
         List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
 
@@ -522,7 +522,7 @@ public class DataSyncService extends IntentService {
      * 1- Request the list of files to the server
      * 2- Update the status of those files in the local database
      */
-    private void checkMissingFiles(String serverBase) {
+    private void checkDeviceNotifications(String serverBase) {
         try {
             String response = getDeviceNotification(serverBase);
             if (!TextUtils.isEmpty(response)) {
@@ -542,7 +542,9 @@ public class DataSyncService extends IntentService {
                 JSONArray jForms = jResponse.optJSONArray("deletedForms");
                 if (jForms != null) {
                     for (int i=0; i<jForms.length(); i++) {
-                        displayFormDeletedNotification(jForms.getString(i));
+                        String id = jForms.getString(i);
+                        displayFormDeletedNotification(id);
+                        mDatabase.deleteSurvey(id);
                     }
                 }
             }
@@ -704,13 +706,6 @@ public class DataSyncService extends IntentService {
                 .setTicker(text)
                 .setOngoing(false);
 
-        // Delete intent. Once the user dismisses the notification, we'll delete the form.
-        Intent intent = new Intent(this, FormDeletedReceiver.class);
-        intent.putExtra(FormDeletedReceiver.FORM_ID, formId);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
-                notificationId, intent, 0);
-        builder.setDeleteIntent(pendingIntent);
-
         // Dummy intent. Do nothing when clicked
         PendingIntent dummyIntent = PendingIntent.getActivity(this, 0, new Intent(), 0);
         builder.setContentIntent(dummyIntent);
@@ -731,7 +726,6 @@ public class DataSyncService extends IntentService {
             return 0;
         }
     }
-
 
     /**
      * Helper class to wrap zip file's meta-data

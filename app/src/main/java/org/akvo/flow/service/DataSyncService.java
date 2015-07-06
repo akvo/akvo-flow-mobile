@@ -116,6 +116,9 @@ public class DataSyncService extends IntentService {
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
 
+    // Reuse notification for data export
+    private static final int NOTIFICATION_DATA_EXPORT = 1;
+
     /**
      * Number of retries to upload a file to S3
      */
@@ -164,7 +167,8 @@ public class DataSyncService extends IntentService {
         for (long id : getUnexportedSurveys()) {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
-                displayNotification(id, getString(R.string.exportcomplete), getDestName(zipFileData.filename));
+                displayNotification(NOTIFICATION_DATA_EXPORT, getString(R.string.exportcomplete),
+                        getDestName(zipFileData.filename));
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
@@ -466,7 +470,7 @@ public class DataSyncService extends IntentService {
                     break;
                 case HttpStatus.SC_NOT_FOUND:
                     // This form has been deleted in the dashboard, thus we cannot sync it
-                    displayNotification(Integer.valueOf(formId),
+                    displayNotification(formId(formId),
                             "Form " + formId + " does not exist", "It has probably been deleted");
                     mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FORM_DELETED);
                     ok = false;// Consider this a failed transmission

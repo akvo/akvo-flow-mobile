@@ -142,8 +142,6 @@ public class DataSyncService extends IntentService {
             if (StatusUtil.hasDataConnection(this)) {
                 syncFiles();// Sync everything
             }
-
-            mDatabase.close();
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
             PersistentUncaughtExceptionHandler.recordException(e);

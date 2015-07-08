@@ -93,7 +93,7 @@ public class SurveyDownloadService extends IntentService {
             }
         }
 
-        sendBroadcastNotification();
+        sendBroadcastNotification(this);
     }
 
     public void onCreate() {
@@ -118,7 +118,10 @@ public class SurveyDownloadService extends IntentService {
             surveys = checkForSurveys(serverBase);
         }
 
-        // if there are surveys for this device, see if we need them
+        // Update all survey groups
+        syncSurveyGroups(surveys);
+
+        // Check synced versions, and omit up-to-date surveys
         surveys = databaseAdaptor.checkSurveyVersions(surveys);
 
         if (!surveys.isEmpty()) {
@@ -127,7 +130,6 @@ public class SurveyDownloadService extends IntentService {
             for (Survey survey : surveys) {
                 try {
                     downloadSurvey(survey);
-                    databaseAdaptor.addSurveyGroup(survey.getSurveyGroup());
                     databaseAdaptor.saveSurvey(survey);
                     String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
                     databaseAdaptor.addLanguages(langs);
@@ -150,6 +152,12 @@ public class SurveyDownloadService extends IntentService {
             if (!survey.isHelpDownloaded()) {
                 downloadResources(survey);
             }
+        }
+    }
+
+    private void syncSurveyGroups(List<Survey> surveys) {
+        for (Survey s : surveys) {
+            databaseAdaptor.addSurveyGroup(s.getSurveyGroup());
         }
     }
 
@@ -367,9 +375,9 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
-        sendBroadcast(intentBroadcast);
+    public static void sendBroadcastNotification(Context context) {
+        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
+        context.sendBroadcast(intentBroadcast);
     }
 
 }

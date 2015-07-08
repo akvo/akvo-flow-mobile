@@ -95,6 +95,7 @@
   <string name="bootstrapstart">Charger les données de l\'enquête depuis la carte SD</string>
   <string name="bootstrapcomplete">Chargement des données depuis la carte SD effectué</string>
   <string name="bootstraperror">Erreur lors de l\'exportation du fichier zip</string>
+  <string name="bootstrap_invalid_app">Erreur: Ce formulaire n\'est pas dans cette instance.</string>
   <string name="transmissionhist">Historique des transmissions</string>
   <string name="transstartdate">La transmission a commencé:</string>
   <string name="transenddate">La transmission est finie:</string>
@@ -170,10 +171,19 @@
   <string name="stats_week">Les 7 derniers jours:</string>
   <string name="stats_today">Aujourd\'hui:</string>
   <string name="distance_label">Distance: </string>
+  <string name="tab_datapoints">ENREGISTREMENTS</string>
+  <string name="tab_map">CARTE</string>
+  <string name="order_date">Date</string>
+  <string name="order_distance">Distance</string>
+  <string name="order_status">Status</string>
+  <string name="order_name">Nom</string>
   <!--Record Activity-->
   <string name="unknown">Donnée non nommée</string>
   <string name="last_modified">Dernière modification</string>
   <string name="last_response">Dernière réponse</string>
+  <string name="error_missing_cascade">Les fichiers de cascade ne sont pas télécharger </string>
+  <string name="tab_forms">ENQUÊTES</string>
+  <string name="tab_history">RÉPONSES</string>
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>

@@ -23,6 +23,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -202,6 +203,25 @@ public class ViewUtil {
 
         builder.show();
     }
+
+    public static void displayNotification(String title, String text,
+            Context context, int id, Integer iconId) {
+        NotificationCompat.Builder builder  = new NotificationCompat.Builder(context)
+                .setContentTitle(title)
+                .setTicker(title)
+                .setContentText(text)
+                .setSmallIcon(iconId != null ? iconId : R.drawable.info)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+
+        // Dummy intent. Do nothing when clicked
+        PendingIntent dummyIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
+        builder.setContentIntent(dummyIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(id, builder.build());
+    }
+
 
     /**
      * displays a notification in the system status bar

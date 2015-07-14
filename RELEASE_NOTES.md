@@ -1,6 +1,26 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.8
+Date: 8 July 2014
+
+New and noteworthy
+------------------
+* Forms deleted in the dashboard are disabled in the app [#304]
+* Hindi language can be selected for the app UI [#312]
+* Multiple barcode questions can be answered with an external bluetooth scanner[#299]
+
+Resolved issues
+---------------
+* Submitted questions are not editable [#307]
+* Handle registration form updates (monitoring surveys)[#310]
+
+# ver 2.1.7
+Date: 10 Jun 2015
+
+Resolved issues:
+* Reduce expected error (network issues) reports [#290] 
+
 # ver 2.1.6
 Date: 14 May 2015
 

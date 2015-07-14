@@ -125,6 +125,7 @@ public class SurveyDbAdapter {
     public interface TransmissionColumns {
         String _ID = "_id";
         String SURVEY_INSTANCE_ID = "survey_instance_id";
+        String SURVEY_ID = "survey_id";
         String FILENAME = "filename";
         String STATUS = "status";// separate table/constants?
         String START_DATE = "start_date";// do we really need this column?
@@ -177,10 +178,11 @@ public class SurveyDbAdapter {
     }
 
     public interface TransmissionStatus {
-        int QUEUED      = 0;
-        int IN_PROGRESS = 1;
-        int SYNCED      = 2;
-        int FAILED      = 3;
+        int QUEUED       = 0;
+        int IN_PROGRESS  = 1;
+        int SYNCED       = 2;
+        int FAILED       = 3;
+        int FORM_DELETED = 4;
     }
 
     private static final String TAG = "SurveyDbAdapter";
@@ -208,7 +210,8 @@ public class SurveyDbAdapter {
 
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
     private static final int VER_FORM_SUBMITTER = 79;
-    private static final int DATABASE_VERSION = VER_FORM_SUBMITTER;
+    private static final int VER_FORM_DEL_CHECK = 80;
+    private static final int DATABASE_VERSION = VER_FORM_DEL_CHECK;
 
     private final Context context;
 
@@ -296,6 +299,7 @@ public class SurveyDbAdapter {
             db.execSQL("CREATE TABLE " + Tables.TRANSMISSION + " ("
                     + TransmissionColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + TransmissionColumns.SURVEY_INSTANCE_ID + " INTEGER NOT NULL,"
+                    + TransmissionColumns.SURVEY_ID + " TEXT,"
                     + TransmissionColumns.FILENAME + " TEXT,"
                     + TransmissionColumns.STATUS + " INTEGER,"
                     + TransmissionColumns.START_DATE + " INTEGER,"
@@ -332,6 +336,9 @@ public class SurveyDbAdapter {
                 case VER_LAUNCH:
                     db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
                             + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
+                case VER_FORM_SUBMITTER:
+                    db.execSQL("ALTER TABLE " + Tables.TRANSMISSION
+                            + " ADD COLUMN " + TransmissionColumns.SURVEY_ID + " TEXT");
                     version = DATABASE_VERSION;
             }
 
@@ -930,8 +937,8 @@ public class SurveyDbAdapter {
     public void deleteSurveyInstance(String surveyInstanceId) {
         deleteResponses(surveyInstanceId);
         database.delete(Tables.SURVEY_INSTANCE, SurveyInstanceColumns._ID + "=?",
-                new String[] {
-                    surveyInstanceId
+                new String[]{
+                        surveyInstanceId
                 });
     }
 
@@ -943,20 +950,21 @@ public class SurveyDbAdapter {
      */
     public void deleteResponse(long surveyInstanceId, String questionId) {
         database.delete(Tables.RESPONSE, ResponseColumns.SURVEY_INSTANCE_ID + "= ? AND "
-                + ResponseColumns.QUESTION_ID + "= ?", new String[] {
+                + ResponseColumns.QUESTION_ID + "= ?", new String[]{
                 String.valueOf(surveyInstanceId),
                 questionId
         });
     }
 
-    public void createTransmission(long surveyInstanceId, String filename) {
-        createTransmission(surveyInstanceId, filename, TransmissionStatus.QUEUED);
+    public void createTransmission(long surveyInstanceId, String formID, String filename) {
+        createTransmission(surveyInstanceId, formID, filename, TransmissionStatus.QUEUED);
     }
 
 
-    public void createTransmission(long surveyInstanceId, String filename, int status) {
+    public void createTransmission(long surveyInstanceId, String formID, String filename, int status) {
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
+        values.put(TransmissionColumns.SURVEY_ID, formID);
         values.put(TransmissionColumns.FILENAME, filename);
         values.put(TransmissionColumns.STATUS, status);
         if (TransmissionStatus.SYNCED == status) {
@@ -999,6 +1007,7 @@ public class SurveyDbAdapter {
                 final int startCol = cursor.getColumnIndexOrThrow(TransmissionColumns.START_DATE);
                 final int endCol = cursor.getColumnIndexOrThrow(TransmissionColumns.END_DATE);
                 final int idCol = cursor.getColumnIndexOrThrow(TransmissionColumns._ID);
+                final int formIdCol = cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_ID);
                 final int surveyInstanceCol = cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_INSTANCE_ID);
                 final int fileCol = cursor.getColumnIndexOrThrow(TransmissionColumns.FILENAME);
                 final int statusCol = cursor.getColumnIndexOrThrow(TransmissionColumns.STATUS);
@@ -1007,6 +1016,7 @@ public class SurveyDbAdapter {
                 do {
                     FileTransmission trans = new FileTransmission();
                     trans.setId(cursor.getLong(idCol));
+                    trans.setFormId(cursor.getString(formIdCol));
                     trans.setRespondentId(cursor.getLong(surveyInstanceCol));
                     trans.setFileName(cursor.getString(fileCol));
                     trans.setStatus(cursor.getInt(statusCol));
@@ -1032,8 +1042,9 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
-                        TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
+                        TransmissionColumns.SURVEY_ID, TransmissionColumns.STATUS,
+                        TransmissionColumns.FILENAME, TransmissionColumns.START_DATE,
+                        TransmissionColumns.END_DATE
                 },
                 TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
@@ -1049,8 +1060,9 @@ public class SurveyDbAdapter {
         Cursor cursor = database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.STATUS, TransmissionColumns.FILENAME,
-                        TransmissionColumns.START_DATE, TransmissionColumns.END_DATE
+                        TransmissionColumns.SURVEY_ID, TransmissionColumns.STATUS,
+                        TransmissionColumns.FILENAME, TransmissionColumns.START_DATE,
+                        TransmissionColumns.END_DATE
                 },
                 TransmissionColumns.STATUS + " IN (?, ?, ?)",
                 new String[] {
@@ -1353,16 +1365,11 @@ public class SurveyDbAdapter {
      *
      * @param surveyId
      */
-    public void deleteSurvey(String surveyId, boolean physicalDelete) {
-        if (!physicalDelete) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(SurveyColumns.DELETED, 1);
-            database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                    new String[] { surveyId });
-        } else {
-            database.delete(Tables.SURVEY, SurveyColumns.SURVEY_ID + " = ? ",
-                    new String[] { surveyId });
-        }
+    public void deleteSurvey(String surveyId) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyColumns.DELETED, 1);
+        database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
+                new String[] { surveyId });
     }
 
     /**
@@ -1624,7 +1631,7 @@ public class SurveyDbAdapter {
 
             // The filename is a unique column in the transmission table, and as we do not have
             // a file to hold this data, we set the value to the instance UUID
-            createTransmission(id, surveyInstance.getUuid(), TransmissionStatus.SYNCED);
+            createTransmission(id, surveyInstance.getSurveyId(), surveyInstance.getUuid(), TransmissionStatus.SYNCED);
         }
     }
     

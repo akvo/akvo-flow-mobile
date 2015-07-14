@@ -152,7 +152,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
 
         @Override
         public boolean isEnabled(int position) {
-            return isEnabled(getItem(position).mId);
+            SurveyInfo s = getItem(position);
+            return !s.mDeleted && isEnabled(s.mId);
         }
         
         private boolean isEnabled(String surveyId) {
@@ -182,7 +183,12 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
             surveyNameView.setText(surveyInfo.mName);
             surveyVersionView.setText("v" + surveyInfo.mVersion);
 
-            final boolean enabled = isEnabled(surveyInfo.mId);
+            boolean enabled = isEnabled(surveyInfo.mId);
+            if (surveyInfo.mDeleted) {
+                enabled = false;
+                surveyVersionView.append(" - " + getString(R.string.form_deleted));
+            }
+
             listItem.setEnabled(enabled);
             surveyNameView.setEnabled(enabled);
             surveyVersionView.setEnabled(enabled);
@@ -236,6 +242,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
                 s.mId = cursor.getString(SurveyQuery.SURVEY_ID);
                 s.mName = cursor.getString(SurveyQuery.NAME);
                 s.mVersion = String.valueOf(cursor.getFloat(SurveyQuery.VERSION));
+                s.mDeleted = cursor.getInt(SurveyQuery.DELETED) == 1;
                 if (!cursor.isNull(SurveyQuery.SUBMITTED)) {
                     s.mLastSubmission = cursor.getLong(SurveyQuery.SUBMITTED);
                     mRegistered = true;
@@ -269,6 +276,7 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
         String mName;
         String mVersion;
         Long mLastSubmission;
+        boolean mDeleted;
     }
 
 }

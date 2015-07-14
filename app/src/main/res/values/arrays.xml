@@ -2,8 +2,8 @@
 <resources>
     
     <string-array name="records_activity_tabs">
-        <item>DATA POINTS</item>
-        <item>MAP</item>
+        <item>@string/tab_datapoints</item>
+        <item>@string/tab_map</item>
     </string-array>
     
     <string-array name="record_tabs">
@@ -13,10 +13,10 @@
     </string-array>
     
     <string-array name="order_by">
-        <item>Date</item>
-        <item>Distance</item>
-        <item>Status</item>
-        <item>Name</item>
+        <item>@string/order_date</item>
+        <item>@string/order_distance</item>
+        <item>@string/order_status</item>
+        <item>@string/order_name</item>
     </string-array>
 
     <!-- App languages -->
@@ -24,11 +24,13 @@
         <item>English</item>
         <item>Español</item>
         <item>Français</item>
+        <item>Hindi</item>
     </string-array>
     <string-array name="app_language_codes">
         <item>en</item>
         <item>es</item>
         <item>fr</item>
+        <item>hi</item>
     </string-array>
 
     <!-- NOTE: Main color will suits the light theme. Must have enough colors for all languages -->

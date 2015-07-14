@@ -48,7 +48,6 @@ import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.exception.TransferException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -94,7 +93,7 @@ public class SurveyDownloadService extends IntentService {
             }
         }
 
-        sendBroadcastNotification();
+        sendBroadcastNotification(this);
     }
 
     public void onCreate() {
@@ -119,7 +118,10 @@ public class SurveyDownloadService extends IntentService {
             surveys = checkForSurveys(serverBase);
         }
 
-        // if there are surveys for this device, see if we need them
+        // Update all survey groups
+        syncSurveyGroups(surveys);
+
+        // Check synced versions, and omit up-to-date surveys
         surveys = databaseAdaptor.checkSurveyVersions(surveys);
 
         if (!surveys.isEmpty()) {
@@ -128,19 +130,16 @@ public class SurveyDownloadService extends IntentService {
             for (Survey survey : surveys) {
                 try {
                     downloadSurvey(survey);
-                    databaseAdaptor.addSurveyGroup(survey.getSurveyGroup());
                     databaseAdaptor.saveSurvey(survey);
                     String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
                     databaseAdaptor.addLanguages(langs);
                     downloadResources(survey);
                     synced++;
-                } catch (Exception e) {
+                } catch (IOException e) {
                     failed++;
                     Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
                     displayErrorNotification(ConstantUtil.NOTIFICATION_FORM_ERROR,
                             getString(R.string.error_form_download));
-                    PersistentUncaughtExceptionHandler
-                            .recordException(new TransferException(survey.getId(), null, e));
                 }
                 displayNotification(synced, failed, surveys.size());
             }
@@ -153,6 +152,12 @@ public class SurveyDownloadService extends IntentService {
             if (!survey.isHelpDownloaded()) {
                 downloadResources(survey);
             }
+        }
+    }
+
+    private void syncSurveyGroups(List<Survey> surveys) {
+        for (Survey s : surveys) {
+            databaseAdaptor.addSurveyGroup(s.getSurveyGroup());
         }
     }
 
@@ -293,10 +298,12 @@ public class SurveyDownloadService extends IntentService {
                     surveys.addAll(new SurveyMetaParser().parseList(response, true));
                 }
             } catch (IllegalArgumentException | IOException e) {
+                if (e instanceof IllegalArgumentException) {
+                    PersistentUncaughtExceptionHandler.recordException(e);
+                }
                 Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         String.format(getString(R.string.error_form_header), id));
-                PersistentUncaughtExceptionHandler.recordException(e);
             }
         }
         return surveys;
@@ -318,10 +325,12 @@ public class SurveyDownloadService extends IntentService {
                 surveys = new SurveyMetaParser().parseList(response);
             }
         } catch (IllegalArgumentException | IOException e) {
+            if (e instanceof IllegalArgumentException) {
+                PersistentUncaughtExceptionHandler.recordException(e);
+            }
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
                     getString(R.string.error_assignment_read));
             Log.e(TAG, e.getMessage());
-            PersistentUncaughtExceptionHandler.recordException(e);
         }
         return surveys;
     }
@@ -366,9 +375,9 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
-        sendBroadcast(intentBroadcast);
+    public static void sendBroadcastNotification(Context context) {
+        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
+        context.sendBroadcast(intentBroadcast);
     }
 
 }

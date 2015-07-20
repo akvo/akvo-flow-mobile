@@ -16,14 +16,19 @@
 package org.akvo.flow.ui.view;
 
 import android.animation.LayoutTransition;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Dependency;
@@ -33,6 +38,7 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -255,13 +261,46 @@ public class QuestionGroupTab extends LinearLayout {
     }
 
     private View getRepeatHeader() {
-        TextView header = (TextView)LayoutInflater.from(getContext()).inflate(R.layout.itemlistrow, null);
+        final int iteration = mIterations;
+        final TextView header = (TextView)LayoutInflater.from(getContext()).inflate(R.layout.itemlistrow, null);
         header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        header.setText(mQuestionGroup.getHeading() + " - " + mIterations);
+        header.setText(mQuestionGroup.getHeading() + " - " + iteration);
         header.setTextColor(getResources().getColor(R.color.text_color_orange));
         header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
 
+        Drawable deleteIcon = getContext().getResources().getDrawable(R.drawable.ic_trash);
+        header.setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
+
+        header.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        int x = header.getRight() - header.getCompoundDrawables()[2].getBounds().width();
+                        if (event.getRawX() < x) {
+                            return false;
+                        }
+                        ViewUtil.showConfirmDialog(R.string.delete_group_title, R.string.delete_group_text,
+                                getContext(), true, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        deleteIteration(iteration);
+                                    }
+                                });
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
         return header;
+    }
+
+    private void deleteIteration(int index) {
+        Toast.makeText(getContext(), "Group " + index + " deleted", Toast.LENGTH_SHORT).show();
     }
 
     /**

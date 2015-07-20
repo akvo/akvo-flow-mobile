@@ -23,7 +23,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -42,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class QuestionGroupTab extends ScrollView {
+public class QuestionGroupTab extends LinearLayout {
     private QuestionGroup mQuestionGroup;
     private QuestionInteractionListener mQuestionListener;
     private SurveyListener mSurveyListener;
@@ -54,6 +53,7 @@ public class QuestionGroupTab extends ScrollView {
 
     private int mIterations;
     private LayoutInflater mInflater;
+    private TextView mRepetitionsText;
 
     public QuestionGroupTab(Context context, QuestionGroup group,  SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -75,8 +75,10 @@ public class QuestionGroupTab extends ScrollView {
     private void init() {
         // Load question group view and set it as ScrollView's child
         // FIXME: Would it make more sense to initialize this attrs in the XML file?
-        mInflater.inflate(R.layout.question_group_tab, this);
+        setOrientation(VERTICAL);
+        inflate(getContext(), R.layout.question_group_tab, this);
         mContainer = (LinearLayout)findViewById(R.id.question_list);
+        mRepetitionsText = (TextView)findViewById(R.id.repeat_header);
 
         // Animate view additions/removals if possible
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -91,6 +93,7 @@ public class QuestionGroupTab extends ScrollView {
         });
 
         if (mQuestionGroup.isRepeatable()) {
+            findViewById(R.id.repeat_header).setVisibility(VISIBLE);
             View repeatBtn = findViewById(R.id.repeat_btn);
             repeatBtn.setVisibility(VISIBLE);
             repeatBtn.setOnClickListener(new OnClickListener() {
@@ -204,6 +207,7 @@ public class QuestionGroupTab extends ScrollView {
     public void loadGroup() {
         if (mQuestionGroup.isRepeatable()) {
             mIterations++;
+            mRepetitionsText.setText("Repetitions: " + mIterations);// FIXME: Externalize string
             mContainer.addView(getRepeatHeader());
         }
 

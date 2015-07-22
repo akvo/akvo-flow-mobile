@@ -588,8 +588,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             }
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event.getEventType())) {
             String questionId = event.getSource().getQuestion().getId();
-            mQuestionResponses.remove(questionId);
-            mDatabase.deleteResponse(mSurveyInstanceId, questionId);
+            deleteResponse(questionId);
         } else if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
             String questionId = event.getSource().getQuestion().getId();
             QuestionResponse response = event.getSource().getResponse();
@@ -621,6 +620,12 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             mRequestQuestionId = event.getSource().getQuestion().getId();
             startActivityForResult(i, PLOTTING_REQUEST);
         }
+    }
+
+    @Override
+    public void deleteResponse(String questionId) {
+        mQuestionResponses.remove(questionId);
+        mDatabase.deleteResponse(mSurveyInstanceId, questionId);
     }
 
     /*

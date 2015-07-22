@@ -31,5 +31,6 @@ public interface SurveyListener {
     public void nextTab();
     public void openQuestion(String questionId);
     public Map<String, QuestionResponse> getResponses();
+    public void deleteResponse(String questionId);
     public QuestionView getQuestionView(String questionId);
 }

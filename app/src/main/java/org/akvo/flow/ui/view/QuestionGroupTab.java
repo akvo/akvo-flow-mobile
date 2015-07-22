@@ -16,15 +16,10 @@
 package org.akvo.flow.ui.view;
 
 import android.animation.LayoutTransition;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,16 +33,17 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
-public class QuestionGroupTab extends LinearLayout {
+public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.OnDeleteListener {
     private QuestionGroup mQuestionGroup;
     private QuestionInteractionListener mQuestionListener;
     private SurveyListener mSurveyListener;
@@ -61,6 +57,9 @@ public class QuestionGroupTab extends LinearLayout {
     private LayoutInflater mInflater;
     private TextView mRepetitionsText;
 
+    private Map<Integer, RepetitionHeader> mHeaders;
+    private List<Integer> mRepetitions;
+
     public QuestionGroupTab(Context context, QuestionGroup group,  SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
         super(context);
@@ -68,6 +67,8 @@ public class QuestionGroupTab extends LinearLayout {
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
         mQuestionViews = new HashMap<>();
+        mHeaders = new HashMap<>();
+        mRepetitions = new ArrayList<>();
         mLoaded = false;
         mIterations = 0;// Repeatable group's instances so far
         mInflater = LayoutInflater.from(context);
@@ -165,11 +166,16 @@ public class QuestionGroupTab extends LinearLayout {
             mIterations = 0;
 
             // Load existing iterations. If no iteration is available, show one by default.
-            int iterCount = getIterationCount();
+            loadRepetitions();
+            //int iterCount = getIterationCount();
+            int iterCount = mRepetitions.size();
             if (iterCount == 0) {
-                iterCount++;
+                // Leave one iteration by default
+                iterCount = 1;
             }
-            loadGroup(iterCount);// Leave one iteration by default
+            for (int i=0; i<iterCount; i++) {
+                loadGroup();
+            }
         }
 
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
@@ -204,24 +210,32 @@ public class QuestionGroupTab extends LinearLayout {
         return mLoaded;
     }
 
-    private void loadGroup(int iterations) {
-        for (int i=0; i<iterations; i++) {
-            loadGroup();
+    private void loadGroup() {
+        mIterations++;
+        // Get existing ID, or create a new one (incremental).
+        if (mRepetitions.size() < mIterations) {
+            if (mRepetitions.isEmpty()) {
+                mRepetitions.add(0);
+            } else {
+                mRepetitions.add(mRepetitions.get(mRepetitions.size() - 1) + 1);
+            }
         }
-    }
+        final int repetitionId = mRepetitions.get(mIterations-1);
 
-    public void loadGroup() {
         if (mQuestionGroup.isRepeatable()) {
-            mIterations++;
             mRepetitionsText.setText("Repetitions: " + mIterations);// FIXME: Externalize string
-            mContainer.addView(getRepeatHeader());
+
+            RepetitionHeader header = new RepetitionHeader(getContext(), mQuestionGroup.getHeading(),
+                    repetitionId, mIterations, this);
+            mHeaders.put(repetitionId, header);
+            mContainer.addView(header);
         }
 
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
 
             if (mQuestionGroup.isRepeatable()) {
-                q = Question.copy(q, q.getId() + "|" + mIterations);// compound id. (qid|iteration)
+                q = Question.copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
             }
 
             QuestionView questionView;
@@ -260,47 +274,48 @@ public class QuestionGroupTab extends LinearLayout {
         }
     }
 
-    private View getRepeatHeader() {
-        final int iteration = mIterations;
-        final TextView header = (TextView)LayoutInflater.from(getContext()).inflate(R.layout.itemlistrow, null);
-        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        header.setText(mQuestionGroup.getHeading() + " - " + iteration);
-        header.setTextColor(getResources().getColor(R.color.text_color_orange));
-        header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
-
-        Drawable deleteIcon = getContext().getResources().getDrawable(R.drawable.ic_trash);
-        header.setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
-
-        header.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        int x = header.getRight() - header.getCompoundDrawables()[2].getBounds().width();
-                        if (event.getRawX() < x) {
-                            return false;
-                        }
-                        ViewUtil.showConfirmDialog(R.string.delete_group_title, R.string.delete_group_text,
-                                getContext(), true, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        deleteIteration(iteration);
-                                    }
-                                });
-                        return true;
-                    default:
-                        return false;
-                }
+    @Override
+    public void onDeleteRepetition(int repetitionID) {
+        for (String qid : mQuestions) {
+            qid += "|" + repetitionID;
+            QuestionView qv = mQuestionViews.get(qid);
+            if (qv != null) {
+                qv.onPause();
+                mQuestionViews.remove(qid);
+                mContainer.removeView(qv);
             }
-        });
+            mSurveyListener.deleteResponse(qid);
+        }
+        // Adjust header indexes
+        for (int id : mRepetitions) {
+            if (id > repetitionID) {
+                mHeaders.get(id).setIndex(id-1);
+            }
+        }
 
-        return header;
+        // Remove repetition header
+        View header = mHeaders.remove(repetitionID);
+        if (header != null) {
+            mContainer.removeView(header);
+        }
+
+        mRepetitions.remove(Integer.valueOf(repetitionID));
+        mIterations--;
+
+        Toast.makeText(getContext(), "Rep " + repetitionID + " deleted", Toast.LENGTH_SHORT).show();
     }
 
-    private void deleteIteration(int index) {
-        Toast.makeText(getContext(), "Group " + index + " deleted", Toast.LENGTH_SHORT).show();
+    private void loadRepetitions() {
+        Set<Integer> reps = new HashSet<>();
+        for (QuestionResponse qr : mSurveyListener.getResponses().values()) {
+            String[] qid = qr.getQuestionId().split("\\|", -1);
+            if (qid.length == 2 && mQuestions.contains(qid[0])) {
+                reps.add(Integer.valueOf(qid[1]));
+            }
+        }
+
+        mRepetitions = new ArrayList<>(reps);
+        Collections.sort(mRepetitions);
     }
 
     /**

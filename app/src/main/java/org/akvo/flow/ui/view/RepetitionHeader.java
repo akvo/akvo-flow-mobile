@@ -9,24 +9,27 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class RepetitionHeader extends TextView implements View.OnTouchListener {
     private String mTitle;
-    private int mIndex;
+    private int mID;
     private OnDeleteListener mListener;
 
     public interface OnDeleteListener {
-        public void onDelete(int index);
+        void onDeleteRepetition(int index);
     }
 
-    public RepetitionHeader(Context context, String title, int index, OnDeleteListener listener) {
+    public RepetitionHeader(Context context, String title, int id, int index, OnDeleteListener listener) {
         super(context);
 
+        mID = id;
         mTitle = title;
-        mIndex = index;
         mListener = listener;
 
+        int padding = (int)PlatformUtil.dp2Pixel(context, 8);
+        setPadding(padding, padding, padding, padding);
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         setText(mTitle + " - " + index);
         setTextColor(getResources().getColor(R.color.text_color_orange));
@@ -36,6 +39,10 @@ public class RepetitionHeader extends TextView implements View.OnTouchListener {
         setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
 
         setOnTouchListener(this);
+    }
+
+    public void setIndex(int index) {
+        setText(mTitle + " - " + index);
     }
 
     @Override
@@ -52,7 +59,7 @@ public class RepetitionHeader extends TextView implements View.OnTouchListener {
                         getContext(), true, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mListener.onDelete(mIndex);
+                                mListener.onDeleteRepetition(mID);
                             }
                         });
                 return true;

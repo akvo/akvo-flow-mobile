@@ -19,7 +19,6 @@ import android.animation.LayoutTransition;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -51,7 +50,6 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private LinearLayout mContainer;
     private boolean mLoaded;
 
-    private LayoutInflater mInflater;// TODO: This class can already inflate views. Remove.
     private TextView mRepetitionsText;
 
     private Map<Integer, RepetitionHeader> mHeaders;
@@ -67,7 +65,6 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         mHeaders = new HashMap<>();
         mRepetitions = new ArrayList<>();// Repetition IDs
         mLoaded = false;
-        mInflater = LayoutInflater.from(context);
         mQuestions = new HashSet<>();
         for (Question q : mQuestionGroup.getQuestions()) {
             mQuestions.add(q.getId());
@@ -76,9 +73,11 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void init() {
-        // Load question group view and set it as ScrollView's child
-        // FIXME: Would it make more sense to initialize this attrs in the XML file?
         setOrientation(VERTICAL);
+        setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+
         inflate(getContext(), R.layout.question_group_tab, this);
         mContainer = (LinearLayout)findViewById(R.id.question_list);
         mRepetitionsText = (TextView)findViewById(R.id.repeat_header);
@@ -107,10 +106,6 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
                 }
             });
         }
-
-        setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
-        setFocusable(true);
-        setFocusableInTouchMode(true);
     }
 
     /**
@@ -264,7 +259,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             mQuestionViews.put(q.getId(), questionView);// Store the reference to the View
 
             // Add divider (within the View)
-            mInflater.inflate(R.layout.divider, questionView);
+            inflate(getContext(), R.layout.divider, questionView);
             mContainer.addView(questionView);
         }
     }

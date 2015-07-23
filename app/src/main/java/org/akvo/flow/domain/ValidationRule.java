@@ -28,7 +28,7 @@ import org.akvo.flow.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class ValidationRule {
-    public static final int DEFAULT_MAX_LENGTH = 500;
+    public static final int DEFAULT_MAX_LENGTH = 9999;
 
     private String validationType;
     private Integer maxLength;

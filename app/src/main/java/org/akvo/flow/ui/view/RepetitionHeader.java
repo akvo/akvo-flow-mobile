@@ -14,24 +14,25 @@ import org.akvo.flow.util.ViewUtil;
 
 public class RepetitionHeader extends TextView implements View.OnTouchListener {
     private String mTitle;
-    private int mID;
+    private int mID, mPosition;
     private OnDeleteListener mListener;
 
     public interface OnDeleteListener {
         void onDeleteRepetition(int index);
     }
 
-    public RepetitionHeader(Context context, String title, int id, int index, OnDeleteListener listener) {
+    public RepetitionHeader(Context context, String title, int id, int pos, OnDeleteListener listener) {
         super(context);
 
         mID = id;
+        mPosition = pos;
         mTitle = title;
         mListener = listener;
 
         int padding = (int)PlatformUtil.dp2Pixel(context, 8);
         setPadding(padding, padding, padding, padding);
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        setText(mTitle + " - " + index);
+        setText(mTitle + " - " + pos);
         setTextColor(getResources().getColor(R.color.text_color_orange));
         setBackgroundColor(getResources().getColor(R.color.background_alternate));
 
@@ -41,8 +42,8 @@ public class RepetitionHeader extends TextView implements View.OnTouchListener {
         setOnTouchListener(this);
     }
 
-    public void setIndex(int index) {
-        setText(mTitle + " - " + index);
+    public void decreasePosition() {
+        setText(mTitle + " - " + --mPosition);
     }
 
     @Override

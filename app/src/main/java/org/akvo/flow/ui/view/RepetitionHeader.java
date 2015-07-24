@@ -18,7 +18,7 @@ public class RepetitionHeader extends TextView implements View.OnTouchListener {
     private OnDeleteListener mListener;
 
     public interface OnDeleteListener {
-        void onDeleteRepetition(int index);
+        void onDeleteRepetition(Integer index);
     }
 
     public RepetitionHeader(Context context, String title, int id, int pos, OnDeleteListener listener) {

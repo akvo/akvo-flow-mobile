@@ -168,7 +168,7 @@ public class DataSyncService extends IntentService {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
                 displayNotification(NOTIFICATION_DATA_EXPORT, getString(R.string.exportcomplete),
-                        getDestName(zipFileData.filename));
+                        zipFileData.formName);
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
@@ -233,6 +233,7 @@ public class DataSyncService extends IntentService {
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
             zipFileData.uuid = formInstance.getUUID();
             zipFileData.formId = String.valueOf(formInstance.getFormId());
+            zipFileData.formName = mDatabase.getSurvey(zipFileData.formId).getName();
 
             File zipFile = getSurveyInstanceFile(zipFileData.uuid);// The filename will match the Survey Instance UUID
 
@@ -735,6 +736,7 @@ public class DataSyncService extends IntentService {
     class ZipFileData {
         String uuid = null;
         String formId = null;
+        String formName = null;
         String filename = null;
         String data = null;
         List<String> imagePaths = new ArrayList<String>();

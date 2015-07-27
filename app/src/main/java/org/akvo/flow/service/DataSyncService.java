@@ -549,8 +549,7 @@ public class DataSyncService extends IntentService {
                         String id = jForms.getString(i);
                         Survey s = mDatabase.getSurvey(id);
                         if (s != null) {
-                            String msg = String.format("\"%s\"", s.getName());
-                            displayFormDeletedNotification(msg);
+                            displayFormDeletedNotification(id, s.getName());
                         }
                         mDatabase.deleteSurvey(id);
                     }
@@ -700,12 +699,12 @@ public class DataSyncService extends IntentService {
         notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
     }
 
-    private void displayFormDeletedNotification(String formId) {
+    private void displayFormDeletedNotification(String id, String name) {
         // Create a unique ID for this form's delete notification
-        final int notificationId = (int)formId(formId);
+        final int notificationId = (int)formId(id);
 
         // Do not show failed if there is none
-        String text = "Form " + formId + " has been deleted";
+        String text = String.format("Form \"%s\" has been deleted", name);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.info)

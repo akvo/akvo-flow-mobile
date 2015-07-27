@@ -636,7 +636,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void displayNotification(long id, String title, String text) {
-        ViewUtil.fireNotification(title, text, this, (int) id, null);
+        ViewUtil.displayNotification(title, text, this, (int) id, null);
     }
 
     /**

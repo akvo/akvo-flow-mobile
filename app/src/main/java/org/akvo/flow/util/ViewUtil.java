@@ -17,18 +17,17 @@
 package org.akvo.flow.util;
 
 import android.app.AlertDialog;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
-import org.akvo.flow.service.DataSyncService;
 
 /**
  * Utility class to handle common features for the View tier
@@ -204,29 +203,29 @@ public class ViewUtil {
     }
 
     /**
-     * displays a notification in the system status bar
-     * 
-     * @param headline - headline to display in notification bar
-     * @param body - body of notification (when user expands bar)
+     * Displays a notification in the system status bar
+     *
+     * @param title - headline to display in notification bar
+     * @param text - body of notification (when user expands bar)
      * @param context
      * @param id - unique (within app) ID of notification
      */
-    public static void fireNotification(String headline, String body,
+    public static void displayNotification(String title, String text,
             Context context, int id, Integer iconId) {
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager notifcationMgr = (NotificationManager) context
-                .getSystemService(ns);
-        int icon = R.drawable.info;
-        if (iconId != null) {
-            icon = iconId;
-        }
-        Notification notification = new Notification(icon, headline,
-                System.currentTimeMillis());
-        Intent notificationIntent = new Intent(context, DataSyncService.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-                notificationIntent, 0);
-        notification.setLatestEventInfo(context, headline, body, contentIntent);
-        notifcationMgr.notify(id, notification);
+        NotificationCompat.Builder builder  = new NotificationCompat.Builder(context)
+                .setContentTitle(title)
+                .setTicker(title)
+                .setContentText(text)
+                .setSmallIcon(iconId != null ? iconId : R.drawable.info)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+
+        // Dummy intent. Do nothing when clicked
+        PendingIntent dummyIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
+        builder.setContentIntent(dummyIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(id, builder.build());
     }
 
     /**

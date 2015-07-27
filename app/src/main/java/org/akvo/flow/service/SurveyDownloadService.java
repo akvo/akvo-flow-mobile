@@ -336,7 +336,7 @@ public class SurveyDownloadService extends IntentService {
     }
 
     private void displayErrorNotification(int id, String msg) {
-        ViewUtil.fireNotification(getString(R.string.error_form_sync_title), msg, this, id, null);
+        ViewUtil.displayNotification(getString(R.string.error_form_sync_title), msg, this, id, null);
     }
 
     private void displayNotification(int synced, int failed, int total) {

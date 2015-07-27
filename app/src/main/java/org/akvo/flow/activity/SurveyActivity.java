@@ -34,6 +34,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
@@ -267,6 +268,9 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 String answer = questionResponse != null ? questionResponse.getValue() : null;
 
                 if (!TextUtils.isEmpty(answer)) {
+                    // Replace pipes with hyphens
+                    answer = answer.replaceAll("\\s*\\|\\s*", " - ");
+
                     if (!first) {
                         builder.append(" - ");
                     } else {
@@ -604,6 +608,9 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
             intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_ID, q.getId());
             intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_TITLE, q.getText());
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_DATAPOINT_ID, mRecordId);
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_FORM_ID, mSurvey.getId());
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_LANGUAGE, FlowApp.getApp().getAppDisplayLanguage());
             intent.setType(ConstantUtil.EXTERNAL_SOURCE_MIME);
             startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
                     + EXTERNAL_SOURCE_REQUEST);

@@ -40,6 +40,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.Base64;
@@ -546,7 +547,11 @@ public class DataSyncService extends IntentService {
                 if (jForms != null) {
                     for (int i=0; i<jForms.length(); i++) {
                         String id = jForms.getString(i);
-                        displayFormDeletedNotification(id);
+                        Survey s = mDatabase.getSurvey(id);
+                        if (s != null) {
+                            String msg = String.format("\"%s\"", s.getName());
+                            displayFormDeletedNotification(msg);
+                        }
                         mDatabase.deleteSurvey(id);
                     }
                 }

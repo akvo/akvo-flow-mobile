@@ -98,7 +98,7 @@ public class BootstrapService extends IntentService {
             }
 
             String startMessage = getString(R.string.bootstrapstart);
-            ViewUtil.fireNotification(startMessage, startMessage, this,
+            ViewUtil.displayNotification(startMessage, startMessage, this,
                     ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
             databaseAdapter = new SurveyDbAdapter(this);
             databaseAdapter.open();
@@ -115,7 +115,7 @@ public class BootstrapService extends IntentService {
                     }
                 }
                 String endMessage = getString(R.string.bootstrapcomplete);
-                ViewUtil.fireNotification(endMessage, endMessage, this,
+                ViewUtil.displayNotification(endMessage, endMessage, this,
                         ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
             } finally {
                 if (databaseAdapter != null) {
@@ -124,7 +124,7 @@ public class BootstrapService extends IntentService {
             }
         } catch (Exception e) {
             String errorMessage = getString(R.string.bootstraperror);
-            ViewUtil.fireNotification(errorMessage, errorMessage, this,
+            ViewUtil.displayNotification(errorMessage, errorMessage, this,
                     ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_alert);
             Log.e(TAG, "Bootstrap error", e);
         }

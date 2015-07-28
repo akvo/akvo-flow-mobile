@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.android.tools.build:gradle:1.2.0'
     }
 }
 
@@ -20,6 +20,11 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 19
+        applicationId "org.akvo.flow"
+        testApplicationId "org.akvo.flow.tests"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        testHandleProfiling true
+        testFunctionalTest true
     }
 
     compileOptions {
@@ -63,4 +68,8 @@ dependencies {
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.mockito:mockito-core:1.9.5'
+    androidTestCompile "com.google.dexmaker:dexmaker:1.2"
+    androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
 }

@@ -49,8 +49,7 @@
 
     <Button
         android:id="@+id/scan_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/scanbarcode" />
+        android:text="@string/scanbarcode"
+        style="@style/button_green"/>
 
 </merge>

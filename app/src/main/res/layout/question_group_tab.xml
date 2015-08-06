@@ -29,16 +29,14 @@
 
             <Button
                 android:id="@+id/repeat_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:text="@string/repeat_group"/>
+                android:text="@string/repeat_group"
+                style="@style/button_grey_light"/>
 
             <Button
                 android:id="@+id/next_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/nextbutton" />
+                android:text="@string/nextbutton"
+                style="@style/button_grey_dark"/>
 
         </LinearLayout>
 

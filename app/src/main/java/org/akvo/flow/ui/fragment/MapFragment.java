@@ -212,6 +212,11 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         return v;
     }
 
+    public void refresh(long surveyGroupId) {
+        mSurveyGroupId = surveyGroupId;
+        refresh();
+    }
+
     /**
      * Ideally, we should build a ContentProvider, so this notifications are handled
      * automatically, and the loaders restarted without this explicit dependency.

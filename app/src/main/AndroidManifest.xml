@@ -28,7 +28,7 @@
         android:label="@string/app_name"
         android:theme="@style/Flow.Theme" >
         <activity
-            android:name=".activity.SurveyGroupListActivity"
+            android:name=".activity.SurveyActivity"
             android:configChanges="locale|layoutDirection">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

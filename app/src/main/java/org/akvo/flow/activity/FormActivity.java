@@ -324,7 +324,7 @@ public class FormActivity extends ActionBarActivity implements SurveyListener,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.survey_activity, menu);
+        getMenuInflater().inflate(R.menu.form_activity, menu);
         SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
         if (isReadOnly()) {
             subMenu.removeItem(R.id.clear);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -235,11 +235,14 @@ public class ConstantUtil {
     public static final int NOTIFICATION_BOOTSTRAP = 106;
 
     /**
-     + * External Sources
-     + */
+     * External Sources
+     */
     public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
     public static final String EXTERNAL_SOURCE_QUESTION_ID = "questionId";
     public static final String EXTERNAL_SOURCE_QUESTION_TITLE = "questionTitle";
+    public static final String EXTERNAL_SOURCE_FORM_ID = "formId";
+    public static final String EXTERNAL_SOURCE_DATAPOINT_ID = "datapointId";
+    public static final String EXTERNAL_SOURCE_LANGUAGE = "language";
     public static final String EXTERNAL_SOURCE_RESPONSE = "response";
     public static final String EXTERNAL_SOURCE_MIME = "text/plain";
 

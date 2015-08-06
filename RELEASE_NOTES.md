@@ -1,8 +1,20 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.9
+Date: 27 July 2015
+
+New and noteworthy
+------------------
+* Cascade questions can now be flagged as *datapoint name* [#316]
+* Improve notifications visibility in Android 4+ [#318]
+
+Resolved issues
+---------------
+* Send extra data to *external sources* intent (a.k.a Caddisfly) [#320]
+
 # ver 2.1.8
-Date: 8 July 2014
+Date: 8 July 2015
 
 New and noteworthy
 ------------------

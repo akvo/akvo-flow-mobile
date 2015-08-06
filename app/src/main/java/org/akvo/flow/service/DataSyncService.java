@@ -420,7 +420,7 @@ public class DataSyncService extends IntentService {
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission.getFileName(), transmission.getFormId(), transmission.getStatus(), serverBase)) {
+            if (syncFile(transmission.getFileName(), transmission.getFormId(), serverBase)) {
                 syncedSurveys.add(surveyInstanceId);
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
@@ -443,7 +443,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(String filename, String formId, int status, String serverBase) {
+    private boolean syncFile(String filename, String formId, String serverBase) {
         if (TextUtils.isEmpty(filename)) {
             return false;
         }
@@ -454,8 +454,7 @@ public class DataSyncService extends IntentService {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
                     : VIDEO_CONTENT_TYPE;
             dir = ConstantUtil.S3_IMAGE_DIR;
-            // Only notify server if the previous attempts have failed
-            action = TransmissionStatus.FAILED == status ? ACTION_IMAGE : null;
+            action = ACTION_IMAGE;
             isPublic = true;// Images/Videos have a public read policy
         } else {
             contentType = DATA_CONTENT_TYPE;
@@ -464,33 +463,32 @@ public class DataSyncService extends IntentService {
             isPublic = false;
         }
 
+        // Temporarily set the status to 'IN PROGRESS'. Transmission status should
+        // *always* be updated with the outcome of the upload operation.
         mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
 
-        boolean ok = sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES);
-        final String destName = getDestName(filename);
+        int status = TransmissionStatus.FAILED;
+        boolean ok = false;
 
-        if (ok && action != null) {
-            // If action is not null, notify GAE back-end that data is available
-            // TODO: Do we need to send the checksum?
-            switch (sendProcessingNotification(serverBase, formId, action, destName)) {
+        if (sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
+            // Notify GAE back-end that data is available
+            switch (sendProcessingNotification(serverBase, formId, action, getDestName(filename))) {
                 case HttpStatus.SC_OK:
-                    // Mark everything completed
-                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
+                    status = TransmissionStatus.SYNCED;// Mark everything completed
+                    ok = true;
                     break;
                 case HttpStatus.SC_NOT_FOUND:
                     // This form has been deleted in the dashboard, thus we cannot sync it
                     displayNotification(formId(formId),
                             "Form " + formId + " does not exist", "It has probably been deleted");
-                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FORM_DELETED);
-                    ok = false;// Consider this a failed transmission
+                    status = TransmissionStatus.FORM_DELETED;
                     break;
                 default:// Any error code
-                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
-                    ok = false;// Consider this a failed transmission
                     break;
             }
         }
 
+        mDatabase.updateTransmissionHistory(filename, status);
         return ok;
     }
 
@@ -645,7 +643,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void displayNotification(long id, String title, String text) {
-        ViewUtil.fireNotification(title, text, this, (int) id, null);
+        ViewUtil.displayNotification(title, text, this, (int) id, null);
     }
 
     /**

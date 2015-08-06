@@ -66,9 +66,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SurveyActivity extends ActionBarActivity implements SurveyListener,
+public class FormActivity extends ActionBarActivity implements SurveyListener,
         QuestionInteractionListener {
-    private static final String TAG = SurveyActivity.class.getSimpleName();
+    private static final String TAG = FormActivity.class.getSimpleName();
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
@@ -107,7 +107,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.survey_activity);
+        setContentView(R.layout.form_activity);
 
         // Read all the params. Note that the survey instance id is now mandatory
         final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);

@@ -144,6 +144,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mDatabase.close();
     }
 
+    public void refresh(long surveyGroupId) {
+        mSurveyGroupId = surveyGroupId;
+        refresh();
+    }
+
     /**
      * Ideally, we should build a ContentProvider, so this notifications are handled
      * automatically, and the loaders restarted without this explicit dependency.

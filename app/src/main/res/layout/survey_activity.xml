@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Main content -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/new_record"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:background="@drawable/button_green">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawableLeft="@drawable/ic_content_new"
+                android:gravity="center"
+                android:minHeight="50dp"
+                android:text="@string/create_data_point"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
+        </RelativeLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_below="@id/new_record"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
+
+    <!-- The navigation drawer -->
+    <FrameLayout
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/background_main">
+
+            <ListView
+                android:id="@+id/survey_group_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:choiceMode="singleChoice"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0dp" />
+            <TextView
+                android:id="@+id/users"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/userlabel"
+                android:drawableLeft="@drawable/ic_action_users"
+                android:drawableStart="@drawable/ic_action_users"/>
+            <TextView
+                android:id="@+id/settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settingslabel"
+                android:drawableLeft="@drawable/ic_action_settings"
+                android:drawableStart="@drawable/ic_action_settings"/>
+        </LinearLayout>
+
+    </FrameLayout>
+</android.support.v4.widget.DrawerLayout>

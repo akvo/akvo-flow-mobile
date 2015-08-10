@@ -48,6 +48,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.astuetz.PagerSlidingTabStrip;
+
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyGroupLoader;
@@ -71,7 +73,7 @@ import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class SurveyActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor>,
-        RecordListListener, ActionBar.TabListener {
+        RecordListListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
     
     // Argument to be passed to list/map fragments
@@ -133,6 +135,10 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         mPager.setAdapter(mTabsAdapter);
         mPager.setOnPageChangeListener(mTabsAdapter);
 
+        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip)findViewById(R.id.tabs);
+        tabs.setViewPager(mPager);
+        tabs.setOnPageChangeListener(mTabsAdapter);
+
         // New record click listener
         findViewById(R.id.new_record).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,7 +171,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         mDatabase = new SurveyDbAdapter(this);
 
         init();
-        setupActionBar();
+        //setupTabs();
     }
     
     @Override
@@ -242,8 +248,9 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         mTabsAdapter.refreshFragments();
         supportInvalidateOptionsMenu();
     }
-    
-    private void setupActionBar() {
+
+    /*
+    private void setupTabs() {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -258,6 +265,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         actionBar.addTab(listTab);
         actionBar.addTab(mapTab);
     }
+    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -451,7 +459,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         @Override
         public void onPageSelected(int position) {
             mSelected = position;
-            getSupportActionBar().setSelectedNavigationItem(position);
+            //getSupportActionBar().setSelectedNavigationItem(position);
         }
 
         @Override
@@ -460,6 +468,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
 
     }
 
+    /*
     @Override
     public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
     }
@@ -472,6 +481,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
     }
+    */
 
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be

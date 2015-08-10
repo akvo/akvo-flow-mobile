@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <!-- Main content -->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.astuetz.PagerSlidingTabStrip
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="48dip"
+            android:background="@drawable/ab_stacked_solid_flow"
+            android:textColor="@color/white"
+            app:pstsIndicatorColor="@color/orange_main"
+            app:pstsShouldExpand="true" />
 
         <RelativeLayout
             android:id="@+id/new_record"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:gravity="center"
             android:background="@drawable/button_green">
 
@@ -33,10 +43,9 @@
 
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
-            android:layout_below="@id/new_record"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </RelativeLayout>
+    </LinearLayout>
 
     <!-- The navigation drawer -->
     <FrameLayout

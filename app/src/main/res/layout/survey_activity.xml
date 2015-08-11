@@ -65,6 +65,8 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:textColor="#565656"
+                android:background="@color/background_alternate"
+                android:textSize="16sp"
                 android:text="Surveys"/>
 
             <ListView

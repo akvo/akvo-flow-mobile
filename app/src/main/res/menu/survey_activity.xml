@@ -10,13 +10,6 @@
         flowapp:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/users"
-        android:orderInCategory="101"
-        android:icon="@drawable/ic_action_users"
-        android:title="@string/userlabel"
-        flowapp:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/sync_records"
         android:icon="@drawable/ic_action_record_sync"
         android:orderInCategory="102"
@@ -37,10 +30,4 @@
         android:title="@string/stats_title"
         flowapp:showAsAction="never"/>
 
-    <item
-        android:id="@+id/settings"
-        android:orderInCategory="105"
-        android:icon="@drawable/ic_action_settings"
-        android:title="@string/settingslabel"
-        flowapp:showAsAction="never" />
 </menu>

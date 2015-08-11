@@ -172,15 +172,20 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         });
 
         mDatabase = new SurveyDbAdapter(this);
+        mDatabase.open();
 
         init();
-        //setupTabs();
+
+        // Automatically select the last used group.
+        SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
+        if (sg != null) {
+            onSurveyGroupSelected(sg);
+        }
     }
     
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase.open();
         // Delete empty Records, if any
         // TODO: For a more efficient cleanup, attempt to wipe ONLY the latest Record,
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
@@ -197,9 +202,14 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     @Override
     public void onPause() {
         super.onPause();
-        mDatabase.close();
         unregisterReceiver(mSurveyedLocalesSyncReceiver);
         unregisterReceiver(mSurveysSyncReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDatabase.close();
     }
 
     private void init() {
@@ -393,9 +403,11 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
             text1.setTextColor(getResources().getColorStateList(mTextColor));
 
             // Alternate background
+            /*
             int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
             final int res= PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
+            */
 
             view.setTag(surveyGroup);
         }
@@ -412,6 +424,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
 
             final SurveyGroup survey = (SurveyGroup) view.getTag();
             onSurveyGroupSelected(survey);
+            mDrawerLayout.closeDrawers();
         }
 
     }

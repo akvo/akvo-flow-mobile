@@ -50,7 +50,7 @@
     <!-- The navigation drawer -->
     <FrameLayout
         android:id="@+id/left_drawer"
-        android:layout_width="240dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start">
 
@@ -60,6 +60,13 @@
             android:orientation="vertical"
             android:background="@color/background_main">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textColor="#565656"
+                android:text="Surveys"/>
+
             <ListView
                 android:id="@+id/survey_group_list"
                 android:layout_width="match_parent"
@@ -68,18 +75,32 @@
                 android:choiceMode="singleChoice"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="0dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#ABABAB"/>
+
             <TextView
                 android:id="@+id/users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="8dp"
                 android:text="@string/userlabel"
+                android:textSize="18sp"
+                android:gravity="center_vertical"
+                android:drawablePadding="8dp"
                 android:drawableLeft="@drawable/ic_action_users"
                 android:drawableStart="@drawable/ic_action_users"/>
             <TextView
                 android:id="@+id/settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:gravity="center_vertical"
+                android:drawablePadding="8dp"
                 android:text="@string/settingslabel"
+                android:textSize="18sp"
                 android:drawableLeft="@drawable/ic_action_settings"
                 android:drawableStart="@drawable/ic_action_settings"/>
         </LinearLayout>

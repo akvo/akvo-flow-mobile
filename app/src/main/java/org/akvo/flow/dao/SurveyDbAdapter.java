@@ -1213,23 +1213,32 @@ public class SurveyDbAdapter {
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.MONITORED)) > 0;
         return new SurveyGroup(id, name, registerSurveyId, monitored);
     }
-    
-    public Cursor getSurveyGroup(long id) {
-        String where = null;
-        String[] selectionArgs = null;
-        
-        if (id != SurveyGroup.ID_NONE) {
-            where = SurveyGroupColumns.SURVEY_GROUP_ID + "= ?";
-            selectionArgs = new String[] {String.valueOf(id)};
+
+    public SurveyGroup getSurveyGroup(long id) {
+        SurveyGroup sg = null;
+        Cursor c = database.query(Tables.SURVEY_GROUP,
+                new String[]{
+                        SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
+                        SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
+                },
+                SurveyGroupColumns.SURVEY_GROUP_ID + "= ?",
+                new String[] {String.valueOf(id)},
+                null, null, null);
+        if (c != null && c.moveToFirst()) {
+            sg = getSurveyGroup(c);
+            c.close();
         }
-        
+
+        return sg;
+    }
+
+    public Cursor getSurveyGroups() {
         return database.query(Tables.SURVEY_GROUP,
                 new String[] {
                         SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
                         SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
                 },
-                where, selectionArgs,
-                null, null, SurveyGroupColumns.NAME);
+                null, null, null, null, SurveyGroupColumns.NAME);
     }
     
     public String createSurveyedLocale(long surveyGroupId) {

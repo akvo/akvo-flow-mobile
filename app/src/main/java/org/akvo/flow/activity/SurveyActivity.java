@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -127,6 +128,8 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Init tabs
         mTabs = getResources().getStringArray(R.array.records_activity_tabs);
@@ -249,6 +252,19 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         supportInvalidateOptionsMenu();
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
     /*
     private void setupTabs() {
         final ActionBar actionBar = getSupportActionBar();
@@ -292,6 +308,10 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch (item.getItemId()) {
             case R.id.search:
                 return onSearchRequested();

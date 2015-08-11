@@ -40,6 +40,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.Base64;
@@ -168,7 +169,7 @@ public class DataSyncService extends IntentService {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
                 displayNotification(NOTIFICATION_DATA_EXPORT, getString(R.string.exportcomplete),
-                        getDestName(zipFileData.filename));
+                        zipFileData.formName);
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
@@ -233,6 +234,7 @@ public class DataSyncService extends IntentService {
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
             zipFileData.uuid = formInstance.getUUID();
             zipFileData.formId = String.valueOf(formInstance.getFormId());
+            zipFileData.formName = mDatabase.getSurvey(zipFileData.formId).getName();
 
             File zipFile = getSurveyInstanceFile(zipFileData.uuid);// The filename will match the Survey Instance UUID
 
@@ -543,7 +545,10 @@ public class DataSyncService extends IntentService {
                 if (jForms != null) {
                     for (int i=0; i<jForms.length(); i++) {
                         String id = jForms.getString(i);
-                        displayFormDeletedNotification(id);
+                        Survey s = mDatabase.getSurvey(id);
+                        if (s != null) {
+                            displayFormDeletedNotification(id, s.getName());
+                        }
                         mDatabase.deleteSurvey(id);
                     }
                 }
@@ -692,12 +697,12 @@ public class DataSyncService extends IntentService {
         notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
     }
 
-    private void displayFormDeletedNotification(String formId) {
+    private void displayFormDeletedNotification(String id, String name) {
         // Create a unique ID for this form's delete notification
-        final int notificationId = (int)formId(formId);
+        final int notificationId = (int)formId(id);
 
         // Do not show failed if there is none
-        String text = "Form " + formId + " has been deleted";
+        String text = String.format("Form \"%s\" has been deleted", name);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.info)
@@ -733,6 +738,7 @@ public class DataSyncService extends IntentService {
     class ZipFileData {
         String uuid = null;
         String formId = null;
+        String formName = null;
         String filename = null;
         String data = null;
         List<String> imagePaths = new ArrayList<String>();

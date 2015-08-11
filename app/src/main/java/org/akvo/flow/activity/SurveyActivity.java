@@ -28,14 +28,11 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -94,12 +91,16 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     private ViewPager mPager;
     private TabsAdapter mTabsAdapter;
     private String[] mTabs;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.record_list_activity);
         setContentView(R.layout.survey_activity);
+
+        mTitle = mDrawerTitle = "Surveys";
 
         // Init navigation drawer
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -115,14 +116,14 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                //getActionBar().setTitle(mTitle);
+                getSupportActionBar().setTitle(mTitle);
                 supportInvalidateOptionsMenu();
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                //getActionBar().setTitle(mDrawerTitle);
+                getSupportActionBar().setTitle(mDrawerTitle);
                 supportInvalidateOptionsMenu();
             }
         };
@@ -210,6 +211,12 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     public void onDestroy() {
         super.onDestroy();
         mDatabase.close();
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getSupportActionBar().setTitle(mTitle);
     }
 
     private void init() {
@@ -325,10 +332,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         switch (item.getItemId()) {
             case R.id.search:
                 return onSearchRequested();
-            case R.id.users:
-                Intent i = new Intent(this, ListUserActivity.class);
-                startActivity(i);
-                return true;
             case R.id.sync_records:
                 Toast.makeText(SurveyActivity.this, R.string.syncing_records,
                         Toast.LENGTH_SHORT).show();
@@ -339,9 +342,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
             case R.id.stats:
                 StatsDialogFragment dialogFragment = StatsDialogFragment.newInstance(mSurveyGroup.getId());
                 dialogFragment.show(getSupportFragmentManager(), "stats");
-                return true;
-            case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -421,6 +421,8 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
                         Toast.LENGTH_LONG).show();
                 return;
             }
+
+            mDrawerList.setItemChecked(position, true);
 
             final SurveyGroup survey = (SurveyGroup) view.getTag();
             onSurveyGroupSelected(survey);

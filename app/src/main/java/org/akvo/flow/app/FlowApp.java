@@ -32,6 +32,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.Prefs;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -87,6 +88,10 @@ public class FlowApp extends Application {
         setAppLanguage(language, false);
 
         loadLastUser();
+
+        // Load last survey group
+        mSurveyGroupId = Prefs.getLong(this, Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+
         mSurveyChecker.run();// Ensure surveys have put their languages
     }
     
@@ -100,6 +105,7 @@ public class FlowApp extends Application {
     
     public void setSurveyGroupId(long surveyGroupId) {
         mSurveyGroupId = surveyGroupId;
+        Prefs.setLong(this, Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
     }
     
     public long getSurveyGroupId() {

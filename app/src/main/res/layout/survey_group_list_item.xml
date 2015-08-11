@@ -7,7 +7,7 @@
 
     <ImageView
         android:id="@+id/surveys_img"
-        android:layout_width="40dp"
+        android:layout_width="32dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
@@ -22,7 +22,8 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
-        android:src="@drawable/right_caret"/>
+        android:src="@drawable/right_caret"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/text1"

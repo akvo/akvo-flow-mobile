@@ -3,11 +3,18 @@
     xmlns:flowapp="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/new_datapoint"
+        android:icon="@drawable/ic_action_new"
+        android:orderInCategory="100"
+        android:title="@string/create_data_point"
+        flowapp:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/search"
         android:icon="@drawable/ic_action_search"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:title="@string/search_hint"
-        flowapp:showAsAction="ifRoom"/>
+        flowapp:showAsAction="never"/>
 
     <item
         android:id="@+id/sync_records"

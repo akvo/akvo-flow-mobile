@@ -143,21 +143,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         tabs.setViewPager(mPager);
         tabs.setOnPageChangeListener(mTabsAdapter);
 
-        // New record click listener
-        findViewById(R.id.new_record).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSurveyGroup == null) {
-                    Toast.makeText(SurveyActivity.this, "You need to select a Survey first",
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
-                // Create new record and return the ID
-                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-                onRecordSelected(newLocaleId);
-            }
-        });
-
         findViewById(R.id.users).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -330,6 +315,10 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         }
 
         switch (item.getItemId()) {
+            case R.id.new_datapoint:
+                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+                onRecordSelected(newLocaleId);
+                return true;
             case R.id.search:
                 return onSearchRequested();
             case R.id.sync_records:

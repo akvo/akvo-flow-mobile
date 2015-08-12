@@ -29,22 +29,16 @@
         android:theme="@style/Flow.Theme" >
         <activity
             android:name=".activity.SurveyActivity"
-            android:configChanges="locale|layoutDirection">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.RecordListActivity"
-            android:label="@string/record_list_activity"
+            android:label="Surveys"
             android:configChanges="locale|layoutDirection"
             android:launchMode="singleTop" >
             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />

@@ -42,8 +42,8 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
-import org.akvo.flow.ui.fragment.SurveyListFragment;
-import org.akvo.flow.ui.fragment.SurveyListFragment.SurveyListListener;
+import org.akvo.flow.ui.fragment.FormListFragment;
+import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -189,7 +189,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
         public Fragment getItem(int position) {
             switch (position) {
                 case POSITION_SURVEYS:
-                    return SurveyListFragment.instantiate(mSurveyGroup, mRecord);
+                    return FormListFragment.instantiate(mSurveyGroup, mRecord);
                 case POSITION_RESPONSES:
                     return ResponseListFragment.instantiate(mSurveyGroup, mRecord);
                 case POSITION_MAP:

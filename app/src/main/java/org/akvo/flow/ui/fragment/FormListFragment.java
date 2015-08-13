@@ -48,9 +48,9 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
-public class SurveyListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
+public class FormListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
         OnItemClickListener {
-    private static final String TAG = SurveyListFragment.class.getSimpleName();
+    private static final String TAG = FormListFragment.class.getSimpleName();
     
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
     private static final String EXTRA_RECORD       = "record";
@@ -67,8 +67,8 @@ public class SurveyListFragment extends ListFragment implements LoaderCallbacks<
     private SurveyDbAdapter mDatabase;
     private SurveyListListener mListener;
     
-    public static SurveyListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
-        SurveyListFragment fragment = new SurveyListFragment();
+    public static FormListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
+        FormListFragment fragment = new FormListFragment();
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
         args.putSerializable(EXTRA_RECORD, record);

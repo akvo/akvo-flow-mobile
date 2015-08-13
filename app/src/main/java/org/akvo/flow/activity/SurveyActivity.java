@@ -41,6 +41,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +56,7 @@ import org.akvo.flow.async.loader.SurveyGroupLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
@@ -66,6 +69,7 @@ import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.StatsDialogFragment;
 import org.akvo.flow.ui.fragment.SurveyedLocaleListFragment;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -76,23 +80,31 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
-    
+
     private static final int POSITION_LIST = 0;
     private static final int POSITION_MAP  = 1;
     
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
+
     private SurveyListAdapter mSurveyAdapter;
+    private UsersAdapter mUsersAdapter;
+    private TabsAdapter mTabsAdapter;
+    private UserToggleListener mUsersToggle;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private View mDrawer;
     private ListView mDrawerList;
+    private TextView mUsernameView;
+    private TextView mListHeader;
     private ViewPager mPager;
-    private TabsAdapter mTabsAdapter;
     private String[] mTabs;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
+
+    private enum Mode { SURVEYS, USERS };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,16 +112,23 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         //setContentView(R.layout.record_list_activity);
         setContentView(R.layout.survey_activity);
 
-        mTitle = mDrawerTitle = "Surveys";
-
-        // Init navigation drawer
+        mUsernameView = (TextView) findViewById(R.id.username);
+        mListHeader = (TextView) findViewById(R.id.list_header);
+        mPager = (ViewPager)findViewById(R.id.pager);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawer = findViewById(R.id.left_drawer);
         mDrawerList = (ListView) findViewById(R.id.survey_group_list);
-        mSurveyAdapter = new SurveyListAdapter(this, null);
-        mDrawerList.setAdapter(mSurveyAdapter);
-        mDrawerList.setOnItemClickListener(mSurveyAdapter);
+        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip)findViewById(R.id.tabs);
 
+        mTitle = mDrawerTitle = getTitle();
+
+        mDatabase = new SurveyDbAdapter(this);
+        mDatabase.open();
+
+        mSurveyAdapter = new SurveyListAdapter(this);
+        mUsersAdapter = new UsersAdapter(this);
+
+        // Init navigation drawer
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
@@ -129,19 +148,18 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         // Init tabs
         mTabs = getResources().getStringArray(R.array.records_activity_tabs);
         mTabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(mTabsAdapter);
         mPager.setOnPageChangeListener(mTabsAdapter);
 
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip)findViewById(R.id.tabs);
         tabs.setViewPager(mPager);
         tabs.setOnPageChangeListener(mTabsAdapter);
+
 
         findViewById(R.id.users).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,18 +175,23 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
             }
         });
 
-        mDatabase = new SurveyDbAdapter(this);
-        mDatabase.open();
+        mUsersToggle = new UserToggleListener();
+        mUsersToggle.setMenuListMode(Mode.SURVEYS);
+        mUsernameView.setOnClickListener(mUsersToggle);
 
         init();
 
-        // Automatically select the last used group.
+        // Automatically select the survey and user
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
         if (sg != null) {
             onSurveyGroupSelected(sg);
         }
+        User u = FlowApp.getApp().getUser();
+        if (u != null) {
+            mUsernameView.setText(u.getName());
+        }
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -267,24 +290,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    /*
-    private void setupTabs() {
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        
-        Tab listTab = actionBar.newTab()
-                .setText(mTabs[POSITION_LIST])
-                .setTabListener(this);
-        Tab mapTab = actionBar.newTab()
-                .setText(mTabs[POSITION_MAP])
-                .setTabListener(this);
-        
-        actionBar.addTab(listTab);
-        actionBar.addTab(mapTab);
-    }
-    */
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // If the nav drawer is open, don't inflate the menu items.
@@ -367,11 +372,45 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
+    class UserToggleListener implements View.OnClickListener {
+        private Mode mListMode = Mode.SURVEYS;
+
+        @Override
+        public void onClick(View v) {
+            switch (mListMode) {
+                case SURVEYS:
+                    setMenuListMode(Mode.USERS);
+                    break;
+                case USERS:
+                    setMenuListMode(Mode.SURVEYS);
+                    break;
+            }
+        }
+
+        public void setMenuListMode(Mode mode) {
+            mListMode = mode;
+            switch (mListMode) {
+                case SURVEYS:
+                    mListHeader.setText("Surveys");
+                    mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_expand, 0);
+                    mDrawerList.setAdapter(mSurveyAdapter);
+                    mDrawerList.setOnItemClickListener(mSurveyAdapter);
+                    break;
+                case USERS:
+                    mListHeader.setText("Users");
+                    mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_collapse, 0);
+                    mDrawerList.setAdapter(mUsersAdapter);
+                    mDrawerList.setOnItemClickListener(mUsersAdapter);
+                    break;
+            }
+        }
+    }
+
     class SurveyListAdapter extends CursorAdapter implements OnItemClickListener {
         final int mTextColor;
 
-        public SurveyListAdapter(Context context, Cursor cursor) {
-            super(context, cursor, 0);
+        public SurveyListAdapter(Context context) {
+            super(context, null, 0);
             mTextColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
         }
 
@@ -492,20 +531,94 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
 
     }
 
-    /*
-    @Override
-    public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
-    }
+    class UsersAdapter extends ArrayAdapter<User> implements OnItemClickListener {
+        final int regularColor, selectedColor;
 
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        mPager.setCurrentItem(tab.getPosition());
-    }
+        public UsersAdapter(Context context) {
+            super(context, android.R.layout.simple_spinner_item);
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-    @Override
-    public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
+            regularColor = PlatformUtil.getResource(context, R.attr.textColorPrimary);
+            selectedColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
+
+            Cursor c = mDatabase.getUsers();
+            if (c != null && c.moveToFirst()) {
+                do {
+                    long id = c.getLong(c.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
+                    String name = c.getString(c.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
+                    add(new User(id, name, null));// TODO: Do we need email?
+                } while (c.moveToNext());
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return super.getCount() + 1;
+        }
+
+        @Override
+        public View getView (int position, View convertView, ViewGroup parent) {
+            // TODO: Use ViewHolder pattern
+            View view = getLayoutInflater().inflate(R.layout.itemlistrow, null);
+            TextView tv = (TextView) view.findViewById(R.id.itemheader);
+            if (position == getCount() - 1) {
+                // New user click
+                tv.setText("Add user");
+            } else {
+                User u = getItem(position);
+                view.setTag(u);
+                tv.setText(u.getName());
+
+                int colorRes = regularColor;
+                final User loggedUser = FlowApp.getApp().getUser();
+                if (loggedUser != null && loggedUser.getId() == u.getId()) {
+                    colorRes = selectedColor;
+                }
+                tv.setTextColor(getResources().getColorStateList(colorRes));
+            }
+
+            return view;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (position == getCount() - 1) {
+                onNewUserClick();
+            } else {
+                onUserSelected(getItem(position));
+            }
+            mUsersToggle.setMenuListMode(Mode.SURVEYS);
+            mDrawerLayout.closeDrawers();
+        }
+
+        void onUserSelected(User user) {
+            mUsernameView.setText(user.getName());
+            FlowApp.getApp().setUser(user);
+            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
+                    String.valueOf(user.getId()));// Save the last id for future sessions
+            notifyDataSetInvalidated();
+        }
+
+        void onNewUserClick() {
+            final EditText et = new EditText(getContext());
+            et.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            ViewUtil.ShowTextInputDialog(getContext(), R.string.adduser, R.string.userlabel,
+                    et, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String username = et.getText().toString();
+                            long id = mDatabase.createOrUpdateUser(null, username, null);
+                            User u = new User(id, username, null);
+
+                            add(u);
+                            onUserSelected(u);
+                        }
+                    });
+        }
+
     }
-    */
 
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be

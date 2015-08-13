@@ -30,6 +30,7 @@
         <activity
             android:name=".activity.SurveyActivity"
             android:label="Surveys"
+            android:icon="@drawable/ic_menu_white_48dp"
             android:configChanges="locale|layoutDirection"
             android:launchMode="singleTop" >
             <intent-filter>

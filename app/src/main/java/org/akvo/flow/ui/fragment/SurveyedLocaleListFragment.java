@@ -18,6 +18,7 @@ package org.akvo.flow.ui.fragment;
 
 import java.util.Date;
 
+import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -51,7 +52,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.RecordListActivity;
 import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
@@ -76,10 +76,18 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     private SurveyedLocaleListAdapter mAdapter;
     private RecordListListener mListener;
 
+    public static SurveyedLocaleListFragment instantiate(long surveyGroupId) {
+        SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP_ID, surveyGroupId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroupId = getArguments().getLong(SurveyActivity.EXTRA_SURVEY_GROUP_ID);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }

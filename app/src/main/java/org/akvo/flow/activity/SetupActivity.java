@@ -1,5 +1,6 @@
 package org.akvo.flow.activity;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -14,7 +15,9 @@ public class SetupActivity extends ActionBarActivity implements LoginFragment.Lo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        displayLogin();
+        startActivity(new Intent(this, SurveyActivity.class));
+        finish();
+        //displayLogin();
     }
 
     private void displayLogin() {

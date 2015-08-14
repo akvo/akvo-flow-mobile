@@ -53,7 +53,6 @@ import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
-import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -76,7 +75,7 @@ public class SurveyGroupListActivity extends ActionBarActivity implements Loader
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.survey_group_activity);
+        setContentView(R.layout.survey_listfragment);
         setTitle(R.string.survey_groups_activity);
         
         mDatabase = new SurveyDbAdapter(getApplicationContext());

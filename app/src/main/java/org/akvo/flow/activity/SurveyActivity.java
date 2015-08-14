@@ -26,11 +26,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -48,8 +45,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.astuetz.PagerSlidingTabStrip;
-
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyGroupLoader;
@@ -63,12 +58,9 @@ import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
-import org.akvo.flow.service.SurveyedLocaleSyncService;
 import org.akvo.flow.service.TimeCheckService;
-import org.akvo.flow.ui.fragment.MapFragment;
+import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.ui.fragment.StatsDialogFragment;
-import org.akvo.flow.ui.fragment.SurveyedLocaleListFragment;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -79,17 +71,16 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     private static final String TAG = SurveyActivity.class.getSimpleName();
     
     // Argument to be passed to list/map fragments
+    public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
 
-    private static final int POSITION_LIST = 0;
-    private static final int POSITION_MAP  = 1;
-    
+    public static final String FRAGMENT_DATAPOINTS = "datapoints_fragment";
+
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
 
     private SurveyListAdapter mSurveyAdapter;
     private UsersAdapter mUsersAdapter;
-    private TabsAdapter mTabsAdapter;
     private UserToggleListener mUsersToggle;
 
     private DrawerLayout mDrawerLayout;
@@ -98,27 +89,20 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     private ListView mDrawerList;
     private TextView mUsernameView;
     private TextView mListHeader;
-    private ViewPager mPager;
-    private String[] mTabs;
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
+    private CharSequence mDrawerTitle, mTitle;
 
-    private enum Mode { SURVEYS, USERS };
-
+    private enum Mode { SURVEYS, USERS }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.record_list_activity);
         setContentView(R.layout.survey_activity);
 
         mUsernameView = (TextView) findViewById(R.id.username);
         mListHeader = (TextView) findViewById(R.id.list_header);
-        mPager = (ViewPager)findViewById(R.id.pager);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawer = findViewById(R.id.left_drawer);
         mDrawerList = (ListView) findViewById(R.id.survey_group_list);
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip)findViewById(R.id.tabs);
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -151,16 +135,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        // Init tabs
-        mTabs = getResources().getStringArray(R.array.records_activity_tabs);
-        mTabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mTabsAdapter);
-        mPager.setOnPageChangeListener(mTabsAdapter);
-
-        tabs.setViewPager(mPager);
-        tabs.setOnPageChangeListener(mTabsAdapter);
-
-
         findViewById(R.id.users).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,20 +164,21 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         if (u != null) {
             mUsernameView.setText(u.getName());
         }
+
+        showDatapointsFragment();
+    }
+
+    // TODO: Add login, survey, datapoints mode selection
+    private void showDatapointsFragment() {
+        Fragment f = DatapointsFragment.instantiate(mSurveyGroup);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, f, FRAGMENT_DATAPOINTS).commit();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Delete empty Records, if any
-        // TODO: For a more efficient cleanup, attempt to wipe ONLY the latest Record,
-        // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
-        mDatabase.deleteEmptyRecords();
-
         loadDrawer();
-
-        registerReceiver(mSurveyedLocalesSyncReceiver,
-                new IntentFilter(getString(R.string.action_locales_sync)));
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }
@@ -211,7 +186,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(mSurveyedLocalesSyncReceiver);
         unregisterReceiver(mSurveysSyncReceiver);
     }
 
@@ -258,10 +232,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         }
     }
 
-    private long getSurveyGroupId() {
-        return mSurveyGroup != null ? mSurveyGroup.getId() : 0;
-    }
-
     private void loadDrawer() {
         getSupportLoaderManager().restartLoader(0, null, this);
     }
@@ -273,7 +243,10 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         // Add group id - Used by the Content Provider. TODO: Find a less dirty solution...
         FlowApp.getApp().setSurveyGroupId(mSurveyGroup.getId());
 
-        mTabsAdapter.refreshFragments();
+        DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS);
+        if (f != null) {
+            f.refresh(mSurveyGroup);
+        }
         supportInvalidateOptionsMenu();
     }
 
@@ -294,23 +267,11 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     public boolean onCreateOptionsMenu(Menu menu) {
         // If the nav drawer is open, don't inflate the menu items.
         if (!mDrawerLayout.isDrawerOpen(mDrawer) && mSurveyGroup != null) {
-            getMenuInflater().inflate(R.menu.survey_activity, menu);
-            if (!mSurveyGroup.isMonitored()) {
-                menu.removeItem(R.id.sync_records);
-            }
-
-            // "Order By" is only available for the ListFragment, not the MapFragment.
-            // The navigation components maintain 2 different indexes: Tab index and Pager index.
-            // The system seems to always update the tab index first, prior to the onCreateOptionsMenu
-            // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
-            // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
-            // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
-            if (getSupportActionBar().getSelectedNavigationIndex() == POSITION_MAP) {
-                menu.removeItem(R.id.order_by);
-            }
+            //getMenuInflater().inflate(R.menu.survey_activity, menu);
+            return super.onCreateOptionsMenu(menu);
         }
 
-        return super.onCreateOptionsMenu(menu);
+        return false;
     }
 
     @Override
@@ -318,28 +279,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-
-        switch (item.getItemId()) {
-            case R.id.new_datapoint:
-                String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-                onRecordSelected(newLocaleId);
-                return true;
-            case R.id.search:
-                return onSearchRequested();
-            case R.id.sync_records:
-                Toast.makeText(SurveyActivity.this, R.string.syncing_records,
-                        Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, SurveyedLocaleSyncService.class);
-                intent.putExtra(SurveyedLocaleSyncService.SURVEY_GROUP, mSurveyGroup.getId());
-                startService(intent);
-                return true;
-            case R.id.stats:
-                StatsDialogFragment dialogFragment = StatsDialogFragment.newInstance(mSurveyGroup.getId());
-                dialogFragment.show(getSupportFragmentManager(), "stats");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -353,10 +293,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         intent.putExtras(extras);
         startActivity(intent);
     }
-
-    // ==================================== //
-    // ========= Loader Callbacks ========= //
-    // ==================================== //
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -459,78 +395,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
 
     }
 
-    class TabsAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
-        int mSelected;
-        
-        public TabsAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return mTabs.length;
-        }
-        
-        private Fragment getFragment(int pos){
-            // Hell of a hack. This should be changed for a more reliable method
-            String tag = "android:switcher:" + R.id.pager + ":" + pos;
-            return getSupportFragmentManager().findFragmentByTag(tag);
-        }
-        
-        public void refreshFragments() {
-            SurveyedLocaleListFragment listFragment = (SurveyedLocaleListFragment) getFragment(POSITION_LIST);
-            MapFragment mapFragment = (MapFragment) getFragment(POSITION_MAP);
-
-            if (listFragment != null) {
-                listFragment.refresh(getSurveyGroupId());
-            }
-            if (mapFragment != null) {
-                mapFragment.refresh(getSurveyGroupId());
-            }
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment = null;
-            Bundle extras = new Bundle();
-            extras.putLong(EXTRA_SURVEY_GROUP_ID, getSurveyGroupId());
-            switch (position) {
-                case POSITION_LIST:
-                    fragment =  new SurveyedLocaleListFragment();
-                    break;
-                case POSITION_MAP:
-                    fragment = new MapFragment();
-                    break;
-            }
-            
-            if (fragment != null) {
-                fragment.setArguments(extras);
-            }
-            
-            return fragment;
-        }
-        
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mTabs[position];
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            mSelected = position;
-            //getSupportActionBar().setSelectedNavigationItem(position);
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-        }
-
-    }
-
     class UsersAdapter extends ArrayAdapter<User> implements OnItemClickListener {
         final int regularColor, selectedColor;
 
@@ -629,18 +493,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
             loadDrawer();
-        }
-    };
-
-    /**
-     * BroadcastReceiver to notify of records synchronisation. This should be
-     * fired from SurveyedLocalesSyncService.
-     */
-    private BroadcastReceiver mSurveyedLocalesSyncReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "New Records have been synchronised. Refreshing fragments...");
-            mTabsAdapter.refreshFragments();
         }
     };
 

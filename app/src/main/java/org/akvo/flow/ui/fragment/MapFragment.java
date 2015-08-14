@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +35,7 @@ import android.widget.FrameLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.RecordListActivity;
+import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -71,19 +72,23 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     private GoogleMap mMap;
     private ClusterManager<SurveyedLocale> mClusterManager;
 
+    public static MapFragment instantiate(long surveyGroupId, String datapointId) {
+        MapFragment fragment = new MapFragment();
+        Bundle args = new Bundle();
+        args.putLong(SurveyActivity.EXTRA_SURVEY_GROUP_ID, surveyGroupId);
+        args.putString(RecordActivity.EXTRA_RECORD_ID, datapointId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mItems = new ArrayList<SurveyedLocale>();
-        Bundle args = getArguments();
-        if (args.containsKey(RecordActivity.EXTRA_RECORD_ID)) {
-            // Single record mode.
-            mSingleRecord = true;
-            mRecordId = args.getString(RecordActivity.EXTRA_RECORD_ID);
-        } else {
-            mSingleRecord = false;
-            mSurveyGroupId = args.getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
-        }
+        mItems = new ArrayList<>();
+
+        mSurveyGroupId = getArguments().getLong(SurveyActivity.EXTRA_SURVEY_GROUP_ID);
+        mRecordId = getArguments().getString(RecordActivity.EXTRA_RECORD_ID);
+        mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
     }
 
     @Override

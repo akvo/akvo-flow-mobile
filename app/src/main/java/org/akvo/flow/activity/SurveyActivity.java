@@ -22,32 +22,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.async.loader.SurveyGroupLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -61,13 +48,13 @@ import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.ui.view.NavigationDrawer;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public class SurveyActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor>,
-        RecordListListener {
+public class SurveyActivity extends ActionBarActivity implements RecordListListener,
+        NavigationDrawer.OnUserSelectedListener, NavigationDrawer.OnSurveySelectedListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
     
     // Argument to be passed to list/map fragments
@@ -76,43 +63,29 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
 
     public static final String FRAGMENT_DATAPOINTS = "datapoints_fragment";
 
-    private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
-
-    private SurveyListAdapter mSurveyAdapter;
-    private UsersAdapter mUsersAdapter;
-    private UserToggleListener mUsersToggle;
+    private SurveyGroup mSurveyGroup;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private View mDrawer;
-    private ListView mDrawerList;
-    private TextView mUsernameView;
-    private TextView mListHeader;
+    private NavigationDrawer mDrawer;
     private CharSequence mDrawerTitle, mTitle;
-
-    private enum Mode { SURVEYS, USERS }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
 
-        mUsernameView = (TextView) findViewById(R.id.username);
-        mListHeader = (TextView) findViewById(R.id.list_header);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawer = findViewById(R.id.left_drawer);
-        mDrawerList = (ListView) findViewById(R.id.survey_group_list);
-
-        mTitle = mDrawerTitle = getTitle();
-
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
-        mSurveyAdapter = new SurveyListAdapter(this);
-        mUsersAdapter = new UsersAdapter(this);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawer = (NavigationDrawer) findViewById(R.id.left_drawer);
+
+        mTitle = mDrawerTitle = getTitle();
 
         // Init navigation drawer
+        mDrawer.init(getSupportLoaderManager(), mDatabase, this, this);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
@@ -135,37 +108,15 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        findViewById(R.id.users).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SurveyActivity.this, ListUserActivity.class));
-            }
-        });
-
-        findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SurveyActivity.this, SettingsActivity.class));
-            }
-        });
-
-        mUsersToggle = new UserToggleListener();
-        mUsersToggle.setMenuListMode(Mode.SURVEYS);
-        mUsernameView.setOnClickListener(mUsersToggle);
-
-        init();
-
         // Automatically select the survey and user
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
         if (sg != null) {
-            onSurveyGroupSelected(sg);
-        }
-        User u = FlowApp.getApp().getUser();
-        if (u != null) {
-            mUsernameView.setText(u.getName());
+            onSurveySelected(sg);
         }
 
         showDatapointsFragment();
+
+        startServices();
     }
 
     // TODO: Add login, survey, datapoints mode selection
@@ -178,7 +129,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     @Override
     public void onResume() {
         super.onResume();
-        loadDrawer();
+        mDrawer.load();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }
@@ -196,12 +147,19 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
         getSupportActionBar().setTitle(mTitle);
     }
 
-    private void init() {
+    private void startServices() {
         if (!StatusUtil.hasExternalStorage()) {
             ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                     false,
@@ -232,15 +190,11 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         }
     }
 
-    private void loadDrawer() {
-        getSupportLoaderManager().restartLoader(0, null, this);
-    }
-
-    private void onSurveyGroupSelected(SurveyGroup surveyGroup) {
+    @Override
+    public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
         setTitle(mSurveyGroup.getName());
 
-        // Add group id - Used by the Content Provider. TODO: Find a less dirty solution...
         FlowApp.getApp().setSurveyGroupId(mSurveyGroup.getId());
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS);
@@ -248,13 +202,15 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
             f.refresh(mSurveyGroup);
         }
         supportInvalidateOptionsMenu();
+        mDrawerLayout.closeDrawers();
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
+    public void onUserSelected(User user) {
+        FlowApp.getApp().setUser(user);
+        mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
+                String.valueOf(user.getId()));// Save the last id for future sessions
+        mDrawerLayout.closeDrawers();
     }
 
     @Override
@@ -284,6 +240,12 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
 
     @Override
     public void onRecordSelected(String surveyedLocaleId) {
+        // Ensure user is logged in
+        if (FlowApp.getApp().getUser() == null) {
+            Toast.makeText(SurveyActivity.this, R.string.mustselectuser,
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         // Start SurveysActivity, sending SurveyGroup + Record
         SurveyedLocale record = mDatabase.getSurveyedLocale(surveyedLocaleId);
         Intent intent = new Intent(this, RecordActivity.class);
@@ -294,196 +256,6 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         startActivity(intent);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyGroupLoader(this, mDatabase);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        mSurveyAdapter.changeCursor(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    class UserToggleListener implements View.OnClickListener {
-        private Mode mListMode = Mode.SURVEYS;
-
-        @Override
-        public void onClick(View v) {
-            switch (mListMode) {
-                case SURVEYS:
-                    setMenuListMode(Mode.USERS);
-                    break;
-                case USERS:
-                    setMenuListMode(Mode.SURVEYS);
-                    break;
-            }
-        }
-
-        public void setMenuListMode(Mode mode) {
-            mListMode = mode;
-            switch (mListMode) {
-                case SURVEYS:
-                    mListHeader.setText("Surveys");
-                    mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_expand, 0);
-                    mDrawerList.setAdapter(mSurveyAdapter);
-                    mDrawerList.setOnItemClickListener(mSurveyAdapter);
-                    break;
-                case USERS:
-                    mListHeader.setText("Users");
-                    mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_collapse, 0);
-                    mDrawerList.setAdapter(mUsersAdapter);
-                    mDrawerList.setOnItemClickListener(mUsersAdapter);
-                    break;
-            }
-        }
-    }
-
-    class SurveyListAdapter extends CursorAdapter implements OnItemClickListener {
-        final int mTextColor;
-
-        public SurveyListAdapter(Context context) {
-            super(context, null, 0);
-            mTextColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
-        }
-
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            View view = inflater.inflate(R.layout.survey_group_list_item, null);
-            bindView(view, context, cursor);
-            return view;
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
-
-            TextView text1 = (TextView)view.findViewById(R.id.text1);
-            text1.setText(surveyGroup.getName());
-            text1.setTextColor(getResources().getColorStateList(mTextColor));
-
-            // Alternate background
-            /*
-            int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-            final int res= PlatformUtil.getResource(context, attr);
-            view.setBackgroundResource(res);
-            */
-
-            view.setTag(surveyGroup);
-        }
-
-        // TODO
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // Ensure user is logged in
-            if (FlowApp.getApp().getUser() == null) {
-                Toast.makeText(SurveyActivity.this, R.string.mustselectuser,
-                        Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            mDrawerList.setItemChecked(position, true);
-
-            final SurveyGroup survey = (SurveyGroup) view.getTag();
-            onSurveyGroupSelected(survey);
-            mDrawerLayout.closeDrawers();
-        }
-
-    }
-
-    class UsersAdapter extends ArrayAdapter<User> implements OnItemClickListener {
-        final int regularColor, selectedColor;
-
-        public UsersAdapter(Context context) {
-            super(context, android.R.layout.simple_spinner_item);
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            regularColor = PlatformUtil.getResource(context, R.attr.textColorPrimary);
-            selectedColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
-
-            Cursor c = mDatabase.getUsers();
-            if (c != null && c.moveToFirst()) {
-                do {
-                    long id = c.getLong(c.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
-                    String name = c.getString(c.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
-                    add(new User(id, name, null));// TODO: Do we need email?
-                } while (c.moveToNext());
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return super.getCount() + 1;
-        }
-
-        @Override
-        public View getView (int position, View convertView, ViewGroup parent) {
-            // TODO: Use ViewHolder pattern
-            View view = getLayoutInflater().inflate(R.layout.itemlistrow, null);
-            TextView tv = (TextView) view.findViewById(R.id.itemheader);
-            if (position == getCount() - 1) {
-                // New user click
-                tv.setText("Add user");
-            } else {
-                User u = getItem(position);
-                view.setTag(u);
-                tv.setText(u.getName());
-
-                int colorRes = regularColor;
-                final User loggedUser = FlowApp.getApp().getUser();
-                if (loggedUser != null && loggedUser.getId() == u.getId()) {
-                    colorRes = selectedColor;
-                }
-                tv.setTextColor(getResources().getColorStateList(colorRes));
-            }
-
-            return view;
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (position == getCount() - 1) {
-                onNewUserClick();
-            } else {
-                onUserSelected(getItem(position));
-            }
-            mUsersToggle.setMenuListMode(Mode.SURVEYS);
-            mDrawerLayout.closeDrawers();
-        }
-
-        void onUserSelected(User user) {
-            mUsernameView.setText(user.getName());
-            FlowApp.getApp().setUser(user);
-            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
-                    String.valueOf(user.getId()));// Save the last id for future sessions
-            notifyDataSetInvalidated();
-        }
-
-        void onNewUserClick() {
-            final EditText et = new EditText(getContext());
-            et.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            ViewUtil.ShowTextInputDialog(getContext(), R.string.adduser, R.string.userlabel,
-                    et, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String username = et.getText().toString();
-                            long id = mDatabase.createOrUpdateUser(null, username, null);
-                            User u = new User(id, username, null);
-
-                            add(u);
-                            onUserSelected(u);
-                        }
-                    });
-        }
-
-    }
-
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be
      * fired from SurveyDownloadService.
@@ -492,8 +264,7 @@ public class SurveyActivity extends ActionBarActivity implements LoaderManager.L
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
-            loadDrawer();
+            mDrawer.load();
         }
     };
-
 }

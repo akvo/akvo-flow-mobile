@@ -29,18 +29,17 @@
         android:theme="@style/Flow.Theme" >
 
         <activity
-            android:name=".activity.SetupActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:name=".activity.SetupActivity"
+            android:label="@string/adduser">
         </activity>
         <activity
             android:name=".activity.SurveyActivity"
             android:configChanges="locale|layoutDirection"
-            android:icon="@drawable/ic_menu_white_48dp"
-            android:label="Surveys"
             android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

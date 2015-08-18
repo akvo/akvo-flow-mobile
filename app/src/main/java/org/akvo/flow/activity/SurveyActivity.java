@@ -49,14 +49,16 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.view.NavigationDrawer;
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class SurveyActivity extends ActionBarActivity implements RecordListListener,
-        NavigationDrawer.OnUserSelectedListener, NavigationDrawer.OnSurveySelectedListener {
+        NavigationDrawer.UserListener, NavigationDrawer.SurveyListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
-    
+
+    private static final int REQUEST_ADD_USER = 0;
+
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
@@ -82,7 +84,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         //mDrawer = (NavigationDrawer) findViewById(R.id.left_drawer);
 
-        mTitle = mDrawerTitle = getTitle();
+        mTitle = mDrawerTitle = "Surveys";// TODO: Externalize str
 
         // Init navigation drawer
         mDrawer = (NavigationDrawer)getSupportFragmentManager().findFragmentByTag("f");
@@ -107,6 +109,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setIcon(R.drawable.ic_menu_white_48dp);
 
         // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
@@ -119,13 +122,27 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
                 DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
 
+        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+            onNewUser();
+        }
+
         startServices();
+    }
+
+    @Override
+    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
+        } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+            finish();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mDrawer.load();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }
@@ -202,10 +219,13 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     }
 
     @Override
+    public void onNewUser() {
+        startActivityForResult(new Intent(this, SetupActivity.class), REQUEST_ADD_USER);
+    }
+
+    @Override
     public void onUserSelected(User user) {
         FlowApp.getApp().setUser(user);
-        mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
-                String.valueOf(user.getId()));// Save the last id for future sessions
         mDrawerLayout.closeDrawers();
     }
 

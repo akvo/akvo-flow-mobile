@@ -97,6 +97,7 @@ public class FlowApp extends Application {
     
     public void setUser(User user) {
         mUser = user;
+        Prefs.setLong(this, Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
     }
     
     public User getUser() {

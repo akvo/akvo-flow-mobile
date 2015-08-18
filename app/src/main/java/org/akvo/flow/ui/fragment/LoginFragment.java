@@ -6,14 +6,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import org.akvo.flow.R;
+import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.User;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
     public interface LoginListener {
-        void onLogin();
+        void onLogin(User user);
     }
+
+    private EditText mUsername;
+    private EditText mEmail;
 
     private LoginListener mListener;
 
@@ -37,11 +43,22 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         View v = inflater.inflate(R.layout.fragment_login, container, false);
         v.findViewById(R.id.login_btn).setOnClickListener(this);
 
+        mUsername = (EditText) v.findViewById(R.id.username);
+        mEmail = (EditText) v.findViewById(R.id.email);
+
         return v;
     }
 
     @Override
     public void onClick(View view) {
-        mListener.onLogin();
+        // TODO: Validate
+        String username = mUsername.getText().toString();
+        String email = mEmail.getText().toString();
+
+        SurveyDbAdapter db = new SurveyDbAdapter(getActivity()).open();
+        final long id = db.createOrUpdateUser(null, username, email);
+        db.close();
+
+        mListener.onLogin(new User(id, username, email));
     }
 }

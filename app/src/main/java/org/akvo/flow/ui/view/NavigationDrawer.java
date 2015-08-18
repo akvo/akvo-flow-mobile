@@ -2,7 +2,6 @@ package org.akvo.flow.ui.view;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,15 +26,15 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.ViewUtil;
 
 public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public interface OnSurveySelectedListener {
+    public interface SurveyListener {
         void onSurveySelected(SurveyGroup surveyGroup);
     }
 
-    public interface OnUserSelectedListener {
+    public interface UserListener {
+        void onNewUser();
         void onUserSelected(User user);
     }
 
@@ -53,8 +51,8 @@ public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCa
     private UserToggleListener mUsersToggle;
 
     private SurveyDbAdapter mDatabase;
-    private OnSurveySelectedListener mSurveysListener;
-    private OnUserSelectedListener mUsersListener;
+    private SurveyListener mSurveysListener;
+    private UserListener mUsersListener;
 
     private enum Mode { SURVEYS, USERS }
 
@@ -73,22 +71,7 @@ public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCa
         addUserView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText et = new EditText(getActivity());
-                et.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-
-                ViewUtil.ShowTextInputDialog(getActivity(), R.string.adduser, R.string.userlabel,
-                        et, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String username = et.getText().toString();
-                                long id = mDatabase.createOrUpdateUser(null, username, null);
-                                User u = new User(id, username, null);
-
-                                mUsersAdapter.onUserSelected(u);
-                                getLoaderManager().restartLoader(LOADER_USERS, null, NavigationDrawer.this);
-                            }
-                        });
+                mUsersListener.onNewUser();
             }
         });
         mUserList.addFooterView(addUserView);
@@ -105,11 +88,6 @@ public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCa
         mUsersToggle = new UserToggleListener();
         mUsersToggle.setMenuListMode(Mode.SURVEYS);
         mUsernameView.setOnClickListener(mUsersToggle);
-
-        User u = FlowApp.getApp().getUser();
-        if (u != null) {
-            mUsernameView.setText(u.getName());
-        }
 
         return v;
     }
@@ -156,9 +134,21 @@ public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        load();
+        updateUser();
+    }
+
     public void load() {
         getLoaderManager().restartLoader(LOADER_SURVEYS, null, this);
         getLoaderManager().restartLoader(LOADER_USERS, null, this);
+    }
+
+    public void updateUser() {
+        User user = FlowApp.getApp().getUser();
+        mUsernameView.setText(user != null ? user.getName() : null);
     }
 
     class UserToggleListener implements View.OnClickListener {
@@ -289,10 +279,6 @@ public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCa
 
             TextView text1 = (TextView)view.findViewById(android.R.id.text1);
             text1.setText(name);
-
-            final User loggedUser = FlowApp.getApp().getUser();
-            boolean selected = loggedUser != null && loggedUser.getId() == id;
-            //text1.setSelected(selected);
 
             view.setTag(user);
         }

@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
@@ -59,8 +60,11 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
         mDoubleEntryText = (EditText)findViewById(R.id.double_entry_et);
 
         // Show/Hide double entry title & EditText
-        findViewById(R.id.double_entry_title).setVisibility(isDoubleEntry() ? VISIBLE : GONE);
-        mDoubleEntryText.setVisibility(isDoubleEntry() ? VISIBLE : GONE);
+        if (isDoubleEntry()) {
+            findViewById(R.id.double_entry_title).setVisibility(VISIBLE);
+            mDoubleEntryText.setVisibility(VISIBLE);
+            mEditText.setInputType(mEditText.getInputType() & ~InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        }
 
         if (isReadOnly()) {
             mEditText.setFocusable(false);

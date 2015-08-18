@@ -98,19 +98,21 @@ public class DatapointsFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.datapoints_fragment, menu);
-        if (!mSurveyGroup.isMonitored()) {
-            menu.removeItem(R.id.sync_records);
-        }
+        if (mSurveyGroup != null) {
+            inflater.inflate(R.menu.datapoints_fragment, menu);
+            if (!mSurveyGroup.isMonitored()) {
+                menu.removeItem(R.id.sync_records);
+            }
 
-        // "Order By" is only available for the ListFragment, not the MapFragment.
-        // The navigation components maintain 2 different indexes: Tab index and Pager index.
-        // The system seems to always update the tab index first, prior to the onCreateOptionsMenu
-        // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
-        // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
-        // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
-        if (mPager.getCurrentItem() == POSITION_MAP) {
-            menu.removeItem(R.id.order_by);
+            // "Order By" is only available for the ListFragment, not the MapFragment.
+            // The navigation components maintain 2 different indexes: Tab index and Pager index.
+            // The system seems to always update the tab index first, prior to the onCreateOptionsMenu
+            // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
+            // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
+            // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
+            if (mPager.getCurrentItem() == POSITION_MAP) {
+                menu.removeItem(R.id.order_by);
+            }
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -162,20 +164,20 @@ public class DatapointsFragment extends Fragment {
             MapFragment mapFragment = (MapFragment) getFragment(POSITION_MAP);
 
             if (listFragment != null) {
-                listFragment.refresh(mSurveyGroup.getId());
+                listFragment.refresh(getSurveyGroupId());
             }
             if (mapFragment != null) {
-                mapFragment.refresh(mSurveyGroup.getId());
+                mapFragment.refresh(getSurveyGroupId());
             }
         }
 
         @Override
         public Fragment getItem(int position) {
             if (position == POSITION_LIST) {
-                return SurveyedLocaleListFragment.instantiate(mSurveyGroup.getId());
+                return SurveyedLocaleListFragment.instantiate(getSurveyGroupId());
             }
             // Map mode
-            return MapFragment.instantiate(mSurveyGroup.getId(), null);
+            return MapFragment.instantiate(getSurveyGroupId(), null);
         }
 
         @Override
@@ -185,9 +187,14 @@ public class DatapointsFragment extends Fragment {
 
     }
 
+    private long getSurveyGroupId() {
+        return mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
+    }
+
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
         mTabsAdapter.refreshFragments();
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     /**

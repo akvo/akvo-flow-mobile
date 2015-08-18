@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.fragment.LoginFragment;
 import org.akvo.flow.ui.fragment.SurveysListFragment;
 
@@ -40,7 +41,7 @@ public class SetupActivity extends ActionBarActivity implements LoginFragment.Lo
     }
 
     @Override
-    public void onSurveyClick(long id) {
+    public void onSurveySelected(SurveyGroup sg) {
         // TODO
     }
 

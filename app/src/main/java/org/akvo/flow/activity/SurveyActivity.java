@@ -24,10 +24,10 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -80,12 +80,12 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mDatabase.open();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawer = (NavigationDrawer) findViewById(R.id.left_drawer);
+        //mDrawer = (NavigationDrawer) findViewById(R.id.left_drawer);
 
         mTitle = mDrawerTitle = getTitle();
 
         // Init navigation drawer
-        mDrawer.init(getSupportLoaderManager(), mDatabase, this, this);
+        mDrawer = (NavigationDrawer)getSupportFragmentManager().findFragmentByTag("f");
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
@@ -108,22 +108,18 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        // Automatically select the survey and user
+        // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
         if (sg != null) {
             onSurveySelected(sg);
+        } else {
+            mDrawerLayout.openDrawer(Gravity.START);
         }
 
-        showDatapointsFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
+                DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
 
         startServices();
-    }
-
-    // TODO: Add login, survey, datapoints mode selection
-    private void showDatapointsFragment() {
-        Fragment f = DatapointsFragment.instantiate(mSurveyGroup);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, f, FRAGMENT_DATAPOINTS).commit();
     }
 
     @Override
@@ -222,7 +218,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // If the nav drawer is open, don't inflate the menu items.
-        if (!mDrawerLayout.isDrawerOpen(mDrawer) && mSurveyGroup != null) {
+        if (!mDrawerLayout.isDrawerOpen(Gravity.START) && mSurveyGroup != null) {
             //getMenuInflater().inflate(R.menu.survey_activity, menu);
             return super.onCreateOptionsMenu(menu);
         }

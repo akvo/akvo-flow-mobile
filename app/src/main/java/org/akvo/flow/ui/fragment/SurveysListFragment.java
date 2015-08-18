@@ -40,7 +40,7 @@ public class SurveysListFragment extends ListFragment implements LoaderCallbacks
     private static final String TAG = SurveysListFragment.class.getSimpleName();
 
     public interface SurveyListListener {
-        void onSurveyClick(long id);
+        void onSurveySelected(SurveyGroup surveyGroup);
     }
 
     private SurveyListListener mListener;
@@ -110,7 +110,7 @@ public class SurveysListFragment extends ListFragment implements LoaderCallbacks
     public void onListItemClick(ListView list, View view, int position, long id) {
         SurveyGroup sg = (SurveyGroup) view.getTag();
         if (sg != null) {
-            mListener.onSurveyClick(sg.getId());
+            mListener.onSurveySelected(sg);
         }
     }
 

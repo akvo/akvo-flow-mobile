@@ -52,9 +52,17 @@ public class DatapointsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         mTabs = getResources().getStringArray(R.array.records_activity_tabs);
-        mDatabase = new SurveyDbAdapter(getActivity());
-        mDatabase.open();
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (mDatabase == null) {
+            mDatabase = new SurveyDbAdapter(getActivity());
+            mDatabase.open();
+        }
     }
 
     @Override

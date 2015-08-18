@@ -1,25 +1,26 @@
 package org.akvo.flow.ui.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
+import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyGroupLoader;
 import org.akvo.flow.async.loader.UserLoader;
@@ -29,7 +30,7 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public class NavigationDrawer extends FrameLayout implements LoaderManager.LoaderCallbacks<Cursor> {
+public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public interface OnSurveySelectedListener {
         void onSurveySelected(SurveyGroup surveyGroup);
@@ -47,8 +48,6 @@ public class NavigationDrawer extends FrameLayout implements LoaderManager.Loade
     private TextView mUsernameView;
     private TextView mListHeader;
 
-    private LoaderManager mLoaderManager;
-
     private SurveyListAdapter mSurveyAdapter;
     private UsersAdapter mUsersAdapter;
     private UserToggleListener mUsersToggle;
@@ -59,36 +58,26 @@ public class NavigationDrawer extends FrameLayout implements LoaderManager.Loade
 
     private enum Mode { SURVEYS, USERS }
 
-    public NavigationDrawer(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.navigation_drawer, container, false);
 
-        inflate(context, R.layout.navigation_drawer, this);
-
-        mUsernameView = (TextView) findViewById(R.id.username);
-        mListHeader = (TextView) findViewById(R.id.list_header);
-        mUserList = (ListView) findViewById(R.id.user_list);
-        mSurveyList = (ListView) findViewById(R.id.survey_group_list);
-
-        mUsersAdapter = new UsersAdapter(context);
-        mUserList.setAdapter(mUsersAdapter);
-        mUserList.setOnItemClickListener(mUsersAdapter);
-
-        mSurveyAdapter = new SurveyListAdapter(context);
-        mSurveyList.setAdapter(mSurveyAdapter);
-        mSurveyList.setOnItemClickListener(mSurveyAdapter);
+        mUsernameView = (TextView) v.findViewById(R.id.username);
+        mListHeader = (TextView) v.findViewById(R.id.list_header);
+        mUserList = (ListView) v.findViewById(R.id.user_list);
+        mSurveyList = (ListView) v.findViewById(R.id.survey_group_list);
 
         // Add list footers
-        LayoutInflater inflater = LayoutInflater.from(context);
         TextView addUserView = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, null);
         addUserView.setText("Add user");
-        addUserView.setOnClickListener(new OnClickListener() {
+        addUserView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText et = new EditText(getContext());
+                final EditText et = new EditText(getActivity());
                 et.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                ViewUtil.ShowTextInputDialog(getContext(), R.string.adduser, R.string.userlabel,
+                ViewUtil.ShowTextInputDialog(getActivity(), R.string.adduser, R.string.userlabel,
                         et, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -97,7 +86,7 @@ public class NavigationDrawer extends FrameLayout implements LoaderManager.Loade
                                 User u = new User(id, username, null);
 
                                 mUsersAdapter.onUserSelected(u);
-                                mLoaderManager.restartLoader(LOADER_USERS, null, NavigationDrawer.this);
+                                getLoaderManager().restartLoader(LOADER_USERS, null, NavigationDrawer.this);
                             }
                         });
             }
@@ -105,10 +94,10 @@ public class NavigationDrawer extends FrameLayout implements LoaderManager.Loade
         mUserList.addFooterView(addUserView);
 
         View settingsView = inflater.inflate(R.layout.navigation_drawer_footer, null);
-        settingsView.setOnClickListener(new OnClickListener() {
+        settingsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getContext().startActivity(new Intent(getContext(), SettingsActivity.class));
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
             }
         });
         mSurveyList.addFooterView(settingsView);
@@ -121,23 +110,55 @@ public class NavigationDrawer extends FrameLayout implements LoaderManager.Loade
         if (u != null) {
             mUsernameView.setText(u.getName());
         }
+
+        return v;
     }
 
-    public NavigationDrawer(Context context) {
-        this(context, null);
+    @Override
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (mDatabase == null) {
+            mDatabase = new SurveyDbAdapter(getActivity());
+            mDatabase.open();
+        }
+        if (mUsersAdapter == null) {
+            mUsersAdapter = new UsersAdapter(getActivity());
+            mUserList.setAdapter(mUsersAdapter);
+            mUserList.setOnItemClickListener(mUsersAdapter);
+        }
+        if (mSurveyAdapter == null) {
+            mSurveyAdapter = new SurveyListAdapter(getActivity());
+            mSurveyList.setAdapter(mSurveyAdapter);
+            mSurveyList.setOnItemClickListener(mSurveyAdapter);
+        }
+
     }
 
-    public void init(LoaderManager loaderManager, SurveyDbAdapter db, OnSurveySelectedListener
-            surveySelectedListener, OnUserSelectedListener userSelectedListener) {
-        mLoaderManager = loaderManager;
-        mDatabase = db;
-        mSurveysListener = surveySelectedListener;
-        mUsersListener = userSelectedListener;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDatabase.close();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mSurveysListener = (SurveyActivity)activity;
+            mUsersListener = (SurveyActivity)activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement surveys and users listeners");
+        }
     }
 
     public void load() {
-        mLoaderManager.restartLoader(LOADER_SURVEYS, null, this);
-        mLoaderManager.restartLoader(LOADER_USERS, null, this);
+        getLoaderManager().restartLoader(LOADER_SURVEYS, null, this);
+        getLoaderManager().restartLoader(LOADER_USERS, null, this);
     }
 
     class UserToggleListener implements View.OnClickListener {
@@ -159,15 +180,15 @@ public class NavigationDrawer extends FrameLayout implements LoaderManager.Loade
             mListMode = mode;
             switch (mListMode) {
                 case SURVEYS:
-                    mUserList.setVisibility(GONE);
-                    mSurveyList.setVisibility(VISIBLE);
+                    mUserList.setVisibility(View.GONE);
+                    mSurveyList.setVisibility(View.VISIBLE);
 
                     mListHeader.setText("Surveys");
                     mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_expand, 0);
                     break;
                 case USERS:
-                    mUserList.setVisibility(VISIBLE);
-                    mSurveyList.setVisibility(GONE);
+                    mUserList.setVisibility(View.VISIBLE);
+                    mSurveyList.setVisibility(View.GONE);
 
                     mListHeader.setText("Users");
                     mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_collapse, 0);
@@ -180,9 +201,9 @@ public class NavigationDrawer extends FrameLayout implements LoaderManager.Loade
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case LOADER_SURVEYS:
-                return new SurveyGroupLoader(getContext(), mDatabase);
+                return new SurveyGroupLoader(getActivity(), mDatabase);
             case LOADER_USERS:
-                return new UserLoader(getContext(), mDatabase);
+                return new UserLoader(getActivity(), mDatabase);
         }
         return null;
     }

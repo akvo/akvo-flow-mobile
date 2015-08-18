@@ -11,8 +11,10 @@
         android:layout_height="match_parent" />
 
     <!-- The navigation drawer -->
-    <org.akvo.flow.ui.view.NavigationDrawer
+    <fragment
+        android:name="org.akvo.flow.ui.view.NavigationDrawer"
         android:id="@+id/left_drawer"
+        android:tag="f"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start" />

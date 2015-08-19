@@ -115,8 +115,10 @@
   <string name="clear_data_success">Data successfully deleted from the device</string>
   <string name="clear_data_error">Error deleting data from the device</string>
   <string name="configuring_languages">Configuring survey languages...</string>
-  <string name="sync_records">Sync Data Points</string>
-  <string name="order_by">Order By</string>
+  <string name="search">Search</string>
+  <string name="sync">Sync</string>
+  <string name="sort">Sort</string>
+  <string name="stats">Stats</string>
   <string name="syncing_records">Syncing Data Points...</string>
   <string name="sync_finished">Data Points Sync finished</string>
   <string name="synced_records">Synced %1$d Data Points</string>
@@ -165,8 +167,7 @@
   <string name="clear_feature_title">Delete feature</string>
   <string name="clear_feature_text">Do you want to remove this feature?</string>
   <!--RecordList Activity-->
-  <string name="create_data_point">CREATE NEW DATA POINT</string>
-  <string name="stats_title">Survey Stats</string>
+  <string name="add_data_point">Add Data Point</string>
   <string name="stats_total">Total Data Points:</string>
   <string name="stats_week">Last 7 days:</string>
   <string name="stats_today">Today:</string>

@@ -38,7 +38,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
@@ -268,10 +267,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
         // Non-monitored surveys display the form directly
         if (!mSurveyGroup.isMonitored()) {
-            if (BootstrapService.isProcessing) {
-                Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
-                return;
-            }
             final String formId = mSurveyGroup.getRegisterSurveyId();
             if (!mDatabase.getSurvey(formId).isHelpDownloaded()) {
                 Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();

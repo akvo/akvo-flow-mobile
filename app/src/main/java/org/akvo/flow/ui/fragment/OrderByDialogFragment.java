@@ -33,7 +33,7 @@ public class OrderByDialogFragment extends DialogFragment implements
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.order_by)
+        builder.setTitle(R.string.sort)
                 .setItems(R.array.order_by, this);
         return builder.create();
     }

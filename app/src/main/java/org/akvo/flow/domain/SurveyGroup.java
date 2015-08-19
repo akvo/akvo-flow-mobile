@@ -37,7 +37,11 @@ public class SurveyGroup implements Serializable {
         mRegisterSurveyId = registerSurveyId;
         mMonitored = monitored;
     }
-    
+
+    public void setRegisterSurveyId(String surveyId) {
+        mRegisterSurveyId = surveyId;
+    }
+
     public String getRegisterSurveyId() {
         return mRegisterSurveyId;
     }

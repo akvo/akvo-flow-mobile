@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -49,6 +50,7 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.view.NavigationDrawer;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -256,20 +258,55 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
     @Override
     public void onRecordSelected(String surveyedLocaleId) {
+        final User user = FlowApp.getApp().getUser();
         // Ensure user is logged in
-        if (FlowApp.getApp().getUser() == null) {
+        if (user == null) {
             Toast.makeText(SurveyActivity.this, R.string.mustselectuser,
                     Toast.LENGTH_LONG).show();
             return;
         }
-        // Start SurveysActivity, sending SurveyGroup + Record
-        SurveyedLocale record = mDatabase.getSurveyedLocale(surveyedLocaleId);
-        Intent intent = new Intent(this, RecordActivity.class);
-        Bundle extras = new Bundle();
-        extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
-        extras.putString(RecordActivity.EXTRA_RECORD_ID, record.getId());
-        intent.putExtras(extras);
-        startActivity(intent);
+
+        // Non-monitored surveys display the form directly
+        if (!mSurveyGroup.isMonitored()) {
+            if (BootstrapService.isProcessing) {
+                Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
+                return;
+            }
+            final String formId = mSurveyGroup.getRegisterSurveyId();
+            if (!mDatabase.getSurvey(formId).isHelpDownloaded()) {
+                Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            long formInstanceId;
+            boolean readOnly = false;
+            Cursor c = mDatabase.getSurveyInstances(surveyedLocaleId);
+            if (c.moveToFirst()) {
+                formInstanceId = c.getLong(c.getColumnIndexOrThrow(SurveyDbAdapter.SurveyInstanceColumns._ID));
+                int status = c.getInt(c.getColumnIndexOrThrow(SurveyDbAdapter.SurveyInstanceColumns.STATUS));
+                readOnly = status != SurveyDbAdapter.SurveyInstanceStatus.SAVED;
+            } else {
+                formInstanceId = mDatabase.createSurveyRespondent(formId, user, surveyedLocaleId);
+            }
+            c.close();
+
+            Intent i = new Intent(this, FormActivity.class);
+            i.putExtra(ConstantUtil.USER_ID_KEY, user.getId());
+            i.putExtra(ConstantUtil.SURVEY_ID_KEY, formId);
+            i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
+            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, surveyedLocaleId);
+            i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, formInstanceId);
+            i.putExtra(ConstantUtil.READONLY_KEY, readOnly);
+            startActivity(i);
+        } else {
+            // Display form list and history
+            Intent intent = new Intent(this, RecordActivity.class);
+            Bundle extras = new Bundle();
+            extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
+            extras.putString(RecordActivity.EXTRA_RECORD_ID, surveyedLocaleId);
+            intent.putExtras(extras);
+            startActivity(intent);
+        }
     }
 
     /**

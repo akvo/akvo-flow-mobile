@@ -56,7 +56,7 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
     private static final String EXTRA_RECORD       = "record";
     
     public interface SurveyListListener {
-        public void onSurveyClick(String surveyId);
+        void onSurveyClick(String surveyId);
     }
     
     private SurveyGroup mSurveyGroup;

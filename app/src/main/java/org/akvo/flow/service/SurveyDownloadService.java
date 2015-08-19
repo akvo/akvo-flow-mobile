@@ -157,7 +157,12 @@ public class SurveyDownloadService extends IntentService {
 
     private void syncSurveyGroups(List<Survey> surveys) {
         for (Survey s : surveys) {
-            databaseAdaptor.addSurveyGroup(s.getSurveyGroup());
+            // Assign registration form id, if missing.
+            SurveyGroup sg = s.getSurveyGroup();
+            if (sg != null && sg.getRegisterSurveyId() == null) {
+                sg.setRegisterSurveyId(s.getId());
+            }
+            databaseAdaptor.addSurveyGroup(sg);
         }
     }
 

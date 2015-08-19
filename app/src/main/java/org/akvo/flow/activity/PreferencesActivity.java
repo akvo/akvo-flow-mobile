@@ -56,7 +56,6 @@ import org.akvo.flow.util.ViewUtil;
  */
 public class PreferencesActivity extends Activity implements OnClickListener,
         OnCheckedChangeListener {
-    private CheckBox saveUserCheckbox;
     private CheckBox beaconCheckbox;
     private CheckBox screenOnCheckbox;
     private CheckBox mobileDataCheckbox;
@@ -81,7 +80,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.preferences);
 
-        saveUserCheckbox = (CheckBox) findViewById(R.id.lastusercheckbox);
         beaconCheckbox = (CheckBox) findViewById(R.id.beaconcheckbox);
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
         mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
@@ -97,7 +95,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
 
         // Setup event listeners
-        saveUserCheckbox.setOnCheckedChangeListener(this);
         beaconCheckbox.setOnCheckedChangeListener(this);
         screenOnCheckbox.setOnCheckedChangeListener(this);
         mobileDataCheckbox.setOnCheckedChangeListener(this);
@@ -113,14 +110,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     private void populateFields() {
         HashMap<String, String> settings = database.getPreferences();
-        String val = settings.get(ConstantUtil.USER_SAVE_SETTING_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            saveUserCheckbox.setChecked(true);
-        } else {
-            saveUserCheckbox.setChecked(false);
-        }
-
-        val = settings.get(ConstantUtil.SCREEN_ON_KEY);
+        String val = settings.get(ConstantUtil.SCREEN_ON_KEY);
         if (val != null && Boolean.parseBoolean(val)) {
             screenOnCheckbox.setChecked(true);
         } else {
@@ -324,9 +314,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView == saveUserCheckbox) {
-            database.savePreference(ConstantUtil.USER_SAVE_SETTING_KEY, "" + isChecked);
-        } else if (buttonView == beaconCheckbox) {
+        if (buttonView == beaconCheckbox) {
             database.savePreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY, "" + isChecked);
             if (isChecked) {
                 // if the option changed, kick the service so it reflects the change

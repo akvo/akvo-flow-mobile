@@ -154,12 +154,7 @@ public class ListUserActivity extends ActionBarActivity {
     }
 
     private void handleDelete(long id) {
-        String savedId = mDatabase.getPreference(ConstantUtil.LAST_USER_SETTING_KEY);
         mDatabase.deleteUser(id);
-        if (savedId != null && savedId.equals(id)) {
-            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY, "");
-        }
-
         display();
     }
     
@@ -211,8 +206,6 @@ public class ListUserActivity extends ActionBarActivity {
             // Set the user in the App, and finish the Activity
             User user = (User) view.getTag();
             FlowApp.getApp().setUser(user);
-            mDatabase.savePreference(ConstantUtil.LAST_USER_SETTING_KEY,
-                    String.valueOf(user.getId()));// Save the last id for future sessions
             display();
             finish();
         }

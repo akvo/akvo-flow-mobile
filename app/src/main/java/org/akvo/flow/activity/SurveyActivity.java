@@ -221,7 +221,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
     @Override
     public void onNewUser() {
-        startActivityForResult(new Intent(this, SetupActivity.class), REQUEST_ADD_USER);
+        startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
     }
 
     @Override

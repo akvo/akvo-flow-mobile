@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:flowapp="http://schemas.android.com/apk/res-auto" >
+    xmlns:flowapp="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/new_datapoint"
         android:icon="@drawable/ic_action_new"
         android:orderInCategory="100"
         android:title="@string/add_data_point"
-        flowapp:showAsAction="ifRoom"/>
+        flowapp:showAsAction="always" />
 
     <item
-        android:id="@+id/search"
-        android:orderInCategory="101"
-        android:title="@string/search"
-        flowapp:showAsAction="never"/>
+        android:id="@+id/more_submenu"
+        android:icon="@drawable/ic_action_overflow"
+        android:orderInCategory="100"
+        android:title="@string/more"
+        flowapp:showAsAction="always">
 
-    <item
-        android:id="@+id/sync_records"
-        android:orderInCategory="102"
-        android:title="@string/sync"
-        flowapp:showAsAction="never"/>
+        <menu>
 
-    <item
-        android:id="@+id/order_by"
-        android:orderInCategory="103"
-        android:title="@string/sort"
-        flowapp:showAsAction="never"/>
+            <item
+                android:id="@+id/search"
+                android:title="@string/search" />
 
-    <item
-        android:id="@+id/stats"
-        android:orderInCategory="104"
-        android:title="@string/stats"
-        flowapp:showAsAction="never"/>
+            <item
+                android:id="@+id/sync_records"
+                android:title="@string/sync" />
 
+            <item
+                android:id="@+id/order_by"
+                android:title="@string/sort" />
+
+            <item
+                android:id="@+id/stats"
+                android:title="@string/stats" />
+
+        </menu>
+
+    </item>
 </menu>

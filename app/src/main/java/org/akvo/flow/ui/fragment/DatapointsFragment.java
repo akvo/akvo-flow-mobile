@@ -118,7 +118,7 @@ public class DatapointsFragment extends Fragment {
             // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
             // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
             // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
-            if (mPager.getCurrentItem() == POSITION_MAP) {
+            if (mPager != null && mPager.getCurrentItem() == POSITION_MAP) {
                 menu.removeItem(R.id.order_by);
             }
         }

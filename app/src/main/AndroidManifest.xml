@@ -29,7 +29,7 @@
         android:theme="@style/Flow.Theme" >
 
         <activity
-            android:name=".activity.SetupActivity"
+            android:name=".activity.AddUserActivity"
             android:label="@string/adduser">
         </activity>
         <activity

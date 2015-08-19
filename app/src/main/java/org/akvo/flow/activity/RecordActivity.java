@@ -47,7 +47,7 @@ import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.util.ConstantUtil;
 
-public class RecordActivity extends ActionBarActivity implements SurveyListListener, TabListener,
+public class RecordActivity extends BackActivity implements SurveyListListener, TabListener,
         RecordListListener {
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_RECORD_ID = "record";
@@ -97,8 +97,7 @@ public class RecordActivity extends ActionBarActivity implements SurveyListListe
     private void setupActionBar() {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         Tab listTab = actionBar.newTab()
                 .setText(mTabs[POSITION_SURVEYS])
                 .setTabListener(this);

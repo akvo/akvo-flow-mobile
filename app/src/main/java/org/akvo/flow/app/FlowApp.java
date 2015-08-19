@@ -129,22 +129,19 @@ public class FlowApp extends Application {
      * so, loads the last logged-in user from the DB
      */
     private void loadLastUser() {
-        // TODO: This DB connection should not be in the UI thread
-        SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
-        database.open();
-        
-        String val = database.getPreference(ConstantUtil.LAST_USER_SETTING_KEY);
-        if (val != null && val.trim().length() > 0) {
-            long id = Long.valueOf(val);
+        long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
+        if (id != -1) {
+            SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
+            database.open();
             Cursor cur = database.getUser(id);
-            if (cur != null) {
+            if (cur.moveToFirst()) {
                 String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
                 String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
                 mUser = new User(id, userName, email);
                 cur.close();
             }
+            database.close();
         }
-        database.close();
     }
 
     public void setAppLanguage(String language, boolean requireRestart) {

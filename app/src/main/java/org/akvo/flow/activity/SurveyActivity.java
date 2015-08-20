@@ -48,14 +48,14 @@ import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.ui.view.NavigationDrawer;
+import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class SurveyActivity extends ActionBarActivity implements RecordListListener,
-        NavigationDrawer.UserListener, NavigationDrawer.SurveyListener {
+        DrawerFragment.UserListener, DrawerFragment.SurveyListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int REQUEST_ADD_USER = 0;
@@ -71,7 +71,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private NavigationDrawer mDrawer;
+    private DrawerFragment mDrawer;
     private CharSequence mDrawerTitle, mTitle;
 
     @Override
@@ -88,7 +88,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mTitle = mDrawerTitle = "Surveys";// TODO: Externalize str
 
         // Init navigation drawer
-        mDrawer = (NavigationDrawer)getSupportFragmentManager().findFragmentByTag("f");
+        mDrawer = (DrawerFragment)getSupportFragmentManager().findFragmentByTag("f");
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 

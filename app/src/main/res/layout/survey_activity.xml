@@ -12,7 +12,7 @@
 
     <!-- The navigation drawer -->
     <fragment
-        android:name="org.akvo.flow.ui.view.NavigationDrawer"
+        android:name="org.akvo.flow.ui.fragment.DrawerFragment"
         android:id="@+id/left_drawer"
         android:tag="f"
         android:layout_width="300dp"

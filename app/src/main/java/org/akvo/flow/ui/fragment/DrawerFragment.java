@@ -1,4 +1,4 @@
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,7 +27,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
 
-public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DrawerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public interface SurveyListener {
         void onSurveySelected(SurveyGroup surveyGroup);
@@ -222,7 +222,6 @@ public class NavigationDrawer extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    // TODO: Use external adapter
     class SurveyListAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {
         final int mTextColor;
 

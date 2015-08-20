@@ -166,6 +166,8 @@
   <string name="clear_point_text">Do you want to remove this point?</string>
   <string name="clear_feature_title">Delete feature</string>
   <string name="clear_feature_text">Do you want to remove this feature?</string>
+  <string name="view_responses">View responses</string>
+  <string name="view_map">View map</string>
   <!--RecordList Activity-->
   <string name="add_data_point">Add Data Point</string>
   <string name="stats_total">Total Data Points:</string>

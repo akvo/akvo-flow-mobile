@@ -76,8 +76,6 @@ public class FormActivity extends ActionBarActivity implements SurveyListener,
     private static final int EXTERNAL_SOURCE_REQUEST  = 4;
     private static final int PLOTTING_REQUEST  = 5;
 
-    private static final int MENU_PREFILL  = 101;
-
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
     private static final String IMAGE_SUFFIX = ".jpg";
@@ -328,12 +326,15 @@ public class FormActivity extends ActionBarActivity implements SurveyListener,
         SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
         if (isReadOnly()) {
             subMenu.removeItem(R.id.clear);
-        } else if (mSurveyGroup.isMonitored()) {
-            // Add 'pre-fill' option, if applies
-            if (mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId()) != null) {
-                subMenu.add(Menu.NONE, MENU_PREFILL, Menu.NONE, R.string.prefill_title);
+            subMenu.removeItem(R.id.prefill);
+        } else {
+            subMenu.removeItem(R.id.view_map);
+            if (!mSurveyGroup.isMonitored() ||
+                    mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId()) == null) {
+                subMenu.removeItem(R.id.prefill);
             }
         }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -349,8 +350,12 @@ public class FormActivity extends ActionBarActivity implements SurveyListener,
             case R.id.clear:
                 clearSurvey();
                 return true;
-            case MENU_PREFILL:
+            case R.id.prefill:
                 displayPrefillDialog();
+                return true;
+            case R.id.view_map:
+                startActivity(new Intent(this, MapActivity.class)
+                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecordId));
                 return true;
         }
         return super.onOptionsItemSelected(item);

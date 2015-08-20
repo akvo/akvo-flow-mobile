@@ -17,6 +17,12 @@
             <item
                 android:id="@+id/clear"
                 android:title="@string/clearbutton"/>
+            <item
+                android:id="@+id/prefill"
+                android:title="@string/prefill_title"/>
+            <item
+                android:id="@+id/view_map"
+                android:title="@string/view_map"/>
         </menu>
 
     </item>

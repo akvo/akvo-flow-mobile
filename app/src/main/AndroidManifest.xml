@@ -30,8 +30,7 @@
 
         <activity
             android:name=".activity.AddUserActivity"
-            android:label="@string/adduser">
-        </activity>
+            android:label="@string/adduser"/>
         <activity
             android:name=".activity.SurveyActivity"
             android:configChanges="locale|layoutDirection"
@@ -80,15 +79,14 @@
             android:configChanges="locale|layoutDirection"
             android:label="@string/app_update_activity"
             android:launchMode="singleTop"
-            android:theme="@style/Flow.Dialog" >
-        </activity>
+            android:theme="@style/Flow.Dialog" />
         <activity
             android:name=".activity.TimeCheckActivity"
             android:configChanges="locale|layoutDirection"
             android:label="@string/time_check_activity"
             android:launchMode="singleTop"
-            android:theme="@style/Flow.Dialog" >
-        </activity>
+            android:theme="@style/Flow.Dialog" />
+        <activity android:name=".activity.MapActivity"/>
 
         <service android:name=".service.DataSyncService" />
         <service android:name=".service.SurveyDownloadService" />

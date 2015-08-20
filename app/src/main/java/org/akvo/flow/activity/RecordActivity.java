@@ -26,7 +26,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBar.TabListener;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -39,7 +38,6 @@ import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.fragment.FormListFragment;
@@ -56,7 +54,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     
     private static final int POSITION_SURVEYS = 0;
     private static final int POSITION_RESPONSES = 1;
-    private static final int POSITION_MAP = 2;
 
     private static final int REQUEST_FORM = 0;
 
@@ -104,13 +101,9 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         Tab responsesTab = actionBar.newTab()
                 .setText(mTabs[POSITION_RESPONSES])
                 .setTabListener(this);
-        Tab mapTab = actionBar.newTab()
-                .setText(mTabs[POSITION_MAP])
-                .setTabListener(this);
-        
+
         actionBar.addTab(listTab);
         actionBar.addTab(responsesTab);
-        actionBar.addTab(mapTab);
     }
     
     @Override
@@ -191,12 +184,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
                     return FormListFragment.instantiate(mSurveyGroup, mRecord);
                 case POSITION_RESPONSES:
                     return ResponseListFragment.instantiate(mSurveyGroup, mRecord);
-                case POSITION_MAP:
-                    Fragment fragment = new MapFragment();
-                    Bundle args = new Bundle();
-                    args.putString(RecordActivity.EXTRA_RECORD_ID, mRecord.getId());
-                    fragment.setArguments(args);
-                    return fragment;
             }
             
             return null;
@@ -215,14 +202,16 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.datapoint_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
+            case R.id.view_map:
+                startActivity(new Intent(this, MapActivity.class)
+                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId()));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

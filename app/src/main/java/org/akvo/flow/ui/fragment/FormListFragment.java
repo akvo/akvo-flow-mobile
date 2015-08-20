@@ -127,12 +127,6 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
         final String surveyId = mAdapter.getItem(position).mId;
         mListener.onSurveyClick(surveyId);
     }
-    
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Add this fragment's options to the 'more' submenu
-        menu.removeItem(R.id.more_submenu);
-    }
 
     private boolean isRegistrationSurvey(String surveyId) {
         return surveyId.equals(mSurveyGroup.getRegisterSurveyId());

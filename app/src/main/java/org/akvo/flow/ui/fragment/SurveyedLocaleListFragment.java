@@ -19,6 +19,7 @@ package org.akvo.flow.ui.fragment;
 import java.util.Date;
 
 import org.akvo.flow.activity.SurveyActivity;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -118,7 +119,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         setEmptyText(getString(R.string.no_records_text));
         getListView().setOnItemClickListener(this);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -162,6 +163,12 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
      * automatically, and the loaders restarted without this explicit dependency.
      */
     public void refresh() {
+        if (mSurveyGroupId <= 0) {
+            setEmptyText(getString(R.string.no_survey_selected_text));
+        } else {
+            setEmptyText(getString(R.string.no_records_text));
+        }
+
         if (isResumed()) {
             if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
                 // Warn user that the location is unknown
@@ -273,6 +280,59 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             super(context, null, false);
         }
 
+        @Override
+        public View newView(Context context, Cursor c, ViewGroup parent) {
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+            return inflater.inflate(R.layout.surveyed_locale_item, null);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor c) {
+            TextView nameView = (TextView) view.findViewById(R.id.locale_name);
+            TextView idView = (TextView) view.findViewById(R.id.locale_id);
+            TextView dateView = (TextView) view.findViewById(R.id.last_modified);
+            TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
+            TextView statusView = (TextView) view.findViewById(R.id.status);
+            ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
+            final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
+
+            // This cursor contains extra info about the Record status
+            int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
+
+            nameView.setText(surveyedLocale.getDisplayName(context));
+            idView.setText(surveyedLocale.getId());
+
+            displayDistanceText(distanceView, getDistanceText(surveyedLocale));
+            displayDateText(dateView, surveyedLocale.getLastModified());
+
+            int statusRes = 0;
+            String statusText = null;
+            switch (status) {
+                case SurveyInstanceStatus.SAVED:
+                    statusRes = R.drawable.ic_status_saved;
+                    statusText = "Saved";
+                    break;
+                case SurveyInstanceStatus.SUBMITTED:
+                case SurveyInstanceStatus.EXPORTED:
+                    statusRes = R.drawable.ic_status_exported;
+                    statusText = "Exported. Sync pending";
+                    break;
+                case SurveyInstanceStatus.SYNCED:
+                case SurveyInstanceStatus.DOWNLOADED:
+                    statusRes = R.drawable.ic_status_synced;
+                    statusText = "Synced";
+                    break;
+            }
+
+            statusImage.setImageResource(statusRes);
+            statusView.setText(statusText);
+
+            // Alternate background
+            int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+            final int res= PlatformUtil.getResource(context, attr);
+            view.setBackgroundResource(res);
+        }
+
         private String getDistanceText(SurveyedLocale surveyedLocale) {
             StringBuilder builder = new StringBuilder(getString(R.string.distance_label) + " ");
             
@@ -306,53 +366,6 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             } else {
                 tv.setVisibility(View.GONE);
             }
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor c) {
-            TextView nameView = (TextView) view.findViewById(R.id.locale_name);
-            TextView idView = (TextView) view.findViewById(R.id.locale_id);
-            TextView dateView = (TextView) view.findViewById(R.id.last_modified);
-            TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
-            ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
-            final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
-
-            // This cursor contains extra info about the Record status
-            int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
-
-            nameView.setText(surveyedLocale.getDisplayName(context));
-            idView.setText(surveyedLocale.getId());
-
-            displayDistanceText(distanceView, getDistanceText(surveyedLocale));
-            displayDateText(dateView, surveyedLocale.getLastModified());
-
-            int statusRes = 0;
-            switch (status) {
-                case SurveyInstanceStatus.SAVED:
-                    statusRes = R.drawable.record_saved_icn;
-                    break;
-                case SurveyInstanceStatus.SUBMITTED:
-                case SurveyInstanceStatus.EXPORTED:
-                    statusRes = R.drawable.record_exported_icn;
-                    break;
-                case SurveyInstanceStatus.SYNCED:
-                case SurveyInstanceStatus.DOWNLOADED:
-                    statusRes = R.drawable.record_synced_icn;
-                    break;
-            }
-
-            statusImage.setImageResource(statusRes);
-
-            // Alternate background
-            int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-            final int res= PlatformUtil.getResource(context, attr);
-            view.setBackgroundResource(res);
-        }
-
-        @Override
-        public View newView(Context context, Cursor c, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            return inflater.inflate(R.layout.surveyed_locale_item, null);
         }
 
     }

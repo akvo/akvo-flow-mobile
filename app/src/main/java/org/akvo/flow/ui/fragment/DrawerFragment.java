@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -43,8 +44,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private ListView mUserList;
     private ListView mSurveyList;
-    private TextView mUsernameView;
     private TextView mListHeader;
+    private TextView mUsernameView;
+    private TextView mEmailView;
+    private ImageView mDropdownView;
 
     private SurveyListAdapter mSurveyAdapter;
     private UsersAdapter mUsersAdapter;
@@ -60,8 +63,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.navigation_drawer, container, false);
 
-        mUsernameView = (TextView) v.findViewById(R.id.username);
         mListHeader = (TextView) v.findViewById(R.id.list_header);
+        mUsernameView = (TextView) v.findViewById(R.id.username);
+        mEmailView = (TextView) v.findViewById(R.id.email);
+        mDropdownView = (ImageView) v.findViewById(R.id.dropdown);
         mUserList = (ListView) v.findViewById(R.id.user_list);
         mSurveyList = (ListView) v.findViewById(R.id.survey_group_list);
 
@@ -87,7 +92,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
         mUsersToggle = new UserToggleListener();
         mUsersToggle.setMenuListMode(Mode.SURVEYS);
-        mUsernameView.setOnClickListener(mUsersToggle);
+        v.findViewById(R.id.user).setOnClickListener(mUsersToggle);
 
         return v;
     }
@@ -138,7 +143,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public void onResume() {
         super.onResume();
         load();
-        updateUser();
+        updateUser(FlowApp.getApp().getUser());
     }
 
     public void load() {
@@ -146,9 +151,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         getLoaderManager().restartLoader(LOADER_USERS, null, this);
     }
 
-    public void updateUser() {
-        User user = FlowApp.getApp().getUser();
+    private void updateUser(User user) {
         mUsernameView.setText(user != null ? user.getName() : null);
+        mEmailView.setText(user != null ? user.getEmail() : null);
     }
 
     class UserToggleListener implements View.OnClickListener {
@@ -174,14 +179,14 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mSurveyList.setVisibility(View.VISIBLE);
 
                     mListHeader.setText("Surveys");
-                    mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_expand, 0);
+                    mDropdownView.setImageResource(R.drawable.ic_action_expand);
                     break;
                 case USERS:
                     mUserList.setVisibility(View.VISIBLE);
                     mSurveyList.setVisibility(View.GONE);
 
                     mListHeader.setText("Users");
-                    mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_action_collapse, 0);
+                    mDropdownView.setImageResource(R.drawable.ic_action_collapse);
                     break;
             }
         }
@@ -267,17 +272,20 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            return inflater.inflate(android.R.layout.simple_list_item_1, null);
+            return inflater.inflate(android.R.layout.simple_list_item_2, null);
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
-            User user = new User(id, name, null);// TODO: Do we need email?
+            String email = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.EMAIL));
+            User user = new User(id, name, email);
 
             TextView text1 = (TextView)view.findViewById(android.R.id.text1);
+            TextView text2 = (TextView)view.findViewById(android.R.id.text2);
             text1.setText(name);
+            text2.setText(email);
 
             view.setTag(user);
         }
@@ -291,7 +299,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         void onUserSelected(User user) {
-            mUsernameView.setText(user.getName());
+            updateUser(user);
             mUsersToggle.setMenuListMode(Mode.SURVEYS);
             if (mUsersListener != null) {
                 mUsersListener.onUserSelected(user);

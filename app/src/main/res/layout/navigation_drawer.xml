@@ -5,13 +5,37 @@
     android:background="@color/background_main"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/username"
+    <RelativeLayout
+        android:id="@+id/user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:padding="8dp"
-        android:textSize="18sp" />
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Medium" />
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/username"
+            android:textAppearance="@android:style/TextAppearance.Small" />
+
+        <ImageView
+            android:id="@+id/dropdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_action_expand"/>
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/list_header"

@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +46,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private ListView mUserList;
     private ListView mSurveyList;
-    private TextView mListHeader;
+    private TextView mHeaderText;
+    private ImageView mHeaderImage;
     private TextView mUsernameView;
     private TextView mEmailView;
     private ImageView mDropdownView;
@@ -63,7 +66,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.navigation_drawer, container, false);
 
-        mListHeader = (TextView) v.findViewById(R.id.list_header);
+        mHeaderText = (TextView) v.findViewById(R.id.header_txt);
+        mHeaderImage = (ImageView) v.findViewById(R.id.header_img);
         mUsernameView = (TextView) v.findViewById(R.id.username);
         mEmailView = (TextView) v.findViewById(R.id.email);
         mDropdownView = (ImageView) v.findViewById(R.id.dropdown);
@@ -72,6 +76,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
         // Add list footers
         TextView addUserView = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, null);
+        addUserView.setPadding((int)PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
         addUserView.setText("Add user");
         addUserView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +159,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private void updateUser(User user) {
         mUsernameView.setText(user != null ? user.getName() : null);
         mEmailView.setText(user != null ? user.getEmail() : null);
+        mEmailView.setVisibility(user == null || TextUtils.isEmpty(user.getEmail()) ? View.GONE : View.VISIBLE);
     }
 
     class UserToggleListener implements View.OnClickListener {
@@ -178,14 +184,16 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mUserList.setVisibility(View.GONE);
                     mSurveyList.setVisibility(View.VISIBLE);
 
-                    mListHeader.setText("Surveys");
+                    mHeaderText.setText("Surveys");
+                    mHeaderImage.setImageResource(R.drawable.survey_icn);
                     mDropdownView.setImageResource(R.drawable.ic_action_expand);
                     break;
                 case USERS:
                     mUserList.setVisibility(View.VISIBLE);
                     mSurveyList.setVisibility(View.GONE);
 
-                    mListHeader.setText("Users");
+                    mHeaderText.setText("Users");
+                    mHeaderImage.setImageResource(R.drawable.ic_person_outline_black_24dp);
                     mDropdownView.setImageResource(R.drawable.ic_action_collapse);
                     break;
             }
@@ -238,16 +246,25 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            return inflater.inflate(R.layout.survey_group_list_item, null);
+            return inflater.inflate(android.R.layout.simple_list_item_1, null);
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
+            view.setPadding((int)PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
+
             final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
 
-            TextView text1 = (TextView)view.findViewById(R.id.text1);
+            TextView text1 = (TextView)view.findViewById(android.R.id.text1);
             text1.setText(surveyGroup.getName());
-            text1.setTextColor(getResources().getColorStateList(mTextColor));
+
+            if (surveyGroup.getId() == FlowApp.getApp().getSurveyGroupId()) {
+                text1.setTextColor(getResources().getColorStateList(mTextColor));
+                text1.setBackgroundColor(getResources().getColor(R.color.background_alternate));
+            } else {
+                text1.setTextColor(Color.BLACK);
+                text1.setBackgroundColor(Color.TRANSPARENT);
+            }
 
             view.setTag(surveyGroup);
         }
@@ -277,6 +294,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
+            view.setPadding((int)PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
+
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
             String email = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.EMAIL));
@@ -286,6 +305,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             TextView text2 = (TextView)view.findViewById(android.R.id.text2);
             text1.setText(name);
             text2.setText(email);
+
+            text2.setVisibility(TextUtils.isEmpty(email) ? View.GONE : View.VISIBLE);
 
             view.setTag(user);
         }

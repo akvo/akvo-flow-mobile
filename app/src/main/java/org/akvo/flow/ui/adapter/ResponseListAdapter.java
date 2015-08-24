@@ -65,8 +65,8 @@ public class ResponseListAdapter extends CursorAdapter {
                 break;
         }
 
-        TextView userView = (TextView) view.findViewById(R.id.text2);
-        TextView dateView = (TextView) view.findViewById(R.id.text3);
+        TextView userView = (TextView) view.findViewById(R.id.username);
+        TextView statusView = (TextView) view.findViewById(R.id.status);
 
         String username = cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTER));
         if (TextUtils.isEmpty(username)) {
@@ -78,10 +78,10 @@ public class ResponseListAdapter extends CursorAdapter {
 
         // Format the date string
         Date date = new Date(displayDate);
-        dateView.setText(statusText
+        statusView.setText(statusText
                 + DateFormat.getLongDateFormat(context).format(date) + " "
                 + DateFormat.getTimeFormat(context).format(date));
-        TextView headingView = (TextView) view.findViewById(R.id.text1);
+        TextView headingView = (TextView) view.findViewById(R.id.form_name);
         headingView.setText(cursor.getString(cursor.getColumnIndex(SurveyColumns.NAME)));
         view.setTag(SURVEY_ID_KEY, cursor.getLong(cursor
                 .getColumnIndex(SurveyInstanceColumns.SURVEY_ID)));
@@ -90,7 +90,7 @@ public class ResponseListAdapter extends CursorAdapter {
         view.setTag(RECORD_KEY, cursor.getString(cursor
                 .getColumnIndex(SurveyInstanceColumns.RECORD_ID)));
         view.setTag(FINISHED_KEY, finished);
-        ImageView stsIcon = (ImageView) view.findViewById(R.id.xmitstsicon);
+        ImageView stsIcon = (ImageView) view.findViewById(R.id.status_img);
         stsIcon.setImageResource(icon);
 
         // Alternate background

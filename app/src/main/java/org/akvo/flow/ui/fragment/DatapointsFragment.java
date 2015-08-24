@@ -201,7 +201,9 @@ public class DatapointsFragment extends Fragment {
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
-        mTabsAdapter.refreshFragments();
+        if (mTabsAdapter != null) {
+            mTabsAdapter.refreshFragments();
+        }
         getActivity().supportInvalidateOptionsMenu();
     }
 

@@ -12,9 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter.Tables;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.util.PlatformUtil;
@@ -43,26 +41,26 @@ public class ResponseListAdapter extends CursorAdapter {
         switch (status) {
             case SurveyInstanceStatus.SAVED:
                 statusText = context.getString(R.string.status_saved) + ": ";
-                icon = R.drawable.form_saved_icn;
+                icon = R.drawable.ic_status_saved;
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE));
                 break;
             case SurveyInstanceStatus.SUBMITTED:
                 statusText = context.getString(R.string.status_submitted) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
-                icon = R.drawable.exported_icn;
+                icon = R.drawable.ic_status_exported;
                 finished = true;
                 break;
             case SurveyInstanceStatus.EXPORTED:
                 statusText = context.getString(R.string.status_exported) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE));
-                icon = R.drawable.exported_icn;
+                icon = R.drawable.ic_status_exported;
                 finished = true;
                 break;
             case SurveyInstanceStatus.SYNCED:
             case SurveyInstanceStatus.DOWNLOADED:
                 statusText = context.getString(R.string.status_synced) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE));
-                icon = R.drawable.checkmark;
+                icon = R.drawable.ic_status_synced;
                 finished = true;
                 break;
         }

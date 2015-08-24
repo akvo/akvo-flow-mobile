@@ -66,17 +66,23 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.navigation_drawer, container, false);
 
-        mHeaderText = (TextView) v.findViewById(R.id.header_txt);
-        mHeaderImage = (ImageView) v.findViewById(R.id.header_img);
+        View header = v.findViewById(R.id.header);
+        header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
+        mHeaderText = (TextView) header.findViewById(R.id.item_txt);
+        mHeaderImage = (ImageView) header.findViewById(R.id.item_img);
+
         mUsernameView = (TextView) v.findViewById(R.id.username);
         mEmailView = (TextView) v.findViewById(R.id.email);
         mDropdownView = (ImageView) v.findViewById(R.id.dropdown);
         mUserList = (ListView) v.findViewById(R.id.user_list);
         mSurveyList = (ListView) v.findViewById(R.id.survey_group_list);
 
+        final int padding = (int)PlatformUtil.dp2Pixel(getActivity(), 8);
+        final int drawablePadding = (int)PlatformUtil.dp2Pixel(getActivity(), 20);
+
         // Add list footers
         TextView addUserView = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, null);
-        addUserView.setPadding((int)PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
+        addUserView.setPadding(drawablePadding, 0, 0, 0);
         addUserView.setText("Add user");
         addUserView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,7 +92,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         });
         mUserList.addFooterView(addUserView);
 
-        View settingsView = inflater.inflate(R.layout.navigation_drawer_footer, null);
+        View settingsView = inflater.inflate(R.layout.drawer_item, null);
+        ((ImageView)settingsView.findViewById(R.id.item_img)).setImageResource(R.drawable.ic_settings_black_48dp);
+        ((TextView)settingsView.findViewById(R.id.item_txt)).setText(getString(R.string.settingslabel));
+
         settingsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -251,7 +260,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            view.setPadding((int)PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
+            view.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
 
             final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
 

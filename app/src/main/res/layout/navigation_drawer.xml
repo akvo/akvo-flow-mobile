@@ -37,29 +37,9 @@
 
     </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:background="@color/background_alternate"
-        android:padding="8dp"
-        android:textColor="#565656" >
-
-        <ImageView
-            android:id="@+id/header_img"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:adjustViewBounds="true" />
-
-        <TextView
-            android:id="@+id/header_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp" />
-
-    </LinearLayout>
+    <include
+        android:id="@+id/header"
+        layout="@layout/drawer_item"/>
 
     <ListView
         android:id="@+id/user_list"

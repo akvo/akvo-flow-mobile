@@ -194,7 +194,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mSurveyList.setVisibility(View.VISIBLE);
 
                     mHeaderText.setText("Surveys");
-                    mHeaderImage.setImageResource(R.drawable.survey_icn);
+                    mHeaderImage.setImageResource(R.drawable.ic_edit_black_48dp);
                     mDropdownView.setImageResource(R.drawable.ic_action_expand);
                     break;
                 case USERS:
@@ -202,7 +202,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mSurveyList.setVisibility(View.GONE);
 
                     mHeaderText.setText("Users");
-                    mHeaderImage.setImageResource(R.drawable.ic_person_outline_black_24dp);
+                    mHeaderImage.setImageResource(R.drawable.ic_account_circle_black_48dp);
                     mDropdownView.setImageResource(R.drawable.ic_action_collapse);
                     break;
             }
@@ -281,6 +281,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final SurveyGroup survey = (SurveyGroup) view.getTag();
+            notifyDataSetInvalidated();
             mSurveysListener.onSurveySelected(survey);
         }
 

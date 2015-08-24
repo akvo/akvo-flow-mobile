@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -66,7 +65,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FormActivity extends ActionBarActivity implements SurveyListener,
+public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
     private static final String TAG = FormActivity.class.getSimpleName();
 
@@ -341,9 +340,6 @@ public class FormActivity extends ActionBarActivity implements SurveyListener,
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
             case R.id.edit_lang:
                 displayLanguagesDialog();
                 return true;

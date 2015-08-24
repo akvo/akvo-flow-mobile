@@ -78,7 +78,6 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         // Setup the tabs in the action bar
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
 
         for (QuestionGroup group : mQuestionGroups) {
             mActionBar.addTab(mActionBar.newTab()

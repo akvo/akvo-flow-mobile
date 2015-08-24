@@ -29,14 +29,11 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -168,7 +165,6 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
 
             final SurveyInfo surveyInfo = getItem(position);
 
-            ImageView icon = (ImageView)listItem.findViewById(R.id.survey_icon);
             TextView surveyNameView = (TextView)listItem.findViewById(R.id.text1);
             TextView surveyVersionView = (TextView)listItem.findViewById(R.id.text2);
             TextView lastSubmissionTitle = (TextView)listItem.findViewById(R.id.date_label);
@@ -187,15 +183,7 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
             surveyNameView.setEnabled(enabled);
             surveyVersionView.setEnabled(enabled);
 
-            int iconRes = R.drawable.survey_icon;
-            boolean showLastSubmission = false;
             if (surveyInfo.mLastSubmission != null) {
-                showLastSubmission = true;
-                iconRes = R.drawable.survey_done_icon;
-            }
-            icon.setImageResource(iconRes);
-
-            if (showLastSubmission) {
                 String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
                 lastSubmissionView.setText(time);
                 lastSubmissionTitle.setVisibility(View.VISIBLE);

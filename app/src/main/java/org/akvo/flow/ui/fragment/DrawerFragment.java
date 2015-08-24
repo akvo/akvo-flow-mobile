@@ -160,6 +160,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         updateUser(FlowApp.getApp().getUser());
     }
 
+    public void setModeSurveys() {
+        mUsersToggle.setMenuListMode(Mode.SURVEYS);
+    }
+
     public void load() {
         getLoaderManager().restartLoader(LOADER_SURVEYS, null, this);
         getLoaderManager().restartLoader(LOADER_USERS, null, this);

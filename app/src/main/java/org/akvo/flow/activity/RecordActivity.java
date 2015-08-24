@@ -28,7 +28,6 @@ import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBar.TabListener;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -63,8 +62,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     private SurveyDbAdapter mDatabase;
     
     private ViewPager mPager;
-    private TextView mRecordTextView;
-    
+
     private String[] mTabs;
     
     @Override
@@ -73,7 +71,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         setContentView(R.layout.record_activity);
         
         mTabs = getResources().getStringArray(R.array.record_tabs);
-        mRecordTextView = (TextView) findViewById(R.id.record_text);
         mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -137,7 +134,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     }
 
     private void displayRecord() {
-        mRecordTextView.setText(mRecord.getDisplayName(this) + ", " + mRecord.getId());
+        setTitle(mRecord.getDisplayName(this));
     }
 
     @Override

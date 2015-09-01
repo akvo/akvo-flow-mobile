@@ -79,8 +79,7 @@
 
     <Button
         android:id="@+id/geo_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/getgeo"/>
+        android:text="@string/getgeo"
+        style="@style/button_green"/>
 
 </merge>

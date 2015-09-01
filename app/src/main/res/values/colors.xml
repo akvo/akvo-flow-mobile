@@ -19,6 +19,10 @@
     <!-- Buttons -->
     <color name="button_green">#00a79d</color>
     <color name="button_green_selected">#007f77</color>
+    <color name="button_grey_light">#BCB9B6</color>
+    <color name="button_grey_light_selected">#808285</color>
+    <color name="button_grey_dark">#79736E</color>
+    <color name="button_grey_dark_selected">#000000</color>
 
     <color name="record_name_background">#CEC6BC</color>
 

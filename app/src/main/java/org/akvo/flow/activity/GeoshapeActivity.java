@@ -33,7 +33,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
@@ -58,8 +57,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeoshapeActivity extends ActionBarActivity implements OnMapClickListener,
-        OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener {
+public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClickListener,
+        OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener {
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
     private static final String JSON_COORDINATES = "coordinates";
@@ -132,7 +131,6 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
         if (mMap != null) {
             mMap.setMyLocationEnabled(true);
             mMap.setOnMarkerClickListener(this);
-            mMap.setOnMapClickListener(this);
             mMap.setOnMyLocationChangeListener(this);
             if (mManualInput) {
                 mMap.setOnMapLongClickListener(this);
@@ -411,11 +409,6 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapClickLis
             Log.e(TAG, "geoJSON() - " + e.getMessage());
             // TODO: Remove features?
         }
-    }
-
-    @Override
-    public void onMapClick(LatLng latLng) {
-        selectFeature(null, null);
     }
 
     @Override

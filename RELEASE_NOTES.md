@@ -1,6 +1,15 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.10
+Date: 18 August 2015
+
+New and noteworthy
+------------------
+* Clicking on the map does not unselect a geoshape [#334]
+* Improve notifications readability [#328]
+* Unlimited response length [#326]
+
 # ver 2.1.9
 Date: 27 July 2015
 

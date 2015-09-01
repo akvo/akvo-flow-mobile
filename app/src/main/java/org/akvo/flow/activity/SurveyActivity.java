@@ -269,8 +269,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 String answer = questionResponse != null ? questionResponse.getValue() : null;
 
                 if (!TextUtils.isEmpty(answer)) {
-                    // Replace pipes with hyphens
-                    answer = answer.replaceAll("\\s*\\|\\s*", " - ");
+                    answer = answer.replaceAll("\\s+", " ");// Trim line breaks, multiple spaces, etc
+                    answer = answer.replaceAll("\\s*\\|\\s*", " - ");// Replace pipes with hyphens
 
                     if (!first) {
                         builder.append(" - ");

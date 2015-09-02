@@ -291,25 +291,6 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         updateRepetitionsHeader();
     }
 
-    /**
-     * For the given form instance, load the list of repetitions IDs.
-     * The populated list will contain the IDs of existing repetitions.
-     * Although IDs are autoincremented numeric values, there might be
-     * gaps caused by deleted iterations.
-    private void loadRepetitions() {
-        Set<Integer> reps = new HashSet<>();
-        for (QuestionResponse qr : mSurveyListener.getResponses().values()) {
-            String[] qid = qr.getQuestionId().split("\\|", -1);
-            if (qid.length == 2 && mQuestions.contains(qid[0])) {
-                reps.add(Integer.valueOf(qid[1]));
-            }
-        }
-
-        mRepetitions = new ArrayList<>(reps);
-        Collections.sort(mRepetitions);
-    }
-     */
-
     public void setupDependencies() {
         for (QuestionView qv : mQuestionViews.values()) {
             setupDependencies(qv);

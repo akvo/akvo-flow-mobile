@@ -83,9 +83,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mDatabase.open();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //mDrawer = (NavigationDrawer) findViewById(R.id.left_drawer);
 
-        mTitle = mDrawerTitle = "Surveys";// TODO: Externalize str
+        mTitle = mDrawerTitle = getString(R.string.app_name);
 
         // Init navigation drawer
         mDrawer = (DrawerFragment)getSupportFragmentManager().findFragmentByTag("f");

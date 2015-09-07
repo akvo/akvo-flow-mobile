@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -49,6 +50,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private Map<String, QuestionView> mQuestionViews;
     private final Set<String> mQuestions;// Map group's questions for a quick look-up
     private LinearLayout mContainer;
+    private ScrollView mScroller;
     private boolean mLoaded;
 
     private TextView mRepetitionsText;
@@ -80,6 +82,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         setFocusableInTouchMode(true);
 
         inflate(getContext(), R.layout.question_group_tab, this);
+        mScroller = (ScrollView)findViewById(R.id.scroller);
         mContainer = (LinearLayout)findViewById(R.id.question_list);
         mRepetitionsText = (TextView)findViewById(R.id.repeat_header);
 
@@ -178,6 +181,18 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
     public QuestionView getQuestionView(String questionId) {
         return mQuestionViews.get(questionId);
+    }
+
+    /**
+     * Attempt to display a particular question, based on the given question ID.
+     */
+    public boolean displayQuestion(String questionId) {
+        QuestionView qv = getQuestionView(questionId);
+        if (qv != null) {
+            mScroller.scrollTo(qv.getLeft(), qv.getTop());
+            return true;
+        }
+        return false;
     }
 
     public void onPause() {

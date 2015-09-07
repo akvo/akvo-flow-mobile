@@ -193,7 +193,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.order_by:
-                DialogFragment dialogFragment = new OrderByDialogFragment();
+                DialogFragment dialogFragment = OrderByDialogFragment.instantiate(mOrderBy);
                 dialogFragment.setTargetFragment(this, 0);
                 dialogFragment.show(getFragmentManager(), "order_by");
                 return true;

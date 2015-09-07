@@ -245,13 +245,16 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // If the nav drawer is open, don't inflate the menu items.
-        if (!mDrawerLayout.isDrawerOpen(Gravity.START) && mSurveyGroup != null) {
-            //getMenuInflater().inflate(R.menu.survey_activity, menu);
-            return super.onCreateOptionsMenu(menu);
-        }
+        return super.onCreateOptionsMenu(menu);
+    }
 
-        return false;
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean showItems = !mDrawerLayout.isDrawerOpen(Gravity.START) && mSurveyGroup != null;
+        for (int i=0; i<menu.size(); i++) {
+            menu.getItem(i).setVisible(showItems);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

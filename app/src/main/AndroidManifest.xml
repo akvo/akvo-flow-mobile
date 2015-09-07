@@ -63,6 +63,7 @@
             android:label="@string/settingslabel" />
         <activity
             android:name=".activity.PreferencesActivity"
+            android:label="@string/prefoptlabel"
             android:configChanges="locale|layoutDirection" />
         <activity
             android:name=".activity.TransmissionHistoryActivity"

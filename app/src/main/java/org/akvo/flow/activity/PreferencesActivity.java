@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -18,14 +18,12 @@ package org.akvo.flow.activity;
 
 import java.util.HashMap;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -54,7 +52,7 @@ import org.akvo.flow.util.ViewUtil;
  *
  * @author Christopher Fagiani
  */
-public class PreferencesActivity extends Activity implements OnClickListener,
+public class PreferencesActivity extends BackActivity implements OnClickListener,
         OnCheckedChangeListener {
     private CheckBox beaconCheckbox;
     private CheckBox screenOnCheckbox;
@@ -77,7 +75,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.preferences);
 
         beaconCheckbox = (CheckBox) findViewById(R.id.beaconcheckbox);

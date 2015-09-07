@@ -70,8 +70,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settingsmenu);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
         Resources resources = getResources();
         list.add(createMap(resources.getString(R.string.prefoptlabel),

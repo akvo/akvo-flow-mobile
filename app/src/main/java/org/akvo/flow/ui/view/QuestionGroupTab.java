@@ -214,7 +214,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void updateRepetitionsHeader() {
-        mRepetitionsText.setText("Repetitions: " + mRepetitions.size());// FIXME: Externalize string
+        mRepetitionsText.setText(getContext().getString(R.string.repetitions) + mRepetitions.size());
     }
 
     private void loadGroup() {

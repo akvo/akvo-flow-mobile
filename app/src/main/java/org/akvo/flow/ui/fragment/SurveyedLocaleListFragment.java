@@ -71,16 +71,16 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     private double mLongitude = 0.0d;
 
     private int mOrderBy;
-    private long mSurveyGroupId;
+    private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
     
     private SurveyedLocaleListAdapter mAdapter;
     private RecordListListener mListener;
 
-    public static SurveyedLocaleListFragment instantiate(long surveyGroupId) {
+    public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
         SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP_ID, surveyGroupId);
+        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -88,7 +88,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getLong(SurveyActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroup = (SurveyGroup)getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }
@@ -153,8 +153,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mDatabase.close();
     }
 
-    public void refresh(long surveyGroupId) {
-        mSurveyGroupId = surveyGroupId;
+    public void refresh(SurveyGroup surveyGroup) {
+        mSurveyGroup = surveyGroup;
         refresh();
     }
 
@@ -163,7 +163,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
      * automatically, and the loaders restarted without this explicit dependency.
      */
     public void refresh() {
-        if (mSurveyGroupId <= 0) {
+        if (mSurveyGroup == null) {
             setEmptyText(getString(R.string.no_survey_selected_text));
         } else {
             setEmptyText(getString(R.string.no_records_text));
@@ -216,7 +216,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
+        long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId, mLatitude, mLongitude, mOrderBy);
     }
 
     @Override
@@ -352,8 +353,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         private void displayDateText(TextView tv, Long time) {
             if (time != null && time > 0) {
                 tv.setVisibility(View.VISIBLE);
-                tv.setText(getString(R.string.last_modified) + " " +
-                        new PrettyTime().format(new Date(time)));
+                int labelRes = R.string.last_modified_regular;
+                if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+                    labelRes = R.string.last_modified_monitored;
+                }
+                tv.setText(getString(labelRes) + " " + new PrettyTime().format(new Date(time)));
             } else {
                 tv.setVisibility(View.GONE);
             }

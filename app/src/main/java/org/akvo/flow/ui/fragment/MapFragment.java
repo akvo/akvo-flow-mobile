@@ -38,6 +38,7 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -60,22 +61,21 @@ import java.util.List;
 public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener {
     private static final String TAG = MapFragment.class.getSimpleName();
 
-    private long mSurveyGroupId;
-    private String mRecordId; // If set, load a single record
+    private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
     private RecordListListener mListener;
 
+    private String mRecordId; // If set, load a single record
     private List<SurveyedLocale> mItems;
-
     private boolean mSingleRecord = false;
 
     private GoogleMap mMap;
     private ClusterManager<SurveyedLocale> mClusterManager;
 
-    public static MapFragment instantiate(long surveyGroupId, String datapointId) {
+    public static MapFragment newInstance(SurveyGroup surveyGroup, String datapointId) {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putLong(SurveyActivity.EXTRA_SURVEY_GROUP_ID, surveyGroupId);
+        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
         args.putString(RecordActivity.EXTRA_RECORD_ID, datapointId);
         fragment.setArguments(args);
         return fragment;
@@ -86,7 +86,7 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         super.onCreate(savedInstanceState);
         mItems = new ArrayList<>();
 
-        mSurveyGroupId = getArguments().getLong(SurveyActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroup = (SurveyGroup)getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         mRecordId = getArguments().getString(RecordActivity.EXTRA_RECORD_ID);
         mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
     }
@@ -155,8 +155,6 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     /**
      * Center the map in the given record's coordinates. If no record is provided,
      * the user's location will be used.
-     *
-     * @param record
      */
     private void centerMap(SurveyedLocale record) {
         if (mMap == null) {
@@ -217,8 +215,8 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         return v;
     }
 
-    public void refresh(long surveyGroupId) {
-        mSurveyGroupId = surveyGroupId;
+    public void refresh(SurveyGroup surveyGroup) {
+        mSurveyGroup = surveyGroup;
         refresh();
     }
 
@@ -261,8 +259,8 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId,
-                ConstantUtil.ORDER_BY_NONE);
+        long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId, ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override

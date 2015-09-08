@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -29,7 +28,7 @@ public class MapActivity extends BackActivity implements RecordListListener {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.content_frame, MapFragment.instantiate(SurveyGroup.ID_NONE, datapointId))
+                .replace(R.id.content_frame, MapFragment.newInstance(null, datapointId))
                 .commit();
     }
 

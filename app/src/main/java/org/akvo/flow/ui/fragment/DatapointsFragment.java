@@ -189,20 +189,20 @@ public class DatapointsFragment extends Fragment {
             MapFragment mapFragment = (MapFragment) getFragment(POSITION_MAP);
 
             if (listFragment != null) {
-                listFragment.refresh(getSurveyGroupId());
+                listFragment.refresh(mSurveyGroup);
             }
             if (mapFragment != null) {
-                mapFragment.refresh(getSurveyGroupId());
+                mapFragment.refresh(mSurveyGroup);
             }
         }
 
         @Override
         public Fragment getItem(int position) {
             if (position == POSITION_LIST) {
-                return SurveyedLocaleListFragment.instantiate(getSurveyGroupId());
+                return SurveyedLocaleListFragment.newInstance(mSurveyGroup);
             }
             // Map mode
-            return MapFragment.instantiate(getSurveyGroupId(), null);
+            return MapFragment.newInstance(mSurveyGroup, null);
         }
 
         @Override
@@ -210,10 +210,6 @@ public class DatapointsFragment extends Fragment {
             return mTabs[position];
         }
 
-    }
-
-    private long getSurveyGroupId() {
-        return mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
     }
 
     public void refresh(SurveyGroup surveyGroup) {

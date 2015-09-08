@@ -136,8 +136,7 @@ public class FlowApp extends Application {
             Cursor cur = database.getUser(id);
             if (cur.moveToFirst()) {
                 String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
-                String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
-                mUser = new User(id, userName, email);
+                mUser = new User(id, userName, null);
                 cur.close();
             }
             database.close();

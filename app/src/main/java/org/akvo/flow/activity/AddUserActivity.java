@@ -3,7 +3,6 @@ package org.akvo.flow.activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 
 import org.akvo.flow.R;
@@ -29,11 +28,6 @@ public class AddUserActivity extends ActionBarActivity implements LoginFragment.
         }
 
         setContentView(R.layout.add_user_activity);
-
-        if (!firstRun) {
-            findViewById(R.id.logo).setVisibility(View.GONE);
-        }
-
     }
 
     @Override

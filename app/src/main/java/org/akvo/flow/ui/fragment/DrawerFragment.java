@@ -1,3 +1,18 @@
+/*
+ *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
@@ -10,7 +25,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +63,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mHeaderText;
     private ImageView mHeaderImage;
     private TextView mUsernameView;
-    private TextView mEmailView;
     private ImageView mDropdownView;
 
     private SurveyListAdapter mSurveyAdapter;
@@ -72,12 +85,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         mHeaderImage = (ImageView) header.findViewById(R.id.item_img);
 
         mUsernameView = (TextView) v.findViewById(R.id.username);
-        mEmailView = (TextView) v.findViewById(R.id.email);
         mDropdownView = (ImageView) v.findViewById(R.id.dropdown);
         mUserList = (ListView) v.findViewById(R.id.user_list);
         mSurveyList = (ListView) v.findViewById(R.id.survey_group_list);
 
-        final int padding = (int)PlatformUtil.dp2Pixel(getActivity(), 8);
         final int drawablePadding = (int)PlatformUtil.dp2Pixel(getActivity(), 20);
 
         // Add list footers
@@ -171,8 +182,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private void updateUser(User user) {
         mUsernameView.setText(user != null ? user.getName() : null);
-        mEmailView.setText(user != null ? user.getEmail() : null);
-        mEmailView.setVisibility(user == null || TextUtils.isEmpty(user.getEmail()) ? View.GONE : View.VISIBLE);
     }
 
     class UserToggleListener implements View.OnClickListener {
@@ -303,7 +312,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            return inflater.inflate(android.R.layout.simple_list_item_2, null);
+            return inflater.inflate(android.R.layout.simple_list_item_1, null);
         }
 
         @Override
@@ -312,15 +321,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
-            String email = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.EMAIL));
-            User user = new User(id, name, email);
+            User user = new User(id, name, null);
 
             TextView text1 = (TextView)view.findViewById(android.R.id.text1);
-            TextView text2 = (TextView)view.findViewById(android.R.id.text2);
             text1.setText(name);
-            text2.setText(email);
-
-            text2.setVisibility(TextUtils.isEmpty(email) ? View.GONE : View.VISIBLE);
 
             view.setTag(user);
         }

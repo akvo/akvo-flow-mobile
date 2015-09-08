@@ -124,7 +124,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
 
         if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
-            onNewUser();
+            startActivityForResult(new Intent(this, AddUserActivity.class)
+                            .putExtra(AddUserActivity.EXTRA_FIRST_RUN, true),
+                    REQUEST_ADD_USER);
         }
 
         startServices();

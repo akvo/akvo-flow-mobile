@@ -50,7 +50,7 @@ public class QuestionGroupTab extends ScrollView {
         mQuestionGroup = group;
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
-        mQuestionViews = new ArrayList<QuestionView>();
+        mQuestionViews = new ArrayList<>();
         mLoaded = false;
         init();
     }
@@ -112,16 +112,18 @@ public class QuestionGroupTab extends ScrollView {
             mContainer.addView(questionView);
         }
 
-        Button next = new Button(context);
-        next.setText(R.string.nextbutton);
-        next.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        next.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSurveyListener.nextTab();
-            }
-        });
-        mContainer.addView(next);
+        if (!mSurveyListener.isReadOnly()) {
+            Button next = new Button(context);
+            next.setText(R.string.nextbutton);
+            next.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            next.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSurveyListener.nextTab();
+                }
+            });
+            mContainer.addView(next);
+        }
     }
 
     public void notifyOptionsChanged() {
@@ -141,11 +143,9 @@ public class QuestionGroupTab extends ScrollView {
 
     /**
      * checks to make sure the mandatory questions in this tab have a response
-     *
-     * @return
      */
     public List<Question> checkInvalidQuestions() {
-        List<Question> missingQuestions = new ArrayList<Question>();
+        List<Question> missingQuestions = new ArrayList<>();
         for (QuestionView view : mQuestionViews) {
             view.checkMandatory();
             if (!view.isValid() && view.areDependenciesSatisfied()) {

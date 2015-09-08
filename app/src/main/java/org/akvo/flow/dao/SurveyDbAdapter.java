@@ -1563,7 +1563,7 @@ public class SurveyDbAdapter {
                 orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
                 break;
             case ConstantUtil.ORDER_BY_NAME:
-                orderByStr = " ORDER BY " + RecordColumns.NAME + " ASC";// By name
+                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
                 break;
         }
 

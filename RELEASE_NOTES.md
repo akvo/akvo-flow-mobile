@@ -1,6 +1,13 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.11
+Date: 9 September 2015
+
+New and noteworthy
+------------------
+* Repeatable Questions Groups: Enumerators can make use of these dynamic groups. They provide a simple way of defining grid-like questions. See FLOW dashboard release notes for more details on this feature [#257]
+
 # ver 2.1.10
 Date: 18 August 2015
 

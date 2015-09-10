@@ -94,7 +94,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                mDrawer.setModeSurveys();
+                //mDrawer.setModeSurveys();
                 getSupportActionBar().setTitle(mTitle);
                 supportInvalidateOptionsMenu();
             }
@@ -138,7 +138,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
         switch (requestCode) {
             case REQUEST_ADD_USER:
-                mDrawer.setModeSurveys();
+                //mDrawer.setModeSurveys();
 
                 if (resultCode == RESULT_OK) {
                     Prefs.setBoolean(this, Prefs.KEY_SETUP, true);

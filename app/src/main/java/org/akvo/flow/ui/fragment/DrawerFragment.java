@@ -29,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,7 +46,14 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DrawerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int GROUP_USERS = 0;
+    private static final int GROUP_SURVEYS = 1;
+    private static final int GROUP_SETTINGS = 2;
 
     public interface SurveyListener {
         void onSurveySelected(SurveyGroup surveyGroup);
@@ -58,66 +67,17 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int LOADER_SURVEYS = 0;
     private static final int LOADER_USERS = 1;
 
-    private ListView mUserList;
-    private ListView mSurveyList;
-    private TextView mHeaderText;
-    private ImageView mHeaderImage;
-    private TextView mUsernameView;
-    private ImageView mDropdownView;
-
-    private SurveyListAdapter mSurveyAdapter;
-    private UsersAdapter mUsersAdapter;
-    private UserToggleListener mUsersToggle;
+    private ExpandableListView mListView;
+    private DrawerAdapter mAdapter;
 
     private SurveyDbAdapter mDatabase;
     private SurveyListener mSurveysListener;
     private UserListener mUsersListener;
 
-    private enum Mode { SURVEYS, USERS }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.navigation_drawer, container, false);
-
-        View header = v.findViewById(R.id.header);
-        header.setBackgroundColor(getResources().getColor(R.color.background_alternate));
-        mHeaderText = (TextView) header.findViewById(R.id.item_txt);
-        mHeaderImage = (ImageView) header.findViewById(R.id.item_img);
-
-        mUsernameView = (TextView) v.findViewById(R.id.username);
-        mDropdownView = (ImageView) v.findViewById(R.id.dropdown);
-        mUserList = (ListView) v.findViewById(R.id.user_list);
-        mSurveyList = (ListView) v.findViewById(R.id.survey_group_list);
-
-        final int drawablePadding = (int)PlatformUtil.dp2Pixel(getActivity(), 20);
-
-        // Add list footers
-        TextView addUserView = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, null);
-        addUserView.setPadding(drawablePadding, 0, 0, 0);
-        addUserView.setText("Add user");
-        addUserView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mUsersListener.onNewUser();
-            }
-        });
-        mUserList.addFooterView(addUserView);
-
-        View settingsView = inflater.inflate(R.layout.drawer_item, null);
-        ((ImageView)settingsView.findViewById(R.id.item_img)).setImageResource(R.drawable.ic_settings_black_48dp);
-        ((TextView)settingsView.findViewById(R.id.item_txt)).setText(getString(R.string.settingslabel));
-
-        settingsView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-            }
-        });
-        mSurveyList.addFooterView(settingsView);
-
-        mUsersToggle = new UserToggleListener();
-        mUsersToggle.setMenuListMode(Mode.SURVEYS);
-        v.findViewById(R.id.user).setOnClickListener(mUsersToggle);
+        mListView = (ExpandableListView)v.findViewById(R.id.list);
 
         return v;
     }
@@ -130,17 +90,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mDatabase = new SurveyDbAdapter(getActivity());
             mDatabase.open();
         }
-        if (mUsersAdapter == null) {
-            mUsersAdapter = new UsersAdapter(getActivity());
-            mUserList.setAdapter(mUsersAdapter);
-            mUserList.setOnItemClickListener(mUsersAdapter);
+        if (mAdapter == null) {
+            mAdapter = new DrawerAdapter();
+            mListView.setAdapter(mAdapter);
+            mListView.expandGroup(GROUP_SURVEYS);
+            mListView.setOnGroupClickListener(mAdapter);
+            mListView.setOnChildClickListener(mAdapter);
         }
-        if (mSurveyAdapter == null) {
-            mSurveyAdapter = new SurveyListAdapter(getActivity());
-            mSurveyList.setAdapter(mSurveyAdapter);
-            mSurveyList.setOnItemClickListener(mSurveyAdapter);
-        }
-
     }
 
     @Override
@@ -171,55 +127,15 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         updateUser(FlowApp.getApp().getUser());
     }
 
-    public void setModeSurveys() {
-        mUsersToggle.setMenuListMode(Mode.SURVEYS);
+    private void updateUser(User user) {
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetInvalidated();
+        }
     }
 
     public void load() {
         getLoaderManager().restartLoader(LOADER_SURVEYS, null, this);
         getLoaderManager().restartLoader(LOADER_USERS, null, this);
-    }
-
-    private void updateUser(User user) {
-        mUsernameView.setText(user != null ? user.getName() : null);
-    }
-
-    class UserToggleListener implements View.OnClickListener {
-        private Mode mListMode = Mode.SURVEYS;
-
-        @Override
-        public void onClick(View v) {
-            switch (mListMode) {
-                case SURVEYS:
-                    setMenuListMode(Mode.USERS);
-                    break;
-                case USERS:
-                    setMenuListMode(Mode.SURVEYS);
-                    break;
-            }
-        }
-
-        public void setMenuListMode(Mode mode) {
-            mListMode = mode;
-            switch (mListMode) {
-                case SURVEYS:
-                    mUserList.setVisibility(View.GONE);
-                    mSurveyList.setVisibility(View.VISIBLE);
-
-                    mHeaderText.setText("Surveys");
-                    mHeaderImage.setImageResource(R.drawable.ic_edit_black_48dp);
-                    mDropdownView.setImageResource(R.drawable.ic_action_expand);
-                    break;
-                case USERS:
-                    mUserList.setVisibility(View.VISIBLE);
-                    mSurveyList.setVisibility(View.GONE);
-
-                    mHeaderText.setText("Users");
-                    mHeaderImage.setImageResource(R.drawable.ic_account_circle_black_48dp);
-                    mDropdownView.setImageResource(R.drawable.ic_action_collapse);
-                    break;
-            }
-        }
     }
 
     @Override
@@ -237,114 +153,210 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         switch (loader.getId()) {
             case LOADER_SURVEYS:
-                mSurveyAdapter.swapCursor(cursor);
+                if (cursor != null) {
+                    List<SurveyGroup> surveys = new ArrayList<>();
+                    if (cursor.moveToFirst()) {
+                        do {
+                            surveys.add(SurveyDbAdapter.getSurveyGroup(cursor));
+                        } while (cursor.moveToNext());
+                        cursor.close();
+                    }
+                    mAdapter.setSurveys(surveys);
+                }
                 break;
             case LOADER_USERS:
-                mUsersAdapter.swapCursor(cursor);
+                if (cursor != null) {
+                    List<User> users = new ArrayList<>();
+                    if (cursor.moveToFirst()) {
+                        do {
+                            long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
+                            String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
+                            users.add(new User(id, name, null));
+                        } while (cursor.moveToNext());
+                        cursor.close();
+                    }
+                    mAdapter.setUsers(users);
+                }
                 break;
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case LOADER_SURVEYS:
-                mSurveyAdapter.swapCursor(null);
-                break;
-            case LOADER_USERS:
-                mUsersAdapter.swapCursor(null);
-                break;
-        }
     }
 
-    class SurveyListAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {
-        final int mTextColor;
+    class DrawerAdapter extends BaseExpandableListAdapter implements ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
+        LayoutInflater mInflater;
+        List<User> mUsers;
+        List<SurveyGroup> mSurveys;
 
-        public SurveyListAdapter(Context context) {
-            super(context, null, 0);
-            mTextColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
+        int mHighlightColor;
+
+        public DrawerAdapter() {
+            mInflater = LayoutInflater.from(getActivity());
+            mUsers = new ArrayList<>();
+            mSurveys = new ArrayList<>();
+            mHighlightColor = PlatformUtil.getResource(getActivity(), R.attr.textColorSecondary);
         }
 
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            return inflater.inflate(android.R.layout.simple_list_item_1, null);
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            view.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
-
-            final SurveyGroup surveyGroup = SurveyDbAdapter.getSurveyGroup(cursor);
-
-            TextView text1 = (TextView)view.findViewById(android.R.id.text1);
-            text1.setText(surveyGroup.getName());
-
-            if (surveyGroup.getId() == FlowApp.getApp().getSurveyGroupId()) {
-                text1.setTextColor(getResources().getColorStateList(mTextColor));
-                text1.setBackgroundColor(getResources().getColor(R.color.background_alternate));
-            } else {
-                text1.setTextColor(Color.BLACK);
-                text1.setBackgroundColor(Color.TRANSPARENT);
-            }
-
-            view.setTag(surveyGroup);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final SurveyGroup survey = (SurveyGroup) view.getTag();
+        public void setUsers(List<User> users) {
+            mUsers = users;
             notifyDataSetInvalidated();
-            mSurveysListener.onSurveySelected(survey);
         }
 
-    }
-
-    class UsersAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {
-        final int regularColor, selectedColor;
-
-        public UsersAdapter(Context context) {
-            super(context, null, 0);
-            regularColor = PlatformUtil.getResource(context, R.attr.textColorPrimary);
-            selectedColor = PlatformUtil.getResource(context, R.attr.textColorSecondary);
+        public void setSurveys(List<SurveyGroup> surveys) {
+            mSurveys = surveys;
+            notifyDataSetInvalidated();
         }
 
         @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            return inflater.inflate(android.R.layout.simple_list_item_1, null);
+        public int getGroupCount() {
+            return 3;
         }
 
         @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            view.setPadding((int)PlatformUtil.dp2Pixel(getActivity(), 20), 0, 0, 0);
-
-            long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
-            User user = new User(id, name, null);
-
-            TextView text1 = (TextView)view.findViewById(android.R.id.text1);
-            text1.setText(name);
-
-            view.setTag(user);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final User user = (User) view.getTag();
-            mUserList.setItemChecked(position, true);
-            mUserList.setSelection(position);
-            onUserSelected(user);
-        }
-
-        void onUserSelected(User user) {
-            updateUser(user);
-            mUsersToggle.setMenuListMode(Mode.SURVEYS);
-            if (mUsersListener != null) {
-                mUsersListener.onUserSelected(user);
+        public int getChildrenCount(int groupPosition) {
+            switch (groupPosition) {
+                case GROUP_USERS:
+                    return mUsers.size() + 1;
+                case GROUP_SURVEYS:
+                    return mSurveys.size();
+                default:
+                    return 0;
             }
         }
 
+        @Override
+        public Object getGroup(int groupPosition) {
+            return null;
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            return null;
+        }
+
+        @Override
+        public long getGroupId(int groupPosition) {
+            return 0;
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            return 0;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+
+        @Override
+        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+            View v = convertView;
+            if (v == null) {
+                v = mInflater.inflate(R.layout.drawer_item, null);
+            }
+            TextView tv = (TextView)v.findViewById(R.id.item_txt);
+            ImageView img = (ImageView)v.findViewById(R.id.item_img);
+            ImageView dropdown = (ImageView)v.findViewById(R.id.dropdown);
+
+            switch (groupPosition) {
+                case GROUP_USERS:
+                    User u = FlowApp.getApp().getUser();
+                    String username = u != null ? u.getName() : "Select user";
+                    tv.setText(username);
+
+                    img.setImageResource(R.drawable.ic_account_circle_black_48dp);
+                    dropdown.setImageResource(isExpanded ? R.drawable.ic_action_collapse : R.drawable.ic_action_expand);
+                    dropdown.setVisibility(View.VISIBLE);
+                    break;
+                case GROUP_SURVEYS:
+                    tv.setText("Surveys");
+                    img.setImageResource(R.drawable.ic_edit_black_48dp);
+                    dropdown.setVisibility(View.GONE);
+                    break;
+                case GROUP_SETTINGS:
+                    tv.setText(getString(R.string.settingslabel));
+                    img.setImageResource(R.drawable.ic_settings_black_48dp);
+                    dropdown.setVisibility(View.GONE);
+                    break;
+
+            }
+
+            return v;
+        }
+
+        @Override
+        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+            View v = convertView;
+            if (v == null) {
+                v = mInflater.inflate(android.R.layout.simple_list_item_1, null);
+            }
+            TextView tv = (TextView)v.findViewById(android.R.id.text1);
+            v.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 30), 0, 0, 0);
+
+            tv.setTextColor(Color.BLACK);
+            v.setBackgroundColor(Color.TRANSPARENT);
+
+            switch (groupPosition) {
+                case 0:
+                    User user = isLastChild ? new User(-1, "Add user", null) : mUsers.get(childPosition);
+                    tv.setText(user.getName());
+                    v.setTag(user);
+                    break;
+                case 1:
+                    SurveyGroup sg = mSurveys.get(childPosition);
+                    tv.setText(sg.getName());
+                    if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
+                        tv.setTextColor(getResources().getColorStateList(mHighlightColor));
+                        v.setBackgroundColor(getResources().getColor(R.color.background_alternate));
+                    }
+                    v.setTag(sg);
+                    break;
+            }
+
+            return v;
+        }
+
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition) {
+            return groupPosition == GROUP_USERS || groupPosition == GROUP_SURVEYS;
+        }
+
+        @Override
+        public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+            switch (groupPosition) {
+                case GROUP_SURVEYS:
+                    return true; // This way the expander cannot be collapsed
+                case GROUP_SETTINGS:
+                    startActivity(new Intent(getActivity(), SettingsActivity.class));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+            switch (groupPosition) {
+                case GROUP_USERS:
+                    User user = (User)v.getTag();
+                    if (user.getId() == -1) {
+                        mUsersListener.onNewUser();
+                    } else {
+                        mUsersListener.onUserSelected(user);
+                        notifyDataSetInvalidated();
+                    }
+                    return true;
+                case GROUP_SURVEYS:
+                    SurveyGroup sg = (SurveyGroup)v.getTag();
+                    mSurveysListener.onSurveySelected(sg);
+                    notifyDataSetInvalidated();
+                    return true;
+            }
+            return false;
+        }
     }
 
 }

@@ -591,17 +591,11 @@ public class SurveyDbAdapter {
     /**
      * if the ID is populated, this will update a user record. Otherwise, it
      * will be inserted
-     * 
-     * @param id
-     * @param name
-     * @param email
-     * @return
      */
-    public long createOrUpdateUser(Long id, String name, String email) {
+    public long createOrUpdateUser(Long id, String name) {
         ContentValues initialValues = new ContentValues();
         Long idVal = id;
         initialValues.put(UserColumns.NAME, name);
-        initialValues.put(UserColumns.EMAIL, email);
         initialValues.put(UserColumns.DELETED, 0);
 
         if (idVal == null) {

@@ -10,7 +10,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.ui.fragment.LoginFragment;
 
-public class AddUserActivity extends ActionBarActivity implements LoginFragment.LoginListener {
+public class AddUserActivity extends ActionBarActivity implements LoginFragment.UserListener {
 
     public static final String EXTRA_FIRST_RUN = "first_run";
 
@@ -28,10 +28,13 @@ public class AddUserActivity extends ActionBarActivity implements LoginFragment.
         }
 
         setContentView(R.layout.add_user_activity);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content, LoginFragment.newInstance(null, null))
+                .commit();
     }
 
     @Override
-    public void onLogin(User user) {
+    public void onUserUpdated(User user) {
         FlowApp.getApp().setUser(user);
         setResult(RESULT_OK);
         finish();

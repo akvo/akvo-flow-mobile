@@ -47,6 +47,7 @@ import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
+import org.akvo.flow.ui.fragment.LoginFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.util.ConstantUtil;
@@ -55,7 +56,7 @@ import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class SurveyActivity extends ActionBarActivity implements RecordListListener,
-        DrawerFragment.UserListener, DrawerFragment.SurveyListener {
+        DrawerFragment.DrawerListener, LoginFragment.UserListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int REQUEST_ADD_USER = 0;
@@ -213,6 +214,30 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     }
 
     @Override
+    public void onUserUpdated(User user) {
+        mDrawer.load();
+    }
+
+    @Override
+    public void onNewUser() {
+        LoginFragment f = LoginFragment.newInstance(null, "New user");
+        f.show(getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void onUpdateUser(User user) {
+        LoginFragment f = LoginFragment.newInstance(user, "Edit user");
+        f.show(getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void onUserSelected(User user) {
+        FlowApp.getApp().setUser(user);
+        mDrawer.load();
+        mDrawerLayout.closeDrawers();
+    }
+
+    @Override
     public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
         setTitle(mSurveyGroup.getName());
@@ -224,17 +249,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             f.refresh(mSurveyGroup);
         }
         supportInvalidateOptionsMenu();
-        mDrawerLayout.closeDrawers();
-    }
-
-    @Override
-    public void onNewUser() {
-        startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
-    }
-
-    @Override
-    public void onUserSelected(User user) {
-        FlowApp.getApp().setUser(user);
+        mDrawer.load();
         mDrawerLayout.closeDrawers();
     }
 

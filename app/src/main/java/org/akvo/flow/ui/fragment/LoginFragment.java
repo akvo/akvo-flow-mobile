@@ -1,7 +1,7 @@
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,19 +9,39 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.AddUserActivity;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
 
-public class LoginFragment extends Fragment implements View.OnClickListener {
+public class LoginFragment extends DialogFragment implements View.OnClickListener {
 
-    public interface LoginListener {
-        void onLogin(User user);
+    public interface UserListener {
+        void onUserUpdated(User user);
     }
 
     private EditText mUsername;
+    private UserListener mListener;
 
-    private LoginListener mListener;
+    private String mTitle;
+    private User mUser;
+
+    public static LoginFragment newInstance(User user, String title) {
+        LoginFragment f = new LoginFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("user", user);
+        args.putString("title", title);
+        f.setArguments(args);
+        return f;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mUser = (User) getArguments().getSerializable("user");
+            mTitle = getArguments().getString("title");
+        }
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -30,10 +50,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (LoginListener)activity;
+            mListener = (UserListener)activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement LoginListener");
+            // Allow null listener
         }
     }
 
@@ -45,8 +64,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         mUsername = (EditText) v.findViewById(R.id.username);
 
-        if (!getActivity().getIntent().getBooleanExtra(AddUserActivity.EXTRA_FIRST_RUN, false)) {
-            v.findViewById(R.id.logo).setVisibility(View.GONE);
+        if (mUser != null) {
+            mUsername.setText(mUser.getName());
+        }
+
+        if (mTitle != null) {
+            getDialog().setTitle(mTitle);
         }
 
         return v;
@@ -56,11 +79,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         // TODO: Validate
         String username = mUsername.getText().toString();
+        Long id = mUser != null ? mUser.getId() : null;
 
         SurveyDbAdapter db = new SurveyDbAdapter(getActivity()).open();
-        final long id = db.createOrUpdateUser(null, username, null);
+        id = db.createOrUpdateUser(id, username);
         db.close();
 
-        mListener.onLogin(new User(id, username, null));
+        mUser = new User(id, username);
+
+        User loggedUser = FlowApp.getApp().getUser();
+        if (loggedUser != null && loggedUser.getId() == id) {
+            loggedUser.setName(username);
+        }
+
+        if (mListener != null) {
+            mListener.onUserUpdated(mUser);
+        }
+
+        dismiss();
     }
 }

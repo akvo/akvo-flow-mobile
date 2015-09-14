@@ -52,7 +52,8 @@ public class LoginFragment extends DialogFragment implements View.OnClickListene
         try {
             mListener = (UserListener)activity;
         } catch (ClassCastException e) {
-            // Allow null listener
+            throw new ClassCastException(activity.toString()
+                    + " must implement UserListener");
         }
     }
 
@@ -92,10 +93,10 @@ public class LoginFragment extends DialogFragment implements View.OnClickListene
             loggedUser.setName(username);
         }
 
-        if (mListener != null) {
-            mListener.onUserUpdated(mUser);
-        }
+        mListener.onUserUpdated(mUser);
 
-        dismiss();
+        if (getShowsDialog()) {
+            dismiss();
+        }
     }
 }

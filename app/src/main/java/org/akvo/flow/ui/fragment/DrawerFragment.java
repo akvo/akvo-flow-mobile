@@ -185,6 +185,49 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
+    private void updateUser(User user) {
+        final long uid = user.getId();
+        final EditText et = new EditText(getActivity());
+        et.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        et.setSingleLine();
+        et.append(user.getName());
+
+        ViewUtil.ShowTextInputDialog(getActivity(), R.string.edit_user, R.string.username, et,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = et.getText().toString();
+
+                        // TODO: Validate name
+                        mDatabase.createOrUpdateUser(uid, name);
+
+                        User loggedUser = FlowApp.getApp().getUser();
+                        if (loggedUser != null && loggedUser.getId() == uid) {
+                            loggedUser.setName(name);
+                        }
+                        load();
+                    }
+                });
+    }
+
+    private void addUser() {
+        final EditText et = new EditText(getActivity());
+        et.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        et.setSingleLine();
+
+        ViewUtil.ShowTextInputDialog(getActivity(), R.string.add_user, R.string.username, et,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = et.getText().toString();
+
+                        // TODO: Validate name
+                        mDatabase.createOrUpdateUser(null, name);
+                        load();
+                    }
+                });
+    }
+
     class DrawerAdapter extends BaseExpandableListAdapter implements ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener, AdapterView.OnItemLongClickListener {
         LayoutInflater mInflater;
 
@@ -330,7 +373,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_USERS:
                     User user = (User)v.getTag();
                     if (user.getId() == -1) {
-                        mListener.onNewUser();
+                        //mListener.onNewUser();
+                        addUser();
                     } else {
                         mListener.onUserSelected(user);
                     }
@@ -350,7 +394,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 if (ExpandableListView.getPackedPositionGroup(packedPos) == GROUP_USERS) {
                     int childPos = ExpandableListView.getPackedPositionChild(packedPos);
                     if (childPos < mUsers.size()) {
-                        mListener.onUpdateUser(mUsers.get(childPos));
+                        updateUser(mUsers.get(childPos));
+                        //mListener.onUpdateUser(mUsers.get(childPos));
                     }
                     return true;
                 }

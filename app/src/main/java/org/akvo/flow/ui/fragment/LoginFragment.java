@@ -66,10 +66,10 @@ public class LoginFragment extends DialogFragment implements View.OnClickListene
         mUsername = (EditText) v.findViewById(R.id.username);
 
         if (mUser != null) {
-            mUsername.setText(mUser.getName());
+            mUsername.append(mUser.getName());
         }
 
-        if (mTitle != null) {
+        if (mTitle != null && getShowsDialog()) {
             getDialog().setTitle(mTitle);
         }
 

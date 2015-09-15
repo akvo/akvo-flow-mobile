@@ -21,7 +21,6 @@
   <string name="userlabel">Manage Users</string>
   <string name="resize_large_images">Resize large images</string>
   <string name="settingslabel">Settings</string>
-  <string name="adduser">Add User</string>
   <string name="nouser">No Users!</string>
   <string name="displayname">Display Name</string>
   <string name="email">Email Address</string>
@@ -224,6 +223,10 @@
   <string name="geoshape_response">Shape captured successfully</string>
   <string name="add_point_title">Add Point</string>
   <string name="add_point_text">Do you want to add a new point at this location?</string>
+  <!--User management-->
+  <string name="add_user">Add User</string>
+  <string name="edit_user">Edit user</string>
+  <string name="username">Username</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Cancel</string>

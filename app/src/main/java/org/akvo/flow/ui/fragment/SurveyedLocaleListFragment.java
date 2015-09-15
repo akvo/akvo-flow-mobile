@@ -310,18 +310,18 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             String statusText = null;
             switch (status) {
                 case SurveyInstanceStatus.SAVED:
-                    statusRes = R.drawable.ic_status_saved;
-                    statusText = "Saved";
+                    statusRes = R.drawable.record_saved_icn;
+                    statusText = getString(R.string.status_saved);
                     break;
                 case SurveyInstanceStatus.SUBMITTED:
                 case SurveyInstanceStatus.EXPORTED:
-                    statusRes = R.drawable.ic_status_exported;
-                    statusText = "Exported. Sync pending";
+                    statusRes = R.drawable.record_exported_icn;
+                    statusText = getString(R.string.status_exported);
                     break;
                 case SurveyInstanceStatus.SYNCED:
                 case SurveyInstanceStatus.DOWNLOADED:
-                    statusRes = R.drawable.ic_status_synced;
-                    statusText = "Synced";
+                    statusRes = R.drawable.record_synced_icn;
+                    statusText = getString(R.string.status_synced);
                     break;
             }
 

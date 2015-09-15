@@ -41,26 +41,26 @@ public class ResponseListAdapter extends CursorAdapter {
         switch (status) {
             case SurveyInstanceStatus.SAVED:
                 statusText = context.getString(R.string.status_saved) + ": ";
-                icon = R.drawable.ic_status_saved;
+                icon = R.drawable.form_saved_icn;
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE));
                 break;
             case SurveyInstanceStatus.SUBMITTED:
                 statusText = context.getString(R.string.status_submitted) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
-                icon = R.drawable.ic_status_exported;
+                icon = R.drawable.exported_icn;
                 finished = true;
                 break;
             case SurveyInstanceStatus.EXPORTED:
                 statusText = context.getString(R.string.status_exported) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE));
-                icon = R.drawable.ic_status_exported;
+                icon = R.drawable.exported_icn;
                 finished = true;
                 break;
             case SurveyInstanceStatus.SYNCED:
             case SurveyInstanceStatus.DOWNLOADED:
                 statusText = context.getString(R.string.status_synced) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE));
-                icon = R.drawable.ic_status_synced;
+                icon = R.drawable.checkmark;
                 finished = true;
                 break;
         }

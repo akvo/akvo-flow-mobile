@@ -19,6 +19,8 @@ package org.akvo.flow.ui.view;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -45,6 +47,8 @@ import java.util.GregorianCalendar;
  * @author Christohper Fagiani
  */
 public class DateQuestionView extends QuestionView implements View.OnClickListener {
+    private static final String TAG = DateQuestionView.class.getSimpleName();
+
     private EditText mDateTextEdit;
     private int mYear;
     private int mMonth;
@@ -96,11 +100,10 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     @Override
     public void setResponse(QuestionResponse resp) {
         if (resp != null && mDateTextEdit != null) {
-            if (resp.getValue() != null && resp.getValue().trim().length() > 0) {
-                mSelectedDate = new Date(Long.parseLong(resp.getValue()));
+            mSelectedDate = parseDateValue(resp.getValue());
+            if (mSelectedDate != null) {
                 mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
             } else {
-                mSelectedDate = null;
                 mDateTextEdit.setText("");
             }
         }
@@ -122,14 +125,14 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        if (resp != null && mDateTextEdit != null) {
-            if (resp.getValue() != null && resp.getValue().trim().length() > 0) {
-                mSelectedDate = new Date(Long.parseLong(resp.getValue()));
-                mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
-            } else {
-                mSelectedDate = null;
-                mDateTextEdit.setText("");
-            }
+        if (resp == null || mDateTextEdit == null) {
+            return;
+        }
+        mSelectedDate = parseDateValue(resp.getValue());
+        if (mSelectedDate != null) {
+            mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
+        } else {
+            mDateTextEdit.setText("");
         }
     }
 
@@ -138,6 +141,17 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         super.resetQuestion(fireEvent);
         mDateTextEdit.setText("");
         mSelectedDate = null;
+    }
+
+    private Date parseDateValue(String value) {
+        try {
+            if (!TextUtils.isEmpty(value)) {
+                return new Date(Long.parseLong(value));
+            }
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "parseDateValue() - Value is not a number: " + value);
+        }
+        return null;
     }
     
 }

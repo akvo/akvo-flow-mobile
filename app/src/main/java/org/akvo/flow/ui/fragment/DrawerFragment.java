@@ -134,6 +134,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public void load() {
+        if (!isResumed()) {
+            return;
+        }
         getLoaderManager().restartLoader(LOADER_SURVEYS, null, this);
         getLoaderManager().restartLoader(LOADER_USERS, null, this);
     }

@@ -163,20 +163,22 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
      * automatically, and the loaders restarted without this explicit dependency.
      */
     public void refresh() {
+        if (!isResumed()) {
+            return;
+        }
+
         if (mSurveyGroup == null) {
             setEmptyText(getString(R.string.no_survey_selected_text));
         } else {
             setEmptyText(getString(R.string.no_records_text));
         }
 
-        if (isResumed()) {
-            if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
-                // Warn user that the location is unknown
-                Toast.makeText(getActivity(), "Unknown Location", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            getLoaderManager().restartLoader(0, null, this);
+        if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
+            // Warn user that the location is unknown
+            Toast.makeText(getActivity(), "Unknown Location", Toast.LENGTH_SHORT).show();
+            return;
         }
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override

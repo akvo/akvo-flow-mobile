@@ -63,7 +63,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
-    public static final String EXTRA_SURVEY_GROUP_ID = "survey_group_id";
 
     public static final String FRAGMENT_DATAPOINTS = "datapoints_fragment";
 
@@ -121,8 +120,11 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             mDrawerLayout.openDrawer(Gravity.START);
         }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
-                DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
+        if (savedInstanceState == null ||
+                getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS) == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
+                    DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
+        }
 
         if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
             startActivityForResult(new Intent(this, AddUserActivity.class)

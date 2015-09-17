@@ -22,7 +22,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,6 +69,7 @@ public class DatapointsFragment extends Fragment {
         mSurveyGroup = (SurveyGroup) getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         mTabs = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Override
@@ -167,7 +168,7 @@ public class DatapointsFragment extends Fragment {
         }
     }
 
-    class TabsAdapter extends FragmentStatePagerAdapter {
+    class TabsAdapter extends FragmentPagerAdapter {
 
         public TabsAdapter(FragmentManager fm) {
             super(fm);

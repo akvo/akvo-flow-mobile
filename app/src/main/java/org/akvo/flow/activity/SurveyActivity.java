@@ -155,6 +155,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     @Override
     public void onResume() {
         super.onResume();
+        // Delete empty responses, if any
+        mDatabase.deleteEmptySurveyInstances();
+        mDatabase.deleteEmptyRecords();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }

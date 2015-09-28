@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -107,11 +107,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     public void onResume() {
         super.onResume();
         mDatabase.open();
-
-        // Delete empty SurveyInstances, if any
-        // TODO: For a more efficient cleanup, attempt to wipe ONLY the latest SurveyInstance,
-        // TODO: providing the id to SurveyActivity, and reading it back on onActivityResult(...)
-        mDatabase.deleteEmptySurveyInstances();
 
         mUser = FlowApp.getApp().getUser();
         // Record might have changed while answering a registration survey

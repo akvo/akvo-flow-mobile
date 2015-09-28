@@ -2,30 +2,47 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/item_img"
-        android:layout_width="30dp"
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:adjustViewBounds="true" />
+        android:background="?android:attr/listDivider" />
 
-    <TextView
-        android:id="@+id/item_txt"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="22sp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
+        android:paddingRight="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
-    <ImageView
-        android:id="@+id/dropdown"
-        android:layout_width="30dp"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside" />
+        <ImageView
+            android:id="@+id/item_img"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:adjustViewBounds="true" />
 
+        <TextView
+            android:id="@+id/item_txt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="22sp" />
+
+        <ImageView
+            android:id="@+id/dropdown"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside" />
+
+    </LinearLayout>
 </LinearLayout>

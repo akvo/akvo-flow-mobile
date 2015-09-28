@@ -24,8 +24,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.DrawerLayout;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +37,6 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
-import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.loader.SurveyGroupLoader;
 import org.akvo.flow.async.loader.UserLoader;
@@ -53,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DrawerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final float ITEM_TEXT_SIZE = 14;
 
     private static final int GROUP_USERS = 0;
     private static final int GROUP_SURVEYS = 1;
@@ -61,8 +59,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public interface DrawerListener {
         void onSurveySelected(SurveyGroup surveyGroup);
         void onUserSelected(User user);
-        void onNewUser();
-        void onUpdateUser(User user);
     }
 
     private static final int LOADER_SURVEYS = 0;
@@ -291,28 +287,41 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             if (v == null) {
                 v = mInflater.inflate(R.layout.drawer_item, null);
             }
+            View divider = v.findViewById(R.id.divider);
             TextView tv = (TextView)v.findViewById(R.id.item_txt);
             ImageView img = (ImageView)v.findViewById(R.id.item_img);
             ImageView dropdown = (ImageView)v.findViewById(R.id.dropdown);
 
+
             switch (groupPosition) {
                 case GROUP_USERS:
+                    divider.setMinimumHeight(0);
+
                     User u = FlowApp.getApp().getUser();
                     String username = u != null ? u.getName() : "Select user";
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
                     tv.setText(username);
 
                     img.setImageResource(R.drawable.ic_account_circle_black_48dp);
+                    img.setVisibility(View.VISIBLE);
                     dropdown.setImageResource(isExpanded ? R.drawable.ic_action_collapse : R.drawable.ic_action_expand);
                     dropdown.setVisibility(View.VISIBLE);
                     break;
                 case GROUP_SURVEYS:
-                    tv.setText("Surveys");
-                    img.setImageResource(R.drawable.ic_edit_black_48dp);
+                    divider.setMinimumHeight((int)PlatformUtil.dp2Pixel(getActivity(), 3));
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(getResources().getColor(R.color.black_diabled));
+                    tv.setText("Surveys");// FIXME: Externalize str
+                    img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;
                 case GROUP_SETTINGS:
+                    divider.setMinimumHeight((int)PlatformUtil.dp2Pixel(getActivity(), 1));
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
                     tv.setText(getString(R.string.settingslabel));
-                    img.setImageResource(R.drawable.ic_settings_black_48dp);
+                    img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;
             }
@@ -329,6 +338,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             TextView tv = (TextView)v.findViewById(android.R.id.text1);
             v.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 30), 0, 0, 0);
 
+            tv.setTextSize(ITEM_TEXT_SIZE);
             tv.setTextColor(Color.BLACK);
             v.setBackgroundColor(Color.TRANSPARENT);
 
@@ -376,7 +386,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_USERS:
                     User user = (User)v.getTag();
                     if (user.getId() == -1) {
-                        //mListener.onNewUser();
                         addUser();
                     } else {
                         mListener.onUserSelected(user);
@@ -398,7 +407,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     int childPos = ExpandableListView.getPackedPositionChild(packedPos);
                     if (childPos < mUsers.size()) {
                         updateUser(mUsers.get(childPos));
-                        //mListener.onUpdateUser(mUsers.get(childPos));
                     }
                     return true;
                 }

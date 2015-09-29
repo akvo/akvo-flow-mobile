@@ -71,7 +71,8 @@ public class SurveyDbAdapter {
                 + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
 
         String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
-                + "JOIN survey ON survey_instance.survey_id = survey.survey_id";
+                + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
+                + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
 
         String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
                 + "survey.survey_id=survey_instance.survey_id";
@@ -1376,7 +1377,8 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Get all the SurveyInstances for a particular Record
+     * Get all the SurveyInstances for a particular data point. Registration form will be at the top
+     * of the list, all other forms will be ordered by submission date (desc).
      */
     public Cursor getSurveyInstances(String recordId) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
@@ -1387,11 +1389,13 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
                         SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER
+                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER,
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[] { recordId },
-                null, null, SurveyInstanceColumns.START_DATE + " DESC");
+                null, null,
+                "CASE WHEN survey.survey_id = survey_group.register_survey_id THEN 0 ELSE 1 END, "
+                        + SurveyInstanceColumns.START_DATE + " DESC");
     }
 
     /**

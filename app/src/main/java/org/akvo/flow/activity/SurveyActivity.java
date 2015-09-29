@@ -224,18 +224,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     }
 
     @Override
-    public void onNewUser() {
-        LoginFragment f = LoginFragment.newInstance(null, "New user");
-        f.show(getSupportFragmentManager(), null);
-    }
-
-    @Override
-    public void onUpdateUser(User user) {
-        LoginFragment f = LoginFragment.newInstance(user, "Edit user");
-        f.show(getSupportFragmentManager(), null);
-    }
-
-    @Override
     public void onUserSelected(User user) {
         FlowApp.getApp().setUser(user);
         mDrawer.load();

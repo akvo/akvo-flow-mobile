@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
@@ -286,12 +288,16 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
         // Non-monitored surveys display the form directly
         if (!mSurveyGroup.isMonitored()) {
-            final String formId = mSurveyGroup.getRegisterSurveyId();
-            if (!mDatabase.getSurvey(formId).isHelpDownloaded()) {
+            Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
+            if (registrationForm == null) {
+                Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
+                return;
+            } else if (!registrationForm.isHelpDownloaded()) {
                 Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
                 return;
             }
 
+            final String formId = registrationForm.getId();
             long formInstanceId;
             boolean readOnly = false;
             Cursor c = mDatabase.getSurveyInstances(surveyedLocaleId);

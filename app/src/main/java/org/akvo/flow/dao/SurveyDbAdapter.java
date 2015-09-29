@@ -1314,6 +1314,25 @@ public class SurveyDbAdapter {
         return null;
     }
 
+    // Attempt to fetch the registation form. If the form ID is explicitely set on the SurveyGroup,
+    // we simply query by ID. Otherwise, assume is a non-monitored form, and query the first form
+    // we find.
+    public Survey getRegistrationForm(SurveyGroup sg) {
+        String formId = sg.getRegisterSurveyId();
+        if (!TextUtils.isEmpty(formId) && !"null".equalsIgnoreCase(formId)) {
+            return getSurvey(formId);
+        }
+        Survey s = null;
+        Cursor c = getSurveys(sg.getId());
+        if (c != null) {
+            if (c.moveToFirst()) {
+                s = getSurvey(c);
+            }
+            c.close();
+        }
+        return s;
+    }
+
     public Cursor getSurveys(long surveyGroupId) {
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = null;

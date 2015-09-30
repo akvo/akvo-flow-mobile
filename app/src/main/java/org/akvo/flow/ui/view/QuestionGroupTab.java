@@ -101,7 +101,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         if (mQuestionGroup.isRepeatable()) {
             findViewById(R.id.repeat_header).setVisibility(VISIBLE);
             View repeatBtn = findViewById(R.id.repeat_btn);
-            repeatBtn.setVisibility(VISIBLE);
+            repeatBtn.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
             repeatBtn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

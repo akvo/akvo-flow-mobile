@@ -352,7 +352,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
             switch (groupPosition) {
                 case 0:
-                    User user = isLastChild ? new User(-1, "Add user") : mUsers.get(childPosition);
+                    User user = isLastChild ? new User(-1, "+ User") : mUsers.get(childPosition);
                     tv.setText(user.getName());
                     v.setTag(user);
                     break;

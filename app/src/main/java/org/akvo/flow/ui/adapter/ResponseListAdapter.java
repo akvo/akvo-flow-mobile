@@ -51,7 +51,7 @@ public class ResponseListAdapter extends CursorAdapter {
         // Default to 'Submitted' status values
         int icon = 0;
         String statusText = context.getString(R.string.status_submitted) + ": ";
-        long displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE));
+        long displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
 
         switch (status) {
             case SurveyInstanceStatus.SAVED:

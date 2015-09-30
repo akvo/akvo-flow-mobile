@@ -39,4 +39,13 @@ public class User implements Serializable {
         mName = name;
     }
 
+    @Override
+    public boolean equals(Object user) {
+        try {
+            return user != null && ((User)user).getId() == mId;
+        } catch (ClassCastException e) {
+            return false;
+        }
+    }
+
 }

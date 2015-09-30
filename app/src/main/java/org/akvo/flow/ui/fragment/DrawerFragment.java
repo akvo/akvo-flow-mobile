@@ -170,7 +170,11 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                         do {
                             long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
                             String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
-                            mUsers.add(new User(id, name));
+                            User user = new User(id, name);
+                            // Skip logged
+                            if (!user.equals(FlowApp.getApp().getUser())) {
+                                mUsers.add(new User(id, name));
+                            }
                         } while (cursor.moveToNext());
                         cursor.close();
                     }

@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -96,7 +95,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                //mDrawer.setModeSurveys();
+                mDrawer.onDrawerClosed();
                 getSupportActionBar().setTitle(mTitle);
                 supportInvalidateOptionsMenu();
             }

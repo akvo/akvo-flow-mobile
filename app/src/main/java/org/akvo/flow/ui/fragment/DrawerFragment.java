@@ -137,6 +137,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         getLoaderManager().restartLoader(LOADER_USERS, null, this);
     }
 
+    public void onDrawerClosed() {
+        mListView.collapseGroup(GROUP_USERS);
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {

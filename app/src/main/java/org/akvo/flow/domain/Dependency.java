@@ -29,6 +29,17 @@ public class Dependency {
     private String question;
     private String answer;
 
+    public Dependency() {
+    }
+
+    /**
+     * Copy constructor
+     */
+    public Dependency(Dependency dependency) {
+        this.question = dependency.getQuestion();
+        this.answer = dependency.getAnswer();
+    }
+
     public String getQuestion() {
         return question;
     }

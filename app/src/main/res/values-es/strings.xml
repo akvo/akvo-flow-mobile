@@ -167,6 +167,10 @@ Version</string>
   <string name="clear_point_text">¿Quiere borrar este punto?</string>
   <string name="clear_feature_title">Borrar figura</string>
   <string name="clear_feature_text">¿Quiere borrar esta figura?</string>
+  <string name="repeat_group">Repetir grupo</string>
+  <string name="repetitions">Repeticiones:</string>
+  <string name="delete_group_title">Eliminar grupo</string>
+  <string name="delete_group_text">¿Está seguro de que desea eliminar este grupo?</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CREAR NUEVO PUNTO DE DATOS</string>
   <string name="stats_title">Estadísticas de la encuesta</string>
@@ -212,6 +216,7 @@ Version</string>
   <string name="error_assignment_read">Las asignaciones de encuesta no se han podido recibir desde el panel de control FLOW</string>
   <string name="error_form_header">El formulario %1$s no se ha podido recibir desde el panel de control.</string>
   <string name="error_form_download">Asegúrese que el formulario está publicado, y que la hora/fecha del dispositivo es correcta.</string>
+  <string name="form_deleted">Este formulario ha sido borrado.</string>
   <!--Plotting-->
   <string name="geoshape_area">Área</string>
   <string name="geoshape_line">Línea</string>

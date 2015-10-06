@@ -88,6 +88,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String SOURCE_QUESTION_ID = "sourceId";
     private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
     private static final String DOUBLE_ENTRY = "requireDoubleEntry";
+    private static final String REPEATABLE = "repeatable";
 
     private static final String SURVEY_GROUP_ID = "surveyGroupId";
     private static final String SURVEY_GROUP_NAME = "surveyGroupName";
@@ -288,6 +289,8 @@ public class SurveyHandler extends DefaultHandler {
                 }
                 currentQuestionGroup.setOrder(count);
             }
+            // Repeatable flag
+            currentQuestionGroup.setRepeatable(Boolean.parseBoolean(attributes.getValue(REPEATABLE)));
         } else if (localName.equalsIgnoreCase(QUESTION)) {
             currentQuestion = new Question();
             if (attributes.getValue(ORDER) != null) {

@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.event.QuestionInteractionListener;
@@ -103,15 +102,14 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     /**
      * Check if the tab is loaded, and do so if it has not been loaded yet.
-     * @param tab
      */
     private void loadTab(int position) {
         QuestionGroupTab tab = mQuestionGroupTabs.get(position);
         if (!tab.isLoaded()) {
             Log.d(TAG, "Loading Tab #" + position);
             tab.load();
-            setupDependencies();// Dependencies might occur across tabs
             tab.loadState();
+            setupDependencies();// Dependencies might occur across tabs
         }
     }
 
@@ -132,11 +130,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     public int displayQuestion(String questionId) {
         for (int i=0; i<mQuestionGroupTabs.size(); i++) {
             QuestionGroupTab questionGroupTab = mQuestionGroupTabs.get(i);
-            QuestionView questionView = questionGroupTab.getQuestionView(questionId);
-            if (questionView != null) {
-                int x = questionView.getLeft();
-                int y = questionView.getTop();
-                questionGroupTab.scrollTo(x, y);
+            if (questionGroupTab.displayQuestion(questionId)) {
                 return i;
             }
         }
@@ -163,7 +157,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
-    private QuestionView getQuestionView(String questionId) {
+    public QuestionView getQuestionView(String questionId) {
         QuestionView questionView = null;
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             questionView = questionGroupTab.getQuestionView(questionId);
@@ -185,26 +179,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
      * correct state
      */
     private void setupDependencies() {
-        for (QuestionGroup group : mQuestionGroups) {
-            for (Question question : group.getQuestions()) {
-                setupDependencies(question);
-            }
-        }
-    }
-
-    private void setupDependencies(Question question) {
-        final List<Dependency> dependencies = question.getDependencies();
-
-        if (dependencies == null) {
-            return;// No dependencies for this question
-        }
-
-        for (Dependency dependency : dependencies) {
-            QuestionView parentQ = getQuestionView(dependency.getQuestion());
-            QuestionView depQ = getQuestionView(question.getId());
-            if (depQ != null && parentQ != null && depQ != parentQ) {
-                parentQ.addQuestionInteractionListener(depQ);
-            }
+        for (QuestionGroupTab tab : mQuestionGroupTabs) {
+            tab.setupDependencies();
         }
     }
 
@@ -276,9 +252,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     }
 
     /**
-     * checks if all the mandatory questions (on all tabs) have responses
-     *
-     * @return
+     * Checks if all the mandatory questions (on all tabs) have responses
      */
     private List<Question> checkInvalidQuestions() {
         List<Question> invalidQuestions = new ArrayList<Question>();

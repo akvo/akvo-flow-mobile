@@ -32,6 +32,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.Prefs;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -87,11 +88,16 @@ public class FlowApp extends Application {
         setAppLanguage(language, false);
 
         loadLastUser();
+
+        // Load last survey group
+        mSurveyGroupId = Prefs.getLong(this, Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+
         mSurveyChecker.run();// Ensure surveys have put their languages
     }
     
     public void setUser(User user) {
         mUser = user;
+        Prefs.setLong(this, Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
     }
     
     public User getUser() {
@@ -100,6 +106,7 @@ public class FlowApp extends Application {
     
     public void setSurveyGroupId(long surveyGroupId) {
         mSurveyGroupId = surveyGroupId;
+        Prefs.setLong(this, Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
     }
     
     public long getSurveyGroupId() {
@@ -122,26 +129,18 @@ public class FlowApp extends Application {
      * so, loads the last logged-in user from the DB
      */
     private void loadLastUser() {
-        // TODO: This DB connection should not be in the UI thread
-        SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
-        database.open();
-        
-        // First check if they want to keep users logged in
-        String val = database.getPreference(ConstantUtil.USER_SAVE_SETTING_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            val = database.getPreference(ConstantUtil.LAST_USER_SETTING_KEY);
-            if (val != null && val.trim().length() > 0) {
-                long id = Long.valueOf(val);
-                Cursor cur = database.getUser(id);
-                if (cur != null) {
-                    String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
-                    String email = cur.getString(cur.getColumnIndexOrThrow(UserColumns.EMAIL));
-                    mUser = new User(id, userName, email);
-                    cur.close();
-                }
+        long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
+        if (id != -1) {
+            SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
+            database.open();
+            Cursor cur = database.getUser(id);
+            if (cur.moveToFirst()) {
+                String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
+                mUser = new User(id, userName);
+                cur.close();
             }
+            database.close();
         }
-        database.close();
     }
 
     public void setAppLanguage(String language, boolean requireRestart) {

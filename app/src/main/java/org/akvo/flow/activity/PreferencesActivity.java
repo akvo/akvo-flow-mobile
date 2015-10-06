@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -18,14 +18,12 @@ package org.akvo.flow.activity;
 
 import java.util.HashMap;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -54,9 +52,8 @@ import org.akvo.flow.util.ViewUtil;
  *
  * @author Christopher Fagiani
  */
-public class PreferencesActivity extends Activity implements OnClickListener,
+public class PreferencesActivity extends BackActivity implements OnClickListener,
         OnCheckedChangeListener {
-    private CheckBox saveUserCheckbox;
     private CheckBox beaconCheckbox;
     private CheckBox screenOnCheckbox;
     private CheckBox mobileDataCheckbox;
@@ -78,10 +75,8 @@ public class PreferencesActivity extends Activity implements OnClickListener,
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.preferences);
 
-        saveUserCheckbox = (CheckBox) findViewById(R.id.lastusercheckbox);
         beaconCheckbox = (CheckBox) findViewById(R.id.beaconcheckbox);
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
         mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
@@ -97,7 +92,6 @@ public class PreferencesActivity extends Activity implements OnClickListener,
         maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
 
         // Setup event listeners
-        saveUserCheckbox.setOnCheckedChangeListener(this);
         beaconCheckbox.setOnCheckedChangeListener(this);
         screenOnCheckbox.setOnCheckedChangeListener(this);
         mobileDataCheckbox.setOnCheckedChangeListener(this);
@@ -113,14 +107,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     private void populateFields() {
         HashMap<String, String> settings = database.getPreferences();
-        String val = settings.get(ConstantUtil.USER_SAVE_SETTING_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            saveUserCheckbox.setChecked(true);
-        } else {
-            saveUserCheckbox.setChecked(false);
-        }
-
-        val = settings.get(ConstantUtil.SCREEN_ON_KEY);
+        String val = settings.get(ConstantUtil.SCREEN_ON_KEY);
         if (val != null && Boolean.parseBoolean(val)) {
             screenOnCheckbox.setChecked(true);
         } else {
@@ -324,9 +311,7 @@ public class PreferencesActivity extends Activity implements OnClickListener,
      */
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView == saveUserCheckbox) {
-            database.savePreference(ConstantUtil.USER_SAVE_SETTING_KEY, "" + isChecked);
-        } else if (buttonView == beaconCheckbox) {
+        if (buttonView == beaconCheckbox) {
             database.savePreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY, "" + isChecked);
             if (isChecked) {
                 // if the option changed, kick the service so it reflects the change

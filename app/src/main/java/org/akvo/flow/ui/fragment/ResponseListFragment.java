@@ -36,7 +36,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.async.loader.SurveyInstanceLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
@@ -191,7 +191,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onListItemClick(ListView list, View view, int position, long id) {
         super.onListItemClick(list, view, position, id);
 
-        Intent i = new Intent(view.getContext(), SurveyActivity.class);
+        Intent i = new Intent(view.getContext(), FormActivity.class);
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, view.getTag(SURVEY_ID_KEY).toString());
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, (Long) view.getTag(SURVEY_INSTANCE_ID_KEY));
 

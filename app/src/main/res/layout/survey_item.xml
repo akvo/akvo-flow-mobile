@@ -1,51 +1,47 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:gravity="center_vertical"
     android:padding="8dp" >
 
-    <ImageView 
-        android:id="@+id/survey_icon"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:layout_alignParentLeft="true"
-        android:adjustViewBounds="true"
-        android:layout_centerVertical="true" />
-
     <TextView
         android:id="@+id/text1"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/survey_icon"
-        android:textSize="18sp" />
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/survey_icon"
-        android:layout_below="@id/text1"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/text1"
-        android:textSize="14sp"
-        android:textColor="#8D943F" />
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toRightOf="@id/text1"
+        android:layout_toEndOf="@id/text1"
+        android:layout_alignBaseline="@+id/text1"
+        android:enabled="false"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/date_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/date"
         android:layout_below="@id/text1"
         android:layout_marginRight="5dp"
-        android:textSize="14sp"
+        android:layout_marginEnd="5dp"
+        android:textSize="18sp"
         android:textColor="#8D943F"
         android:text="@string/last_response"/>
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text1"
+        android:layout_toRightOf="@+id/date_label"
+        android:layout_toEndOf="@+id/date_label"
+        android:textSize="18sp"
+        android:textColor="#8D943F" />
 
 </RelativeLayout>

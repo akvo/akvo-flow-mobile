@@ -89,8 +89,8 @@
   <string name="bootstraperror">Error processing bootstrap zip file</string>
   <string name="bootstrap_invalid_app">Error: Form doesn\'t belong to this FLOW instance</string>
   <string name="transmissionhist">Transmission History</string>
-  <string name="transstartdate">Transmission Started:</string>
-  <string name="transenddate">Transmission Finished:</string>
+  <string name="transstartdate">Started:</string>
+  <string name="transenddate">Finished:</string>
   <string name="confirmchangetitle">Change response?</string>
   <string name="confirmchangetext">Do you want to change your response?</string>
   <string name="resetall">Delete Everything (users, surveys, and all collected data)</string>

@@ -18,16 +18,9 @@
   <string name="clearbutton">Clear</string>
   <string name="submitbutton">Submit</string>
   <string name="geodialog">GPS must be enabled to do this. Select OK to go to\tthe settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
-  <string name="userlabel">Manage Users</string>
   <string name="resize_large_images">Resize large images</string>
   <string name="settingslabel">Settings</string>
   <string name="nouser">No Users!</string>
-  <string name="displayname">Display Name</string>
-  <string name="email">Email Address</string>
-  <string name="userinstructions">Select the current user by clicking. To create a new user, press the \'+\' icon. Long-click to edit a user.</string>
-  <string name="editmenu">Edit User</string>
-  <string name="deleteusermenu">Delete User</string>
-  <string name="mustselectuser">Please click the Manage Users icon and choose a user before continuing.</string>
   <string name="exportcomplete">Data has been exported to SD card</string>
   <string name="prefoptlabel">Preferences</string>
   <string name="prefoptdesc">Set default survey language and other preference data</string>
@@ -228,10 +221,17 @@
   <string name="geoshape_response">Shape captured successfully</string>
   <string name="add_point_title">Add Point</string>
   <string name="add_point_text">Do you want to add a new point at this location?</string>
-  <!--User management-->
+  <!--Navigation Drawer-->
+  <string name="select_user">Select User</string>
   <string name="add_user">Add User</string>
+  <string name="new_user">+ User</string>
   <string name="edit_user">Edit user</string>
+  <string name="delete_user">Delete user</string>
+  <string name="empty_user_warning">Username cannot be empty</string>
+  <string name="delete_user_confirmation">Are you sure you want to delete this user?</string>
   <string name="username">Username</string>
+  <string name="mustselectuser">Please select a user before continuing</string>
+  <string name="surveys">Surveys</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Cancel</string>

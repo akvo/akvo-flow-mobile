@@ -24,14 +24,16 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -52,17 +54,23 @@ import java.util.List;
 public class DrawerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final float ITEM_TEXT_SIZE = 14;
 
+    // Context menu IDs
+    private static final int ID_EDIT_USER = 0;
+    private static final int ID_DELETE_USER = 1;
+
+    // ExpandableList's group IDs
     private static final int GROUP_USERS = 0;
     private static final int GROUP_SURVEYS = 1;
     private static final int GROUP_SETTINGS = 2;
+
+    // Loader IDs
+    private static final int LOADER_SURVEYS = 0;
+    private static final int LOADER_USERS = 1;
 
     public interface DrawerListener {
         void onSurveySelected(SurveyGroup surveyGroup);
         void onUserSelected(User user);
     }
-
-    private static final int LOADER_SURVEYS = 0;
-    private static final int LOADER_USERS = 1;
 
     private ExpandableListView mListView;
     private DrawerAdapter mAdapter;
@@ -95,7 +103,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mListView.expandGroup(GROUP_SURVEYS);
             mListView.setOnGroupClickListener(mAdapter);
             mListView.setOnChildClickListener(mAdapter);
-            mListView.setOnItemLongClickListener(mAdapter);
             registerForContextMenu(mListView);
         }
     }
@@ -175,7 +182,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                             long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
                             String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
                             User user = new User(id, name);
-                            // Skip logged
+                            // Skip selected user
                             if (!user.equals(FlowApp.getApp().getUser())) {
                                 mUsers.add(new User(id, name));
                             }
@@ -192,24 +199,28 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    private void updateUser(User user) {
-        final long uid = user.getId();
+    private void addUser() {
+        editUser(null);
+    }
+
+    private void editUser(final User user) {
+        final Long uid = user != null ? user.getId() : null;
+        final String name = user != null ? user.getName() : "";
         final EditText et = new EditText(getActivity());
         et.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         et.setSingleLine();
-        et.append(user.getName());
+        et.append(name);
 
-        ViewUtil.ShowTextInputDialog(getActivity(), R.string.edit_user, R.string.username, et,
+        int titleRes = user != null ? R.string.edit_user : R.string.add_user;
+
+        ViewUtil.ShowTextInputDialog(getActivity(), titleRes, R.string.username, et,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String name = et.getText().toString();
-
-                        // TODO: Validate name
                         mDatabase.createOrUpdateUser(uid, name);
-
                         User loggedUser = FlowApp.getApp().getUser();
-                        if (loggedUser != null && loggedUser.getId() == uid) {
+                        if (user != null && user.equals(loggedUser)) {
                             loggedUser.setName(name);
                         }
                         load();
@@ -217,25 +228,76 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 });
     }
 
-    private void addUser() {
-        final EditText et = new EditText(getActivity());
-        et.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        et.setSingleLine();
-
-        ViewUtil.ShowTextInputDialog(getActivity(), R.string.add_user, R.string.username, et,
-                new DialogInterface.OnClickListener() {
+    private void deleteUser(final User user) {
+        final long uid = user.getId();
+        ViewUtil.showConfirmDialog(R.string.delete_user, R.string.delete_user_confirmation, getActivity(),
+                true, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String name = et.getText().toString();
-
-                        // TODO: Validate name
-                        mDatabase.createOrUpdateUser(null, name);
+                        mDatabase.deleteUser(uid);
+                        if (user.equals(FlowApp.getApp().getUser())) {
+                            FlowApp.getApp().setUser(null);
+                        }
                         load();
                     }
                 });
     }
 
-    class DrawerAdapter extends BaseExpandableListAdapter implements ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener, AdapterView.OnItemLongClickListener {
+    private User getUserForContextMenu(ExpandableListContextMenuInfo info) {
+        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+        int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+        int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
+
+        if (group != GROUP_USERS) {
+            // Only user's group can trigger the context menu
+            return null;
+        }
+
+        switch (type) {
+            case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
+                if (child < mUsers.size()) {
+                    return mUsers.get(child);
+                }
+                break;
+            case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
+                return FlowApp.getApp().getUser();
+        }
+
+        return null;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        User user = getUserForContextMenu((ExpandableListContextMenuInfo) menuInfo);
+
+        if (user != null) {
+            menu.setHeaderTitle(user.getName());
+            menu.add(0, ID_EDIT_USER, ID_EDIT_USER, R.string.edit_user);
+            menu.add(0, ID_DELETE_USER, ID_DELETE_USER, R.string.delete_user);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        User user = getUserForContextMenu((ExpandableListContextMenuInfo) item.getMenuInfo());
+
+        if (user != null) {
+            switch (item.getItemId()) {
+                case ID_EDIT_USER:
+                    editUser(user);
+                    return true;
+                case ID_DELETE_USER:
+                    deleteUser(user);
+                    return true;
+            }
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    class DrawerAdapter extends BaseExpandableListAdapter implements
+            ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
         LayoutInflater mInflater;
 
         int mHighlightColor;
@@ -306,7 +368,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     divider.setMinimumHeight(0);
 
                     User u = FlowApp.getApp().getUser();
-                    String username = u != null ? u.getName() : "Select user";
+                    String username = u != null ? u.getName() : getString(R.string.select_user);
                     tv.setTextSize(ITEM_TEXT_SIZE);
                     tv.setTextColor(Color.BLACK);
                     tv.setText(username);
@@ -320,7 +382,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     divider.setMinimumHeight((int)PlatformUtil.dp2Pixel(getActivity(), 3));
                     tv.setTextSize(ITEM_TEXT_SIZE);
                     tv.setTextColor(getResources().getColor(R.color.black_diabled));
-                    tv.setText("Surveys");// FIXME: Externalize str
+                    tv.setText(R.string.surveys);
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;
@@ -351,12 +413,12 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             v.setBackgroundColor(Color.TRANSPARENT);
 
             switch (groupPosition) {
-                case 0:
-                    User user = isLastChild ? new User(-1, "+ User") : mUsers.get(childPosition);
+                case GROUP_USERS:
+                    User user = isLastChild ? new User(-1, getString(R.string.new_user)) : mUsers.get(childPosition);
                     tv.setText(user.getName());
                     v.setTag(user);
                     break;
-                case 1:
+                case GROUP_SURVEYS:
                     SurveyGroup sg = mSurveys.get(childPosition);
                     tv.setText(sg.getName());
                     if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
@@ -403,21 +465,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     SurveyGroup sg = (SurveyGroup)v.getTag();
                     mListener.onSurveySelected(sg);
                     return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                long packedPos = ((ExpandableListView)parent).getExpandableListPosition(position);
-                if (ExpandableListView.getPackedPositionGroup(packedPos) == GROUP_USERS) {
-                    int childPos = ExpandableListView.getPackedPositionChild(packedPos);
-                    if (childPos < mUsers.size()) {
-                        updateUser(mUsers.get(childPos));
-                    }
-                    return true;
-                }
             }
             return false;
         }

@@ -183,7 +183,7 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
             surveyNameView.setEnabled(enabled);
             surveyVersionView.setEnabled(enabled);
 
-            if (surveyInfo.mLastSubmission != null) {
+            if (surveyInfo.mLastSubmission != null && !isRegistrationSurvey(surveyInfo.mId)) {
                 String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
                 lastSubmissionView.setText(time);
                 lastSubmissionTitle.setVisibility(View.VISIBLE);

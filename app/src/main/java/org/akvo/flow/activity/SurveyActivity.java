@@ -48,7 +48,6 @@ import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.LoginFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.util.ConstantUtil;
@@ -57,7 +56,7 @@ import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class SurveyActivity extends ActionBarActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, LoginFragment.UserListener {
+        DrawerFragment.DrawerListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int REQUEST_ADD_USER = 0;
@@ -127,10 +126,12 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                     DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
         }
 
-        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
-            startActivityForResult(new Intent(this, AddUserActivity.class)
-                            .putExtra(AddUserActivity.EXTRA_FIRST_RUN, true),
-                    REQUEST_ADD_USER);
+        // Display selected user name, or trigger the setup Activity if this has not been done yet
+        User user = FlowApp.getApp().getUser();
+        if (user != null) {
+            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(), Toast.LENGTH_LONG).show();
+        } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+            startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
         }
 
         startServices();
@@ -142,8 +143,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
         switch (requestCode) {
             case REQUEST_ADD_USER:
-                //mDrawer.setModeSurveys();
-
                 if (resultCode == RESULT_OK) {
                     Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
                 } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
@@ -217,11 +216,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             String surveyedLocaleId = intent.getDataString();
             onRecordSelected(surveyedLocaleId);
         }
-    }
-
-    @Override
-    public void onUserUpdated(User user) {
-        mDrawer.load();
     }
 
     @Override

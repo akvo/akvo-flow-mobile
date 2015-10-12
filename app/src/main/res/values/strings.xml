@@ -232,6 +232,7 @@
   <string name="username">Username</string>
   <string name="mustselectuser">Please select a user before continuing</string>
   <string name="surveys">Surveys</string>
+  <string name="logged_in_as">Logged in as</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Cancel</string>

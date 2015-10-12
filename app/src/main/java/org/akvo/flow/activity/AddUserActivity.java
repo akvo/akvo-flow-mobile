@@ -1,54 +1,55 @@
+/*
+ *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
+
 package org.akvo.flow.activity;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.ui.fragment.LoginFragment;
 
-public class AddUserActivity extends ActionBarActivity implements LoginFragment.UserListener {
-
-    public static final String EXTRA_FIRST_RUN = "first_run";
+public class AddUserActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        final boolean firstRun = getIntent().getBooleanExtra(EXTRA_FIRST_RUN, false);
-        if (firstRun) {
-            // Hide Action Bar and logo
-            supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        } else if (getSupportActionBar() != null) {
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setIcon(R.drawable.ic_arrow_back_white_48dp);
-        }
-
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content, LoginFragment.newInstance(null, null))
-                .commit();
-    }
 
-    @Override
-    public void onUserUpdated(User user) {
-        FlowApp.getApp().setUser(user);
-        setResult(RESULT_OK);
-        finish();
-    }
+        final EditText et = (EditText) findViewById(R.id.username);
+        findViewById(R.id.login_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = et.getText().toString();
+                SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
+                long id = db.createOrUpdateUser(null, username);
+                db.close();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+                // Select the newly created user, and exit the Activity
+                FlowApp.getApp().setUser(new User(id, username));
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
     }
 
 }

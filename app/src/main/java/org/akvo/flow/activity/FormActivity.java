@@ -329,6 +329,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             subMenu.removeItem(R.id.prefill);
         } else {
             subMenu.removeItem(R.id.view_map);
+            subMenu.removeItem(R.id.transmission);
             if (!mSurveyGroup.isMonitored() ||
                     mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId()) == null) {
                 subMenu.removeItem(R.id.prefill);
@@ -353,6 +354,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case R.id.view_map:
                 startActivity(new Intent(this, MapActivity.class)
                         .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecordId));
+                return true;
+            case R.id.transmission:
+                startActivity(new Intent(this, TransmissionHistoryActivity.class)
+                        .putExtra(ConstantUtil.RESPONDENT_ID_KEY, mSurveyInstanceId));
                 return true;
         }
         return super.onOptionsItemSelected(item);

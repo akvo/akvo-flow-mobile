@@ -129,18 +129,25 @@ public class FlowApp extends Application {
      * so, loads the last logged-in user from the DB
      */
     private void loadLastUser() {
+        SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
+        database.open();
+
+        // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades
+        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+            Prefs.setBoolean(this, Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
+        }
+
         long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
         if (id != -1) {
-            SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
-            database.open();
             Cursor cur = database.getUser(id);
             if (cur.moveToFirst()) {
                 String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
                 mUser = new User(id, userName);
                 cur.close();
             }
-            database.close();
         }
+
+        database.close();
     }
 
     public void setAppLanguage(String language, boolean requireRestart) {

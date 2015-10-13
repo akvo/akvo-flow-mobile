@@ -1,6 +1,22 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.1.11
+Date: 9 September 2015
+
+New and noteworthy
+------------------
+* Repeatable Questions Groups: Enumerators can make use of these dynamic groups. They provide a simple way of defining grid-like questions. For more details on this feature, see [the documentation](http://flow.readthedocs.org/en/latest/docs/dashboard/surveys/3-creating-editing-survey.html#working-with-question-groups) [#257]
+
+# ver 2.1.10
+Date: 18 August 2015
+
+New and noteworthy
+------------------
+* Clicking on the map does not unselect a geoshape [#334]
+* Improve notifications readability [#328]
+* Unlimited response length [#326]
+
 # ver 2.1.9
 Date: 27 July 2015
 

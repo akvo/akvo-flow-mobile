@@ -48,6 +48,7 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -268,8 +269,8 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
                 String answer = questionResponse != null ? questionResponse.getValue() : null;
 
                 if (!TextUtils.isEmpty(answer)) {
-                    // Replace pipes with hyphens
-                    answer = answer.replaceAll("\\s*\\|\\s*", " - ");
+                    answer = answer.replaceAll("\\s+", " ");// Trim line breaks, multiple spaces, etc
+                    answer = answer.replaceAll("\\s*\\|\\s*", " - ");// Replace pipes with hyphens
 
                     if (!first) {
                         builder.append(" - ");
@@ -478,6 +479,11 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
     }
 
     @Override
+    public QuestionView getQuestionView(String questionId) {
+        return mAdapter.getQuestionView(questionId);
+    }
+
+    @Override
     public String getDefaultLanguage() {
         return getDefaultLang();
     }
@@ -586,8 +592,7 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             }
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event.getEventType())) {
             String questionId = event.getSource().getQuestion().getId();
-            mQuestionResponses.remove(questionId);
-            mDatabase.deleteResponse(mSurveyInstanceId, questionId);
+            deleteResponse(questionId);
         } else if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
             String questionId = event.getSource().getQuestion().getId();
             QuestionResponse response = event.getSource().getResponse();
@@ -622,6 +627,12 @@ public class SurveyActivity extends ActionBarActivity implements SurveyListener,
             mRequestQuestionId = event.getSource().getQuestion().getId();
             startActivityForResult(i, PLOTTING_REQUEST);
         }
+    }
+
+    @Override
+    public void deleteResponse(String questionId) {
+        mQuestionResponses.remove(questionId);
+        mDatabase.deleteResponse(mSurveyInstanceId, questionId);
     }
 
     /*

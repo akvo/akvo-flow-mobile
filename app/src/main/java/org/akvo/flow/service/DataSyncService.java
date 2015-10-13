@@ -40,6 +40,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.Base64;
@@ -168,7 +169,7 @@ public class DataSyncService extends IntentService {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
                 displayNotification(NOTIFICATION_DATA_EXPORT, getString(R.string.exportcomplete),
-                        getDestName(zipFileData.filename));
+                        zipFileData.formName);
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
@@ -233,6 +234,7 @@ public class DataSyncService extends IntentService {
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
             zipFileData.uuid = formInstance.getUUID();
             zipFileData.formId = String.valueOf(formInstance.getFormId());
+            zipFileData.formName = mDatabase.getSurvey(zipFileData.formId).getName();
 
             File zipFile = getSurveyInstanceFile(zipFileData.uuid);// The filename will match the Survey Instance UUID
 
@@ -343,11 +345,20 @@ public class DataSyncService extends IntentService {
                         || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
                     imagePaths.add(value);
                 }
+                int iteration = 0;
+                String qid = data.getString(question_fk_col);
+                String[] tokens = qid.split("\\|", -1);
+                if (tokens.length == 2) {
+                    // This is a compound ID from a repeatable question
+                    qid = tokens[0];
+                    iteration = Integer.parseInt(tokens[1]);
+                }
 
                 Response response = new Response();
-                response.setQuestionId(data.getString(question_fk_col));
+                response.setQuestionId(qid);
                 response.setAnswerType(type);
                 response.setValue(value);
+                response.setIteration(iteration);
                 responses.add(response);
             } while (data.moveToNext());
 
@@ -411,7 +422,7 @@ public class DataSyncService extends IntentService {
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission.getFileName(), transmission.getFormId(), transmission.getStatus(), serverBase)) {
+            if (syncFile(transmission.getFileName(), transmission.getFormId(), serverBase)) {
                 syncedSurveys.add(surveyInstanceId);
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
@@ -434,7 +445,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(String filename, String formId, int status, String serverBase) {
+    private boolean syncFile(String filename, String formId, String serverBase) {
         if (TextUtils.isEmpty(filename)) {
             return false;
         }
@@ -445,8 +456,7 @@ public class DataSyncService extends IntentService {
             contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
                     : VIDEO_CONTENT_TYPE;
             dir = ConstantUtil.S3_IMAGE_DIR;
-            // Only notify server if the previous attempts have failed
-            action = TransmissionStatus.FAILED == status ? ACTION_IMAGE : null;
+            action = ACTION_IMAGE;
             isPublic = true;// Images/Videos have a public read policy
         } else {
             contentType = DATA_CONTENT_TYPE;
@@ -455,33 +465,32 @@ public class DataSyncService extends IntentService {
             isPublic = false;
         }
 
+        // Temporarily set the status to 'IN PROGRESS'. Transmission status should
+        // *always* be updated with the outcome of the upload operation.
         mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
 
-        boolean ok = sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES);
-        final String destName = getDestName(filename);
+        int status = TransmissionStatus.FAILED;
+        boolean ok = false;
 
-        if (ok && action != null) {
-            // If action is not null, notify GAE back-end that data is available
-            // TODO: Do we need to send the checksum?
-            switch (sendProcessingNotification(serverBase, formId, action, destName)) {
+        if (sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
+            // Notify GAE back-end that data is available
+            switch (sendProcessingNotification(serverBase, formId, action, getDestName(filename))) {
                 case HttpStatus.SC_OK:
-                    // Mark everything completed
-                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.SYNCED);
+                    status = TransmissionStatus.SYNCED;// Mark everything completed
+                    ok = true;
                     break;
                 case HttpStatus.SC_NOT_FOUND:
                     // This form has been deleted in the dashboard, thus we cannot sync it
                     displayNotification(formId(formId),
                             "Form " + formId + " does not exist", "It has probably been deleted");
-                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FORM_DELETED);
-                    ok = false;// Consider this a failed transmission
+                    status = TransmissionStatus.FORM_DELETED;
                     break;
                 default:// Any error code
-                    mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
-                    ok = false;// Consider this a failed transmission
                     break;
             }
         }
 
+        mDatabase.updateTransmissionHistory(filename, status);
         return ok;
     }
 
@@ -545,7 +554,10 @@ public class DataSyncService extends IntentService {
                 if (jForms != null) {
                     for (int i=0; i<jForms.length(); i++) {
                         String id = jForms.getString(i);
-                        displayFormDeletedNotification(id);
+                        Survey s = mDatabase.getSurvey(id);
+                        if (s != null) {
+                            displayFormDeletedNotification(id, s.getName());
+                        }
                         mDatabase.deleteSurvey(id);
                     }
                 }
@@ -694,12 +706,12 @@ public class DataSyncService extends IntentService {
         notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
     }
 
-    private void displayFormDeletedNotification(String formId) {
+    private void displayFormDeletedNotification(String id, String name) {
         // Create a unique ID for this form's delete notification
-        final int notificationId = (int)formId(formId);
+        final int notificationId = (int)formId(id);
 
         // Do not show failed if there is none
-        String text = "Form " + formId + " has been deleted";
+        String text = String.format("Form \"%s\" has been deleted", name);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.info)
@@ -735,6 +747,7 @@ public class DataSyncService extends IntentService {
     class ZipFileData {
         String uuid = null;
         String formId = null;
+        String formName = null;
         String filename = null;
         String data = null;
         List<String> imagePaths = new ArrayList<String>();

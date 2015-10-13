@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/repeat_header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="start|center_vertical"
+        android:background="@color/record_name_background"
+        android:padding="6dp"
+        android:textSize="16sp"
+        android:visibility="gone" />
+    <ScrollView
+        android:id="@+id/scroller"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/question_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <Button
+                android:id="@+id/repeat_btn"
+                android:visibility="gone"
+                android:text="@string/repeat_group"
+                style="@style/button_grey_light"/>
+
+            <Button
+                android:id="@+id/next_btn"
+                android:text="@string/nextbutton"
+                style="@style/button_grey_dark"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</merge>

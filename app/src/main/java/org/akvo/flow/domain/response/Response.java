@@ -20,6 +20,9 @@ public class Response {
     private String answerType;
     private String value;
 
+    // Added in repeatable question groups
+    private Integer iteration;
+
     public void setQuestionId(String questionId) {
         this.questionId = questionId;
     }
@@ -42,5 +45,13 @@ public class Response {
 
     public void setAnswerType(String answerType) {
         this.answerType = answerType;
+    }
+
+    public void setIteration(Integer iteration) {
+        this.iteration = iteration;
+    }
+
+    public Integer getIteration() {
+        return iteration;
     }
 }

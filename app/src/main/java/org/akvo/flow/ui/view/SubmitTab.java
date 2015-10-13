@@ -17,6 +17,7 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -54,6 +55,8 @@ public class SubmitTab extends ListView implements OnClickListener {
         mSubmitButton = new Button(context);
         mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
+        mSubmitButton.setTextColor(Color.WHITE);
+        mSubmitButton.setBackgroundResource(R.drawable.button_green);
         mSubmitButton.setText(context.getString(R.string.submitbutton));
         mSubmitButton.setOnClickListener(this);
 

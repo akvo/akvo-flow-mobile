@@ -219,8 +219,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                 .getHelpTypeCount()];
         final Resources resources = getResources();
         int itemIndex = 0;
-        ArrayList tempList = mQuestion
-                .getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
+        List tempList = mQuestion.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
 
         if (tempList != null && tempList.size() > 0) {
             items[itemIndex++] = resources.getString(R.string.photohelpoption);
@@ -265,7 +264,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         } else if (ConstantUtil.TIP_HELP_TYPE.equals(type)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             StringBuilder textBuilder = new StringBuilder();
-            ArrayList<QuestionHelp> helpItems = mQuestion.getHelpByType(type);
+            List<QuestionHelp> helpItems = mQuestion.getHelpByType(type);
             boolean isFirst = true;
             String[] langs = getLanguages();
             String language = getDefaultLang();
@@ -361,7 +360,13 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_CLEAR_EVENT);
         }
 
-        // Show/Hide the Question, according to the dependencies
+        checkDependencies();
+    }
+
+    /**
+     * Show/Hide the Question, according to the dependencies
+     */
+    public void checkDependencies() {
         if (areDependenciesSatisfied()) {
             setVisibility(View.VISIBLE);
         } else {

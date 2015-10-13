@@ -9,25 +9,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:imeOptions="actionDone"
-        android:inputType="textNoSuggestions"/>
+        android:inputType="textNoSuggestions|textMultiLine"/>
 
     <TextView
         android:id="@+id/double_entry_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:text="@string/repeat_answer"/>
 
     <EditText
         android:id="@+id/double_entry_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:inputType="textNoSuggestions"/>
 
     <Button
         android:id="@+id/external_source_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/use_external_source"/>
+        android:text="@string/use_external_source"
+        style="@style/button_green"/>
 
 </merge>
 

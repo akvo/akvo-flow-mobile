@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -277,7 +277,7 @@ public class OptionQuestionView extends QuestionView {
         if (mQuestion.isAllowOther()) {
             extras++;
         }
-        ArrayList<Option> options = mQuestion.getOptions();
+        List<Option> options = mQuestion.getOptions();
         Spanned[] optionArray = new Spanned[options.size() + extras];
         optionArray[0] = Html.fromHtml("");
         for (int i = 0; i < options.size(); i++) {
@@ -428,11 +428,7 @@ public class OptionQuestionView extends QuestionView {
     }
 
     /**
-     * forms a delimited string containing all selected options not including
-     * OTHER
-     * 
-     * @param r
-     * @return
+     * Forms a delimited string containing all selected options not including OTHER
      */
     private String getMultipleSelections() {
         StringBuffer newResponse = new StringBuffer();

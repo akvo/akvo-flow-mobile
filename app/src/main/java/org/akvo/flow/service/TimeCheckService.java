@@ -65,7 +65,7 @@ public class TimeCheckService extends IntentService {
         }
 
         try {
-            final String url = serverBase + TIME_CHECK_PATH;
+            final String url = serverBase + TIME_CHECK_PATH + "?ts=" + System.currentTimeMillis();
             String response = HttpUtil.httpGet(url);
             if (!TextUtils.isEmpty(response)) {
                 JSONObject json = new JSONObject(response);

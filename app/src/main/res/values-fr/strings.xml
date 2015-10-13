@@ -164,6 +164,10 @@
   <string name="clear_point_text">Voulez vous effacer ce point?</string>
   <string name="clear_feature_title">Supprimer cette fonction</string>
   <string name="clear_feature_text">Voulez vous supprimer cette fonction?</string>
+  <string name="repeat_group">Répéter le groupe</string>
+  <string name="repetitions">Répétitions:</string>
+  <string name="delete_group_title">Supprimer le groupe</string>
+  <string name="delete_group_text">Voulez-vous supprimer ce groupe?</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CRÉER UN NOUVEAU POINT</string>
   <string name="stats_title">Statistiques de l\'enquête</string>
@@ -209,6 +213,7 @@
   <string name="error_assignment_read">Les affectations des formulaires n\'ont pas pas pu être lu du tableau de bord FLOW</string>
   <string name="error_form_header">Le formulaire %1$s n\'a pas pu être lu depuis le tableau de bord FLOW.</string>
   <string name="error_form_download">Rassurez vous que le formulaire est publié, et que les paramères d\' heure/date sont ok.</string>
+  <string name="form_deleted">Ce formulaire a été supprimer.</string>
   <!--Plotting-->
   <string name="geoshape_area">Surface</string>
   <string name="geoshape_line">Ligne</string>

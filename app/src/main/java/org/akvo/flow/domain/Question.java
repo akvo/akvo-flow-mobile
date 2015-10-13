@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -19,6 +19,7 @@ package org.akvo.flow.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.akvo.flow.util.ConstantUtil;
 
@@ -41,16 +42,16 @@ public class Question {
     private int order;
     private ValidationRule validationRule;
     private String renderType;
-    private ArrayList<QuestionHelp> questionHelp;
+    private List<QuestionHelp> questionHelp;
     private boolean mandatory;
     private String type;
-    private ArrayList<Option> options;
+    private List<Option> options;
     private boolean allowOther;
     private boolean allowMultiple;
     private boolean locked;
-    private HashMap<String, AltText> altTextMap = new HashMap<String, AltText>();
-    private ArrayList<Dependency> dependencies;
-    private ArrayList<ScoringRule> scoringRules;
+    private Map<String, AltText> altTextMap = new HashMap<String, AltText>();
+    private List<Dependency> dependencies;
+    private List<ScoringRule> scoringRules;
     private boolean useStrength;
     private int strengthMin;
     private int strengthMax;
@@ -105,7 +106,7 @@ public class Question {
         this.strengthMax = strengthMax;
     }
 
-    public ArrayList<QuestionHelp> getQuestionHelp() {
+    public List<QuestionHelp> getQuestionHelp() {
         return questionHelp;
     }
 
@@ -117,7 +118,7 @@ public class Question {
         this.locked = locked;
     }
 
-    public HashMap<String, AltText> getAltTextMap() {
+    public Map<String, AltText> getAltTextMap() {
         return altTextMap;
     }
 
@@ -153,12 +154,8 @@ public class Question {
         this.order = order;
     }
 
-    public ArrayList<Dependency> getDependencies() {
+    public List<Dependency> getDependencies() {
         return dependencies;
-    }
-
-    public void setDependencies(ArrayList<Dependency> dependencies) {
-        this.dependencies = dependencies;
     }
 
     public String getId() {
@@ -193,7 +190,7 @@ public class Question {
         this.type = type;
     }
 
-    public ArrayList<Option> getOptions() {
+    public List<Option> getOptions() {
         return options;
     }
 
@@ -216,8 +213,8 @@ public class Question {
         dependencies.add(dep);
     }
 
-    public ArrayList<QuestionHelp> getHelpByType(String type) {
-        ArrayList<QuestionHelp> help = new ArrayList<QuestionHelp>();
+    public List<QuestionHelp> getHelpByType(String type) {
+        List<QuestionHelp> help = new ArrayList<QuestionHelp>();
         if (questionHelp != null && type != null) {
             for (int i = 0; i < questionHelp.size(); i++) {
                 if (type.equalsIgnoreCase(questionHelp.get(i).getType())) {
@@ -275,6 +272,10 @@ public class Question {
             scoringRules = new ArrayList<ScoringRule>();
         }
         scoringRules.add(rule);
+    }
+
+    public List<ScoringRule> getScoringRules() {
+        return scoringRules;
     }
 
     /**
@@ -354,5 +355,50 @@ public class Question {
 
     public boolean isAllowPolygon() {
         return allowPolygon;
+    }
+
+    /**
+     * Clone a question and update the question ID. This is only relevant for repeat-question-groups,
+     * which require different instances of the question for each iteration.
+     * Note: Excluding dependencies, all non-primitive variables are *not* deep-copied.
+     */
+    public static Question copy(Question question, String questionId) {
+        Question q = new Question();
+        q.id = questionId;
+        q.text = question.getText();
+        q.order = question.getOrder();
+        q.renderType = question.getRenderType();
+        q.mandatory = question.isMandatory();
+        q.type = question.getType();
+        q.allowOther = question.isAllowOther();
+        q.allowMultiple = question.isAllowMultiple();
+        q.locked = question.isLocked();
+        q.useStrength = question.useStrength();
+        q.strengthMin = question.getStrengthMin();
+        q.strengthMax = question.getStrengthMax();
+        q.localeName = question.isLocaleName();
+        q.localeLocation = question.isLocaleLocation();
+        q.sourceQuestionId = question.getSourceQuestionId();
+        q.isDoubleEntry = question.isDoubleEntry();
+        q.useExternalSource = question.useExternalSource();
+        q.allowPoints = question.isAllowPoints();
+        q.allowLine = question.isAllowLine();
+        q.allowPolygon = question.isAllowPolygon();
+        q.src = question.getSrc();
+        q.validationRule = question.getValidationRule();// Shallow copy
+        q.options = question.getOptions();// Shallow copy
+        q.questionHelp = question.getQuestionHelp();// Shallow copy
+        q.altTextMap = question.getAltTextMap();// Shallow copy
+        q.scoringRules = question.getScoringRules();// Shallow copy
+        q.levels = question.getLevels();// Shallow copy
+
+        // Deep-copy dependencies
+        if (question.dependencies != null) {
+            q.dependencies = new ArrayList<>();
+            for (Dependency d : question.getDependencies()) {
+                q.dependencies.add(new Dependency(d));
+            }
+        }
+        return q;
     }
 }

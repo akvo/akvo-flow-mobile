@@ -34,8 +34,7 @@
 
     <Button
         android:id="@+id/capture_shape_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/capture_shape" />
+        android:text="@string/capture_shape"
+        style="@style/button_green"/>
 
 </merge>

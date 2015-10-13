@@ -164,6 +164,10 @@
   <string name="clear_point_text">Do you want to remove this point?</string>
   <string name="clear_feature_title">Delete feature</string>
   <string name="clear_feature_text">Do you want to remove this feature?</string>
+  <string name="repeat_group">Repeat group</string>
+  <string name="repetitions">Repetitions:</string>
+  <string name="delete_group_title">Delete group</string>
+  <string name="delete_group_text">Do you want to delete this group?</string>
   <!--RecordList Activity-->
   <string name="create_data_point">CREATE NEW DATA POINT</string>
   <string name="stats_title">Survey Stats</string>

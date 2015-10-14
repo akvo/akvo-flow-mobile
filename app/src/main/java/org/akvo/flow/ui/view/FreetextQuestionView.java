@@ -105,6 +105,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
         if (mQuestion.useExternalSource()) {
             externalSourceBtn.setVisibility(VISIBLE);
             externalSourceBtn.setOnClickListener(this);
+            externalSourceBtn.setEnabled(!mSurveyListener.isReadOnly());
             mEditText.setEnabled(false);
             mDoubleEntryText.setEnabled(false);
         } else {

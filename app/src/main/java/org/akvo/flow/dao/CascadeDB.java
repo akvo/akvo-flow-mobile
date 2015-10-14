@@ -34,7 +34,16 @@ public class CascadeDB {
     public interface NodeColumns {
         String ID = "id";
         String NAME = "name";
+        String CODE = "code";
         String PARENT = "parent";
+    }
+
+    public interface NodeQuery {
+        String[] PROJECTION = new String[]{NodeColumns.ID, NodeColumns.NAME, NodeColumns.CODE};
+
+        int ID = 0;
+        int NAME = 1;
+        int CODE = 2;
     }
 
     private DatabaseHelper mHelper;
@@ -64,8 +73,7 @@ public class CascadeDB {
     }
 
     public List<Node> getValues(long parent) {
-        Cursor c = mDatabase.query(TABLE_NODE,
-                new String[]{NodeColumns.ID, NodeColumns.NAME},
+        Cursor c = mDatabase.query(TABLE_NODE, NodeQuery.PROJECTION,
                 NodeColumns.PARENT + "=?",
                 new String[]{String.valueOf(parent)},
                 null, null, NodeColumns.NAME);
@@ -74,7 +82,8 @@ public class CascadeDB {
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-                    result.add(new Node(c.getLong(0), c.getString(1)));
+                    result.add(new Node(c.getLong(NodeQuery.ID), c.getString(NodeQuery.NAME),
+                            c.getString(NodeQuery.CODE)));
                 } while (c.moveToNext());
             }
             c.close();

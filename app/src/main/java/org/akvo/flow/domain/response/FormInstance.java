@@ -13,7 +13,7 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
-package org.akvo.flow.api.response;
+package org.akvo.flow.domain.response;
 
 import java.util.List;
 

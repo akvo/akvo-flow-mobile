@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -13,37 +13,27 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
-package org.akvo.flow.domain;
 
-/**
- * Node represents a cascading question tree value.
- */
-public class Node {
-    private long mId;
-    private String mName;
-    private String mCode;
+package org.akvo.flow.domain.response;
 
-    public Node(long id, String name, String code) {
-        mId = id;
-        mName = name;
-        mCode = code;
+import java.util.List;
+
+import org.akvo.flow.domain.SurveyedLocale;
+
+public class SurveyedLocalesResponse {
+    private List<SurveyedLocale> mSurveyedLocales;
+    private String mError;
+
+    public SurveyedLocalesResponse(List<SurveyedLocale> surveyedLocales, String error) {
+        mSurveyedLocales = surveyedLocales;
+        mError = error;
+    }
+    
+    public List<SurveyedLocale> getSurveyedLocales() {
+        return mSurveyedLocales;
     }
 
-    public long getId() {
-        return mId;
+    public String getError() {
+        return mError;
     }
-
-    public String getName() {
-        return mName;
-    }
-
-    public String getCode() {
-        return mCode;
-    }
-
-    @Override
-    public String toString() {
-        return mName;
-    }
-
 }

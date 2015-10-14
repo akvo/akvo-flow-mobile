@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -13,27 +13,27 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+package org.akvo.flow.domain.response.value;
 
-package org.akvo.flow.api.response;
+public class CascadeValue {
+    private String name;
+    private String code;
 
-import java.util.List;
 
-import org.akvo.flow.domain.SurveyedLocale;
-
-public class SurveyedLocalesResponse {
-    private List<SurveyedLocale> mSurveyedLocales;
-    private String mError;
-
-    public SurveyedLocalesResponse(List<SurveyedLocale> surveyedLocales, String error) {
-        mSurveyedLocales = surveyedLocales;
-        mError = error;
-    }
-    
-    public List<SurveyedLocale> getSurveyedLocales() {
-        return mSurveyedLocales;
+    public String getName() {
+        return name;
     }
 
-    public String getError() {
-        return mError;
+    public void setName(String name) {
+        this.name = name;
     }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
 }

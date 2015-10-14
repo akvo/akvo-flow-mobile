@@ -26,7 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import org.akvo.flow.api.response.SurveyedLocalesResponse;
+import org.akvo.flow.domain.response.SurveyedLocalesResponse;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 

@@ -18,6 +18,8 @@ package org.akvo.flow.ui.fragment;
 
 import java.util.Date;
 
+import org.akvo.flow.activity.SurveyActivity;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -51,7 +53,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.RecordListActivity;
 import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
@@ -70,16 +71,24 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     private double mLongitude = 0.0d;
 
     private int mOrderBy;
-    private long mSurveyGroupId;
+    private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
     
     private SurveyedLocaleListAdapter mAdapter;
     private RecordListListener mListener;
 
+    public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
+        SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
+        mSurveyGroup = (SurveyGroup)getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }
@@ -110,7 +119,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         setEmptyText(getString(R.string.no_records_text));
         getListView().setOnItemClickListener(this);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -144,19 +153,32 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mDatabase.close();
     }
 
+    public void refresh(SurveyGroup surveyGroup) {
+        mSurveyGroup = surveyGroup;
+        refresh();
+    }
+
     /**
      * Ideally, we should build a ContentProvider, so this notifications are handled
      * automatically, and the loaders restarted without this explicit dependency.
      */
     public void refresh() {
-        if (isResumed()) {
-            if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
-                // Warn user that the location is unknown
-                Toast.makeText(getActivity(), "Unknown Location", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            getLoaderManager().restartLoader(0, null, this);
+        if (!isResumed()) {
+            return;
         }
+
+        if (mSurveyGroup == null) {
+            setEmptyText(getString(R.string.no_survey_selected_text));
+        } else {
+            setEmptyText(getString(R.string.no_records_text));
+        }
+
+        if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
+            // Warn user that the location is unknown
+            Toast.makeText(getActivity(), "Unknown Location", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -173,7 +195,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.order_by:
-                DialogFragment dialogFragment = new OrderByDialogFragment();
+                DialogFragment dialogFragment = OrderByDialogFragment.instantiate(mOrderBy);
                 dialogFragment.setTargetFragment(this, 0);
                 dialogFragment.show(getFragmentManager(), "order_by");
                 return true;
@@ -196,7 +218,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId, mLatitude, mLongitude, mOrderBy);
+        long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId, mLatitude, mLongitude, mOrderBy);
     }
 
     @Override
@@ -260,6 +283,59 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             super(context, null, false);
         }
 
+        @Override
+        public View newView(Context context, Cursor c, ViewGroup parent) {
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+            return inflater.inflate(R.layout.surveyed_locale_item, null);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor c) {
+            TextView nameView = (TextView) view.findViewById(R.id.locale_name);
+            TextView idView = (TextView) view.findViewById(R.id.locale_id);
+            TextView dateView = (TextView) view.findViewById(R.id.last_modified);
+            TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
+            TextView statusView = (TextView) view.findViewById(R.id.status);
+            ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
+            final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
+
+            // This cursor contains extra info about the Record status
+            int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
+
+            nameView.setText(surveyedLocale.getDisplayName(context));
+            idView.setText(surveyedLocale.getId());
+
+            displayDistanceText(distanceView, getDistanceText(surveyedLocale));
+            displayDateText(dateView, surveyedLocale.getLastModified());
+
+            int statusRes = 0;
+            String statusText = null;
+            switch (status) {
+                case SurveyInstanceStatus.SAVED:
+                    statusRes = R.drawable.record_saved_icn;
+                    statusText = getString(R.string.status_saved);
+                    break;
+                case SurveyInstanceStatus.SUBMITTED:
+                case SurveyInstanceStatus.EXPORTED:
+                    statusRes = R.drawable.record_exported_icn;
+                    statusText = getString(R.string.status_exported);
+                    break;
+                case SurveyInstanceStatus.SYNCED:
+                case SurveyInstanceStatus.DOWNLOADED:
+                    statusRes = R.drawable.record_synced_icn;
+                    statusText = getString(R.string.status_synced);
+                    break;
+            }
+
+            statusImage.setImageResource(statusRes);
+            statusView.setText(statusText);
+
+            // Alternate background
+            int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+            final int res= PlatformUtil.getResource(context, attr);
+            view.setBackgroundResource(res);
+        }
+
         private String getDistanceText(SurveyedLocale surveyedLocale) {
             StringBuilder builder = new StringBuilder(getString(R.string.distance_label) + " ");
             
@@ -279,8 +355,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         private void displayDateText(TextView tv, Long time) {
             if (time != null && time > 0) {
                 tv.setVisibility(View.VISIBLE);
-                tv.setText(getString(R.string.last_modified) + " " +
-                        new PrettyTime().format(new Date(time)));
+                int labelRes = R.string.last_modified_regular;
+                if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+                    labelRes = R.string.last_modified_monitored;
+                }
+                tv.setText(getString(labelRes) + " " + new PrettyTime().format(new Date(time)));
             } else {
                 tv.setVisibility(View.GONE);
             }
@@ -293,53 +372,6 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             } else {
                 tv.setVisibility(View.GONE);
             }
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor c) {
-            TextView nameView = (TextView) view.findViewById(R.id.locale_name);
-            TextView idView = (TextView) view.findViewById(R.id.locale_id);
-            TextView dateView = (TextView) view.findViewById(R.id.last_modified);
-            TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
-            ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
-            final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
-
-            // This cursor contains extra info about the Record status
-            int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
-
-            nameView.setText(surveyedLocale.getDisplayName(context));
-            idView.setText(surveyedLocale.getId());
-
-            displayDistanceText(distanceView, getDistanceText(surveyedLocale));
-            displayDateText(dateView, surveyedLocale.getLastModified());
-
-            int statusRes = 0;
-            switch (status) {
-                case SurveyInstanceStatus.SAVED:
-                    statusRes = R.drawable.record_saved_icn;
-                    break;
-                case SurveyInstanceStatus.SUBMITTED:
-                case SurveyInstanceStatus.EXPORTED:
-                    statusRes = R.drawable.record_exported_icn;
-                    break;
-                case SurveyInstanceStatus.SYNCED:
-                case SurveyInstanceStatus.DOWNLOADED:
-                    statusRes = R.drawable.record_synced_icn;
-                    break;
-            }
-
-            statusImage.setImageResource(statusRes);
-
-            // Alternate background
-            int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-            final int res= PlatformUtil.getResource(context, attr);
-            view.setBackgroundResource(res);
-        }
-
-        @Override
-        public View newView(Context context, Cursor c, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            return inflater.inflate(R.layout.surveyed_locale_item, null);
         }
 
     }

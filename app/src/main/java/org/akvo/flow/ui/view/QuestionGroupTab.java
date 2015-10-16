@@ -91,12 +91,14 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             mContainer.setLayoutTransition(new LayoutTransition());
         }
 
-        findViewById(R.id.next_btn).setOnClickListener(new OnClickListener() {
+        View next = findViewById(R.id.next_btn);
+        next.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSurveyListener.nextTab();
             }
         });
+        next.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
 
         if (mQuestionGroup.isRepeatable()) {
             findViewById(R.id.repeat_header).setVisibility(VISIBLE);

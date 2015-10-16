@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,16 +16,15 @@
 
 package org.akvo.flow.domain;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private long mId;
     private String mName;
-    private String mEmail;
-    private boolean mAdmin = false;// TODO
-    
-    public User(long id, String name, String email) {
+
+    public User(long id, String name) {
         mId = id;
         mName = name;
-        mEmail = email;
     }
     
     public long getId() {
@@ -36,8 +35,17 @@ public class User {
         return mName;
     }
     
-    public String getEmail() {
-        return mEmail;
+    public void setName(String name) {
+        mName = name;
+    }
+
+    @Override
+    public boolean equals(Object user) {
+        try {
+            return user != null && ((User)user).getId() == mId;
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 
 }

@@ -16,6 +16,8 @@
 
 package org.akvo.flow.api.parser.csv;
 
+import android.text.TextUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -47,6 +49,12 @@ public class SurveyMetaParser {
         String groupName = touple[Attr.GROUP_NAME];
         boolean monitored = Boolean.valueOf(touple[Attr.GROUP_MONITORED]);
         String registerSurveyId = touple[Attr.GROUP_REGISTRATION_SURVEY];
+
+        // Assign registration form id, if missing.
+        if (TextUtils.isEmpty(registerSurveyId) || "null".equalsIgnoreCase(registerSurveyId)) {
+            registerSurveyId = survey.getId();
+        }
+
         SurveyGroup group = new SurveyGroup(groupId, groupName, registerSurveyId, monitored);
         
         survey.setSurveyGroup(group);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -71,17 +71,19 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
                 break;
         }
 
-        TextView startDate = (TextView) view.findViewById(R.id.startdate);
+        String startDate = getContext().getString(R.string.transstartdate);
+        String endDate = getContext().getString(R.string.transenddate);
+
         if (trans.getStartDate() != null) {
-            startDate.setText(dateFormat.format(trans.getStartDate()));
+            startDate += " " + dateFormat.format(trans.getStartDate());
         }
-        TextView endDate = (TextView) view.findViewById(R.id.enddate);
         if (trans.getEndDate() != null) {
-            endDate.setText(dateFormat.format(trans.getEndDate()));
+            endDate += " " + dateFormat.format(trans.getEndDate());
         }
 
-        TextView fileName = (TextView) view.findViewById(R.id.filename);
-        fileName.setText(trans.getFileName());
+        ((TextView) view.findViewById(R.id.startdate)).setText(startDate);
+        ((TextView) view.findViewById(R.id.enddate)).setText(endDate);
+        ((TextView) view.findViewById(R.id.filename)).setText(trans.getFileName());
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {

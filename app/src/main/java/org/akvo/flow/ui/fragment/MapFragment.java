@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,9 +35,10 @@ import android.widget.FrameLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.RecordListActivity;
+import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.async.loader.SurveyedLocaleLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -59,31 +61,34 @@ import java.util.List;
 public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener {
     private static final String TAG = MapFragment.class.getSimpleName();
 
-    private long mSurveyGroupId;
-    private String mRecordId; // If set, load a single record
+    private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
     private RecordListListener mListener;
 
+    private String mRecordId; // If set, load a single record
     private List<SurveyedLocale> mItems;
-
     private boolean mSingleRecord = false;
 
     private GoogleMap mMap;
     private ClusterManager<SurveyedLocale> mClusterManager;
 
+    public static MapFragment newInstance(SurveyGroup surveyGroup, String datapointId) {
+        MapFragment fragment = new MapFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putString(RecordActivity.EXTRA_RECORD_ID, datapointId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mItems = new ArrayList<SurveyedLocale>();
-        Bundle args = getArguments();
-        if (args.containsKey(RecordActivity.EXTRA_RECORD_ID)) {
-            // Single record mode.
-            mSingleRecord = true;
-            mRecordId = args.getString(RecordActivity.EXTRA_RECORD_ID);
-        } else {
-            mSingleRecord = false;
-            mSurveyGroupId = args.getLong(RecordListActivity.EXTRA_SURVEY_GROUP_ID);
-        }
+        mItems = new ArrayList<>();
+
+        mSurveyGroup = (SurveyGroup)getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+        mRecordId = getArguments().getString(RecordActivity.EXTRA_RECORD_ID);
+        mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
     }
 
     @Override
@@ -150,8 +155,6 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     /**
      * Center the map in the given record's coordinates. If no record is provided,
      * the user's location will be used.
-     *
-     * @param record
      */
     private void centerMap(SurveyedLocale record) {
         if (mMap == null) {
@@ -212,6 +215,11 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
         return v;
     }
 
+    public void refresh(SurveyGroup surveyGroup) {
+        mSurveyGroup = surveyGroup;
+        refresh();
+    }
+
     /**
      * Ideally, we should build a ContentProvider, so this notifications are handled
      * automatically, and the loaders restarted without this explicit dependency.
@@ -251,8 +259,8 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, mSurveyGroupId,
-                ConstantUtil.ORDER_BY_NONE);
+        long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId, ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override

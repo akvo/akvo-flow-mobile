@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -30,21 +30,28 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.akvo.flow.R;
 import org.akvo.flow.dao.CascadeDB;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.response.value.CascadeValue;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CascadeQuestionView extends QuestionView implements AdapterView.OnItemSelectedListener {
+    private static final String TAG = CascadeQuestionView.class.getSimpleName();
     private static final int POSITION_NONE = -1;// no spinner position id
 
     private static final long ID_NONE = -1;// no node id
@@ -145,7 +152,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
         // Insert a fake 'Select' value
-        Node node = new Node(ID_NONE, getContext().getString(R.string.select));
+        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null);
         values.add(0, node);
 
         SpinnerAdapter adapter = new CascadeAdapter(getContext(), values);
@@ -176,6 +183,34 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
+    private String saveValues(List<CascadeValue> values) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(values);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return "";
+    }
+
+    private List<CascadeValue> loadValues(String data) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(data, new TypeReference<List<CascadeValue>>(){});
+        } catch (IOException e) {
+            Log.e(TAG, "Value is not a valid JSON response: " + data);
+        }
+
+        List<CascadeValue> values = new ArrayList<>();
+        String[] tokens = data.split("\\|", -1);
+        for (String token : tokens) {
+            CascadeValue v = new CascadeValue();
+            v.setName(token);
+            values.add(v);
+        }
+        return values;
+    }
+
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
@@ -184,25 +219,26 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             return;
         }
         mSpinnerContainer.removeAllViews();
-        String[] names = answer.split("\\|", -1);
 
-        // For each existing token, we load the corresponding level values, and create a spinner
+        List<CascadeValue> values = loadValues(answer);
+
+        // For each existing value, we load the corresponding level nodes, and create a spinner
         // view, automatically selecting the token. On each iteration, we keep track of selected
         // value's id, in order to fetch the descendant nodes from the DB.
         int index = 0;
         long parentId = 0;
-        while (index < names.length) {
+        while (index < values.size()) {
             int valuePosition = POSITION_NONE;
             List<Node> spinnerValues = mDatabase.getValues(parentId);
             for (int pos=0; pos<spinnerValues.size(); pos++) {
                 Node node = spinnerValues.get(pos);
-                if (node.getName().equals(names[index])) {
+                CascadeValue v = values.get(index);
+                if (node.getName().equals(v.getName())) {
                     valuePosition = pos;
                     parentId = node.getId();
                     break;
                 }
             }
-
 
             if (valuePosition == POSITION_NONE || spinnerValues.isEmpty()) {
                 mSpinnerContainer.removeAllViews();
@@ -224,16 +260,18 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        // For the path we've got so far
-        StringBuilder builder = new StringBuilder();
+        List<CascadeValue> values = new ArrayList<>();
         for (int i=0; i<mSpinnerContainer.getChildCount(); i++) {
             Node node = (Node)getSpinner(i).getSelectedItem();
             if (node.getId() != ID_NONE) {
-                builder.append("|").append(node.toString());
+                CascadeValue v = new CascadeValue();
+                v.setName(node.getName());
+                v.setCode(node.getCode());
+                values.add(v);
             }
         }
-        // Skip the first "|", if found.
-        String response = builder.length() > 0 ? builder.substring(1) : "";
+
+        String response = saveValues(values);
         setResponse(new QuestionResponse(response, ConstantUtil.CASCADE_RESPONSE_TYPE,
                 getQuestion().getId()), suppressListeners);
     }

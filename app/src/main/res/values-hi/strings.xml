@@ -18,17 +18,9 @@
   <string name="clearbutton">हटाएं </string>
   <string name="submitbutton">GPS इस कार्य के लिए सक्षम होना चाइये . Settings पे जाने के लिए OK करें .</string>
   <string name="geodialog">GPS सक्षम होना चाहिए . Setting पे जाने के लिए OK करें. Use GPS Satellite चुनें  और वापस जाने के लिए बैक बटन दबाएं . GPS सक्षम होने पर, Check Geo Location  दबाकर अपनी स्तिधि जानिए .</string>
-  <string name="userlabel">मैनेज यूजर</string>
   <string name="resize_large_images">रीसाइज़े लार्ज इमेजेज </string>
   <string name="settingslabel">सेटिंग्स </string>
-  <string name="adduser">ऐड यूजर </string>
   <string name="nouser">नो यूजर </string>
-  <string name="displayname">डिस्प्ले नाम </string>
-  <string name="email">ईमेल एड्रेस </string>
-  <string name="userinstructions">उपयोगकर्ता के नाम का चुनें .तथा नए उपयोगकर्ता के लिए, \'+\' को दबाएं </string>
-  <string name="editmenu">एडिट यूजर </string>
-  <string name="deleteusermenu">डिलीट यूजर </string>
-  <string name="mustselectuser">मैनेज उसेर्स  दबाकर, अपने नाम को चुनें </string>
   <string name="exportcomplete">SD कार्ड पे डेटा भेज दिया गया है </string>
   <string name="prefoptlabel">प्रेफ्रेंसेस </string>
   <string name="prefoptdesc">सर्वे की भाषा तथा अन्य विकल्प की सूची </string>
@@ -97,8 +89,8 @@
   <string name="bootstraperror">बूटस्ट्रैप ज़िप फाइल की प्रक्रिया में त्रुटि</string>
   <string name="bootstrap_invalid_app">त्रुटि : फॉर्म इस डैशबोर्ड का नहीं है </string>
   <string name="transmissionhist">ट्रांसमिशन हिस्ट्री </string>
-  <string name="transstartdate">डेटा के संचरण की पूर्ण जानकारी </string>
-  <string name="transenddate">प्रसार समाप्तः  हुआ </string>
+  <string name="transstartdate">शुरू </string>
+  <string name="transenddate">समाप्त</string>
   <string name="confirmchangetitle">उत्तर बदलना के लिए </string>
   <string name="confirmchangetext">SD कार्ड को जाँचिए </string>
   <string name="resetall">सभी उपभोक्ता सर्वे अन्य  इकट्ठा करा डेटा डिलीट करें </string>
@@ -115,8 +107,6 @@
   <string name="clear_data_success">डेटा आपके फ़ोन अथवा टेबलेट से सफलता पूर्ण हटा दिया गया है </string>
   <string name="clear_data_error">उपकरण से डेटा हटाने  में त्रुटि</string>
   <string name="configuring_languages">सर्वे भाषाओं को समनुरूप या कॉन्फ़िगर करना  </string>
-  <string name="sync_records">डेटा पॉइंट्स को सिंक करें </string>
-  <string name="order_by">आर्डर बाय </string>
   <string name="syncing_records">डेटा पॉइंट्स सिंक हो रहे हैं </string>
   <string name="sync_finished">डेटा पॉइंट्स सिंकिंग समाप्त </string>
   <string name="synced_records">%1$d डेटा पॉइंट्स सिंक हो चुके हैं </string>
@@ -136,7 +126,6 @@
   <string name="please_restart">कृपया ऐप को पुनर्प्रारंभ करें </string>
   <!--Empty Views-->
   <string name="no_surveys_text">आप के पास कोई सर्वे नियुक्त नहीं हैI   फ्लो, FLOW डैशबोर्ड में सर्वे नियुक्त किये जाते हैंI</string>
-  <string name="no_records_text">आपके पास कोई डेटा पॉइंट्स नहीं है I शुरू करने के लिए \"क्रिएट न्यू  डेटा पॉइंट\" को चुनिए </string>
   <!--Activity Labels-->
   <string name="survey_groups_activity">सर्वे </string>
   <string name="record_list_activity">डेटा पॉइंट का चयन करें  </string>
@@ -165,8 +154,6 @@
   <string name="clear_feature_title"> फीचर डिलीट करें </string>
   <string name="clear_feature_text">क्या आप इस फीचर को हटाना चाहेंगे ?</string>
   <!--RecordList Activity-->
-  <string name="create_data_point">नया डेटा पॉइंट बनाइये </string>
-  <string name="stats_title">सर्वे स्टैट्</string>
   <string name="stats_total">कुल डेटा पॉइंट्स </string>
   <string name="stats_week">पिछले सात, 7, दिन </string>
   <string name="stats_today">आज </string>
@@ -179,7 +166,6 @@
   <string name="order_name">नाम </string>
   <!--Record Activity-->
   <string name="unknown">बेनाम डेटा पॉइंट </string>
-  <string name="last_modified">पिछले संशोधित </string>
   <string name="last_response">पिछला उत्तर </string>
   <string name="error_missing_cascade">कास्केड डाउनलोड नहीं हुआ है </string>
   <string name="tab_forms">फॉर्म्स </string>
@@ -218,6 +204,7 @@
   <string name="geoshape_response">आकर सफल रुप से लिया गया है </string>
   <string name="add_point_title">पॉइंट जोड़े </string>
   <string name="add_point_text">क्या आप इस स्थान पे नया पॉइंट जोड़ना चाहतें हैं ?</string>
+  <!--Navigation Drawer-->
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">रद्द</string>

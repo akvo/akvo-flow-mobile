@@ -1,3 +1,18 @@
+/*
+ *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
 package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
@@ -12,9 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter.Tables;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.util.PlatformUtil;
@@ -35,40 +48,29 @@ public class ResponseListAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         final int status = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
 
-        // This default values should NEVER be displayed
-        String statusText = "";
-        int icon = R.drawable.red_cross;
-        boolean finished = false;
-        long displayDate = 0L;
+        // Default to 'Submitted' status values
+        int icon = 0;
+        String statusText = context.getString(R.string.status_submitted) + ": ";
+        long displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
+
         switch (status) {
             case SurveyInstanceStatus.SAVED:
-                statusText = context.getString(R.string.status_saved) + ": ";
                 icon = R.drawable.form_saved_icn;
+                statusText = context.getString(R.string.status_saved) + ": ";
                 displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SAVED_DATE));
                 break;
             case SurveyInstanceStatus.SUBMITTED:
-                statusText = context.getString(R.string.status_submitted) + ": ";
-                displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE));
-                icon = R.drawable.exported_icn;
-                finished = true;
-                break;
             case SurveyInstanceStatus.EXPORTED:
-                statusText = context.getString(R.string.status_exported) + ": ";
-                displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.EXPORTED_DATE));
                 icon = R.drawable.exported_icn;
-                finished = true;
                 break;
             case SurveyInstanceStatus.SYNCED:
             case SurveyInstanceStatus.DOWNLOADED:
-                statusText = context.getString(R.string.status_synced) + ": ";
-                displayDate = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SYNC_DATE));
                 icon = R.drawable.checkmark;
-                finished = true;
                 break;
         }
 
-        TextView userView = (TextView) view.findViewById(R.id.text2);
-        TextView dateView = (TextView) view.findViewById(R.id.text3);
+        TextView userView = (TextView) view.findViewById(R.id.username);
+        TextView statusView = (TextView) view.findViewById(R.id.status);
 
         String username = cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTER));
         if (TextUtils.isEmpty(username)) {
@@ -80,10 +82,10 @@ public class ResponseListAdapter extends CursorAdapter {
 
         // Format the date string
         Date date = new Date(displayDate);
-        dateView.setText(statusText
+        statusView.setText(statusText
                 + DateFormat.getLongDateFormat(context).format(date) + " "
                 + DateFormat.getTimeFormat(context).format(date));
-        TextView headingView = (TextView) view.findViewById(R.id.text1);
+        TextView headingView = (TextView) view.findViewById(R.id.form_name);
         headingView.setText(cursor.getString(cursor.getColumnIndex(SurveyColumns.NAME)));
         view.setTag(SURVEY_ID_KEY, cursor.getLong(cursor
                 .getColumnIndex(SurveyInstanceColumns.SURVEY_ID)));
@@ -91,8 +93,8 @@ public class ResponseListAdapter extends CursorAdapter {
                 .getColumnIndex(SurveyInstanceColumns._ID)));
         view.setTag(RECORD_KEY, cursor.getString(cursor
                 .getColumnIndex(SurveyInstanceColumns.RECORD_ID)));
-        view.setTag(FINISHED_KEY, finished);
-        ImageView stsIcon = (ImageView) view.findViewById(R.id.xmitstsicon);
+        view.setTag(FINISHED_KEY, status != SurveyInstanceStatus.SAVED);
+        ImageView stsIcon = (ImageView) view.findViewById(R.id.status_img);
         stsIcon.setImageResource(icon);
 
         // Alternate background

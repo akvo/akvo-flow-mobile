@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -32,7 +32,6 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
@@ -62,7 +61,7 @@ import org.akvo.flow.util.ViewUtil;
  * 
  * @author Christopher Fagiani
  */
-public class SettingsActivity extends ActionBarActivity implements AdapterView.OnItemClickListener {
+public class SettingsActivity extends BackActivity implements AdapterView.OnItemClickListener {
     private static final String TAG = "SettingsActivity";
     private static final String LABEL = "label";
     private static final String DESC = "desc";
@@ -70,8 +69,6 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settingsmenu);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
         Resources resources = getResources();

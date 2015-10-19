@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -21,10 +21,12 @@ package org.akvo.flow.domain;
 public class Node {
     private long mId;
     private String mName;
+    private String mCode;
 
-    public Node(long id, String name) {
+    public Node(long id, String name, String code) {
         mId = id;
         mName = name;
+        mCode = code;
     }
 
     public long getId() {
@@ -33,6 +35,10 @@ public class Node {
 
     public String getName() {
         return mName;
+    }
+
+    public String getCode() {
+        return mCode;
     }
 
     @Override

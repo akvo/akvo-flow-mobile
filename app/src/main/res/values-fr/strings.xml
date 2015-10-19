@@ -18,17 +18,9 @@
   <string name="clearbutton">Effacer</string>
   <string name="submitbutton">Envoyer</string>
   <string name="geodialog">Votre GPS doit être activer. Cliquez OK pour accéder aux préférences. Sélectionnez Utilisez le GPS et pressez le bouton de retour pour revenir a cet écran. Vous pouvez maintenant obtenir la géolocalisation.</string>
-  <string name="userlabel">Gérer les utilisateurs</string>
   <string name="resize_large_images">Réduire les images trop lourdes</string>
   <string name="settingslabel">Paramètres</string>
-  <string name="adduser">Ajouter un utilisateur</string>
   <string name="nouser">Il n\'y a pas d\'utilisateurs!</string>
-  <string name="displayname">Nom</string>
-  <string name="email">Email</string>
-  <string name="userinstructions">Sélectionner l\'utilisateur dans la liste. Pour créer un nouvel utilisateur, appuyer sur le bouton Menu et sélectionnez \"ajouter un utilisateur\". Faire un clic long pour éditer un utilisateur.</string>
-  <string name="editmenu">Sélectionner un utilisateur</string>
-  <string name="deleteusermenu">Supprimer un utilisateur</string>
-  <string name="mustselectuser">Veuillez cliquer sur l\'icone \"gestion des utilisateurs\" et choisir un utilisateur avant de continuer.</string>
   <string name="exportcomplete">Les données ont été exportés sur la carte SD</string>
   <string name="prefoptlabel">Préférences</string>
   <string name="prefoptdesc">Choisir la langue par défaut de l\'enquête et autres préférences</string>
@@ -97,8 +89,8 @@
   <string name="bootstraperror">Erreur lors de l\'exportation du fichier zip</string>
   <string name="bootstrap_invalid_app">Erreur: Ce formulaire n\'est pas dans cette instance.</string>
   <string name="transmissionhist">Historique des transmissions</string>
-  <string name="transstartdate">La transmission a commencé:</string>
-  <string name="transenddate">La transmission est finie:</string>
+  <string name="transstartdate">Commencé:</string>
+  <string name="transenddate">Fini:</string>
   <string name="confirmchangetitle">Changer la réponse?</string>
   <string name="confirmchangetext">Voulez-vous changer votre réponse?</string>
   <string name="resetall">Tout effacer (utilisateurs, enquêtes, et toutes les données collectées)</string>
@@ -115,8 +107,10 @@
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
   <string name="configuring_languages">Paramètrer la langue de l\'enquête...</string>
-  <string name="sync_records">Synchroniser les enregistrements</string>
-  <string name="order_by">Classé par</string>
+  <string name="search">Recherche</string>
+  <string name="sync">Sync</string>
+  <string name="sort">Trier</string>
+  <string name="stats">Stats</string>
   <string name="syncing_records">Synchronisation des enregistrements en cours...</string>
   <string name="sync_finished">La synchronisation des enregistrements est terminée</string>
   <string name="synced_records">%1$d des enregistrements synchronisés</string>
@@ -136,7 +130,8 @@
   <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
   <string name="no_surveys_text">Vous n\'avez pas d\'enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord FLOW</string>
-  <string name="no_records_text">Vous n\'avez pas d\'enregistrement synchronisé. Pour éditer des enregistrements, vous devez les synchroniser, ou en créer de nouveaux</string>
+  <string name="no_records_text">Vous n\'avez pas encore de données. Cliquez \"+\" en haut de l\'écran pour en ajouter.</string>
+  <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
   <!--Activity Labels-->
   <string name="survey_groups_activity">Enquêtes</string>
   <string name="record_list_activity">Sélectionner un enregistrement</string>
@@ -166,11 +161,12 @@
   <string name="clear_feature_text">Voulez vous supprimer cette fonction?</string>
   <string name="repeat_group">Répéter le groupe</string>
   <string name="repetitions">Répétitions:</string>
+  <string name="view_responses">Voir les réponses.</string>
+  <string name="view_map">Voir carte.</string>
   <string name="delete_group_title">Supprimer le groupe</string>
   <string name="delete_group_text">Voulez-vous supprimer ce groupe?</string>
   <!--RecordList Activity-->
-  <string name="create_data_point">CRÉER UN NOUVEAU POINT</string>
-  <string name="stats_title">Statistiques de l\'enquête</string>
+  <string name="add_data_point">Créer un point de donnée</string>
   <string name="stats_total">Total de points:</string>
   <string name="stats_week">Les 7 derniers jours:</string>
   <string name="stats_today">Aujourd\'hui:</string>
@@ -183,9 +179,11 @@
   <string name="order_name">Nom</string>
   <!--Record Activity-->
   <string name="unknown">Donnée non nommée</string>
-  <string name="last_modified">Dernière modification</string>
+  <string name="last_modified_monitored">Dernière modification</string>
+  <string name="last_modified_regular">Envoyé</string>
   <string name="last_response">Dernière réponse</string>
   <string name="error_missing_cascade">Les fichiers de cascade ne sont pas télécharger </string>
+  <string name="error_missing_form">Formulaire non trouvé. Re-télécharger tous les formulaires.</string>
   <string name="tab_forms">ENQUÊTES</string>
   <string name="tab_history">RÉPONSES</string>
   <!--Form & transmission status-->
@@ -223,6 +221,18 @@
   <string name="geoshape_response">Surface enregistrée avec succès </string>
   <string name="add_point_title">Créer un point</string>
   <string name="add_point_text">Voulez vous ajouter un point a cet endroit?</string>
+  <!--Navigation Drawer-->
+  <string name="select_user">Choisir un utilisateur</string>
+  <string name="add_user">Ajouter un utilisateur</string>
+  <string name="new_user">+ utilisateur</string>
+  <string name="edit_user">Sélectionner un utilisateur</string>
+  <string name="delete_user">Supprimer un utilisateur</string>
+  <string name="empty_user_warning">Nom d\'utilisateur est obligatoire</string>
+  <string name="delete_user_confirmation">Voulez-vous supprimer cet utilisateur?</string>
+  <string name="username">Nom d\'utilisateur</string>
+  <string name="mustselectuser">Veuillez sélectionner un utilisateur pour continuer</string>
+  <string name="surveys">Enquêtes</string>
+  <string name="logged_in_as">Connecté en tant que</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Annuler</string>
@@ -231,6 +241,8 @@
   <string name="retry">Réessayer</string>
   <string name="delete">Supprimer</string>
   <string name="error_value_required">Ce champ ne peut être vide</string>
+  <string name="drawer_open">Menu ouvert</string>
+  <string name="drawer_close">Menu fermé</string>
   <!--Intent Actions. Do not translate this strings-->
   <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
   <string name="action_locales_sync">fieldsurvey.ACTION_LOCALES_SYNC</string>

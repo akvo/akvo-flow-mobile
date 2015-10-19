@@ -71,7 +71,8 @@ public class SurveyDbAdapter {
                 + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
 
         String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
-                + "JOIN survey ON survey_instance.survey_id = survey.survey_id";
+                + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
+                + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
 
         String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
                 + "survey.survey_id=survey_instance.survey_id";
@@ -591,17 +592,11 @@ public class SurveyDbAdapter {
     /**
      * if the ID is populated, this will update a user record. Otherwise, it
      * will be inserted
-     * 
-     * @param id
-     * @param name
-     * @param email
-     * @return
      */
-    public long createOrUpdateUser(Long id, String name, String email) {
+    public long createOrUpdateUser(Long id, String name) {
         ContentValues initialValues = new ContentValues();
         Long idVal = id;
         initialValues.put(UserColumns.NAME, name);
-        initialValues.put(UserColumns.EMAIL, email);
         initialValues.put(UserColumns.DELETED, 0);
 
         if (idVal == null) {
@@ -1213,23 +1208,32 @@ public class SurveyDbAdapter {
         boolean monitored = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyGroupColumns.MONITORED)) > 0;
         return new SurveyGroup(id, name, registerSurveyId, monitored);
     }
-    
-    public Cursor getSurveyGroup(long id) {
-        String where = null;
-        String[] selectionArgs = null;
-        
-        if (id != SurveyGroup.ID_NONE) {
-            where = SurveyGroupColumns.SURVEY_GROUP_ID + "= ?";
-            selectionArgs = new String[] {String.valueOf(id)};
+
+    public SurveyGroup getSurveyGroup(long id) {
+        SurveyGroup sg = null;
+        Cursor c = database.query(Tables.SURVEY_GROUP,
+                new String[]{
+                        SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
+                        SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
+                },
+                SurveyGroupColumns.SURVEY_GROUP_ID + "= ?",
+                new String[] {String.valueOf(id)},
+                null, null, null);
+        if (c != null && c.moveToFirst()) {
+            sg = getSurveyGroup(c);
+            c.close();
         }
-        
+
+        return sg;
+    }
+
+    public Cursor getSurveyGroups() {
         return database.query(Tables.SURVEY_GROUP,
                 new String[] {
                         SurveyGroupColumns._ID, SurveyGroupColumns.SURVEY_GROUP_ID, SurveyGroupColumns.NAME,
                         SurveyGroupColumns.REGISTER_SURVEY_ID, SurveyGroupColumns.MONITORED
                 },
-                where, selectionArgs,
-                null, null, SurveyGroupColumns.NAME);
+                null, null, null, null, SurveyGroupColumns.NAME);
     }
     
     public String createSurveyedLocale(long surveyGroupId) {
@@ -1310,6 +1314,25 @@ public class SurveyDbAdapter {
         return null;
     }
 
+    // Attempt to fetch the registation form. If the form ID is explicitely set on the SurveyGroup,
+    // we simply query by ID. Otherwise, assume is a non-monitored form, and query the first form
+    // we find.
+    public Survey getRegistrationForm(SurveyGroup sg) {
+        String formId = sg.getRegisterSurveyId();
+        if (!TextUtils.isEmpty(formId) && !"null".equalsIgnoreCase(formId)) {
+            return getSurvey(formId);
+        }
+        Survey s = null;
+        Cursor c = getSurveys(sg.getId());
+        if (c != null) {
+            if (c.moveToFirst()) {
+                s = getSurvey(c);
+            }
+            c.close();
+        }
+        return s;
+    }
+
     public Cursor getSurveys(long surveyGroupId) {
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = null;
@@ -1373,7 +1396,8 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Get all the SurveyInstances for a particular Record
+     * Get all the SurveyInstances for a particular data point. Registration form will be at the top
+     * of the list, all other forms will be ordered by submission date (desc).
      */
     public Cursor getSurveyInstances(String recordId) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
@@ -1384,11 +1408,13 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
                         SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER
+                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER,
                 },
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[] { recordId },
-                null, null, SurveyInstanceColumns.START_DATE + " DESC");
+                null, null,
+                "CASE WHEN survey.survey_id = survey_group.register_survey_id THEN 0 ELSE 1 END, "
+                        + SurveyInstanceColumns.START_DATE + " DESC");
     }
 
     /**
@@ -1554,7 +1580,7 @@ public class SurveyDbAdapter {
                 orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
                 break;
             case ConstantUtil.ORDER_BY_NAME:
-                orderByStr = " ORDER BY " + RecordColumns.NAME + " ASC";// By name
+                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
                 break;
         }
 

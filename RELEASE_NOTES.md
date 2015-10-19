@@ -1,6 +1,18 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.0
+Date: 19 October 2015
+
+New and noteworthy
+------------------
+* Cascade codes: Cascade questions support user-defined codes [#317]
+* Simplified UI/UX: The app interface has been overhauled, defining a simplified workflow for regular (non-monitoring) surveys. You can read more on this in the [official documentation](http://flow.readthedocs.org/en/latest/docs/flow-app-2.2.0.html) [#336]
+
+Resolved issues
+---------------
+* Disable edit features in read-only mode [#349]
+
 # ver 2.1.11
 Date: 9 September 2015
 

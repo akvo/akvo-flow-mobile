@@ -55,9 +55,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize|locale|layoutDirection"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity.UserEditActivity"
-            android:configChanges="locale|layoutDirection" />
-        <activity
             android:name=".activity.SettingsActivity"
             android:configChanges="locale|layoutDirection"
             android:label="@string/settingslabel" />

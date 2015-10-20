@@ -113,6 +113,10 @@ public class FlowApp extends Application {
         return mSurveyGroupId;
     }
 
+    public String getAppLanguageCode() {
+        return mLocale.getLanguage();
+    }
+
     public String getAppDisplayLanguage() {
         String lang = mLocale.getDisplayLanguage();
         if (!TextUtils.isEmpty(lang)) {

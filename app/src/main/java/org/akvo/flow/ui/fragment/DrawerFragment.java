@@ -204,12 +204,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void editUser(final User user) {
-        final Long uid = user != null ? user.getId() : null;
-        final String name = user != null ? user.getName() : "";
+        final boolean newUser = user == null;
         final EditText et = new EditText(getActivity());
         et.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         et.setSingleLine();
-        et.append(name);
+        if (!newUser) {
+            et.append(user.getName());
+        }
 
         int titleRes = user != null ? R.string.edit_user : R.string.add_user;
 
@@ -217,10 +218,15 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String name = et.getText().toString();
-                        mDatabase.createOrUpdateUser(uid, name);
+                        Long uid = newUser ? null : user.getId();
+                        String name = et.getText().toString();// TODO: Validate name
+                        uid = mDatabase.createOrUpdateUser(uid, name);
+
                         User loggedUser = FlowApp.getApp().getUser();
-                        if (user != null && user.equals(loggedUser)) {
+                        if (newUser) {
+                            // Automatically log in new users
+                            mListener.onUserSelected(new User(uid, name));
+                        } else if (user.equals(loggedUser)) {
                             loggedUser.setName(name);
                         }
                         load();

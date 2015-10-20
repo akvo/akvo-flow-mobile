@@ -58,13 +58,14 @@ public class SurveyedLocaleSyncService extends IntentService {
         int syncedRecords = 0;
         FlowApi api = new FlowApi();
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
-        displayNotification(getString(R.string.syncing_records), 
+        displayNotification(getString(R.string.syncing_records),
                 getString(R.string.pleasewait), false);
         try {
-            Set<String> batch, lastBatch = null;
+            Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
                 batch = sync(database, api, surveyGroupId);
-                if (lastBatch != null && lastBatch.containsAll(batch)) {
+                batch.removeAll(lastBatch);// Remove duplicates.
+                if (batch.isEmpty()) {
                     break;
                 }
                 syncedRecords += batch.size();

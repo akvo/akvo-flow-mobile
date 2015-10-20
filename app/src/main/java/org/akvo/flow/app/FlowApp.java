@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -111,6 +111,10 @@ public class FlowApp extends Application {
     
     public long getSurveyGroupId() {
         return mSurveyGroupId;
+    }
+
+    public String getAppLanguageCode() {
+        return mLocale.getLanguage();
     }
 
     public String getAppDisplayLanguage() {

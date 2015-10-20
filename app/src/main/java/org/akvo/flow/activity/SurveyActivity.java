@@ -126,14 +126,12 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                     DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
         }
 
-        // Display selected user name, or trigger the setup Activity if this has not been done yet
-        User user = FlowApp.getApp().getUser();
-        if (user != null) {
-            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(), Toast.LENGTH_LONG).show();
-        } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+        // Start the setup Activity if necessary.
+        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
             startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
         }
 
+        displaySelectedUser();
         startServices();
     }
 
@@ -144,6 +142,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         switch (requestCode) {
             case REQUEST_ADD_USER:
                 if (resultCode == RESULT_OK) {
+                    displaySelectedUser();
                     Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
                 } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
                     finish();
@@ -223,6 +222,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         FlowApp.getApp().setUser(user);
         mDrawer.load();
         mDrawerLayout.closeDrawers();
+        displaySelectedUser();
     }
 
     @Override
@@ -319,6 +319,13 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             extras.putString(RecordActivity.EXTRA_RECORD_ID, surveyedLocaleId);
             intent.putExtras(extras);
             startActivity(intent);
+        }
+    }
+
+    private void displaySelectedUser() {
+        User user = FlowApp.getApp().getUser();
+        if (user != null) {
+            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(), Toast.LENGTH_LONG).show();
         }
     }
 

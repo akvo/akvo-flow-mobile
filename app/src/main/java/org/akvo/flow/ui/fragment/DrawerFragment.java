@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
@@ -218,8 +220,14 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Long uid = newUser ? null : user.getId();
                         String name = et.getText().toString();// TODO: Validate name
+                        if (TextUtils.isEmpty(name)) {
+                            // Disallow blank usernames
+                            Toast.makeText(getActivity(), R.string.empty_user_warning, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Long uid = newUser ? null : user.getId();
                         uid = mDatabase.createOrUpdateUser(uid, name);
 
                         User loggedUser = FlowApp.getApp().getUser();

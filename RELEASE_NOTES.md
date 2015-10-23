@@ -1,6 +1,15 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.0.1
+Date: 23 October 2015
+
+Resolved issues
+---------------
+* Usernames cannot be left empty. New users are automatically selected [#357]
+* Fix number of datapoints synced in the notification [#358]
+* Rearrange photo preview layout [#362]
+
 # ver 2.2.0
 Date: 19 October 2015
 

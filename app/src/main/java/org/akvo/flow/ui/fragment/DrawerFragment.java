@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
@@ -204,12 +206,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void editUser(final User user) {
-        final Long uid = user != null ? user.getId() : null;
-        final String name = user != null ? user.getName() : "";
+        final boolean newUser = user == null;
         final EditText et = new EditText(getActivity());
         et.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         et.setSingleLine();
-        et.append(name);
+        if (!newUser) {
+            et.append(user.getName());
+        }
 
         int titleRes = user != null ? R.string.edit_user : R.string.add_user;
 
@@ -217,10 +220,21 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String name = et.getText().toString();
-                        mDatabase.createOrUpdateUser(uid, name);
+                        String name = et.getText().toString();// TODO: Validate name
+                        if (TextUtils.isEmpty(name)) {
+                            // Disallow blank usernames
+                            Toast.makeText(getActivity(), R.string.empty_user_warning, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Long uid = newUser ? null : user.getId();
+                        uid = mDatabase.createOrUpdateUser(uid, name);
+
                         User loggedUser = FlowApp.getApp().getUser();
-                        if (user != null && user.equals(loggedUser)) {
+                        if (newUser) {
+                            // Automatically log in new users
+                            mListener.onUserSelected(new User(uid, name));
+                        } else if (user.equals(loggedUser)) {
                             loggedUser.setName(name);
                         }
                         load();

@@ -10,11 +10,6 @@
         android:gravity="center_vertical"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/media_btn"
-            style="@style/button_green"
-            android:text="Take Photo" />
-
         <RelativeLayout
             android:id="@+id/preview_container"
             android:layout_width="wrap_content"
@@ -26,23 +21,29 @@
                 android:id="@+id/image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxHeight="150dp"
                 android:adjustViewBounds="true"
-                android:scaleType="centerInside"/>
+                android:maxHeight="150dp"
+                android:scaleType="centerInside" />
+
             <ProgressBar
                 android:id="@+id/progress"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                />
+                android:layout_centerInParent="true" />
+
             <ImageButton
                 android:id="@+id/download"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
                 android:background="@android:color/transparent"
-                android:src="@drawable/download"/>
+                android:src="@drawable/download" />
         </RelativeLayout>
+
+        <Button
+            android:id="@+id/media_btn"
+            style="@style/button_green"
+            android:text="@string/takephoto" />
 
     </LinearLayout>
 

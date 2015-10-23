@@ -18,6 +18,9 @@ package org.akvo.flow.activity;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -36,7 +39,26 @@ public class AddUserActivity extends ActionBarActivity {
         setContentView(R.layout.add_user_activity);
 
         final EditText et = (EditText) findViewById(R.id.username);
-        findViewById(R.id.login_btn).setOnClickListener(new View.OnClickListener() {
+        final View nextBtn = findViewById(R.id.login_btn);
+
+        // Ensure the username is not left blank
+        nextBtn.setEnabled(false);
+        et.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                nextBtn.setEnabled(!TextUtils.isEmpty(s));
+            }
+        });
+
+        nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String username = et.getText().toString();

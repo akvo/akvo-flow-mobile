@@ -626,7 +626,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_TITLE, q.getText());
             intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_DATAPOINT_ID, mRecordId);
             intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_FORM_ID, mSurvey.getId());
-            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_LANGUAGE, FlowApp.getApp().getAppDisplayLanguage());
+            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
             intent.setType(ConstantUtil.EXTERNAL_SOURCE_MIME);
             startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
                     + EXTERNAL_SOURCE_REQUEST);

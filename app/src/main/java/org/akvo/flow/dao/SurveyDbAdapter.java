@@ -121,6 +121,7 @@ public class SurveyDbAdapter {
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
         String DURATION = "duration";
         String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
+        String VERSION = "version";
     }
 
     public interface TransmissionColumns {
@@ -212,7 +213,8 @@ public class SurveyDbAdapter {
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
     private static final int VER_FORM_SUBMITTER = 79;
     private static final int VER_FORM_DEL_CHECK = 80;
-    private static final int DATABASE_VERSION = VER_FORM_DEL_CHECK;
+    private static final int VER_FORM_VERSION = 81;
+    private static final int DATABASE_VERSION = VER_FORM_VERSION;
 
     private final Context context;
 
@@ -275,6 +277,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
                     + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
                     + SurveyInstanceColumns.SUBMITTER + " TEXT,"
+                    + SurveyInstanceColumns.VERSION + " REAL,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -340,6 +343,9 @@ public class SurveyDbAdapter {
                 case VER_FORM_SUBMITTER:
                     db.execSQL("ALTER TABLE " + Tables.TRANSMISSION
                             + " ADD COLUMN " + TransmissionColumns.SURVEY_ID + " TEXT");
+                case VER_FORM_DEL_CHECK:
+                    db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
+                            + " ADD COLUMN " + SurveyInstanceColumns.VERSION + " REAL");
                     version = DATABASE_VERSION;
             }
 
@@ -738,11 +744,12 @@ public class SurveyDbAdapter {
     /**
      * creates a new unsubmitted survey instance
      */
-    public long createSurveyRespondent(String surveyId, User user, String surveyedLocaleId) {
+    public long createSurveyRespondent(String surveyId, double version, User user, String surveyedLocaleId) {
         final long time = System.currentTimeMillis();
 
         ContentValues initialValues = new ContentValues();
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
+        initialValues.put(SurveyInstanceColumns.VERSION, version);
         initialValues.put(SurveyInstanceColumns.USER_ID, user.getId());
         initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
         initialValues.put(SurveyInstanceColumns.UUID, PlatformUtil.uuid());

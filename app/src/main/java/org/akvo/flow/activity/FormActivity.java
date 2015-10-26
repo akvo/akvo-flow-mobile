@@ -127,7 +127,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         // Set the survey name as Activity title
-        setTitle(mSurvey.getName());
+        getSupportActionBar().setTitle(mSurvey.getName());
+        getSupportActionBar().setSubtitle("v " + mSurvey.getVersion());
+
         mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
         mPager.setAdapter(mAdapter);

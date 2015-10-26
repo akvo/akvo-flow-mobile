@@ -299,7 +299,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 int status = c.getInt(c.getColumnIndexOrThrow(SurveyDbAdapter.SurveyInstanceColumns.STATUS));
                 readOnly = status != SurveyDbAdapter.SurveyInstanceStatus.SAVED;
             } else {
-                formInstanceId = mDatabase.createSurveyRespondent(formId, user, surveyedLocaleId);
+                formInstanceId = mDatabase.createSurveyRespondent(formId, registrationForm.getVersion(), user, surveyedLocaleId);
             }
             c.close();
 

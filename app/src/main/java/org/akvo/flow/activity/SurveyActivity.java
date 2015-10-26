@@ -295,8 +295,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             boolean readOnly = false;
             Cursor c = mDatabase.getSurveyInstances(surveyedLocaleId);
             if (c.moveToFirst()) {
-                formInstanceId = c.getLong(c.getColumnIndexOrThrow(SurveyDbAdapter.SurveyInstanceColumns._ID));
-                int status = c.getInt(c.getColumnIndexOrThrow(SurveyDbAdapter.SurveyInstanceColumns.STATUS));
+                formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
+                int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
                 readOnly = status != SurveyDbAdapter.SurveyInstanceStatus.SAVED;
             } else {
                 formInstanceId = mDatabase.createSurveyRespondent(formId, registrationForm.getVersion(), user, surveyedLocaleId);

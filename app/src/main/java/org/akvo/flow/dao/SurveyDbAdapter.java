@@ -1408,15 +1408,7 @@ public class SurveyDbAdapter {
      */
     public Cursor getSurveyInstances(String recordId) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
-                new String[] {
-                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
-                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
-                        SurveyColumns.NAME, SurveyInstanceColumns.SAVED_DATE,
-                        SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
-                        SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER,
-                },
+                FormInstanceQuery.PROJECTION,
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[] { recordId },
                 null, null,
@@ -1774,6 +1766,36 @@ public class SurveyDbAdapter {
         int LATITUDE = 4;
         int LONGITUDE = 5;
         int LAST_MODIFIED = 6;
+    }
+
+    public interface FormInstanceQuery {
+        String[] PROJECTION = {
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
+                SurveyColumns.NAME,
+                SurveyInstanceColumns.SAVED_DATE,
+                SurveyInstanceColumns.USER_ID,
+                SurveyInstanceColumns.SUBMITTED_DATE,
+                SurveyInstanceColumns.UUID,
+                SurveyInstanceColumns.STATUS,
+                SurveyInstanceColumns.SYNC_DATE,
+                SurveyInstanceColumns.EXPORTED_DATE,
+                SurveyInstanceColumns.RECORD_ID,
+                SurveyInstanceColumns.SUBMITTER,
+        };
+
+        int _ID = 0;
+        int SURVEY_ID = 1;
+        int NAME = 2;
+        int SAVED_DATE = 3;
+        int USER_ID = 4;
+        int SUBMITTED_DATE = 5;
+        int UUID = 6;
+        int STATUS = 7;
+        int SYNC_DATE = 8;
+        int EXPORTED_DATE = 9;
+        int RECORD_ID = 10;
+        int SUBMITTER = 11;
     }
 
 }

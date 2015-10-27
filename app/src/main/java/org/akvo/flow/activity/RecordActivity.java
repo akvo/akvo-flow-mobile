@@ -146,7 +146,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         }
 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId,
+        long[] instances = mDatabase.getFormInstances(mRecord.getId(), surveyId,
                 SurveyInstanceStatus.SAVED);
         long instance = instances.length > 0 ? instances[0]
                 : mDatabase.createSurveyRespondent(surveyId, survey.getVersion(), mUser, mRecord.getId());

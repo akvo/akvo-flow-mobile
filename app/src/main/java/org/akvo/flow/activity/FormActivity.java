@@ -21,6 +21,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -128,7 +129,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         // Set the survey name as Activity title
         getSupportActionBar().setTitle(mSurvey.getName());
-        getSupportActionBar().setSubtitle("v " + mSurvey.getVersion());
+        getSupportActionBar().setSubtitle("v " + getVersion());
 
         mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
@@ -199,6 +200,21 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 try { in.close(); } catch (IOException e) {}
             }
         }
+    }
+
+    private double getVersion() {
+        double version = 0.0;
+        Cursor c = mDatabase.getFormInstance(mSurveyInstanceId);
+        if (c.moveToFirst()) {
+            version = c.getDouble(SurveyDbAdapter.FormInstanceQuery.VERSION);
+        }
+        c.close();
+
+        if (version == 0.0) {
+            version = mSurvey.getVersion();// Default to current value
+        }
+
+        return version;
     }
 
     /**

@@ -1399,14 +1399,22 @@ public class SurveyDbAdapter {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.DELETED, 1);
         database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                new String[] { surveyId });
+                new String[]{surveyId});
+    }
+
+    public Cursor getFormInstance(long formInstanceId) {
+        return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
+                FormInstanceQuery.PROJECTION,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID + "= ?",
+                new String[] { String.valueOf(formInstanceId) },
+                null, null, null);
     }
 
     /**
      * Get all the SurveyInstances for a particular data point. Registration form will be at the top
      * of the list, all other forms will be ordered by submission date (desc).
      */
-    public Cursor getSurveyInstances(String recordId) {
+    public Cursor getFormInstances(String recordId) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
                 FormInstanceQuery.PROJECTION,
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
@@ -1420,7 +1428,7 @@ public class SurveyDbAdapter {
      * Get SurveyInstances with a particular status.
      * If the recordId is not null, results will be filtered by Record.
      */
-    public long[] getSurveyInstances(String recordId, String surveyId, int status) {
+    public long[] getFormInstances(String recordId, String surveyId, int status) {
         String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.STATUS + "= ?" +
                 " AND "  + SurveyInstanceColumns.RECORD_ID + "= ?";
@@ -1772,6 +1780,7 @@ public class SurveyDbAdapter {
         String[] PROJECTION = {
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.VERSION,
                 SurveyColumns.NAME,
                 SurveyInstanceColumns.SAVED_DATE,
                 SurveyInstanceColumns.USER_ID,
@@ -1786,16 +1795,17 @@ public class SurveyDbAdapter {
 
         int _ID = 0;
         int SURVEY_ID = 1;
-        int NAME = 2;
-        int SAVED_DATE = 3;
-        int USER_ID = 4;
-        int SUBMITTED_DATE = 5;
-        int UUID = 6;
-        int STATUS = 7;
-        int SYNC_DATE = 8;
-        int EXPORTED_DATE = 9;
-        int RECORD_ID = 10;
-        int SUBMITTER = 11;
+        int VERSION = 2;
+        int NAME = 3;
+        int SAVED_DATE = 4;
+        int USER_ID = 5;
+        int SUBMITTED_DATE = 6;
+        int UUID = 7;
+        int STATUS = 8;
+        int SYNC_DATE = 9;
+        int EXPORTED_DATE = 10;
+        int RECORD_ID = 11;
+        int SUBMITTER = 12;
     }
 
 }

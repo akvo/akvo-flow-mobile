@@ -32,7 +32,7 @@ public class SurveyInstanceLoader extends DataLoader<Cursor> {
 
     @Override
     public Cursor loadData(SurveyDbAdapter database) {
-        return database.getSurveyInstances(mSurveyedLocaleId);
+        return database.getFormInstances(mSurveyedLocaleId);
     }
 
 }

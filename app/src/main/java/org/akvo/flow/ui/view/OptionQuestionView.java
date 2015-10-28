@@ -23,9 +23,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -33,7 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
@@ -65,7 +61,6 @@ public class OptionQuestionView extends QuestionView {
     private final String OTHER_TEXT;
     private RadioGroup mOptionGroup;
     private List<CheckBox> mCheckBoxes;
-    private Spinner mSpinner;
     private TextView mOtherText;
     private Map<Integer, String> mIdToValueMap;
     private volatile boolean mSuppressListeners = false;
@@ -81,16 +76,10 @@ public class OptionQuestionView extends QuestionView {
         // Just inflate the header. Options will be added dynamically
         setQuestionView(R.layout.question_header);
 
-        mIdToValueMap = new HashMap<Integer, String>();
+        mIdToValueMap = new HashMap<>();
         mSuppressListeners = true;
         if (mQuestion.getOptions() != null) {
-            // spinners aren't compatible with multiple selection. if the survey
-            // has both allowMultiple=true and renderMode=spinner, that is an
-            // error but we'll just honor the allowMultiple
-            if (!mQuestion.isAllowMultiple() && ConstantUtil.SPINNER_RENDER_MODE
-                    .equalsIgnoreCase(mQuestion.getRenderType())) {
-                setupSpinnerType();
-            } else if (!mQuestion.isAllowMultiple()) {
+            if (!mQuestion.isAllowMultiple()) {
                 setupRadioType();
             } else {
                 setupCheckboxType();
@@ -103,61 +92,6 @@ public class OptionQuestionView extends QuestionView {
             }
         }
         mSuppressListeners = false;
-    }
-
-    private void setupSpinnerType() {
-        mSpinner = new Spinner(getContext());
-        mSpinner.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-        initializeSpinnerOptions();
-        // set the selection to the first element
-        mSpinner.setSelection(0);
-
-        mSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @SuppressWarnings("rawtypes")
-            public void onItemSelected(AdapterView parent, View view, int position, long id) {
-                if (!mSuppressListeners) {
-                    //mSpinner.requestFocus();
-                    // if position is greater than the size of the array then OTHER is selected
-                    if (position > mQuestion.getOptions().size()) {
-                        // only display the dialog if OTHER isn't
-                        // already populated as the response. need this
-                        // to suppress the OTHER dialog
-                        if (getResponse() == null || !getResponse().getType().equals(
-                                ConstantUtil.OTHER_RESPONSE_TYPE)) {
-                            displayOtherDialog();
-                        }
-                    } else if (position == 0) {
-                        if (mOtherText != null) {
-                            mOtherText.setText("");
-                        }
-                        setResponse(new QuestionResponse("", ConstantUtil.VALUE_RESPONSE_TYPE,
-                                mQuestion.getId()));
-                    } else {
-                        if (mOtherText != null) {
-                            mOtherText.setText("");
-                        }
-                        setResponse(new QuestionResponse(mQuestion.getOptions()
-                                    .get(position > 0 ? position - 1 : 0)
-                                    .getText(),
-                                ConstantUtil.VALUE_RESPONSE_TYPE,
-                                mQuestion.getId()));
-                    }
-                }
-            }
-
-            @SuppressWarnings("rawtypes")
-            public void onNothingSelected(AdapterView parent) {
-                if (!mSuppressListeners) {
-                    setResponse(new QuestionResponse("", ConstantUtil.VALUE_RESPONSE_TYPE,
-                            mQuestion.getId()));
-                }
-            }
-        });
-        addView(mSpinner);
-        if (isReadOnly()) {
-            mSpinner.setEnabled(false);
-        }
     }
 
     private void setupRadioType() {
@@ -244,54 +178,24 @@ public class OptionQuestionView extends QuestionView {
     public void notifyOptionsChanged() {
         super.notifyOptionsChanged();
 
-        if (ConstantUtil.SPINNER_RENDER_MODE.equalsIgnoreCase(mQuestion.getRenderType())) {
-            initializeSpinnerOptions();
-            rehydrate(getResponse());
-        } else {
-            List<Option> options = mQuestion.getOptions();
-            if (mQuestion.isAllowMultiple()) {
-                for (int i = 0; i < mCheckBoxes.size(); i++) {
-                    // make sure we have a corresponding option (i.e. not the OTHER option)
-                    if (i < options.size()) {
-                        mCheckBoxes.get(i).setText(formOptionText(options.get(i)),
-                                BufferType.SPANNABLE);
-                    }
+        List<Option> options = mQuestion.getOptions();
+        if (mQuestion.isAllowMultiple()) {
+            for (int i = 0; i < mCheckBoxes.size(); i++) {
+                // make sure we have a corresponding option (i.e. not the OTHER option)
+                if (i < options.size()) {
+                    mCheckBoxes.get(i).setText(formOptionText(options.get(i)),
+                            BufferType.SPANNABLE);
                 }
-            } else {
-                for (int i = 0; i < mOptionGroup.getChildCount(); i++) {
-                    // make sure we have a corresponding option (i.e. not the OTHER option)
-                    if (i < options.size()) {
-                        ((RadioButton) (mOptionGroup.getChildAt(i)))
-                                .setText(formOptionText(options.get(i)));
-                    }
+            }
+        } else {
+            for (int i = 0; i < mOptionGroup.getChildCount(); i++) {
+                // make sure we have a corresponding option (i.e. not the OTHER option)
+                if (i < options.size()) {
+                    ((RadioButton) (mOptionGroup.getChildAt(i)))
+                            .setText(formOptionText(options.get(i)));
                 }
             }
         }
-    }
-
-    /**
-     * sets the spinner content
-     */
-    private void initializeSpinnerOptions() {
-        int extras = 1;
-        if (mQuestion.isAllowOther()) {
-            extras++;
-        }
-        List<Option> options = mQuestion.getOptions();
-        Spanned[] optionArray = new Spanned[options.size() + extras];
-        optionArray[0] = Html.fromHtml("");
-        for (int i = 0; i < options.size(); i++) {
-            optionArray[i + 1] = formOptionText(options.get(i));
-        }
-        // put the "other" option in the last slot in the array
-        if (mQuestion.isAllowOther()) {
-            optionArray[optionArray.length - 1] = Html.fromHtml(OTHER_TEXT);
-        }
-        ArrayAdapter<CharSequence> optionAdapter = new ArrayAdapter<CharSequence>(
-                getContext(), android.R.layout.simple_spinner_item, optionArray);
-        optionAdapter
-                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinner.setAdapter(optionAdapter);
     }
 
     /**
@@ -321,19 +225,11 @@ public class OptionQuestionView extends QuestionView {
                     } else {
                         isFirst = false;
                     }
-                    text.append("<font color='");
-                    // spinners have black backgrounds so if the text color is
-                    // white, make it black so it shows up
-                    if (ConstantUtil.WHITE_COLOR.equalsIgnoreCase(sColors[i])
-                            && ConstantUtil.SPINNER_RENDER_MODE
-                                    .equalsIgnoreCase(mQuestion.getRenderType())) {
-                        text.append(ConstantUtil.BLACK_COLOR);
-                    } else {
-                        text.append(sColors[i]);
-                    }
-                    text.append("'>")
-                            .append(TextUtils.htmlEncode(txt.getText()))
-                            .append("</font>");
+                    text.append("<font color='")
+                        .append(sColors[i])
+                        .append("'>")
+                        .append(TextUtils.htmlEncode(txt.getText()))
+                        .append("</font>");
                 }
             }
         }
@@ -571,34 +467,6 @@ public class OptionQuestionView extends QuestionView {
                 }
 
             }
-            if (mSpinner != null && resp.getValue() != null) {
-                List<Option> options = mQuestion.getOptions();
-                if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType()) && mQuestion.isAllowOther()) {
-                    // since OTHER is the last option and the response is of
-                    // OTHER type, select the last option in the spinner which
-                    // is size +1 (accounting for the initial BLANK and the
-                    // OTHER options which both aren't in the options
-                    // collection)
-                    mSpinner.setSelection(options.size() + 1);
-                    if (resp.getValue() != null) {
-                        mOtherText.setText(resp.getValue());
-                    }
-                } else {
-                    boolean found = false;
-                    for (int i = 0; i < options.size(); i++) {
-                        if (resp.getValue().equalsIgnoreCase(
-                                options.get(i).getText())) {
-                            // need to add 1 because of the initial blank option
-                            mSpinner.setSelection(i + 1);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        mSpinner.setSelection(0);
-                    }
-                }
-            }
         }
         mSuppressListeners = false;
     }
@@ -612,9 +480,6 @@ public class OptionQuestionView extends QuestionView {
         mSuppressListeners = true;
         if (mOptionGroup != null) {
             mOptionGroup.clearCheck();
-        }
-        if (mSpinner != null) {
-            mSpinner.setSelection(0);
         }
         if (mCheckBoxes != null) {
             for (int i = 0; i < mCheckBoxes.size(); i++) {

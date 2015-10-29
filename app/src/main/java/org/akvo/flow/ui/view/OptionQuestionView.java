@@ -41,7 +41,6 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +51,7 @@ import java.util.Map;
 /**
  * Question type that supports the selection of a single option from a list of
  * choices (i.e. a radio button group).
- * 
+ *
  * @author Christopher Fagiani
  */
 public class OptionQuestionView extends QuestionView {
@@ -75,19 +74,22 @@ public class OptionQuestionView extends QuestionView {
         setQuestionView(R.layout.question_header);
 
         mIdToValueMap = new HashMap<>();
-        mSuppressListeners = true;
-        if (mQuestion.getOptions() != null) {
-            if (!mQuestion.isAllowMultiple()) {
-                setupRadioType();
-            } else {
-                setupCheckboxType();
-            }
 
-            if (mQuestion.isAllowOther()) {
-                mOtherText = new TextView(getContext());
-                mOtherText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                addView(mOtherText);
-            }
+        if (mQuestion.getOptions() == null) {
+            return;
+        }
+
+        mSuppressListeners = true;
+        if (mQuestion.isAllowMultiple()) {
+            setupCheckboxType();
+        } else {
+            setupRadioType();
+        }
+
+        if (mQuestion.isAllowOther()) {
+            mOtherText = new TextView(getContext());
+            mOtherText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            addView(mOtherText);
         }
         mSuppressListeners = false;
     }
@@ -95,15 +97,15 @@ public class OptionQuestionView extends QuestionView {
     private void setupRadioType() {
         mOptionGroup = new RadioGroup(getContext());
         mOptionGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    //mOptionGroup.requestChildFocus(mOptionGroup.findViewById(checkedId), mOptionGroup);
-                    handleSelection(checkedId, true);
-                }
-            });
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                handleSelection(checkedId, true);
+            }
+        });
         for (Option o : mQuestion.getOptions()) {
             RadioButton rb = new RadioButton(getContext());
             rb.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
+            rb.setEnabled(!isReadOnly());
             rb.setLongClickable(true);
             rb.setOnLongClickListener(new OnLongClickListener() {
                 @Override
@@ -120,26 +122,22 @@ public class OptionQuestionView extends QuestionView {
             RadioButton rb = new RadioButton(getContext());
             rb.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
+            rb.setEnabled(!isReadOnly());
             rb.setText(OTHER_TEXT);
             mOptionGroup.addView(rb);
             mIdToValueMap.put(rb.getId(), OTHER_TEXT);
         }
         addView(mOptionGroup);
-        if (isReadOnly()) {
-            for (int j = 0; j < mOptionGroup.getChildCount(); j++) {
-                mOptionGroup.getChildAt(j).setEnabled(false);
-            }
-        }
     }
 
     private void setupCheckboxType() {
-        mCheckBoxes = new ArrayList<CheckBox>();
+        mCheckBoxes = new ArrayList<>();
         List<Option> options = mQuestion.getOptions();
         for (int i = 0; i < options.size(); i++) {
             CheckBox box = new CheckBox(getContext());
             box.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            box.setEnabled(!isReadOnly());
             box.setId(i);
-            mCheckBoxes.add(box);
             box.setText(formOptionText(options.get(i)), BufferType.SPANNABLE);
             box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -147,28 +145,25 @@ public class OptionQuestionView extends QuestionView {
                     handleSelection(buttonView.getId(), isChecked);
                 }
             });
+            mCheckBoxes.add(box);
             mIdToValueMap.put(box.getId(), options.get(i).getText());
             addView(box);
         }
         if (mQuestion.isAllowOther()) {
             CheckBox box = new CheckBox(getContext());
             box.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            box.setEnabled(!isReadOnly());
             box.setId(options.size());
+            box.setText(OTHER_TEXT);
             box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     handleSelection(buttonView.getId(), isChecked);
                 }
             });
-            box.setText(OTHER_TEXT);
             mCheckBoxes.add(box);
             mIdToValueMap.put(box.getId(), OTHER_TEXT);
             addView(box);
-        }
-        if (isReadOnly()) {
-            for (int i = 0; i < mCheckBoxes.size(); i++) {
-                mCheckBoxes.get(i).setEnabled(false);
-            }
         }
     }
 
@@ -181,16 +176,14 @@ public class OptionQuestionView extends QuestionView {
             for (int i = 0; i < mCheckBoxes.size(); i++) {
                 // make sure we have a corresponding option (i.e. not the OTHER option)
                 if (i < options.size()) {
-                    mCheckBoxes.get(i).setText(formOptionText(options.get(i)),
-                            BufferType.SPANNABLE);
+                    mCheckBoxes.get(i).setText(formOptionText(options.get(i)), BufferType.SPANNABLE);
                 }
             }
         } else {
             for (int i = 0; i < mOptionGroup.getChildCount(); i++) {
                 // make sure we have a corresponding option (i.e. not the OTHER option)
                 if (i < options.size()) {
-                    ((RadioButton) (mOptionGroup.getChildAt(i)))
-                            .setText(formOptionText(options.get(i)));
+                    ((RadioButton) (mOptionGroup.getChildAt(i))).setText(formOptionText(options.get(i)));
                 }
             }
         }
@@ -198,9 +191,6 @@ public class OptionQuestionView extends QuestionView {
 
     /**
      * forms the text for an option based on the visible languages
-     * 
-     * @param opt
-     * @return
      */
     private Spanned formOptionText(Option opt) {
         boolean isFirst = true;
@@ -224,10 +214,10 @@ public class OptionQuestionView extends QuestionView {
                         isFirst = false;
                     }
                     text.append("<font color='")
-                        .append(sColors[i])
-                        .append("'>")
-                        .append(TextUtils.htmlEncode(txt.getText()))
-                        .append("</font>");
+                            .append(sColors[i])
+                            .append("'>")
+                            .append(TextUtils.htmlEncode(txt.getText()))
+                            .append("</font>");
                 }
             }
         }
@@ -235,46 +225,14 @@ public class OptionQuestionView extends QuestionView {
     }
 
     /**
-     * prompts the user to confirm they want to change the value and, if so,
-     * populates the QuestionResponse.
-     * 
-     * @param checkedId
-     * @param isChecked
-     */
-    private void handleSelection(final int checkedId, final boolean isChecked) {
-        if (!mSuppressListeners) {
-            QuestionResponse r = getResponse();
-            if (r != null && r.getValue() != null && r.getValue().trim().length() > 0) {
-                ViewUtil.showConfirmDialog(R.string.confirmchangetitle,
-                        R.string.confirmchangetext, getContext(), true,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int which) {
-                                handleSelectionInternal(checkedId, isChecked);
-                            }
-                        }, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int which) {
-                                // if they select "Cancel", then undo the change
-                                rehydrate(getResponse());
-                            }
-                        });
-            } else {
-                handleSelectionInternal(checkedId, isChecked);
-            }
-        }
-    }
-
-    /**
      * populates the QuestionResponse object based on the current state of the
      * selected option(s)
-     * 
-     * @param checkedId
-     * @param isChecked
      */
-    private void handleSelectionInternal(int checkedId, boolean isChecked) {
+    private void handleSelection(int checkedId, boolean isChecked) {
+        if (mSuppressListeners) {
+            return;
+        }
+
         if (OTHER_TEXT.equals(mIdToValueMap.get(checkedId))) {
             // only display the dialog if OTHER isn't already populated as
             // the response need this to suppress the OTHER dialog
@@ -298,9 +256,8 @@ public class OptionQuestionView extends QuestionView {
 
         } else {
             if (!mQuestion.isAllowMultiple()
-                    || (mQuestion.isAllowMultiple() && (getResponse() == null
-                            || getResponse().getValue() == null || getResponse()
-                            .getValue().trim().length() == 0))) {
+                    || getResponse() == null
+                    || TextUtils.isEmpty(getResponse().getValue())) {
                 // if we don't allow multiple and they didn't select other, we
                 // can clear the otherText
                 if (mOtherText != null) {
@@ -324,26 +281,26 @@ public class OptionQuestionView extends QuestionView {
      * Forms a delimited string containing all selected options not including OTHER
      */
     private String getMultipleSelections() {
-        StringBuffer newResponse = new StringBuffer();
-        int count = 0;
-        if (mCheckBoxes != null) {
-            for (int i = 0; i < mCheckBoxes.size(); i++) {
-                if (mCheckBoxes.get(i).isChecked()) {
-                    if (count > 0) {
-                        newResponse.append("|");
-                    }
-                    if (!OTHER_TEXT.equals(mIdToValueMap.get(mCheckBoxes.get(i)
-                            .getId()))) {
-                        newResponse.append(mIdToValueMap.get(mCheckBoxes.get(i)
-                                .getId()));
-                    } else {
-                        // if OTHER is selected
-                        newResponse.append(mLatestOtherText);
+        if (mCheckBoxes == null) {
+            return "";
+        }
 
-                    }
-                    count++;
-                }
+        StringBuilder newResponse = new StringBuilder();
+        boolean first = true;
+        for (CheckBox box : mCheckBoxes) {
+            if (!box.isChecked()) {
+                continue;
             }
+            if (!first) {
+                newResponse.append("|");
+            }
+            if (!OTHER_TEXT.equals(mIdToValueMap.get(box.getId()))) {
+                newResponse.append(mIdToValueMap.get(box.getId()));
+            } else {
+                // if OTHER is selected
+                newResponse.append(mLatestOtherText);
+            }
+            first = false;
         }
         return newResponse.toString();
     }
@@ -365,19 +322,12 @@ public class OptionQuestionView extends QuestionView {
         builder.setPositiveButton(R.string.okbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mLatestOtherText = inputView.getText().toString();
-                        if (mLatestOtherText == null) {
-                            mLatestOtherText = "";
-                        } else {
-                            mLatestOtherText = mLatestOtherText.trim();
-                        }
+                        mLatestOtherText = inputView.getText().toString().trim();
                         if (getQuestion().isAllowMultiple()
                                 && getResponse() != null
                                 && getResponse().getValue() != null) {
                             // if we support multiple, we need to append the answer
-                            String responseText = getMultipleSelections();
-
-                            setResponse(new QuestionResponse(responseText,
+                            setResponse(new QuestionResponse(getMultipleSelections(),
                                     ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion.getId()));
                         } else {
                             // if we aren't supporting multiple or we don't
@@ -428,8 +378,8 @@ public class OptionQuestionView extends QuestionView {
                     // id matches the other option, select it
                     if (mIdToValueMap.get(key).equals(resp.getValue())
                             || (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp
-                                    .getType()) && mIdToValueMap.get(key)
-                                    .equals(OTHER_TEXT))) {
+                            .getType()) && mIdToValueMap.get(key)
+                            .equals(OTHER_TEXT))) {
                         mOptionGroup.check(key);
                         if (mIdToValueMap.get(key).equals(OTHER_TEXT) && mQuestion.isAllowOther()) {
                             String txt = resp.getValue();
@@ -441,20 +391,18 @@ public class OptionQuestionView extends QuestionView {
                     }
                 }
             } else if (mCheckBoxes != null) {
-                if (resp.getValue() != null
-                        && resp.getValue().trim().length() > 0) {
+                if (resp.getValue() != null && resp.getValue().trim().length() > 0) {
                     // if the response text matches the text stored for this
                     // option ID OR if the response is the "OTHER" type and the
                     // id matches the other option, select it
-                    List<String> valList = Arrays.asList(resp.getValue().split(
-                            "\\|"));
+                    List<String> valList = Arrays.asList(resp.getValue().split("\\|"));
                     for (Integer key : mIdToValueMap.keySet()) {
                         if (valList.contains(mIdToValueMap.get(key))) {
-                            mCheckBoxes.get(key.intValue()).setChecked(true);
+                            mCheckBoxes.get(key).setChecked(true);
                         } else if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType()) &&
                                 OTHER_TEXT.equals(mIdToValueMap.get(key)) &&
                                 mQuestion.isAllowOther()) {
-                            mCheckBoxes.get(key.intValue()).setChecked(true);
+                            mCheckBoxes.get(key).setChecked(true);
                             // the last token is always the Other text (even if
                             // it's blank)
                             mLatestOtherText = valList.get(valList.size() - 1);

@@ -25,15 +25,11 @@ import java.util.HashMap;
  */
 public class Option {
     private String text;
-    private String value;
-    private HashMap<String, AltText> altTextMap = new HashMap<String, AltText>();
+    private String code;
+    private HashMap<String, AltText> altTextMap = new HashMap<>();
 
     public void addAltText(AltText altText) {
         altTextMap.put(altText.getLanguage(), altText);
-    }
-
-    public HashMap<String, AltText> getAltTextMap() {
-        return altTextMap;
     }
 
     public AltText getAltText(String lang) {
@@ -48,12 +44,12 @@ public class Option {
         this.text = text;
     }
 
-    public String getValue() {
-        return value;
+    public String getCode() {
+        return code;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setCode(String code) {
+        this.code = code;
     }
 
 }

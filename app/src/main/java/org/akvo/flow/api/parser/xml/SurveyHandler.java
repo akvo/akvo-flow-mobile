@@ -60,6 +60,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String TEXT = "text";
     private static final String OPTION = "option";
     private static final String VALUE = "value";
+    private static final String CODE = "code";
     private static final String OPTIONS = "options";
     private static final String ALLOW_OTHER = "allowOther";
     private static final String VALIDATION_TYPE = "validationType";
@@ -404,7 +405,12 @@ public class SurveyHandler extends DefaultHandler {
             }
         } else if (localName.equalsIgnoreCase(OPTION)) {
             currentOption = new Option();
-            currentOption.setCode(attributes.getValue(VALUE));
+            // Check for code (new forms) or value (old forms)
+            if (attributes.getValue(CODE) != null) {
+                currentOption.setCode(attributes.getValue(CODE));
+            } else {
+                currentOption.setCode(attributes.getValue(VALUE));
+            }
         } else if (localName.equalsIgnoreCase(LEVELS)) {
             currentLevels = new ArrayList<Level>();
         } else if (localName.equalsIgnoreCase(LEVEL)) {

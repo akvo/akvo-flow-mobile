@@ -56,8 +56,6 @@ import java.util.Map;
  * @author Christopher Fagiani
  */
 public class OptionQuestionView extends QuestionView {
-    public static boolean promptOnChange;
-
     private final String OTHER_TEXT;
     private RadioGroup mOptionGroup;
     private List<CheckBox> mCheckBoxes;
@@ -246,8 +244,7 @@ public class OptionQuestionView extends QuestionView {
     private void handleSelection(final int checkedId, final boolean isChecked) {
         if (!mSuppressListeners) {
             QuestionResponse r = getResponse();
-            if (r != null && r.getValue() != null
-                    && r.getValue().trim().length() > 0 && promptOnChange) {
+            if (r != null && r.getValue() != null && r.getValue().trim().length() > 0) {
                 ViewUtil.showConfirmDialog(R.string.confirmchangetitle,
                         R.string.confirmchangetext, getContext(), true,
                         new DialogInterface.OnClickListener() {

@@ -116,7 +116,7 @@ public class OptionQuestionView extends QuestionView {
             });
             rb.setText(formOptionText(o), BufferType.SPANNABLE);
             mOptionGroup.addView(rb);
-            mIdToValueMap.put(rb.getId(), o.getText());
+            mIdToValueMap.put(rb.getId(), o.getCode());
         }
         if (mQuestion.isAllowOther()) {
             RadioButton rb = new RadioButton(getContext());
@@ -146,7 +146,7 @@ public class OptionQuestionView extends QuestionView {
                 }
             });
             mCheckBoxes.add(box);
-            mIdToValueMap.put(box.getId(), options.get(i).getText());
+            mIdToValueMap.put(box.getId(), options.get(i).getCode());
             addView(box);
         }
         if (mQuestion.isAllowOther()) {

@@ -34,6 +34,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
+import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
@@ -138,16 +139,17 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
         }
-        if (!mDatabase.getSurvey(surveyId).isHelpDownloaded()) {
+        Survey survey = mDatabase.getSurvey(surveyId);
+        if (!survey.isHelpDownloaded()) {
             Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
             return;
         }
 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getSurveyInstances(mRecord.getId(), surveyId,
+        long[] instances = mDatabase.getFormInstances(mRecord.getId(), surveyId,
                 SurveyInstanceStatus.SAVED);
         long instance = instances.length > 0 ? instances[0]
-                : mDatabase.createSurveyRespondent(surveyId, mUser, mRecord.getId());
+                : mDatabase.createSurveyRespondent(surveyId, survey.getVersion(), mUser, mRecord.getId());
 
         Intent i = new Intent(this, FormActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());

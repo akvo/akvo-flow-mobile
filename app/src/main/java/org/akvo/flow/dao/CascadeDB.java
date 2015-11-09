@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -23,7 +23,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import org.akvo.flow.domain.Node;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,14 +36,6 @@ public class CascadeDB {
         String NAME = "name";
         String CODE = "code";
         String PARENT = "parent";
-    }
-
-    public interface NodeQuery {
-        String[] PROJECTION = new String[]{NodeColumns.ID, NodeColumns.NAME, NodeColumns.CODE};
-
-        int ID = 0;
-        int NAME = 1;
-        int CODE = 2;
     }
 
     private DatabaseHelper mHelper;
@@ -87,7 +78,7 @@ public class CascadeDB {
                 do {
                     Long id = c.getLong(c.getColumnIndex(NodeColumns.ID));
                     String name = c.getString(c.getColumnIndex(NodeColumns.NAME));
-                    String code = codeCol > -1 ? c.getString(codeCol) : null;// TODO: Should we send empty string? Name? Null?
+                    String code = codeCol > -1 ? c.getString(codeCol) : null;
                     result.add(new Node(id, name, code));
                 } while (c.moveToNext());
             }

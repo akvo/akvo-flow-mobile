@@ -187,7 +187,7 @@ Version</string>
   <string name="last_response">Última respuesta:</string>
   <string name="error_missing_cascade">Los recursos cascada no han sido descargados</string>
   <string name="error_missing_form">Formulario no encontrado. Por favor, vuelva a descargar todos los formularios.</string>
-  <string name="tab_forms">ENCUESTAS</string>
+  <string name="tab_forms">FORMULARIOS</string>
   <string name="tab_history">RESPUESTAS</string>
   <!--Form & transmission status-->
   <string name="status_queued">En espera</string>

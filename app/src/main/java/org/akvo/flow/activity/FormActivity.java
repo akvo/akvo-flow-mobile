@@ -263,18 +263,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
             boolean first = true;
             for (String questionId : localeNameQuestions) {
                 QuestionResponse questionResponse = mDatabase.getResponse(mSurveyInstanceId, questionId);
-                String answer = questionResponse != null ? questionResponse.getValue() : null;
+                String answer = questionResponse != null ? questionResponse.getDatapointNameValue() : null;
 
                 if (!TextUtils.isEmpty(answer)) {
-                    answer = answer.replaceAll("\\s+", " ");// Trim line breaks, multiple spaces, etc
-                    answer = answer.replaceAll("\\s*\\|\\s*", " - ");// Replace pipes with hyphens
-
                     if (!first) {
                         builder.append(" - ");
-                    } else {
-                        first = false;
                     }
-                    builder.append(answer.trim());
+                    builder.append(answer);
+                    first = false;
                 }
             }
             // Make sure the value is not larger than 500 chars

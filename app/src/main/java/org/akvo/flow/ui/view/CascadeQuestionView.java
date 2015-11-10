@@ -193,7 +193,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         return "";
     }
 
-    private List<CascadeValue> loadValues(String data) {
+    public static List<CascadeValue> loadValues(String data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(data, new TypeReference<List<CascadeValue>>(){});

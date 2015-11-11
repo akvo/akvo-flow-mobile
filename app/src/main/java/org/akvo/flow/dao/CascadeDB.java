@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -38,14 +38,6 @@ public class CascadeDB {
         String PARENT = "parent";
     }
 
-    public interface NodeQuery {
-        String[] PROJECTION = new String[]{NodeColumns.ID, NodeColumns.NAME, NodeColumns.CODE};
-
-        int ID = 0;
-        int NAME = 1;
-        int CODE = 2;
-    }
-
     private DatabaseHelper mHelper;
     public SQLiteDatabase mDatabase;
 
@@ -73,17 +65,21 @@ public class CascadeDB {
     }
 
     public List<Node> getValues(long parent) {
-        Cursor c = mDatabase.query(TABLE_NODE, NodeQuery.PROJECTION,
+        // For backwards compatibility, we'll query all columns, and check if the code exist.
+        Cursor c = mDatabase.query(TABLE_NODE, null,
                 NodeColumns.PARENT + "=?",
                 new String[]{String.valueOf(parent)},
                 null, null, NodeColumns.NAME);
 
-        final List<Node> result = new ArrayList<Node>();
+        final List<Node> result = new ArrayList<>();
         if (c != null) {
             if (c.moveToFirst()) {
+                final int codeCol = c.getColumnIndex(NodeColumns.CODE);
                 do {
-                    result.add(new Node(c.getLong(NodeQuery.ID), c.getString(NodeQuery.NAME),
-                            c.getString(NodeQuery.CODE)));
+                    Long id = c.getLong(c.getColumnIndex(NodeColumns.ID));
+                    String name = c.getString(c.getColumnIndex(NodeColumns.NAME));
+                    String code = codeCol > -1 ? c.getString(codeCol) : null;
+                    result.add(new Node(id, name, code));
                 } while (c.moveToNext());
             }
             c.close();

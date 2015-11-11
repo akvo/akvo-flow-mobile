@@ -12,6 +12,9 @@
 
         <item name="android:titleTextStyle" tools:targetApi="11">@style/Flow.ActionBar.Text</item>
         <item name="titleTextStyle">@style/Flow.ActionBar.Text</item>
+
+        <item name="android:subtitleTextStyle" tools:targetApi="11">@style/Flow.ActionBar.Text</item>
+        <item name="subtitleTextStyle">@style/Flow.ActionBar.Text</item>
     </style>
 
     <style name="Flow.ActionBar.Tabs" parent="@style/Widget.AppCompat.ActionBar.TabView">

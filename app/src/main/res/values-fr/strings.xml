@@ -184,7 +184,7 @@
   <string name="last_response">Dernière réponse</string>
   <string name="error_missing_cascade">Les fichiers de cascade ne sont pas télécharger </string>
   <string name="error_missing_form">Formulaire non trouvé. Re-télécharger tous les formulaires.</string>
-  <string name="tab_forms">ENQUÊTES</string>
+  <string name="tab_forms">FORMULAIRES</string>
   <string name="tab_history">RÉPONSES</string>
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>

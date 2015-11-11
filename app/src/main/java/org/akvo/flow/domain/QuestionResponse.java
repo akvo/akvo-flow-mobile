@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,6 +16,8 @@
 
 package org.akvo.flow.domain;
 
+import org.akvo.flow.domain.response.value.CascadeValue;
+import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 public class QuestionResponse {
@@ -161,4 +163,44 @@ public class QuestionResponse {
         }
         return hasVal;
     }
+
+    /**
+     * Build a human-readable representation of the response.
+     * Based on the response type, this means handling and parsing each value in a different way.
+     */
+    public String getDatapointNameValue() {
+        if (type == null || value == null) {
+            return "";
+        }
+
+        String name;
+        switch (type) {
+            case ConstantUtil.CASCADE_RESPONSE_TYPE:
+                name = getCascadeDatapointName();
+                break;
+            default:
+                name = value;
+                break;
+        }
+
+        name = name.replaceAll("\\s+", " ");// Trim line breaks, multiple spaces, etc
+        name = name.replaceAll("\\s*\\|\\s*", " - ");// Replace pipes with hyphens
+
+        return name.trim();
+    }
+
+    private String getCascadeDatapointName() {
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+        for (CascadeValue cv : CascadeQuestionView.loadValues(value)) {
+            if (!first) {
+                builder.append(" - ");
+            }
+            builder.append(cv.getName());
+            first = false;
+        }
+
+        return builder.toString();
+    }
+
 }

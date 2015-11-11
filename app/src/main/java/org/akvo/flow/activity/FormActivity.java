@@ -21,6 +21,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -127,7 +128,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         // Set the survey name as Activity title
-        setTitle(mSurvey.getName());
+        getSupportActionBar().setTitle(mSurvey.getName());
+        getSupportActionBar().setSubtitle("v " + getVersion());
+
         mPager = (ViewPager)findViewById(R.id.pager);
         mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
         mPager.setAdapter(mAdapter);
@@ -199,6 +202,21 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
     }
 
+    private double getVersion() {
+        double version = 0.0;
+        Cursor c = mDatabase.getFormInstance(mSurveyInstanceId);
+        if (c.moveToFirst()) {
+            version = c.getDouble(SurveyDbAdapter.FormInstanceQuery.VERSION);
+        }
+        c.close();
+
+        if (version == 0.0) {
+            version = mSurvey.getVersion();// Default to current value
+        }
+
+        return version;
+    }
+
     /**
      * Load state for the current survey instance
      */
@@ -263,18 +281,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
             boolean first = true;
             for (String questionId : localeNameQuestions) {
                 QuestionResponse questionResponse = mDatabase.getResponse(mSurveyInstanceId, questionId);
-                String answer = questionResponse != null ? questionResponse.getValue() : null;
+                String answer = questionResponse != null ? questionResponse.getDatapointNameValue() : null;
 
                 if (!TextUtils.isEmpty(answer)) {
-                    answer = answer.replaceAll("\\s+", " ");// Trim line breaks, multiple spaces, etc
-                    answer = answer.replaceAll("\\s*\\|\\s*", " - ");// Replace pipes with hyphens
-
                     if (!first) {
                         builder.append(" - ");
-                    } else {
-                        first = false;
                     }
-                    builder.append(answer.trim());
+                    builder.append(answer);
+                    first = false;
                 }
             }
             // Make sure the value is not larger than 500 chars

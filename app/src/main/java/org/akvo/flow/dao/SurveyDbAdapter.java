@@ -121,6 +121,7 @@ public class SurveyDbAdapter {
         String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
         String DURATION = "duration";
         String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
+        String VERSION = "version";
     }
 
     public interface TransmissionColumns {
@@ -212,7 +213,8 @@ public class SurveyDbAdapter {
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
     private static final int VER_FORM_SUBMITTER = 79;
     private static final int VER_FORM_DEL_CHECK = 80;
-    private static final int DATABASE_VERSION = VER_FORM_DEL_CHECK;
+    private static final int VER_FORM_VERSION = 81;
+    private static final int DATABASE_VERSION = VER_FORM_VERSION;
 
     private final Context context;
 
@@ -275,6 +277,7 @@ public class SurveyDbAdapter {
                     + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
                     + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
                     + SurveyInstanceColumns.SUBMITTER + " TEXT,"
+                    + SurveyInstanceColumns.VERSION + " REAL,"
                     + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
 
             db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
@@ -340,6 +343,9 @@ public class SurveyDbAdapter {
                 case VER_FORM_SUBMITTER:
                     db.execSQL("ALTER TABLE " + Tables.TRANSMISSION
                             + " ADD COLUMN " + TransmissionColumns.SURVEY_ID + " TEXT");
+                case VER_FORM_DEL_CHECK:
+                    db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
+                            + " ADD COLUMN " + SurveyInstanceColumns.VERSION + " REAL");
                     version = DATABASE_VERSION;
             }
 
@@ -738,11 +744,12 @@ public class SurveyDbAdapter {
     /**
      * creates a new unsubmitted survey instance
      */
-    public long createSurveyRespondent(String surveyId, User user, String surveyedLocaleId) {
+    public long createSurveyRespondent(String surveyId, double version, User user, String surveyedLocaleId) {
         final long time = System.currentTimeMillis();
 
         ContentValues initialValues = new ContentValues();
         initialValues.put(SurveyInstanceColumns.SURVEY_ID, surveyId);
+        initialValues.put(SurveyInstanceColumns.VERSION, version);
         initialValues.put(SurveyInstanceColumns.USER_ID, user.getId());
         initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
         initialValues.put(SurveyInstanceColumns.UUID, PlatformUtil.uuid());
@@ -1392,24 +1399,24 @@ public class SurveyDbAdapter {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.DELETED, 1);
         database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                new String[] { surveyId });
+                new String[]{surveyId});
+    }
+
+    public Cursor getFormInstance(long formInstanceId) {
+        return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
+                FormInstanceQuery.PROJECTION,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID + "= ?",
+                new String[] { String.valueOf(formInstanceId) },
+                null, null, null);
     }
 
     /**
      * Get all the SurveyInstances for a particular data point. Registration form will be at the top
      * of the list, all other forms will be ordered by submission date (desc).
      */
-    public Cursor getSurveyInstances(String recordId) {
+    public Cursor getFormInstances(String recordId) {
         return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
-                new String[] {
-                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
-                        Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
-                        SurveyColumns.NAME, SurveyInstanceColumns.SAVED_DATE,
-                        SurveyInstanceColumns.USER_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.STATUS,
-                        SurveyInstanceColumns.SYNC_DATE, SurveyInstanceColumns.EXPORTED_DATE,
-                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.SUBMITTER,
-                },
+                FormInstanceQuery.PROJECTION,
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[] { recordId },
                 null, null,
@@ -1421,7 +1428,7 @@ public class SurveyDbAdapter {
      * Get SurveyInstances with a particular status.
      * If the recordId is not null, results will be filtered by Record.
      */
-    public long[] getSurveyInstances(String recordId, String surveyId, int status) {
+    public long[] getFormInstances(String recordId, String surveyId, int status) {
         String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.STATUS + "= ?" +
                 " AND "  + SurveyInstanceColumns.RECORD_ID + "= ?";
@@ -1767,6 +1774,38 @@ public class SurveyDbAdapter {
         int LATITUDE = 4;
         int LONGITUDE = 5;
         int LAST_MODIFIED = 6;
+    }
+
+    public interface FormInstanceQuery {
+        String[] PROJECTION = {
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.VERSION,
+                SurveyColumns.NAME,
+                SurveyInstanceColumns.SAVED_DATE,
+                SurveyInstanceColumns.USER_ID,
+                SurveyInstanceColumns.SUBMITTED_DATE,
+                SurveyInstanceColumns.UUID,
+                SurveyInstanceColumns.STATUS,
+                SurveyInstanceColumns.SYNC_DATE,
+                SurveyInstanceColumns.EXPORTED_DATE,
+                SurveyInstanceColumns.RECORD_ID,
+                SurveyInstanceColumns.SUBMITTER,
+        };
+
+        int _ID = 0;
+        int SURVEY_ID = 1;
+        int VERSION = 2;
+        int NAME = 3;
+        int SAVED_DATE = 4;
+        int USER_ID = 5;
+        int SUBMITTED_DATE = 6;
+        int UUID = 7;
+        int STATUS = 8;
+        int SYNC_DATE = 9;
+        int EXPORTED_DATE = 10;
+        int RECORD_ID = 11;
+        int SUBMITTER = 12;
     }
 
 }

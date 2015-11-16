@@ -1,6 +1,15 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.0.2
+Date: 11 November 2015
+
+Resolved issues
+---------------
+* Fix backwards compatibility in cascade questions [#371]
+* Fix datapoint name generation in cascade questions [#373]
+* Display form version [#365]
+
 # ver 2.2.0.1
 Date: 23 October 2015
 

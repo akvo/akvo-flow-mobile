@@ -368,49 +368,41 @@ public class OptionQuestionView extends QuestionView {
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
-        mSuppressListeners = true;
-        if (resp != null) {
-            if (mOptionGroup != null) {
-                // the enhanced for loop is ok here
-                for (Integer key : mIdToValueMap.keySet()) {
-                    // if the response text matches the text stored for this
-                    // option ID OR if the response is the "OTHER" type and the
-                    // id matches the other option, select it
-                    if (mIdToValueMap.get(key).equals(resp.getValue())
-                            || (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp
-                            .getType()) && mIdToValueMap.get(key)
-                            .equals(OTHER_TEXT))) {
-                        mOptionGroup.check(key);
-                        if (mIdToValueMap.get(key).equals(OTHER_TEXT) && mQuestion.isAllowOther()) {
-                            String txt = resp.getValue();
-                            if (txt != null) {
-                                mOtherText.setText(txt);
-                            }
-                        }
-                        break;
-                    }
-                }
-            } else if (mCheckBoxes != null) {
-                if (resp.getValue() != null && resp.getValue().trim().length() > 0) {
-                    // if the response text matches the text stored for this
-                    // option ID OR if the response is the "OTHER" type and the
-                    // id matches the other option, select it
-                    List<String> valList = Arrays.asList(resp.getValue().split("\\|"));
-                    for (Integer key : mIdToValueMap.keySet()) {
-                        if (valList.contains(mIdToValueMap.get(key))) {
-                            mCheckBoxes.get(key).setChecked(true);
-                        } else if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType()) &&
-                                OTHER_TEXT.equals(mIdToValueMap.get(key)) &&
-                                mQuestion.isAllowOther()) {
-                            mCheckBoxes.get(key).setChecked(true);
-                            // the last token is always the Other text (even if
-                            // it's blank)
-                            mLatestOtherText = valList.get(valList.size() - 1);
-                            mOtherText.setText(mLatestOtherText);
-                        }
-                    }
-                }
+        if (resp == null || TextUtils.isEmpty(resp.getValue())) {
+            return;
+        }
 
+        mSuppressListeners = true;
+        if (!mQuestion.isAllowMultiple()) {
+            for (Integer key : mIdToValueMap.keySet()) {
+                // if the response text matches the text stored for this
+                // option ID OR if the response is the "OTHER" type and the
+                // id matches the other option, select it
+                if (mIdToValueMap.get(key).equals(resp.getValue())
+                        || (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp
+                        .getType()) && mIdToValueMap.get(key).equals(OTHER_TEXT))) {
+                    mOptionGroup.check(key);
+                    if (mIdToValueMap.get(key).equals(OTHER_TEXT) && mQuestion.isAllowOther()) {
+                        mOtherText.setText(resp.getValue());
+                    }
+                    break;
+                }
+            }
+        } else if (mCheckBoxes != null) {
+            // if the response text matches the text stored for this
+            // option ID OR if the response is the "OTHER" type and the
+            // id matches the other option, select it
+            List<String> valList = Arrays.asList(resp.getValue().split("\\|"));
+            for (Integer key : mIdToValueMap.keySet()) {
+                if (valList.contains(mIdToValueMap.get(key))) {
+                    mCheckBoxes.get(key).setChecked(true);
+                } else if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType()) &&
+                        OTHER_TEXT.equals(mIdToValueMap.get(key))) {
+                    mCheckBoxes.get(key).setChecked(true);
+                    // the last token is always the Other text (even if it's blank)
+                    mLatestOtherText = valList.get(valList.size() - 1);
+                    mOtherText.setText(mLatestOtherText);
+                }
             }
         }
         mSuppressListeners = false;

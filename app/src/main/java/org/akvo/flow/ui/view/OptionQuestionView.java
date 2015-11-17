@@ -38,6 +38,7 @@ import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.response.Response;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
@@ -55,13 +56,18 @@ import java.util.Map;
  * @author Christopher Fagiani
  */
 public class OptionQuestionView extends QuestionView {
+    private static final String OTHER_CODE = "OTHER";
     private final String OTHER_TEXT;
     private RadioGroup mOptionGroup;
     private List<CheckBox> mCheckBoxes;
     private TextView mOtherText;
-    private Map<Integer, String> mIdToValueMap;
+    private Map<Integer, Option> mIdToOptionMap;
     private volatile boolean mSuppressListeners = false;
     private String mLatestOtherText;
+
+    // A Map would be more efficient here, but we need to preserve the original order.
+    // FIXME: We might not need this variable
+    private List<Option> mSelectedOptions;
 
     public OptionQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -73,7 +79,8 @@ public class OptionQuestionView extends QuestionView {
         // Just inflate the header. Options will be added dynamically
         setQuestionView(R.layout.question_header);
 
-        mIdToValueMap = new HashMap<>();
+        mIdToOptionMap = new HashMap<>();
+        mSelectedOptions = new ArrayList<>();
 
         if (mQuestion.getOptions() == null) {
             return;
@@ -116,16 +123,18 @@ public class OptionQuestionView extends QuestionView {
             });
             rb.setText(formOptionText(o), BufferType.SPANNABLE);
             mOptionGroup.addView(rb);
-            mIdToValueMap.put(rb.getId(), o.getCode());
+            mIdToOptionMap.put(rb.getId(), o);
         }
         if (mQuestion.isAllowOther()) {
             RadioButton rb = new RadioButton(getContext());
             rb.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
-            rb.setEnabled(!isReadOnly());
             rb.setText(OTHER_TEXT);
+            rb.setEnabled(!isReadOnly());
             mOptionGroup.addView(rb);
-            mIdToValueMap.put(rb.getId(), OTHER_TEXT);
+            Option other = new Option();
+            other.setCode(OTHER_CODE);
+            mIdToOptionMap.put(rb.getId(), other);
         }
         addView(mOptionGroup);
     }
@@ -146,7 +155,7 @@ public class OptionQuestionView extends QuestionView {
                 }
             });
             mCheckBoxes.add(box);
-            mIdToValueMap.put(box.getId(), options.get(i).getCode());
+            mIdToOptionMap.put(box.getId(), options.get(i));
             addView(box);
         }
         if (mQuestion.isAllowOther()) {
@@ -162,7 +171,9 @@ public class OptionQuestionView extends QuestionView {
                 }
             });
             mCheckBoxes.add(box);
-            mIdToValueMap.put(box.getId(), OTHER_TEXT);
+            Option other = new Option();
+            other.setCode(OTHER_CODE);
+            mIdToOptionMap.put(box.getId(), other);
             addView(box);
         }
     }
@@ -233,128 +244,68 @@ public class OptionQuestionView extends QuestionView {
             return;
         }
 
-        if (OTHER_TEXT.equals(mIdToValueMap.get(checkedId))) {
-            // only display the dialog if OTHER isn't already populated as
-            // the response need this to suppress the OTHER dialog
-            if (isChecked && (getResponse() == null || !getResponse().getType()
-                    .equals(ConstantUtil.OTHER_RESPONSE_TYPE))) {
-                displayOtherDialog();
-            } else if (!isChecked && getResponse() != null) {
-                // since they unchecked "Other", clear the display
-                if (mOtherText != null) {
-                    mOtherText.setText("");
-                }
-                mLatestOtherText = "";
-                QuestionResponse r = getResponse();
-                r.setType(ConstantUtil.VALUE_RESPONSE_TYPE);
-                if (mQuestion.isAllowMultiple()) {
-                    r.setValue(getMultipleSelections());
-                } else {
-                    r.setValue("");
-                }
-            }
-
-        } else {
-            if (!mQuestion.isAllowMultiple()
-                    || getResponse() == null
-                    || TextUtils.isEmpty(getResponse().getValue())) {
-                // if we don't allow multiple and they didn't select other, we
-                // can clear the otherText
-                if (mOtherText != null) {
-                    mOtherText.setText("");
-                }
-                setResponse(new QuestionResponse(mIdToValueMap.get(checkedId),
-                        ConstantUtil.VALUE_RESPONSE_TYPE, mQuestion.getId()));
-            } else {
-                // if there is already a response and we support multiple,
-                // we have to combine
-                QuestionResponse r = getResponse();
-                String newResponse = getMultipleSelections();
-                r.setValue(newResponse);
-                r.setType(ConstantUtil.VALUE_RESPONSE_TYPE);
-                notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
-            }
+        boolean isOther = OTHER_TEXT.equals(mIdToOptionMap.get(checkedId).getText());
+        if (isOther && isChecked) {
+            displayOtherDialog(checkedId);
+            return;
         }
+
+        captureResponse();
     }
 
     /**
      * Forms a delimited string containing all selected options not including OTHER
      */
-    private String getMultipleSelections() {
-        if (mCheckBoxes == null) {
-            return "";
+    private List<Option> getSelection() {
+        List<Option> options = new ArrayList<>();
+        if (mQuestion.isAllowMultiple()) {
+            for (CheckBox cb: mCheckBoxes) {
+                if (cb.isChecked()) {
+                    Option option = mIdToOptionMap.get(cb.getId());
+                    options.add(option);
+                }
+            }
+        } else {
+            Option option = mIdToOptionMap.get(mOptionGroup.getCheckedRadioButtonId());
+            options.add(option);
         }
 
-        StringBuilder newResponse = new StringBuilder();
-        boolean first = true;
-        for (CheckBox box : mCheckBoxes) {
-            if (!box.isChecked()) {
-                continue;
-            }
-            if (!first) {
-                newResponse.append("|");
-            }
-            if (!OTHER_TEXT.equals(mIdToValueMap.get(box.getId()))) {
-                newResponse.append(mIdToValueMap.get(box.getId()));
-            } else {
-                // if OTHER is selected
-                newResponse.append(mLatestOtherText);
-            }
-            first = false;
-        }
-        return newResponse.toString();
+        return options;
     }
 
     /**
      * displays a pop-up dialog where the user can enter in a specific value for
      * the "OTHER" option in a freetext view.
      */
-    private void displayOtherDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+    private void displayOtherDialog(final int otherId) {
         LinearLayout main = new LinearLayout(getContext());
         main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         main.setOrientation(LinearLayout.VERTICAL);
-        builder.setTitle(R.string.otherinstructions);
         final EditText inputView = new EditText(getContext());
         inputView.setSingleLine();
+        inputView.append(mLatestOtherText);
         main.addView(inputView);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.otherinstructions);
         builder.setView(main);
         builder.setPositiveButton(R.string.okbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mLatestOtherText = inputView.getText().toString().trim();
-                        if (getQuestion().isAllowMultiple()
-                                && getResponse() != null
-                                && getResponse().getValue() != null) {
-                            // if we support multiple, we need to append the answer
-                            setResponse(new QuestionResponse(getMultipleSelections(),
-                                    ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion.getId()));
-                        } else {
-                            // if we aren't supporting multiple or we don't
-                            // already have a value, just set it
-                            setResponse(new QuestionResponse(mLatestOtherText,
-                                    ConstantUtil.OTHER_RESPONSE_TYPE, mQuestion.getId()));
-                        }
+                        mIdToOptionMap.get(otherId).setText(mLatestOtherText);
+                        captureResponse();
                         // update the UI with the other text
                         if (mOtherText != null) {
                             mOtherText.setText(mLatestOtherText);
-                        }
-                        if (dialog != null) {
-                            dialog.dismiss();
                         }
                     }
                 });
         builder.setNegativeButton(R.string.cancelbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // Reset the answer only for single-choice questions
-                        if (!getQuestion().isAllowMultiple()) {
-                            setResponse(new QuestionResponse("", ConstantUtil.OTHER_RESPONSE_TYPE,
-                                    mQuestion.getId()));
-                        }
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
+                        // Deselect 'other'
+                        handleSelection(otherId, false);
                     }
                 });
 
@@ -372,36 +323,41 @@ public class OptionQuestionView extends QuestionView {
             return;
         }
 
+        List<Option> selectedOptions = loadResponse(resp.getValue());
+        if (selectedOptions.isEmpty()) {
+            return;
+        }
+
         mSuppressListeners = true;
         if (!mQuestion.isAllowMultiple()) {
-            for (Integer key : mIdToValueMap.keySet()) {
-                // if the response text matches the text stored for this
-                // option ID OR if the response is the "OTHER" type and the
-                // id matches the other option, select it
-                if (mIdToValueMap.get(key).equals(resp.getValue())
-                        || (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp
-                        .getType()) && mIdToValueMap.get(key).equals(OTHER_TEXT))) {
-                    mOptionGroup.check(key);
-                    if (mIdToValueMap.get(key).equals(OTHER_TEXT) && mQuestion.isAllowOther()) {
-                        mOtherText.setText(resp.getValue());
-                    }
+            Option option = selectedOptions.get(0);
+            for (int i=0; i<mOptionGroup.getChildCount(); i++) {
+                RadioButton rb = (RadioButton) mOptionGroup.getChildAt(i);
+                if (rb.getText().equals(option.getText())) {
+                    mOptionGroup.check(rb.getId());
+                    break;
+                } else if (OTHER_TEXT.equals(rb.getText()) && mQuestion.isAllowOther()) {
+                    // Assume this is the OTHER value
+                    mOptionGroup.check(rb.getId());
+                    mLatestOtherText = option.getText();
+                    mOtherText.setText(mLatestOtherText);
+                    mIdToOptionMap.get(rb.getId()).setText(mLatestOtherText);
                     break;
                 }
             }
-        } else if (mCheckBoxes != null) {
-            // if the response text matches the text stored for this
-            // option ID OR if the response is the "OTHER" type and the
-            // id matches the other option, select it
-            List<String> valList = Arrays.asList(resp.getValue().split("\\|"));
-            for (Integer key : mIdToValueMap.keySet()) {
-                if (valList.contains(mIdToValueMap.get(key))) {
-                    mCheckBoxes.get(key).setChecked(true);
-                } else if (ConstantUtil.OTHER_RESPONSE_TYPE.equals(resp.getType()) &&
-                        OTHER_TEXT.equals(mIdToValueMap.get(key))) {
-                    mCheckBoxes.get(key).setChecked(true);
-                    // the last token is always the Other text (even if it's blank)
-                    mLatestOtherText = valList.get(valList.size() - 1);
-                    mOtherText.setText(mLatestOtherText);
+        } else {
+            for (Option option : selectedOptions) {
+                for (CheckBox cb : mCheckBoxes) {
+                    if (option.equals(mIdToOptionMap.get(cb.getId()))) {
+                        cb.setChecked(true);
+                        break;
+                    } else if (OTHER_TEXT.equals(cb.getText()) && mQuestion.isAllowOther()) {
+                        // Assume this is the OTHER value
+                        cb.setChecked(true);
+                        mLatestOtherText = option.getText();
+                        mOtherText.setText(mLatestOtherText);
+                        mIdToOptionMap.get(cb.getId()).setText(mLatestOtherText);
+                    }
                 }
             }
         }
@@ -442,6 +398,13 @@ public class OptionQuestionView extends QuestionView {
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+        mSelectedOptions = getSelection();
+        // TODO: Based on mSelectedOptions, populate Question Response
+    }
+
+    private List<Option> loadResponse(String data) {
+        // TODO: Handle JSON and pipe-separated values
+        return null;
     }
 
 }

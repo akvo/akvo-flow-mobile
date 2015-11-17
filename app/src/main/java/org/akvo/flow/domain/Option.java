@@ -52,4 +52,13 @@ public class Option {
         this.code = code;
     }
 
+    @Override
+    public boolean equals(Object option) {
+        if (option == null || !(option instanceof Option)) {
+            return false;
+        }
+
+        return text != null && text.equals(((Option) option).getText());
+    }
+
 }

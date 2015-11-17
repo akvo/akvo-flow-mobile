@@ -77,32 +77,29 @@ public class QuestionResponse {
     }
 
     public boolean isValid() {
-        if (!ConstantUtil.OTHER_RESPONSE_TYPE.equals(type)) {
-            // if the response isn't "OTHER" then we have to check that it has a
-            // value that isn't just a blank
-            if (value == null || value.trim().length() == 0) {
-                return false;
-            }
-            // now check that, if it's a geo question, we have something specified
-            if (ConstantUtil.GEO_RESPONSE_TYPE.equals(type)) {
-                String[] tokens = value.split("\\|", -1);
-                if (tokens.length >= 2) {
-                    // at least the first 2 tokens must be numeric
-                    for (int i = 0; i < 2; i++) {
-                        String token = tokens[i];
-                        try {
-                            if (token.trim().length() > 0) {
-                                Double.parseDouble(token);
-                            } else {
-                                return false;
-                            }
-                        } catch (NumberFormatException e) {
+        // We have to check that it has a value that isn't just a blank
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
+        // now check that, if it's a geo question, we have something specified
+        if (ConstantUtil.GEO_RESPONSE_TYPE.equals(type)) {
+            String[] tokens = value.split("\\|", -1);
+            if (tokens.length >= 2) {
+                // at least the first 2 tokens must be numeric
+                for (int i = 0; i < 2; i++) {
+                    String token = tokens[i];
+                    try {
+                        if (token.trim().length() > 0) {
+                            Double.parseDouble(token);
+                        } else {
                             return false;
                         }
+                    } catch (NumberFormatException e) {
+                        return false;
                     }
-                } else {
-                    return false;
                 }
+            } else {
+                return false;
             }
         }
         return true;

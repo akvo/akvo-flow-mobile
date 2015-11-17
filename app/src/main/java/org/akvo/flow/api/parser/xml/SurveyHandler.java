@@ -405,12 +405,7 @@ public class SurveyHandler extends DefaultHandler {
             }
         } else if (localName.equalsIgnoreCase(OPTION)) {
             currentOption = new Option();
-            // Check for code (new forms) or value (old forms)
-            if (attributes.getValue(CODE) != null) {
-                currentOption.setCode(attributes.getValue(CODE));
-            } else {
-                currentOption.setCode(attributes.getValue(VALUE));
-            }
+            currentOption.setCode(attributes.getValue(CODE));
         } else if (localName.equalsIgnoreCase(LEVELS)) {
             currentLevels = new ArrayList<Level>();
         } else if (localName.equalsIgnoreCase(LEVEL)) {

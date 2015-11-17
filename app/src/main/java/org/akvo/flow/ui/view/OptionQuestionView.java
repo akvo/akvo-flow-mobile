@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -38,16 +39,14 @@ import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.domain.response.Response;
-import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Question type that supports the selection of a single option from a list of
@@ -56,6 +55,7 @@ import java.util.Map;
  * @author Christopher Fagiani
  */
 public class OptionQuestionView extends QuestionView {
+    private static final String TAG = OptionQuestionView.class.getSimpleName();
     private static final String OTHER_CODE = "OTHER";
     private final String OTHER_TEXT;
     private RadioGroup mOptionGroup;
@@ -271,7 +271,9 @@ public class OptionQuestionView extends QuestionView {
         main.setOrientation(LinearLayout.VERTICAL);
         final EditText inputView = new EditText(getContext());
         inputView.setSingleLine();
-        inputView.append(mLatestOtherText);
+        if (!TextUtils.isEmpty(mLatestOtherText)) {
+            inputView.append(mLatestOtherText);
+        }
         main.addView(inputView);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -311,47 +313,30 @@ public class OptionQuestionView extends QuestionView {
             return;
         }
 
-        List<Option> selectedOptions = loadResponse(resp.getValue());
-        if (selectedOptions.isEmpty()) {
+        List<Option> selectedOptions = deserialize(resp.getValue());
+        if (selectedOptions == null || selectedOptions.isEmpty()) {
             return;
         }
 
         mSuppressListeners = true;
-        if (!mQuestion.isAllowMultiple()) {
-            Option option = selectedOptions.get(0);
-            for (int i=0; i<mOptionGroup.getChildCount(); i++) {
-                RadioButton rb = (RadioButton) mOptionGroup.getChildAt(i);
-                final int id = rb.getId();
-                if (rb.getText().equals(option.getText())) {
-                    mOptionGroup.check(id);
-                    break;
-                } else if (mQuestion.isAllowOther() && (option.isOther() || mOptions.get(id).isOther())) {
+        for (Option selectedOption : selectedOptions) {
+            for (int i=0; i<mOptions.size(); i++) {
+                Option option = mOptions.get(i);
+                boolean match = selectedOption.equals(option);
+                if (!match && selectedOption.isOther() && option.isOther()) {
                     // Assume this is the OTHER value
-                    mOptionGroup.check(id);
-                    mLatestOtherText = option.getText();
+                    match = true;
+                    mLatestOtherText = selectedOption.getText();
                     mOtherText.setText(mLatestOtherText);
-                    mOptions.get(id).setText(mLatestOtherText);
-                    break;
+                    option.setText(mLatestOtherText);
                 }
-            }
-        } else {
-            for (Option option : selectedOptions) {
-                for (CheckBox cb : mCheckBoxes) {
-                    final int id = cb.getId();
-                    if (id < mOptions.size()-1) {
-                        break;
+                if (match) {
+                    if (mQuestion.isAllowMultiple()) {
+                        mCheckBoxes.get(i).setChecked(true);
+                    } else {
+                        mOptionGroup.check(i);
                     }
-                    if (option.equals(mOptions.get(id))) {
-                        cb.setChecked(true);
-                        break;
-                    } else if (mQuestion.isAllowOther() && (option.isOther() || mOptions.get(id).isOther())) {
-                        // Assume this is the OTHER value
-                        cb.setChecked(true);
-                        mLatestOtherText = option.getText();
-                        mOtherText.setText(mLatestOtherText);
-                        mOptions.get(id).setText(mLatestOtherText);
-                        break;
-                    }
+                    break;// TODO: Break outer loop in single-choice responses?
                 }
             }
         }
@@ -392,12 +377,56 @@ public class OptionQuestionView extends QuestionView {
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        // TODO: Based on mSelectedOptions, populate Question Response
+        String response = serialize(getSelection());
+        setResponse(new QuestionResponse(response, ConstantUtil.OPTION_RESPONSE_TYPE,
+                getQuestion().getId()), suppressListeners);
     }
 
-    private List<Option> loadResponse(String data) {
-        // TODO: Handle JSON and pipe-separated values
+    private String serialize(List<Option> values) {
+        try {
+            JSONArray jOptions = new JSONArray();
+            for (Option option : values) {
+                JSONObject jOption = new JSONObject();
+                jOption.put(Attrs.TEXT, option.getText());
+                if (!TextUtils.isEmpty(option.getCode())) {
+                    jOption.put(Attrs.CODE, option.getCode());
+                }
+                if (option.isOther()) {
+                    jOption.put(Attrs.IS_OTHER, true);
+                }
+                jOptions.put(jOption);
+            }
+            return jOptions.toString();
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return "";
+    }
+
+    private List<Option> deserialize(String data) {
+        try {
+            List<Option> options = new ArrayList<>();
+            JSONArray jOptions = new JSONArray(data);
+            for (int i=0; i<jOptions.length(); i++) {
+                JSONObject jOption = jOptions.getJSONObject(i);
+                Option option = new Option();
+                option.setText(jOption.optString(Attrs.TEXT));
+                option.setCode(jOption.optString(Attrs.CODE));
+                option.setIsOther(jOption.optBoolean(Attrs.IS_OTHER));
+                options.add(option);
+            }
+            return options;
+        } catch (JSONException e) {
+            // TODO: Backwards compatibility; Pipe-separated responses
+            Log.e(TAG, e.getMessage());
+        }
         return null;
+    }
+
+    interface Attrs {
+        String CODE = "code";
+        String TEXT = "text";
+        String IS_OTHER = "isOther";
     }
 
 }

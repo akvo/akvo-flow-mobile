@@ -26,6 +26,7 @@ import java.util.HashMap;
 public class Option {
     private String text;
     private String code;
+    private boolean isOther;
     private HashMap<String, AltText> altTextMap = new HashMap<>();
 
     public void addAltText(AltText altText) {
@@ -50,6 +51,14 @@ public class Option {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public void setIsOther(boolean isOther) {
+        this.isOther = isOther;
+    }
+
+    public boolean isOther() {
+        return isOther;
     }
 
     @Override

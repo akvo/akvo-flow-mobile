@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.api.parser.json;
+package org.akvo.flow.serialization.response;
 
 import android.util.Log;
 

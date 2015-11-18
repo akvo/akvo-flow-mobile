@@ -16,8 +16,8 @@
 
 package org.akvo.flow.domain;
 
-import org.akvo.flow.domain.response.value.CascadeValue;
-import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.serialization.response.value.CascadeValue;
+import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.util.ConstantUtil;
 
 public class QuestionResponse {
@@ -173,7 +173,10 @@ public class QuestionResponse {
         String name;
         switch (type) {
             case ConstantUtil.CASCADE_RESPONSE_TYPE:
-                name = getCascadeDatapointName();
+                name = CascadeValue.getDatapointName(value);
+                break;
+            case ConstantUtil.OPTION_RESPONSE_TYPE:
+                name = OptionValue.getDatapointName(value);
                 break;
             default:
                 name = value;
@@ -184,20 +187,6 @@ public class QuestionResponse {
         name = name.replaceAll("\\s*\\|\\s*", " - ");// Replace pipes with hyphens
 
         return name.trim();
-    }
-
-    private String getCascadeDatapointName() {
-        StringBuilder builder = new StringBuilder();
-        boolean first = true;
-        for (CascadeValue cv : CascadeQuestionView.loadValues(value)) {
-            if (!first) {
-                builder.append(" - ");
-            }
-            builder.append(cv.getName());
-            first = false;
-        }
-
-        return builder.toString();
     }
 
 }

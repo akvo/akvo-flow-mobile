@@ -22,7 +22,6 @@ import android.content.DialogInterface;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -40,10 +39,8 @@ import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.util.ConstantUtil;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +52,6 @@ import java.util.List;
  * @author Christopher Fagiani
  */
 public class OptionQuestionView extends QuestionView {
-    private static final String TAG = OptionQuestionView.class.getSimpleName();
     private static final String OTHER_CODE = "OTHER";
     private final String OTHER_TEXT;
     private RadioGroup mOptionGroup;
@@ -313,7 +309,7 @@ public class OptionQuestionView extends QuestionView {
             return;
         }
 
-        List<Option> selectedOptions = deserialize(resp.getValue());
+        List<Option> selectedOptions = OptionValue.deserialize(resp.getValue());
         if (selectedOptions == null || selectedOptions.isEmpty()) {
             return;
         }
@@ -377,56 +373,9 @@ public class OptionQuestionView extends QuestionView {
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        String response = serialize(getSelection());
+        String response = OptionValue.serialize(getSelection());
         setResponse(new QuestionResponse(response, ConstantUtil.OPTION_RESPONSE_TYPE,
                 getQuestion().getId()), suppressListeners);
-    }
-
-    private String serialize(List<Option> values) {
-        try {
-            JSONArray jOptions = new JSONArray();
-            for (Option option : values) {
-                JSONObject jOption = new JSONObject();
-                jOption.put(Attrs.TEXT, option.getText());
-                if (!TextUtils.isEmpty(option.getCode())) {
-                    jOption.put(Attrs.CODE, option.getCode());
-                }
-                if (option.isOther()) {
-                    jOption.put(Attrs.IS_OTHER, true);
-                }
-                jOptions.put(jOption);
-            }
-            return jOptions.toString();
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        return "";
-    }
-
-    private List<Option> deserialize(String data) {
-        try {
-            List<Option> options = new ArrayList<>();
-            JSONArray jOptions = new JSONArray(data);
-            for (int i=0; i<jOptions.length(); i++) {
-                JSONObject jOption = jOptions.getJSONObject(i);
-                Option option = new Option();
-                option.setText(jOption.optString(Attrs.TEXT));
-                option.setCode(jOption.optString(Attrs.CODE));
-                option.setIsOther(jOption.optBoolean(Attrs.IS_OTHER));
-                options.add(option);
-            }
-            return options;
-        } catch (JSONException e) {
-            // TODO: Backwards compatibility; Pipe-separated responses
-            Log.e(TAG, e.getMessage());
-        }
-        return null;
-    }
-
-    interface Attrs {
-        String CODE = "code";
-        String TEXT = "text";
-        String IS_OTHER = "isOther";
     }
 
 }

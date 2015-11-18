@@ -21,7 +21,7 @@ import android.text.TextUtils;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import org.akvo.flow.api.parser.xml.SaxSurveyParser;
+import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.domain.Survey;
 
 /**

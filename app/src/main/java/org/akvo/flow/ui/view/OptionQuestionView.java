@@ -319,8 +319,10 @@ public class OptionQuestionView extends QuestionView {
             for (int i=0; i<mOptions.size(); i++) {
                 Option option = mOptions.get(i);
                 boolean match = selectedOption.equals(option);
-                if (!match && selectedOption.isOther() && option.isOther()) {
-                    // Assume this is the OTHER value
+                if (!match && option.isOther()) {
+                    // Assume this is the OTHER value. A more reliable indicator would be to check
+                    // selected response's `isOther` flag, but this is not guaranteed to be present
+                    // in old responses.
                     match = true;
                     mLatestOtherText = selectedOption.getText();
                     mOtherText.setText(mLatestOtherText);

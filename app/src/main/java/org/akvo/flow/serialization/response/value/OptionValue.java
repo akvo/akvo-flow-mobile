@@ -49,10 +49,18 @@ public class OptionValue {
             }
             return options;
         } catch (JSONException e) {
-            // TODO: Backwards compatibility; Pipe-separated responses
             Log.e(TAG, e.getMessage());
         }
-        return new ArrayList<>();
+
+        // Default to old format
+        List<Option> options = new ArrayList<>();
+        String[] tokens = data.split("\\|", -1);
+        for (String token : tokens) {
+            Option o = new Option();
+            o.setText(token);
+            options.add(o);
+        }
+        return options;
     }
 
     public static String getDatapointName(String value) {

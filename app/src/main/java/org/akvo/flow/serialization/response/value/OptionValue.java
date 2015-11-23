@@ -43,7 +43,7 @@ public class OptionValue {
                 JSONObject jOption = jOptions.getJSONObject(i);
                 Option option = new Option();
                 option.setText(jOption.optString(Attrs.TEXT));
-                option.setCode(jOption.optString(Attrs.CODE));
+                option.setCode(jOption.optString(Attrs.CODE, null));
                 option.setIsOther(jOption.optBoolean(Attrs.IS_OTHER));
                 options.add(option);
             }

@@ -2,13 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.flow"
     android:versionCode="1"
-    android:versionName="2.2.0.2" >
+    android:versionName="2.2.0.2">
 
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -26,17 +27,17 @@
         android:hasCode="true"
         android:icon="@drawable/app_icon"
         android:label="@string/app_name"
-        android:theme="@style/Flow.Theme" >
-
+        android:theme="@style/Flow.Theme">
         <activity
             android:name=".activity.AddUserActivity"
-            android:label="@string/add_user"/>
+            android:label="@string/add_user" />
         <activity
             android:name=".activity.SurveyActivity"
             android:configChanges="locale|layoutDirection"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
@@ -60,8 +61,8 @@
             android:label="@string/settingslabel" />
         <activity
             android:name=".activity.PreferencesActivity"
-            android:label="@string/prefoptlabel"
-            android:configChanges="locale|layoutDirection" />
+            android:configChanges="locale|layoutDirection"
+            android:label="@string/prefoptlabel" />
         <activity
             android:name=".activity.TransmissionHistoryActivity"
             android:configChanges="locale|layoutDirection" />
@@ -80,7 +81,11 @@
             android:label="@string/time_check_activity"
             android:launchMode="singleTop"
             android:theme="@style/Flow.Dialog" />
-        <activity android:name=".activity.MapActivity"/>
+        <activity android:name=".activity.MapActivity" />
+
+        <activity
+            android:name=".activity.SignatureActivity"
+            android:label="@string/title_activity_signature"/>
 
         <service android:name=".service.DataSyncService" />
         <service android:name=".service.SurveyDownloadService" />
@@ -91,7 +96,7 @@
         <service android:name=".service.SurveyedLocaleSyncService" />
         <service android:name=".service.TimeCheckService" />
 
-        <receiver android:name=".broadcast.SyncDataReceiver" >
+        <receiver android:name=".broadcast.SyncDataReceiver">
             <intent-filter>
                 <action android:name="org.akvo.flow.DATA_SUBMITTED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />

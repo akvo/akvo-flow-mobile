@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.astuetz.PagerSlidingTabStrip;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.SignatureActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
@@ -152,7 +153,10 @@ public class DatapointsFragment extends Fragment {
                 ((SurveyActivity)getActivity()).onRecordSelected(newLocaleId);// TODO: Use interface pattern
                 return true;
             case R.id.search:
-                return getActivity().onSearchRequested();
+                // return getActivity().onSearchRequested();
+                // FIXME: Shortcut to trigger signature pad
+                startActivity(new Intent(getActivity(), SignatureActivity.class));
+                return true;
             case R.id.sync_records:
                 Toast.makeText(getActivity(), R.string.syncing_records, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), SurveyedLocaleSyncService.class);

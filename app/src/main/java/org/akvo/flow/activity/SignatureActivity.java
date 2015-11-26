@@ -1,5 +1,6 @@
 package org.akvo.flow.activity;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
@@ -21,9 +22,19 @@ public class SignatureActivity extends Activity {
                 clear();
             }
         });
+        findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                save();
+            }
+        });
     }
 
     private void clear() {
         mSignatureView.clear();
+    }
+
+    private void save() {
+        Bitmap bitmap = mSignatureView.getBitmap();
     }
 }

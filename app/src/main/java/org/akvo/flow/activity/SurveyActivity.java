@@ -228,9 +228,12 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     @Override
     public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
-        setTitle(mSurveyGroup.getName());
 
-        FlowApp.getApp().setSurveyGroupId(mSurveyGroup.getId());
+        CharSequence title = mSurveyGroup != null ? mSurveyGroup.getName() : mDrawerTitle;
+        long id = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
+
+        setTitle(title);
+        FlowApp.getApp().setSurveyGroupId(id);
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS);
         if (f != null) {

@@ -334,6 +334,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     mDatabase.deleteSurveyGroup(surveyGroupId);
+                                    if (FlowApp.getApp().getSurveyGroupId() == surveyGroupId) {
+                                        mListener.onSurveySelected(null);
+                                    }
                                     load();
                                 }
                             })

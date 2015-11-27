@@ -1,18 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="org.akvo.flow.activity.SignatureActivity">
+    android:orientation="vertical"
+    android:background="@color/button_grey_light"
+    android:padding="8dp">
 
-    <org.akvo.flow.ui.view.SignatureView
-        android:id="@+id/signature"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <org.akvo.flow.ui.view.SignatureView
+            android:id="@+id/signature"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"/>
+
+        <Button
+            android:id="@+id/clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:text="Clear"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="I understand this is an electronic representation of my signature"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,19 +41,19 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/clear"
+            android:id="@+id/cancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="clear"/>
+            android:text="CANCEL"/>
 
         <Button
             android:id="@+id/save"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="save"/>
+            android:text="SAVE"/>
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

@@ -43,6 +43,7 @@ public class SignatureView extends View {
     public void resetBitmap() {
         mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mCanvas.drawColor(BACKGROUND_COLOR);
     }
 
     public void clear() {
@@ -63,7 +64,7 @@ public class SignatureView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(BACKGROUND_COLOR);
+        //canvas.drawColor(BACKGROUND_COLOR);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
     }

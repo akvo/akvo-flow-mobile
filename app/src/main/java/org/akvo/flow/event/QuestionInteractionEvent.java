@@ -37,6 +37,7 @@ public class QuestionInteractionEvent {
     public static final String SCAN_BARCODE_EVENT = "SCAN";
     public static final String EXTERNAL_SOURCE_EVENT = "EXTERNALSOURCE";
     public static final String PLOTTING_EVENT = "PLOTTING";
+    public static final String ADD_SIGNATURE_EVENT = "SIGNATURE";
 
     private String eventType;
     private QuestionView source;

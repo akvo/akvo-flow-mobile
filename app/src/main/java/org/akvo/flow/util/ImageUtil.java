@@ -39,14 +39,15 @@ public class ImageUtil {
     private static final String TAG = ImageUtil.class.getSimpleName();
 
     public static String encodeBase64(Bitmap bitmap, int reqWidth, int reqHeight) {
-        //Matrix m = new Matrix();
-        //m.setRectToRect(new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight()),
-        //        new RectF(0, 0, reqWidth, reqHeight), Matrix.ScaleToFit.CENTER);
-        //Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
+        Matrix m = new Matrix();
+        m.setRectToRect(new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight()),
+                new RectF(0, 0, reqWidth, reqHeight), Matrix.ScaleToFit.CENTER);
+        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] image = stream.toByteArray();
+        Log.i(TAG, "Image compressed to PNG. " + image.length + " bytes");
         return Base64.encodeToString(image, Base64.DEFAULT);
     }
 

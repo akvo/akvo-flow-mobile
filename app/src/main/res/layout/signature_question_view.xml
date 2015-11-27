@@ -10,12 +10,6 @@
         android:gravity="center_vertical"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:singleLine="true"/>
-
         <ImageView
             android:id="@+id/image"
             android:layout_width="wrap_content"
@@ -30,6 +24,18 @@
             android:id="@+id/sign_btn"
             style="@style/button_green"
             android:text="sign" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Signed by:"/>
+
+        <EditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"/>
 
     </LinearLayout>
 

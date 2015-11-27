@@ -35,7 +35,7 @@ import org.akvo.flow.util.ImageUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class SignatureQuestionView extends QuestionView {
+public class SignatureQuestionView extends QuestionView implements View.OnFocusChangeListener {
     private static final String TAG = SignatureQuestionView.class.getSimpleName();
     private EditText mName;
     private ImageView mImage;
@@ -65,6 +65,7 @@ public class SignatureQuestionView extends QuestionView {
                     notifyQuestionListeners(QuestionInteractionEvent.ADD_SIGNATURE_EVENT);
                 }
             });
+            mName.setOnFocusChangeListener(this);
         }
     }
 
@@ -133,6 +134,14 @@ public class SignatureQuestionView extends QuestionView {
         } else {
             mImage.setImageDrawable(null);
             mImage.setVisibility(GONE);
+        }
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            mResponseName = mName.getText().toString();
+            captureResponse();
         }
     }
 

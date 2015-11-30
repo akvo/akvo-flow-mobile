@@ -1,6 +1,13 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.1
+Date: 30 November 2015
+
+Resolved issues
+---------------
+* Bring back manual survey deletion [#379]
+
 # ver 2.2.0.2
 Date: 11 November 2015
 

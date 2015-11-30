@@ -16,6 +16,7 @@
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -57,6 +58,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private static final float ITEM_TEXT_SIZE = 14;
 
     // Context menu IDs
+    private static final int ID_DELETE_SURVEY = 0;
     private static final int ID_EDIT_USER = 0;
     private static final int ID_DELETE_USER = 1;
 
@@ -71,6 +73,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     public interface DrawerListener {
         void onSurveySelected(SurveyGroup surveyGroup);
+
         void onUserSelected(User user);
     }
 
@@ -86,13 +89,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.navigation_drawer, container, false);
-        mListView = (ExpandableListView)v.findViewById(R.id.list);
+        mListView = (ExpandableListView) v.findViewById(R.id.list);
 
         return v;
     }
 
     @Override
-    public void onActivityCreated (Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         if (mDatabase == null) {
@@ -122,7 +125,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (DrawerListener)activity;
+            mListener = (DrawerListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement surveys and users listeners");
@@ -257,47 +260,102 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 });
     }
 
-    private User getUserForContextMenu(ExpandableListContextMenuInfo info) {
-        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
-        int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
-        int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
-
-        if (group != GROUP_USERS) {
-            // Only user's group can trigger the context menu
-            return null;
+    private SurveyGroup getSurveyForContextMenu(int type, int group, int child) {
+        if (group == GROUP_SURVEYS && type == ExpandableListView.PACKED_POSITION_TYPE_CHILD && child < mSurveys.size()) {
+            return mSurveys.get(child);
         }
+        return null;
+    }
 
-        switch (type) {
-            case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
-                if (child < mUsers.size()) {
-                    return mUsers.get(child);
-                }
-                break;
-            case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
+    private User getUserForContextMenu(int type, int group, int child) {
+        if (group == GROUP_USERS) {
+            if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD && child < mUsers.size()) {
+                return mUsers.get(child);
+            } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
                 return FlowApp.getApp().getUser();
+            }
         }
-
         return null;
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        User user = getUserForContextMenu((ExpandableListContextMenuInfo) menuInfo);
+        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) menuInfo;
+        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+        int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+        int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
 
-        if (user != null) {
-            menu.setHeaderTitle(user.getName());
-            menu.add(0, ID_EDIT_USER, ID_EDIT_USER, R.string.edit_user);
-            menu.add(0, ID_DELETE_USER, ID_DELETE_USER, R.string.delete_user);
+        switch (group) {
+            case GROUP_SURVEYS:
+                SurveyGroup sg = getSurveyForContextMenu(type, group, child);
+                if (sg != null) {
+                    menu.setHeaderTitle(sg.getName());
+                    menu.add(0, ID_DELETE_SURVEY, ID_DELETE_SURVEY, R.string.delete);
+                }
+                break;
+            case GROUP_USERS:
+                User user = getUserForContextMenu(type, group, child);
+                if (user != null) {
+                    menu.setHeaderTitle(user.getName());
+                    menu.add(0, ID_EDIT_USER, ID_EDIT_USER, R.string.edit_user);
+                    menu.add(0, ID_DELETE_USER, ID_DELETE_USER, R.string.delete_user);
+                }
+                break;
         }
+
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        User user = getUserForContextMenu((ExpandableListContextMenuInfo) item.getMenuInfo());
+        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
+        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+        int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+        int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
 
+        switch (group) {
+            case GROUP_SURVEYS:
+                return onSurveyContextItemSelected(type, group, child, item.getItemId());
+            case GROUP_USERS:
+                return onUserContextItemSelected(type, group, child, item.getItemId());
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    private boolean onSurveyContextItemSelected(int type, int group, int child, int itemID) {
+        SurveyGroup sg = getSurveyForContextMenu(type, group, child);
+        if (sg != null && itemID == ID_DELETE_SURVEY) {
+            final long surveyGroupId = sg.getId();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage(R.string.delete_project_text)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.okbutton,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    mDatabase.deleteSurveyGroup(surveyGroupId);
+                                    if (FlowApp.getApp().getSurveyGroupId() == surveyGroupId) {
+                                        mListener.onSurveySelected(null);
+                                    }
+                                    load();
+                                }
+                            })
+                    .setNegativeButton(R.string.cancelbutton,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+            builder.show();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean onUserContextItemSelected(int type, int group, int child, int itemID) {
+        User user = getUserForContextMenu(type, group, child);
         if (user != null) {
-            switch (item.getItemId()) {
+            switch (itemID) {
                 case ID_EDIT_USER:
                     editUser(user);
                     return true;
@@ -306,8 +364,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     return true;
             }
         }
-
-        return super.onContextItemSelected(item);
+        return false;
     }
 
     class DrawerAdapter extends BaseExpandableListAdapter implements
@@ -372,9 +429,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 v = mInflater.inflate(R.layout.drawer_item, null);
             }
             View divider = v.findViewById(R.id.divider);
-            TextView tv = (TextView)v.findViewById(R.id.item_txt);
-            ImageView img = (ImageView)v.findViewById(R.id.item_img);
-            ImageView dropdown = (ImageView)v.findViewById(R.id.dropdown);
+            TextView tv = (TextView) v.findViewById(R.id.item_txt);
+            ImageView img = (ImageView) v.findViewById(R.id.item_img);
+            ImageView dropdown = (ImageView) v.findViewById(R.id.dropdown);
 
 
             switch (groupPosition) {
@@ -393,7 +450,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     dropdown.setVisibility(View.VISIBLE);
                     break;
                 case GROUP_SURVEYS:
-                    divider.setMinimumHeight((int)PlatformUtil.dp2Pixel(getActivity(), 3));
+                    divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 3));
                     tv.setTextSize(ITEM_TEXT_SIZE);
                     tv.setTextColor(getResources().getColor(R.color.black_diabled));
                     tv.setText(R.string.surveys);
@@ -401,7 +458,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     dropdown.setVisibility(View.GONE);
                     break;
                 case GROUP_SETTINGS:
-                    divider.setMinimumHeight((int)PlatformUtil.dp2Pixel(getActivity(), 1));
+                    divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 1));
                     tv.setTextSize(ITEM_TEXT_SIZE);
                     tv.setTextColor(Color.BLACK);
                     tv.setText(getString(R.string.settingslabel));
@@ -419,7 +476,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             if (v == null) {
                 v = mInflater.inflate(android.R.layout.simple_list_item_1, null);
             }
-            TextView tv = (TextView)v.findViewById(android.R.id.text1);
+            TextView tv = (TextView) v.findViewById(android.R.id.text1);
             v.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 30), 0, 0, 0);
 
             tv.setTextSize(ITEM_TEXT_SIZE);
@@ -468,7 +525,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
             switch (groupPosition) {
                 case GROUP_USERS:
-                    User user = (User)v.getTag();
+                    User user = (User) v.getTag();
                     if (user.getId() == -1) {
                         addUser();
                     } else {
@@ -476,7 +533,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     }
                     return true;
                 case GROUP_SURVEYS:
-                    SurveyGroup sg = (SurveyGroup)v.getTag();
+                    SurveyGroup sg = (SurveyGroup) v.getTag();
                     mListener.onSurveySelected(sg);
                     return true;
             }

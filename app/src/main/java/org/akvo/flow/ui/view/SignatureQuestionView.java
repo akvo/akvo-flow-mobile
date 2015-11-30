@@ -145,6 +145,18 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
         }
     }
 
+    @Override
+    public boolean isValid() {
+        boolean valid = super.isValid();
+        if (valid && getResponse() != null) {
+            valid = !TextUtils.isEmpty(mResponseName) && !TextUtils.isEmpty(mResponseImage);
+        }
+        if (!valid) {
+            setError(getResources().getString(R.string.error_question_mandatory));
+        }
+        return valid;
+    }
+
     interface Attr {
         String NAME = "name";
         String IMAGE = "image";

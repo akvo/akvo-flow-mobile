@@ -40,7 +40,9 @@ public class SignatureActivity extends Activity {
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                save();
+                if (!mSignatureView.isEmpty()) {
+                    save();
+                }
             }
         });
     }

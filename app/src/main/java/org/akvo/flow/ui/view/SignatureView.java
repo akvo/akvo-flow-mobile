@@ -23,6 +23,7 @@ public class SignatureView extends View {
     private Paint mBitmapPaint;
     private Bitmap mBitmap;
     private Canvas mCanvas;
+    private boolean mIsEmpty;
 
     public SignatureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,12 +45,17 @@ public class SignatureView extends View {
         mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(BACKGROUND_COLOR);
+        mIsEmpty = true;
     }
 
     public void clear() {
         mPath.reset();
         resetBitmap();
         invalidate();
+    }
+
+    public boolean isEmpty() {
+        return mIsEmpty;
     }
 
     public Bitmap getBitmap() {
@@ -64,7 +70,6 @@ public class SignatureView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        //canvas.drawColor(BACKGROUND_COLOR);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
     }
@@ -111,6 +116,7 @@ public class SignatureView extends View {
                 return false;
         }
 
+        mIsEmpty = false;
         invalidate();
         return true;
     }

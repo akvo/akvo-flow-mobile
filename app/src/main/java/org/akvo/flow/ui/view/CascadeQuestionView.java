@@ -41,6 +41,7 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.CascadeValue;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -84,32 +85,34 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         // Construct local filename (src refers to remote location of the resource)
         String src = getQuestion().getSrc();
-        if (TextUtils.isEmpty(src)) {
-            throw new IllegalStateException("Cascade question must have a valid src");
+        if (!TextUtils.isEmpty(src)) {
+            File db = new File(FileUtil.getFilesDir(FileType.RES), src);
+            if (db.exists()) {
+                mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
+                mDatabase.open();
+            }
         }
-        final File db = new File(FileUtil.getFilesDir(FileType.RES), src);
-        if (!db.exists()) {
-            throw new IllegalStateException("Cascade resource file doesn't exist at "
-                    + db.getAbsolutePath());
-        }
-
-        mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
-        mDatabase.open();
     }
 
     @Override
     public void onResume() {
-        if (!mDatabase.isOpen()) {
+        if (mDatabase != null && !mDatabase.isOpen()) {
             mDatabase.open();
         }
     }
 
     @Override
     public void onPause() {
-        mDatabase.close();
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
     }
 
     private void updateSpinners(int updatedSpinnerIndex) {
+        if (mDatabase == null) {
+            return;
+        }
+
         final int nextLevel = updatedSpinnerIndex + 1;
 
         // First, clean up descendant spinners (if any)
@@ -214,8 +217,9 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
+
         String answer = resp != null ? resp.getValue() : null;
-        if (TextUtils.isEmpty(answer)) {
+        if (mDatabase == null || TextUtils.isEmpty(answer)) {
             return;
         }
         mSpinnerContainer.removeAllViews();
@@ -256,6 +260,12 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         updateSpinners(POSITION_NONE);
+        if (mDatabase == null) {
+            String error = "Cannot load cascade resource: " + getQuestion().getSrc();
+            Log.e(TAG, error);
+            PersistentUncaughtExceptionHandler.recordException(new IllegalStateException(error));
+            setError(error);
+        }
     }
 
     @Override
@@ -281,8 +291,8 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     }
 
     public boolean isValid() {
-        boolean valid = super.isValid() && mFinished;
-        if (!valid) {
+        boolean valid = super.isValid();
+        if (valid && !mFinished) {
             setError(getResources().getString(R.string.error_question_mandatory));
         }
         return valid;

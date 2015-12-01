@@ -35,7 +35,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
-import org.akvo.flow.api.parser.json.SurveyedLocaleParser;
+import org.akvo.flow.serialization.response.SurveyedLocaleParser;
 import org.akvo.flow.domain.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.SurveyedLocale;

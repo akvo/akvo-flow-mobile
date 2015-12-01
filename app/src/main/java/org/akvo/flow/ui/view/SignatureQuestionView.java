@@ -113,6 +113,7 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+        mResponseName = mName.getText().toString();
         try {
             JSONObject jResponse = new JSONObject();
             jResponse.put(Attr.NAME, mResponseName);
@@ -140,7 +141,6 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (!hasFocus) {
-            mResponseName = mName.getText().toString();
             captureResponse();
         }
     }

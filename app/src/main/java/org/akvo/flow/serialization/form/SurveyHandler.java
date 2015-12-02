@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.api.parser.xml;
+package org.akvo.flow.serialization.form;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +60,7 @@ public class SurveyHandler extends DefaultHandler {
     private static final String TEXT = "text";
     private static final String OPTION = "option";
     private static final String VALUE = "value";
+    private static final String CODE = "code";
     private static final String OPTIONS = "options";
     private static final String ALLOW_OTHER = "allowOther";
     private static final String VALIDATION_TYPE = "validationType";
@@ -404,7 +405,7 @@ public class SurveyHandler extends DefaultHandler {
             }
         } else if (localName.equalsIgnoreCase(OPTION)) {
             currentOption = new Option();
-            currentOption.setValue(attributes.getValue(VALUE));
+            currentOption.setCode(attributes.getValue(CODE));
         } else if (localName.equalsIgnoreCase(LEVELS)) {
             currentLevels = new ArrayList<Level>();
         } else if (localName.equalsIgnoreCase(LEVEL)) {

@@ -16,8 +16,8 @@
 
 package org.akvo.flow.domain;
 
-import org.akvo.flow.domain.response.value.CascadeValue;
-import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.serialization.response.value.CascadeValue;
+import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.util.ConstantUtil;
 
 public class QuestionResponse {
@@ -77,32 +77,29 @@ public class QuestionResponse {
     }
 
     public boolean isValid() {
-        if (!ConstantUtil.OTHER_RESPONSE_TYPE.equals(type)) {
-            // if the response isn't "OTHER" then we have to check that it has a
-            // value that isn't just a blank
-            if (value == null || value.trim().length() == 0) {
-                return false;
-            }
-            // now check that, if it's a geo question, we have something specified
-            if (ConstantUtil.GEO_RESPONSE_TYPE.equals(type)) {
-                String[] tokens = value.split("\\|", -1);
-                if (tokens.length >= 2) {
-                    // at least the first 2 tokens must be numeric
-                    for (int i = 0; i < 2; i++) {
-                        String token = tokens[i];
-                        try {
-                            if (token.trim().length() > 0) {
-                                Double.parseDouble(token);
-                            } else {
-                                return false;
-                            }
-                        } catch (NumberFormatException e) {
+        // We have to check that it has a value that isn't just a blank
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
+        // now check that, if it's a geo question, we have something specified
+        if (ConstantUtil.GEO_RESPONSE_TYPE.equals(type)) {
+            String[] tokens = value.split("\\|", -1);
+            if (tokens.length >= 2) {
+                // at least the first 2 tokens must be numeric
+                for (int i = 0; i < 2; i++) {
+                    String token = tokens[i];
+                    try {
+                        if (token.trim().length() > 0) {
+                            Double.parseDouble(token);
+                        } else {
                             return false;
                         }
+                    } catch (NumberFormatException e) {
+                        return false;
                     }
-                } else {
-                    return false;
                 }
+            } else {
+                return false;
             }
         }
         return true;
@@ -176,7 +173,10 @@ public class QuestionResponse {
         String name;
         switch (type) {
             case ConstantUtil.CASCADE_RESPONSE_TYPE:
-                name = getCascadeDatapointName();
+                name = CascadeValue.getDatapointName(value);
+                break;
+            case ConstantUtil.OPTION_RESPONSE_TYPE:
+                name = OptionValue.getDatapointName(value);
                 break;
             default:
                 name = value;
@@ -187,20 +187,6 @@ public class QuestionResponse {
         name = name.replaceAll("\\s*\\|\\s*", " - ");// Replace pipes with hyphens
 
         return name.trim();
-    }
-
-    private String getCascadeDatapointName() {
-        StringBuilder builder = new StringBuilder();
-        boolean first = true;
-        for (CascadeValue cv : CascadeQuestionView.loadValues(value)) {
-            if (!first) {
-                builder.append(" - ");
-            }
-            builder.append(cv.getName());
-            first = false;
-        }
-
-        return builder.toString();
     }
 
 }

@@ -15,7 +15,7 @@
  */
 package org.akvo.flow.domain.response.value;
 
-public class CascadeValue {
+public class CascadeNode {
     private String name;
     private String code;
 

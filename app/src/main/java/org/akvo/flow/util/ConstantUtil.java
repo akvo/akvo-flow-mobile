@@ -72,12 +72,6 @@ public class ConstantUtil {
     public static final String TIP_HELP_TYPE = "tip";
 
     /**
-     * rendering options
-     */
-    public static final String SPINNER_RENDER_MODE = "spinner";
-    //public static final String RADIO_RENDER_MODE = "radio";
-
-    /**
      * response types
      */
     public static final String VALUE_RESPONSE_TYPE = "VALUE";
@@ -86,7 +80,7 @@ public class ConstantUtil {
     public static final String GEO_RESPONSE_TYPE = "GEO";
     public static final String DATE_RESPONSE_TYPE = "DATE";
     public static final String CASCADE_RESPONSE_TYPE = "CASCADE";
-    public static final String OTHER_RESPONSE_TYPE = "OTHER";
+    public static final String OPTION_RESPONSE_TYPE = "OPTION";
     public static final String SIGNATURE_RESPONSE_TYPE = "SIGNATURE";
 
     /**

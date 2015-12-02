@@ -39,7 +39,7 @@ import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.api.parser.csv.SurveyMetaParser;
+import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;

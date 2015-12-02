@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.api.parser.csv;
+package org.akvo.flow.serialization.form;
 
 import android.text.TextUtils;
 

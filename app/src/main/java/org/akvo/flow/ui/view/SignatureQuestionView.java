@@ -19,7 +19,6 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,20 +27,18 @@ import android.widget.ImageView;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.serialization.response.value.SignatureValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class SignatureQuestionView extends QuestionView implements View.OnFocusChangeListener {
-    private static final String TAG = SignatureQuestionView.class.getSimpleName();
     private EditText mName;
     private ImageView mImage;
 
-    private String mResponseName;
-    private String mResponseImage;
+    private Signature mSignature;
 
     public SignatureQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -50,6 +47,8 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
 
     private void init() {
         setQuestionView(R.layout.signature_question_view);
+
+        mSignature = new Signature();
 
         mName = (EditText)findViewById(R.id.name);
         mImage = (ImageView)findViewById(R.id.image);
@@ -76,7 +75,7 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
     @Override
     public void questionComplete(Bundle data) {
         if (data != null) {
-            mResponseImage = data.getString(ConstantUtil.SIGNATURE_IMAGE);
+            mSignature.setImage(data.getString(ConstantUtil.SIGNATURE_IMAGE));
             captureResponse();
             displayResponse();
         }
@@ -90,14 +89,8 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
             return;
         }
 
-        try {
-            JSONObject jResponse = new JSONObject(getResponse().getValue());
-            mResponseName = jResponse.optString(Attr.NAME);
-            mResponseImage = jResponse.optString(Attr.IMAGE);
-            displayResponse();
-        } catch (JSONException e) {
-            Log.e(TAG, "Response is not JSON-formatted: " + e.getMessage());
-        }
+        mSignature = SignatureValue.deserialize(getResponse().getValue());
+        displayResponse();
     }
 
     /**
@@ -106,31 +99,23 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mResponseName = null;
-        mResponseImage = null;
+        mSignature = new Signature();
         displayResponse();
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        mResponseName = mName.getText().toString();
-        try {
-            JSONObject jResponse = new JSONObject();
-            jResponse.put(Attr.NAME, mResponseName);
-            jResponse.put(Attr.IMAGE, mResponseImage);
-
-            setResponse(new QuestionResponse(jResponse.toString(), ConstantUtil.SIGNATURE_RESPONSE_TYPE,
-                    getQuestion().getId()));
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
+        mSignature.setName(mName.getText().toString());
+        String value = SignatureValue.serialize(mSignature);
+        setResponse(new QuestionResponse(value, ConstantUtil.SIGNATURE_RESPONSE_TYPE,
+                getQuestion().getId()));
     }
 
     private void displayResponse() {
-        mName.setText(mResponseName);
-        if (!TextUtils.isEmpty(mResponseImage)) {
+        mName.setText(mSignature.getName());
+        if (!TextUtils.isEmpty(mSignature.getImage())) {
             // TODO: Resize image?
-            mImage.setImageBitmap(ImageUtil.decodeBase64(mResponseImage));
+            mImage.setImageBitmap(ImageUtil.decodeBase64(mSignature.getImage()));
             mImage.setVisibility(VISIBLE);
         } else {
             mImage.setImageDrawable(null);
@@ -147,19 +132,11 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
 
     @Override
     public boolean isValid() {
-        boolean valid = super.isValid();
-        if (valid && getResponse() != null) {
-            valid = !TextUtils.isEmpty(mResponseName) && !TextUtils.isEmpty(mResponseImage);
-        }
-        if (!valid) {
+        if (!super.isValid() || !mSignature.isValid()) {
             setError(getResources().getString(R.string.error_question_mandatory));
+            return false;
         }
-        return valid;
-    }
-
-    interface Attr {
-        String NAME = "name";
-        String IMAGE = "image";
+        return true;
     }
 
 }

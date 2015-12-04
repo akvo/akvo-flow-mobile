@@ -22,8 +22,6 @@ set -e
 [[ -n "${FLOW_SERVER_CONFIG}" ]] || { echo "FLOW_SERVER_CONFIG env var needs to be set"; exit 1; }
 [[ -n "${FLOW_S3_ACCESS_KEY}" ]] || { echo "FLOW_S3_ACCESS_KEY env var needs to be set"; exit 1; }
 [[ -n "${FLOW_S3_SECRET_KEY}" ]] || { echo "FLOW_S3_SECRET_KEY env var needs to be set"; exit 1; }
-[[ -n "${FLOW_GAE_USERNAME}" ]] || { echo "FLOW_GAE_USERNAME env var needs to be set"; exit 1; }
-[[ -n "${FLOW_GAE_PASSWORD}" ]] || { echo "FLOW_GAE_PASSWORD env var needs to be set"; exit 1; }
 
 # Move to the project directory
 cd $FLOW_MOBILE
@@ -46,13 +44,16 @@ for i in $(cat tmp/instances.txt); do
     rm -rf bin
     echo "=================================================="
     if [[ -f $FLOW_SERVER_CONFIG/$i/survey.properties ]]; then
+        accountId=$(sed -n "s/\(.*\)name=\"serviceAccountId\"[[:space:]]*value=\"\(.*\)\"\(.*\)/\2/p" $FLOW_SERVER_CONFIG/$i/appengine-web.xml)
+        accountSecret=$FLOW_SERVER_CONFIG/$i/$i.p12
         filename=builds/$i/$version/flow-$version.apk
+
         echo "generating apk version" $version "for instance" $i
         cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
         ./gradlew assembleRelease
         mkdir -p builds/$i/$version
         mv app/bin/flow.apk $filename
-        java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$FLOW_GAE_USERNAME" "$FLOW_GAE_PASSWORD"
+        java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$accountId" "$accountSecret"
     else
         echo "Cannot find survey.properties file for instance" $i
     fi

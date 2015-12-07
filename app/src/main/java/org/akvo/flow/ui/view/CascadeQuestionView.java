@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CascadeQuestionView extends QuestionView implements AdapterView.OnItemSelectedListener {
+    private static final String TAG = CascadeQuestionView.class.getSimpleName();
     private static final int POSITION_NONE = -1;// no spinner position id
 
     private static final long ID_NONE = -1;// no node id

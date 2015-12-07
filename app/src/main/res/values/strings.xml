@@ -165,6 +165,8 @@
     <string name="view_map">View map</string>
     <string name="delete_group_title">Delete group</string>
     <string name="delete_group_text">Do you want to delete this group?</string>
+    <string name="add_signature">Add signature</string>
+    <string name="signed_by">Signed by:</string>
     <!--RecordList Activity-->
     <string name="add_data_point">Add Data Point</string>
     <string name="stats_total">Total Data Points:</string>

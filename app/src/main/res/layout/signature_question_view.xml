@@ -23,13 +23,13 @@
         <Button
             android:id="@+id/sign_btn"
             style="@style/button_green"
-            android:text="sign" />
+            android:text="@string/add_signature" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Signed by:"/>
+            android:text="@string/signed_by" />
 
         <EditText
             android:id="@+id/name"

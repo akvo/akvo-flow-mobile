@@ -14,8 +14,6 @@
     <string name="lat">Lat</string>
     <string name="lon">Lon</string>
     <string name="elevation">Height</string>
-    <string name="savebutton">Save</string>
-    <string name="clearbutton">Clear</string>
     <string name="submitbutton">Submit</string>
     <string name="geodialog">GPS must be enabled to do this. Select OK to go to\tthe settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
     <string name="resize_large_images">Resize large images</string>
@@ -167,6 +165,7 @@
     <string name="delete_group_text">Do you want to delete this group?</string>
     <string name="add_signature">Add signature</string>
     <string name="signed_by">Signed by:</string>
+    <string name="signature_terms">I understand this is an electronic representation of my signature</string>
     <!--RecordList Activity-->
     <string name="add_data_point">Add Data Point</string>
     <string name="stats_total">Total Data Points:</string>
@@ -238,6 +237,8 @@
     <!--Misc-->
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>
+    <string name="savebutton">Save</string>
+    <string name="clearbutton">Clear</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="retry">Retry</string>

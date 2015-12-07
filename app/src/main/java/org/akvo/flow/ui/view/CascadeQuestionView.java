@@ -30,29 +30,25 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.akvo.flow.R;
 import org.akvo.flow.dao.CascadeDB;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.domain.response.value.CascadeValue;
+import org.akvo.flow.domain.response.value.CascadeNode;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CascadeQuestionView extends QuestionView implements AdapterView.OnItemSelectedListener {
-    private static final String TAG = CascadeQuestionView.class.getSimpleName();
     private static final int POSITION_NONE = -1;// no spinner position id
 
     private static final long ID_NONE = -1;// no node id
@@ -186,34 +182,6 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
-    private String saveValues(List<CascadeValue> values) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(values);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        return "";
-    }
-
-    public static List<CascadeValue> loadValues(String data) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(data, new TypeReference<List<CascadeValue>>(){});
-        } catch (IOException e) {
-            Log.e(TAG, "Value is not a valid JSON response: " + data);
-        }
-
-        List<CascadeValue> values = new ArrayList<>();
-        String[] tokens = data.split("\\|", -1);
-        for (String token : tokens) {
-            CascadeValue v = new CascadeValue();
-            v.setName(token);
-            values.add(v);
-        }
-        return values;
-    }
-
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
@@ -224,7 +192,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         }
         mSpinnerContainer.removeAllViews();
 
-        List<CascadeValue> values = loadValues(answer);
+        List<CascadeNode> values = CascadeValue.deserialize(answer);
 
         // For each existing value, we load the corresponding level nodes, and create a spinner
         // view, automatically selecting the token. On each iteration, we keep track of selected
@@ -236,7 +204,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             List<Node> spinnerValues = mDatabase.getValues(parentId);
             for (int pos=0; pos<spinnerValues.size(); pos++) {
                 Node node = spinnerValues.get(pos);
-                CascadeValue v = values.get(index);
+                CascadeNode v = values.get(index);
                 if (node.getName().equals(v.getName())) {
                     valuePosition = pos;
                     parentId = node.getId();
@@ -270,18 +238,18 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        List<CascadeValue> values = new ArrayList<>();
+        List<CascadeNode> values = new ArrayList<>();
         for (int i=0; i<mSpinnerContainer.getChildCount(); i++) {
             Node node = (Node)getSpinner(i).getSelectedItem();
             if (node.getId() != ID_NONE) {
-                CascadeValue v = new CascadeValue();
+                CascadeNode v = new CascadeNode();
                 v.setName(node.getName());
                 v.setCode(node.getCode());
                 values.add(v);
             }
         }
 
-        String response = saveValues(values);
+        String response = CascadeValue.serialize(values);
         setResponse(new QuestionResponse(response, ConstantUtil.CASCADE_RESPONSE_TYPE,
                 getQuestion().getId()), suppressListeners);
     }

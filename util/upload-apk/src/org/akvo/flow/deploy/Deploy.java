@@ -1,6 +1,3 @@
-
-package org.akvo.flow.deploy;
-
 /*
  * Copyright 2010-2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,6 +12,9 @@ package org.akvo.flow.deploy;
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+
+package org.akvo.flow.deploy;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,8 +52,8 @@ public class Deploy {
     private static final int INSTANCE_ID = 2;
     private static final int APK_PATH = 3;
     private static final int VERSION = 4;
-    private static final int GAE_USERNAME = 5;
-    private static final int GAE_PASSWORD = 6;
+    private static final int ACCOUNT_ID = 5;
+    private static final int ACCOUNT_SECRET = 6;
 
     private static final String BUCKET_NAME = "akvoflow";
 
@@ -73,8 +73,8 @@ public class Deploy {
         final String accessKey = args[S3_ACCESS_KEY];
         final String secretKey = args[S3_SECRET_KEY];
         final String instance = args[INSTANCE_ID];
-        final String username = args[GAE_USERNAME];
-        final String password = args[GAE_PASSWORD];
+        final String accountId = args[ACCOUNT_ID];
+        final String accountSecret = args[ACCOUNT_SECRET];
         final String version = args[VERSION];
 
         final String s3Path = "apk/" + instance + "/" + file.getName();
@@ -84,7 +84,7 @@ public class Deploy {
 
         try {
             uploadS3(accessKey, secretKey, s3Path, file);
-            updateVersion(host, username, password, s3Url, version, getMD5Checksum(file));
+            updateVersion(host, accountId, accountSecret, s3Url, version, getMD5Checksum(file));
         } catch (AmazonServiceException ase) {
             System.err
                     .println("Caught an AmazonServiceException, which means your request made it "
@@ -130,10 +130,10 @@ public class Deploy {
         System.out.println("Apk uploaded successfully, with result ETag " + result.getETag());
     }
 
-    private static void updateVersion(String host, String username, String password, String url,
+    private static void updateVersion(String host, String accountId, String accountSecret, String url,
             String version, String md5) throws IOException {
         RemoteApiOptions options = new RemoteApiOptions().server(host, 443)
-                .credentials(username, password);
+                .useServiceAccountCredential(accountId, accountSecret);
         RemoteApiInstaller installer = new RemoteApiInstaller();
         installer.install(options);
         try {

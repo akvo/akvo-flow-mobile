@@ -45,11 +45,14 @@
         android:gravity="center"
         android:text="@string/or"
         android:textSize="12sp"
-        android:textColor="@color/black_diabled" />
+        android:textColor="@color/black_disabled" />
 
     <Button
         android:id="@+id/scan_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
         android:text="@string/scanbarcode"
-        style="@style/button_green"/>
+        style="@style/button_primary"/>
 
 </merge>

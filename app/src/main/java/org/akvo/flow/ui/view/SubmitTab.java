@@ -56,7 +56,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
         mSubmitButton.setTextColor(Color.WHITE);
-        mSubmitButton.setBackgroundResource(R.drawable.button_green);
+        mSubmitButton.setBackgroundResource(R.drawable.button_primary);
         mSubmitButton.setText(context.getString(R.string.submitbutton));
         mSubmitButton.setOnClickListener(this);
 

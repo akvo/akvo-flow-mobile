@@ -452,7 +452,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 3));
                     tv.setTextSize(ITEM_TEXT_SIZE);
-                    tv.setTextColor(getResources().getColor(R.color.black_diabled));
+                    tv.setTextColor(getResources().getColor(R.color.black_disabled));
                     tv.setText(R.string.surveys);
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);

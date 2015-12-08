@@ -16,7 +16,6 @@ repositories {
 android {
     compileSdkVersion "Google Inc.:Google APIs:19"
     buildToolsVersion "19.1.0"
-
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 19
@@ -26,12 +25,10 @@ android {
         testHandleProfiling true
         testFunctionalTest true
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-
     signingConfigs {
 
         flowRelease {
@@ -47,12 +44,16 @@ android {
             }
         }
     }
-
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
-
+    productFlavors {
+        flow {
+        }
+        biogas {
+        }
+    }
 }
 
 android.applicationVariants.all { variant ->
@@ -71,6 +72,6 @@ dependencies {
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile "com.google.dexmaker:dexmaker:1.2"
-    androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
+    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }

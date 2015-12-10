@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.0'
+        classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
 
@@ -48,10 +48,13 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
+
     productFlavors {
         flow {
         }
         biogas {
+        }
+        cookstoves {
         }
     }
 }

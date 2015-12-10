@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -132,6 +133,11 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         }
 
         mInputContainer.addView(view);
+        if (mQuestion.isAllowMultiple()) {
+            TextView orderView = (TextView) view.findViewById(R.id.order);
+            orderView.setText(mInputContainer.getChildCount() + ":");
+            orderView.setVisibility(VISIBLE);
+        }
         captureResponse();
     }
 

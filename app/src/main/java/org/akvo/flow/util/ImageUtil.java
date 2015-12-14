@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2012-2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,18 @@ package org.akvo.flow.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,6 +37,23 @@ import java.lang.reflect.Field;
 
 public class ImageUtil {
     private static final String TAG = ImageUtil.class.getSimpleName();
+
+    public static String encodeBase64(Bitmap bitmap, int reqWidth, int reqHeight) {
+        Matrix m = new Matrix();
+        m.setRectToRect(new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight()),
+                new RectF(0, 0, reqWidth, reqHeight), Matrix.ScaleToFit.CENTER);
+        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] image = stream.toByteArray();
+        return Base64.encodeToString(image, Base64.DEFAULT);
+    }
+
+    public static Bitmap decodeBase64(String data) {
+        byte[] image = Base64.decode(data, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(image, 0, image.length);
+    }
 
     /**
      * resizeImage handles resizing a too-large image file from the camera,

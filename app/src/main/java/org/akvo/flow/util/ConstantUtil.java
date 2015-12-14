@@ -62,6 +62,7 @@ public class ConstantUtil {
     public static final String DATE_QUESTION_TYPE = "date";
     public static final String CASCADE_QUESTION_TYPE = "cascade";
     public static final String GEOSHAPE_QUESTION_TYPE = "geoshape";
+    public static final String SIGNATURE_QUESTION_TYPE = "signature";
 
     /**
      * help types
@@ -80,6 +81,7 @@ public class ConstantUtil {
     public static final String DATE_RESPONSE_TYPE = "DATE";
     public static final String CASCADE_RESPONSE_TYPE = "CASCADE";
     public static final String OPTION_RESPONSE_TYPE = "OPTION";
+    public static final String SIGNATURE_RESPONSE_TYPE = "SIGNATURE";
 
     /**
      * validation types
@@ -102,6 +104,11 @@ public class ConstantUtil {
      * media question support
      */
     public static final String MEDIA_FILE_KEY = "filename";
+
+    /**
+     * Signature result data
+     */
+    public static final String SIGNATURE_IMAGE = "signature_image";
 
     /**
      * Plot measurement result data

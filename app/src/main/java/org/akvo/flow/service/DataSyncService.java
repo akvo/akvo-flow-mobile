@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +44,6 @@ import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.Base64;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -256,7 +256,7 @@ public class DataSyncService extends IntentService {
                 Mac mac = Mac.getInstance(SIGNING_ALGORITHM);
                 mac.init(signingKey);
                 byte[] hmac = mac.doFinal(digest);
-                String encodedHmac = Base64.encodeBytes(hmac);
+                String encodedHmac = Base64.encodeToString(hmac, Base64.DEFAULT);
                 writeTextToZip(zos, encodedHmac, SIG_FILE_NAME);
             }
 

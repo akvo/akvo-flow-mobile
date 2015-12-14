@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2012-2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ public class ImageUtil {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] image = stream.toByteArray();
-        Log.i(TAG, "Image compressed to PNG. " + image.length + " bytes");
         return Base64.encodeToString(image, Base64.DEFAULT);
     }
 

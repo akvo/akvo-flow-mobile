@@ -27,7 +27,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/button_grey_dark"
             android:textColor="@color/white"
-            android:text="Clear"/>
+            android:text="@string/clearbutton"/>
 
         <View
             android:id="@+id/ruler"

@@ -49,6 +49,7 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
         if (isReadOnly()) {
             mMapBtn.setText(R.string.view_shape);
         }
+        displayResponseView();
     }
 
     private void displayResponseView() {

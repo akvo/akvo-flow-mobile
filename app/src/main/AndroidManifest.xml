@@ -85,7 +85,6 @@
 
         <activity
             android:name=".activity.SignatureActivity"
-            android:label="@string/title_activity_signature"
             android:screenOrientation="landscape"/>
 
         <service android:name=".service.DataSyncService" />

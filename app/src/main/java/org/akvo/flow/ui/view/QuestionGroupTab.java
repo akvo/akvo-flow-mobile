@@ -262,6 +262,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
                 questionView = new CascadeQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.GEOSHAPE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new GeoshapeQuestionView(context, q, mSurveyListener);
+            } else if (ConstantUtil.SIGNATURE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
+                questionView = new SignatureQuestionView(context, q, mSurveyListener);
             } else {
                 questionView = new QuestionHeaderView(context, q, mSurveyListener);
             }

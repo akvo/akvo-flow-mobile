@@ -76,6 +76,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
     private static final int EXTERNAL_SOURCE_REQUEST  = 4;
     private static final int PLOTTING_REQUEST  = 5;
+    private static final int SIGNATURE_REQUEST  = 6;
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
@@ -461,6 +462,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case EXTERNAL_SOURCE_REQUEST:
             case SCAN_ACTIVITY_REQUEST:
             case PLOTTING_REQUEST:
+            case SIGNATURE_REQUEST:
             default:
                 mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
                 break;
@@ -651,6 +653,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             mRequestQuestionId = event.getSource().getQuestion().getId();
             startActivityForResult(i, PLOTTING_REQUEST);
+        } else if (QuestionInteractionEvent.ADD_SIGNATURE_EVENT.equals(event.getEventType())) {
+            Intent i = new Intent(this, SignatureActivity.class);
+            mRequestQuestionId = event.getSource().getQuestion().getId();
+            startActivityForResult(i, SIGNATURE_REQUEST);
         }
     }
 

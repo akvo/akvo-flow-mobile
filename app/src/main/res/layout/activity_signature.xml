@@ -25,9 +25,8 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_margin="4dp"
-            android:background="@drawable/button_grey_dark"
-            android:textColor="@color/white"
-            android:text="@string/clearbutton"/>
+            android:text="@string/clearbutton"
+            style="@style/button_tertiary"/>
 
         <View
             android:id="@+id/ruler"
@@ -61,9 +60,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="4dp"
-            android:background="@drawable/button_grey_dark"
-            android:textColor="@color/white"
-            android:text="@string/cancelbutton"/>
+            android:text="@string/cancelbutton"
+            style="@style/button_tertiary"/>
 
         <Button
             android:id="@+id/save"
@@ -71,9 +69,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="4dp"
-            android:background="@drawable/button_green"
-            android:textColor="@color/white"
-            android:text="@string/savebutton"/>
+            android:text="@string/savebutton"
+            style="@style/button_primary" />
 
     </LinearLayout>
 

@@ -34,9 +34,9 @@ mkdir tmp
 mkdir builds
 
 build_name() {
-    if [[ "$1" == "akvoflow-dev2" ]]; then
+    if [[ "$1" == "akvoflow-89" ]]; then
         echo "assembleBiogasRelease"
-    elif [[ "$1" == "akvoflow-dev3" ]]; then
+    elif [[ "$1" == "akvoflow-101" ]]; then
         echo "assembleCookstovesRelease"
     else
         echo "assembleFlowRelease"

@@ -33,6 +33,16 @@ rm -rf builds
 mkdir tmp
 mkdir builds
 
+build_name() {
+    if [[ "$1" == "akvoflow-dev2" ]]; then
+        echo "assembleBiogasRelease"
+    elif [[ "$1" == "akvoflow-dev3" ]]; then
+        echo "assembleCookstovesRelease"
+    else
+        echo "assembleFlowRelease"
+    fi
+}
+
 # If an argument is provided with the instance name, deploy only that instance APK. Otherwise, deploy all of them
 if [[ -n "$1" ]]; then
     echo $1 > tmp/instances.txt
@@ -47,10 +57,11 @@ for i in $(cat tmp/instances.txt); do
         accountId=$(sed -n "s/\(.*\)name=\"serviceAccountId\"[[:space:]]*value=\"\(.*\)\"\(.*\)/\2/p" $FLOW_SERVER_CONFIG/$i/appengine-web.xml)
         accountSecret=$FLOW_SERVER_CONFIG/$i/$i.p12
         filename=builds/$i/$version/flow-$version.apk
+        build=$(build_name $i)
 
-        echo "generating apk version" $version "for instance" $i
+        echo "generating apk version" $version "for instance" $i "and build" $build
         cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
-        ./gradlew assembleRelease
+        ./gradlew $build
         mkdir -p builds/$i/$version
         mv app/bin/flow.apk $filename
         java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$accountId" "$accountSecret"

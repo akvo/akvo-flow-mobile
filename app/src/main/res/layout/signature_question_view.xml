@@ -22,8 +22,8 @@
 
         <Button
             android:id="@+id/sign_btn"
-            style="@style/button_green"
-            android:text="@string/add_signature" />
+            android:text="@string/add_signature"
+            style="@style/button_primary" />
 
         <TextView
             android:layout_width="match_parent"

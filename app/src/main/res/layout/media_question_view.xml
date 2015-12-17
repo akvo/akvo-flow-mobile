@@ -42,8 +42,11 @@
 
         <Button
             android:id="@+id/media_btn"
-            style="@style/button_green"
-            android:text="@string/takephoto" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@string/takephoto"
+            style="@style/button_primary"/>
 
     </LinearLayout>
 

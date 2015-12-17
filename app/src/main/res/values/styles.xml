@@ -23,7 +23,7 @@
     </style>
 
     <style name="Flow.ActionBar.Text" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/orange_main</item>
+        <item name="android:textColor">@color/action_bar_text</item>
     </style>
 
     <style name="Flow.ActionBar.TabText" parent="@style/Widget.AppCompat.ActionBar.TabText">
@@ -35,25 +35,19 @@
         <item name="android:divider">@color/white</item>
     </style>
 
-    <style name="large_button">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
+    <style name="button_primary">
+        <item name="android:background">@drawable/button_primary</item>
+        <item name="android:textColor">@color/button_primary_text</item>
     </style>
 
-    <style name="button_green" parent="large_button">
-        <item name="android:background">@drawable/button_green</item>
+    <style name="button_secondary">
+        <item name="android:background">@drawable/button_secondary</item>
+        <item name="android:textColor">@color/button_secondary_text</item>
     </style>
 
-    <style name="button_grey_light" parent="large_button">
-        <item name="android:background">@drawable/button_grey_light</item>
-        <item name="android:layout_margin">8dp</item>
-    </style>
-
-    <style name="button_grey_dark" parent="large_button">
-        <item name="android:background">@drawable/button_grey_dark</item>
-        <item name="android:layout_margin">8dp</item>
+    <style name="button_tertiary">
+        <item name="android:background">@drawable/button_tertiary</item>
+        <item name="android:textColor">@color/button_tertiary_text</item>
     </style>
 
     <!-- Dark Styles -->

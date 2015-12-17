@@ -15,7 +15,7 @@
         android:layout_marginBottom="30dp"
         android:adjustViewBounds="true"
         android:scaleType="centerInside"
-        android:src="@drawable/akvoflow_logo" />
+        android:src="@drawable/logo" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,10 +38,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="20dp"
-            android:background="@drawable/button_green"
             android:text="@string/nextbutton"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            style="@style/button_primary"/>
 
     </LinearLayout>
 

@@ -48,7 +48,7 @@ public class RepetitionHeader extends TextView implements View.OnTouchListener {
         setPadding(padding, padding, padding, padding);
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         setText(mTitle + " - " + pos);
-        setTextColor(getResources().getColor(R.color.text_color_orange));
+        setTextColor(getResources().getColor(R.color.text_color_secondary));
         setBackgroundColor(getResources().getColor(R.color.background_alternate));
 
         // Show 'delete' icon if the OnDeleteListener param is not null

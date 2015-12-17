@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="default_underline_indicator_selected_color">#FF33B5E5</color>
-
+    <!-- Colors -->
     <color name="white">#ffffff</color>
 
-    <color name="background_main">#fffef2e7</color>
-    <color name="background_alternate">#f1eae4</color>
-
     <color name="black_main">#000000</color>
-    <color name="black_diabled">#8f8f8f</color>
+    <color name="black_disabled">#8f8f8f</color>
 
     <color name="orange_main">#e17e26</color>
     <color name="orange_disabled">#80e17e26</color>
@@ -16,16 +12,45 @@
     <color name="blue_main">#2bb5e6</color>
     <color name="blue_disabled">#802bb5e6</color>
 
-    <!-- Buttons -->
     <color name="button_green">#00a79d</color>
     <color name="button_green_selected">#007f77</color>
-    <color name="button_grey_light">#BCB9B6</color>
+    <color name="button_grey_light">#bcb9b6</color>
     <color name="button_grey_light_selected">#808285</color>
-    <color name="button_grey_dark">#79736E</color>
+    <color name="button_grey_dark">#79736e</color>
     <color name="button_grey_dark_selected">#000000</color>
 
-    <color name="record_name_background">#CEC6BC</color>
+    <!-- FLOW branding -->
+    <color name="background_main">#fffef2e7</color>
+    <color name="background_alternate">#f1eae4</color>
 
-    <color name="feature_menu_background">#E0736357</color>
+    <!-- Text -->
+    <color name="text_primary">@color/black_main</color>
+    <color name="text_primary_disabled">@color/black_disabled</color>
+    <color name="text_secondary">@color/orange_main</color>
+    <color name="text_secondary_disabled">@color/orange_disabled</color>
+    <color name="text_tertiary">@color/blue_main</color>
+    <color name="text_tertiary_disabled">@color/blue_disabled</color>
+
+    <color name="action_bar_text">@color/orange_main</color>
+
+    <color name="tab_text">@color/white</color>
+    <color name="tab_text_selected">@color/orange_main</color>
+
+    <!-- Buttons -->
+    <color name="button_primary">@color/button_green</color>
+    <color name="button_primary_selected">@color/button_green_selected</color>
+    <color name="button_primary_disabled">@color/button_grey_light</color>
+    <color name="button_primary_text">@color/white</color>
+    <color name="button_secondary">@color/button_grey_light</color>
+    <color name="button_secondary_selected">@color/button_grey_light_selected</color>
+    <color name="button_secondary_text">@color/white</color>
+    <color name="button_tertiary">@color/button_grey_dark</color>
+    <color name="button_tertiary_selected">@color/button_grey_dark_selected</color>
+    <color name="button_tertiary_text">@color/white</color>
+
+    <color name="default_underline_indicator_selected_color">#ff33b5e5</color>
+
+    <color name="record_name_background">#cec6bc</color>
+    <color name="feature_menu_background">#e0736357</color>
 
 </resources>

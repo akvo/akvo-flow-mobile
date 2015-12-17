@@ -19,7 +19,7 @@
     <color name="button_grey_dark">#79736e</color>
     <color name="button_grey_dark_selected">#000000</color>
 
-    <!-- Brand: TODO: Extract to its own file-->
+    <!-- FLOW branding -->
     <color name="background_main">#fffef2e7</color>
     <color name="background_alternate">#f1eae4</color>
 

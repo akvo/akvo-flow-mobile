@@ -6,8 +6,7 @@
     <color name="snv_green">#3a781e</color>
     <color name="snv_green_selected">#8cb07e</color>
 
-    <!-- Brand: TODO: Extract to its own file-->
-
+    <!-- SNV branding -->
     <color name="background_main">#ffffff</color>
     <color name="background_alternate">#e4f1f9</color>
 

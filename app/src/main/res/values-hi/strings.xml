@@ -14,8 +14,6 @@
   <string name="lat">लैटीट्ूड </string>
   <string name="lon">लोंगीतुड </string>
   <string name="elevation">ऊंचाई </string>
-  <string name="savebutton">सुरक्षित करें </string>
-  <string name="clearbutton">हटाएं </string>
   <string name="submitbutton">GPS इस कार्य के लिए सक्षम होना चाइये . Settings पे जाने के लिए OK करें .</string>
   <string name="geodialog">GPS सक्षम होना चाहिए . Setting पे जाने के लिए OK करें. Use GPS Satellite चुनें  और वापस जाने के लिए बैक बटन दबाएं . GPS सक्षम होने पर, Check Geo Location  दबाकर अपनी स्तिधि जानिए .</string>
   <string name="resize_large_images">रीसाइज़े लार्ज इमेजेज </string>
@@ -107,6 +105,9 @@
   <string name="clear_data_success">डेटा आपके फ़ोन अथवा टेबलेट से सफलता पूर्ण हटा दिया गया है </string>
   <string name="clear_data_error">उपकरण से डेटा हटाने  में त्रुटि</string>
   <string name="configuring_languages">सर्वे भाषाओं को समनुरूप या कॉन्फ़िगर करना  </string>
+  <string name="search">खोज </string>
+  <string name="sync">सिंक </string>
+  <string name="sort">छाँटिएन </string>
   <string name="syncing_records">डेटा पॉइंट्स सिंक हो रहे हैं </string>
   <string name="sync_finished">डेटा पॉइंट्स सिंकिंग समाप्त </string>
   <string name="synced_records">%1$d डेटा पॉइंट्स सिंक हो चुके हैं </string>
@@ -126,6 +127,8 @@
   <string name="please_restart">कृपया ऐप को पुनर्प्रारंभ करें </string>
   <!--Empty Views-->
   <string name="no_surveys_text">आप के पास कोई सर्वे नियुक्त नहीं हैI   फ्लो, FLOW डैशबोर्ड में सर्वे नियुक्त किये जाते हैंI</string>
+  <string name="no_records_text">आपके पास कोई डेटा पॉइंट नहीं है ।  नया डेटा पॉइंट बनाने के लिए स्क्रीन के ऊपरी ओर  \'+\' निशान को चुनियें । </string>
+  <string name="no_survey_selected_text">आपने कोई सर्वे नहीं चुना है । कृपया साइड मेनू से कोई सर्वे चुने । </string>
   <!--Activity Labels-->
   <string name="survey_groups_activity">सर्वे </string>
   <string name="record_list_activity">डेटा पॉइंट का चयन करें  </string>
@@ -153,6 +156,12 @@
   <string name="clear_point_text">क्या आप इस पॉइंट को हटाना चाहेंगे ?</string>
   <string name="clear_feature_title"> फीचर डिलीट करें </string>
   <string name="clear_feature_text">क्या आप इस फीचर को हटाना चाहेंगे ?</string>
+  <string name="repeat_group">सवाल दोहराइए </string>
+  <string name="repetitions">दुहराव</string>
+  <string name="view_responses">प्रतिक्रिया देखिये </string>
+  <string name="view_map">मैप देखिये </string>
+  <string name="delete_group_title">दोहराये सवाल मिटायें </string>
+  <string name="delete_group_text">क्या आप दोहराये सवाल मिटाना चाहतें हैं ?</string>
   <!--RecordList Activity-->
   <string name="stats_total">कुल डेटा पॉइंट्स </string>
   <string name="stats_week">पिछले सात, 7, दिन </string>
@@ -208,6 +217,8 @@
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">रद्द</string>
+  <string name="savebutton">सुरक्षित करें </string>
+  <string name="clearbutton">हटाएं </string>
   <string name="yes">हाँ </string>
   <string name="no">नहीं </string>
   <string name="retry">पुन: प्रयास</string>

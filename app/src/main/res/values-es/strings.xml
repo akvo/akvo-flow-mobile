@@ -14,8 +14,6 @@
   <string name="lat">Lat</string>
   <string name="lon">Lon</string>
   <string name="elevation">Altura</string>
-  <string name="savebutton">Guardar</string>
-  <string name="clearbutton">Borrar</string>
   <string name="submitbutton">Enviar</string>
   <string name="geodialog">Para realizar esta acción el GPS debe estar activado. Pulse OK para ir a sección de ajustes. Seleccione Satélites GPS y regrese a la aplicación. Una vez activado el GPS, vuelva a intentar la búsqueda.</string>
   <string name="resize_large_images">Reducir imágenes grandes</string>
@@ -168,6 +166,9 @@ Version</string>
   <string name="view_map">Ver mapa</string>
   <string name="delete_group_title">Eliminar grupo</string>
   <string name="delete_group_text">¿Está seguro de que desea eliminar este grupo?</string>
+  <string name="add_signature">Añadir firma</string>
+  <string name="signed_by">Firmado por:</string>
+  <string name="signature_terms">Entiendo que esta es una representación electrónica de mi firma</string>
   <!--RecordList Activity-->
   <string name="add_data_point">Añadir punto de datos</string>
   <string name="stats_total">Número total de puntos de datos:</string>
@@ -239,6 +240,8 @@ Version</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Cancelar</string>
+  <string name="savebutton">Guardar</string>
+  <string name="clearbutton">Borrar</string>
   <string name="yes">Sí</string>
   <string name="no">No</string>
   <string name="retry">Reintentar</string>

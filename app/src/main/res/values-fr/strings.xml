@@ -14,8 +14,6 @@
   <string name="lat">Lat</string>
   <string name="lon">Lon</string>
   <string name="elevation">Altitude</string>
-  <string name="savebutton">Enregistrer</string>
-  <string name="clearbutton">Effacer</string>
   <string name="submitbutton">Envoyer</string>
   <string name="geodialog">Votre GPS doit être activer. Cliquez OK pour accéder aux préférences. Sélectionnez Utilisez le GPS et pressez le bouton de retour pour revenir a cet écran. Vous pouvez maintenant obtenir la géolocalisation.</string>
   <string name="resize_large_images">Réduire les images trop lourdes</string>
@@ -165,6 +163,9 @@
   <string name="view_map">Voir carte.</string>
   <string name="delete_group_title">Supprimer le groupe</string>
   <string name="delete_group_text">Voulez-vous supprimer ce groupe?</string>
+  <string name="add_signature">Ajouter une signature</string>
+  <string name="signed_by">Signé par:</string>
+  <string name="signature_terms">Je comprends que ceci est une image éléctronique représentant ma signature</string>
   <!--RecordList Activity-->
   <string name="add_data_point">Créer un point de donnée</string>
   <string name="stats_total">Total de points:</string>
@@ -236,6 +237,8 @@
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Annuler</string>
+  <string name="savebutton">Enregistrer</string>
+  <string name="clearbutton">Effacer</string>
   <string name="yes">Oui</string>
   <string name="no">Non</string>
   <string name="retry">Réessayer</string>

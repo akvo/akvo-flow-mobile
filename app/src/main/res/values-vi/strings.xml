@@ -14,8 +14,6 @@
   <string name="lat">Vĩ độ</string>
   <string name="lon">Kinh độ</string>
   <string name="elevation">Độ cao</string>
-  <string name="savebutton">Lưu dữ liệu</string>
-  <string name="clearbutton">Xóa dữ liệu</string>
   <string name="submitbutton">Đệ trình</string>
   <string name="geodialog">Cần phải kích hoạt ứng dụng định vị tọa độ để thực hiện chức năng này. Chọn Ok để vào trang Cài đặt. Chọn \"Sử dụng vệ tinh để định vị tọa độ\" và sau đó ấn nút quay lại. Khi ứng dụng định vị tọa độ được kích hoạt, bạn có thể nhấp lại \"Kiểm tra tọa độ địa lý\" để biết được vị trí hiện tại của bạn</string>
   <string name="resize_large_images">Thay đổi kích thước của những ảnh cỡ lớn</string>
@@ -25,12 +23,12 @@
   <string name="prefoptlabel">Sự ưu tiên</string>
   <string name="prefoptdesc">Cài đặt ngôn ngữ khảo sát mặc định và dữ liệu ưu tiên khác</string>
   <string name="sendoptlabel">Đồng bộ hóa dữ liệu</string>
-  <string name="sendoptdesc">DĐồng bộ hóa dữ liệu khảo sát. Bạn phải có kết nối mạng (điện thoại di động hoặc wifi) để thực hiện thao tác này</string>
+  <string name="sendoptdesc">Đồng bộ hóa dữ liệu khảo sát. Bạn phải có kết nối mạng (điện thoại di động hoặc wifi) để thực hiện thao tác này</string>
   <string name="poweroptlabel">Quản lý năng lượng</string>
   <string name="poweroptdesc">Bật tắt Wi-Fi để quản lý tốt hơn tuổi thọ pin.</string>
   <string name="screenoptlabel">Giữ màn hình hoạt động trong quá trình nhập dữ liệu khảo sát</string>
   <string name="screenoptdesc">Tránh để màn hình bị tắt khi đang ở chế độ nhập dữ liệu. Chắc chắn rằng tắt màn hình hoặc thoát khỏi ứng dụng bằng tay khi không sử dụng để tránh bị hao pin</string>
-  <string name="aboutlabel">Về</string>
+  <string name="aboutlabel">Phiên bản</string>
   <string name="aboutdesc">Hiển thị thông tin của phiên bản</string>
   <string name="abouttitle">Giới thiệu ứng dụng Akvo Flow</string>
   <string name="abouttext">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion </string>
@@ -165,6 +163,9 @@
   <string name="view_map">View map</string>
   <string name="delete_group_title">Xóa nhóm câu hỏi</string>
   <string name="delete_group_text">Bạn có muốn xóa nhóm câu hỏi này?</string>
+  <string name="add_signature">Ký tên</string>
+  <string name="signed_by">Được ký bởi</string>
+  <string name="signature_terms">Tôi hiểu rằng đây là chữ ký điện tử của tôi</string>
   <!--RecordList Activity-->
   <string name="add_data_point">Tạo điểm dữ liệu mới</string>
   <string name="stats_total">Tổng số những điểm dữ liệu:</string>
@@ -183,7 +184,7 @@
   <string name="last_modified_regular">Đã đệ trình:</string>
   <string name="last_response">Câu trả lời cuối cùng:</string>
   <string name="error_missing_cascade">Những file danh sách chưa được tải xuống</string>
-  <string name="error_missing_form">Form not found. Please re-download all the forms</string>
+  <string name="error_missing_form">Không tìm thấy mẫu biểu. Xin vui lòng tải lại tất cả các mẫu biểu</string>
   <string name="tab_forms">Những biểu mẫu</string>
   <string name="tab_history">Lịch sử </string>
   <!--Form & transmission status-->
@@ -227,15 +228,17 @@
   <string name="new_user">+ người sử dụng</string>
   <string name="edit_user">Chỉnh sửa tên người sử dụng</string>
   <string name="delete_user">Xóa tên người sử dụng</string>
-  <string name="empty_user_warning">Username cannot be empty</string>
-  <string name="delete_user_confirmation">Are you sure you want to delete this user?</string>
-  <string name="username">Username</string>
-  <string name="mustselectuser">Please select a user before continuing</string>
+  <string name="empty_user_warning">Tên của người sử dụng không thể bỏ trống</string>
+  <string name="delete_user_confirmation">Bạn có chắc chắn muốn xóa tên người sử dụng này không?</string>
+  <string name="username">Tên người sử dụng</string>
+  <string name="mustselectuser">Xin vui lòng chọn tên người sử dụng trước khi tiếp tục</string>
   <string name="surveys">Khảo sát</string>
-  <string name="logged_in_as">Logged in as</string>
+  <string name="logged_in_as">Đăng nhập bởi</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">Hủy bỏ</string>
+  <string name="savebutton">Lưu dữ liệu</string>
+  <string name="clearbutton">Xóa dữ liệu</string>
   <string name="yes">Có</string>
   <string name="no">Không</string>
   <string name="retry">Làm lại</string>

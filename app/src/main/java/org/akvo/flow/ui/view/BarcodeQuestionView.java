@@ -125,6 +125,7 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     mInputContainer.removeView(view);
+                                    displayOrder();
                                     captureResponse();
                                 }
                             });
@@ -133,12 +134,21 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         }
 
         mInputContainer.addView(view);
-        if (mQuestion.isAllowMultiple()) {
+        displayOrder();
+        captureResponse();
+    }
+
+    private void displayOrder() {
+        if (!mQuestion.isAllowMultiple()) {
+            return;
+        }
+        for (int i=0; i<mInputContainer.getChildCount(); i++) {
+            View view = mInputContainer.getChildAt(i);
             TextView orderView = (TextView) view.findViewById(R.id.order);
-            orderView.setText(mInputContainer.getChildCount() + ":");
+            String text = i+1 + ":";
+            orderView.setText(text);
             orderView.setVisibility(VISIBLE);
         }
-        captureResponse();
     }
 
     /**

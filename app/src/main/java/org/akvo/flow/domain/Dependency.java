@@ -16,6 +16,10 @@
 
 package org.akvo.flow.domain;
 
+import org.akvo.flow.serialization.response.value.OptionValue;
+
+import java.util.List;
+
 /**
  * data structure representing a dependency between questions. A dependency
  * consists of two values: a question ID and an answer value. When a question
@@ -61,9 +65,10 @@ public class Dependency {
             return answer == val;
         }
 
-        for (String v : val.split("\\|", -1)) {
+        List<Option> values = OptionValue.deserialize(val);
+        for (Option o : values) {
             for (String a : answer.split("\\|", -1)) {
-                if (v.trim().equals(a.trim())) {
+                if (o.getText().trim().equals(a.trim())) {
                     return true;
                 }
             }

@@ -2,6 +2,7 @@ package org.akvo.flow.serialization.response.value;
 
 import junit.framework.TestCase;
 
+import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Option;
 
 import java.util.ArrayList;
@@ -76,5 +77,33 @@ public class OptionValueTest extends TestCase {
         assertEquals("UK", values.get(0).getCode());
         assertEquals("Spain", values.get(1).getText());
         assertEquals("ES", values.get(1).getCode());
+    }
+
+    public void testDependencies() {
+        List<Option> options = new ArrayList<>();
+        Option option = new Option();
+        option.setText("United Kingdom");
+        option.setCode("UK");
+        options.add(option);
+
+        option = new Option();
+        option.setText("Spain");
+        option.setCode("ES");
+        options.add(option);
+
+        String response = OptionValue.serialize(options);
+
+        Dependency dependency = new Dependency();
+        dependency.setAnswer("Spain");
+        assertTrue(dependency.isMatch(response));
+
+        dependency.setAnswer("Spain|Finland");
+        assertTrue(dependency.isMatch(response));
+
+        dependency.setAnswer("Spain|United Kingdom");
+        assertTrue(dependency.isMatch(response));
+
+        dependency.setAnswer("Other");
+        assertFalse(dependency.isMatch(response));
     }
 }

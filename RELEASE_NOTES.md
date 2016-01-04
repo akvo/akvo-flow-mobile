@@ -1,6 +1,23 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.2
+Date: 4 January 2016
+
+New and noteworthy
+------------------
+* Multiple barcode questions show each value's order within the response [#389]
+* Location beacons are disabled by default [#384]
+* Signature question type is now available [#380]
+* Codes support in option questions [#367]
+* Branded apps (SNV only) [#388]
+* Vietnamese translation added [#372]
+
+Resolved issues
+---------------
+* Fix geoshape questions in repeatable question groups [#394]
+* Handle invalid cascades more gracefully [#382]
+
 # ver 2.2.1
 Date: 30 November 2015
 

@@ -32,6 +32,15 @@
             android:singleLine="true"
             android:textSize="24sp" />
 
+        <EditText
+            android:id="@+id/devide_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/identlabel"
+            android:singleLine="true"
+            android:textSize="24sp" />
+
         <Button
             android:id="@+id/login_btn"
             android:layout_width="match_parent"

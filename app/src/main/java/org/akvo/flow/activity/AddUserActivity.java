@@ -29,8 +29,12 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.util.ConstantUtil;
 
-public class AddUserActivity extends ActionBarActivity {
+public class AddUserActivity extends ActionBarActivity implements TextWatcher{
+    private View mNext;
+    private EditText mName;
+    private EditText mID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,40 +42,45 @@ public class AddUserActivity extends ActionBarActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
 
-        final EditText et = (EditText) findViewById(R.id.username);
-        final View nextBtn = findViewById(R.id.login_btn);
+        mName = (EditText) findViewById(R.id.username);
+        mID = (EditText) findViewById(R.id.devide_id);
+        mNext = findViewById(R.id.login_btn);
 
         // Ensure the username is not left blank
-        nextBtn.setEnabled(false);
-        et.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+        mNext.setEnabled(false);
+        mName.addTextChangedListener(this);
+        mID.addTextChangedListener(this);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                nextBtn.setEnabled(!TextUtils.isEmpty(s));
-            }
-        });
-
-        nextBtn.setOnClickListener(new View.OnClickListener() {
+        mNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = et.getText().toString();
+                String username = mName.getText().toString().trim();
+                String deviceId = mID.getText().toString().trim();
                 SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
-                long id = db.createOrUpdateUser(null, username);
+                long uid = db.createOrUpdateUser(null, username);
+                db.savePreference(ConstantUtil.DEVICE_IDENT_KEY, deviceId);
                 db.close();
 
                 // Select the newly created user, and exit the Activity
-                FlowApp.getApp().setUser(new User(id, username));
+                FlowApp.getApp().setUser(new User(uid, username));
                 setResult(RESULT_OK);
                 finish();
             }
         });
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        boolean valid = !TextUtils.isEmpty(mName.getText()) && !TextUtils.isEmpty(mID.getText());
+        mNext.setEnabled(valid);
     }
 
 }

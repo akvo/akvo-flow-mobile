@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -25,6 +25,18 @@ public class AltText {
     private String language;
     private String type;
     private String text;
+
+    public AltText() {
+    }
+
+    /**
+     * Copy constructor
+     */
+    public AltText(AltText altText) {
+        this.language = altText.getLanguage();
+        this.type = altText.getType();
+        this.text = altText.getText();
+    }
 
     public String getLanguage() {
         return language;

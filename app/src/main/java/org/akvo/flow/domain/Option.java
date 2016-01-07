@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -28,6 +28,21 @@ public class Option {
     private String code;
     private boolean isOther;
     private HashMap<String, AltText> altTextMap = new HashMap<>();
+
+    public Option() {
+    }
+
+    /**
+     * Copy constructor
+     */
+    public Option(Option option) {
+        this.text = option.getText();
+        this.code = option.getCode();
+        this.isOther = option.isOther();
+        for (AltText altText : option.altTextMap.values()) {
+            addAltText(new AltText(altText));// Deep-copy AltText map
+        }
+    }
 
     public void addAltText(AltText altText) {
         altTextMap.put(altText.getLanguage(), altText);

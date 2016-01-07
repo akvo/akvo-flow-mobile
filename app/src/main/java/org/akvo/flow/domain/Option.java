@@ -29,6 +29,21 @@ public class Option {
     private boolean isOther;
     private HashMap<String, AltText> altTextMap = new HashMap<>();
 
+    public Option() {
+    }
+
+    /**
+     * Copy constructor
+     */
+    public Option(Option option) {
+        this.text = option.getText();
+        this.code = option.getCode();
+        this.isOther = option.isOther();
+        for (AltText altText : option.altTextMap.values()) {
+            this.altTextMap.put(altText.getLanguage(), altText);
+        }
+    }
+
     public void addAltText(AltText altText) {
         altTextMap.put(altText.getLanguage(), altText);
     }

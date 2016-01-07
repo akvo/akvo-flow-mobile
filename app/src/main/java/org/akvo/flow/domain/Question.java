@@ -386,7 +386,6 @@ public class Question {
         q.allowPolygon = question.isAllowPolygon();
         q.src = question.getSrc();
         q.validationRule = question.getValidationRule();// Shallow copy
-        q.options = question.getOptions();// Shallow copy
         q.questionHelp = question.getQuestionHelp();// Shallow copy
         q.altTextMap = question.getAltTextMap();// Shallow copy
         q.scoringRules = question.getScoringRules();// Shallow copy
@@ -397,6 +396,14 @@ public class Question {
             q.dependencies = new ArrayList<>();
             for (Dependency d : question.getDependencies()) {
                 q.dependencies.add(new Dependency(d));
+            }
+        }
+
+        // Deep-copy options
+        if (question.options != null) {
+            q.options = new ArrayList<>();
+            for (Option o : question.options) {
+                q.options.add(new Option(o));
             }
         }
         return q;

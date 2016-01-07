@@ -26,6 +26,18 @@ public class AltText {
     private String type;
     private String text;
 
+    public AltText() {
+    }
+
+    /**
+     * Copy constructor
+     */
+    public AltText(AltText altText) {
+        this.language = altText.getLanguage();
+        this.type = altText.getType();
+        this.text = altText.getText();
+    }
+
     public String getLanguage() {
         return language;
     }

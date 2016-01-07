@@ -40,7 +40,7 @@ public class Option {
         this.code = option.getCode();
         this.isOther = option.isOther();
         for (AltText altText : option.altTextMap.values()) {
-            this.altTextMap.put(altText.getLanguage(), altText);
+            addAltText(new AltText(altText));// Deep-copy AltText map
         }
     }
 

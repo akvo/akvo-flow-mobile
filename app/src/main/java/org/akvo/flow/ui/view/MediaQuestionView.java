@@ -19,6 +19,9 @@ package org.akvo.flow.ui.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,6 +34,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -51,11 +55,13 @@ import java.io.File;
  * 
  * @author Christopher Fagiani
  */
-public class MediaQuestionView extends QuestionView implements OnClickListener, MediaSyncTask.DownloadListener {
+public class MediaQuestionView extends QuestionView implements OnClickListener,
+        LocationListener, MediaSyncTask.DownloadListener {
     private Button mMediaButton;
     private ImageView mImage;
     private ProgressBar mProgressBar;
     private View mDownloadBtn;
+    private TextView mLocationInfo;
     private String mMediaType;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
@@ -72,6 +78,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
         mImage = (ImageView)findViewById(R.id.image);
         mProgressBar = (ProgressBar)findViewById(R.id.progress);
         mDownloadBtn = findViewById(R.id.download);
+        mLocationInfo = (TextView)findViewById(R.id.location_info);
 
         if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
@@ -147,6 +154,17 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
                     isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
                     getQuestion().getId()));
             displayThumbnail();
+
+            // Read location
+            mLocationInfo.setVisibility(VISIBLE);
+            LocationManager locMgr = (LocationManager) getContext()
+                    .getSystemService(Context.LOCATION_SERVICE);
+            if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                mLocationInfo.setText("Reading location info...");
+                locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            } else {
+                mLocationInfo.setText("Unknown Location");
+            }
         }
     }
 
@@ -218,6 +236,31 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
             Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
         }
         displayThumbnail();
+    }
+
+    public void onLocationChanged(Location location) {
+        float currentAccuracy = location.getAccuracy();
+        // if accuracy is 0 then the gps has no idea where we're at
+        if (currentAccuracy > 0) {
+            // If we are below the accuracy treshold, stop listening for updates.
+            // This means that after the geolocation is 'green', it stays the same,
+            // otherwise it keeps on listening
+            if (currentAccuracy <= 20f) {
+                LocationManager locMgr = (LocationManager) getContext()
+                        .getSystemService(Context.LOCATION_SERVICE);
+                locMgr.removeUpdates(this);
+                mLocationInfo.setText("Location ready: " + location.toString());
+            }
+        }
+    }
+
+    public void onProviderDisabled(String provider) {
+    }
+
+    public void onProviderEnabled(String provider) {
+    }
+
+    public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 
 }

@@ -165,7 +165,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
                     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
                     mListeningLocation = true;
                 }
-                displayLocationInfo(location);
+                displayLocationInfo();
             }
         }
     }
@@ -194,7 +194,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
                     isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
                     getQuestion().getId()));
         }
-        displayLocationInfo(ImageUtil.getLocation(file.getAbsolutePath()));
+        displayLocationInfo();
     }
 
     /**
@@ -220,7 +220,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mLocationManager.removeUpdates(this);
         if (mListeningLocation) {
             mListeningLocation = false;
-            displayLocationInfo(null);
+            displayLocationInfo();
         }
     }
 
@@ -254,6 +254,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
         }
         displayThumbnail();
+        displayLocationInfo();
     }
 
     @Override
@@ -266,13 +267,20 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             if (getResponse() != null && !TextUtils.isEmpty(getResponse().getValue())) {
                 double lat = location.getLatitude(), lon = location.getLongitude();
                 ImageUtil.setLocation(getResponse().getValue(), lat, lon);
-                displayLocationInfo(new float[]{(float)lat, (float)lon});
+                displayLocationInfo();
             }
         }
     }
 
-    private void displayLocationInfo(float[] location) {
+    private void displayLocationInfo() {
+        String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (TextUtils.isEmpty(filename) || !new File(filename).exists()) {
+            mLocationInfo.setVisibility(GONE);
+            return;
+        }
+
         mLocationInfo.setVisibility(VISIBLE);
+        float[] location = ImageUtil.getLocation(filename);
         if (location != null) {
             mLocationInfo.setText(getResources().getString(R.string.image_location_saved)+": "+Arrays.toString(location));
         } else if (mListeningLocation) {

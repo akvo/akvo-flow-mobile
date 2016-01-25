@@ -166,6 +166,9 @@
     <string name="add_signature">Add signature</string>
     <string name="signed_by">Signed by:</string>
     <string name="signature_terms">I understand this is an electronic representation of my signature</string>
+    <string name="image_location_unknown">Geolocation unknown</string>
+    <string name="image_location_reading">Reading geolocation</string>
+    <string name="image_location_saved">Geolocation saved</string>
     <!--RecordList Activity-->
     <string name="add_data_point">Add Data Point</string>
     <string name="stats_total">Total Data Points:</string>

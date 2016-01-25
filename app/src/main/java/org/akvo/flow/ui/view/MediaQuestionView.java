@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -48,6 +48,7 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Question type that supports taking a picture/video/audio recording with the
@@ -63,11 +64,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     private View mDownloadBtn;
     private TextView mLocationInfo;
     private String mMediaType;
+    private LocationManager mLocationManager;
+    private boolean mListeningLocation;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
         super(context, q, surveyListener);
         mMediaType = type;
+        mLocationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         init();
     }
 
@@ -155,15 +159,13 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
                     getQuestion().getId()));
             displayThumbnail();
 
-            // Read location
-            mLocationInfo.setVisibility(VISIBLE);
-            LocationManager locMgr = (LocationManager) getContext()
-                    .getSystemService(Context.LOCATION_SERVICE);
-            if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                mLocationInfo.setText("Reading location info...");
-                locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            } else {
-                mLocationInfo.setText("Unknown Location");
+            if (isImage()) {
+                float[] location = ImageUtil.getLocation(result);
+                if (location == null && mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+                    mListeningLocation = true;
+                }
+                displayLocationInfo(location);
             }
         }
     }
@@ -176,20 +178,23 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
-        // We now check whether the file is found in the local filesystem, and update the path if it's not
-        String filename = getResponse() != null ? getResponse().getValue() : null;
-        if (!TextUtils.isEmpty(filename)) {
-            File file = new File(filename);
-            if (!file.exists() && isReadOnly())
-                // Looks like the image is not present in the filesystem (i.e. remote URL)
-                // Update response, matching the local path. Note: In the future, media responses should
-                // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
-                file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
-                setResponse(new QuestionResponse(file.getAbsolutePath(),
-                        isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                        getQuestion().getId()));
-        }
         displayThumbnail();
+        String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (TextUtils.isEmpty(filename)) {
+            return;
+        }
+        // We now check whether the file is found in the local filesystem, and update the path if it's not
+        File file = new File(filename);
+        if (!file.exists() && isReadOnly()) {
+            // Looks like the image is not present in the filesystem (i.e. remote URL)
+            // Update response, matching the local path. Note: In the future, media responses should
+            // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
+            file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
+            setResponse(new QuestionResponse(file.getAbsolutePath(),
+                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                    getQuestion().getId()));
+        }
+        displayLocationInfo(ImageUtil.getLocation(file.getAbsolutePath()));
     }
 
     /**
@@ -200,10 +205,23 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         super.resetQuestion(fireEvent);
         mImage.setImageDrawable(null);
         hideDownloadOptions();
+        mLocationInfo.setVisibility(GONE);
+        mLocationManager.removeUpdates(this);
+        mListeningLocation = false;
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+    }
+
+    @Override
+    public void onPause() {
+        // Remove updates from LocationManager, to allow this object being GC
+        mLocationManager.removeUpdates(this);
+        if (mListeningLocation) {
+            mListeningLocation = false;
+            displayLocationInfo(null);
+        }
     }
 
     private void displayThumbnail() {
@@ -238,19 +256,29 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         displayThumbnail();
     }
 
+    @Override
     public void onLocationChanged(Location location) {
         float currentAccuracy = location.getAccuracy();
         // if accuracy is 0 then the gps has no idea where we're at
-        if (currentAccuracy > 0) {
-            // If we are below the accuracy treshold, stop listening for updates.
-            // This means that after the geolocation is 'green', it stays the same,
-            // otherwise it keeps on listening
-            if (currentAccuracy <= 20f) {
-                LocationManager locMgr = (LocationManager) getContext()
-                        .getSystemService(Context.LOCATION_SERVICE);
-                locMgr.removeUpdates(this);
-                mLocationInfo.setText("Location ready: " + location.toString());
+        if (currentAccuracy > 0 && currentAccuracy <= 20f && mListeningLocation) {
+            mLocationManager.removeUpdates(this);
+            mListeningLocation = false;
+            if (getResponse() != null && !TextUtils.isEmpty(getResponse().getValue())) {
+                double lat = location.getLatitude(), lon = location.getLongitude();
+                ImageUtil.setLocation(getResponse().getValue(), lat, lon);
+                displayLocationInfo(new float[]{(float)lat, (float)lon});
             }
+        }
+    }
+
+    private void displayLocationInfo(float[] location) {
+        mLocationInfo.setVisibility(VISIBLE);
+        if (location != null) {
+            mLocationInfo.setText(getResources().getString(R.string.image_location_saved)+": "+Arrays.toString(location));
+        } else if (mListeningLocation) {
+            mLocationInfo.setText(R.string.image_location_reading);
+        } else {
+            mLocationInfo.setText(R.string.image_location_unknown);
         }
     }
 

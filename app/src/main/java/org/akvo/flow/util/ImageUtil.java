@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 The Android Open Source Project
+ * Copyright (C) 2012-2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,42 @@ public class ImageUtil {
             Log.e(TAG, e.getMessage());
         }
 
+    }
+
+    public static float[] getLocation(String image) {
+        try {
+            ExifInterface exif = new ExifInterface(image);
+            float[] output = new float[2];
+            if (exif.getLatLong(output)) {
+                return output;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static boolean setLocation(String image, double latitude, double longitude) {
+        try {
+            ExifInterface exif = new ExifInterface(image);
+
+            String latDMS = convertDMS(latitude);
+            String lonDMS = convertDMS(longitude);
+            String latRef = latitude >= 0d ? "N" : "S";
+            String lonRef = longitude >= 0d ? "E" : "W";
+
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, latDMS);
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, latRef);
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, lonDMS);
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, lonRef);
+            exif.saveAttributes();
+            return true;
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return false;
     }
 
     private static boolean saveImage(Bitmap bitmap, String filename) {
@@ -253,6 +289,35 @@ public class ImageUtil {
             Log.e(TAG, e.getMessage());
         }
         return value;
+    }
+
+    private static String convertDMS(double coordinate) {
+        if (coordinate < -180.0 || coordinate > 180.0 || Double.isNaN(coordinate)) {
+            throw new IllegalArgumentException("coordinate=" + coordinate);
+        }
+
+        // Fixed denominator for seconds
+        final int secondsDenom = 1000;
+
+        StringBuilder sb = new StringBuilder();
+
+        coordinate = Math.abs(coordinate);
+
+        int degrees = (int) Math.floor(coordinate);
+        sb.append(degrees);
+        sb.append("/1,");
+        coordinate -= degrees;
+        coordinate *= 60.0;
+        int minutes = (int) Math.floor(coordinate);
+        sb.append(minutes);
+        sb.append("/1,");
+        coordinate -= minutes;
+        coordinate *= 60.0;
+        coordinate *= secondsDenom;
+        int secondsNum = (int) Math.floor(coordinate);
+        sb.append(secondsNum);
+        sb.append("/").append(secondsDenom);
+        return sb.toString();
     }
 
 }

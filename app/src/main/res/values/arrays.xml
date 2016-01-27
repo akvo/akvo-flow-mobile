@@ -25,6 +25,7 @@
         <item>Français</item>
         <item>Hindi</item>
         <item>Vietnamese</item>
+        <item>Bahasa Indonesia</item>
     </string-array>
     <string-array name="app_language_codes">
         <item>en</item>
@@ -32,6 +33,7 @@
         <item>fr</item>
         <item>hi</item>
         <item>vi</item>
+        <item>in</item>
     </string-array>
 
     <!-- NOTE: Main color will suits the light theme. Must have enough colors for all languages -->

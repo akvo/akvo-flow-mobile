@@ -48,7 +48,6 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * Question type that supports taking a picture/video/audio recording with the
@@ -282,7 +281,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mLocationInfo.setVisibility(VISIBLE);
         float[] location = ImageUtil.getLocation(filename);
         if (location != null) {
-            mLocationInfo.setText(getResources().getString(R.string.image_location_saved)+": "+Arrays.toString(location));
+            mLocationInfo.setText(R.string.image_location_saved);
         } else if (mListeningLocation) {
             mLocationInfo.setText(R.string.image_location_reading);
         } else {

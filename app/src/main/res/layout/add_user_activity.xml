@@ -33,7 +33,7 @@
             android:textSize="24sp" />
 
         <EditText
-            android:id="@+id/devide_id"
+            android:id="@+id/device_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

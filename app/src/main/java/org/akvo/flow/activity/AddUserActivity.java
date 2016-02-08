@@ -43,7 +43,7 @@ public class AddUserActivity extends ActionBarActivity implements TextWatcher{
         setContentView(R.layout.add_user_activity);
 
         mName = (EditText) findViewById(R.id.username);
-        mID = (EditText) findViewById(R.id.devide_id);
+        mID = (EditText) findViewById(R.id.device_id);
         mNext = findViewById(R.id.login_btn);
 
         // Ensure the username is not left blank

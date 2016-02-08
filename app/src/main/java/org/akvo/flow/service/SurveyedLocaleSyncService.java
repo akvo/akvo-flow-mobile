@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -76,11 +76,6 @@ public class SurveyedLocaleSyncService extends IntentService {
             }
             displayNotification(getString(R.string.sync_finished),
                     String.format(getString(R.string.synced_records), syncedRecords), true);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            displayToast(getString(R.string.network_error));
-            displayNotification(getString(R.string.sync_error), 
-                    getString(R.string.network_error), true);
         } catch (HttpException e) {
             Log.e(TAG, e.getMessage());
             String message = e.getMessage();
@@ -92,6 +87,11 @@ public class SurveyedLocaleSyncService extends IntentService {
             }
             displayToast(message);
             displayNotification(getString(R.string.sync_error), message, true);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            displayToast(getString(R.string.network_error));
+            displayNotification(getString(R.string.sync_error),
+                    getString(R.string.network_error), true);
         } finally {
             database.close();
         }
@@ -103,7 +103,7 @@ public class SurveyedLocaleSyncService extends IntentService {
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
     private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
-            throws IOException, HttpException {
+            throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);

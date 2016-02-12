@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -332,6 +332,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mAdapter.onDestroy();
         mDatabase.close();
     }
 

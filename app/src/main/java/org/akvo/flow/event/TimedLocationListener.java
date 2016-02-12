@@ -22,7 +22,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,7 +32,7 @@ import java.util.TimerTask;
  * and the caller will receive such event.
  */
 public class TimedLocationListener implements LocationListener {
-    private static final long TIMEOUT   = 1000 * 30; // 1 minute
+    private static final long TIMEOUT   = 1000 * 60; // 1 minute
     private static final float ACCURACY = 20f;       // 20 meters
 
     public interface Listener {

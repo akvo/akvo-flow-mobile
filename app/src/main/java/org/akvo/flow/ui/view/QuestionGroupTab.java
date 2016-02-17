@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -211,6 +211,13 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         }
     }
 
+    public void onDestroy() {
+        // Propagate onDestroy callback
+        for (QuestionView qv : mQuestionViews.values()) {
+            qv.onDestroy();
+        }
+    }
+
     public boolean isLoaded() {
         return mLoaded;
     }
@@ -286,7 +293,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             qid += "|" + repetitionID;
             QuestionView qv = mQuestionViews.get(qid);
             if (qv != null) {
-                qv.onPause();
+                qv.onDestroy();
                 mQuestionViews.remove(qid);
                 mContainer.removeView(qv);
             }

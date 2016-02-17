@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -486,6 +486,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * This callback will be invoked *after* the question is instantiated and initialized.
      */
     public void onResume() {
+    }
+
+    /**
+     * Activity callback propagation. Use this hook to release resources no longer needed.
+     */
+    public void onDestroy() {
     }
 
     public QuestionResponse getResponse() {

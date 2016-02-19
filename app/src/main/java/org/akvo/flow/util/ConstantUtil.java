@@ -82,6 +82,7 @@ public class ConstantUtil {
     public static final String CASCADE_RESPONSE_TYPE = "CASCADE";
     public static final String OPTION_RESPONSE_TYPE = "OPTION";
     public static final String SIGNATURE_RESPONSE_TYPE = "SIGNATURE";
+    public static final String CADDISFLY_RESPONSE_TYPE = "CADDISFLY";
 
     /**
      * validation types

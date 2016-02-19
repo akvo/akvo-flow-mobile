@@ -42,7 +42,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
         mEditText = (EditText)findViewById(R.id.input_et);
 
-        Button externalSourceBtn = (Button)findViewById(R.id.external_source_btn);
+        Button externalSourceBtn = (Button)findViewById(R.id.button);
         externalSourceBtn.setOnClickListener(this);
         externalSourceBtn.setEnabled(!mSurveyListener.isReadOnly());
     }
@@ -97,7 +97,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.external_source_btn) {
+        if (view.getId() == R.id.button) {
             notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT);
         }
     }

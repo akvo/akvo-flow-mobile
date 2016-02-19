@@ -61,6 +61,7 @@ public class Question {
     private boolean isDoubleEntry;
     private boolean useExternalSource;
     private boolean allowPoints, allowLine, allowPolygon;
+    private String caddisflyRes;
 
     // cascading question specific attrs
     private String src;
@@ -323,6 +324,14 @@ public class Question {
 
     public String getSrc() {
         return src;
+    }
+
+    public void setCaddisflyRes(String res) {
+        this.caddisflyRes = res;
+    }
+
+    public String getCaddisflyRes() {
+        return caddisflyRes;
     }
 
     public List<Level> getLevels() {

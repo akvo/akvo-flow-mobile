@@ -63,6 +63,7 @@ public class ConstantUtil {
     public static final String CASCADE_QUESTION_TYPE = "cascade";
     public static final String GEOSHAPE_QUESTION_TYPE = "geoshape";
     public static final String SIGNATURE_QUESTION_TYPE = "signature";
+    public static final String CADDISFLY_QUESTION_TYPE = "caddisfly";
 
     /**
      * help types

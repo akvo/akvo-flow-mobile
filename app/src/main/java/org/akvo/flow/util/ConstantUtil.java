@@ -236,16 +236,17 @@ public class ConstantUtil {
     public static final int NOTIFICATION_BOOTSTRAP = 106;
 
     /**
-     * External Sources
+     * Caddisfly serialization settings
      */
-    public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
-    public static final String EXTERNAL_SOURCE_QUESTION_ID = "questionId";
-    public static final String EXTERNAL_SOURCE_QUESTION_TITLE = "questionTitle";
-    public static final String EXTERNAL_SOURCE_FORM_ID = "formId";
-    public static final String EXTERNAL_SOURCE_DATAPOINT_ID = "datapointId";
-    public static final String EXTERNAL_SOURCE_LANGUAGE = "language";
-    public static final String EXTERNAL_SOURCE_RESPONSE = "response";
-    public static final String EXTERNAL_SOURCE_MIME = "text/plain";
+    public static final String CADDISFLY_ACTION = "org.akvo.flow.action.caddisfly";
+    public static final String CADDISFLY_RESOURCE_ID = "caddisflyResourceUuid";
+    public static final String CADDISFLY_QUESTION_ID = "questionId";
+    public static final String CADDISFLY_QUESTION_TITLE = "questionTitle";
+    public static final String CADDISFLY_FORM_ID = "formId";
+    public static final String CADDISFLY_DATAPOINT_ID = "datapointId";
+    public static final String CADDISFLY_LANGUAGE = "language";
+    public static final String CADDISFLY_RESPONSE = "response";
+    public static final String CADDISFLY_MIME = "text/plain";
 
     /**
      * prevent instantiation

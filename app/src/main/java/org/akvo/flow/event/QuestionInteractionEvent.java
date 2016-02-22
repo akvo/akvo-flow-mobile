@@ -35,7 +35,7 @@ public class QuestionInteractionEvent {
     public static final String PHOTO_TIP_VIEW = "PHOTOTIP";
     public static final String ACTIVITY_TIP_VIEW = "ACTIVITYTIP";
     public static final String SCAN_BARCODE_EVENT = "SCAN";
-    public static final String EXTERNAL_SOURCE_EVENT = "EXTERNALSOURCE";
+    public static final String CADDISFLY = "CADDISFLY";
     public static final String PLOTTING_EVENT = "PLOTTING";
     public static final String ADD_SIGNATURE_EVENT = "SIGNATURE";
 

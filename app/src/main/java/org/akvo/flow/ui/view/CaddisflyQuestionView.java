@@ -42,9 +42,9 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
         mEditText = (EditText)findViewById(R.id.input_et);
 
-        Button externalSourceBtn = (Button)findViewById(R.id.button);
-        externalSourceBtn.setOnClickListener(this);
-        externalSourceBtn.setEnabled(!mSurveyListener.isReadOnly());
+        Button button = (Button)findViewById(R.id.button);
+        button.setOnClickListener(this);
+        button.setEnabled(!mSurveyListener.isReadOnly());
     }
 
     @Override
@@ -89,7 +89,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     @Override
     public void questionComplete(Bundle data) {
         if (data != null) {
-            String value = data.getString(ConstantUtil.EXTERNAL_SOURCE_RESPONSE);
+            String value = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
             mEditText.setText(value);
         }
         captureResponse();
@@ -98,7 +98,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.button) {
-            notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT);
+            notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY);
         }
     }
 

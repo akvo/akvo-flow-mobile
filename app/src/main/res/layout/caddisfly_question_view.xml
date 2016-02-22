@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:text="@string/use_external_source"
+        android:text="@string/caddisfly_test"
         style="@style/button_primary"/>
 
 </merge>

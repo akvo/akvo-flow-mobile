@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -74,7 +74,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
-    private static final int EXTERNAL_SOURCE_REQUEST  = 4;
+    private static final int CADDISFLY_REQUEST  = 4;
     private static final int PLOTTING_REQUEST  = 5;
     private static final int SIGNATURE_REQUEST  = 6;
 
@@ -459,7 +459,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
                 break;
-            case EXTERNAL_SOURCE_REQUEST:
+            case CADDISFLY_REQUEST:
             case SCAN_ACTIVITY_REQUEST:
             case PLOTTING_REQUEST:
             case SIGNATURE_REQUEST:
@@ -634,18 +634,19 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 event.getSource().setResponse(null, true);// Invalidate previous response
                 deleteResponse(questionId);
             }
-        } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
+        } else if (QuestionInteractionEvent.CADDISFLY.equals(event.getEventType())) {
             mRequestQuestionId = event.getSource().getQuestion().getId();
             final Question q = event.getSource().getQuestion();
-            Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
-            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_ID, q.getId());
-            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_QUESTION_TITLE, q.getText());
-            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_DATAPOINT_ID, mRecordId);
-            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_FORM_ID, mSurvey.getId());
-            intent.putExtra(ConstantUtil.EXTERNAL_SOURCE_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
-            intent.setType(ConstantUtil.EXTERNAL_SOURCE_MIME);
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
-                    + EXTERNAL_SOURCE_REQUEST);
+            Intent intent = new Intent(ConstantUtil.CADDISFLY_ACTION);
+            intent.putExtra(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
+            intent.putExtra(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
+            intent.putExtra(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
+            intent.putExtra(ConstantUtil.CADDISFLY_DATAPOINT_ID, mRecordId);
+            intent.putExtra(ConstantUtil.CADDISFLY_FORM_ID, mSurvey.getId());
+            intent.putExtra(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+            intent.setType(ConstantUtil.CADDISFLY_MIME);
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.caddisfly_test)),
+                    + CADDISFLY_REQUEST);
         } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
             Intent i = new Intent(this, GeoshapeActivity.class);
             if (event.getData() != null) {

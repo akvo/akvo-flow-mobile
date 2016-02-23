@@ -34,12 +34,10 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyedLocaleMeta;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -566,6 +564,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
         return mAdapter.getQuestionView(questionId);
     }
 
+    @Override
+    public String getDatapointId() {
+        return mRecordId;
+    }
+
+    @Override
+    public String getFormId() {
+        return mSurvey.getId();
+    }
+
     /**
      * event handler that can be used to handle events fired by individual
      * questions at the Activity level. Because we can't launch the photo
@@ -636,14 +644,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
         } else if (QuestionInteractionEvent.CADDISFLY.equals(event.getEventType())) {
             mRequestQuestionId = event.getSource().getQuestion().getId();
-            final Question q = event.getSource().getQuestion();
             Intent intent = new Intent(ConstantUtil.CADDISFLY_ACTION);
-            intent.putExtra(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
-            intent.putExtra(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
-            intent.putExtra(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
-            intent.putExtra(ConstantUtil.CADDISFLY_DATAPOINT_ID, mRecordId);
-            intent.putExtra(ConstantUtil.CADDISFLY_FORM_ID, mSurvey.getId());
-            intent.putExtra(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+            intent.putExtras(event.getData());
             intent.setType(ConstantUtil.CADDISFLY_MIME);
             startActivityForResult(Intent.createChooser(intent, getString(R.string.caddisfly_test)),
                     + CADDISFLY_REQUEST);

@@ -4,21 +4,40 @@
 
     <include layout="@layout/question_header" />
 
-    <EditText
-        android:id="@+id/input_et"
+    <RelativeLayout
+        android:id="@+id/response_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:imeOptions="actionDone"
-        android:enabled="false"
-        android:singleLine="true"
-        android:inputType="textNoSuggestions|textMultiLine"/>
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/checkmark"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:src="@drawable/checkmark" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/checkmark"
+            android:layout_toRightOf="@id/checkmark"
+            android:text="@string/caddisfly_response"
+            android:textColor="#8dc63f"
+            android:textSize="18sp" />
+    </RelativeLayout>
 
     <Button
         android:id="@+id/button"
+        style="@style/button_primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
         android:text="@string/caddisfly_test"
-        style="@style/button_primary"/>
+        android:textSize="16sp" />
 
 </merge>

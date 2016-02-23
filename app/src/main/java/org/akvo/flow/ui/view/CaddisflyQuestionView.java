@@ -18,11 +18,12 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
@@ -30,7 +31,9 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener {
-    private EditText mEditText;
+    private Button mButton;
+    private View mResponseView;
+    private String mValue;
 
     public CaddisflyQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -39,67 +42,57 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     private void init() {
         setQuestionView(R.layout.caddisfly_question_view);
-
-        mEditText = (EditText)findViewById(R.id.input_et);
-
-        Button button = (Button)findViewById(R.id.button);
-        button.setOnClickListener(this);
-        button.setEnabled(!mSurveyListener.isReadOnly());
+        mResponseView = findViewById(R.id.response_view);
+        mButton = (Button)findViewById(R.id.button);
+        mButton.setOnClickListener(this);
+        displayResponseView();
     }
 
-    @Override
-    public void setResponse(QuestionResponse resp) {
-        String value = resp != null ? resp.getValue() : null;
-        mEditText.setText(value);
-        super.setResponse(resp);
+    private void displayResponseView() {
+        mResponseView.setVisibility(TextUtils.isEmpty(mValue) ? GONE : VISIBLE);
+        mButton.setEnabled(!mSurveyListener.isReadOnly());
     }
 
-    /**
-     * pulls the data out of the fields and saves it as a response object,
-     * possibly suppressing listeners
-     */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(mEditText.getText().toString(),
-                ConstantUtil.CADDISFLY_RESPONSE_TYPE, getQuestion().getId()),
-                suppressListeners);
-
-        checkMandatory();// Mandatory question must be answered
+        setResponse(new QuestionResponse(mValue, ConstantUtil.CADDISFLY_RESPONSE_TYPE,
+                getQuestion().getId()), suppressListeners);
     }
 
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        String val = resp != null ? resp.getValue() : null;
-        mEditText.setText(val);
+        mValue = resp != null ? resp.getValue() : null;
+        displayResponseView();
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
-        mEditText.setText("");
         super.resetQuestion(fireEvent);
-    }
-
-    @Override
-    public void displayError(String error) {
-        // Display the error within the EditText (instead of question text)
-        mEditText.setError(error);
+        mValue = null;
+        displayResponseView();
     }
 
     @Override
     public void questionComplete(Bundle data) {
         if (data != null) {
-            String value = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
-            mEditText.setText(value);
+            mValue = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
+            displayResponseView();
         }
         captureResponse();
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.button) {
-            notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY);
-        }
+        Question q = getQuestion();
+        Bundle data = new Bundle();
+        data.putString(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
+        data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
+        data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
+        data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
+        data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
+        data.putString(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+        notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY, data);
     }
 
 }

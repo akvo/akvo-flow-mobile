@@ -144,7 +144,6 @@
   <string name="repeat_answer">कृपया उत्तर दोहराएं </string>
   <string name="error_answer_match">उत्तर मेल नहीं खा रहे हैं </string>
   <string name="error_img_preview">चित्र लोड होने में त्रुटि </string>
-  <string name="use_external_source">बाहरी स्त्रोत का उपयोग करें </string>
   <string name="error_empty_form">खली फॉर्म जमा नहीं हो सकतेI  कृपया पहले अनुकूल उत्तर दें I</string>
   <string name="select">कृपया चुनें   </string>
   <string name="clear_value_msg"> क्या आप इस संख्या को हटाना चाहेंगे ?</string>

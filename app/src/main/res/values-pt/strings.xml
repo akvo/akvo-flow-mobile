@@ -148,7 +148,6 @@ Limpar Respostas Inquérito</string>
   <string name="repeat_answer">Por favor, repita a resposta</string>
   <string name="error_answer_match">As respostas não coincidem</string>
   <string name="error_img_preview">Não é possível carregar visualização da imagem</string>
-  <string name="use_external_source">Use Fonte Externa</string>
   <string name="error_empty_form">Formulários vazios não podem ser submetidos. Por favor, adicione as respostas correspondentes em primeiro lugar.</string>
   <string name="select">Por favor seleccione</string>
   <string name="clear_value_msg">Quer apagar este valor?</string>

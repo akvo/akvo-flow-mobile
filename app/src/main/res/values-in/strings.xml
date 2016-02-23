@@ -145,7 +145,6 @@
   <string name="repeat_answer">Mohon ulangi jawaban</string>
   <string name="error_answer_match">Jawaban tidak sama</string>
   <string name="error_img_preview">Tidak dapat memuat gambar pratayang</string>
-  <string name="use_external_source">Gunakan sumber dari luar</string>
   <string name="error_empty_form">Tidak dapat mengirim formulir kosong. Mohon jawab pertanyaan terlebih dulu.</string>
   <string name="select">mohon pilih</string>
   <string name="clear_value_msg">Apakah Anda ingin menghapus isian ini?</string>

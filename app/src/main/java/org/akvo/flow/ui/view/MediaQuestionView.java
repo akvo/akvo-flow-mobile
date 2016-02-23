@@ -19,9 +19,6 @@ package org.akvo.flow.ui.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,6 +40,7 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
@@ -56,21 +54,20 @@ import java.io.File;
  * @author Christopher Fagiani
  */
 public class MediaQuestionView extends QuestionView implements OnClickListener,
-        LocationListener, MediaSyncTask.DownloadListener {
+        TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
     private Button mMediaButton;
     private ImageView mImage;
     private ProgressBar mProgressBar;
     private View mDownloadBtn;
     private TextView mLocationInfo;
     private String mMediaType;
-    private LocationManager mLocationManager;
-    private boolean mListeningLocation;
+    private TimedLocationListener mLocationListener;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
         super(context, q, surveyListener);
         mMediaType = type;
-        mLocationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        mLocationListener = new TimedLocationListener(context, this);
         init();
     }
 
@@ -159,10 +156,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             displayThumbnail();
 
             if (isImage()) {
-                float[] location = ImageUtil.getLocation(result);
-                if (location == null && mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-                    mListeningLocation = true;
+                if (ImageUtil.getLocation(result) == null) {
+                    mLocationListener.start();
                 }
                 displayLocationInfo();
             }
@@ -205,8 +200,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mImage.setImageDrawable(null);
         hideDownloadOptions();
         mLocationInfo.setVisibility(GONE);
-        mLocationManager.removeUpdates(this);
-        mListeningLocation = false;
+        mLocationListener.stop();
     }
 
     @Override
@@ -214,12 +208,9 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     }
 
     @Override
-    public void onPause() {
-        // Remove updates from LocationManager, to allow this object being GC
-        mLocationManager.removeUpdates(this);
-        if (mListeningLocation) {
-            mListeningLocation = false;
-            displayLocationInfo();
+    public void onDestroy() {
+        if (mLocationListener.isListening()) {
+            mLocationListener.stop();
         }
     }
 
@@ -257,18 +248,21 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        float currentAccuracy = location.getAccuracy();
-        // if accuracy is 0 then the gps has no idea where we're at
-        if (currentAccuracy > 0 && currentAccuracy <= 20f && mListeningLocation) {
-            mLocationManager.removeUpdates(this);
-            mListeningLocation = false;
-            if (getResponse() != null && !TextUtils.isEmpty(getResponse().getValue())) {
-                double lat = location.getLatitude(), lon = location.getLongitude();
-                ImageUtil.setLocation(getResponse().getValue(), lat, lon);
-                displayLocationInfo();
-            }
+    public void onLocationReady(double lat, double lon) {
+        if (getResponse() != null && !TextUtils.isEmpty(getResponse().getValue())) {
+            ImageUtil.setLocation(getResponse().getValue(), lat, lon);
+            displayLocationInfo();
         }
+    }
+
+    @Override
+    public void onTimeout() {
+        displayLocationInfo();
+    }
+
+    @Override
+    public void onGPSDisabled() {
+        displayLocationInfo();
     }
 
     private void displayLocationInfo() {
@@ -282,20 +276,11 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         float[] location = ImageUtil.getLocation(filename);
         if (location != null) {
             mLocationInfo.setText(R.string.image_location_saved);
-        } else if (mListeningLocation) {
+        } else if (mLocationListener.isListening()) {
             mLocationInfo.setText(R.string.image_location_reading);
         } else {
             mLocationInfo.setText(R.string.image_location_unknown);
         }
-    }
-
-    public void onProviderDisabled(String provider) {
-    }
-
-    public void onProviderEnabled(String provider) {
-    }
-
-    public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 
 }

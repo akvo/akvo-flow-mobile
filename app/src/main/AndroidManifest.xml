@@ -30,7 +30,8 @@
         android:theme="@style/Flow.Theme">
         <activity
             android:name=".activity.AddUserActivity"
-            android:label="@string/add_user" />
+            android:label="@string/add_user"
+            android:configChanges="locale|layoutDirection" />
         <activity
             android:name=".activity.SurveyActivity"
             android:configChanges="locale|layoutDirection"
@@ -85,7 +86,8 @@
 
         <activity
             android:name=".activity.SignatureActivity"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape"
+            android:configChanges="locale|layoutDirection" />
 
         <service android:name=".service.DataSyncService" />
         <service android:name=".service.SurveyDownloadService" />

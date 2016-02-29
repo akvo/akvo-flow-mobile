@@ -111,7 +111,8 @@ public class DataSyncService extends IntentService {
     private static final String FORMID_PARAM = "&formID=";
 
     private static final String DATA_CONTENT_TYPE = "application/zip";
-    private static final String IMAGE_CONTENT_TYPE = "image/jpeg";
+    private static final String JPEG_CONTENT_TYPE = "image/jpeg";
+    private static final String PNG_CONTENT_TYPE = "image/png";
     private static final String VIDEO_CONTENT_TYPE = "video/mp4";
 
     private static final String ACTION_SUBMIT = "submit";
@@ -306,6 +307,7 @@ public class DataSyncService extends IntentService {
             int question_fk_col = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
             int answer_type_col = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
             int answer_col = data.getColumnIndexOrThrow(ResponseColumns.ANSWER);
+            int filename_col = data.getColumnIndexOrThrow(ResponseColumns.FILENAME);
             int disp_name_col = data.getColumnIndexOrThrow(UserColumns.NAME);
             int email_col = data.getColumnIndexOrThrow(UserColumns.EMAIL);
             int submitted_date_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
@@ -338,6 +340,12 @@ public class DataSyncService extends IntentService {
                     formInstance.setDuration(surveyal_time);
                     formInstance.setUsername(cleanVal(data.getString(disp_name_col)));
                     formInstance.setEmail(cleanVal(data.getString(email_col)));
+                }
+
+                // If the response has any file attached, enqueue it to the image list
+                String filename = data.getString(filename_col);
+                if (!TextUtils.isEmpty(filename)) {
+                    imagePaths.add(filename);
                 }
 
                 String type = data.getString(answer_type_col);
@@ -446,23 +454,29 @@ public class DataSyncService extends IntentService {
     }
 
     private boolean syncFile(String filename, String formId, String serverBase) {
-        if (TextUtils.isEmpty(filename)) {
+        if (TextUtils.isEmpty(filename) || filename.lastIndexOf(".") < 0) {
             return false;
         }
 
         String contentType, dir, action;
         boolean isPublic;
-        if (filename.endsWith(ConstantUtil.IMAGE_SUFFIX) || filename.endsWith(ConstantUtil.VIDEO_SUFFIX)) {
-            contentType = filename.endsWith(ConstantUtil.IMAGE_SUFFIX) ? IMAGE_CONTENT_TYPE
-                    : VIDEO_CONTENT_TYPE;
-            dir = ConstantUtil.S3_IMAGE_DIR;
-            action = ACTION_IMAGE;
-            isPublic = true;// Images/Videos have a public read policy
-        } else {
-            contentType = DATA_CONTENT_TYPE;
-            dir = ConstantUtil.S3_DATA_DIR;
-            action = ACTION_SUBMIT;
-            isPublic = false;
+        String ext = filename.substring(filename.lastIndexOf("."));
+        contentType = contentType(ext);
+        switch (ext) {
+            case ConstantUtil.JPG_SUFFIX:
+            case ConstantUtil.PNG_SUFFIX:
+            case ConstantUtil.VIDEO_SUFFIX:
+                dir = ConstantUtil.S3_IMAGE_DIR;
+                action = ACTION_IMAGE;
+                isPublic = true;// Images/Videos have a public read policy
+                break;
+            case ConstantUtil.ARCHIVE_SUFFIX:
+                dir = ConstantUtil.S3_DATA_DIR;
+                action = ACTION_SUBMIT;
+                isPublic = false;
+                break;
+            default:
+                return false;
         }
 
         // Temporarily set the status to 'IN PROGRESS'. Transmission status should
@@ -727,6 +741,21 @@ public class DataSyncService extends IntentService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, builder.build());
+    }
+
+    private String contentType(String ext) {
+        switch (ext) {
+            case ConstantUtil.PNG_SUFFIX:
+                return PNG_CONTENT_TYPE;
+            case ConstantUtil.JPG_SUFFIX:
+                return JPEG_CONTENT_TYPE;
+            case ConstantUtil.VIDEO_SUFFIX:
+                return VIDEO_CONTENT_TYPE;
+            case ConstantUtil.ARCHIVE_SUFFIX:
+                return DATA_CONTENT_TYPE;
+            default:
+                return null;
+        }
     }
 
     /**

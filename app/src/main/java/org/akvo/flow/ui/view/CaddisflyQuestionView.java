@@ -19,6 +19,7 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -29,11 +30,16 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
+
+import java.io.File;
 
 public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener {
+    private static final String TAG = CaddisflyQuestionView.class.getSimpleName();
     private Button mButton;
     private View mResponseView;
     private String mValue;
+    private String mImage;
 
     public CaddisflyQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -55,8 +61,10 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(mValue, ConstantUtil.CADDISFLY_RESPONSE_TYPE,
-                getQuestion().getId()), suppressListeners);
+        QuestionResponse r = new QuestionResponse(mValue, ConstantUtil.CADDISFLY_RESPONSE_TYPE,
+                getQuestion().getId());
+        r.setFilename(mImage);
+        setResponse(r);
     }
 
     @Override
@@ -77,6 +85,25 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     public void questionComplete(Bundle data) {
         if (data != null) {
             mValue = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
+
+            // Get optional image and store it as part of the response
+            String image = data.getString(ConstantUtil.CADDISFLY_IMAGE);
+
+            Log.d(TAG, "caddisflyTestComplete - Response: " + mValue + ". Image: " + image);
+
+            File src = !TextUtils.isEmpty(image) ? new File(image) : null;
+            if (src != null && src.exists()) {
+                // Move the image into the FLOW directory
+                File dst = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), src.getName());
+
+                if (!src.renameTo(dst)) {
+                    Log.e(TAG, String.format("Could not move file %s to %s",
+                            src.getAbsoluteFile(), dst.getAbsoluteFile()));
+                } else {
+                    mImage = dst.getAbsolutePath();
+                }
+            }
+
             displayResponseView();
         }
         captureResponse();

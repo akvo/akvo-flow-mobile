@@ -498,15 +498,13 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     public void setResponse(QuestionResponse response, boolean suppressListeners) {
         if (response != null) {
-            if (mQuestion != null) {
-                response.setScoredValue(mQuestion.getResponseScore(response.getValue()));
-            }
             if (this.mResponse == null) {
                 this.mResponse = response;
             } else {
                 // we need to preserve the ID so we don't get duplicates in the db
                 this.mResponse.setType(response.getType());
                 this.mResponse.setValue(response.getValue());
+                this.mResponse.setFilename(response.getFilename());
             }
         } else {
             this.mResponse = response;

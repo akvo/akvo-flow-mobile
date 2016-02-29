@@ -239,6 +239,7 @@ public class ConstantUtil {
     /**
      * Caddisfly serialization settings
      */
+    public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
     public static final String CADDISFLY_ACTION = "org.akvo.flow.action.caddisfly";
     public static final String CADDISFLY_RESOURCE_ID = "caddisflyResourceUuid";
     public static final String CADDISFLY_QUESTION_ID = "questionId";

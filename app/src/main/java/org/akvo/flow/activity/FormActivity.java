@@ -72,9 +72,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
     private static final int SCAN_ACTIVITY_REQUEST  = 3;
-    private static final int CADDISFLY_REQUEST  = 4;
-    private static final int PLOTTING_REQUEST  = 5;
-    private static final int SIGNATURE_REQUEST  = 6;
+    private static final int EXTERNAL_SOURCE_REQUEST  = 4;
+    private static final int CADDISFLY_REQUEST  = 5;
+    private static final int PLOTTING_REQUEST  = 6;
+    private static final int SIGNATURE_REQUEST  = 7;
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
@@ -457,6 +458,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
                 break;
+            case EXTERNAL_SOURCE_REQUEST:
             case CADDISFLY_REQUEST:
             case SCAN_ACTIVITY_REQUEST:
             case PLOTTING_REQUEST:
@@ -642,6 +644,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 event.getSource().setResponse(null, true);// Invalidate previous response
                 deleteResponse(questionId);
             }
+        } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
+            mRequestQuestionId = event.getSource().getQuestion().getId();
+            Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
+            intent.putExtras(event.getData());
+            intent.setType(ConstantUtil.CADDISFLY_MIME);
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
+                    + EXTERNAL_SOURCE_REQUEST);
         } else if (QuestionInteractionEvent.CADDISFLY.equals(event.getEventType())) {
             mRequestQuestionId = event.getSource().getQuestion().getId();
             Intent intent = new Intent(ConstantUtil.CADDISFLY_ACTION);

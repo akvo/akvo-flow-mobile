@@ -1,6 +1,20 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.3
+Date: 29 February 2016
+
+New and noteworthy
+------------------
+* Indonesia Bahasa and Portuguese translations [#410]
+* Automatically add geotagging to image responses [#402]
+* Enforce Device ID setting on app's first run [#395]
+
+Resolved issues
+---------------
+* Ensure mandatory option questions are always filled in [#411]
+* Device rotation flickering [#151]
+
 # ver 2.2.2
 Date: 4 January 2016
 

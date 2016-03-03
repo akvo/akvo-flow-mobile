@@ -331,6 +331,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mAdapter.onDestroy();
         mDatabase.close();
     }
 

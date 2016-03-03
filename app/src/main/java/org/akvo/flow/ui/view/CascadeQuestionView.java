@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -89,6 +89,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
                 mDatabase.open();
             }
         }
+        updateSpinners(POSITION_NONE);
     }
 
     @Override

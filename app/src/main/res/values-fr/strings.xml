@@ -224,7 +224,7 @@
   <!--Navigation Drawer-->
   <string name="select_user">Choisir un utilisateur</string>
   <string name="add_user">Ajouter un utilisateur</string>
-  <string name="new_user">+ utilisateur</string>
+  <string name="new_user">+ Nom d’enquêteur’</string>
   <string name="edit_user">Sélectionner un utilisateur</string>
   <string name="delete_user">Supprimer un utilisateur</string>
   <string name="empty_user_warning">Nom d\'utilisateur est obligatoire</string>

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -31,6 +31,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -39,6 +40,7 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
@@ -51,17 +53,21 @@ import java.io.File;
  * 
  * @author Christopher Fagiani
  */
-public class MediaQuestionView extends QuestionView implements OnClickListener, MediaSyncTask.DownloadListener {
+public class MediaQuestionView extends QuestionView implements OnClickListener,
+        TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
     private Button mMediaButton;
     private ImageView mImage;
     private ProgressBar mProgressBar;
     private View mDownloadBtn;
+    private TextView mLocationInfo;
     private String mMediaType;
+    private TimedLocationListener mLocationListener;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
         super(context, q, surveyListener);
         mMediaType = type;
+        mLocationListener = new TimedLocationListener(context, this);
         init();
     }
 
@@ -72,6 +78,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
         mImage = (ImageView)findViewById(R.id.image);
         mProgressBar = (ProgressBar)findViewById(R.id.progress);
         mDownloadBtn = findViewById(R.id.download);
+        mLocationInfo = (TextView)findViewById(R.id.location_info);
 
         if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
@@ -147,6 +154,13 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
                     isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
                     getQuestion().getId()));
             displayThumbnail();
+
+            if (isImage()) {
+                if (ImageUtil.getLocation(result) == null) {
+                    mLocationListener.start();
+                }
+                displayLocationInfo();
+            }
         }
     }
 
@@ -158,20 +172,23 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
-        // We now check whether the file is found in the local filesystem, and update the path if it's not
-        String filename = getResponse() != null ? getResponse().getValue() : null;
-        if (!TextUtils.isEmpty(filename)) {
-            File file = new File(filename);
-            if (!file.exists() && isReadOnly())
-                // Looks like the image is not present in the filesystem (i.e. remote URL)
-                // Update response, matching the local path. Note: In the future, media responses should
-                // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
-                file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
-                setResponse(new QuestionResponse(file.getAbsolutePath(),
-                        isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                        getQuestion().getId()));
-        }
         displayThumbnail();
+        String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (TextUtils.isEmpty(filename)) {
+            return;
+        }
+        // We now check whether the file is found in the local filesystem, and update the path if it's not
+        File file = new File(filename);
+        if (!file.exists() && isReadOnly()) {
+            // Looks like the image is not present in the filesystem (i.e. remote URL)
+            // Update response, matching the local path. Note: In the future, media responses should
+            // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
+            file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
+            setResponse(new QuestionResponse(file.getAbsolutePath(),
+                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                    getQuestion().getId()));
+        }
+        displayLocationInfo();
     }
 
     /**
@@ -182,10 +199,19 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
         super.resetQuestion(fireEvent);
         mImage.setImageDrawable(null);
         hideDownloadOptions();
+        mLocationInfo.setVisibility(GONE);
+        mLocationListener.stop();
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mLocationListener.isListening()) {
+            mLocationListener.stop();
+        }
     }
 
     private void displayThumbnail() {
@@ -218,6 +244,43 @@ public class MediaQuestionView extends QuestionView implements OnClickListener, 
             Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
         }
         displayThumbnail();
+        displayLocationInfo();
+    }
+
+    @Override
+    public void onLocationReady(double lat, double lon) {
+        if (getResponse() != null && !TextUtils.isEmpty(getResponse().getValue())) {
+            ImageUtil.setLocation(getResponse().getValue(), lat, lon);
+            displayLocationInfo();
+        }
+    }
+
+    @Override
+    public void onTimeout() {
+        displayLocationInfo();
+    }
+
+    @Override
+    public void onGPSDisabled() {
+        displayLocationInfo();
+    }
+
+    private void displayLocationInfo() {
+        String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (TextUtils.isEmpty(filename) || !new File(filename).exists()) {
+            mLocationInfo.setVisibility(GONE);
+            return;
+        }
+
+        mLocationInfo.setVisibility(VISIBLE);
+        float[] location = ImageUtil.getLocation(filename);
+        if (location != null) {
+            mLocationInfo.setText(R.string.image_location_saved);
+        } else if (mLocationListener.isListening()) {
+            mLocationInfo.setText(R.string.image_location_reading);
+        } else {
+            mLocationInfo.setText(R.string.image_location_unknown);
+        }
     }
 
 }

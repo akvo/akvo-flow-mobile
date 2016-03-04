@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -70,7 +70,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
             mEditText.setFocusable(false);
             mDoubleEntryText.setFocusable(false);
         }
-        
+
         int maxLength = ValidationRule.DEFAULT_MAX_LENGTH;
         ValidationRule rule = getQuestion().getValidationRule();
         if (rule != null) {
@@ -107,6 +107,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
             externalSourceBtn.setOnClickListener(this);
             externalSourceBtn.setEnabled(!mSurveyListener.isReadOnly());
             mEditText.setEnabled(false);
+            mEditText.setInputType(mEditText.getInputType() & ~InputType.TYPE_TEXT_FLAG_MULTI_LINE);
             mDoubleEntryText.setEnabled(false);
         } else {
             externalSourceBtn.setVisibility(GONE);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -147,6 +147,13 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         // Propagate onResume callback
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             questionGroupTab.onResume();
+        }
+    }
+
+    public void onDestroy() {
+        // Propagate onDestroy callback
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.onDestroy();
         }
     }
 

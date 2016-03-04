@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -250,8 +250,10 @@ public class OptionQuestionView extends QuestionView {
                 }
             }
         } else {
-            Option option = mOptions.get(mOptionGroup.getCheckedRadioButtonId());
-            options.add(option);
+            int checked = mOptionGroup.getCheckedRadioButtonId();
+            if (checked != -1) {
+                options.add(mOptions.get(checked));
+            }
         }
 
         return options;
@@ -375,7 +377,11 @@ public class OptionQuestionView extends QuestionView {
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        String response = OptionValue.serialize(getSelection());
+        String response = null;
+        List<Option> values = getSelection();
+        if (!values.isEmpty()) {
+            response = OptionValue.serialize(values);
+        }
         setResponse(new QuestionResponse(response, ConstantUtil.OPTION_RESPONSE_TYPE,
                 getQuestion().getId()), suppressListeners);
     }

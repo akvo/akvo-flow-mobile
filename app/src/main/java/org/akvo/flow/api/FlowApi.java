@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -64,7 +64,7 @@ public class FlowApi {
     }
     
     public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
-            throws IOException, HttpException {
+            throws IOException {
         final String query = Param.IMEI + URLEncode(IMEI)
                 + "&" + Param.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
                 + "&" + Param.PHONE_NUMBER + URLEncode(PHONE_NUMBER)
@@ -73,7 +73,6 @@ public class FlowApi {
 
         final String url = BASE_URL + Path.SURVEYED_LOCALE 
                 + "?" + query
-                //+ "&" + PARAM.HMAC + URLEncoder.encode(getAuthorization(query), "UTF-8");
                 + "&" + Param.HMAC + getAuthorization(query);
         String response = HttpUtil.httpGet(url);
         if (response != null) {

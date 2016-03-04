@@ -57,7 +57,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
 
     public DateQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mCalendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+        mCalendar = Calendar.getInstance();
         mCalendar.set(Calendar.HOUR_OF_DAY, 0);
         mCalendar.set(Calendar.MINUTE, 0);
         mCalendar.set(Calendar.SECOND, 0);

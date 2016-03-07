@@ -53,15 +53,17 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     private EditText mDateTextEdit;
     private DateFormat mDateFormat;
     private Date mSelectedDate;
-    private Calendar mCalendar;
+    private Calendar mLocalCalendar;
+    private Calendar mGMTCalendar;
 
     public DateQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mCalendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-        mCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        mCalendar.set(Calendar.MINUTE, 0);
-        mCalendar.set(Calendar.SECOND, 0);
-        mCalendar.set(Calendar.MILLISECOND, 0);
+        mLocalCalendar = GregorianCalendar.getInstance();
+        mGMTCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+        mGMTCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        mGMTCalendar.set(Calendar.MINUTE, 0);
+        mGMTCalendar.set(Calendar.SECOND, 0);
+        mGMTCalendar.set(Calendar.MILLISECOND, 0);
         mDateFormat = SimpleDateFormat.getDateInstance();
         init();
     }
@@ -79,17 +81,17 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (mSelectedDate != null) {
-            mCalendar.setTime(mSelectedDate);
+            mLocalCalendar.setTime(mSelectedDate);
         }
         DatePickerDialog dia = new DatePickerDialog(getContext(), new OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                mCalendar.set(year, monthOfYear, dayOfMonth);
-                mSelectedDate = mCalendar.getTime();
+                mGMTCalendar.set(year, monthOfYear, dayOfMonth);
+                mSelectedDate = mGMTCalendar.getTime();
                 mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
                 captureResponse();
             }
-        }, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
+        }, mLocalCalendar.get(Calendar.YEAR), mLocalCalendar.get(Calendar.MONTH), mLocalCalendar.get(Calendar.DAY_OF_MONTH));
         dia.show();
     }
 

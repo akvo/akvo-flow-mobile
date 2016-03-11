@@ -1,6 +1,13 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.3.1
+Date: 11 March 2016
+
+Resolved issues
+---------------
+* Ensure cascade responses are always complete [#425]
+
 # ver 2.2.3
 Date: 29 February 2016
 

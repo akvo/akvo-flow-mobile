@@ -123,7 +123,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
             Node node = (Node)getSpinner(updatedSpinnerIndex).getSelectedItem();
             if (node.getId() == ID_NONE) {
                 // if this is the first level, it means we've got no answer at all
-                mFinished = updatedSpinnerIndex == 0;
+                mFinished = false;
                 return; // Do not load more levels
             } else {
                 parent = node.getId();
@@ -260,9 +260,10 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         return (Spinner)mSpinnerContainer.getChildAt(position).findViewById(R.id.spinner);
     }
 
+    @Override
     public boolean isValid() {
-        boolean valid = super.isValid();
-        if (valid && !mFinished) {
+        boolean valid = super.isValid() && mFinished;
+        if (!valid) {
             setError(getResources().getString(R.string.error_question_mandatory));
         }
         return valid;

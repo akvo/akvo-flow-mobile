@@ -36,7 +36,7 @@ public class TimedLocationListener implements LocationListener {
     private static final float ACCURACY = 20f;       // 20 meters
 
     public interface Listener {
-        void onLocationReady(double lat, double lon);
+        void onLocationReady(double latitude, double longitude, double altitude, float accuracy);
         void onTimeout();
         void onGPSDisabled();
     }
@@ -100,7 +100,8 @@ public class TimedLocationListener implements LocationListener {
         float currentAccuracy = location.getAccuracy();
         // if accuracy is 0 then the gps has no idea where we're at
         if (currentAccuracy > 0 && currentAccuracy <= ACCURACY && mListeningLocation) {
-            mListener.onLocationReady(location.getLatitude(), location.getLongitude());
+            mListener.onLocationReady(location.getLatitude(), location.getLongitude(),
+                    location.getAltitude(), location.getAccuracy());
             stop();
         }
     }

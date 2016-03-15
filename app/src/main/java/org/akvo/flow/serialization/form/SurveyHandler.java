@@ -97,6 +97,7 @@ public class SurveyHandler extends DefaultHandler {
 
     private static final String USE_EXTERNAL_SOURCE = "allowExternalSources";
     private static final String CASCADE_RESOURCE = "cascadeResource";
+    private static final String CADDISFLY_RESOURCE = "caddisflyResourceUuid";
     private static final String LEVELS = "levels";
     private static final String LEVEL = "level";
 
@@ -381,6 +382,8 @@ public class SurveyHandler extends DefaultHandler {
 
             // Question src. Added in cascading question implementation.
             currentQuestion.setSrc(attributes.getValue(CASCADE_RESOURCE));
+
+            currentQuestion.setCaddisflyRes(attributes.getValue(CADDISFLY_RESOURCE));
 
             // Geoshape options (question scope)
             currentQuestion.setAllowPoints(Boolean.parseBoolean(attributes.getValue(ALLOW_POINTS)));

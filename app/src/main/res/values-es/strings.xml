@@ -148,7 +148,6 @@ Version</string>
   <string name="repeat_answer">Por favor, repita la respuesta</string>
   <string name="error_answer_match">Las respuestas no son iguales</string>
   <string name="error_img_preview">La imagen no pude ser cargada</string>
-  <string name="use_external_source">Utilizar aplicación externa</string>
   <string name="error_empty_form">Un formulario sin respuestas no puede ser enviado. Por favor, responda a las preguntas antes de enviar.</string>
   <string name="select">por favor, seleccione</string>
   <string name="clear_value_msg">¿Está seguro de que quiere borrar este valor?</string>

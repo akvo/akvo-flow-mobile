@@ -113,7 +113,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     public void onClick(View v) {
         // TODO: Use switch instead of if-else
         if (v == mImageView) {
-            String filename = mMedia != null ? mMedia.getImage() : null;
+            String filename = mMedia != null ? mMedia.getFilename() : null;
             if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
                 Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
                 return;
@@ -143,7 +143,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             mDownloadBtn.setVisibility(GONE);
             mProgressBar.setVisibility(VISIBLE);
 
-            MediaSyncTask downloadTask = new MediaSyncTask(getContext(), new File(mMedia.getImage()), this);
+            MediaSyncTask downloadTask = new MediaSyncTask(getContext(), new File(mMedia.getFilename()), this);
             downloadTask.execute();
         }
     }
@@ -157,7 +157,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         String result = mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
         if (result != null) {
             mMedia = new Media();
-            mMedia.setImage(result);
+            mMedia.setFilename(result);
 
             captureResponse();
             displayThumbnail();
@@ -186,7 +186,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mMedia = MediaValue.deserialize(resp.getValue());
 
         displayThumbnail();
-        String filename = mMedia.getImage();
+        String filename = mMedia.getFilename();
         if (TextUtils.isEmpty(filename)) {
             return;
         }
@@ -197,7 +197,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             // Update response, matching the local path. Note: In the future, media responses should
             // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
             file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
-            mMedia.setImage(file.getAbsolutePath());
+            mMedia.setFilename(file.getAbsolutePath());
             captureResponse();
         }
         displayLocationInfo();
@@ -218,10 +218,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        String value = MediaValue.serialize(mMedia);
-        setResponse(new QuestionResponse(value,
-                isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                getQuestion().getId()));
+        QuestionResponse response = null;
+        if (mMedia != null && !TextUtils.isEmpty(mMedia.getFilename())) {
+            response = new QuestionResponse(MediaValue.serialize(mMedia),
+                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                    getQuestion().getId());
+            response.setFilename(mMedia.getFilename());
+        }
+        setResponse(response);
     }
 
     @Override
@@ -234,7 +238,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     private void displayThumbnail() {
         hideDownloadOptions();
 
-        String filename = mMedia != null ? mMedia.getImage() : null;
+        String filename = mMedia != null ? mMedia.getFilename() : null;
         if (TextUtils.isEmpty(filename)) {
             return;
         }
@@ -275,7 +279,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
 
             mMedia.setLocation(location);
             // Add location to EXIF too
-            ImageUtil.setLocation(mMedia.getImage(), latitude, longitude);
+            ImageUtil.setLocation(mMedia.getFilename(), latitude, longitude);
 
             captureResponse();
             displayLocationInfo();
@@ -293,7 +297,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     }
 
     private void displayLocationInfo() {
-        String filename = mMedia != null ? mMedia.getImage() : null;
+        String filename = mMedia != null ? mMedia.getFilename() : null;
         if (TextUtils.isEmpty(filename) || !new File(filename).exists()) {
             mLocationInfo.setVisibility(GONE);
             return;

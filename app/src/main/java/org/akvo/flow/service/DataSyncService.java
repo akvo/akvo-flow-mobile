@@ -348,11 +348,14 @@ public class DataSyncService extends IntentService {
                     imagePaths.add(filename);
                 }
 
+                // Ensure backwards compatibility. Old image responses may contain filenames
                 String type = data.getString(answer_type_col);
-                if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
-                        || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
-                    imagePaths.add(value);
+                if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type) || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
+                    if (!TextUtils.isEmpty(value) && new File(value).exists()) {
+                        imagePaths.add(value);
+                    }
                 }
+
                 int iteration = 0;
                 String qid = data.getString(question_fk_col);
                 String[] tokens = qid.split("\\|", -1);

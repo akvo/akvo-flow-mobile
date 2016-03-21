@@ -16,15 +16,15 @@
 package org.akvo.flow.domain.response.value;
 
 public class Media {
-    private String image;
+    private String filename;
     private Location location;
 
-    public String getImage() {
-        return image;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public Location getLocation() {

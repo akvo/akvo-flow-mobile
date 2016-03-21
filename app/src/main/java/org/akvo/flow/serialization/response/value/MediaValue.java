@@ -15,6 +15,7 @@
  */
 package org.akvo.flow.serialization.response.value;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -42,12 +43,19 @@ public class MediaValue {
     }
 
     public static Media deserialize(String data) {
+        if (TextUtils.isEmpty(data)) {
+            return null;
+        }
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(data, Media.class);
         } catch (IOException e) {
             Log.e(TAG, "Value is not a valid JSON response: " + data);
         }
-        return null;
+
+        // Assume old format - plain image
+        Media media = new Media();
+        media.setFilename(data);
+        return media;
     }
 }

@@ -145,6 +145,7 @@
   <string name="repeat_answer">Vui lòng, nhắc lại câu trả lời</string>
   <string name="error_answer_match">Câu trả lời không phù hợp</string>
   <string name="error_img_preview">Không thể xem trước hình ảnh</string>
+  <string name="use_external_source">Sử dụng nguồn bên ngoài</string>
   <string name="error_empty_form">Những biểu mẫu trống dữ liệu không thể đệ trình. Trước tiên, vui lòng, điền thêm những câu trả lời tương ứng.</string>
   <string name="select">Vui lòng chọn</string>
   <string name="clear_value_msg">Bạn có muốn xóa dữ liệu này?</string>

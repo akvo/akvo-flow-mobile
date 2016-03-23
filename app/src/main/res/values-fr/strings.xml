@@ -145,6 +145,7 @@
   <string name="repeat_answer">Veuillez répéter la réponse</string>
   <string name="error_answer_match">Les réponses ne correspondent pas</string>
   <string name="error_img_preview">Impossible de charger l\'image</string>
+  <string name="use_external_source">Utiliser source externe</string>
   <string name="error_empty_form">Les formulaires vides ne peuvent être envoyés. Veuillez répondre aux questions.</string>
   <string name="select">Veuillez sélectionner</string>
   <string name="clear_value_msg">Voulez-vous supprimer cette valeur?</string>

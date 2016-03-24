@@ -38,9 +38,12 @@ import org.akvo.flow.R;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.response.value.Location;
+import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
+import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
@@ -56,12 +59,13 @@ import java.io.File;
 public class MediaQuestionView extends QuestionView implements OnClickListener,
         TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
     private Button mMediaButton;
-    private ImageView mImage;
+    private ImageView mImageView;
     private ProgressBar mProgressBar;
     private View mDownloadBtn;
     private TextView mLocationInfo;
     private String mMediaType;
     private TimedLocationListener mLocationListener;
+    private Media mMedia;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
@@ -75,7 +79,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         setQuestionView(R.layout.media_question_view);
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
-        mImage = (ImageView)findViewById(R.id.image);
+        mImageView = (ImageView)findViewById(R.id.image);
         mProgressBar = (ProgressBar)findViewById(R.id.progress);
         mDownloadBtn = findViewById(R.id.download);
         mLocationInfo = (TextView)findViewById(R.id.location_info);
@@ -90,8 +94,10 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             mMediaButton.setEnabled(false);
         }
 
-        mImage.setOnClickListener(this);
+        mImageView.setOnClickListener(this);
         mDownloadBtn.setOnClickListener(this);
+
+        mMedia = null;
 
         hideDownloadOptions();
     }
@@ -106,8 +112,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
      */
     public void onClick(View v) {
         // TODO: Use switch instead of if-else
-        if (v == mImage) {
-            String filename = getResponse() != null ? getResponse().getValue() : null;
+        if (v == mImageView) {
+            String filename = mMedia != null ? mMedia.getFilename() : null;
             if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
                 Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
                 return;
@@ -137,7 +143,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             mDownloadBtn.setVisibility(GONE);
             mProgressBar.setVisibility(VISIBLE);
 
-            MediaSyncTask downloadTask = new MediaSyncTask(getContext(), new File(getResponse().getValue()), this);
+            MediaSyncTask downloadTask = new MediaSyncTask(getContext(), new File(mMedia.getFilename()), this);
             downloadTask.execute();
         }
     }
@@ -148,11 +154,12 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        if (mediaData != null) {
-            final String result = mediaData.getString(ConstantUtil.MEDIA_FILE_KEY);
-            setResponse(new QuestionResponse(result,
-                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+        String result = mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
+        if (result != null) {
+            mMedia = new Media();
+            mMedia.setFilename(result);
+
+            captureResponse();
             displayThumbnail();
 
             if (isImage()) {
@@ -172,8 +179,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
+        if (resp == null || TextUtils.isEmpty(resp.getValue())) {
+            return;
+        }
+
+        mMedia = MediaValue.deserialize(resp.getValue());
+
         displayThumbnail();
-        String filename = getResponse() != null ? getResponse().getValue() : null;
+        String filename = mMedia.getFilename();
         if (TextUtils.isEmpty(filename)) {
             return;
         }
@@ -184,9 +197,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             // Update response, matching the local path. Note: In the future, media responses should
             // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
             file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
-            setResponse(new QuestionResponse(file.getAbsolutePath(),
-                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+            mMedia.setFilename(file.getAbsolutePath());
+            captureResponse();
         }
         displayLocationInfo();
     }
@@ -197,7 +209,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        mImage.setImageDrawable(null);
+        mMedia = null;
+        mImageView.setImageDrawable(null);
         hideDownloadOptions();
         mLocationInfo.setVisibility(GONE);
         mLocationListener.stop();
@@ -205,6 +218,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+        QuestionResponse response = null;
+        if (mMedia != null && !TextUtils.isEmpty(mMedia.getFilename())) {
+            response = new QuestionResponse(MediaValue.serialize(mMedia),
+                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
+                    getQuestion().getId());
+            response.setFilename(mMedia.getFilename());
+        }
+        setResponse(response);
     }
 
     @Override
@@ -217,19 +238,19 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     private void displayThumbnail() {
         hideDownloadOptions();
 
-        String filename = getResponse() != null ? getResponse().getValue() : null;
+        String filename = mMedia != null ? mMedia.getFilename() : null;
         if (TextUtils.isEmpty(filename)) {
             return;
         }
         if (!new File(filename).exists()) {
-            mImage.setImageResource(R.drawable.blurry_image);
+            mImageView.setImageResource(R.drawable.blurry_image);
             mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {
             // Image thumbnail
-            ImageUtil.displayImage(mImage, filename);
+            ImageUtil.displayImage(mImageView, filename);
         } else {
             // Video thumbnail
-            mImage.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
+            mImageView.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
                     filename, MediaStore.Video.Thumbnails.MINI_KIND));
         }
     }
@@ -248,9 +269,19 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     }
 
     @Override
-    public void onLocationReady(double lat, double lon) {
-        if (getResponse() != null && !TextUtils.isEmpty(getResponse().getValue())) {
-            ImageUtil.setLocation(getResponse().getValue(), lat, lon);
+    public void onLocationReady(double latitude, double longitude, double altitude, float accuracy) {
+        if (mMedia != null) {
+            Location location = new Location();
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+            location.setAltitude(altitude);
+            location.setAccuracy(accuracy);
+
+            mMedia.setLocation(location);
+            // Add location to EXIF too
+            ImageUtil.setLocation(mMedia.getFilename(), latitude, longitude);
+
+            captureResponse();
             displayLocationInfo();
         }
     }
@@ -266,7 +297,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     }
 
     private void displayLocationInfo() {
-        String filename = getResponse() != null ? getResponse().getValue() : null;
+        String filename = mMedia != null ? mMedia.getFilename() : null;
         if (TextUtils.isEmpty(filename) || !new File(filename).exists()) {
             mLocationInfo.setVisibility(GONE);
             return;

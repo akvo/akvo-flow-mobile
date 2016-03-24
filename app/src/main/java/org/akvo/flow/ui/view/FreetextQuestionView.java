@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.ValidationRule;
@@ -222,8 +223,8 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
 
     @Override
     public void questionComplete(Bundle data) {
-        if (data != null && data.containsKey(ConstantUtil.EXTERNAL_SOURCE_RESPONSE)) {
-            setResponse(new QuestionResponse(data.getString(ConstantUtil.EXTERNAL_SOURCE_RESPONSE),
+        if (data != null && data.containsKey(ConstantUtil.CADDISFLY_RESPONSE)) {
+            setResponse(new QuestionResponse(data.getString(ConstantUtil.CADDISFLY_RESPONSE),
                     ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()));
         }
     }
@@ -231,7 +232,14 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.external_source_btn) {
-            notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT);
+            Question q = getQuestion();
+            Bundle data = new Bundle();
+            data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
+            data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
+            data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
+            data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
+            data.putString(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+            notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT, data);
         }
     }
 

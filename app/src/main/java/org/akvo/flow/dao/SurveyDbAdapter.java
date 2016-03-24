@@ -162,8 +162,7 @@ public class SurveyDbAdapter {
         String ANSWER = "answer";
         String TYPE = "type";
         String INCLUDE = "include";
-        String SCORED_VAL = "scored_val";
-        String STRENGTH = "strength";
+        String FILENAME = "filename";
     }
 
     public interface PreferencesColumns {
@@ -214,7 +213,8 @@ public class SurveyDbAdapter {
     private static final int VER_FORM_SUBMITTER = 79;
     private static final int VER_FORM_DEL_CHECK = 80;
     private static final int VER_FORM_VERSION = 81;
-    private static final int DATABASE_VERSION = VER_FORM_VERSION;
+    private static final int VER_CADDISFLY_QN = 82;
+    private static final int DATABASE_VERSION = VER_CADDISFLY_QN;
 
     private final Context context;
 
@@ -287,8 +287,7 @@ public class SurveyDbAdapter {
                     + ResponseColumns.ANSWER + " TEXT NOT NULL,"
                     + ResponseColumns.TYPE + " TEXT NOT NULL,"
                     + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"
-                    + ResponseColumns.SCORED_VAL + " TEXT,"
-                    + ResponseColumns.STRENGTH + " TEXT)");
+                    + ResponseColumns.FILENAME + " TEXT)");
 
             db.execSQL("CREATE TABLE " + Tables.RECORD + " ("
                     + RecordColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -346,6 +345,9 @@ public class SurveyDbAdapter {
                 case VER_FORM_DEL_CHECK:
                     db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
                             + " ADD COLUMN " + SurveyInstanceColumns.VERSION + " REAL");
+                case VER_FORM_VERSION:
+                    db.execSQL("ALTER TABLE " + Tables.RESPONSE
+                            + " ADD COLUMN " + ResponseColumns.FILENAME + " TEXT");
                     version = DATABASE_VERSION;
             }
 
@@ -493,7 +495,7 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
                         SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.DURATION,
                         ResponseColumns.ANSWER, ResponseColumns.TYPE, ResponseColumns.QUESTION_ID,
-                        ResponseColumns.STRENGTH, ResponseColumns.SCORED_VAL, UserColumns.NAME, UserColumns.EMAIL
+                        ResponseColumns.FILENAME, UserColumns.NAME, UserColumns.EMAIL
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.INCLUDE + " = 1",
                 new String[] {
@@ -621,7 +623,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
                         ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.SCORED_VAL, ResponseColumns.STRENGTH
+                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
@@ -633,8 +635,7 @@ public class SurveyDbAdapter {
             int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
             int qidCol = cursor.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
             int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
-            int scoreCol = cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL);
-            int strengthCol = cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH);
+            int filenameCol = cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME);
 
             if (cursor.moveToFirst()) {
                 do {
@@ -645,8 +646,7 @@ public class SurveyDbAdapter {
                     response.setType(cursor.getString(typeCol));
                     response.setQuestionId(cursor.getString(qidCol));
                     response.setIncludeFlag(cursor.getInt(includeCol) == 1);
-                    response.setScoredValue(cursor.getString(scoreCol));
-                    response.setStrength(cursor.getString(strengthCol));
+                    response.setFilename(cursor.getString(filenameCol));
 
                     responses.put(response.getQuestionId(), response);
                 } while (cursor.moveToNext());
@@ -670,7 +670,7 @@ public class SurveyDbAdapter {
                 new String[] {
                     ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
                     ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                    ResponseColumns.INCLUDE, ResponseColumns.SCORED_VAL, ResponseColumns.STRENGTH
+                    ResponseColumns.INCLUDE, ResponseColumns.FILENAME
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                     + " =?",
@@ -683,8 +683,7 @@ public class SurveyDbAdapter {
             resp.setType(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE)));
             resp.setValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER)));
             resp.setId(cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID)));
-            resp.setScoredValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.SCORED_VAL)));
-            resp.setStrength(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.STRENGTH)));
+            resp.setFilename(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME)));
 
             boolean include = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
             resp.setIncludeFlag(include);
@@ -709,8 +708,7 @@ public class SurveyDbAdapter {
                 resp.getRespondentId(), resp.getQuestionId());
         if (responseToSave != null) {
             responseToSave.setValue(resp.getValue());
-            responseToSave.setStrength(resp.getStrength());
-            responseToSave.setScoredValue(resp.getScoredValue());
+            responseToSave.setFilename(resp.getFilename());
             if (resp.getType() != null) {
                 responseToSave.setType(resp.getType());
             }
@@ -723,9 +721,8 @@ public class SurveyDbAdapter {
         initialValues.put(ResponseColumns.TYPE, responseToSave.getType());
         initialValues.put(ResponseColumns.QUESTION_ID, responseToSave.getQuestionId());
         initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getRespondentId());
-        initialValues.put(ResponseColumns.SCORED_VAL, responseToSave.getScoredValue());
+        initialValues.put(ResponseColumns.FILENAME, responseToSave.getFilename());
         initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag() ? 1: 0);
-        initialValues.put(ResponseColumns.STRENGTH, responseToSave.getStrength());
         if (responseToSave.getId() == null) {
             id = database.insert(Tables.RESPONSE, null, initialValues);
         } else {

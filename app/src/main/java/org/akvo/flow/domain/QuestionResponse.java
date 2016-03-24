@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -26,28 +26,14 @@ public class QuestionResponse {
     private Long id;
     private Long respondentId;
     private String questionId;
+    private String filename;
     private boolean includeFlag;
-    private String scoredValue;
-    private String strength;
-
-    public QuestionResponse(Long id, Long respondentId, String qId, String val,
-            String t, boolean includeFlag) {
-        this(id, respondentId, qId, val, t, includeFlag, null);
-    }
 
     public QuestionResponse(String val, String t, String questionId) {
-        this(null, null, questionId, val, t, true);
-    }
-
-    public QuestionResponse(Long id, Long respondentId, String qId, String val,
-            String t, boolean includeFlag, String strength) {
-        this.id = id;
-        value = val;
-        type = t;
-        this.respondentId = respondentId;
-        questionId = qId;
-        this.includeFlag = includeFlag;
-        this.strength = strength;
+        this.value = val;
+        this.type = t;
+        this.questionId = questionId;
+        this.includeFlag = true;
     }
 
     public QuestionResponse() {
@@ -57,15 +43,6 @@ public class QuestionResponse {
         respondentId = null;
         questionId = null;
         includeFlag = true;
-        strength = null;
-    }
-
-    public String getStrength() {
-        return strength;
-    }
-
-    public void setStrength(String strength) {
-        this.strength = strength;
     }
 
     public boolean getIncludeFlag() {
@@ -145,12 +122,12 @@ public class QuestionResponse {
         this.id = id;
     }
 
-    public String getScoredValue() {
-        return scoredValue;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setScoredValue(String scoredValue) {
-        this.scoredValue = scoredValue;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public boolean hasValue() {

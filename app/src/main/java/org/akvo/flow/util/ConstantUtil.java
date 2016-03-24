@@ -27,7 +27,8 @@ public class ConstantUtil {
      */
     public static final String FILE_SURVEY_LOCATION_TYPE = "file";
     public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String IMAGE_SUFFIX = ".jpg";
+    public static final String JPG_SUFFIX = ".jpg";
+    public static final String PNG_SUFFIX = ".png";
     public static final String VIDEO_SUFFIX = ".mp4";
     public static final String XML_SUFFIX = ".xml";
     public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";
@@ -63,6 +64,7 @@ public class ConstantUtil {
     public static final String CASCADE_QUESTION_TYPE = "cascade";
     public static final String GEOSHAPE_QUESTION_TYPE = "geoshape";
     public static final String SIGNATURE_QUESTION_TYPE = "signature";
+    public static final String CADDISFLY_QUESTION_TYPE = "caddisfly";
 
     /**
      * help types
@@ -82,6 +84,7 @@ public class ConstantUtil {
     public static final String CASCADE_RESPONSE_TYPE = "CASCADE";
     public static final String OPTION_RESPONSE_TYPE = "OPTION";
     public static final String SIGNATURE_RESPONSE_TYPE = "SIGNATURE";
+    public static final String CADDISFLY_RESPONSE_TYPE = "CADDISFLY";
 
     /**
      * validation types
@@ -234,16 +237,19 @@ public class ConstantUtil {
     public static final int NOTIFICATION_BOOTSTRAP = 106;
 
     /**
-     * External Sources
+     * Caddisfly serialization settings
      */
     public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
-    public static final String EXTERNAL_SOURCE_QUESTION_ID = "questionId";
-    public static final String EXTERNAL_SOURCE_QUESTION_TITLE = "questionTitle";
-    public static final String EXTERNAL_SOURCE_FORM_ID = "formId";
-    public static final String EXTERNAL_SOURCE_DATAPOINT_ID = "datapointId";
-    public static final String EXTERNAL_SOURCE_LANGUAGE = "language";
-    public static final String EXTERNAL_SOURCE_RESPONSE = "response";
-    public static final String EXTERNAL_SOURCE_MIME = "text/plain";
+    public static final String CADDISFLY_ACTION = "org.akvo.flow.action.caddisfly";
+    public static final String CADDISFLY_RESOURCE_ID = "caddisflyResourceUuid";
+    public static final String CADDISFLY_QUESTION_ID = "questionId";
+    public static final String CADDISFLY_QUESTION_TITLE = "questionTitle";
+    public static final String CADDISFLY_FORM_ID = "formId";
+    public static final String CADDISFLY_DATAPOINT_ID = "datapointId";
+    public static final String CADDISFLY_LANGUAGE = "language";
+    public static final String CADDISFLY_RESPONSE = "response";
+    public static final String CADDISFLY_IMAGE = "image";
+    public static final String CADDISFLY_MIME = "text/plain";
 
     /**
      * prevent instantiation

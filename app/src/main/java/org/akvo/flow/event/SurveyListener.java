@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -23,14 +23,16 @@ import java.util.List;
 import java.util.Map;
 
 public interface SurveyListener {
-    public List<QuestionGroup> getQuestionGroups();
-    public String getDefaultLanguage();
-    public String[] getLanguages();
-    public boolean isReadOnly();
-    public void onSurveySubmit();
-    public void nextTab();
-    public void openQuestion(String questionId);
-    public Map<String, QuestionResponse> getResponses();
-    public void deleteResponse(String questionId);
-    public QuestionView getQuestionView(String questionId);
+    List<QuestionGroup> getQuestionGroups();
+    String getDefaultLanguage();
+    String[] getLanguages();
+    boolean isReadOnly();
+    void onSurveySubmit();
+    void nextTab();
+    void openQuestion(String questionId);
+    Map<String, QuestionResponse> getResponses();
+    void deleteResponse(String questionId);
+    QuestionView getQuestionView(String questionId);
+    String getDatapointId();
+    String getFormId();
 }

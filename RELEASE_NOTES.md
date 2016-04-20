@@ -1,6 +1,17 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.4
+Date: 20 April 2016
+
+New and noteworthy
+------------------
+* Serialise image location as part of media question responses [#402]
+
+Resolved issues
+---------------
+* Fix date question GMT offsets [#403]
+
 # ver 2.2.3.1
 Date: 11 March 2016
 

@@ -53,7 +53,7 @@ fi
 for i in $(cat tmp/instances.txt); do 
     rm -rf bin
     echo "=================================================="
-    if [[ -f $FLOW_SERVER_CONFIG/$i/survey.properties ]]; then
+    if [[ -f $FLOW_SERVER_CONFIG/$i/survey.properties && -f $FLOW_SERVER_CONFIG/$i/$i.p12 ]]; then
         accountId=$(sed -n "s/\(.*\)name=\"serviceAccountId\"[[:space:]]*value=\"\(.*\)\"\(.*\)/\2/p" $FLOW_SERVER_CONFIG/$i/appengine-web.xml)
         accountSecret=$FLOW_SERVER_CONFIG/$i/$i.p12
         filename=builds/$i/$version/flow-$version.apk

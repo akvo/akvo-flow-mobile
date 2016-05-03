@@ -103,6 +103,7 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         }
         mScanBtn.setEnabled(!isReadOnly());
         mInputText.setFocusable(!isReadOnly());
+        mInputText.setEnabled(!mQuestion.isLocked());
 
         mInputText.setOnFocusChangeListener(this);
         mScanBtn.setOnClickListener(this);

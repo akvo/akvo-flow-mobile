@@ -1,6 +1,13 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.5
+Date: 6 May 2016
+
+Resolved issues
+---------------
+* Disable manual editing on locked barcode questions
+
 # ver 2.2.4
 Date: 20 April 2016
 

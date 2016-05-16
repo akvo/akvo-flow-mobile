@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -103,6 +103,7 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         }
         mScanBtn.setEnabled(!isReadOnly());
         mInputText.setFocusable(!isReadOnly());
+        mInputText.setEnabled(!mQuestion.isLocked());
 
         mInputText.setOnFocusChangeListener(this);
         mScanBtn.setOnClickListener(this);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -18,9 +18,6 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,6 +32,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -46,10 +44,9 @@ import java.text.DecimalFormat;
  * 
  * @author Christopher Fagiani
  */
-public class GeoQuestionView extends QuestionView implements OnClickListener,
-        LocationListener, OnFocusChangeListener {
+public class GeoQuestionView extends QuestionView implements OnClickListener, OnFocusChangeListener,
+        TimedLocationListener.Listener {
     private static final float UNKNOWN_ACCURACY = 99999999f;
-    private static final float ACCURACY_THRESHOLD = 25f;
     private static final String DELIM = "|";
     private Button mGeoButton;
     private EditText mLatField;
@@ -59,10 +56,11 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     private TextView mSearchingIndicator;
     private String mCode = "";
     private float mLastAccuracy;
-    private boolean mNeedUpdate = false;
+    private TimedLocationListener mLocationListener;
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
+        mLocationListener = new TimedLocationListener(context, this);
         init();
     }
 
@@ -98,52 +96,19 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
     }
 
     /**
-     * When the user clicks the "Populate Geo" button, start listening for
-     * location updates
+     * When the user clicks the "Populate Geo" button, start listening for location updates
      */
     public void onClick(View v) {
-        LocationManager locMgr = (LocationManager) getContext()
-                .getSystemService(Context.LOCATION_SERVICE);
-        if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
+        mSearchingIndicator.setText(R.string.searching);
+        mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
+        mStatusIndicator.setTextColor(Color.RED);
 
-            mLatField.setText("");
-            mLonField.setText("");
-            mElevationField.setText("");
-            mCode = "";
-            mNeedUpdate = true;
-            mSearchingIndicator.setText(R.string.searching);
-            mLastAccuracy = UNKNOWN_ACCURACY;
-            locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        } else {
-            // we can't turn GPS on directly, the best we can do is launch the
-            // settings page
-            ViewUtil.showGPSDialog(getContext());
-        }
-    }
-
-    /**
-     * populates the fields on the UI with the location info from the event
-     * 
-     * @param loc
-     */
-    private void populateLocation(Location loc) {
-        if (loc.hasAccuracy()) {
-            mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": "
-                    + new DecimalFormat("#").format(loc.getAccuracy()) + "m");
-            if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
-                mStatusIndicator.setTextColor(Color.GREEN);
-            } else {
-                mStatusIndicator.setTextColor(Color.RED);
-            }
-        }
-        mLatField.setText(loc.getLatitude() + "");
-        mLonField.setText(loc.getLongitude() + "");
-        // elevation is in meters, even one decimal is way more than GPS
-        // precision
-        mElevationField.setText(new DecimalFormat("#.#").format(loc.getAltitude()));
-        mCode = generateCode(loc.getLatitude(), loc.getLongitude());
-        setResponse();
+        mLatField.setText("");
+        mLonField.setText("");
+        mElevationField.setText("");
+        mCode = "";
+        mLastAccuracy = UNKNOWN_ACCURACY;
+        mLocationListener.start();
     }
 
     /**
@@ -202,52 +167,38 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
 
     @Override
     public void questionComplete(Bundle data) {
-        // completeIcon.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * called by the system when it gets location updates.
-     */
-    public void onLocationChanged(Location location) {
-        float currentAccuracy = location.getAccuracy();
-        // if accuracy is 0 then the gps has no idea where we're at
-        if (currentAccuracy > 0) {
-
-            // If we are below the accuracy treshold, stop listening for
-            // updates.
-            // This means that after the geolocation is 'green', it stays the
-            // same,
-            // otherwise it keeps on listening
-            if (currentAccuracy <= ACCURACY_THRESHOLD) {
-                LocationManager locMgr = (LocationManager) getContext()
-                        .getSystemService(Context.LOCATION_SERVICE);
-                locMgr.removeUpdates(this);
-                mSearchingIndicator.setText(R.string.ready);
-            }
-
-            // if the location reading is more accurate than the last, update
-            // the view
-            if (mLastAccuracy > currentAccuracy || mNeedUpdate) {
-                mLastAccuracy = currentAccuracy;
-                mNeedUpdate = false;
-                populateLocation(location);
-            }
-        } else if (mNeedUpdate) {
-            mNeedUpdate = true;
-            populateLocation(location);
+    @Override
+    public void onLocationReady(double latitude, double longitude, double altitude, float accuracy) {
+        if (accuracy < mLastAccuracy) {
+            mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": "
+                    + new DecimalFormat("#").format(accuracy) + "m");
+            mLatField.setText(latitude + "");
+            mLonField.setText(longitude + "");
+            // elevation is in meters, even one decimal is way more than GPS precision
+            mElevationField.setText(new DecimalFormat("#.#").format(altitude));
+            mCode = generateCode(latitude, longitude);
+        }
+        if (accuracy <= TimedLocationListener.ACCURACY_DEFAULT) {
+            mLocationListener.stop();
+            setResponse();
+            mSearchingIndicator.setText(R.string.ready);
+            mStatusIndicator.setTextColor(Color.GREEN);
         }
     }
 
-    public void onProviderDisabled(String provider) {
-        // no op. needed for LocationListener interface
+    @Override
+    public void onTimeout() {
+        // Unknown location
+        resetQuestion(true);
+        mSearchingIndicator.setText(R.string.timeout);
     }
 
-    public void onProviderEnabled(String provider) {
-        // no op. needed for LocationListener interface
-    }
-
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // no op. needed for LocationListener interface
+    @Override
+    public void onGPSDisabled() {
+        // we can't turn GPS on directly, the best we can do is launch the settings page
+        ViewUtil.showGPSDialog(getContext());
     }
 
     /**
@@ -277,18 +228,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener,
                     + DELIM + mCode,
                     ConstantUtil.GEO_RESPONSE_TYPE, getQuestion().getId()));
         }
-    }
-
-    @Override
-    public void onPause() {
-        // Remove updates from LocationManager, to allow this object being GC
-        // and avoid an unnecessary use of the GPS and battery draining.
-        LocationManager locMgr = (LocationManager) getContext()
-                .getSystemService(Context.LOCATION_SERVICE);
-        locMgr.removeUpdates(this);
-
-        // Update the UI in case we come back later to the same instance
-        mSearchingIndicator.setText("");
     }
 
     @Override

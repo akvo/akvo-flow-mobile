@@ -50,11 +50,11 @@ public class TimedLocationListener implements LocationListener {
     private boolean mListeningLocation;
     private boolean mAllowMockupLocations;
 
-    public TimedLocationListener(Context context, Listener listener) {
+    public TimedLocationListener(Context context, Listener listener, boolean allowMockupLocations) {
         mLocationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         mListener = listener;
         mListeningLocation = false;
-        mAllowMockupLocations = true;
+        mAllowMockupLocations = allowMockupLocations;
     }
 
     public void start() {

@@ -60,7 +60,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mLocationListener = new TimedLocationListener(context, this);
+        mLocationListener = new TimedLocationListener(context, this, !q.isLocked());
         init();
     }
 

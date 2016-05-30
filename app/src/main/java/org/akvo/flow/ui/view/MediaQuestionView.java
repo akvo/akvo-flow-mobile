@@ -71,7 +71,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             String type) {
         super(context, q, surveyListener);
         mMediaType = type;
-        mLocationListener = new TimedLocationListener(context, this);
+        mLocationListener = new TimedLocationListener(context, this, !q.isLocked());
         init();
     }
 

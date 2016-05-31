@@ -127,6 +127,7 @@ public class S3Api {
 
     public boolean put(String objectKey, File file, String type, boolean isPublic) throws IOException {
         // Get date and signature
+        final int size = (int)file.length();// long version was added on API level 19
         final byte[] rawMd5 = FileUtil.getMD5Checksum(file);
         final String md5Base64 = Base64.encodeToString(rawMd5, Base64.NO_WRAP);
         final String md5Hex = FileUtil.hexMd5(rawMd5);
@@ -142,6 +143,7 @@ public class S3Api {
         try {
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
+            conn.setFixedLengthStreamingMode(size);
             conn.setRequestMethod("PUT");
             conn.setRequestProperty("Content-MD5", md5Base64);
             conn.setRequestProperty("Content-Type", type);

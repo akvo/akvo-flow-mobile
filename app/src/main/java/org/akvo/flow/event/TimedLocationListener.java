@@ -33,8 +33,9 @@ import java.util.TimerTask;
  * and the caller will receive such event.
  */
 public class TimedLocationListener implements LocationListener {
+    public static final float ACCURACY_DEFAULT = 20f; // 20 meters
+
     private static final long TIMEOUT   = 1000 * 60; // 1 minute
-    private static final float ACCURACY = 20f;       // 20 meters
 
     public interface Listener {
         void onLocationReady(double latitude, double longitude, double altitude, float accuracy);
@@ -49,11 +50,11 @@ public class TimedLocationListener implements LocationListener {
     private boolean mListeningLocation;
     private boolean mAllowMockupLocations;
 
-    public TimedLocationListener(Context context, Listener listener) {
+    public TimedLocationListener(Context context, Listener listener, boolean allowMockupLocations) {
         mLocationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         mListener = listener;
         mListeningLocation = false;
-        mAllowMockupLocations = true;
+        mAllowMockupLocations = allowMockupLocations;
     }
 
     public void start() {
@@ -104,7 +105,6 @@ public class TimedLocationListener implements LocationListener {
         if (isValid(location) && mListeningLocation) {
             mListener.onLocationReady(location.getLatitude(), location.getLongitude(),
                     location.getAltitude(), location.getAccuracy());
-            stop();
         }
     }
 
@@ -131,6 +131,6 @@ public class TimedLocationListener implements LocationListener {
         }
 
         // if accuracy is 0 then the gps has no idea where we're at
-        return location.getAccuracy() > 0 && location.getAccuracy() <= ACCURACY;
+        return location.getAccuracy() > 0;
     }
 }

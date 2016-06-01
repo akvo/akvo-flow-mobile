@@ -71,7 +71,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             String type) {
         super(context, q, surveyListener);
         mMediaType = type;
-        mLocationListener = new TimedLocationListener(context, this);
+        mLocationListener = new TimedLocationListener(context, this, !q.isLocked());
         init();
     }
 
@@ -270,6 +270,11 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
 
     @Override
     public void onLocationReady(double latitude, double longitude, double altitude, float accuracy) {
+        if (accuracy > TimedLocationListener.ACCURACY_DEFAULT) {
+            // This location is not accurate enough. Keep listening for updates
+            return;
+        }
+        mLocationListener.stop();
         if (mMedia != null) {
             Location location = new Location();
             location.setLatitude(latitude);

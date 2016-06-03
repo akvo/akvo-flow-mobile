@@ -65,7 +65,10 @@ public class FlowApi {
     
     public List<SurveyedLocale> getSurveyedLocales(long surveyGroup, String timestamp)
             throws IOException {
-        final String query = Param.IMEI + URLEncode(IMEI)
+        Context context = FlowApp.getApp();
+        // Note: To compute the HMAC auth token, query params must be alphabetically ordered
+        final String query = Param.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
+                + "&" + Param.IMEI + URLEncode(IMEI)
                 + "&" + Param.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
                 + "&" + Param.PHONE_NUMBER + URLEncode(PHONE_NUMBER)
                 + "&" + Param.SURVEY_GROUP + surveyGroup

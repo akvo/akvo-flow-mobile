@@ -20,6 +20,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -32,8 +33,9 @@ import java.util.TimerTask;
  * and the caller will receive such event.
  */
 public class TimedLocationListener implements LocationListener {
+    public static final float ACCURACY_DEFAULT = 20f; // 20 meters
+
     private static final long TIMEOUT   = 1000 * 60; // 1 minute
-    private static final float ACCURACY = 20f;       // 20 meters
 
     public interface Listener {
         void onLocationReady(double latitude, double longitude, double altitude, float accuracy);
@@ -45,11 +47,14 @@ public class TimedLocationListener implements LocationListener {
     private Listener mListener;
     private LocationManager mLocationManager;
     private Timer mTimer;
-    private boolean mListeningLocation = false;
+    private boolean mListeningLocation;
+    private boolean mAllowMockupLocations;
 
-    public TimedLocationListener(Context context, Listener listener) {
+    public TimedLocationListener(Context context, Listener listener, boolean allowMockupLocations) {
         mLocationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         mListener = listener;
+        mListeningLocation = false;
+        mAllowMockupLocations = allowMockupLocations;
     }
 
     public void start() {
@@ -97,12 +102,9 @@ public class TimedLocationListener implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        float currentAccuracy = location.getAccuracy();
-        // if accuracy is 0 then the gps has no idea where we're at
-        if (currentAccuracy > 0 && currentAccuracy <= ACCURACY && mListeningLocation) {
+        if (isValid(location) && mListeningLocation) {
             mListener.onLocationReady(location.getLatitude(), location.getLongitude(),
                     location.getAltitude(), location.getAccuracy());
-            stop();
         }
     }
 
@@ -117,5 +119,18 @@ public class TimedLocationListener implements LocationListener {
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    private boolean isValid(Location location) {
+        if (!mAllowMockupLocations) {
+            // We can only access this method from API level 18 onwards
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 &&
+                    location.isFromMockProvider()) {
+                return false;
+            }
+        }
+
+        // if accuracy is 0 then the gps has no idea where we're at
+        return location.getAccuracy() > 0;
     }
 }

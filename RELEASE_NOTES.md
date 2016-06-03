@@ -1,6 +1,15 @@
 Akvo FLOW app release notes
 ===========================
 
+# ver 2.2.6
+Date: 3 June 2016
+
+Resolved issues
+---------------
+* Improve data upload performance [#443]
+* Add androidId to surveyedLocale sync requests [#441]
+* Integrate TimedLocationListener on GeoLocation questions [#439]
+
 # ver 2.2.5
 Date: 6 May 2016
 

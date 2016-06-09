@@ -49,4 +49,4 @@
 1. run `flow-releases.sh`. All credentials for each instance will be fetched from the config repo.
 
 
-For further details on the deployment implementation, check out `flow-releases.sh`## Handling a new APK version
+For further details on the deployment implementation, check out `flow-releases.sh`

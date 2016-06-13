@@ -21,6 +21,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -86,7 +87,10 @@ public class StatusUtil {
         if (number == null || number.trim().length() == 0
                 || number.trim().equalsIgnoreCase("null")
                 || number.trim().equalsIgnoreCase("unknown")) {
-            // if we can't get the phone number, use the MAC instead
+            // If we can't get the phone number, use the MAC instead (only Android < 6.0)
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                return "";
+            }
             WifiManager wifiMgr = (WifiManager) context
                     .getSystemService(Context.WIFI_SERVICE);
             if (wifiMgr != null) {

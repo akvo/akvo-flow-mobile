@@ -91,8 +91,7 @@ public class StatusUtil {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                 return "";
             }
-            WifiManager wifiMgr = (WifiManager) context
-                    .getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiMgr = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
             if (wifiMgr != null) {
                 // presumably if we don't have a cell connection, then we must
                 // be connected by WIFI so this should work
@@ -101,18 +100,6 @@ public class StatusUtil {
                     number = info.getMacAddress();
                 }
             }
-        }
-        // handle the case where we don't have a phone number OR a
-        // WIFI connection (could be offline, using Bluetooth or cable
-        // connection)
-        if (number == null || number.trim().length() == 0) {
-            number = teleMgr.getDeviceId(); // IMEI on a GSM device
-        } else {
-            number = number.trim(); // sometimes numbers are reported w leading
-                                    // space
-            if (number.startsWith("+"))
-                number = number.substring(1); // sometimes the + prefix can
-                                              // appear and disappear
         }
         return number;
     }

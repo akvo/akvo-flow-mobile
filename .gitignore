@@ -16,6 +16,7 @@
 
 app/bin
 app/gen
+app/project.properties
 survey.properties
 survey_test/bin
 survey_test/gen

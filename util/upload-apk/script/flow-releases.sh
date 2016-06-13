@@ -11,8 +11,6 @@ set -e
 # FLOW_SERVER_CONFIG=/path/to/akvo-flow-server-config
 # FLOW_S3_ACCESS_KEY=your_S3_access_key
 # FLOW_S3_SECRET_KEY=your_S3_secret_key
-# FLOW_GAE_USERNAME=google_username
-# FLOW_GAE_PASSWORD=google_password
 #
 # The scripts reads the version number of the apk directly from the versionName 
 # property in AndroidManifest.xml
@@ -35,10 +33,13 @@ mkdir builds
 
 build_name() {
     if [[ "$1" == "akvoflow-89" ]]; then
+	# Biogas custom build
         echo "assembleBiogasRelease"
     elif [[ "$1" == "akvoflow-101" ]]; then
+	# Cookstoves custom build
         echo "assembleCookstovesRelease"
     else
+	# Regular Flow build
         echo "assembleFlowRelease"
     fi
 }

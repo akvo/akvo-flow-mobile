@@ -16,6 +16,7 @@
 
 package org.akvo.flow.activity;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -29,6 +30,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ConstantUtil;
 
 public class AddUserActivity extends ActionBarActivity implements TextWatcher{
@@ -60,6 +62,10 @@ public class AddUserActivity extends ActionBarActivity implements TextWatcher{
                 long uid = db.createOrUpdateUser(null, username);
                 db.savePreference(ConstantUtil.DEVICE_IDENT_KEY, deviceId);
                 db.close();
+
+                // Trigger the SurveyDownload Service, in order to make
+                // a backend connection with the new Device ID
+                startService(new Intent(AddUserActivity.this, SurveyDownloadService.class));
 
                 // Select the newly created user, and exit the Activity
                 FlowApp.getApp().setUser(new User(uid, username));

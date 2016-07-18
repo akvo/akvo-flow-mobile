@@ -22,7 +22,7 @@
   <string name="exportcomplete">ទិន្នន័យត្រូវបាននាំចេញទៅ​ SD card ហើយ  </string>
   <string name="prefoptlabel">ចូលចិត្តជាងគេ </string>
   <string name="prefoptdesc">កំណត់ភាសានៃការធ្វើអង្កេត និងទិន្នន័យដែលចូលចិត្តជាងគេផ្សេងៗទៀត</string>
-  <string name="sendoptlabel">ធ្វើទិន្នន័យឲ្យចេញដំណាលគ្នា </string>
+  <string name="sendoptlabel">ធ្វើទិន្នន័យឲ្យចេញដំណាលគ្នា (Sync Data) </string>
   <string name="sendoptdesc">ធ្វើទិន្នន័យអង្កេតឲ្យចេញដំណាលគ្នា។ អ្នកត្រូវតែមានសេវាអ៊ីនធើណិត (3G ឬ Wifi) ដើម្បីធ្វើកិច្ចការនេះ </string>
   <string name="poweroptlabel">ការគ្រប់គ្រងថ្មទូរស័ព្ទ</string>
   <string name="poweroptdesc">ត្រូវចុចបិទWi-Fi ពេលមិនត្រូវការ ដើម្បីគ្រប់គ្រងថ្មទូរស័ព្ទឲ្យបានយូរ </string>
@@ -157,8 +157,8 @@
   <string name="clear_point_text">តើអ្នកចង់លុបចំណុចនេះឬទេ?</string>
   <string name="clear_feature_title">លុបលក្ខណៈសណ្ឋាន </string>
   <string name="clear_feature_text">តើអ្នកចង់លុបលក្ខណៈសណ្ឋាននេះឬទេ? </string>
-  <string name="repeat_group">ដាក់ក្រុមម្តងទៀត  </string>
-  <string name="repetitions">ធ្វើឡើងវិញៈ</string>
+  <string name="repeat_group">បន្ថែមមួយទៀត  </string>
+  <string name="repetitions">ចំនួនសំណួរដែលបានឆ្លើយ</string>
   <string name="view_responses">មើលចម្លើយ</string>
   <string name="view_map">​មើលផែនទី </string>
   <string name="delete_group_title">លុបក្រុម</string>
@@ -180,9 +180,9 @@
   <string name="order_date">កាលបរិច្ឆេទ </string>
   <string name="order_distance">ចម្ងាយ</string>
   <string name="order_status">ស្ថានភាព</string>
-  <string name="order_name">ឈ្មោ</string>
+  <string name="order_name">ឈ្មោះ</string>
   <!--Record Activity-->
-  <string name="unknown">ចំណុចទិន្នន័យគ្មានឈ្មោ</string>
+  <string name="unknown">ចំណុចទិន្នន័យគ្មានឈ្មោះ</string>
   <string name="last_modified_monitored">កែលើកចុងក្រោយៈ</string>
   <string name="last_modified_regular">បានបញ្ជូនចេញៈ </string>
   <string name="last_response">ចម្លើយចុងក្រោយៈ </string>

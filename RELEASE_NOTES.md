@@ -1,5 +1,15 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.2.7
+Date: 20 July 2016
+
+New and noteworthy
+------------------
+* **Added Khmer language** to the list of available app languages [#447]
+
+Resolved issues
+---------------
+* **Fixed a wrongly translated string** in vietnamese [#452]
 
 # ver 2.2.6
 Date: 3 June 2016

@@ -63,10 +63,6 @@ public class AddUserActivity extends ActionBarActivity implements TextWatcher{
                 db.savePreference(ConstantUtil.DEVICE_IDENT_KEY, deviceId);
                 db.close();
 
-                // Trigger the SurveyDownload Service, in order to make
-                // a backend connection with the new Device ID
-                startService(new Intent(AddUserActivity.this, SurveyDownloadService.class));
-
                 // Select the newly created user, and exit the Activity
                 FlowApp.getApp().setUser(new User(uid, username));
                 setResult(RESULT_OK);

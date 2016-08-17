@@ -146,6 +146,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 if (resultCode == RESULT_OK) {
                     displaySelectedUser();
                     Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
+                    // Trigger the SurveyDownload Service, so the first
+                    // backend connection uses the new Device ID
+                    startService(new Intent(this, SurveyDownloadService.class));
                 } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
                     finish();
                 }

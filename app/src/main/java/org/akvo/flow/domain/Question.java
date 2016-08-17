@@ -399,6 +399,7 @@ public class Question {
         q.altTextMap = question.getAltTextMap();// Shallow copy
         q.scoringRules = question.getScoringRules();// Shallow copy
         q.levels = question.getLevels();// Shallow copy
+        q.caddisflyRes = question.getCaddisflyRes();
 
         // Deep-copy dependencies
         if (question.dependencies != null) {

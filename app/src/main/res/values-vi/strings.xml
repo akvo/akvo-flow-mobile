@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string name="app_name">Phần mềm Akvo</string>
-  <string name="accuracy">Tài khoản</string>
+  <string name="accuracy">Độ chính xác</string>
   <string name="searching">Đang tìm kiếm</string>
   <string name="ready">Sẵn sàng</string>
   <string name="nocardspacetitle">Bộ nhớ trong đầy dữ liệu</string>
@@ -166,6 +166,9 @@
   <string name="add_signature">Ký tên</string>
   <string name="signed_by">Được ký bởi</string>
   <string name="signature_terms">Tôi hiểu rằng đây là chữ ký điện tử của tôi</string>
+  <string name="image_location_unknown">Không rõ vị trí địa lý</string>
+  <string name="image_location_reading">Đang đọc vị trí địa lý</string>
+  <string name="image_location_saved">Đã lưu vị trí địa lý</string>
   <!--RecordList Activity-->
   <string name="add_data_point">Tạo điểm dữ liệu mới</string>
   <string name="stats_total">Tổng số những điểm dữ liệu:</string>

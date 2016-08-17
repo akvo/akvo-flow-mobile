@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -127,12 +127,14 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         }
 
         // Start the setup Activity if necessary.
+        boolean noDevIdYet = false;
         if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+            noDevIdYet = true;
             startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
         }
 
         displaySelectedUser();
-        startServices();
+        startServices(noDevIdYet);
     }
 
     @Override
@@ -144,6 +146,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 if (resultCode == RESULT_OK) {
                     displaySelectedUser();
                     Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
+                    // Trigger the SurveyDownload Service, so the first
+                    // backend connection uses the new Device ID
+                    startService(new Intent(this, SurveyDownloadService.class));
                 } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
                     finish();
                 }
@@ -186,7 +191,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         getSupportActionBar().setTitle(mTitle);
     }
 
-    private void startServices() {
+    private void startServices(boolean waitForDeviceId) {
         if (!StatusUtil.hasExternalStorage()) {
             ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                     false,
@@ -198,7 +203,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                     },
                     null);
         } else {
-            startService(new Intent(this, SurveyDownloadService.class));
+            if (!waitForDeviceId) {
+                startService(new Intent(this, SurveyDownloadService.class));
+            }
             startService(new Intent(this, LocationService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));

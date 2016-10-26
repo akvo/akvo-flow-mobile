@@ -16,7 +16,6 @@
 
 package org.akvo.flow.activity;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -30,7 +29,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ConstantUtil;
 
 public class AddUserActivity extends ActionBarActivity implements TextWatcher{

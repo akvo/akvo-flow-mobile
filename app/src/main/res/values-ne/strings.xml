@@ -4,6 +4,7 @@
   <string name="accuracy">एक्युरेसी</string>
   <string name="searching">खोजी हुँदैछ...</string>
   <string name="ready">तयार</string>
+  <string name="timeout">समय सकियो</string>
   <string name="nocardspacetitle">डाटाको ठाउँ छैन</string>
   <string name="lowcardspacetitle">डाटाको ठाउँ कम छ</string>
   <string name="nocardspacedialog">एस डि कार्ड भरिएको हुनाले डाटा सकंलन गर्न मिल्दैन। डाटा सकंलन गर्न कार्डबाट केही हटाएर खाली ठाउँ बनाउनु होला।  </string>
@@ -14,21 +15,11 @@
   <string name="lat">अक्षांश</string>
   <string name="lon">देशान्तर</string>
   <string name="elevation"> उचाइ</string>
-  <string name="savebutton">सेभ गर्नुहोस्</string>
-  <string name="clearbutton">हटाउनुहोस्</string>
   <string name="submitbutton">बुझाउनुहोस्।</string>
   <string name="geodialog">यसको लागि जि पि एस् इनेबल भएको हुनुपर्दछ। OK थिचेर Settings मा जानुहोस्। Use GPS Satellites छान्नुहोस् अनि फर्कनलाई Back बटन थिच्नुहोस्। एकपल्ट जि पि एस् इनेबल भईसके पछि तपाईंले Check  Geo Location थिचेर आफ्नो स्थानको  जि पि एस् डाटा लिन सक्नुहुनेछ। </string>
-  <string name="userlabel">प्रयोगकर्ता व्यवस्थापन</string>
   <string name="resize_large_images">ठुलो तस्बिरहरुको नाप मिलाउनुहोस्</string>
   <string name="settingslabel">सेटीङ्स्</string>
-  <string name="adduser">प्रयोगकर्ता थप्नुहोस्</string>
   <string name="nouser">प्रयोगकर्ता छैन!</string>
-  <string name="displayname">डिस्प्ले नाम</string>
-  <string name="email">ई-मेल ठेगाना</string>
-  <string name="userinstructions">थिचेर वर्तमान प्रयोगकर्ता छान्न मिल्छ। नयाँ प्रयोगकर्ता बनाउनलाई \'+\' थिच्नुहोस् । प्रयोगकर्ता बदल्नलाई नाम माथि एकछिन सम्म थिची राख्नुहोस्।  </string>
-  <string name="editmenu"> प्रयोगकर्ता बदल्नुहोस्।</string>
-  <string name="deleteusermenu">प्रयोगकर्ता हटाउनुहोस्</string>
-  <string name="mustselectuser">अघि बढ्नको लागि कृपया Manage User लाई थिचेर प्रयोगकर्ता छान्नुहोस्। </string>
   <string name="exportcomplete">एस डि कार्डमा डाटा पठाइयो।</string>
   <string name="prefoptlabel">छनौट</string>
   <string name="prefoptdesc">पुर्व निर्धारित सर्भे भाषा तथा छनौटहरु राख्नुहोस्। </string>
@@ -97,8 +88,8 @@
   <string name="bootstraperror">बुट स्ट्र्याप zip फाइल प्रसारणमा त्रुटि </string>
   <string name="bootstrap_invalid_app">त्रुटि: फारम यस फ्लो instance को हैन।</string>
   <string name="transmissionhist">डाटा प्रसारण हिस्ट्री</string>
-  <string name="transstartdate">डाटा प्रसारण शुरु भयो।</string>
-  <string name="transenddate">डाटा प्रसारण पुरा भयो। </string>
+  <string name="transstartdate">शुरु भयो</string>
+  <string name="transenddate">सकियो</string>
   <string name="confirmchangetitle">उतर बद्लिने?</string>
   <string name="confirmchangetext">के तपाईं आफ्नो उतर बदल्न चाहनुहुन्छ?</string>
   <string name="resetall">सबै हटाउँछ। (प्रयोगकर्ताहरु, सर्भेहरु, र संकलन गरिएका डाटाहरु)</string>
@@ -115,8 +106,10 @@
   <string name="clear_data_success">डिभाइसबाट डाटा सफलतापुर्वक हटाइयो।</string>
   <string name="clear_data_error">डिभाइसबाट डाटा हटाउन त्रुटि भएको छ। </string>
   <string name="configuring_languages">सर्भे भाषाहरु कन्फिगर हुँदैछन्...</string>
-  <string name="sync_records">डाटा पोइन्टहरु सिँक गर्नुहोस्।</string>
-  <string name="order_by">क्रमबद्ध गर्ने </string>
+  <string name="search">खोजी गर्नुहोस्</string>
+  <string name="sync">सिन्क गर्नुहोस्</string>
+  <string name="sort">क्रममा मिलाउनुहोस्</string>
+  <string name="stats">तथ्यान्क</string>
   <string name="syncing_records">डाटा पोइन्टहरु सिँक हुँदैछन्...</string>
   <string name="sync_finished">डाटा पोइन्टहरु सिँक भई सके।</string>
   <string name="synced_records">सिँक भएका %1$d डाटा पोइन्टहरु</string>
@@ -136,7 +129,8 @@
   <string name="please_restart">कृपया एप्पलाई पुन: शुरु गर्नुहोस्।</string>
   <!--Empty Views-->
   <string name="no_surveys_text">तपाईंको लागि कुनै सर्भे पठाइएको छैन। सर्भे पठाउने काम ड्यास्बोर्ड बाट हुन्छ।</string>
-  <string name="no_records_text">अहिलेसम्म तपाईंको कुनै Data Point छैन। शुरु गर्नको लागि CREATE NEW DATA POINT मा थिच्नुहोस्।</string>
+  <string name="no_records_text">तपाईंको अहिले कुनै डाटा प्वाईन्ट छैन। नयाँ डाटा प्वाईन्ट थप्नको लागि स्क्रिन माथिको \'+\' चिन्हमा थिच्नुहोस्।</string>
+  <string name="no_survey_selected_text">तपाईंको कुनै सर्भे छानिएको छैन। कुनै एक सर्भे छान्नको लागि साइडको मेनु खोल्नुहोस्।</string>
   <!--Activity Labels-->
   <string name="survey_groups_activity">सर्भेहरु </string>
   <string name="record_list_activity">डाटा प्वाइन्ट छान्नुहोस्</string>
@@ -153,6 +147,8 @@
   <string name="error_answer_match">उत्तरहरु एक आपसमा मिल्दैनन्।</string>
   <string name="error_img_preview">फोटोको प्री-भ्यु लोड गर्न सकिएन।</string>
   <string name="use_external_source">बाहिरी श्रोतको प्रयोग गर्नुहोस्</string>
+  <string name="caddisfly_test">टेस्टमा जानुहोस्</string>
+  <string name="caddisfly_response">टेस्ट सफलतापुर्वक कब्जा भयो</string>
   <string name="error_empty_form">खाली फारमहरु सब्मिट हुन सक्तैनन्। कृपया पहिले चाहिने उत्तरहरु थप्निहोस्।</string>
   <string name="select">कृपया छान्नुहोस्</string>
   <string name="clear_value_msg">के तपाईं यो मान हटाउन चाहनुहुन्छ?</string>
@@ -164,9 +160,20 @@
   <string name="clear_point_text">के तपाईं यो बिन्दु हटाउन चाहनुहुन्छ?</string>
   <string name="clear_feature_title">फिचर हटाउनुहोस्</string>
   <string name="clear_feature_text">के तपाईं यो फिचर हटाउन चाहनुहुन्छ?</string>
+  <string name="repeat_group">समुह दोहोर्याउनुहोस्</string>
+  <string name="repetitions">दोहोरिएको</string>
+  <string name="view_responses">प्रतिकृयाहरु हेर्नुहोस्</string>
+  <string name="view_map">नक्सा/मानचित्र हेर्नुहोस्</string>
+  <string name="delete_group_title">समुह हटाउनुहोस्</string>
+  <string name="delete_group_text">के तपाईं यो समुह हटाउन चाहनुहुन्छ?</string>
+  <string name="add_signature">हस्ताक्षर थप्नुहोस्</string>
+  <string name="signed_by">हस्ताक्षर गर्ने</string>
+  <string name="signature_terms">म, यो मेरो विध्युतीय हस्ताक्षरको भनी प्रमाणित गर्दछु।</string>
+  <string name="image_location_unknown">अज्ञात भू-अवस्थिती</string>
+  <string name="image_location_reading">भू-अवस्थिती पढ्दै</string>
+  <string name="image_location_saved">भू-अवस्थिती सेभ भयो।</string>
   <!--RecordList Activity-->
-  <string name="create_data_point">नयाँ डाटा प्वाइन्ट बनाउनुहोस्</string>
-  <string name="stats_title">सर्भे अवस्था</string>
+  <string name="add_data_point">डाटा प्वाईन्ट थप्नुहोस्</string>
   <string name="stats_total">जम्मा डाटा प्वाइन्टहरु</string>
   <string name="stats_week">गएको 7 दिन</string>
   <string name="stats_today">आज</string>
@@ -179,9 +186,11 @@
   <string name="order_name">नाम</string>
   <!--Record Activity-->
   <string name="unknown">बेनाम डाटा प्वाइन्ट</string>
-  <string name="last_modified">अन्तिम पल्ट फेरिएको</string>
+  <string name="last_modified_monitored">अन्तिम पटक फेरिएको</string>
+  <string name="last_modified_regular">बुझाईयो</string>
   <string name="last_response">अन्तिम उत्तर</string>
   <string name="error_missing_cascade">क्यास्केड फाइलहरु डाउन्लोड भएनन्</string>
+  <string name="error_missing_form">फारम भेटिएन। कृपया सबै फारमहरु फेरि डाउन्लोड गर्नुहोस्।</string>
   <string name="tab_forms">फारमहरु</string>
   <string name="tab_history">हिस्ट्री</string>
   <!--Form & transmission status-->
@@ -209,6 +218,7 @@
   <string name="error_assignment_read">फ्लो ड्यास्बोर्डबाट फारम असाइन्मेन्ट पढ्न सकिएन</string>
   <string name="error_form_header">फ्लो ड्यास्बोर्डबाट फारम %1$s पढ्न सकिएन</string>
   <string name="error_form_download">फारम पब्लिश भएको र स्थानिय मिति र समय ठीक भएको पक्का गर्नुहोस् </string>
+  <string name="form_deleted">यो फारम हटाइएको छ।</string>
   <!--Plotting-->
   <string name="geoshape_area">क्षेत्र</string>
   <string name="geoshape_line">रेखा</string>
@@ -218,14 +228,30 @@
   <string name="geoshape_response">आकार सफलतापुर्वक कब्जा भयो।</string>
   <string name="add_point_title">बिन्दु थप्नुहोस्</string>
   <string name="add_point_text">के तपाईं यस स्थानमा नयाँ बिन्दु थप्न चाहनु हुन्छ?</string>
+  <!--Navigation Drawer-->
+  <string name="select_user">प्रयोगकर्ता छान्नुहोस्</string>
+  <string name="add_user">प्रयोगकर्ता थप्नुहोस्</string>
+  <string name="new_user">+ प्रयोगकर्ता</string>
+  <string name="edit_user">प्रयोगकर्ता फेरबदल गर्नुहोस्</string>
+  <string name="delete_user">प्रयोगकर्ता हटाउनुहोस्</string>
+  <string name="empty_user_warning">प्रयोगकर्ताको नाम खाली हुन सक्दैन</string>
+  <string name="delete_user_confirmation">के तपाईं यो प्रयोगकर्तालाई हटाउने पक्का हुनुहुन्छ?</string>
+  <string name="username">प्रयोगकर्ताको नाम</string>
+  <string name="mustselectuser">कृपया अघि बढ्नु पहिले प्रयोगकर्ता छान्नुहोस्।</string>
+  <string name="surveys">सर्भेहरु</string>
+  <string name="logged_in_as">लग इन गरिएको</string>
   <!--Misc-->
   <string name="okbutton">ठीक छ</string>
   <string name="cancelbutton">रद्द गर्नुहोस्</string>
+  <string name="savebutton">सेभ गर्नुहोस्</string>
+  <string name="clearbutton">हटाउनुहोस्</string>
   <string name="yes">हो</string>
   <string name="no">हैन</string>
   <string name="retry">फेरि प्रयास गर्नुहोस्</string>
   <string name="delete">डिलिट गर्नुहोस्</string>
   <string name="error_value_required">यो कोठा खाली हुन सक्दैन।</string>
+  <string name="drawer_open">ड्रअर खुला छ</string>
+  <string name="drawer_close">ड्रअर बन्द छ</string>
   <!--Intent Actions. Do not translate this strings-->
   <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
   <string name="action_locales_sync">ieldsurvey.ACTION_LOCALES_SYNC</string>

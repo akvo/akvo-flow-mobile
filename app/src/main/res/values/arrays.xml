@@ -28,6 +28,7 @@
         <item>Khmer</item>
         <item>Portuguese</item>
         <item>Vietnamese</item>
+        <item>Nepali</item>
     </string-array>
     <string-array name="app_language_codes">
         <item>in</item>
@@ -38,6 +39,7 @@
         <item>km</item>
         <item>pt</item>
         <item>vi</item>
+        <item>np</item>
     </string-array>
 
     <!-- NOTE: Main color will suits the light theme. Must have enough colors for all languages -->

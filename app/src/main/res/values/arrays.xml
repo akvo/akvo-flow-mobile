@@ -39,7 +39,7 @@
         <item>km</item>
         <item>pt</item>
         <item>vi</item>
-        <item>np</item>
+        <item>ne</item>
     </string-array>
 
     <!-- NOTE: Main color will suits the light theme. Must have enough colors for all languages -->

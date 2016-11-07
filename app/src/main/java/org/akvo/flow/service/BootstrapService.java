@@ -98,8 +98,7 @@ public class BootstrapService extends IntentService {
             }
 
             String startMessage = getString(R.string.bootstrapstart);
-            ViewUtil.displayNotification(startMessage, startMessage, this,
-                    ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
+            displayNotification(startMessage);
             databaseAdapter = new SurveyDbAdapter(this);
             databaseAdapter.open();
             try {
@@ -115,8 +114,7 @@ public class BootstrapService extends IntentService {
                     }
                 }
                 String endMessage = getString(R.string.bootstrapcomplete);
-                ViewUtil.displayNotification(endMessage, endMessage, this,
-                        ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
+                displayNotification(endMessage);
             } finally {
                 if (databaseAdapter != null) {
                     databaseAdapter.close();
@@ -124,10 +122,14 @@ public class BootstrapService extends IntentService {
             }
         } catch (Exception e) {
             String errorMessage = getString(R.string.bootstraperror);
-            ViewUtil.displayNotification(errorMessage, errorMessage, this,
-                    ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_alert);
+            displayNotification(errorMessage);
             Log.e(TAG, "Bootstrap error", e);
         }
+    }
+
+    private void displayNotification(String message) {
+        //FIXME: why are we repeating the message in title and text?
+        ViewUtil.displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
     }
 
     /**

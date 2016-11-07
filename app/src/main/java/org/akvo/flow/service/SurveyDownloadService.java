@@ -341,15 +341,11 @@ public class SurveyDownloadService extends IntentService {
     }
 
     private void displayErrorNotification(int id, String msg) {
-        ViewUtil.displayNotification(getString(R.string.error_form_sync_title), msg, this, id,
-                                     android.R.drawable.ic_dialog_alert);
+        ViewUtil.displayNotification(getString(R.string.error_form_sync_title), msg, this, id);
     }
 
     private void displayNotification(int synced, int failed, int total) {
         boolean finished = synced + failed >= total;
-        int icon = finished ? android.R.drawable.stat_sys_download_done
-                : android.R.drawable.stat_sys_download;
-
         String title = getString(R.string.downloading_forms);
         // Do not show failed if there is none
         String text = failed > 0 ? String.format(getString(R.string.data_sync_all),
@@ -357,7 +353,7 @@ public class SurveyDownloadService extends IntentService {
                 : String.format(getString(R.string.data_sync_synced), synced);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(icon)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setTicker(title);

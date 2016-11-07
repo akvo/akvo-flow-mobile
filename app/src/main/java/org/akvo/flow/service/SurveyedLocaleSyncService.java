@@ -127,10 +127,8 @@ public class SurveyedLocaleSyncService extends IntentService {
     }
     
     private void displayNotification(String title, String text, boolean finished) {
-        int icon = finished ? android.R.drawable.stat_sys_download_done
-                : android.R.drawable.stat_sys_download;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(icon)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setTicker(title);

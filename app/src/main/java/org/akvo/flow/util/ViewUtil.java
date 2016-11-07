@@ -211,12 +211,12 @@ public class ViewUtil {
      * @param id - unique (within app) ID of notification
      */
     public static void displayNotification(String title, String text,
-            Context context, int id, Integer iconId) {
+            Context context, int id) {
         NotificationCompat.Builder builder  = new NotificationCompat.Builder(context)
                 .setContentTitle(title)
                 .setTicker(title)
                 .setContentText(text)
-                .setSmallIcon(iconId != null ? iconId : R.drawable.info)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
 
         // Dummy intent. Do nothing when clicked

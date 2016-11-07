@@ -665,7 +665,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void displayNotification(long id, String title, String text) {
-        ViewUtil.displayNotification(title, text, this, (int) id, null);
+        ViewUtil.displayNotification(title, text, this, (int) id);
     }
 
     /**
@@ -675,7 +675,7 @@ public class DataSyncService extends IntentService {
      */
     private void displayProgressNotification(int synced, int total) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(android.R.drawable.stat_sys_upload)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(getString(R.string.data_sync_title))
                 .setContentText(getString(R.string.data_sync_text))
                 .setTicker(getString(R.string.data_sync_text))
@@ -705,7 +705,7 @@ public class DataSyncService extends IntentService {
                 : String.format(getString(R.string.data_sync_synced), syncedForms);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(android.R.drawable.stat_sys_upload_done)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(getString(R.string.data_sync_title))
                 .setContentText(text)
                 .setTicker(text)
@@ -731,7 +731,7 @@ public class DataSyncService extends IntentService {
         String text = String.format("Form \"%s\" has been deleted", name);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.info)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle("Form deleted")
                 .setContentText(text)
                 .setTicker(text)

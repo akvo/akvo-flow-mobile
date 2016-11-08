@@ -14,7 +14,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion "Google Inc.:Google APIs:21"
+    compileSdkVersion 21
     buildToolsVersion "21.1.2"
     defaultConfig {
         minSdkVersion 10

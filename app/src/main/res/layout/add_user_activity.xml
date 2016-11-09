@@ -39,6 +39,7 @@
             android:layout_marginTop="8dp"
             android:hint="@string/identlabel"
             android:singleLine="true"
+            android:imeOptions="actionDone"
             android:textSize="24sp" />
 
         <Button

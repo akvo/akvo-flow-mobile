@@ -255,7 +255,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                                                 identTextView.setText(s);
                                                 database.savePreference(
                                                         ConstantUtil.DEVICE_IDENT_KEY, s);
-                                                // Trigger the SurveySync Service, in order to force
+                                                // Trigger the SurveyDownload Service, in order to force
                                                 // a backend connection with the new Device ID
                                                 startService(new Intent(PreferencesActivity.this,
                                                         SurveyDownloadService.class));

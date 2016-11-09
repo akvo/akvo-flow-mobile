@@ -1,5 +1,22 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.2.8
+Date: 8 November 2016
+
+# New and noteworthy
+* **Nepali translations** [#330] - We have introduced Nepali as a new language in the app, and in addition updated translations in a number of the other languages [#478]
+
+* **Use new Flow app icon** [#466] - We have updated the Flow icon in line with the new Akvo-wide design guidelines
+
+* **Caddisfly question type** [#421] - As part of the [integration of the Akvo Caddisfly app with Akvo Flow](https://github.com/akvo/akvo-product-design/issues/5), the app now recognises a `caddisfly question` as a new question type
+
+# Resolved issues
+* **Do not check for new surveys before Device ID is set** [#454] - This fixes the issue where it was not possible to identify a device in the dashboard because it was missing the user-defined device identifier.  This was caused by the app connecting to the dashboard *before* the identifier was setup correctly within the app, and as a result, transmitting an empty field instead of the device identifier
+
+* **Remove unused geopoint code** [#461] - A cleanup of the system to remove unused parts of the application
+
+
+---------------
 # ver 2.2.7
 Date: 20 July 2016
 

@@ -29,7 +29,7 @@ Building the app
 
 License
 -------
-Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
 
 Akvo FLOW is free software: you can redistribute it and modify it under the terms of the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
 

@@ -16,18 +16,6 @@
 
 package org.akvo.flow.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Environment;
@@ -35,7 +23,18 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
@@ -67,6 +66,7 @@ import org.akvo.flow.util.ViewUtil;
  * @author Christopher Fagiani
  */
 public class BootstrapService extends IntentService {
+
     private static final String TAG = "BOOTSTRAP_SERVICE";
     public volatile static boolean isProcessing = false;
     private SurveyDbAdapter databaseAdapter;
@@ -177,61 +177,7 @@ public class BootstrapService extends IntentService {
                 FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
                         FileUtil.getFilesDir(FileType.RES));
             } else if (filename.endsWith(ConstantUtil.XML_SUFFIX)) {
-                // Survey file
-                String surveyName = filename;
-                if (surveyName.contains(".")) {
-                    surveyName = surveyName.substring(0, surveyName.indexOf("."));
-                }
-                Survey survey = databaseAdapter.getSurvey(id);
-                if (survey == null) {
-                    survey = new Survey();
-                    survey.setId(id);
-                    survey.setName(surveyName);
-                    survey.setHelpDownloaded(true);// Resources are always attached to the zip file
-                    survey.setType(ConstantUtil.SURVEY_TYPE);
-                }
-                survey.setLocation(ConstantUtil.FILE_LOCATION);
-                survey.setFileName(filename);
-
-                // in both cases (new survey and existing), we need to update the xml
-                File surveyFile = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
-                FileUtil.copy(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
-                // now read the survey XML back into memory to see if there is a version
-                Survey loadedSurvey = null;
-                try {
-                    InputStream in = new FileInputStream(surveyFile);
-                    loadedSurvey = SurveyDao.loadSurvey(survey, in);
-                } catch (FileNotFoundException e) {
-                    Log.e(TAG, "Could not load survey xml file");
-                }
-                if (loadedSurvey == null) {
-                    // Something went wrong, we cannot continue with this survey
-                    continue;
-                }
-
-                // Check form app id. Reject the form if it does not belong to the one set up
-                final String app = StatusUtil.getApplicationId(this);
-                final String formApp = loadedSurvey.getApp();
-                if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
-                    displayToast(getString(R.string.bootstrap_invalid_app));
-                    throw new IllegalArgumentException("Form belongs to a different instance." +
-                            " Expected: " + app + ". Got: " + formApp);
-                }
-
-                survey.setName(loadedSurvey.getName());
-                survey.setSurveyGroup(loadedSurvey.getSurveyGroup());
-
-                if (loadedSurvey.getVersion() > 0) {
-                    survey.setVersion(loadedSurvey.getVersion());
-                } else {
-                    survey.setVersion(1d);
-                }
-
-                // Save the Survey, SurveyGroup, and languages.
-                databaseAdapter.addSurveyGroup(survey.getSurveyGroup());
-                databaseAdapter.saveSurvey(survey);
-                String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
-                databaseAdapter.addLanguages(langs);
+                processSurveyFile(zipFile, entry, filename, id);
             } else {
                 // Help media file
                 File helpDir = new File(FileUtil.getFilesDir(FileType.FORMS), id);
@@ -245,6 +191,108 @@ public class BootstrapService extends IntentService {
 
         // now rename the zip file so we don't process it again
         file.renameTo(new File(file.getAbsolutePath() + ConstantUtil.PROCESSED_OK_SUFFIX));
+    }
+
+    private void processSurveyFile(ZipFile zipFile, ZipEntry entry, String filename, String id) throws IOException {
+        String surveyName = filename;
+        // we want to avoid duplicate survey names
+        String surveyFolderName = generateSurveyFolder(entry);
+        if (surveyName.contains(ConstantUtil.DOT_SEPARATOR)) {
+            surveyName = surveyName.substring(0, surveyName.indexOf(ConstantUtil.DOT_SEPARATOR));
+        }
+        Survey survey = databaseAdapter.getSurvey(id);
+        if (survey == null) {
+            survey = new Survey();
+            survey.setId(id);
+            survey.setName(surveyName);
+            survey.setHelpDownloaded(true);// Resources are always attached to the zip file
+            survey.setType(ConstantUtil.SURVEY_TYPE);
+        }
+        survey.setLocation(ConstantUtil.FILE_LOCATION);
+        String surveyFileName = generateSurveyFileName(filename, surveyFolderName);
+        survey.setFileName(surveyFileName);
+
+        // in both cases (new survey and existing), we need to update the xml
+        File surveyFile = generateNewSurveyFile(filename, surveyFolderName);
+        FileUtil.copy(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
+
+        // now read the survey XML back into memory to see if there is a version
+        Survey loadedSurvey = null;
+        try {
+            InputStream in = new FileInputStream(surveyFile);
+            loadedSurvey = SurveyDao.loadSurvey(survey, in);
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "Could not load survey xml file");
+        }
+        if (loadedSurvey == null) {
+            // Something went wrong, we cannot continue with this survey
+            return;
+        }
+
+        verifyAppId(loadedSurvey);
+
+        survey.setName(loadedSurvey.getName());
+        survey.setSurveyGroup(loadedSurvey.getSurveyGroup());
+
+        if (loadedSurvey.getVersion() > 0) {
+            survey.setVersion(loadedSurvey.getVersion());
+        } else {
+            survey.setVersion(1d);
+        }
+
+        // Save the Survey, SurveyGroup, and languages.
+        updateSurveyStorage(survey);
+    }
+
+    /**
+     * Check form app id. Reject the form if it does not belong to the one set up
+     * @param loadedSurvey
+     */
+    private void verifyAppId(Survey loadedSurvey) {
+        final String app = StatusUtil.getApplicationId(this);
+        final String formApp = loadedSurvey.getApp();
+        if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
+            displayToast(getString(R.string.bootstrap_invalid_app));
+            throw new IllegalArgumentException("Form belongs to a different instance." +
+                                                   " Expected: " + app + ". Got: " + formApp);
+        }
+    }
+
+    private void updateSurveyStorage(Survey survey) {
+        databaseAdapter.addSurveyGroup(survey.getSurveyGroup());
+        databaseAdapter.saveSurvey(survey);
+        String[] languages = LangsPreferenceUtil.determineLanguages(this, survey);
+        databaseAdapter.addLanguages(languages);
+    }
+
+    private File generateNewSurveyFile(String filename, String surveyFolderName) {
+        File filesDir = FileUtil.getFilesDir(FileType.FORMS);
+        if (TextUtils.isEmpty(surveyFolderName)) {
+            return new File(filesDir, filename);
+        } else {
+            File surveyFolder = new File(filesDir, surveyFolderName);
+            if (!surveyFolder.exists()) {
+                surveyFolder.mkdir();
+            }
+            return new File(surveyFolder, filename);
+        }
+    }
+
+    private String generateSurveyFileName(String filename, String surveyFolderName) {
+        StringBuilder sb = new StringBuilder(20);
+        if (!TextUtils.isEmpty(surveyFolderName)) {
+            sb.append(surveyFolderName);
+            sb.append(File.separator);
+        }
+        sb.append(filename);
+        return sb.toString();
+    }
+
+    private String generateSurveyFolder(ZipEntry entry) {
+        String entryName = entry.getName();
+        String entryPaths[] = entryName == null ? new String[0] : entryName.split(File.separator);
+        String surveyFolderName = entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
+        return surveyFolderName;
     }
 
     /**

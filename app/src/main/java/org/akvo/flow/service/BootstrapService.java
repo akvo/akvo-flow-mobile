@@ -20,6 +20,8 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -136,7 +138,7 @@ public class BootstrapService extends IntentService {
      */
     private void rollback(File zipFile) throws Exception {
         ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-        ZipEntry entry = null;
+        ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
             String parts[] = entry.getName().split("/");
             String fileName = parts[parts.length - 1];
@@ -193,7 +195,8 @@ public class BootstrapService extends IntentService {
         file.renameTo(new File(file.getAbsolutePath() + ConstantUtil.PROCESSED_OK_SUFFIX));
     }
 
-    private void processSurveyFile(ZipFile zipFile, ZipEntry entry, String filename, String id) throws IOException {
+    private void processSurveyFile(@NonNull ZipFile zipFile, @NonNull ZipEntry entry, @NonNull String filename,
+                                   @NonNull String id) throws IOException {
         String surveyName = filename;
         // we want to avoid duplicate survey names
         String surveyFolderName = generateSurveyFolder(entry);
@@ -246,9 +249,9 @@ public class BootstrapService extends IntentService {
 
     /**
      * Check form app id. Reject the form if it does not belong to the one set up
-     * @param loadedSurvey
+     * @param loadedSurvey survey to verify
      */
-    private void verifyAppId(Survey loadedSurvey) {
+    private void verifyAppId(@NonNull Survey loadedSurvey) {
         final String app = StatusUtil.getApplicationId(this);
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
@@ -258,14 +261,15 @@ public class BootstrapService extends IntentService {
         }
     }
 
-    private void updateSurveyStorage(Survey survey) {
+    private void updateSurveyStorage(@NonNull Survey survey) {
         databaseAdapter.addSurveyGroup(survey.getSurveyGroup());
         databaseAdapter.saveSurvey(survey);
         String[] languages = LangsPreferenceUtil.determineLanguages(this, survey);
         databaseAdapter.addLanguages(languages);
     }
 
-    private File generateNewSurveyFile(String filename, String surveyFolderName) {
+    @NonNull
+    private File generateNewSurveyFile(@NonNull String filename, @Nullable String surveyFolderName) {
         File filesDir = FileUtil.getFilesDir(FileType.FORMS);
         if (TextUtils.isEmpty(surveyFolderName)) {
             return new File(filesDir, filename);
@@ -278,7 +282,8 @@ public class BootstrapService extends IntentService {
         }
     }
 
-    private String generateSurveyFileName(String filename, String surveyFolderName) {
+    @NonNull
+    private String generateSurveyFileName(@NonNull String filename, @Nullable String surveyFolderName) {
         StringBuilder sb = new StringBuilder(20);
         if (!TextUtils.isEmpty(surveyFolderName)) {
             sb.append(surveyFolderName);
@@ -288,11 +293,11 @@ public class BootstrapService extends IntentService {
         return sb.toString();
     }
 
-    private String generateSurveyFolder(ZipEntry entry) {
+    @NonNull
+    private String generateSurveyFolder(@NonNull ZipEntry entry) {
         String entryName = entry.getName();
         String entryPaths[] = entryName == null ? new String[0] : entryName.split(File.separator);
-        String surveyFolderName = entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
-        return surveyFolderName;
+        return entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
     }
 
     /**
@@ -324,7 +329,7 @@ public class BootstrapService extends IntentService {
      * directory
      */
     private ArrayList<File> getZipFiles() {
-        ArrayList<File> zipFiles = new ArrayList<File>();
+        ArrayList<File> zipFiles = new ArrayList<>();
         // zip files can only be loaded on the SD card (not internal storage) so
         // we only need to look there
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {

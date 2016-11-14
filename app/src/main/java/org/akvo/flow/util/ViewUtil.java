@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -22,12 +22,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
+import org.akvo.flow.service.ServiceToastRunnable;
 
 /**
  * Utility class to handle common features for the View tier
@@ -365,6 +368,17 @@ public class ViewUtil {
                 });
 
         builder.show();
+    }
+
+    /**
+     * Display a UI Toast using the Handler's thread (main thread)
+     * @param msg message to display
+     * @param uiThreadHandler the handler to use
+     * @param applicationContext the Context to use for the toast
+     */
+    public static void displayToastFromService(@NonNull final String msg, @NonNull Handler uiThreadHandler,
+                                               @NonNull final Context applicationContext) {
+        uiThreadHandler.post(new ServiceToastRunnable(applicationContext, msg));
     }
 
     /**

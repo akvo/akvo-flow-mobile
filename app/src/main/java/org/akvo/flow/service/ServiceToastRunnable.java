@@ -13,29 +13,27 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
-package org.akvo.flow.domain.apkupdate;
+package org.akvo.flow.service;
 
-public class ApkData {
+import android.content.Context;
+import android.widget.Toast;
+import java.lang.ref.WeakReference;
 
-    private final String version;
-    private final String fileUrl;
-    private final String md5Checksum;
+public class ServiceToastRunnable implements Runnable {
 
-    public ApkData(String version, String fileUrl, String md5Checksum) {
-        this.version = version;
-        this.fileUrl = fileUrl;
-        this.md5Checksum = md5Checksum;
+    private final WeakReference<Context> contextWeakReference;
+    private final String msg;
+
+    public ServiceToastRunnable(Context applicationContext, String msg) {
+        this.contextWeakReference = new WeakReference<>(applicationContext);
+        this.msg = msg;
     }
 
-    public String getVersion() {
-        return version;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public String getMd5Checksum() {
-        return md5Checksum;
+    @Override
+    public void run() {
+        Context context = contextWeakReference.get();
+        if (context != null) {
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        }
     }
 }

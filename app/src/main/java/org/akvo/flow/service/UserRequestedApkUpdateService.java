@@ -27,6 +27,7 @@ import org.akvo.flow.domain.apkupdate.ApkData;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.util.ApkUpdateHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.json.JSONObject;
@@ -43,7 +44,6 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     private static final String TAG = "USER_REQ_APK_UPDATE";
 
-    private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
     private final ApkApiService apkApiService = new ApkApiService();
     private final ApkUpdateMapper apkUpdateMapper = new ApkUpdateMapper();
     private final Navigator navigator = new Navigator();
@@ -80,7 +80,7 @@ public class UserRequestedApkUpdateService extends IntentService {
         try {
             JSONObject json = apkApiService.getApkDataObject(this);
             ApkData data = apkUpdateMapper.transform(json);
-            if (apkUpdateHelper.shouldAppBeUpdated(data, this)) {
+            if (ApkUpdateHelper.shouldAppBeUpdated(data, this)) {
                 // There is a newer version. Fire the 'Download and Install' Activity.
                 navigator.navigateToAppUpdate(this, data);
             } else {

@@ -22,9 +22,14 @@ import android.os.Handler;
 import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
+import org.akvo.flow.api.service.ApkApiService;
+import org.akvo.flow.domain.apkupdate.ApkData;
+import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
+import org.json.JSONObject;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -39,12 +44,15 @@ public class UserRequestedApkUpdateService extends IntentService {
     private static final String TAG = "USER_REQ_APK_UPDATE";
 
     private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
+    private final ApkApiService apkApiService = new ApkApiService();
+    private final ApkUpdateMapper apkUpdateMapper = new ApkUpdateMapper();
+    private final Navigator navigator = new Navigator();
+
+    private Handler uiHandler;
 
     public UserRequestedApkUpdateService() {
         super(TAG);
     }
-
-    private Handler uiHandler;
 
     @Override
     public void onCreate() {
@@ -70,7 +78,12 @@ public class UserRequestedApkUpdateService extends IntentService {
         }
 
         try {
-            if (!apkUpdateHelper.shouldUpdate(this)) {
+            JSONObject json = apkApiService.getApkDataObject(this);
+            ApkData data = apkUpdateMapper.transform(json);
+            if (apkUpdateHelper.shouldAppBeUpdated(data, this)) {
+                // There is a newer version. Fire the 'Download and Install' Activity.
+                navigator.navigateToAppUpdate(this, data);
+            } else {
                 ViewUtil.displayToastFromService(getString(R.string.apk_update_service_no_update), uiHandler,
                                                  getApplicationContext());
             }

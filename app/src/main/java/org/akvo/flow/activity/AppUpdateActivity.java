@@ -16,8 +16,11 @@
 package org.akvo.flow.activity;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -26,15 +29,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.lang.ref.WeakReference;
-import org.akvo.flow.R;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.StatusUtil;
-import org.apache.http.HttpStatus;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -42,8 +36,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.akvo.flow.R;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.StatusUtil;
+import org.apache.http.HttpStatus;
 
 public class AppUpdateActivity extends Activity {
 
@@ -54,6 +55,7 @@ public class AppUpdateActivity extends Activity {
     private static final String TAG = AppUpdateActivity.class.getSimpleName();
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS = 100;
+    public static final String UPDATE_ACTIVITY_LAST_SEEN_TIME_MS = "APP_UPDATE_SHOWN_TIMESTAMP";
 
     private Button mInstallBtn;
     private ProgressBar mProgress;
@@ -104,6 +106,8 @@ public class AppUpdateActivity extends Activity {
                 cancel();
             }
         });
+
+        new ActivitySeenPreferenceSaverTask(this).execute();
     }
 
     /**
@@ -321,6 +325,24 @@ public class AppUpdateActivity extends Activity {
             }
 
             return ok;
+        }
+    }
+
+    private static class ActivitySeenPreferenceSaverTask extends AsyncTask<Void, Void, Void> {
+
+        private final WeakReference<Context> contextWeakReference;
+
+        private ActivitySeenPreferenceSaverTask(Context context) {
+            this.contextWeakReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected Void doInBackground(Void[] params) {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(contextWeakReference.get());
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putLong(UPDATE_ACTIVITY_LAST_SEEN_TIME_MS, System.currentTimeMillis());
+            editor.apply();
+            return null;
         }
     }
 }

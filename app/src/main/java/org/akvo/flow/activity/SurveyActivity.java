@@ -134,7 +134,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         }
 
         displaySelectedUser();
-        startServices(noDevIdYet);
+        startServices(noDevIdYet, savedInstanceState);
     }
 
     @Override
@@ -192,7 +192,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         getSupportActionBar().setTitle(mTitle);
     }
 
-    private void startServices(boolean waitForDeviceId) {
+    private void startServices(boolean waitForDeviceId, Bundle savedInstanceState) {
         if (!StatusUtil.hasExternalStorage()) {
             ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                     false,
@@ -211,8 +211,15 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             startService(new Intent(this, LocationService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
-            startService(new Intent(this, ApkUpdateService.class));
+            startUpdateService(savedInstanceState);
             startService(new Intent(this, TimeCheckService.class));
+        }
+    }
+
+    private void startUpdateService(Bundle savedInstanceState) {
+        //only start the service if we are not changing orientation
+        if (savedInstanceState == null) {
+            startService(new Intent(this, ApkUpdateService.class));
         }
     }
 

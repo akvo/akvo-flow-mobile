@@ -22,13 +22,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.api.service.ApkApiService;
 import org.akvo.flow.domain.apkupdate.ApkData;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ApkUpdateHelper;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.json.JSONObject;
 
@@ -92,8 +92,7 @@ public class ApkUpdateService extends IntentService {
     }
 
     private boolean userHasSeenUpdateActivityToday(Context context) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        long lastSeen = settings.getLong(AppUpdateActivity.UPDATE_ACTIVITY_LAST_SEEN_TIME_MS, INVALID_TIMESTAMP);
+        long lastSeen = Prefs.getLong(context, Prefs.KEY_UPDATE_ACTIVITY_LAST_SEEN_TIME_MS, INVALID_TIMESTAMP);
         return (lastSeen != INVALID_TIMESTAMP) && (System.currentTimeMillis() - lastSeen > RUN_INTERVAL_IN_MS);
     }
 }

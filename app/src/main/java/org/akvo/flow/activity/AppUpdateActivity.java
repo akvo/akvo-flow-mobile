@@ -17,10 +17,8 @@ package org.akvo.flow.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -43,6 +41,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.apache.http.HttpStatus;
 
@@ -55,7 +54,6 @@ public class AppUpdateActivity extends Activity {
     private static final String TAG = AppUpdateActivity.class.getSimpleName();
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS = 100;
-    public static final String UPDATE_ACTIVITY_LAST_SEEN_TIME_MS = "APP_UPDATE_SHOWN_TIMESTAMP";
 
     private Button mInstallBtn;
     private ProgressBar mProgress;
@@ -338,10 +336,10 @@ public class AppUpdateActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void[] params) {
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(contextWeakReference.get());
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putLong(UPDATE_ACTIVITY_LAST_SEEN_TIME_MS, System.currentTimeMillis());
-            editor.apply();
+            if (contextWeakReference.get() != null) {
+                Prefs.setLong(contextWeakReference.get(), Prefs.KEY_UPDATE_ACTIVITY_LAST_SEEN_TIME_MS,
+                              System.currentTimeMillis());
+            }
             return null;
         }
     }

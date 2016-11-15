@@ -133,7 +133,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
         }
 
-        displaySelectedUser();
         startServices(noDevIdYet);
     }
 

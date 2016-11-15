@@ -11,6 +11,7 @@ public class Prefs {
     public static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
+    public static final String KEY_UPDATE_ACTIVITY_LAST_SEEN_TIME_MS = "APP_UPDATE_SHOWN_TIMESTAMP";
 
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;

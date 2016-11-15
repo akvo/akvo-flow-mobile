@@ -16,6 +16,7 @@
 package org.akvo.flow.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,14 +27,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.akvo.flow.R;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.StatusUtil;
-import org.apache.http.HttpStatus;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,10 +34,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.akvo.flow.R;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.Prefs;
+import org.akvo.flow.util.StatusUtil;
+import org.apache.http.HttpStatus;
 
 public class AppUpdateActivity extends Activity {
+
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";
@@ -69,14 +71,14 @@ public class AppUpdateActivity extends Activity {
         mVersion = getIntent().getStringExtra(EXTRA_VERSION);
         mMd5Checksum = getIntent().getStringExtra(EXTRA_CHECKSUM);
 
-        mInstallBtn = (Button)findViewById(R.id.install_btn);
-        mProgress = (ProgressBar)findViewById(R.id.progress);
+        mInstallBtn = (Button) findViewById(R.id.install_btn);
+        mProgress = (ProgressBar) findViewById(R.id.progress);
         mProgress.setMax(MAX_PROGRESS);// Values will be in percentage
 
         // If the file is already downloaded, just prompt the install text
         final String filename = checkLocalFile();
         if (filename != null) {
-            TextView updateTV = (TextView)findViewById(R.id.update_text);
+            TextView updateTV = (TextView) findViewById(R.id.update_text);
             updateTV.setText(R.string.clicktoinstall);
             mInstallBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -89,19 +91,21 @@ public class AppUpdateActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     mInstallBtn.setEnabled(false);
-                    mTask = new UpdateAsyncTask();
+                    mTask = new UpdateAsyncTask(mUrl, mVersion, mMd5Checksum, AppUpdateActivity.this);
                     mTask.execute();
                 }
             });
         }
 
-        Button cancelBtn = (Button)findViewById(R.id.cancel_btn);
+        Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cancel();
             }
         });
+
+        new ActivitySeenPreferenceSaverTask(this).execute();
     }
 
     /**
@@ -146,7 +150,36 @@ public class AppUpdateActivity extends Activity {
         return mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING;
     }
 
-    class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
+    private void updateProgress(int percentComplete) {
+        mProgress.setProgress(percentComplete);
+    }
+
+    private void onTaskExecutionEnded(String filename) {
+        if (TextUtils.isEmpty(filename)) {
+            Toast.makeText(this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
+            mInstallBtn.setText(R.string.retry);
+            mInstallBtn.setEnabled(true);
+            return;
+        }
+
+        PlatformUtil.installAppUpdate(this, filename);
+        finish();
+    }
+
+    private static class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
+
+        private String mMd5Checksum;
+
+        private final String mUrl;
+        private final String mVersion;
+        private final WeakReference<AppUpdateActivity> activityWeakReference;
+
+        private UpdateAsyncTask(String url, String version, String mMd5Checksum, AppUpdateActivity activity) {
+            this.mUrl = url;
+            this.mVersion = version;
+            this.mMd5Checksum = mMd5Checksum;
+            this.activityWeakReference = new WeakReference<>(activity);
+        }
 
         @Override
         protected String doInBackground(Void... params) {
@@ -175,26 +208,27 @@ public class AppUpdateActivity extends Activity {
             }
 
             Log.d(TAG, "onProgressUpdate() - APK update: " + percentComplete + "%");
-            mProgress.setProgress(percentComplete);
+            updateProgress(percentComplete);
+        }
+
+        private void updateProgress(int percentComplete) {
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
+            if (appUpdateActivity != null) {
+                appUpdateActivity.updateProgress(percentComplete);
+            }
         }
 
         @Override
         protected void onPostExecute(String filename) {
-            if (TextUtils.isEmpty(filename)) {
-                Toast.makeText(AppUpdateActivity.this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
-                mInstallBtn.setText(R.string.retry);
-                mInstallBtn.setEnabled(true);
-                return;
+            if (activityWeakReference.get() != null) {
+                activityWeakReference.get().onTaskExecutionEnded(filename);
             }
-
-            PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
-            finish();
         }
 
         @Override
-        protected void onCancelled () {
+        protected void onCancelled() {
             Log.d(TAG, "onCancelled() - APK update task cancelled");
-            mProgress.setProgress(0);
+            updateProgress(0);
             cleanupDownloads(mVersion);
         }
 
@@ -206,9 +240,6 @@ public class AppUpdateActivity extends Activity {
         /**
          * Wipe any existing apk file, and create a new File for the new one, according to the
          * given version
-         * @param location
-         * @param version
-         * @return
          */
         private File createFile(String location, String version) {
             cleanupDownloads(version);
@@ -226,13 +257,10 @@ public class AppUpdateActivity extends Activity {
          * Downloads the apk file and stores it on the file system
          * After the download, a new notification will be displayed, requesting
          * the user to 'click to installAppUpdate'
-         *
-         * @param remoteFile
-         * @param surveyId
          */
         private boolean downloadApk(String location, String localPath) {
             Log.i(TAG, "App Update: Downloading new version " + mVersion + " from " + mUrl);
-            if (!StatusUtil.hasDataConnection(AppUpdateActivity.this)) {
+            if (activityWeakReference.get() != null && !StatusUtil.hasDataConnection(activityWeakReference.get())) {
                 Log.e(TAG, "No internet connection. Can't perform the requested operation");
                 return false;
             }
@@ -295,6 +323,24 @@ public class AppUpdateActivity extends Activity {
             }
 
             return ok;
+        }
+    }
+
+    private static class ActivitySeenPreferenceSaverTask extends AsyncTask<Void, Void, Void> {
+
+        private final WeakReference<Context> contextWeakReference;
+
+        private ActivitySeenPreferenceSaverTask(Context context) {
+            this.contextWeakReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected Void doInBackground(Void[] params) {
+            if (contextWeakReference.get() != null) {
+                Prefs.setLong(contextWeakReference.get(), Prefs.KEY_UPDATE_ACTIVITY_LAST_SEEN_TIME_MS,
+                              System.currentTimeMillis());
+            }
+            return null;
         }
     }
 }

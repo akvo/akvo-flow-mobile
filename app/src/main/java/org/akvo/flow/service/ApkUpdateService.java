@@ -17,10 +17,20 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import org.akvo.flow.api.service.ApkApiService;
+import org.akvo.flow.domain.apkupdate.ApkData;
+import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.util.ApkUpdateHelper;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
+import org.json.JSONObject;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -34,7 +44,19 @@ public class ApkUpdateService extends IntentService {
 
     private static final String TAG = "APK_UPDATE_SERVICE";
 
-    private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
+    /**
+     * FIXME: once updated to a later version of play services we can use
+     *
+     * @see GcmTaskService which runs on a provided interval so no need to check ourselves
+     *
+     * For now this is 24hours in ms
+     **/
+    public static final int RUN_INTERVAL_IN_MS = 1 * 60 * 60 * 24 * 1000;
+    public static final int INVALID_TIMESTAMP = -1;
+
+    private final ApkApiService apkApiService = new ApkApiService();
+    private final ApkUpdateMapper apkUpdateMapper = new ApkUpdateMapper();
+    private final Navigator navigator = new Navigator();
 
     public ApkUpdateService() {
         super(TAG);
@@ -51,16 +73,26 @@ public class ApkUpdateService extends IntentService {
      * we display a notification, requesting the user to download it.
      */
     private void checkUpdates() {
-        if (!StatusUtil.hasDataConnection(this)) {
+        if (userHasSeenUpdateActivityToday(this) && !StatusUtil.hasDataConnection(this)) {
             Log.d(TAG, "No internet connection. Can't perform the requested operation");
             return;
         }
 
         try {
-            apkUpdateHelper.shouldUpdate(this);
+            JSONObject json = apkApiService.getApkDataObject(this);
+            ApkData data = apkUpdateMapper.transform(json);
+            if (ApkUpdateHelper.shouldAppBeUpdated(data, this)) {
+                // There is a newer version. Fire the 'Download and Install' Activity.
+                navigator.navigateToAppUpdate(this, data);
+            }
         } catch (Exception e) {
             Log.e(TAG, "Could not call apk version service", e);
             PersistentUncaughtExceptionHandler.recordException(e);
         }
+    }
+
+    private boolean userHasSeenUpdateActivityToday(Context context) {
+        long lastSeen = Prefs.getLong(context, Prefs.KEY_UPDATE_ACTIVITY_LAST_SEEN_TIME_MS, INVALID_TIMESTAMP);
+        return (lastSeen != INVALID_TIMESTAMP) && (System.currentTimeMillis() - lastSeen > RUN_INTERVAL_IN_MS);
     }
 }

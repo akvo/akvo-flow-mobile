@@ -24,6 +24,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -32,7 +33,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import java.util.ArrayList;
+import java.util.List;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
@@ -42,23 +56,8 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener {
+public class MapFragment extends SupportMapFragment implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener,
+    OnMapReadyCallback {
     private static final String TAG = MapFragment.class.getSimpleName();
 
     private SurveyGroup mSurveyGroup;
@@ -69,7 +68,9 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     private List<SurveyedLocale> mItems;
     private boolean mSingleRecord = false;
 
+    @Nullable
     private GoogleMap mMap;
+
     private ClusterManager<SurveyedLocale> mClusterManager;
 
     public static MapFragment newInstance(SurveyGroup surveyGroup, String datapointId) {
@@ -109,22 +110,31 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mDatabase = new SurveyDbAdapter(getActivity());
-        if (mMap == null) {
-            mMap = getMap();
-            configMap();
-        }
+        getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        configMap();
     }
 
     private void configMap() {
         if (mMap != null) {
             mMap.setMyLocationEnabled(true);
             mMap.setOnInfoWindowClickListener(this);
-            mClusterManager = new ClusterManager<SurveyedLocale>(getActivity(), mMap);
-            mClusterManager.setRenderer(new PointRenderer());
+            mClusterManager = new ClusterManager<>(getActivity(), mMap);
+            mClusterManager.setRenderer(new PointRenderer(mMap));
             mMap.setOnMarkerClickListener(mClusterManager);
-            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            //mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            //    @Override
+            //    public void onCameraChange(CameraPosition cameraPosition) {
+            //        cluster();
+            //    }
+            //});
+            mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
                 @Override
-                public void onCameraChange(CameraPosition cameraPosition) {
+                public void onCameraIdle() {
                     cluster();
                 }
             });
@@ -149,7 +159,14 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
                 .including(new LatLng(sw.latitude - latDst/scale, sw.longitude - lonDst/scale))
                 .including(new LatLng(ne.latitude + latDst/scale, sw.longitude - lonDst/scale));
 
-        new DynamicallyAddMarkerTask().execute(newBounds);
+        //new DynamicallyAddMarkerTask().execute(newBounds);
+        mClusterManager.clearItems();
+        for (SurveyedLocale item : mItems) {
+            if (item.getPosition() != null && newBounds.contains(item.getPosition())) {
+                mClusterManager.addItem(item);
+            }
+        }
+        mClusterManager.cluster();
     }
 
     /**
@@ -274,7 +291,6 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
             mItems.clear();
             do {
                 SurveyedLocale item = SurveyDbAdapter.getSurveyedLocale(cursor);
-                //mClusterManager.addItem(item);
                 mItems.add(item);
             } while (cursor.moveToNext());
         }
@@ -292,8 +308,8 @@ public class MapFragment extends SupportMapFragment implements LoaderCallbacks<C
      */
     class PointRenderer extends DefaultClusterRenderer<SurveyedLocale> {
 
-        public PointRenderer() {
-            super(getActivity(), getMap(), mClusterManager);
+        public PointRenderer(GoogleMap map) {
+            super(getActivity(), map, mClusterManager);
         }
 
         @Override

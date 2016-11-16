@@ -142,6 +142,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         spaceLeftOnCard();
+        Log.d(TAG, "form activity");
     }
 
     /**

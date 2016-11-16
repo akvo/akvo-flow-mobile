@@ -26,38 +26,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.akvo.flow.R;
-import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.api.S3Api;
-import org.akvo.flow.domain.response.FormInstance;
-import org.akvo.flow.domain.response.Response;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.domain.FileTransmission;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.HttpException;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.PropertyUtil;
-import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.StringUtil;
-import org.akvo.flow.util.ViewUtil;
-
-import org.apache.http.HttpStatus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -72,9 +41,35 @@ import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.akvo.flow.R;
+import org.akvo.flow.api.FlowApi;
+import org.akvo.flow.api.S3Api;
+import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
+import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
+import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
+import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
+import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.response.FormInstance;
+import org.akvo.flow.domain.response.Response;
+import org.akvo.flow.exception.HttpException;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.HttpUtil;
+import org.akvo.flow.util.PropertyUtil;
+import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.util.ViewUtil;
+import org.apache.http.HttpStatus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -676,6 +671,7 @@ public class DataSyncService extends IntentService {
     private void displayProgressNotification(int synced, int total) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setColor(getResources().getColor(R.color.orange_main))
                 .setContentTitle(getString(R.string.data_sync_title))
                 .setContentText(getString(R.string.data_sync_text))
                 .setTicker(getString(R.string.data_sync_text))
@@ -706,6 +702,7 @@ public class DataSyncService extends IntentService {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setColor(getResources().getColor(R.color.orange_main))
                 .setContentTitle(getString(R.string.data_sync_title))
                 .setContentText(text)
                 .setTicker(text)
@@ -732,6 +729,7 @@ public class DataSyncService extends IntentService {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setColor(getResources().getColor(R.color.orange_main))
                 .setContentTitle("Form deleted")
                 .setContentText(text)
                 .setTicker(text)

@@ -16,6 +16,7 @@
 
 package org.akvo.flow.service;
 
+import android.support.v4.content.ContextCompat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -354,6 +355,7 @@ public class SurveyDownloadService extends IntentService {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setColor(getResources().getColor(R.color.orange_main))
                 .setContentTitle(title)
                 .setContentText(text)
                 .setTicker(title);

@@ -26,7 +26,6 @@ import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
 import org.akvo.flow.R;
 
 /**
@@ -217,6 +216,7 @@ public class ViewUtil {
                 .setTicker(title)
                 .setContentText(text)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setColor(context.getResources().getColor(R.color.orange_main))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
 
         // Dummy intent. Do nothing when clicked

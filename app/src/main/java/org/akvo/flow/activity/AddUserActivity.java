@@ -16,7 +16,7 @@
 
 package org.akvo.flow.activity;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -24,14 +24,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
-
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 
-public class AddUserActivity extends ActionBarActivity implements TextWatcher{
+public class AddUserActivity extends Activity implements TextWatcher{
     private View mNext;
     private EditText mName;
     private EditText mID;
@@ -39,7 +38,7 @@ public class AddUserActivity extends ActionBarActivity implements TextWatcher{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
 
         mName = (EditText) findViewById(R.id.username);

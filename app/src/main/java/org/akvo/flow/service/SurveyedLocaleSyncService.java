@@ -16,11 +16,6 @@
 
 package org.akvo.flow.service;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -30,7 +25,10 @@ import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
-
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.dao.SurveyDbAdapter;
@@ -129,6 +127,7 @@ public class SurveyedLocaleSyncService extends IntentService {
     private void displayNotification(String title, String text, boolean finished) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setColor(getResources().getColor(R.color.orange_main))
                 .setContentTitle(title)
                 .setContentText(text)
                 .setTicker(title);

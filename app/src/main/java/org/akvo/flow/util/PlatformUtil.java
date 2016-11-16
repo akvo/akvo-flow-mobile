@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -70,11 +70,9 @@ public class PlatformUtil {
         String[] currentParts = installedVersion.split("\\.");
         String[] newPartsParts = newVersion.split("\\.");
         int length = Math.max(currentParts.length, newPartsParts.length);
-        for (int i=0; i< length; i++) {
-            int currentPart = i < currentParts.length ?
-                    Integer.parseInt(currentParts[i]) : 0;
-            int newPart = i < newPartsParts.length ?
-                    Integer.parseInt(newPartsParts[i]) : 0;
+        for (int i = 0; i < length; i++) {
+            int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
+            int newPart = i < newPartsParts.length ? Integer.parseInt(newPartsParts[i]) : 0;
 
             if (currentPart < newPart) {
                 return true;// Newer version

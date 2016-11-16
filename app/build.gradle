@@ -14,7 +14,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion "Google Inc.:Google APIs:21"
+    compileSdkVersion 21
     buildToolsVersion "21.1.2"
     defaultConfig {
         minSdkVersion 10
@@ -68,6 +68,7 @@ android.applicationVariants.all { variant ->
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.android.support:appcompat-v7:19.+'
+    compile 'com.android.support:support-annotations:21.0.0'
     compile 'com.google.android.gms:play-services:4.0.30'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'

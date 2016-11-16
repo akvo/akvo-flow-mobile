@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.flow"
-    android:versionCode="1"
-    android:versionName="2.2.7" >
+    android:versionCode="2"
+    android:versionName="2.2.8" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -95,6 +95,7 @@
         <service android:name=".service.BootstrapService" />
         <service android:name=".service.ExceptionReportingService" />
         <service android:name=".service.ApkUpdateService" />
+        <service android:name=".service.UserRequestedApkUpdateService" />
         <service android:name=".service.SurveyedLocaleSyncService" />
         <service android:name=".service.TimeCheckService" />
 

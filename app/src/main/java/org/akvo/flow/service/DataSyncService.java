@@ -494,7 +494,7 @@ public class DataSyncService extends IntentService {
                 case HttpStatus.SC_NOT_FOUND:
                     // This form has been deleted in the dashboard, thus we cannot sync it
                     displayNotification(formId(formId),
-                            "Form " + formId + " does not exist", "It has probably been deleted");
+                            getString(R.string.sync_error_title, formId), getString(R.string.sync_error_message));
                     status = TransmissionStatus.FORM_DELETED;
                     break;
                 default:// Any error code

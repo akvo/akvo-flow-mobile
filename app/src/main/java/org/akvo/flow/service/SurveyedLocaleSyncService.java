@@ -17,12 +17,8 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 import java.io.IOException;
@@ -36,28 +32,31 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.NotificationHelper;
 
 public class SurveyedLocaleSyncService extends IntentService {
+
     private static final String TAG = SurveyedLocaleSyncService.class.getSimpleName();
 
     public static final String SURVEY_GROUP = "survey_group";
-    
+
     private Handler mHandler = new Handler();
-    
+
     public SurveyedLocaleSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
         setIntentRedelivery(true);
     }
-    
+
     @Override
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         int syncedRecords = 0;
         FlowApi api = new FlowApi();
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
-        displayNotification(getString(R.string.syncing_records),
-                getString(R.string.pleasewait), false);
+        NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                                                           getString(R.string.pleasewait), true, true,
+                                                           ConstantUtil.NOTIFICATION_RECORD_SYNC);
         try {
             Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
@@ -68,12 +67,16 @@ public class SurveyedLocaleSyncService extends IntentService {
                 }
                 syncedRecords += batch.size();
                 sendBroadcastNotification();// Keep the UI fresh!
-                displayNotification(getString(R.string.syncing_records),
-                        String.format(getString(R.string.synced_records), syncedRecords), false);
+                NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                                                                   String.format(getString(R.string.synced_records),
+                                                                                 syncedRecords), true, true,
+                                                                   ConstantUtil.NOTIFICATION_RECORD_SYNC);
                 lastBatch = batch;
             }
-            displayNotification(getString(R.string.sync_finished),
-                    String.format(getString(R.string.synced_records), syncedRecords), true);
+            NotificationHelper.displayNotificationWithProgress(this, getString(R.string.sync_finished),
+                                                               String.format(getString(R.string.synced_records),
+                                                                             syncedRecords), true, true,
+                                                               ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } catch (HttpException e) {
             Log.e(TAG, e.getMessage());
             String message = e.getMessage();
@@ -84,12 +87,14 @@ public class SurveyedLocaleSyncService extends IntentService {
                     break;
             }
             displayToast(message);
-            displayNotification(getString(R.string.sync_error), message, true);
+            NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.sync_error), message, false,
+                                                               false, ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
             displayToast(getString(R.string.network_error));
-            displayNotification(getString(R.string.sync_error),
-                    getString(R.string.network_error), true);
+            NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
+                                                               getString(R.string.network_error), false, false,
+                                                               ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } finally {
             database.close();
         }
@@ -100,8 +105,7 @@ public class SurveyedLocaleSyncService extends IntentService {
     /**
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
-    private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
-            throws IOException {
+    private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId) throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<String>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
@@ -114,7 +118,7 @@ public class SurveyedLocaleSyncService extends IntentService {
         }
         return records;
     }
-    
+
     private void displayToast(final String text) {
         mHandler.post(new Runnable() {
             @Override
@@ -123,29 +127,7 @@ public class SurveyedLocaleSyncService extends IntentService {
             }
         });
     }
-    
-    private void displayNotification(String title, String text, boolean finished) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setColor(getResources().getColor(R.color.orange_main))
-                .setContentTitle(title)
-                .setContentText(text)
-                .setTicker(title);
 
-        builder.setOngoing(!finished);// Ongoing if still syncing the records
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, !finished);
-        
-        // Dummy intent. Do nothing when clicked
-        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        builder.setContentIntent(intent);
-        
-        NotificationManager notificationManager = 
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ConstantUtil.NOTIFICATION_RECORD_SYNC, builder.build());
-    }
-    
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
      * This notification will be received in SurveyedLocalesActivity, in order to
@@ -155,5 +137,4 @@ public class SurveyedLocaleSyncService extends IntentService {
         Intent intentBroadcast = new Intent(getString(R.string.action_locales_sync));
         sendBroadcast(intentBroadcast);
     }
-
 }

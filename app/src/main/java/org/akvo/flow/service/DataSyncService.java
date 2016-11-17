@@ -17,12 +17,8 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -62,17 +58,16 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
+import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
-import org.akvo.flow.util.ViewUtil;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
  * Handle survey export and sync in a background thread. The export process takes
  * no arguments, and will try to zip all the survey instances with a SUBMITTED status
  * but with no EXPORT_DATE (export hasn't happened yet). Ideally, and if the service has been
@@ -86,9 +81,9 @@ import org.json.JSONObject;
  * files to the datastore.
  *
  * @author Christopher Fagiani
- *
  */
 public class DataSyncService extends IntentService {
+
     private static final String TAG = "SyncService";
     private static final String DELIMITER = "\t";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
@@ -164,8 +159,7 @@ public class DataSyncService extends IntentService {
         for (long id : getUnexportedSurveys()) {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
-                displayNotification(NOTIFICATION_DATA_EXPORT, getString(R.string.exportcomplete),
-                        zipFileData.formName);
+                displayNotification(NOTIFICATION_DATA_EXPORT, getString(R.string.exportcomplete), zipFileData.formName);
 
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
@@ -190,8 +184,8 @@ public class DataSyncService extends IntentService {
                     long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
                     String uuid = cursor.getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID));
                     if (!getSurveyInstanceFile(uuid).exists()) {
-                        Log.d(TAG, "Exported file for survey " + uuid +  " not found. It's status " +
-                                "will be set to 'submitted', and will be reprocessed");
+                        Log.d(TAG, "Exported file for survey " + uuid + " not found. It's status " +
+                            "will be set to 'submitted', and will be reprocessed");
                         updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
                     }
                 } while (cursor.moveToNext());
@@ -207,8 +201,8 @@ public class DataSyncService extends IntentService {
             surveyInstanceIds = new long[cursor.getCount()];
             if (cursor.moveToFirst()) {
                 do {
-                    surveyInstanceIds[cursor.getPosition()] = cursor.getLong(
-                            cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+                    surveyInstanceIds[cursor.getPosition()] =
+                        cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -247,8 +241,7 @@ public class DataSyncService extends IntentService {
             if (!StringUtil.isNullOrEmpty(signingKeyString)) {
                 MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
                 byte[] digest = sha1Digest.digest(zipFileData.data.getBytes("UTF-8"));
-                SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes("UTF-8"),
-                        SIGNING_ALGORITHM);
+                SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes("UTF-8"), SIGNING_ALGORITHM);
                 Mac mac = Mac.getInstance(SIGNING_ALGORITHM);
                 mac.init(signingKey);
                 byte[] hmac = mac.doFinal(digest);
@@ -271,8 +264,7 @@ public class DataSyncService extends IntentService {
      * Writes the contents of text to a zip entry within the Zip file behind zos
      * named fileName
      */
-    private void writeTextToZip(ZipOutputStream zos, String text,
-            String fileName) throws IOException {
+    private void writeTextToZip(ZipOutputStream zos, String text, String fileName) throws IOException {
         Log.i(TAG, "Writing zip entry");
         zos.putNextEntry(new ZipEntry(fileName));
         byte[] allBytes = text.getBytes("UTF-8");
@@ -424,7 +416,6 @@ public class DataSyncService extends IntentService {
         final int totalFiles = transmissions.size();
         displayProgressNotification(0, totalFiles);
 
-
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
@@ -493,8 +484,7 @@ public class DataSyncService extends IntentService {
                     break;
                 case HttpStatus.SC_NOT_FOUND:
                     // This form has been deleted in the dashboard, thus we cannot sync it
-                    displayNotification(formId(formId),
-                            getString(R.string.sync_error_title, formId), getString(R.string.sync_error_message));
+                    displayErrorNotification(formId);
                     status = TransmissionStatus.FORM_DELETED;
                     break;
                 default:// Any error code
@@ -506,8 +496,7 @@ public class DataSyncService extends IntentService {
         return ok;
     }
 
-    private boolean sendFile(String fileAbsolutePath, String dir, String contentType,
-            boolean isPublic, int retries) {
+    private boolean sendFile(String fileAbsolutePath, String dir, String contentType, boolean isPublic, int retries) {
         final File file = new File(fileAbsolutePath);
         if (!file.exists()) {
             return false;
@@ -564,7 +553,7 @@ public class DataSyncService extends IntentService {
 
                 JSONArray jForms = jResponse.optJSONArray("deletedForms");
                 if (jForms != null) {
-                    for (int i=0; i<jForms.length(); i++) {
+                    for (int i = 0; i < jForms.length(); i++) {
                         String id = jForms.getString(i);
                         Survey s = mDatabase.getSurvey(id);
                         if (s != null) {
@@ -586,7 +575,7 @@ public class DataSyncService extends IntentService {
     private List<String> parseFiles(JSONArray jFiles) throws JSONException {
         List<String> files = new ArrayList<String>();
         if (jFiles != null) {
-            for (int i=0; i<jFiles.length(); i++) {
+            for (int i = 0; i < jFiles.length(); i++) {
                 // Build the sdcard path for each image
                 String filename = jFiles.getString(i);
                 File file = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
@@ -606,8 +595,9 @@ public class DataSyncService extends IntentService {
 
     /**
      * Request the notifications GAE has ready for us, like the list of missing files.
-     * @param serverBase
+     *
      * @return String body of the HTTP response
+     *
      * @throws Exception
      */
     private String getDeviceNotification(String serverBase) throws Exception {
@@ -625,9 +615,15 @@ public class DataSyncService extends IntentService {
      * so it can start processing the file
      */
     private int sendProcessingNotification(String serverBase, String formId, String action, String fileName) {
-        String url = serverBase + NOTIFICATION_PATH + action
-                + FORMID_PARAM + formId
-                + FILENAME_PARAM + fileName + "&" + FlowApi.getDeviceParams();
+        String url = serverBase
+            + NOTIFICATION_PATH
+            + action
+            + FORMID_PARAM
+            + formId
+            + FILENAME_PARAM
+            + fileName
+            + "&"
+            + FlowApi.getDeviceParams();
         try {
             HttpUtil.httpGet(url);
             return HttpStatus.SC_OK;
@@ -660,88 +656,53 @@ public class DataSyncService extends IntentService {
     }
 
     private void displayNotification(long id, String title, String text) {
-        ViewUtil.displayNotification(title, text, this, (int) id);
+        NotificationHelper.displayNotification(title, text, this, (int) id);
+    }
+
+    private void displayErrorNotification(String formId) {
+        NotificationHelper.displayErrorNotification(getString(R.string.sync_error_title, formId),
+                                               getString(R.string.sync_error_message), this, formId(formId));
     }
 
     /**
      * Display a notification showing the up-to-date status of the sync
+     *
      * @param synced number of handled transmissions so far (either successful or not)
      * @param total number of transmissions in the batch
      */
     private void displayProgressNotification(int synced, int total) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setColor(getResources().getColor(R.color.orange_main))
-                .setContentTitle(getString(R.string.data_sync_title))
-                .setContentText(getString(R.string.data_sync_text))
-                .setTicker(getString(R.string.data_sync_text))
-                .setOngoing(true);
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(total, synced, false);
-
-        // Dummy intent. Do nothing when clicked
-        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        builder.setContentIntent(intent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
+        String title = getString(R.string.data_sync_title);
+        String text = getString(R.string.data_sync_text);
+        NotificationHelper.displayProgressNotification(this, synced, total, title, text,
+                                                       ConstantUtil.NOTIFICATION_DATA_SYNC);
     }
 
     /**
      * Display a notification showing the final status of the sync
+     *
      * @param syncedForms number of successful transmissions
      * @param failedForms number of failed transmissions
      */
     private void displaySyncedNotification(int syncedForms, int failedForms) {
         // Do not show failed if there is none
-        String text = failedForms > 0 ? String.format(getString(R.string.data_sync_all),
-                syncedForms, failedForms)
-                : String.format(getString(R.string.data_sync_synced), syncedForms);
+        String text = failedForms > 0 ? String.format(getString(R.string.data_sync_all), syncedForms, failedForms)
+            : String.format(getString(R.string.data_sync_synced), syncedForms);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setColor(getResources().getColor(R.color.orange_main))
-                .setContentTitle(getString(R.string.data_sync_title))
-                .setContentText(text)
-                .setTicker(text)
-                .setOngoing(false);
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, false);
-
-        // Dummy intent. Do nothing when clicked
-        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        builder.setContentIntent(intent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ConstantUtil.NOTIFICATION_DATA_SYNC, builder.build());
+        String title = getString(R.string.data_sync_title);
+        NotificationHelper.displayNonOngoingNotificationWithProgress(this, text, title,
+                                                                     ConstantUtil.NOTIFICATION_DATA_SYNC);
     }
 
     private void displayFormDeletedNotification(String id, String name) {
         // Create a unique ID for this form's delete notification
-        final int notificationId = (int)formId(id);
+        final int notificationId = formId(id);
 
+        //TODO: extract these hard coded strings!!!!
         // Do not show failed if there is none
         String text = String.format("Form \"%s\" has been deleted", name);
+        String title = "Form deleted";
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setColor(getResources().getColor(R.color.orange_main))
-                .setContentTitle("Form deleted")
-                .setContentText(text)
-                .setTicker(text)
-                .setOngoing(false);
-
-        // Dummy intent. Do nothing when clicked
-        PendingIntent dummyIntent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        builder.setContentIntent(dummyIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(notificationId, builder.build());
+        NotificationHelper.displayNonOnGoingErrorNotification(this, notificationId, text, title);
     }
 
     private String contentType(String ext) {
@@ -762,10 +723,10 @@ public class DataSyncService extends IntentService {
     /**
      * Coerce a form id into its numeric format
      */
-    public static long formId(String id) {
+    public static int formId(String id) {
         try {
-            return Long.valueOf(id);
-        } catch (NumberFormatException e ){
+            return Integer.valueOf(id);
+        } catch (NumberFormatException e) {
             Log.e(TAG, id + " is not a valid form id");
             return 0;
         }
@@ -775,6 +736,7 @@ public class DataSyncService extends IntentService {
      * Helper class to wrap zip file's meta-data
      */
     class ZipFileData {
+
         String uuid = null;
         String formId = null;
         String formName = null;
@@ -782,5 +744,4 @@ public class DataSyncService extends IntentService {
         String data = null;
         List<String> imagePaths = new ArrayList<String>();
     }
-
 }

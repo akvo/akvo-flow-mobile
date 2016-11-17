@@ -45,6 +45,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -123,14 +124,20 @@ public class BootstrapService extends IntentService {
             }
         } catch (Exception e) {
             String errorMessage = getString(R.string.bootstraperror);
-            displayNotification(errorMessage);
+            displayErrorNotification(errorMessage);
+
             Log.e(TAG, "Bootstrap error", e);
         }
     }
 
+    private void displayErrorNotification(String errorMessage) {
+        //FIXME: why are we repeating the message in title and text?
+        NotificationHelper.displayErrorNotification(errorMessage, errorMessage, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
+    }
+
     private void displayNotification(String message) {
         //FIXME: why are we repeating the message in title and text?
-        ViewUtil.displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
+        NotificationHelper.displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
     }
 
     /**

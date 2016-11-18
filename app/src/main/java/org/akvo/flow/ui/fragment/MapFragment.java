@@ -37,6 +37,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -129,9 +130,9 @@ public class MapFragment extends SupportMapFragment
             mClusterManager = new ClusterManager<>(getActivity(), mMap);
             mClusterManager.setRenderer(new PointRenderer(mMap, getActivity(), mClusterManager));
             mMap.setOnMarkerClickListener(mClusterManager);
-            mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                 @Override
-                public void onCameraIdle() {
+                public void onCameraChange(CameraPosition cameraPosition) {
                     cluster();
                 }
             });

@@ -31,6 +31,13 @@ android {
     }
     signingConfigs {
 
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('debug-key/debug.keystore')
+            storePassword 'android'
+        }
+
         flowRelease {
             storeFile file(RELEASE_STORE_FILE)
             storePassword RELEASE_STORE_PASSWORD

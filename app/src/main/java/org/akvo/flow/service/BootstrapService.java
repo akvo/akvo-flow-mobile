@@ -1,18 +1,18 @@
-/*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
- *
- *  This file is part of Akvo FLOW.
- *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
- *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
- *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- */
+    /*
+     *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+     *
+     *  This file is part of Akvo FLOW.
+     *
+     *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+     *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+     *  either version 3 of the License or any later version.
+     *
+     *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+     *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+     *  See the GNU Affero General Public License included below for more details.
+     *
+     *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+     */
 
 package org.akvo.flow.service;
 
@@ -24,7 +24,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -255,7 +254,8 @@ public class BootstrapService extends IntentService {
         final String app = StatusUtil.getApplicationId(this);
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
-            displayToast(getString(R.string.bootstrap_invalid_app));
+            ViewUtil.displayToastFromService(getString(R.string.bootstrap_invalid_app), mHandler,
+                                             getApplicationContext());
             throw new IllegalArgumentException("Form belongs to a different instance." +
                                                    " Expected: " + app + ". Got: " + formApp);
         }
@@ -367,18 +367,4 @@ public class BootstrapService extends IntentService {
         Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
         sendBroadcast(intentBroadcast);
     }
-
-    /**
-     * Display a UI Toast using the Handler's thread (main thread)
-     * @param msg message to display
-     */
-    private void displayToast(final String msg) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(BootstrapService.this, msg, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
 }

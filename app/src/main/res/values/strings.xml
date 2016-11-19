@@ -219,6 +219,9 @@
     <string name="error_form_header">Form %1$s could not be read from FLOW dashboard.</string>
     <string name="error_form_download">Ensure the form is published, and your local date/time settings are OK.</string>
     <string name="form_deleted">This form has been deleted.</string>
+    <!--File sync-->
+    <string name="sync_error_message">It has probably been deleted</string>
+    <string name="sync_error_title">Form %1$s does not exist</string>
     <!--Plotting-->
     <string name="geoshape_area">Area</string>
     <string name="geoshape_line">Line</string>
@@ -252,4 +255,13 @@
     <string name="error_value_required">This field cannot be blank</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
+
+    <!--settings activity-->
+    <string name="settings_app_update_title">Check for updates</string>
+    <string name="settings_app_update_description">Check if there is a newer version for the Flow app.</string>
+
+    <!--app update service -->
+    <string name="apk_update_service_no_update">You already have the latest version of the app.</string>
+    <string name="apk_update_service_error_update">There was an error when trying to update the app, please try again.</string>
+    <string name="apk_update_service_error_no_internet">There was an error when trying to update the app, you are not connected to the internet.</string>
 </resources>

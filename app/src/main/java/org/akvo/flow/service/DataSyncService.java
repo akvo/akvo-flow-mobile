@@ -697,10 +697,9 @@ public class DataSyncService extends IntentService {
         // Create a unique ID for this form's delete notification
         final int notificationId = formId(id);
 
-        //TODO: extract these hard coded strings!!!!
         // Do not show failed if there is none
-        String text = String.format("Form \"%s\" has been deleted", name);
-        String title = "Form deleted";
+        String text = String.format(getString(R.string.data_sync_error_form_deleted_text), name);
+        String title = getString(R.string.data_sync_error_form_deleted_title);
 
         NotificationHelper.displayNonOnGoingErrorNotification(this, notificationId, text, title);
     }

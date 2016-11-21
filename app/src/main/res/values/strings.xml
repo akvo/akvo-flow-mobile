@@ -219,6 +219,9 @@
     <string name="error_form_header">Form %1$s could not be read from FLOW dashboard.</string>
     <string name="error_form_download">Ensure the form is published, and your local date/time settings are OK.</string>
     <string name="form_deleted">This form has been deleted.</string>
+    <!--File sync-->
+    <string name="sync_error_message">It has probably been deleted</string>
+    <string name="sync_error_title">Form %1$s does not exist</string>
     <!--Plotting-->
     <string name="geoshape_area">Area</string>
     <string name="geoshape_line">Line</string>

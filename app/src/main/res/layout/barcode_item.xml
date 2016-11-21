@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+    >
 
     <TextView
         android:id="@+id/order"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minEms="1"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        />
 
     <EditText
         android:id="@+id/input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:enabled="false"
         android:focusable="false"
         android:singleLine="true"
-        android:layout_weight="1"/>
+        />
 
     <ImageButton
         android:id="@+id/delete"
         android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:background="@android:color/transparent"
         android:adjustViewBounds="true"
+        android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_trash"/>
+        android:src="@drawable/ic_trash"
+        />
 
 </LinearLayout>

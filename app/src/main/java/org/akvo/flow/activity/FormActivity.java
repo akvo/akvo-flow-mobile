@@ -115,7 +115,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mSurveyGroup = (SurveyGroup)getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
         mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
 
-        mQuestionResponses = new HashMap<String, QuestionResponse>();
+        mQuestionResponses = new HashMap<>();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -138,7 +138,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         // Initialize new survey or load previous responses
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
         if (!responses.isEmpty()) {
-            loadState(responses);
+            displayResponses(responses);
         }
 
         spaceLeftOnCard();
@@ -181,7 +181,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             response.setId(null);
             response.setRespondentId(mSurveyInstanceId);
         }
-        loadState(responses);
+        displayResponses(responses);
     }
 
     private void loadSurvey(String surveyId) {
@@ -220,15 +220,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
     /**
      * Load state for the current survey instance
      */
-    private void loadState() {
+    private void loadResponses() {
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
-        loadState(responses);
+        displayResponses(responses);
     }
 
     /**
      * Load state with the provided responses map
      */
-    private void loadState(Map<String, QuestionResponse> responses) {
+    private void displayResponses(Map<String, QuestionResponse> responses) {
         mQuestionResponses = responses;
         mAdapter.reset();// Propagate the change
     }
@@ -384,7 +384,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
-                        loadState();
+                        loadResponses();
                         spaceLeftOnCard();
                     }
                 });

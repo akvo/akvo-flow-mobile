@@ -42,12 +42,10 @@ import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
@@ -94,6 +92,7 @@ import javax.crypto.spec.SecretKeySpec;
  *
  */
 public class DataSyncService extends IntentService {
+
     private static final String TAG = "SyncService";
     private static final String DELIMITER = "\t";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
@@ -103,12 +102,6 @@ public class DataSyncService extends IntentService {
 
     private static final String SURVEY_DATA_FILE_JSON = "data.json";
     private static final String SIG_FILE_NAME = ".sig";
-
-    // Sync constants
-    private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification";
-    private static final String NOTIFICATION_PATH = "/processor?action=";
-    private static final String FILENAME_PARAM = "&fileName=";
-    private static final String FORMID_PARAM = "&formID=";
 
     private static final String DATA_CONTENT_TYPE = "application/zip";
     private static final String JPEG_CONTENT_TYPE = "image/jpeg";
@@ -126,10 +119,9 @@ public class DataSyncService extends IntentService {
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
-    private static final int ERROR_UNKNOWN = -1;
-
     private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
+    public static final String UTF_8_CHARSET = "UTF-8";
 
     public DataSyncService() {
         super(TAG);
@@ -251,8 +243,8 @@ public class DataSyncService extends IntentService {
             String signingKeyString = mProps.getProperty(SIGNING_KEY_PROP);
             if (!StringUtil.isNullOrEmpty(signingKeyString)) {
                 MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
-                byte[] digest = sha1Digest.digest(zipFileData.data.getBytes("UTF-8"));
-                SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes("UTF-8"),
+                byte[] digest = sha1Digest.digest(zipFileData.data.getBytes(UTF_8_CHARSET));
+                SecretKeySpec signingKey = new SecretKeySpec(signingKeyString.getBytes(UTF_8_CHARSET),
                         SIGNING_ALGORITHM);
                 Mac mac = Mac.getInstance(SIGNING_ALGORITHM);
                 mac.init(signingKey);
@@ -280,7 +272,7 @@ public class DataSyncService extends IntentService {
             String fileName) throws IOException {
         Log.i(TAG, "Writing zip entry");
         zos.putNextEntry(new ZipEntry(fileName));
-        byte[] allBytes = text.getBytes("UTF-8");
+        byte[] allBytes = text.getBytes(UTF_8_CHARSET);
         zos.write(allBytes, 0, allBytes.length);
         zos.closeEntry();
         Log.i(TAG, "Entry Complete");
@@ -487,14 +479,14 @@ public class DataSyncService extends IntentService {
         mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
 
         int status = TransmissionStatus.FAILED;
-        boolean ok = false;
+        boolean synced = false;
 
         if (sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
-            // Notify GAE back-end that data is available
-            switch (sendProcessingNotification(serverBase, formId, action, getDestName(filename))) {
+            FlowApi api = new FlowApi();
+            switch (api.sendProcessingNotification(serverBase, formId, action, getDestName(filename))) {
                 case HttpStatus.SC_OK:
                     status = TransmissionStatus.SYNCED;// Mark everything completed
-                    ok = true;
+                    synced = true;
                     break;
                 case HttpStatus.SC_NOT_FOUND:
                     // This form has been deleted in the dashboard, thus we cannot sync it
@@ -508,7 +500,7 @@ public class DataSyncService extends IntentService {
         }
 
         mDatabase.updateTransmissionHistory(filename, status);
-        return ok;
+        return synced;
     }
 
     private boolean sendFile(String fileAbsolutePath, String dir, String contentType,
@@ -551,32 +543,35 @@ public class DataSyncService extends IntentService {
      * 2- Update the status of those files in the local database
      */
     private void checkDeviceNotifications(String serverBase) {
+        FlowApi flowApi = new FlowApi();
         try {
-            String response = getDeviceNotification(serverBase);
-            if (!TextUtils.isEmpty(response)) {
-                JSONObject jResponse = new JSONObject(response);
-                List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
-                files.addAll(parseFiles(jResponse.optJSONArray("missingUnknown")));
+            StringBuilder surveyIdsBuilder = new StringBuilder();
+            for (String id : mDatabase.getSurveyIds()) {
+                surveyIdsBuilder.append("&formId=" + id);
+            }
+            JSONObject jResponse = flowApi.getDeviceNotification(serverBase, surveyIdsBuilder.toString());
 
-                // Handle missing files. If an unknown file exists in the filesystem
-                // it will be marked as failed in the transmission history, so it can
-                // be handled and retried in the next sync attempt.
-                for (String filename : files) {
-                    if (new File(filename).exists()) {
-                        setFileTransmissionFailed(filename);
-                    }
+            List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
+            files.addAll(parseFiles(jResponse.optJSONArray("missingUnknown")));
+
+            // Handle missing files. If an unknown file exists in the filesystem
+            // it will be marked as failed in the transmission history, so it can
+            // be handled and retried in the next sync attempt.
+            for (String filename : files) {
+                if (new File(filename).exists()) {
+                    setFileTransmissionFailed(filename);
                 }
+            }
 
-                JSONArray jForms = jResponse.optJSONArray("deletedForms");
-                if (jForms != null) {
-                    for (int i=0; i<jForms.length(); i++) {
-                        String id = jForms.getString(i);
-                        Survey s = mDatabase.getSurvey(id);
-                        if (s != null) {
-                            displayFormDeletedNotification(id, s.getName());
-                        }
-                        mDatabase.deleteSurvey(id);
+            JSONArray jForms = jResponse.optJSONArray("deletedForms");
+            if (jForms != null) {
+                for (int i = 0; i < jForms.length(); i++) {
+                    String id = jForms.getString(i);
+                    Survey s = mDatabase.getSurvey(id);
+                    if (s != null) {
+                        displayFormDeletedNotification(id, s.getName());
                     }
+                    mDatabase.deleteSurvey(id);
                 }
             }
         } catch (Exception e) {
@@ -589,7 +584,7 @@ public class DataSyncService extends IntentService {
      * formatting the path to match the structure of the sdcard's files.
      */
     private List<String> parseFiles(JSONArray jFiles) throws JSONException {
-        List<String> files = new ArrayList<String>();
+        List<String> files = new ArrayList<>();
         if (jFiles != null) {
             for (int i=0; i<jFiles.length(); i++) {
                 // Build the sdcard path for each image
@@ -606,42 +601,6 @@ public class DataSyncService extends IntentService {
         if (rows == 0) {
             // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
             mDatabase.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
-        }
-    }
-
-    /**
-     * Request the notifications GAE has ready for us, like the list of missing files.
-     * @param serverBase
-     * @return String body of the HTTP response
-     * @throws Exception
-     */
-    private String getDeviceNotification(String serverBase) throws Exception {
-        // Send the list of surveys we've got downloaded, getting notified of the deleted ones
-        StringBuilder surveyIds = new StringBuilder();
-        for (String id : mDatabase.getSurveyIds()) {
-            surveyIds.append("&formId=" + id);
-        }
-        String url = serverBase + DEVICE_NOTIFICATION_PATH + "?" + FlowApi.getDeviceParams() + surveyIds.toString();
-        return HttpUtil.httpGet(url);
-    }
-
-    /**
-     * Sends a message to the service with the file name that was just uploaded
-     * so it can start processing the file
-     */
-    private int sendProcessingNotification(String serverBase, String formId, String action, String fileName) {
-        String url = serverBase + NOTIFICATION_PATH + action
-                + FORMID_PARAM + formId
-                + FILENAME_PARAM + fileName + "&" + FlowApi.getDeviceParams();
-        try {
-            HttpUtil.httpGet(url);
-            return HttpStatus.SC_OK;
-        } catch (HttpException e) {
-            Log.e(TAG, e.getStatus() + " response for formId: " + formId);
-            return e.getStatus();
-        } catch (Exception e) {
-            Log.e(TAG, "GAE sync notification failed for file: " + fileName);
-            return ERROR_UNKNOWN;
         }
     }
 

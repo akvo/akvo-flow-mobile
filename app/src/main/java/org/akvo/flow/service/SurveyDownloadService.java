@@ -1,17 +1,16 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ * This file is part of Akvo FLOW.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
 package org.akvo.flow.service;
@@ -39,7 +38,6 @@ import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;
@@ -67,9 +65,6 @@ public class SurveyDownloadService extends IntentService {
     public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated
 
     private static final String DEFAULT_TYPE = "Survey";
-
-    private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice";
-    private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
 
     private SurveyDbAdapter databaseAdaptor;
 
@@ -295,13 +290,10 @@ public class SurveyDownloadService extends IntentService {
      */
     private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds) {
         List<Survey> surveys = new ArrayList<Survey>();
+        FlowApi flowApi = new FlowApi();
         for (String id : surveyIds) {
             try {
-                final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id + "&" + FlowApi.getDeviceParams();
-                String response = HttpUtil.httpGet(url);
-                if (response != null) {
-                    surveys.addAll(new SurveyMetaParser().parseList(response, true));
-                }
+                flowApi.getSurveyHeader(serverBase, surveys, id);
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
                     PersistentUncaughtExceptionHandler.recordException(e);
@@ -322,13 +314,10 @@ public class SurveyDownloadService extends IntentService {
      * TODO: Move this feature to FLOWApi
      */
     private List<Survey> checkForSurveys(String serverBase) {
-        List<Survey> surveys = new ArrayList<Survey>();
+        List<Survey> surveys = new ArrayList<>();
+        FlowApi api = new FlowApi();
         try {
-            final String url = serverBase + SURVEY_LIST_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
-            String response = HttpUtil.httpGet(url);
-            if (response != null) {
-                surveys = new SurveyMetaParser().parseList(response);
-            }
+            surveys = api.getSurveys(serverBase, surveys);
         } catch (IllegalArgumentException | IOException e) {
             if (e instanceof IllegalArgumentException) {
                 PersistentUncaughtExceptionHandler.recordException(e);

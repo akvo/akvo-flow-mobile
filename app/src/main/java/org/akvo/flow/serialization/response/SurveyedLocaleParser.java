@@ -21,6 +21,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +29,6 @@ import org.json.JSONObject;
 
 import org.akvo.flow.domain.response.SurveyedLocalesResponse;
 import org.akvo.flow.domain.SurveyInstance;
-import org.akvo.flow.domain.SurveyedLocale;
 
 public class SurveyedLocaleParser {
     private static final String TAG = SurveyedLocaleParser.class.getSimpleName();
@@ -71,7 +71,7 @@ public class SurveyedLocaleParser {
         List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);
 
         SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, lastModified, surveyGroupId,
-                latitude, longitude);
+                                                           latitude, longitude);
         surveyedLocale.setSurveyInstances(surveyInstances);
 
         return surveyedLocale;

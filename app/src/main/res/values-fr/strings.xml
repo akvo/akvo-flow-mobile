@@ -24,7 +24,7 @@
   <string name="prefoptlabel">Préférences</string>
   <string name="prefoptdesc">Choisir la langue par défaut de l\'enquête et autres préférences</string>
   <string name="sendoptlabel">Synchroniser les données</string>
-  <string name="sendoptdesc">Synchroniser les données de l\'enquête. Vous devez avoir avoir une connexion Internet (mobile ou wi-fi) pour réaliser cette commande.</string>
+  <string name="sendoptdesc">Synchroniser les données de l\'enquête. Vous devez avoir une connexion Internet (mobile ou wi-fi) pour réaliser cette commande.</string>
   <string name="poweroptlabel">Gestion de la batterie</string>
   <string name="poweroptdesc">Activer/désactiver le Wi-Fi pour une meilleure gestion de la batterie.</string>
   <string name="screenoptlabel">Garder l\'écran activé pendant l\'entrée des données</string>
@@ -219,6 +219,9 @@
   <string name="error_form_header">Le formulaire %1$s n\'a pas pu être lu depuis le tableau de bord FLOW.</string>
   <string name="error_form_download">Rassurez vous que le formulaire est publié, et que les paramères d\' heure/date sont ok.</string>
   <string name="form_deleted">Ce formulaire a été supprimer.</string>
+  <!--File sync-->
+  <string name="sync_error_message">Il a probablement été supprimé</string>
+  <string name="sync_error_title">Le formulaire %1$s n\'existe plus</string>
   <!--Plotting-->
   <string name="geoshape_area">Surface</string>
   <string name="geoshape_line">Ligne</string>
@@ -252,4 +255,11 @@
   <string name="error_value_required">Ce champ ne peut être vide</string>
   <string name="drawer_open">Menu ouvert</string>
   <string name="drawer_close">Menu fermé</string>
+  <!--settings activity-->
+  <string name="settings_app_update_title">Vérifier les mises à jour</string>
+  <string name="settings_app_update_description">Vérifier s\'il existe une version plus récente de Akvo Flow.</string>
+  <!--app update service-->
+  <string name="apk_update_service_no_update">Vous avez déjà la dernière version de l\'application.</string>
+  <string name="apk_update_service_error_update">Une erreur est survenue en essayant d\'actualiser l\'application, veuillez réessayer plus tard.</string>
+  <string name="apk_update_service_error_no_internet">Une erreur est survenue en essayant d\'actualiser l\'application, vous n\'etes pas connecté/e à internet.</string>
 </resources>

@@ -222,6 +222,9 @@ Sem espaço para armazenamento
   <string name="error_form_header">O Formulário %1$s não pode ser lido a partir do painel do FLOW.</string>
   <string name="error_form_download">Certifique-se de que o formulário foi publicado e de que as suas definições de data / hora locais estão correctas</string>
   <string name="form_deleted">Este formulário foi eliminado.</string>
+  <!--File sync-->
+  <string name="sync_error_message">Provavelmente foi eliminado.</string>
+  <string name="sync_error_title">O formulário %1$s não existe</string>
   <!--Plotting-->
   <string name="geoshape_area">Área</string>
   <string name="geoshape_line">Linha</string>
@@ -255,4 +258,11 @@ Sem espaço para armazenamento
   <string name="error_value_required">Este campo não pode ficar em branco</string>
   <string name="drawer_open">Desenhador aberto</string>
   <string name="drawer_close">Desenhador fechado</string>
+  <!--settings activity-->
+  <string name="settings_app_update_title">Verificar actualizações</string>
+  <string name="settings_app_update_description">Verifique se existe uma versão mais recente do Akvo Flow.</string>
+  <!--app update service-->
+  <string name="apk_update_service_no_update">Você já tem a versão mais recente do aplicativo.</string>
+  <string name="apk_update_service_error_update">Houve um erro ao tentar atualizar o aplicativo, por favor, tente novamente.</string>
+  <string name="apk_update_service_error_no_internet">Houve um erro ao tentar atualizar o aplicativo, você não está conectado à Internet.</string>
 </resources>

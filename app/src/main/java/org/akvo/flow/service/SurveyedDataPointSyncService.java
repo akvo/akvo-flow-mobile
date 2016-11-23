@@ -36,6 +36,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 
 public class SurveyedDataPointSyncService extends IntentService {
@@ -107,7 +108,8 @@ public class SurveyedDataPointSyncService extends IntentService {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
-        List<SurveyedLocale> locales = api.getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime);
+        List<SurveyedLocale> locales = api.getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime,
+                                                              PlatformUtil.getAndroidID(this));
         if (locales != null) {
             for (SurveyedLocale locale : locales) {
                 database.syncSurveyedLocale(locale);

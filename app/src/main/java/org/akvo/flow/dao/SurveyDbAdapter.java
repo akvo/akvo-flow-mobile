@@ -55,6 +55,8 @@ import org.akvo.flow.util.PlatformUtil;
  */
 public class SurveyDbAdapter {
 
+    public static final int DOES_NOT_EXIST = -1;
+
     public interface Tables {
         String SURVEY = "survey";
         String SURVEY_INSTANCE = "survey_instance";
@@ -1634,7 +1636,7 @@ public class SurveyDbAdapter {
                     new String[] { surveyInstance.getUuid()},
                     null, null, null);
                 
-            long id = -1;
+            long id = DOES_NOT_EXIST;
             if (cursor.moveToFirst()) {
                 id = cursor.getLong(0);
             }
@@ -1648,7 +1650,7 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
             values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
 
-            if (id != -1) {
+            if (id != DOES_NOT_EXIST) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
                         + " = ?", new String[] { surveyInstance.getUuid()});
             } else {

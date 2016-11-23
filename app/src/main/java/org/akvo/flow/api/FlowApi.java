@@ -16,8 +16,8 @@
 
 package org.akvo.flow.api;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -28,8 +28,10 @@ import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -47,6 +49,7 @@ import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.apache.http.HttpStatus;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class FlowApi {
@@ -59,14 +62,19 @@ public class FlowApi {
     private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice";
     private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
     private static final String NOTIFICATION_PATH = "/processor?action=";
-    public static final String DEVICE_NOTIFICATION_PATH = "/devicenotification";
-
+    private static final String DEVICE_NOTIFICATION_PATH = "/devicenotification";
     // Sync constants
     private static final String FILENAME_PARAM = "&fileName=";
     private static final String FORMID_PARAM = "&formID=";
     private static final int ERROR_UNKNOWN = -1;
-
     private static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
+    private static final String BEACON_SERVICE_PATH = "/locationBeacon?action=beacon";
+    private static final String LAT = "&lat=";
+    private static final String LON = "&lon=";
+    private static final String ACC = "&acc=";
+    private static final String OS_VERSION = "&osVersion=";
+    private static final String TIME_CHECK_PATH = "/devicetimerest";
+    private static final String CHARSET_UTF8 = "UTF-8";
 
     static {
         Context context = FlowApp.getApp();
@@ -75,14 +83,52 @@ public class FlowApi {
         IMEI = StatusUtil.getImei(context);
     }
 
+    public String getServerTime(@NonNull String serverBase) throws IOException {
+        final String url = serverBase + TIME_CHECK_PATH + "?ts=" + System.currentTimeMillis();
+        String response = HttpUtil.httpGet(url);
+        String time = "";
+        if (!TextUtils.isEmpty(response)) {
+            JSONObject json;
+            try {
+                json = new JSONObject(response);
+                time = json.getString("time");
+            } catch (JSONException e1) {
+                Log.e(TAG, "Error fetching time: ", e1);
+            }
+        }
+        return time;
+    }
+
+    /**
+     * Sends the location beacon to the server
+     *
+     * The response is ignored
+     */
+    public void sendLocation(@Nullable String serverBase, @Nullable Double latitude, @Nullable Double longitude,
+                             @Nullable Float accuracy) {
+        if (serverBase != null) {
+            try {
+                String url = serverBase + BEACON_SERVICE_PATH + "&" + getDeviceParams();
+                if (latitude != null && longitude != null && accuracy != null) {
+                    url += LAT + latitude + LON + longitude + ACC + accuracy;
+                }
+                url += OS_VERSION + encodeUrl("Android " + android.os.Build.VERSION.RELEASE);
+                HttpUtil.httpGet(url);
+            } catch (IOException e) {
+                Log.e(TAG, "Could not send location beacon", e);
+            }
+        }
+    }
+
     /**
      * Request the notifications GAE has ready for us, like the list of missing files.
-     * @param serverBase
+     *
      * @return String body of the HTTP response
+     *
      * @throws Exception
      */
     @Nullable
-    public JSONObject getDeviceNotification(String serverBase, String surveyIds) throws Exception {
+    public JSONObject getDeviceNotification(@NonNull String serverBase, @NonNull String surveyIds) throws Exception {
         // Send the list of surveys we've got downloaded, getting notified of the deleted ones
         String url = serverBase + DEVICE_NOTIFICATION_PATH + "?" + getDeviceParams() + surveyIds;
         String response = HttpUtil.httpGet(url);
@@ -92,12 +138,13 @@ public class FlowApi {
         return null;
     }
 
-    public void getSurveyHeader(String serverBaseUrl, List<Survey> surveys, String id) throws IOException {
-        final String url = serverBaseUrl + SURVEY_HEADER_SERVICE_PATH + id + "&" + getDeviceParams();
+    public List<Survey> getSurveyHeader(String serverBaseUrl, String surveyId) throws IOException {
+        final String url = serverBaseUrl + SURVEY_HEADER_SERVICE_PATH + surveyId + "&" + getDeviceParams();
         String response = HttpUtil.httpGet(url);
         if (response != null) {
-            surveys.addAll(new SurveyMetaParser().parseList(response, true));
+            return new SurveyMetaParser().parseList(response, true);
         }
+        return Collections.emptyList();
     }
 
     public List<Survey> getSurveys(String serverBase, List<Survey> surveys) throws IOException {
@@ -115,9 +162,15 @@ public class FlowApi {
      * so it can start processing the file
      */
     public int sendProcessingNotification(String serverBaseUrl, String formId, String action, String fileName) {
-        String url = serverBaseUrl + NOTIFICATION_PATH + action
-                + FORMID_PARAM + formId
-                + FILENAME_PARAM + fileName + "&" + getDeviceParams();
+        String url = serverBaseUrl
+            + NOTIFICATION_PATH
+            + action
+            + FORMID_PARAM
+            + formId
+            + FILENAME_PARAM
+            + fileName
+            + "&"
+            + getDeviceParams();
         try {
             HttpUtil.httpGet(url);
             return HttpStatus.SC_OK;
@@ -131,39 +184,48 @@ public class FlowApi {
     }
 
     @Nullable
-    public List<SurveyedLocale> getSurveyedLocales(String serverBaseUrl, long surveyGroup, String timestamp)
-            throws IOException {
-        Context context = FlowApp.getApp();
+    public List<SurveyedLocale> getSurveyedLocales(String serverBaseUrl, long surveyGroup, String timestamp,
+                                                   String androidID) throws IOException {
         // Note: To compute the HMAC auth token, query params must be alphabetically ordered
-        final String query = Param.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
-                + "&" + Param.IMEI + URLEncode(IMEI)
-                + "&" + Param.LAST_UPDATED + (!TextUtils.isEmpty(timestamp)? timestamp : "0")
-                + "&" + Param.PHONE_NUMBER + URLEncode(PHONE_NUMBER)
-                + "&" + Param.SURVEY_GROUP + surveyGroup
-                + "&" + Param.TIMESTAMP + getTimestamp();
+        final String query =
+            Param.ANDROID_ID
+                + encodeUrl(androidID)
+                + "&"
+                + Param.IMEI
+                + encodeUrl(IMEI)
+                + "&"
+                + Param.LAST_UPDATED
+                + (!TextUtils.isEmpty(timestamp) ? timestamp : "0")
+                + "&"
+                + Param.PHONE_NUMBER
+                + encodeUrl(PHONE_NUMBER)
+                + "&"
+                + Param.SURVEY_GROUP
+                + surveyGroup
+                + "&"
+                + Param.TIMESTAMP
+                + getTimestamp();
 
-        final String url = serverBaseUrl + Path.SURVEYED_LOCALE
-                + "?" + query
-                + "&" + Param.HMAC + getAuthorization(query);
+        final String url =
+            serverBaseUrl + Path.SURVEYED_LOCALE + "?" + query + "&" + Param.HMAC + getAuthorization(query);
         String response = HttpUtil.httpGet(url);
         if (response != null) {
-            Log.d(TAG, response); //TODO: remove
             SurveyedLocalesResponse slRes = new SurveyedLocaleParser().parseResponse(response);
             if (slRes.getError() != null) {
                 throw new HttpException(slRes.getError(), Status.MALFORMED_RESPONSE);
             }
             return slRes.getSurveyedLocales();
         }
-        
+
         return null;
     }
 
-    private static String URLEncode(String param) {
+    private String encodeUrl(String param) {
         if (TextUtils.isEmpty(param)) {
             return "";
         }
         try {
-            return URLEncoder.encode(param, "UTF-8");
+            return URLEncoder.encode(param, CHARSET_UTF8);
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, e.getMessage());
             return "";
@@ -174,7 +236,7 @@ public class FlowApi {
         PropertyUtil props = new PropertyUtil(context.getResources());
         return props.getProperty(ConstantUtil.API_KEY);
     }
-    
+
     private String getAuthorization(String query) {
         String authorization = null;
         try {
@@ -189,45 +251,44 @@ public class FlowApi {
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Log.e(TAG, e.getMessage());
         }
-        
+
         return authorization;
     }
-    
-    @SuppressLint("SimpleDateFormat")
+
     private String getTimestamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        
+
         try {
-            return URLEncoder.encode(dateFormat.format(new Date()), "UTF-8");
+            return URLEncoder.encode(dateFormat.format(new Date()), CHARSET_UTF8);
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, e.getMessage());
             return null;
         }
     }
 
-    public static String getDeviceParams() {
+    private String getDeviceParams() {
         Context context = FlowApp.getApp();
-        return Param.PHONE_NUMBER + URLEncode(PHONE_NUMBER)
-                + "&" + Param.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
-                + "&" + Param.IMEI + URLEncode(IMEI)
-                + "&" + Param.VERSION + URLEncode(PlatformUtil.getVersionName(context))
-                + "&" + Param.DEVICE_ID + URLEncode(StatusUtil.getDeviceId(context));
+        return Param.PHONE_NUMBER + encodeUrl(PHONE_NUMBER) + "&" + Param.ANDROID_ID + encodeUrl(
+            PlatformUtil.getAndroidID(context)) + "&" + Param.IMEI + encodeUrl(IMEI) + "&" + Param.VERSION + encodeUrl(
+            PlatformUtil.getVersionName(context)) + "&" + Param.DEVICE_ID + encodeUrl(StatusUtil.getDeviceId(context));
     }
-    
+
     interface Path {
+
         String SURVEYED_LOCALE = "/surveyedlocale";
     }
-    
+
     interface Param {
+
         String SURVEY_GROUP = "surveyGroupId=";
         String PHONE_NUMBER = "phoneNumber=";
-        String IMEI         = "imei=";
-        String TIMESTAMP    = "ts=";
+        String IMEI = "imei=";
+        String TIMESTAMP = "ts=";
         String LAST_UPDATED = "lastUpdateTime=";
-        String HMAC         = "h=";
-        String VERSION      = "ver=";
-        String DEVICE_ID    = "devId=";
-        String ANDROID_ID   = "androidId=";
+        String HMAC = "h=";
+        String VERSION = "ver=";
+        String DEVICE_ID = "devId=";
+        String ANDROID_ID = "androidId=";
     }
 }

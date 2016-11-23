@@ -18,25 +18,21 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.util.Log;
-
-import org.akvo.flow.activity.TimeCheckActivity;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.StatusUtil;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import org.akvo.flow.activity.TimeCheckActivity;
+import org.akvo.flow.api.FlowApi;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.StatusUtil;
+
+import static org.akvo.flow.util.StringUtil.isValid;
 
 public class TimeCheckService extends IntentService {
     private static final String TAG = TimeCheckService.class.getSimpleName();
-    private static final String TIME_CHECK_PATH = "/devicetimerest";
     private static final long OFFSET_THRESHOLD = 13 * 60 * 1000;// 13 minutes
     private static final String PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";// ISO 8601
     private static final String TIMEZONE = "UTC";
@@ -65,28 +61,24 @@ public class TimeCheckService extends IntentService {
         }
 
         try {
-            final String url = serverBase + TIME_CHECK_PATH + "?ts=" + System.currentTimeMillis();
-            String response = HttpUtil.httpGet(url);
-            if (!TextUtils.isEmpty(response)) {
-                JSONObject json = new JSONObject(response);
-                String time = json.getString("time");
-                if (!TextUtils.isEmpty(time) && !time.equalsIgnoreCase("null")) {
-                    DateFormat df = new SimpleDateFormat(PATTERN);
-                    df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-                    final long remote = df.parse(time).getTime();
-                    final long local = System.currentTimeMillis();
-                    boolean onTime = Math.abs(remote - local) < OFFSET_THRESHOLD;
+            FlowApi flowApi = new FlowApi();
+            String time = flowApi.getServerTime(serverBase);
 
-                    if (!onTime) {
-                        Intent i = new Intent(this, TimeCheckActivity.class);
-                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(i);
-                    }
+            if (isValid(time)) {
+                DateFormat df = new SimpleDateFormat(PATTERN);
+                df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+                final long remote = df.parse(time).getTime();
+                final long local = System.currentTimeMillis();
+                boolean onTime = Math.abs(remote - local) < OFFSET_THRESHOLD;
+
+                if (!onTime) {
+                    Intent i = new Intent(this, TimeCheckActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
                 }
             }
-        } catch (IOException | JSONException | ParseException e) {
+        } catch (IOException | ParseException e) {
             Log.e(TAG, "Error fetching time: ", e);
         }
     }
-
 }

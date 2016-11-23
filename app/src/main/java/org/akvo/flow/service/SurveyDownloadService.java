@@ -102,7 +102,7 @@ public class SurveyDownloadService extends IntentService {
      * passed in, then those specific surveys will be downloaded. If they're already
      * on the device, the surveys will be replaced with the new ones.
      */
-    private void checkAndDownload(String[] surveyIds) throws IOException {
+    private void checkAndDownload(String[] surveyIds) {
         // Load preferences
         final String serverBase = StatusUtil.getServerBase(this);
 
@@ -251,24 +251,9 @@ public class SurveyDownloadService extends IntentService {
                 // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
                 // Naive check to determine whether or not this is an absolute filename
                 if (resource.startsWith("http")) {
-                    final String filename = new File(resource).getName();
-                    final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
-                    if (!surveyDir.exists()) {
-                        surveyDir.mkdir();
-                    }
-                    HttpUtil.httpGet(resource, new File(surveyDir, filename));
+                    downloadGaeResource(sid, resource);
                 } else {
-                    // resource is just a filename
-                    final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
-                    final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-                    final File resDir = FileUtil.getFilesDir(FileType.RES);
-                    final File file = new File(resDir, filename);
-                    S3Api s3 = new S3Api(SurveyDownloadService.this);
-                    s3.syncFile(objectKey, file);
-                    FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
-                    if (!file.delete()) {
-                        Log.e(TAG, "Error deleting resource zip file");
-                    }
+                    downloadS3Resource(resource);
                 }
             } catch (Exception e) {
                 ok = false;
@@ -285,22 +270,45 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
+    private void downloadS3Resource(String resource) throws IOException {
+        // resource is just a filename
+        final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
+        final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+        final File resDir = FileUtil.getFilesDir(FileType.RES);
+        final File file = new File(resDir, filename);
+        S3Api s3 = new S3Api(SurveyDownloadService.this);
+        s3.syncFile(objectKey, file);
+        FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
+        if (!file.delete()) {
+            Log.e(TAG, "Error deleting resource zip file");
+        }
+    }
+
+    private void downloadGaeResource(String sid, String url) throws IOException {
+        final String filename = new File(url).getName();
+        final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
+        if (!surveyDir.exists()) {
+            surveyDir.mkdir();
+        }
+        HttpUtil.httpGet(url, new File(surveyDir, filename));
+    }
+
     /**
      * invokes a service call to get the header information for multiple surveys
      */
     private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds) {
-        List<Survey> surveys = new ArrayList<Survey>();
+        List<Survey> surveys = new ArrayList<>();
         FlowApi flowApi = new FlowApi();
         for (String id : surveyIds) {
             try {
-                flowApi.getSurveyHeader(serverBase, surveys, id);
+                surveys.addAll(flowApi.getSurveyHeader(serverBase, id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
                     PersistentUncaughtExceptionHandler.recordException(e);
                 }
                 Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
-                        String.format(getString(R.string.error_form_header), id));
+                        getString(R.string.error_form_header, id));
             }
         }
         return surveys;
@@ -369,7 +377,7 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    public static void sendBroadcastNotification(Context context) {
+    private static void sendBroadcastNotification(Context context) {
         Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
         context.sendBroadcast(intentBroadcast);
     }

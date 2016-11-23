@@ -222,6 +222,9 @@ Version</string>
   <string name="error_form_header">El formulario %1$s no se ha podido recibir desde el panel de control.</string>
   <string name="error_form_download">Asegúrese que el formulario está publicado, y que la hora/fecha del dispositivo es correcta.</string>
   <string name="form_deleted">Este formulario ha sido borrado.</string>
+  <!--File sync-->
+  <string name="sync_error_message">Probablemente ha sido borrado</string>
+  <string name="sync_error_title">El formulario %1$s no existe</string>
   <!--Plotting-->
   <string name="geoshape_area">Área</string>
   <string name="geoshape_line">Línea</string>
@@ -255,4 +258,11 @@ Version</string>
   <string name="error_value_required">Este campo no puede ser dejado en blanco</string>
   <string name="drawer_open">Abrir menú</string>
   <string name="drawer_close">Cerrar menú</string>
+  <!--settings activity-->
+  <string name="settings_app_update_title">Comprobar si hay actualizaciones</string>
+  <string name="settings_app_update_description">Compruebe si hay una nueva versión de Akvo Flow.</string>
+  <!--app update service-->
+  <string name="apk_update_service_no_update">Ya que tiene la última versión de la aplicación.</string>
+  <string name="apk_update_service_error_update">Se ha producido un error al intentar actualizar la aplicación, por favor intente-lo de nuevo.</string>
+  <string name="apk_update_service_error_no_internet">Se ha producido un error al intentar actualizar la aplicación, usted no está conectado a Internet.</string>
 </resources>

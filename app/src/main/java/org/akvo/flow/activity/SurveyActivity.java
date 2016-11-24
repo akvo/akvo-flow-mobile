@@ -133,8 +133,12 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
         }
 
-        displaySelectedUser();
         startServices(noDevIdYet);
+
+        //When the app is restarted we need to display the current user
+        if (savedInstanceState == null) {
+            displaySelectedUser();
+        }
     }
 
     @Override
@@ -146,9 +150,10 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 if (resultCode == RESULT_OK) {
                     displaySelectedUser();
                     Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
-                    // Trigger the SurveyDownload Service, so the first
-                    // backend connection uses the new Device ID
+                    // Trigger the delayed services, so the first
+                    // backend connections uses the new Device ID
                     startService(new Intent(this, SurveyDownloadService.class));
+                    startService(new Intent(this, DataSyncService.class));
                 } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
                     finish();
                 }
@@ -205,11 +210,11 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         } else {
             if (!waitForDeviceId) {
                 startService(new Intent(this, SurveyDownloadService.class));
+                startService(new Intent(this, DataSyncService.class));
             }
             startService(new Intent(this, LocationService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
-            startService(new Intent(this, DataSyncService.class));
             startService(new Intent(this, ApkUpdateService.class));
             startService(new Intent(this, TimeCheckService.class));
         }

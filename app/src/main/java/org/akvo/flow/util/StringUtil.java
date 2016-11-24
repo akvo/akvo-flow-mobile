@@ -16,6 +16,8 @@
 
 package org.akvo.flow.util;
 
+import android.text.TextUtils;
+
 /**
  * simple string convenience functions
  * 
@@ -30,11 +32,7 @@ public class StringUtil {
      * @return
      */
     public static boolean isNullOrEmpty(String s) {
-        if (s == null || s.trim().length() == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return s == null || s.trim().length() == 0;
     }
 
     // copy a string transforming all control chars
@@ -63,5 +61,9 @@ public class StringUtil {
         }
 
         return result;
+    }
+
+    public static boolean isValid(String value) {
+        return !TextUtils.isEmpty(value) && !value.equalsIgnoreCase("null");
     }
 }

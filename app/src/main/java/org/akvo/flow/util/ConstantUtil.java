@@ -38,6 +38,7 @@ public class ConstantUtil {
     public static final String STACKTRACE_FILENAME = "err-";
     public static final String STACKTRACE_SUFFIX = ".stacktrace";
     public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
+    public static final String DOT_SEPARATOR = ".";
 
     /**
      * survey file locations

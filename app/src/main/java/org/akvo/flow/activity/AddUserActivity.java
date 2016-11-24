@@ -16,23 +16,26 @@
 
 package org.akvo.flow.activity;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-
+import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 
-public class AddUserActivity extends ActionBarActivity implements TextWatcher{
-    private View mNext;
+public class AddUserActivity extends ActionBarActivity implements TextWatcher, TextView.OnEditorActionListener {
+
+    private View mNextBt;
     private EditText mName;
     private EditText mID;
 
@@ -44,29 +47,34 @@ public class AddUserActivity extends ActionBarActivity implements TextWatcher{
 
         mName = (EditText) findViewById(R.id.username);
         mID = (EditText) findViewById(R.id.device_id);
-        mNext = findViewById(R.id.login_btn);
+        mNextBt = findViewById(R.id.login_btn);
 
         // Ensure the username is not left blank
-        mNext.setEnabled(false);
+        mNextBt.setEnabled(false);
         mName.addTextChangedListener(this);
         mID.addTextChangedListener(this);
+        mID.setOnEditorActionListener(this);
 
-        mNext.setOnClickListener(new View.OnClickListener() {
+        mNextBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = mName.getText().toString().trim();
-                String deviceId = mID.getText().toString().trim();
-                SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
-                long uid = db.createOrUpdateUser(null, username);
-                db.savePreference(ConstantUtil.DEVICE_IDENT_KEY, deviceId);
-                db.close();
-
-                // Select the newly created user, and exit the Activity
-                FlowApp.getApp().setUser(new User(uid, username));
-                setResult(RESULT_OK);
-                finish();
+                saveUserData();
             }
         });
+    }
+
+    private void saveUserData() {
+        String username = mName.getText().toString().trim();
+        String deviceId = mID.getText().toString().trim();
+        SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
+        long uid = db.createOrUpdateUser(null, username);
+        db.savePreference(ConstantUtil.DEVICE_IDENT_KEY, deviceId);
+        db.close();
+
+        // Select the newly created user, and exit the Activity
+        FlowApp.getApp().setUser(new User(uid, username));
+        setResult(RESULT_OK);
+        finish();
     }
 
     @Override
@@ -80,7 +88,15 @@ public class AddUserActivity extends ActionBarActivity implements TextWatcher{
     @Override
     public void afterTextChanged(Editable s) {
         boolean valid = !TextUtils.isEmpty(mName.getText()) && !TextUtils.isEmpty(mID.getText());
-        mNext.setEnabled(valid);
+        mNextBt.setEnabled(valid);
     }
 
+    @Override
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            saveUserData();
+            return true;
+        }
+        return false;
+    }
 }

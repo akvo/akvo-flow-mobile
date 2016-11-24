@@ -16,7 +16,7 @@ Date: 24 November 2016
 * **When device is rotated do not show the user is logged in** [#498] - We no longer show the Toast message saying the user has been logged in every time the device is rotated.
 * **Surveys with the same name failed with manual transfer** [#476] - We have fixed the issue and you can have multiple forms with the same name and manually transfer them with all the questions displayed correctly.
 * **Added translations when there was an error synchronising a file** [#487] - We have provided translations for this error message.
-
+* **Do not check for notifications before deviceId is set** [#484] - This is the second part of [#454] and prevents the device from syncing if there is no deviceId set.
 
 ---------------
 # ver 2.2.8

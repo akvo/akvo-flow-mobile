@@ -134,6 +134,11 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         }
 
         startServices(noDevIdYet);
+
+        //When the app is restarted we need to display the current user
+        if (savedInstanceState == null) {
+            displaySelectedUser();
+        }
     }
 
     @Override

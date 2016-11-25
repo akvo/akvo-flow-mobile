@@ -37,6 +37,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
+import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleSyncService extends IntentService {
@@ -69,7 +70,7 @@ public class SurveyedLocaleSyncService extends IntentService {
                     break;
                 }
                 syncedRecords += batch.size();
-                sendBroadcastNotification();// Keep the UI fresh!
+                sendBroadcastNotification(batch.toString());// Keep the UI fresh!
                 displayNotification(getString(R.string.syncing_records),
                         String.format(getString(R.string.synced_records), syncedRecords), false);
                 lastBatch = batch;
@@ -96,7 +97,7 @@ public class SurveyedLocaleSyncService extends IntentService {
             database.close();
         }
 
-        sendBroadcastNotification();
+        sendBroadcastNotification("");
     }
 
     /**
@@ -151,11 +152,15 @@ public class SurveyedLocaleSyncService extends IntentService {
     
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
-     * This notification will be received in SurveyedLocalesActivity, in order to
+     * This notification will be received in {@link DatapointsFragment}, in order to
      * refresh its data
+     * @param dataPointId
      */
-    private void sendBroadcastNotification() {
+    private void sendBroadcastNotification(String dataPointId) {
+        //TODO: this should be a local broadcast (only for the app)
+        //TODO: instead of strings this should be a constant: fieldsurvey.ACTION_LOCALES_SYNC
         Intent intentBroadcast = new Intent(getString(R.string.action_locales_sync));
+        intentBroadcast.putExtra("added", dataPointId); //testing TODO:remove
         sendBroadcast(intentBroadcast);
     }
 

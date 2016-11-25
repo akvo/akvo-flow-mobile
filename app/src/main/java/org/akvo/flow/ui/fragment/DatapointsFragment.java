@@ -33,9 +33,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import com.astuetz.PagerSlidingTabStrip;
-
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.dao.SurveyDbAdapter;
@@ -43,10 +41,12 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.service.SurveyedLocaleSyncService;
 
 public class DatapointsFragment extends Fragment {
+
     private static final String TAG = DatapointsFragment.class.getSimpleName();
 
     private static final int POSITION_LIST = 0;
     private static final int POSITION_MAP = 1;
+    public static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
 
     private SurveyDbAdapter mDatabase;
     private TabsAdapter mTabsAdapter;
@@ -55,7 +55,15 @@ public class DatapointsFragment extends Fragment {
     private String[] mTabs;
     private SurveyGroup mSurveyGroup;
 
-    public static DatapointsFragment instantiate(SurveyGroup surveyGroup) {
+    public DatapointsFragment() {
+    }
+
+    public static DatapointsFragment newInstance(SurveyGroup surveyGroup) {
+        if (surveyGroup !=null) {
+            Log.d(TAG, "newInstance "+surveyGroup.toPrintableString());
+        } else {
+            Log.d(TAG, "newInstance");
+        }
         DatapointsFragment fragment = new DatapointsFragment();
         Bundle args = new Bundle();
         args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
@@ -96,6 +104,8 @@ public class DatapointsFragment extends Fragment {
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
         mDatabase.deleteEmptyRecords();
 
+        //TODO: this should be a local broadcast (only for the app)
+        //TODO: instead of strings this should be a constant: fieldsurvey.ACTION_LOCALES_SYNC
         getActivity().registerReceiver(mSurveyedLocalesSyncReceiver,
                 new IntentFilter(getString(R.string.action_locales_sync)));
     }
@@ -116,7 +126,6 @@ public class DatapointsFragment extends Fragment {
         mTabsAdapter = new TabsAdapter(getFragmentManager());
         mPager.setAdapter(mTabsAdapter);
         tabs.setViewPager(mPager);
-        //tabs.setOnPageChangeListener(mTabsAdapter);
 
         return v;
     }
@@ -137,6 +146,7 @@ public class DatapointsFragment extends Fragment {
             // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
             // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
             if (mPager != null && mPager.getCurrentItem() == POSITION_MAP) {
+                //TODO: maybe instead of removing we should use custom menu for each fragment
                 subMenu.removeItem(R.id.order_by);
             }
         }
@@ -161,13 +171,14 @@ public class DatapointsFragment extends Fragment {
                 return true;
             case R.id.stats:
                 StatsDialogFragment dialogFragment = StatsDialogFragment.newInstance(mSurveyGroup.getId());
-                dialogFragment.show(getFragmentManager(), "stats");
+                dialogFragment.show(getFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    //TODO: make static to avoid memory leaks
     class TabsAdapter extends FragmentPagerAdapter {
 
         public TabsAdapter(FragmentManager fm) {
@@ -179,6 +190,7 @@ public class DatapointsFragment extends Fragment {
             return mTabs.length;
         }
 
+        //TODO: use weak reference to save fragments
         private Fragment getFragment(int pos) {
             // Hell of a hack. This should be changed for a more reliable method
             String tag = "android:switcher:" + R.id.pager + ":" + pos;
@@ -215,20 +227,29 @@ public class DatapointsFragment extends Fragment {
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        if (surveyGroup !=null) {
+            Log.d(TAG, "newInstance "+surveyGroup.toPrintableString());
+        }
         if (mTabsAdapter != null) {
             mTabsAdapter.refreshFragments();
         }
+        //TODO: call this via listener interface
         getActivity().supportInvalidateOptionsMenu();
     }
 
     /**
      * BroadcastReceiver to notify of records synchronisation. This should be
      * fired from SurveyedLocalesSyncService.
+     *
+     * TODO: prevent from accessing surveyGroup, make into a static internal class
      */
     private BroadcastReceiver mSurveyedLocalesSyncReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "New Records have been synchronised. Refreshing fragments...");
+            //TODO: this does not make sense, where do we get the surveyGroupFrom?
+            //shouldn't we pass it as extra.
+            Log.d(TAG, "got new datapoints "+intent.getStringExtra("added"));
             refresh(mSurveyGroup);
         }
     };

@@ -25,6 +25,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -64,7 +65,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
 
-    public static final String FRAGMENT_DATAPOINTS = "datapoints_fragment";
+    public static final String DATAPOINTS_FRAGMENT_TAG = "datapoints_fragment";
 
     private SurveyDbAdapter mDatabase;
     private SurveyGroup mSurveyGroup;
@@ -78,7 +79,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
-
+        Log.d(TAG, "onCreate");
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -87,7 +88,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mTitle = mDrawerTitle = getString(R.string.app_name);
 
         // Init navigation drawer
-        mDrawer = (DrawerFragment)getSupportFragmentManager().findFragmentByTag("f");
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag("f");
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
@@ -120,10 +122,11 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             mDrawerLayout.openDrawer(Gravity.START);
         }
 
-        if (savedInstanceState == null ||
-                getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS) == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
-                    DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
+        if (savedInstanceState == null || supportFragmentManager.findFragmentByTag(DATAPOINTS_FRAGMENT_TAG) == null) {
+            DatapointsFragment datapointsFragment = DatapointsFragment.newInstance(mSurveyGroup);
+            supportFragmentManager.beginTransaction()
+                                  .replace(R.id.content_frame, datapointsFragment, DATAPOINTS_FRAGMENT_TAG)
+                                  .commit();
         }
 
         // Start the setup Activity if necessary.
@@ -247,11 +250,13 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         setTitle(title);
         FlowApp.getApp().setSurveyGroupId(id);
 
-        DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS);
+        DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
+            DATAPOINTS_FRAGMENT_TAG);
         if (f != null) {
             f.refresh(mSurveyGroup);
+        } else {
+            supportInvalidateOptionsMenu();
         }
-        supportInvalidateOptionsMenu();
         mDrawer.load();
         mDrawerLayout.closeDrawers();
     }

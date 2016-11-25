@@ -62,4 +62,13 @@ public class SurveyGroup implements Serializable {
     public String toString() {
         return mName;
     }
+
+    public String toPrintableString() {
+        return "SurveyGroup{" +
+            "mId=" + mId +
+            ", mName='" + mName + '\'' +
+            ", mMonitored=" + mMonitored +
+            ", mRegisterSurveyId='" + mRegisterSurveyId + '\'' +
+            '}';
+    }
 }

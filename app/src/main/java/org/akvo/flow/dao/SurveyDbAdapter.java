@@ -120,7 +120,10 @@ public class SurveyDbAdapter {
         String SUBMITTED_DATE = "submitted_date";
         String EXPORTED_DATE = "exported_date";
         String SYNC_DATE = "sync_date";
-        String STATUS = "status";// Denormalized value. See 'SurveyInstanceStatus'
+        /**
+         * Denormalized value. see {@link SurveyInstanceStatus}
+         **/
+        String STATUS = "status";
         String DURATION = "duration";
         String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
         String VERSION = "version";
@@ -173,11 +176,12 @@ public class SurveyDbAdapter {
     }
 
     public interface SurveyInstanceStatus {
-        int SAVED      = 0;
-        int SUBMITTED  = 1;
-        int EXPORTED   = 2;
-        int SYNCED     = 3;
-        int DOWNLOADED = 4;
+        int UNKNOWN = 0;
+        int SAVED = 1;
+        int SUBMITTED = 2;
+        int EXPORTED = 3;
+        int SYNCED = 4;
+        int DOWNLOADED = 5;
     }
 
     public interface TransmissionStatus {

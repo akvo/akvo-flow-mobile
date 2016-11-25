@@ -23,16 +23,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
+import android.util.Pair;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
@@ -45,15 +49,15 @@ public class SurveyedDataPointSyncService extends IntentService {
     private static final String TAG = SurveyedDataPointSyncService.class.getSimpleName();
 
     public static final String SURVEY_GROUP = "survey_group";
-    
-    private Handler mHandler = new Handler();
-    
+
+    private final Handler mHandler = new Handler();
+
     public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
         setIntentRedelivery(true);
     }
-    
+
     @Override
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
@@ -62,22 +66,33 @@ public class SurveyedDataPointSyncService extends IntentService {
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         displayNotification(getString(R.string.syncing_records),
                 getString(R.string.pleasewait), false);
+        boolean correctSync = true;
         try {
             Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
-                batch = sync(database, api, surveyGroupId);
+                Pair<Set<String>, Boolean> syncResult = sync(database, api, surveyGroupId);
+                batch = syncResult.first;
+                if (!syncResult.second) {
+                    //at least one of the data points seems corrupted
+                    correctSync = syncResult.second;
+                }
                 batch.removeAll(lastBatch);// Remove duplicates.
                 if (batch.isEmpty()) {
                     break;
                 }
                 syncedRecords += batch.size();
-                sendBroadcastNotification(batch.toString());// Keep the UI fresh!
+                sendBroadcastNotification();// Keep the UI fresh!
                 displayNotification(getString(R.string.syncing_records),
                         String.format(getString(R.string.synced_records), syncedRecords), false);
                 lastBatch = batch;
             }
-            displayNotification(getString(R.string.sync_finished),
-                    String.format(getString(R.string.synced_records), syncedRecords), true);
+            if (correctSync) {
+                displayNotification(getString(R.string.sync_finished),
+                        String.format(getString(R.string.synced_records), syncedRecords), true);
+            } else {
+                displayNotification(getString(R.string.sync_finished),
+                        getString(R.string.syncing_corrupted_datapoints_error), true);
+            }
         } catch (HttpException e) {
             Log.e(TAG, e.getMessage(), e);
             String message = e.getMessage();
@@ -98,37 +113,39 @@ public class SurveyedDataPointSyncService extends IntentService {
             database.close();
         }
 
-        sendBroadcastNotification("");
+        sendBroadcastNotification();
     }
 
     /**
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
-    private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
+    private Pair<Set<String>, Boolean> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
             throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         List<SurveyedLocale> locales = api.getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime,
-                                                              PlatformUtil.getAndroidID(this));
+                PlatformUtil.getAndroidID(this));
+        boolean correctData = true;
         if (locales != null) {
             for (SurveyedLocale locale : locales) {
+                List<SurveyInstance> surveyInstances = locale.getSurveyInstances();
+                if (surveyInstances == null || surveyInstances.isEmpty()) {
+                    correctData = false;
+                }
                 database.syncSurveyedLocale(locale);
                 records.add(locale.getId());
             }
         }
-        return records;
+        //Delete empty or corrupted data received from server
+        database.deleteEmptyRecords();
+        return new Pair<>(records, correctData);
     }
-    
+
     private void displayToast(final String text) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
-            }
-        });
+        mHandler.post(new ServiceToastRunnable(getApplicationContext(), text));
     }
-    
+
     private void displayNotification(String title, String text, boolean finished) {
         int icon = finished ? android.R.drawable.stat_sys_download_done
                 : android.R.drawable.stat_sys_download;
@@ -142,28 +159,24 @@ public class SurveyedDataPointSyncService extends IntentService {
 
         // Progress will only be displayed in Android versions > 4.0
         builder.setProgress(1, 1, !finished);
-        
+
         // Dummy intent. Do nothing when clicked
         PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
         builder.setContentIntent(intent);
-        
-        NotificationManager notificationManager = 
+
+        NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(ConstantUtil.NOTIFICATION_RECORD_SYNC, builder.build());
     }
-    
+
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
      * This notification will be received in {@link DatapointsFragment}, in order to
      * refresh its data
-     * @param dataPointId
      */
-    private void sendBroadcastNotification(String dataPointId) {
-        //TODO: this should be a local broadcast (only for the app)
-        //TODO: instead of strings this should be a constant: fieldsurvey.ACTION_LOCALES_SYNC
-        Intent intentBroadcast = new Intent(getString(R.string.action_locales_sync));
-        intentBroadcast.putExtra("added", dataPointId); //testing TODO:remove
-        sendBroadcast(intentBroadcast);
+    private void sendBroadcastNotification() {
+        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 
 }

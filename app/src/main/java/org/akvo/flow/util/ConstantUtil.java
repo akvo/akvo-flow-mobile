@@ -127,10 +127,7 @@ public class ConstantUtil {
      */
     public static final String USER_ID_KEY = "UID";
     public static final String SURVEY_ID_KEY = "SID";
-    public static final String ID_KEY = "_id";
     public static final String RESPONDENT_ID_KEY = "survey_respondent_id";
-    public static final String IMAGE_URL_LIST_KEY = "imageurls";
-    public static final String IMAGE_CAPTION_LIST_KEY = "imagecaps";
     public static final String READONLY_KEY = "readonly";
     public static final String SINGLE_SURVEY_KEY = "single_survey";
     public static final String SURVEY_GROUP = "survey_group";
@@ -165,12 +162,6 @@ public class ConstantUtil {
      * language codes
      */
     public static final String ENGLISH_CODE = "en";
-
-    /**
-     * html colors
-     */
-    public static final String WHITE_COLOR = "white";
-    public static final String BLACK_COLOR = "black";
 
     /**
      * "code" to prevent unauthorized use of administrative settings/preferences
@@ -250,6 +241,9 @@ public class ConstantUtil {
     public static final String CADDISFLY_RESPONSE = "response";
     public static final String CADDISFLY_IMAGE = "image";
     public static final String CADDISFLY_MIME = "text/plain";
+
+    //broadcasts
+    public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
 
     /**
      * prevent instantiation

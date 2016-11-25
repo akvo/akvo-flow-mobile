@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -145,8 +145,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         if (!isResumed()) {
             return;
         }
-        getLoaderManager().restartLoader(LOADER_SURVEYS, null, this);
-        getLoaderManager().restartLoader(LOADER_USERS, null, this);
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.restartLoader(LOADER_SURVEYS, null, this);
+        loaderManager.restartLoader(LOADER_USERS, null, this);
     }
 
     public void onDrawerClosed() {

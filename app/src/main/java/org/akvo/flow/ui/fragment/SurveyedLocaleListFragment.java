@@ -62,8 +62,8 @@ import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
 import org.akvo.flow.util.ConstantUtil;
 
-public class SurveyedLocaleListFragment extends ListFragment implements LocationListener, 
-            OnItemClickListener, LoaderCallbacks<Cursor>, OrderByDialogListener {
+public class SurveyedLocaleListFragment extends ListFragment implements LocationListener,
+        OnItemClickListener, LoaderCallbacks<Cursor>, OrderByDialogListener {
     private static final String TAG = SurveyedLocaleListFragment.class.getSimpleName();
 
     private LocationManager mLocationManager;
@@ -73,7 +73,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     private int mOrderBy;
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
-    
+
     private SurveyedLocaleListAdapter mAdapter;
     private RecordListListener mListener;
 
@@ -88,31 +88,31 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroup = (SurveyGroup)getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+        mSurveyGroup = (SurveyGroup) getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        
+
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (RecordListListener)activity;
+            mListener = (RecordListListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SurveyedLocalesFragmentListener");
         }
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         mDatabase = new SurveyDbAdapter(getActivity());
-        if(mAdapter == null) {
+        if (mAdapter == null) {
             mAdapter = new SurveyedLocaleListAdapter(getActivity());
             setListAdapter(mAdapter);
         }
@@ -144,7 +144,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
         refresh();
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
@@ -186,10 +186,10 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         Cursor cursor = (Cursor) mAdapter.getItem(position);
         final String localeId = cursor.getString(cursor.getColumnIndexOrThrow(
                 RecordColumns.RECORD_ID));
-        
+
         mListener.onRecordSelected(localeId);// Notify the host activity
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -200,7 +200,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 dialogFragment.show(getFragmentManager(), "order_by");
                 return true;
         }
-        
+
         return false;
     }
 
@@ -228,7 +228,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             Log.e(TAG, "onFinished() - Loader returned no data");
             return;
         }
-        
+
         mAdapter.swapCursor(cursor);
     }
 
@@ -236,7 +236,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
     }
-    
+
     // ==================================== //
     // ======== Location Callbacks ======== //
     // ==================================== //
@@ -301,7 +301,6 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
             // This cursor contains extra info about the Record status
             int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
-
             nameView.setText(surveyedLocale.getDisplayName(context));
             idView.setText(surveyedLocale.getId());
 
@@ -325,6 +324,9 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                     statusRes = R.drawable.record_synced_icn;
                     statusText = getString(R.string.status_synced);
                     break;
+                default:
+                    //wrong state
+                    break;
             }
 
             statusImage.setImageResource(statusRes);
@@ -332,13 +334,13 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
             // Alternate background
             int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-            final int res= PlatformUtil.getResource(context, attr);
+            final int res = PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale) {
             StringBuilder builder = new StringBuilder(getString(R.string.distance_label) + " ");
-            
+
             if (surveyedLocale.getLatitude() != null && surveyedLocale.getLongitude() != null
                     && (mLatitude != 0.0d || mLongitude != 0.0d)) {
                 float[] results = new float[1];
@@ -375,5 +377,5 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         }
 
     }
-    
+
 }

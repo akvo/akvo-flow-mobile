@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -47,6 +47,7 @@ import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -56,8 +57,10 @@ import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
+import java.lang.ref.WeakReference;
+
 public class SurveyActivity extends ActionBarActivity implements RecordListListener,
-        DrawerFragment.DrawerListener {
+        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final int REQUEST_ADD_USER = 0;
@@ -65,7 +68,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
 
-    public static final String DATAPOINTS_FRAGMENT_TAG = "datapoints_fragment";
+    private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
 
     private SurveyDbAdapter mDatabase;
     private SurveyGroup mSurveyGroup;
@@ -74,6 +77,12 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
     private CharSequence mDrawerTitle, mTitle;
+
+    /**
+     * BroadcastReceiver to notify of surveys synchronisation. This should be
+     * fired from {@link SurveyDownloadService}.
+     */
+    private final BroadcastReceiver mSurveysSyncReceiver = new SurveySyncBroadcastReceiver(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +131,11 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             mDrawerLayout.openDrawer(Gravity.START);
         }
 
-        if (savedInstanceState == null || supportFragmentManager.findFragmentByTag(DATAPOINTS_FRAGMENT_TAG) == null) {
+        if (savedInstanceState == null || supportFragmentManager.findFragmentByTag(DATA_POINTS_FRAGMENT_TAG) == null) {
             DatapointsFragment datapointsFragment = DatapointsFragment.newInstance(mSurveyGroup);
             supportFragmentManager.beginTransaction()
-                                  .replace(R.id.content_frame, datapointsFragment, DATAPOINTS_FRAGMENT_TAG)
-                                  .commit();
+                    .replace(R.id.content_frame, datapointsFragment, DATA_POINTS_FRAGMENT_TAG)
+                    .commit();
         }
 
         // Start the setup Activity if necessary.
@@ -145,7 +154,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     }
 
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
@@ -173,7 +182,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
@@ -251,7 +260,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         FlowApp.getApp().setSurveyGroupId(id);
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
-            DATAPOINTS_FRAGMENT_TAG);
+                DATA_POINTS_FRAGMENT_TAG);
         if (f != null) {
             f.refresh(mSurveyGroup);
         } else {
@@ -268,14 +277,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean showItems = !mDrawerLayout.isDrawerOpen(Gravity.START) && mSurveyGroup != null;
-        for (int i=0; i<menu.size(); i++) {
+        for (int i = 0; i < menu.size(); i++) {
             menu.getItem(i).setVisible(showItems);
         }
         return super.onPrepareOptionsMenu(menu);
@@ -283,10 +287,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -349,15 +350,38 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         }
     }
 
-    /**
-     * BroadcastReceiver to notify of surveys synchronisation. This should be
-     * fired from SurveyDownloadService.
-     */
-    private BroadcastReceiver mSurveysSyncReceiver = new BroadcastReceiver() {
+    @Override
+    public void invalidateMenu() {
+        supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void syncRecords(long surveyGroupId) {
+        Toast.makeText(this, R.string.syncing_records, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, SurveyedDataPointSyncService.class);
+        intent.putExtra(SurveyedDataPointSyncService.SURVEY_GROUP, surveyGroupId);
+        startService(intent);
+    }
+
+    private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
+
+        private final WeakReference<SurveyActivity> activityWeakReference;
+
+        private SurveySyncBroadcastReceiver(SurveyActivity activity) {
+            this.activityWeakReference = new WeakReference<>(activity);
+        }
+
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
-            mDrawer.load();
+            SurveyActivity surveyActivity = activityWeakReference.get();
+            if (surveyActivity != null) {
+                surveyActivity.reloadDrawer();
+            }
         }
-    };
+    }
+
+    private void reloadDrawer() {
+        mDrawer.load();
+    }
 }

@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -58,7 +59,6 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
 import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
 import org.akvo.flow.util.ConstantUtil;
 

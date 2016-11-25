@@ -1,17 +1,16 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ * This file is part of Akvo FLOW.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
 package org.akvo.flow.domain;
@@ -30,9 +29,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class SurveyedLocale implements Serializable, ClusterItem {
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = -3556354410813212814L;
     
     private String mId;
@@ -45,7 +42,7 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     private List<SurveyInstance> mSurveyInstances = null;
 
     public SurveyedLocale(String id, String name, long lastModified, long surveyGroupId,
-            Double latitude, Double longitude) {
+                          Double latitude, Double longitude) {
         mId = id;
         mName = name;
         mLastModified = lastModified;
@@ -111,5 +108,4 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     public String getDisplayName(Context context) {
         return TextUtils.isEmpty(mName) ? context.getString(R.string.unknown) : mName;
     }
-    
 }

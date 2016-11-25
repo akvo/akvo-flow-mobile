@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.OnDeleteListener {
+
     private QuestionGroup mQuestionGroup;
     private QuestionInteractionListener mQuestionListener;
     private SurveyListener mSurveyListener;
@@ -59,7 +60,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private Repetitions mRepetitions;// Repetition IDs
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
-            QuestionInteractionListener questionListener) {
+                            QuestionInteractionListener questionListener) {
         super(context);
         mQuestionGroup = group;
         mSurveyListener = surveyListener;
@@ -82,9 +83,9 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         setFocusableInTouchMode(true);
 
         inflate(getContext(), R.layout.question_group_tab, this);
-        mScroller = (ScrollView)findViewById(R.id.scroller);
-        mContainer = (LinearLayout)findViewById(R.id.question_list);
-        mRepetitionsText = (TextView)findViewById(R.id.repeat_header);
+        mScroller = (ScrollView) findViewById(R.id.scroller);
+        mContainer = (LinearLayout) findViewById(R.id.question_list);
+        mRepetitionsText = (TextView) findViewById(R.id.repeat_header);
 
         // Animate view additions/removals if possible
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -166,11 +167,15 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             // Load existing iterations. If no iteration is available, show one by default.
             mRepetitions.loadIDs();
             int iterCount = Math.max(mRepetitions.size(), 1);
-            for (int i=0; i<iterCount; i++) {
+            for (int i = 0; i < iterCount; i++) {
                 loadGroup(i);
             }
         }
 
+        displayResponses();
+    }
+
+    private void displayResponses() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
         for (QuestionView qv : mQuestionViews.values()) {
             final String questionId = qv.getQuestion().getId();
@@ -231,13 +236,15 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void loadGroup(int index) {
-        final int repetitionId = mRepetitions.size() <= index ? mRepetitions.next() : mRepetitions.getRepetitionId(index);
-        final int position = index+1;// Visual indicator.
+        final int repetitionId =
+            mRepetitions.size() <= index ? mRepetitions.next() : mRepetitions.getRepetitionId(index);
+        final int position = index + 1;// Visual indicator.
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
-            RepetitionHeader header = new RepetitionHeader(getContext(), mQuestionGroup.getHeading(),
-                    repetitionId, position, mSurveyListener.isReadOnly() ? null : this);
+            RepetitionHeader header =
+                new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId, position,
+                                     mSurveyListener.isReadOnly() ? null : this);
             mHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -254,11 +261,9 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener,
-                        ConstantUtil.PHOTO_QUESTION_TYPE);
+                questionView = new MediaQuestionView(context, q, mSurveyListener, ConstantUtil.PHOTO_QUESTION_TYPE);
             } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener,
-                        ConstantUtil.VIDEO_QUESTION_TYPE);
+                questionView = new MediaQuestionView(context, q, mSurveyListener, ConstantUtil.VIDEO_QUESTION_TYPE);
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new GeoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
@@ -359,6 +364,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     class Repetitions implements Iterable<Integer> {
+
         List<Integer> mIDs = new ArrayList<>();
 
         /**
@@ -409,5 +415,4 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             return mIDs.iterator();
         }
     }
-
 }

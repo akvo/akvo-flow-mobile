@@ -16,11 +16,6 @@
 
 package org.akvo.flow.service;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -30,7 +25,10 @@ import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
-
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.dao.SurveyDbAdapter;
@@ -39,15 +37,18 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.StatusUtil;
 
-public class SurveyedLocaleSyncService extends IntentService {
-    private static final String TAG = SurveyedLocaleSyncService.class.getSimpleName();
+public class SurveyedDataPointSyncService extends IntentService {
+
+    private static final String TAG = SurveyedDataPointSyncService.class.getSimpleName();
 
     public static final String SURVEY_GROUP = "survey_group";
     
     private Handler mHandler = new Handler();
     
-    public SurveyedLocaleSyncService() {
+    public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
         setIntentRedelivery(true);
@@ -78,7 +79,7 @@ public class SurveyedLocaleSyncService extends IntentService {
             displayNotification(getString(R.string.sync_finished),
                     String.format(getString(R.string.synced_records), syncedRecords), true);
         } catch (HttpException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, e.getMessage(), e);
             String message = e.getMessage();
             switch (e.getStatus()) {
                 case HttpException.Status.SC_FORBIDDEN:
@@ -89,7 +90,7 @@ public class SurveyedLocaleSyncService extends IntentService {
             displayToast(message);
             displayNotification(getString(R.string.sync_error), message, true);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, e.getMessage(), e);
             displayToast(getString(R.string.network_error));
             displayNotification(getString(R.string.sync_error),
                     getString(R.string.network_error), true);
@@ -106,9 +107,10 @@ public class SurveyedLocaleSyncService extends IntentService {
     private Set<String> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
             throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
-        Set<String> records = new HashSet<String>();
+        Set<String> records = new HashSet<>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
-        List<SurveyedLocale> locales = api.getSurveyedLocales(surveyGroupId, syncTime);
+        List<SurveyedLocale> locales = api.getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime,
+                                                              PlatformUtil.getAndroidID(this));
         if (locales != null) {
             for (SurveyedLocale locale : locales) {
                 database.syncSurveyedLocale(locale);

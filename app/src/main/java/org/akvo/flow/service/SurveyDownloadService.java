@@ -1,17 +1,16 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ * This file is part of Akvo FLOW.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
 package org.akvo.flow.service;
@@ -39,7 +38,6 @@ import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;
@@ -67,9 +65,6 @@ public class SurveyDownloadService extends IntentService {
     public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated
 
     private static final String DEFAULT_TYPE = "Survey";
-
-    private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice";
-    private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
 
     private SurveyDbAdapter databaseAdaptor;
 
@@ -107,7 +102,7 @@ public class SurveyDownloadService extends IntentService {
      * passed in, then those specific surveys will be downloaded. If they're already
      * on the device, the surveys will be replaced with the new ones.
      */
-    private void checkAndDownload(String[] surveyIds) throws IOException {
+    private void checkAndDownload(String[] surveyIds) {
         // Load preferences
         final String serverBase = StatusUtil.getServerBase(this);
 
@@ -256,24 +251,9 @@ public class SurveyDownloadService extends IntentService {
                 // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
                 // Naive check to determine whether or not this is an absolute filename
                 if (resource.startsWith("http")) {
-                    final String filename = new File(resource).getName();
-                    final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
-                    if (!surveyDir.exists()) {
-                        surveyDir.mkdir();
-                    }
-                    HttpUtil.httpGet(resource, new File(surveyDir, filename));
+                    downloadGaeResource(sid, resource);
                 } else {
-                    // resource is just a filename
-                    final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
-                    final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-                    final File resDir = FileUtil.getFilesDir(FileType.RES);
-                    final File file = new File(resDir, filename);
-                    S3Api s3 = new S3Api(SurveyDownloadService.this);
-                    s3.syncFile(objectKey, file);
-                    FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
-                    if (!file.delete()) {
-                        Log.e(TAG, "Error deleting resource zip file");
-                    }
+                    downloadS3Resource(resource);
                 }
             } catch (Exception e) {
                 ok = false;
@@ -290,25 +270,45 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
+    private void downloadS3Resource(String resource) throws IOException {
+        // resource is just a filename
+        final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
+        final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+        final File resDir = FileUtil.getFilesDir(FileType.RES);
+        final File file = new File(resDir, filename);
+        S3Api s3 = new S3Api(SurveyDownloadService.this);
+        s3.syncFile(objectKey, file);
+        FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
+        if (!file.delete()) {
+            Log.e(TAG, "Error deleting resource zip file");
+        }
+    }
+
+    private void downloadGaeResource(String sid, String url) throws IOException {
+        final String filename = new File(url).getName();
+        final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
+        if (!surveyDir.exists()) {
+            surveyDir.mkdir();
+        }
+        HttpUtil.httpGet(url, new File(surveyDir, filename));
+    }
+
     /**
      * invokes a service call to get the header information for multiple surveys
      */
     private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds) {
-        List<Survey> surveys = new ArrayList<Survey>();
+        List<Survey> surveys = new ArrayList<>();
+        FlowApi flowApi = new FlowApi();
         for (String id : surveyIds) {
             try {
-                final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id + "&" + FlowApi.getDeviceParams();
-                String response = HttpUtil.httpGet(url);
-                if (response != null) {
-                    surveys.addAll(new SurveyMetaParser().parseList(response, true));
-                }
+                surveys.addAll(flowApi.getSurveyHeader(serverBase, id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
                     PersistentUncaughtExceptionHandler.recordException(e);
                 }
                 Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
-                        String.format(getString(R.string.error_form_header), id));
+                        getString(R.string.error_form_header, id));
             }
         }
         return surveys;
@@ -322,13 +322,10 @@ public class SurveyDownloadService extends IntentService {
      * TODO: Move this feature to FLOWApi
      */
     private List<Survey> checkForSurveys(String serverBase) {
-        List<Survey> surveys = new ArrayList<Survey>();
+        List<Survey> surveys = new ArrayList<>();
+        FlowApi api = new FlowApi();
         try {
-            final String url = serverBase + SURVEY_LIST_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
-            String response = HttpUtil.httpGet(url);
-            if (response != null) {
-                surveys = new SurveyMetaParser().parseList(response);
-            }
+            surveys = api.getSurveys(serverBase, surveys);
         } catch (IllegalArgumentException | IOException e) {
             if (e instanceof IllegalArgumentException) {
                 PersistentUncaughtExceptionHandler.recordException(e);
@@ -380,7 +377,7 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    public static void sendBroadcastNotification(Context context) {
+    private static void sendBroadcastNotification(Context context) {
         Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
         context.sendBroadcast(intentBroadcast);
     }

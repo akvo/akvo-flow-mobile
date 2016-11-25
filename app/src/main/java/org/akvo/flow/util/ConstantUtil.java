@@ -244,6 +244,7 @@ public class ConstantUtil {
 
     //broadcasts
     public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
+    public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
 
     /**
      * prevent instantiation

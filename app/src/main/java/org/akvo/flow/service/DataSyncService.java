@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -619,8 +620,8 @@ public class DataSyncService extends IntentService {
         mDatabase.updateSurveyStatus(surveyInstanceId, status);
 
         // Dispatch a Broadcast notification to notify of survey instances status change
-        Intent intentBroadcast = new Intent(getString(R.string.action_data_sync));
-        sendBroadcast(intentBroadcast);
+        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_DATA_SYNC);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 
     private void displayNotification(long id, String title, String text) {

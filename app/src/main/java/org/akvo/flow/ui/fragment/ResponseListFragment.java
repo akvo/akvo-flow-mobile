@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -86,14 +87,14 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onResume() {
         super.onResume();
         refresh();
-        getActivity().registerReceiver(dataSyncReceiver,
-                new IntentFilter(getString(R.string.action_data_sync)));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
+                new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(dataSyncReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
     }
 
     @Override
@@ -116,7 +117,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             mDatabase.open();
         }
 
-        if(mAdapter == null) {
+        if (mAdapter == null) {
             mAdapter = new ResponseListAdapter(getActivity());// Cursor Adapter
             setListAdapter(mAdapter);
         }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -220,7 +220,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            String s = StringUtil.ControlToSPace(inputView
+                                            String s = StringUtil.controlToSpace(inputView
                                                     .getText().toString());
                                             // drop any control chars, especially tabs
                                             database.savePreference(
@@ -248,7 +248,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                                         new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                String s = StringUtil.ControlToSPace(inputView
+                                                String s = StringUtil.controlToSpace(inputView
                                                         .getText().toString());
                                                 // drop any control chars,
                                                 // especially tabs

@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -69,7 +70,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
-    public static final String DRAWER_FRAGMENT_TAG = "f";
+    private static final String DRAWER_FRAGMENT_TAG = "f";
 
     private SurveyDbAdapter mDatabase;
     private SurveyGroup mSurveyGroup;
@@ -89,6 +90,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
+
+        initializeToolBar();
+
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -100,7 +104,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+                R.drawable.ic_menu_white_48dp, R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
@@ -119,9 +123,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.ic_menu_white_48dp);
 
         // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
@@ -150,6 +151,14 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         //When the app is restarted we need to display the current user
         if (savedInstanceState == null) {
             displaySelectedUser();
+        }
+    }
+
+    private void initializeToolBar() {
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
         }
     }
 

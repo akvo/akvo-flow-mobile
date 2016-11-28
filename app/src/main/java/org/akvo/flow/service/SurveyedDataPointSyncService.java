@@ -17,20 +17,11 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.Pair;
 import android.util.Log;
-import android.util.Pair;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
@@ -39,19 +30,24 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
-import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SurveyedDataPointSyncService extends IntentService {
 
     private static final String TAG = SurveyedDataPointSyncService.class.getSimpleName();
 
     public static final String SURVEY_GROUP = "survey_group";
-
+    
     private final Handler mHandler = new Handler();
-
+    
     public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
@@ -64,9 +60,10 @@ public class SurveyedDataPointSyncService extends IntentService {
         int syncedRecords = 0;
         FlowApi api = new FlowApi();
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
-        displayNotification(getString(R.string.syncing_records),
-                getString(R.string.pleasewait), false);
         boolean correctSync = true;
+        NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                                                           getString(R.string.pleasewait), true, true,
+                                                           ConstantUtil.NOTIFICATION_RECORD_SYNC);
         try {
             Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
@@ -82,16 +79,21 @@ public class SurveyedDataPointSyncService extends IntentService {
                 }
                 syncedRecords += batch.size();
                 sendBroadcastNotification();// Keep the UI fresh!
-                displayNotification(getString(R.string.syncing_records),
-                        String.format(getString(R.string.synced_records), syncedRecords), false);
+                NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                                                                   String.format(getString(R.string.synced_records),
+                                                                                 syncedRecords), true, true,
+                                                                   ConstantUtil.NOTIFICATION_RECORD_SYNC);
                 lastBatch = batch;
             }
             if (correctSync) {
-                displayNotification(getString(R.string.sync_finished),
-                        String.format(getString(R.string.synced_records), syncedRecords), true);
+                NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                        String.format(getString(R.string.synced_records),
+                                syncedRecords), true, true,
+                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
             } else {
-                displayNotification(getString(R.string.sync_finished),
-                        getString(R.string.syncing_corrupted_datapoints_error), true);
+                NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                        getString(R.string.syncing_corrupted_datapoints_error), true, true,
+                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
             }
         } catch (HttpException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -103,12 +105,14 @@ public class SurveyedDataPointSyncService extends IntentService {
                     break;
             }
             displayToast(message);
-            displayNotification(getString(R.string.sync_error), message, true);
+            NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.sync_error), message, false,
+                                                               false, ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
             displayToast(getString(R.string.network_error));
-            displayNotification(getString(R.string.sync_error),
-                    getString(R.string.network_error), true);
+            NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
+                                                               getString(R.string.network_error), false, false,
+                                                               ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } finally {
             database.close();
         }
@@ -146,37 +150,13 @@ public class SurveyedDataPointSyncService extends IntentService {
         mHandler.post(new ServiceToastRunnable(getApplicationContext(), text));
     }
 
-    private void displayNotification(String title, String text, boolean finished) {
-        int icon = finished ? android.R.drawable.stat_sys_download_done
-                : android.R.drawable.stat_sys_download;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(icon)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setTicker(title);
-
-        builder.setOngoing(!finished);// Ongoing if still syncing the records
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, !finished);
-
-        // Dummy intent. Do nothing when clicked
-        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        builder.setContentIntent(intent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ConstantUtil.NOTIFICATION_RECORD_SYNC, builder.build());
-    }
-
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
-     * This notification will be received in {@link DatapointsFragment}, in order to
+     * This notification will be received in {@link org.akvo.flow.ui.fragment.DatapointsFragment}, in order to
      * refresh its data
      */
     private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
-
 }

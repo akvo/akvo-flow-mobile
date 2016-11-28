@@ -17,18 +17,14 @@
 package org.akvo.flow.util;
 
 import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
 import org.akvo.flow.R;
 import org.akvo.flow.service.ServiceToastRunnable;
 
@@ -76,8 +72,8 @@ public class ViewUtil {
      * @param textId
      * @param parentContext
      */
-    public static void showConfirmDialog(int titleId, int textId,
-            Context parentContext) {
+    private static void showConfirmDialog(int titleId, int textId,
+                                          Context parentContext) {
         showConfirmDialog(titleId, textId, parentContext, false,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -206,32 +202,6 @@ public class ViewUtil {
     }
 
     /**
-     * Displays a notification in the system status bar
-     *
-     * @param title - headline to display in notification bar
-     * @param text - body of notification (when user expands bar)
-     * @param context
-     * @param id - unique (within app) ID of notification
-     */
-    public static void displayNotification(String title, String text,
-            Context context, int id, Integer iconId) {
-        NotificationCompat.Builder builder  = new NotificationCompat.Builder(context)
-                .setContentTitle(title)
-                .setTicker(title)
-                .setContentText(text)
-                .setSmallIcon(iconId != null ? iconId : R.drawable.info)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
-
-        // Dummy intent. Do nothing when clicked
-        PendingIntent dummyIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-        builder.setContentIntent(dummyIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(id, builder.build());
-    }
-
-    /**
      * displays a dialog box for selection of one or more survey languages
      */
     public static void displayLanguageSelector(final Context context,
@@ -348,7 +318,7 @@ public class ViewUtil {
             DialogInterface.OnClickListener clickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
         LinearLayout main = new LinearLayout(parentContext);
-        main.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+        main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
         main.setOrientation(LinearLayout.VERTICAL);
         builder.setTitle(title);

@@ -188,11 +188,11 @@ public class DatapointsFragment extends Fragment {
                 return true;
             case R.id.search:
                 if (listener != null) {
-                    return listener.onSearchRequested();
+                    return listener.onSearchTap();
                 }
             case R.id.sync_records:
                 if (listener != null && mSurveyGroup != null) {
-                    listener.syncRecords(mSurveyGroup.getId());
+                    listener.onSyncRecordsTap(mSurveyGroup.getId());
                 }
                 return true;
             case R.id.stats:
@@ -273,7 +273,7 @@ public class DatapointsFragment extends Fragment {
             mTabsAdapter.refreshFragments(mSurveyGroup);
         }
         if (listener != null) {
-            listener.invalidateMenu();
+            listener.refreshMenu();
         }
     }
 
@@ -297,12 +297,12 @@ public class DatapointsFragment extends Fragment {
 
     public interface DatapointFragmentListener {
 
-        void invalidateMenu();
+        void refreshMenu();
 
         void onRecordSelected(String recordId);
 
-        boolean onSearchRequested();
+        boolean onSearchTap();
 
-        void syncRecords(long surveyGroupId);
+        void onSyncRecordsTap(long surveyGroupId);
     }
 }

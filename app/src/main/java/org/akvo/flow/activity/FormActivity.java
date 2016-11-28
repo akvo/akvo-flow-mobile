@@ -105,7 +105,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_activity);
-        Log.d(TAG, "onCreate");
 
         // Read all the params. Note that the survey instance id is now mandatory
         final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
@@ -258,7 +257,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void saveState() {
         if (!mReadOnly) {
-            Log.d(TAG, "saving state ...");
             mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
             mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 

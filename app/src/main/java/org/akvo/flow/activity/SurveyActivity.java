@@ -69,6 +69,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
+    public static final String DRAWER_FRAGMENT_TAG = "f";
 
     private SurveyDbAdapter mDatabase;
     private SurveyGroup mSurveyGroup;
@@ -88,7 +89,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
-        Log.d(TAG, "onCreate");
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -98,7 +98,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
         // Init navigation drawer
         FragmentManager supportFragmentManager = getSupportFragmentManager();
-        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag("f");
+        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
@@ -351,16 +351,21 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     }
 
     @Override
-    public void invalidateMenu() {
+    public void refreshMenu() {
         supportInvalidateOptionsMenu();
     }
 
     @Override
-    public void syncRecords(long surveyGroupId) {
+    public void onSyncRecordsTap(long surveyGroupId) {
         Toast.makeText(this, R.string.syncing_records, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, SurveyedDataPointSyncService.class);
         intent.putExtra(SurveyedDataPointSyncService.SURVEY_GROUP, surveyGroupId);
         startService(intent);
+    }
+
+    @Override
+    public boolean onSearchTap() {
+        return onSearchRequested();
     }
 
     private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {

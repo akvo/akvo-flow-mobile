@@ -210,7 +210,6 @@ public class FlowApi {
             serverBaseUrl + Path.SURVEYED_LOCALE + "?" + query + "&" + Param.HMAC + getAuthorization(query);
         String response = HttpUtil.httpGet(url);
         if (response != null) {
-            Log.d(TAG, response);
             SurveyedLocalesResponse slRes = new SurveyedLocaleParser().parseResponse(response);
             if (slRes.getError() != null) {
                 throw new HttpException(slRes.getError(), Status.MALFORMED_RESPONSE);

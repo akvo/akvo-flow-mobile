@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -79,6 +80,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
 
+        initializeToolBar();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -108,8 +110,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
@@ -137,6 +137,14 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         //When the app is restarted we need to display the current user
         if (savedInstanceState == null) {
             displaySelectedUser();
+        }
+    }
+
+    private void initializeToolBar() {
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
         }
     }
 

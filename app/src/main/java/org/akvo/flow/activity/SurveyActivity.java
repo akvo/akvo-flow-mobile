@@ -89,7 +89,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         // Init navigation drawer
         mDrawer = (DrawerFragment)getSupportFragmentManager().findFragmentByTag("f");
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+                R.drawable.ic_menu_white_48dp, R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
@@ -108,9 +108,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.ic_menu_white_48dp);
 
         // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());

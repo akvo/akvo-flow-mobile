@@ -17,10 +17,13 @@
 package org.akvo.flow.service;
 
 import org.akvo.flow.activity.AppUpdateActivity;
+import org.akvo.flow.util.AutoLog;
+import org.akvo.flow.util.HackedPackageManager;
 import org.json.JSONObject;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.pm.InstrumentationInfo;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -28,6 +31,8 @@ import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
+
+import java.io.IOException;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -39,7 +44,7 @@ import org.akvo.flow.util.StatusUtil;
  */
 public class ApkUpdateService extends IntentService {
     private static final String TAG = "APK_UPDATE_SERVICE";
-    private static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
+    public static final String APK_VERSION_SERVICE_PATH = "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
 
     public ApkUpdateService() {
         super(TAG);
@@ -63,11 +68,8 @@ public class ApkUpdateService extends IntentService {
         }
 
         try {
-            final String url = StatusUtil.getServerBase(this) + APK_VERSION_SERVICE_PATH;
-            String response = HttpUtil.httpGet(url);
-            if (!TextUtils.isEmpty(response)) {
-                JSONObject json = new JSONObject(response);
-                String ver = json.getString("version");
+            JSONObject json = PlatformUtil.getResponseJson(this);
+            String ver = json.getString("version");
                 if (!TextUtils.isEmpty(ver) && !ver.equalsIgnoreCase("null")) {
                     String location = json.getString("fileName");
                     if (PlatformUtil.isNewerVersion(PlatformUtil.getVersionName(this), ver)
@@ -84,11 +86,11 @@ public class ApkUpdateService extends IntentService {
                         startActivity(i);
                     }
                 }
-            }
         } catch (Exception e) {
             Log.e(TAG, "Could not call apk version service", e);
             PersistentUncaughtExceptionHandler.recordException(e);
         }
     }
+
 
 }

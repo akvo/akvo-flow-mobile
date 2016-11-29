@@ -23,10 +23,16 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.provider.Settings.Secure;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 
+import org.akvo.flow.service.ApkUpdateService;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -49,6 +55,19 @@ public class PlatformUtil {
             Log.e(TAG, e.getMessage());
             return "";
         }
+    }
+
+    public static JSONObject getResponseJson(Context context) throws IOException, JSONException
+    {
+        final String url = StatusUtil.getServerBase(context) + ApkUpdateService.APK_VERSION_SERVICE_PATH;
+        String response = HttpUtil.httpGet(url);
+        AutoLog.debug("url", url);
+        if (!TextUtils.isEmpty(response))
+        {
+            return new JSONObject(response);
+        }
+
+        throw new RuntimeException("Cannot retrieve Json from url!");
     }
 
     /**

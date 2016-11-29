@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.util.AutoLog;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PlatformUtil;
@@ -102,6 +103,7 @@ public class AppUpdateActivity extends Activity {
                 cancel();
             }
         });
+
     }
 
     /**

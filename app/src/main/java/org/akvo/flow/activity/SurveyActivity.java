@@ -50,6 +50,7 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.DrawerFragment;
+import org.akvo.flow.util.AutoLog;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
@@ -81,7 +82,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
-
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         mTitle = mDrawerTitle = getString(R.string.app_name);

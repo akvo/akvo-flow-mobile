@@ -50,7 +50,8 @@ import org.akvo.flow.util.PlatformUtil;
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
  * DAOs
- * 
+ *
+ *
  * @author Christopher Fagiani
  */
 public class SurveyDbAdapter {
@@ -564,7 +565,9 @@ public class SurveyDbAdapter {
 
     /**
      * returns a cursor listing all users
-     * 
+     *
+     * todo: implement builder for queries against db to improve readability and simplicity
+     * todo: current database.query() may be replaced
      * @return
      */
     public Cursor getUsers() {

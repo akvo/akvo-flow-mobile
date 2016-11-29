@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -28,12 +28,9 @@ import java.util.Set;
 import java.util.zip.ZipInputStream;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.akvo.flow.R;
@@ -53,8 +50,8 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.ViewUtil;
 
 /**
  * This activity will check for new surveys on the device and install as needed
@@ -341,38 +338,19 @@ public class SurveyDownloadService extends IntentService {
     }
 
     private void displayErrorNotification(int id, String msg) {
-        ViewUtil.displayNotification(getString(R.string.error_form_sync_title), msg, this, id, null);
+        NotificationHelper.displayErrorNotification(getString(R.string.error_form_sync_title), msg, this, id);
     }
 
     private void displayNotification(int synced, int failed, int total) {
         boolean finished = synced + failed >= total;
-        int icon = finished ? android.R.drawable.stat_sys_download_done
-                : android.R.drawable.stat_sys_download;
-
         String title = getString(R.string.downloading_forms);
         // Do not show failed if there is none
         String text = failed > 0 ? String.format(getString(R.string.data_sync_all),
                 synced, failed)
                 : String.format(getString(R.string.data_sync_synced), synced);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(icon)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setTicker(title);
-
-        builder.setOngoing(!finished);// Ongoing if still syncing the records
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(total, synced+failed, false);
-
-        // Dummy intent. Do nothing when clicked
-        PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        builder.setContentIntent(intent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ConstantUtil.NOTIFICATION_FORMS_SYNCED, builder.build());
+        NotificationHelper.displayNotification(this, total, title, text, ConstantUtil.NOTIFICATION_FORMS_SYNCED, !finished,
+                                               synced + failed);
     }
 
     /**

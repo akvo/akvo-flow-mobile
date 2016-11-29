@@ -17,7 +17,8 @@ repositories {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "23.0.3"
+//    buildToolsVersion "23.0.3"
+    buildToolsVersion "21.1.2"
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 21
@@ -33,6 +34,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     signingConfigs {
+
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('debug-key/debug.keystore')
+            storePassword 'android'
+        }
 
         flowRelease {
             storeFile file(RELEASE_STORE_FILE)
@@ -60,6 +68,10 @@ android {
         cookstoves {
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 android.applicationVariants.all { variant ->
@@ -70,14 +82,21 @@ android.applicationVariants.all { variant ->
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile 'com.android.support:appcompat-v7:19.+'
+    compile 'com.android.support:appcompat-v7:21.0.0'
+    compile 'com.android.support:support-annotations:23.1.1'
     compile 'com.google.android.gms:play-services:4.0.30'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile "org.powermock:powermock-module-junit4:1.6.2"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
+    testCompile "org.powermock:powermock-api-mockito:1.6.2"
+    testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
+
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
     androidTestCompile 'com.android.support.test:runner:0.5'

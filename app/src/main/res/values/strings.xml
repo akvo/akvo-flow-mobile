@@ -124,6 +124,8 @@
     <string name="data_sync_text">Uploading data. Please, wait...</string>
     <string name="data_sync_all">Synced Forms: %1$d - Failed: %2$d</string>
     <string name="data_sync_synced">Synced Forms: %1$d</string>
+    <string name="data_sync_error_form_deleted_title">Form deleted</string>
+    <string name="data_sync_error_form_deleted_text">Form %1$s has been deleted</string>
     <!--Localization-->
     <string name="app_language">App Language</string>
     <string name="please_restart">Please, restart the app</string>
@@ -219,6 +221,9 @@
     <string name="error_form_header">Form %1$s could not be read from FLOW dashboard.</string>
     <string name="error_form_download">Ensure the form is published, and your local date/time settings are OK.</string>
     <string name="form_deleted">This form has been deleted.</string>
+    <!--File sync-->
+    <string name="sync_error_message">It has probably been deleted</string>
+    <string name="sync_error_title">Form %1$s does not exist</string>
     <!--Plotting-->
     <string name="geoshape_area">Area</string>
     <string name="geoshape_line">Line</string>
@@ -252,8 +257,13 @@
     <string name="error_value_required">This field cannot be blank</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
-    <!--Intent Actions. Do not translate this strings-->
-    <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
-    <string name="action_locales_sync">fieldsurvey.ACTION_LOCALES_SYNC</string>
-    <string name="action_data_sync">fieldsurvey.ACTION_DATA_SYNC</string>
+
+    <!--settings activity-->
+    <string name="settings_app_update_title">Check for updates</string>
+    <string name="settings_app_update_description">Check if there is a newer version for the Flow app.</string>
+
+    <!--app update service -->
+    <string name="apk_update_service_no_update">You are running the latest version of the app.</string>
+    <string name="apk_update_service_error_update">There was an error when updating the app. Please try again.</string>
+    <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
 </resources>

@@ -4,6 +4,7 @@
   <string name="accuracy">Prec</string>
   <string name="searching">Buscando...</string>
   <string name="ready">Listo</string>
+  <string name="timeout">Tiempo de espera</string>
   <string name="nocardspacetitle">No hay espacio de almacenamiento</string>
   <string name="lowcardspacetitle">Poco espacio de almacenamiento</string>
   <string name="nocardspacedialog">La tarjeta SD está llena y no se pueden recopilar más datos. Debe liberar espacio para poder continuar.</string>
@@ -149,6 +150,8 @@ Version</string>
   <string name="error_answer_match">Las respuestas no son iguales</string>
   <string name="error_img_preview">La imagen no pude ser cargada</string>
   <string name="use_external_source">Utilizar aplicación externa</string>
+  <string name="caddisfly_test">Ir a la prueba</string>
+  <string name="caddisfly_response">Prueba capturada correctamente</string>
   <string name="error_empty_form">Un formulario sin respuestas no puede ser enviado. Por favor, responda a las preguntas antes de enviar.</string>
   <string name="select">por favor, seleccione</string>
   <string name="clear_value_msg">¿Está seguro de que quiere borrar este valor?</string>
@@ -169,6 +172,9 @@ Version</string>
   <string name="add_signature">Añadir firma</string>
   <string name="signed_by">Firmado por:</string>
   <string name="signature_terms">Entiendo que esta es una representación electrónica de mi firma</string>
+  <string name="image_location_unknown">Geolocalización no conocida</string>
+  <string name="image_location_reading">Leyendo geolocalización</string>
+  <string name="image_location_saved">Geolocalización guardada</string>
   <!--RecordList Activity-->
   <string name="add_data_point">Añadir punto de datos</string>
   <string name="stats_total">Número total de puntos de datos:</string>
@@ -216,6 +222,9 @@ Version</string>
   <string name="error_form_header">El formulario %1$s no se ha podido recibir desde el panel de control.</string>
   <string name="error_form_download">Asegúrese que el formulario está publicado, y que la hora/fecha del dispositivo es correcta.</string>
   <string name="form_deleted">Este formulario ha sido borrado.</string>
+  <!--File sync-->
+  <string name="sync_error_message">Probablemente ha sido borrado</string>
+  <string name="sync_error_title">El formulario %1$s no existe</string>
   <!--Plotting-->
   <string name="geoshape_area">Área</string>
   <string name="geoshape_line">Línea</string>
@@ -249,8 +258,11 @@ Version</string>
   <string name="error_value_required">Este campo no puede ser dejado en blanco</string>
   <string name="drawer_open">Abrir menú</string>
   <string name="drawer_close">Cerrar menú</string>
-  <!--Intent Actions. Do not translate this strings-->
-  <string name="action_surveys_sync">fieldsurvey.ACTION_SURVEYS_SYNC</string>
-  <string name="action_locales_sync">fieldsurvey.ACTION_LOCALES_SYNC</string>
-  <string name="action_data_sync">fieldsurvey.ACTION_DATA_SYNC</string>
+  <!--settings activity-->
+  <string name="settings_app_update_title">Comprobar si hay actualizaciones</string>
+  <string name="settings_app_update_description">Compruebe si hay una nueva versión de Akvo Flow.</string>
+  <!--app update service-->
+  <string name="apk_update_service_no_update">Ya que tiene la última versión de la aplicación.</string>
+  <string name="apk_update_service_error_update">Se ha producido un error al intentar actualizar la aplicación, por favor intente-lo de nuevo.</string>
+  <string name="apk_update_service_error_no_internet">Se ha producido un error al intentar actualizar la aplicación, usted no está conectado a Internet.</string>
 </resources>

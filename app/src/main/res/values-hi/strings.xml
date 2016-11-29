@@ -1,39 +1,39 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string name="app_name">खोज जारी है </string>
-  <string name="accuracy">Acc</string>
+  <string name="accuracy">सूक्ष्मता</string>
   <string name="searching">खोज जारी है </string>
   <string name="ready">तैयार</string>
   <string name="nocardspacetitle">जगह नहीं है </string>
   <string name="lowcardspacetitle">कम जगह है </string>
-  <string name="nocardspacedialog">SD  कार्ड भर चूका है , अधिक जानकारी के लिए जगह नहीं है.  जारी रहने के लिए, SD कार्ड पर स्थान उपलब्द करें। </string>
-  <string name="lowcardspacedialog">आपके SD पर %% जगह उपलब्द है. SD  के  भर जाने बाद आप और अधिक  जानकारी जमा नहीं कर पाएंगे।  </string>
+  <string name="nocardspacedialog">SD कार्ड पूरी तरह भर चूका है, अधिक डेटा एकत्रित करने के लिए कार्ड में जगह नहीं है | आगे बढ़ने के लिए, SD कार्ड पर जगह बनाएं ।</string>
+  <string name="lowcardspacedialog">आपके SD कार्ड पर %% जगह उपलब्द है | SD कार्ड के भर जाने के बाद आप और अधिक डेटा जमा नहीं कर पाएंगे।   </string>
   <string name="takephoto">फोटो खींचे </string>
   <string name="takevideo">वीडियो बनाएँ  </string>
-  <string name="getgeo">जियोलोकशन जाँचे </string>
-  <string name="lat">लैटीट्ूड </string>
-  <string name="lon">लोंगीतुड </string>
+  <string name="getgeo">भौगोलिक स्थिति जांचे</string>
+  <string name="lat">लैटिट्यूड</string>
+  <string name="lon">लोंगिट्यूड</string>
   <string name="elevation">ऊंचाई </string>
-  <string name="submitbutton">GPS इस कार्य के लिए सक्षम होना चाइये . Settings पे जाने के लिए OK करें .</string>
-  <string name="geodialog">GPS सक्षम होना चाहिए . Setting पे जाने के लिए OK करें. Use GPS Satellite चुनें  और वापस जाने के लिए बैक बटन दबाएं . GPS सक्षम होने पर, Check Geo Location  दबाकर अपनी स्तिधि जानिए .</string>
-  <string name="resize_large_images">रीसाइज़े लार्ज इमेजेज </string>
+  <string name="submitbutton">जमा करें</string>
+  <string name="geodialog">फ़ोन का GPS चालू होना चाहिए | Settings में जाने के लिए OK करें | Use GPS Satellite चुनें और वापस जाने के लिए बैक बटन दबाएं | GPS चालू होने पर, \'भौगोलिक स्थिति जांचे\' बटन दबाकर अपनी स्थिति दर्ज करें |</string>
+  <string name="resize_large_images">फोटो का साइज़</string>
   <string name="settingslabel">सेटिंग्स </string>
-  <string name="nouser">नो यूजर </string>
-  <string name="exportcomplete">SD कार्ड पे डेटा भेज दिया गया है </string>
+  <string name="nouser">कोई प्रयोगकर्ता नहीं हैं!</string>
+  <string name="exportcomplete">SD कार्ड पर डेटा दर्ज कर दिया गया है</string>
   <string name="prefoptlabel">प्रेफ्रेंसेस </string>
   <string name="prefoptdesc">सर्वे की भाषा तथा अन्य विकल्प की सूची </string>
   <string name="sendoptlabel">सिंक डेटा </string>
-  <string name="sendoptdesc">सर्वे डेटा सिंक करें . इस कार्य करें के लिए मोबाइल या वाई -फाई  का होना आवश्यक है </string>
-  <string name="poweroptlabel">पावर मैनेजमेंट </string>
-  <string name="poweroptdesc">बैटरी का नियंत्रण </string>
+  <string name="sendoptdesc">सर्वे डेटा सिंक करें | इस कार्य करें के लिए डेटा (मोबाइल या वाई -फाई) का होना आवश्यक है |</string>
+  <string name="poweroptlabel">पावर मैनेजमेंट - या बैटरी संचालन</string>
+  <string name="poweroptdesc">बैटरी के संचालन के लिए वाई-फाई को ऑन / ऑफ करना</string>
   <string name="screenoptlabel">सर्वे के दौरान, स्क्रीन को ओन रखें </string>
-  <string name="screenoptdesc">सर्वे करते समय स्क्रीन को बंध न होने देता है.  बैटरी की बचत के लिए,इसतमाल न करने की स्तिथि में स्क्रीन  को बंद करना या एप्प से बहार निकलना आवशयक है </string>
-  <string name="aboutlabel">अबाउट </string>
-  <string name="aboutdesc">एप्प का वर्शन जाननें  के लिए </string>
-  <string name="abouttitle">अबाउट-Akvo FLOW एप्प</string>
+  <string name="screenoptdesc">सर्वे करते समय स्क्रीन को बंद नहीं होने देना  | याद रहे की बैटरी की बचत के लिए, इस्तमाल न करते समय स्क्रीन को स्वयं बंद करदें (या ऐप्प से बाहर निकल जाएं )</string>
+  <string name="aboutlabel">ऐप्प के बारे में</string>
+  <string name="aboutdesc">ऐप्प का वर्शन संख्या या प्रारूप जानने के लिए</string>
+  <string name="abouttitle">Akvo FLOW ऐप्प के बारे में</string>
   <string name="abouttext">Akvo FLOW एप्प , Akvo फाउंडेशन  के द्वारा  विकसित तथा  २०१०-२०१४  तक कॉपीराइटेड है </string>
   <string name="gpsstatuslabel">GPS स्टेटस </string>
-  <string name="gpsstatusdesc">GPS स्टेटस को इस्तेमाल करने के लिए, इसका  आपके फ़ोन या टेबलेट में स्तापित होना आवश्यक  है </string>
+  <string name="gpsstatusdesc">GPS स्टेटस ऐप्प को इस्तेमाल करने के लिए | इस ऐप्प का आपके फ़ोन या टैबलेट में होना आवश्यक है</string>
   <string name="nogpsstatus">आपके उपकरण में GPS स्टेटस स्तापित नहीं है I इसे स्तापित करने के गूगल प्ले स्टोर इस्तमाल करैं I</string>
   <string name="otherinstructions">कृपया विवरण डाले </string>
   <string name="texthelpoption">सहायक पुस्तिका देखें </string>
@@ -108,6 +108,7 @@
   <string name="search">खोज </string>
   <string name="sync">सिंक </string>
   <string name="sort">छाँटिएन </string>
+  <string name="stats">आंकड़े</string>
   <string name="syncing_records">डेटा पॉइंट्स सिंक हो रहे हैं </string>
   <string name="sync_finished">डेटा पॉइंट्स सिंकिंग समाप्त </string>
   <string name="synced_records">%1$d डेटा पॉइंट्स सिंक हो चुके हैं </string>
@@ -145,6 +146,8 @@
   <string name="error_answer_match">उत्तर मेल नहीं खा रहे हैं </string>
   <string name="error_img_preview">चित्र लोड होने में त्रुटि </string>
   <string name="use_external_source">बाहरी स्त्रोत का उपयोग करें </string>
+  <string name="caddisfly_test">जांच प्रारंभ करें</string>
+  <string name="caddisfly_response">परिणाम सफलतापूर्वक दर्ज कर लिया है</string>
   <string name="error_empty_form">खली फॉर्म जमा नहीं हो सकतेI  कृपया पहले अनुकूल उत्तर दें I</string>
   <string name="select">कृपया चुनें   </string>
   <string name="clear_value_msg"> क्या आप इस संख्या को हटाना चाहेंगे ?</string>
@@ -162,11 +165,18 @@
   <string name="view_map">मैप देखिये </string>
   <string name="delete_group_title">दोहराये सवाल मिटायें </string>
   <string name="delete_group_text">क्या आप दोहराये सवाल मिटाना चाहतें हैं ?</string>
+  <string name="add_signature">हस्ताक्षर करें</string>
+  <string name="signed_by">हस्ताक्षरकर्ता:</string>
+  <string name="signature_terms">मै समझता/समझती हूँ कि यह मेरे हस्ताक्षर का केवल इलेक्ट्रॉनिक प्रतिरूप है </string>
+  <string name="image_location_unknown">भौगोलिक स्थिति अज्ञात</string>
+  <string name="image_location_reading">भौगोलिक स्थिति की जांच जारी</string>
+  <string name="image_location_saved">भौगोलिक स्थिति अभिलिखित</string>
   <!--RecordList Activity-->
+  <string name="add_data_point">नया डेटा पॉइंट बनाएं</string>
   <string name="stats_total">कुल डेटा पॉइंट्स </string>
   <string name="stats_week">पिछले सात, 7, दिन </string>
   <string name="stats_today">आज </string>
-  <string name="distance_label">दूर स्थान</string>
+  <string name="distance_label">दूरी:</string>
   <string name="tab_datapoints">डेटा पॉइंट</string>
   <string name="tab_map">मानचित्र </string>
   <string name="order_date">तारीख </string>
@@ -175,8 +185,11 @@
   <string name="order_name">नाम </string>
   <!--Record Activity-->
   <string name="unknown">बेनाम डेटा पॉइंट </string>
+  <string name="last_modified_monitored">पिछ्ला परिवर्तन:</string>
+  <string name="last_modified_regular">जमा:</string>
   <string name="last_response">पिछला उत्तर </string>
   <string name="error_missing_cascade">कास्केड डाउनलोड नहीं हुआ है </string>
+  <string name="error_missing_form">यह फॉर्म उपलब्ध नहीं है । कृपया सभी फॉर्म को पुनः डाउनलोड करें</string>
   <string name="tab_forms">फॉर्म्स </string>
   <string name="tab_history">इतिहास </string>
   <!--Form & transmission status-->
@@ -189,7 +202,7 @@
   <string name="status_exported">निर्यातित </string>
   <!--APK update-->
   <string name="app_update_activity">Akvo FLOW अपडेट </string>
-  <string name="app_update">नया FLOW संस्करण उपलब्ध है. \"Update\" को चुनें व इसे डाउनलोड करें </string>
+  <string name="app_update">नया FLOW वर्शन उपलब्ध है | \"Update\" को चुनें व इसे डाउनलोड करें </string>
   <string name="update">अपडेट </string>
   <string name="not_now">अभी नहीं </string>
   <string name="clicktoinstall">नया FLOW संस्करण उपलब्ध है. क्या आप इसे स्तापित करना चाहेंगे ?</string>
@@ -204,6 +217,7 @@
   <string name="error_assignment_read">फॉर्म असाइनमेंट्स FLOW dashboard पर पढ़े नहीं जा रहे हैं </string>
   <string name="error_form_header">यह फॉर्म  %1$s FLOW dashboard पर पढ़ा नहीं जा सकता </string>
   <string name="error_form_download">सुनिशिचित करें की फॉर्म प्रकाशित हो और आपका स्थानिक समय  व दिनांक सही हो </string>
+  <string name="form_deleted">यह फॉर्म हटा दिया गया है</string>
   <!--Plotting-->
   <string name="geoshape_area">एरिया /क्षेत्र</string>
   <string name="geoshape_line">लाइन /रेखा</string>
@@ -214,6 +228,17 @@
   <string name="add_point_title">पॉइंट जोड़े </string>
   <string name="add_point_text">क्या आप इस स्थान पे नया पॉइंट जोड़ना चाहतें हैं ?</string>
   <!--Navigation Drawer-->
+  <string name="select_user">प्रयोगकर्त्ता चुनें</string>
+  <string name="add_user">नया प्रयोगकर्त्ता</string>
+  <string name="new_user">नया प्रयोगकर्त्ता</string>
+  <string name="edit_user">प्रयोगकर्त्ता परिवर्तन</string>
+  <string name="delete_user">प्रयोगकर्त्ता हटाएँ</string>
+  <string name="empty_user_warning">प्रयोगकर्त्ता का नाम खाली नहीं हो सकता</string>
+  <string name="delete_user_confirmation">क्या आप निश्चित रूप से इस प्रयोगकर्ता को हटाना चाहते हैं? </string>
+  <string name="username">प्रयोगकर्ता का नाम</string>
+  <string name="mustselectuser">आगे बढ़ने से पहले प्रयोगकर्ता चुनें</string>
+  <string name="surveys">सर्वेक्षण</string>
+  <string name="logged_in_as">इस समय प्रयोगकर्ता है </string>
   <!--Misc-->
   <string name="okbutton">OK</string>
   <string name="cancelbutton">रद्द</string>
@@ -224,5 +249,4 @@
   <string name="retry">पुन: प्रयास</string>
   <string name="delete">हटाएं </string>
   <string name="error_value_required">इस स्थान को खली नहीं छोड़ें </string>
-  <!--Intent Actions. Do not translate this strings-->
 </resources>

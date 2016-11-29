@@ -1,5 +1,41 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.2.9
+Date: 24 November 2016
+
+# New and noteworthy
+* **Add possibility to update the app from the settings screen** - [#500] You can now go to the Settings screen and check for updates for the app and whenever you chose so.
+* **Improvements to login screen** [#469]  - We have made it easier to navigate between text input fields. Use the softkeyboard keys to go the the next field and to send the data when all done.
+* **Remove the text input field for barcode questions when manual input disabled** [#460] - We removed the confusing non editable text input when manual input is not allowed.
+* **Facilitate debugging using the same debug key** [#509]
+* **Allow debugging the app directly from Android Studio** [#491] - We have made it easier to debug directly using android studio and provided instructions in the wiki.
+* **Moved non translatable strings to a separate file** [#480]
+* **Added unit tests support** [#305] - You can now run unit tests, just follow instructions provided in the wiki.
+
+# Resolved issues
+* **When device is rotated do not show the user is logged in** [#498] - We no longer show the Toast message saying the user has been logged in every time the device is rotated.
+* **Surveys with the same name failed with manual transfer** [#476] - We have fixed the issue and you can have multiple forms with the same name and manually transfer them with all the questions displayed correctly.
+* **Added translations when there was an error synchronising a file** [#487] - We have provided translations for this error message.
+* **Do not check for notifications before deviceId is set** [#484] - This is the second part of [#454] and prevents the device from syncing if there is no deviceId set.
+
+---------------
+# ver 2.2.8
+Date: 8 November 2016
+
+# New and noteworthy
+* **Nepali translations** [#330] - We have introduced Nepali as a new language in the app, and in addition updated translations in a number of the other languages [#478]
+
+* **Use new Flow app icon** [#466] - We have updated the Flow icon in line with the new Akvo-wide design guidelines
+
+* **Caddisfly question type** [#421] - As part of the [integration of the Akvo Caddisfly app with Akvo Flow](https://github.com/akvo/akvo-product-design/issues/5), the app now recognises a `caddisfly question` as a new question type
+
+# Resolved issues
+* **Do not check for new surveys before Device ID is set** [#454] - This fixes the issue where it was not possible to identify a device in the dashboard because it was missing the user-defined device identifier.  This was caused by the app connecting to the dashboard *before* the identifier was setup correctly within the app, and as a result, transmitting an empty field instead of the device identifier
+
+* **Remove unused geopoint code** [#461] - A cleanup of the system to remove unused parts of the application
+
+
+---------------
 # ver 2.2.7
 Date: 20 July 2016
 

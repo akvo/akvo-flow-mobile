@@ -124,6 +124,8 @@
     <string name="data_sync_text">Uploading data. Please, wait...</string>
     <string name="data_sync_all">Synced Forms: %1$d - Failed: %2$d</string>
     <string name="data_sync_synced">Synced Forms: %1$d</string>
+    <string name="data_sync_error_form_deleted_title">Form deleted</string>
+    <string name="data_sync_error_form_deleted_text">Form %1$s has been deleted</string>
     <!--Localization-->
     <string name="app_language">App Language</string>
     <string name="please_restart">Please, restart the app</string>
@@ -261,7 +263,7 @@
     <string name="settings_app_update_description">Check if there is a newer version for the Flow app.</string>
 
     <!--app update service -->
-    <string name="apk_update_service_no_update">You already have the latest version of the app.</string>
-    <string name="apk_update_service_error_update">There was an error when trying to update the app, please try again.</string>
-    <string name="apk_update_service_error_no_internet">There was an error when trying to update the app, you are not connected to the internet.</string>
+    <string name="apk_update_service_no_update">You are running the latest version of the app.</string>
+    <string name="apk_update_service_error_update">There was an error when updating the app. Please try again.</string>
+    <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
 </resources>

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,6 +16,7 @@
 
 package org.akvo.flow.util;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 /**
@@ -25,23 +26,28 @@ import android.text.TextUtils;
  */
 public class StringUtil {
 
+    public static final char SPACE_CHAR = '\u0020';
+
     /**
      * checks a string to see if it's null or has no non-whitespace characters
      * 
      * @param s
      * @return
      */
-    public static boolean isNullOrEmpty(String s) {
+    public static boolean isNullOrEmpty(@Nullable String s) {
         return s == null || s.trim().length() == 0;
     }
 
     // copy a string transforming all control chars
     // (like newline and tab) into spaces
-    public static String ControlToSPace(String val) {
+    public static String controlToSpace(@Nullable String val) {
         String result = "";
+        if (val == null) {
+            return result;
+        }
         for (int i = 0; i < val.length(); i++) {
-            if (val.charAt(i) < '\u0020')
-                result = result + '\u0020';
+            if (val.charAt(i) < SPACE_CHAR)
+                result = result + SPACE_CHAR;
             else
                 result = result + val.charAt(i);
         }
@@ -49,21 +55,7 @@ public class StringUtil {
         return result;
     }
 
-    // copy a string transforming all control chars
-    // (like newline and tab) and comma into spaces
-    public static String ControlCommaToSPace(String val) {
-        String result = "";
-        for (int i = 0; i < val.length(); i++) {
-            if (val.charAt(i) < '\u0020' || val.charAt(i) == ',')
-                result = result + '\u0020';
-            else
-                result = result + val.charAt(i);
-        }
-
-        return result;
-    }
-
-    public static boolean isValid(String value) {
+    public static boolean isValid(@Nullable String value) {
         return !TextUtils.isEmpty(value) && !value.equalsIgnoreCase("null");
     }
 }

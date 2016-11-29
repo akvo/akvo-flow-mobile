@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -79,6 +80,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
 
+        initializeToolBar();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
@@ -89,7 +91,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         // Init navigation drawer
         mDrawer = (DrawerFragment)getSupportFragmentManager().findFragmentByTag("f");
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+                R.drawable.ic_menu_white_48dp, R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
@@ -108,9 +110,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.ic_menu_white_48dp);
 
         // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
@@ -134,6 +133,19 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         }
 
         startServices(noDevIdYet);
+
+        //When the app is restarted we need to display the current user
+        if (savedInstanceState == null) {
+            displaySelectedUser();
+        }
+    }
+
+    private void initializeToolBar() {
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
+        }
     }
 
     @Override

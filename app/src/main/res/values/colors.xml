@@ -48,6 +48,8 @@
     <color name="button_tertiary_selected">@color/button_grey_dark_selected</color>
     <color name="button_tertiary_text">@color/white</color>
 
+    <color name="red">#FF0000</color>
+
     <color name="default_underline_indicator_selected_color">#ff33b5e5</color>
 
     <color name="record_name_background">#cec6bc</color>

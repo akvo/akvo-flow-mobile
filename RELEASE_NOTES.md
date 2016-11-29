@@ -1,5 +1,24 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.2.9
+Date: 24 November 2016
+
+# New and noteworthy
+* **Add possibility to update the app from the settings screen** - [#500] You can now go to the Settings screen and check for updates for the app and whenever you chose so.
+* **Improvements to login screen** [#469]  - We have made it easier to navigate between text input fields. Use the softkeyboard keys to go the the next field and to send the data when all done.
+* **Remove the text input field for barcode questions when manual input disabled** [#460] - We removed the confusing non editable text input when manual input is not allowed.
+* **Facilitate debugging using the same debug key** [#509]
+* **Allow debugging the app directly from Android Studio** [#491] - We have made it easier to debug directly using android studio and provided instructions in the wiki.
+* **Moved non translatable strings to a separate file** [#480]
+* **Added unit tests support** [#305] - You can now run unit tests, just follow instructions provided in the wiki.
+
+# Resolved issues
+* **When device is rotated do not show the user is logged in** [#498] - We no longer show the Toast message saying the user has been logged in every time the device is rotated.
+* **Surveys with the same name failed with manual transfer** [#476] - We have fixed the issue and you can have multiple forms with the same name and manually transfer them with all the questions displayed correctly.
+* **Added translations when there was an error synchronising a file** [#487] - We have provided translations for this error message.
+* **Do not check for notifications before deviceId is set** [#484] - This is the second part of [#454] and prevents the device from syncing if there is no deviceId set.
+
+---------------
 # ver 2.2.8
 Date: 8 November 2016
 

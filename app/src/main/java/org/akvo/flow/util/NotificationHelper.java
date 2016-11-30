@@ -130,18 +130,20 @@ public class NotificationHelper {
     }
 
     private static NotificationCompat.Builder createNotificationBuilder(String title, String text, Context context) {
+        return createDefaultNotification(title, text, context)
+                .setColor(context.getResources().getColor(R.color.orange_main));
+    }
+
+    private static NotificationCompat.Builder createDefaultNotification(String title, String text, Context context) {
         return new NotificationCompat.Builder(context).setSmallIcon(R.drawable.notification_icon)
-                                                      .setColor(context.getResources().getColor(R.color.orange_main))
-                                                      .setContentTitle(title)
-                                                      .setContentText(text)
-                                                      .setTicker(title);
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setContentTitle(title)
+                .setContentText(text)
+                .setTicker(title);
     }
 
     private static NotificationCompat.Builder createErrorNotificationBuilder(String title, String text, Context context) {
-        return new NotificationCompat.Builder(context).setSmallIcon(R.drawable.notification_icon)
-                                                      .setColor(context.getResources().getColor(R.color.red))
-                                                      .setContentTitle(title)
-                                                      .setContentText(text)
-                                                      .setTicker(title);
+        return createDefaultNotification(title, text, context)
+                .setColor(context.getResources().getColor(R.color.red));
     }
 }

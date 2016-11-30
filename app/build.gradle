@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenCentral()
@@ -43,8 +44,16 @@ android {
         }
     }
     packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
         exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude '.readme'
     }
 
     productFlavors {
@@ -76,6 +85,8 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
+    apt 'com.google.dagger:dagger-compiler:2.4'
+    compile 'com.google.dagger:dagger:2.4'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'

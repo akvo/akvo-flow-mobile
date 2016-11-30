@@ -30,6 +30,9 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerApplicationComponent;
+import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
@@ -45,11 +48,24 @@ public class FlowApp extends Application {
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
 
+    private ApplicationComponent applicationComponent;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        initializeInjector();
         init();
         app = this;
+    }
+
+    private void initializeInjector() {
+        this.applicationComponent =
+                DaggerApplicationComponent.builder().applicationModule(new ApplicationModule(this)).build();
+        this.applicationComponent.inject(this);
+    }
+
+    public ApplicationComponent getApplicationComponent() {
+        return this.applicationComponent;
     }
 
     public static FlowApp getApp() {

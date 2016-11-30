@@ -18,34 +18,34 @@ package org.akvo.flow.service;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
+
 import java.io.IOException;
 import org.akvo.flow.api.service.ApkApiService;
 import org.akvo.flow.domain.apkupdate.ApkData;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
-import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StringUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.inject.Inject;
+
 public class ApkUpdateHelper {
 
-    private final ApkApiService apkApiService = new ApkApiService();
-    private final ApkUpdateMapper apkUpdateMapper = new ApkUpdateMapper();
-    private final Navigator navigator = new Navigator();
+    private final ApkApiService apkApiService;
+    private final ApkUpdateMapper apkUpdateMapper;
 
-    public ApkUpdateHelper() {
+    @Inject
+    public ApkUpdateHelper(ApkApiService apkApiService, ApkUpdateMapper apkUpdateMapper) {
+        this.apkApiService = apkApiService;
+        this.apkUpdateMapper = apkUpdateMapper;
     }
 
-    boolean shouldUpdate(@NonNull Context context) throws IOException, JSONException {
-        JSONObject json = apkApiService.getApkDataObject(context);
+    Pair<Boolean, ApkData> shouldUpdate(@NonNull Context context, String serverBase) throws IOException, JSONException {
+        JSONObject json = apkApiService.getApkDataObject(serverBase);
         ApkData data = apkUpdateMapper.transform(json);
-        if (shouldAppBeUpdated(data, context)) {
-            // There is a newer version. Fire the 'Download and Install' Activity.
-            navigator.navigateToAppUpdate(context, data);
-            return true;
-        }
-        return false;
+        return new Pair<>(shouldAppBeUpdated(data, context), data);
     }
 
     private boolean shouldAppBeUpdated(@Nullable ApkData data, @NonNull Context context) {

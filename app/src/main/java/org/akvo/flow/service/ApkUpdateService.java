@@ -18,9 +18,17 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Handler;
+import android.support.v4.util.Pair;
 import android.util.Log;
+
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.apkupdate.ApkData;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.StatusUtil;
+
+import javax.inject.Inject;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -34,10 +42,21 @@ public class ApkUpdateService extends IntentService {
 
     private static final String TAG = "APK_UPDATE_SERVICE";
 
-    private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
+    @Inject
+    ApkUpdateHelper apkUpdateHelper;
+
+    @Inject
+    Navigator navigator;
 
     public ApkUpdateService() {
         super(TAG);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
     }
 
     @Override
@@ -57,7 +76,11 @@ public class ApkUpdateService extends IntentService {
         }
 
         try {
-            apkUpdateHelper.shouldUpdate(this);
+            Pair<Boolean, ApkData> result = apkUpdateHelper.shouldUpdate(this, StatusUtil.getServerBase(this));
+            // There is a newer version. Fire the 'Download and Install' Activity.
+            if (result.first) {
+                navigator.navigateToAppUpdate(this, result.second);
+            }
         } catch (Exception e) {
             Log.e(TAG, "Could not call apk version service", e);
             PersistentUncaughtExceptionHandler.recordException(e);

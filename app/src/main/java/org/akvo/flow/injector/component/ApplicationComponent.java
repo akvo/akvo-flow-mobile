@@ -22,6 +22,8 @@ import android.content.Context;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.service.UserRequestedApkUpdateService;
 
 import javax.inject.Singleton;
 
@@ -38,4 +40,8 @@ public interface ApplicationComponent {
     void inject(BaseActivity baseActivity);
 
     Context context();
+
+    void inject(UserRequestedApkUpdateService userRequestedApkUpdateService);
+
+    void inject(ApkUpdateService apkUpdateService);
 }

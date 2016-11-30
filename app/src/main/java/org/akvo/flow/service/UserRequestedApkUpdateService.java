@@ -19,12 +19,18 @@ package org.akvo.flow.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.util.Pair;
 import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.apkupdate.ApkData;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
+
+import javax.inject.Inject;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -38,7 +44,11 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     private static final String TAG = "USER_REQ_APK_UPDATE";
 
-    private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
+    @Inject
+    ApkUpdateHelper apkUpdateHelper;
+
+    @Inject
+    Navigator navigator;
 
     public UserRequestedApkUpdateService() {
         super(TAG);
@@ -49,6 +59,8 @@ public class UserRequestedApkUpdateService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
         this.uiHandler = new Handler();
     }
 
@@ -70,7 +82,11 @@ public class UserRequestedApkUpdateService extends IntentService {
         }
 
         try {
-            if (!apkUpdateHelper.shouldUpdate(this)) {
+            Pair<Boolean, ApkData> result = apkUpdateHelper.shouldUpdate(this, StatusUtil.getServerBase(this));
+            // There is a newer version. Fire the 'Download and Install' Activity.
+            if (result.first) {
+                navigator.navigateToAppUpdate(this, result.second);
+            } else {
                 ViewUtil.displayToastFromService(getString(R.string.apk_update_service_no_update), uiHandler,
                                                  getApplicationContext());
             }

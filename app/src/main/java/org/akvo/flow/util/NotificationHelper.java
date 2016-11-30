@@ -36,7 +36,7 @@ public class NotificationHelper {
      */
     public static void displayNotification(String title, String text, Context context, int notificationId) {
         NotificationCompat.Builder builder =
-            createNotificationBuilder(title, text, context).setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+            createNotificationBuilder(title, text, context);
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
@@ -49,7 +49,7 @@ public class NotificationHelper {
      */
     public static void displayErrorNotification(String title, String text, Context context, int notificationId) {
         NotificationCompat.Builder builder =
-            createErrorNotificationBuilder(title, text, context).setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+            createErrorNotificationBuilder(title, text, context);
         notifyWithDummyIntent(context, notificationId, builder);
     }
 

@@ -118,7 +118,7 @@
     <string name="loading">Loading...</string>
     <string name="prefill_title">Pre-fill Responses</string>
     <string name="prefill_text">Pre-fill form with previous answers?</string>
-    <string name="error_assignment_text">Assignment in Akvo FLOW dashboard required</string>
+    <string name="error_assignment_text">Flow dashboard assignment required</string>
     <!--Data sync-->
     <string name="data_sync_title">Data Synchronization</string>
     <string name="data_sync_text">Uploading data. Please, wait...</string>

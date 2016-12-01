@@ -23,6 +23,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
+import org.akvo.flow.domain.repository.ExceptionRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
@@ -46,6 +47,8 @@ public interface ApplicationComponent {
     Context context();
 
     ApkRepository apkRepository();
+
+    ExceptionRepository exceptionRepository();
 
     void inject(FlowApp app);
 

@@ -22,9 +22,11 @@ import android.content.Context;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.repository.ApkDataRepository;
+import org.akvo.flow.data.repository.ExceptionDataRepository;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
+import org.akvo.flow.domain.repository.ExceptionRepository;
 import org.akvo.flow.thread.UIThread;
 
 import javax.inject.Singleton;
@@ -63,5 +65,11 @@ public class ApplicationModule {
     @Singleton
     ApkRepository provideApkRepository(ApkDataRepository apkDataRepository) {
         return apkDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    ExceptionRepository provideExceptionRepository(ExceptionDataRepository exceptionDataRepository) {
+        return exceptionDataRepository;
     }
 }

@@ -15,13 +15,11 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.domain.repository;
 
-public class Constants {
+import rx.Observable;
 
-    public static final String APK_VERSION_SERVICE_PATH =
-            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
+public interface ExceptionRepository {
 
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
+    Observable<Boolean> save(Throwable throwable);
 }

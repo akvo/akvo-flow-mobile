@@ -15,31 +15,26 @@
  *
  */
 
-package org.akvo.flow.data.datasource.network;
+package org.akvo.flow.data.repository;
 
-
-import android.support.annotation.NonNull;
-
-import org.akvo.flow.data.datasource.ApkDataSource;
-import org.akvo.flow.data.entity.ApiApkData;
-import org.akvo.flow.data.net.FlowRestApi;
+import org.akvo.flow.data.datasource.exception.ExceptionFileDataSource;
+import org.akvo.flow.domain.repository.ExceptionRepository;
 
 import javax.inject.Inject;
 
 import rx.Observable;
 
-public class NetworkApkDataSource implements ApkDataSource {
+public class ExceptionDataRepository implements ExceptionRepository {
 
-    private final FlowRestApi restApi;
+    private final ExceptionFileDataSource exceptionFileDataSource;
 
     @Inject
-    public NetworkApkDataSource(FlowRestApi restApi) {
-        this.restApi = restApi;
+    public ExceptionDataRepository(ExceptionFileDataSource exceptionFileDataSource) {
+        this.exceptionFileDataSource = exceptionFileDataSource;
     }
 
-    //TODO: baseUrl should be injected
     @Override
-    public Observable<ApiApkData> getApkData(@NonNull String baseUrl) {
-        return restApi.loadApkData(baseUrl);
+    public Observable<Boolean> save(Throwable throwable) {
+        return exceptionFileDataSource.save(throwable);
     }
 }

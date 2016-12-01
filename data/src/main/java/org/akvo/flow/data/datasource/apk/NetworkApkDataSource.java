@@ -15,13 +15,31 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.data.datasource.apk;
 
-public class Constants {
 
-    public static final String APK_VERSION_SERVICE_PATH =
-            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
+import android.support.annotation.NonNull;
 
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
+import org.akvo.flow.data.datasource.ApkDataSource;
+import org.akvo.flow.data.entity.ApiApkData;
+import org.akvo.flow.data.net.FlowRestApi;
+
+import javax.inject.Inject;
+
+import rx.Observable;
+
+public class NetworkApkDataSource implements ApkDataSource {
+
+    private final FlowRestApi restApi;
+
+    @Inject
+    public NetworkApkDataSource(FlowRestApi restApi) {
+        this.restApi = restApi;
+    }
+
+    //TODO: baseUrl should be injected
+    @Override
+    public Observable<ApiApkData> getApkData(@NonNull String baseUrl) {
+        return restApi.loadApkData(baseUrl);
+    }
 }

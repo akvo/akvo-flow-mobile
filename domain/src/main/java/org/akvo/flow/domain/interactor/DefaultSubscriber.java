@@ -15,13 +15,25 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.domain.interactor;
 
-public class Constants {
+/**
+ * Default subscriber base class to be used whenever you want default error handling.
+ */
+public class DefaultSubscriber<T> extends rx.Subscriber<T> {
 
-    public static final String APK_VERSION_SERVICE_PATH =
-            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
+    @Override
+    public void onCompleted() {
+        // no-op by default.
+    }
 
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
+    @Override
+    public void onError(Throwable e) {
+        // no-op by default.
+    }
+
+    @Override
+    public void onNext(T t) {
+        // no-op by default.
+    }
 }

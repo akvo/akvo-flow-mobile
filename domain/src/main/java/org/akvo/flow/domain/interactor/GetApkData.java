@@ -27,14 +27,14 @@ import javax.inject.Inject;
 
 import rx.Observable;
 
-public class GetApkDataUseCase extends UseCase {
+public class GetApkData extends UseCase {
 
     private final ApkRepository apkRepository;
 
     public static final String BASE_URL_KEY = "base_url_key";
 
     @Inject
-    public GetApkDataUseCase(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread, ApkRepository apkRepository) {
+    public GetApkData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread, ApkRepository apkRepository) {
         super(threadExecutor, postExecutionThread);
         this.apkRepository = apkRepository;
     }

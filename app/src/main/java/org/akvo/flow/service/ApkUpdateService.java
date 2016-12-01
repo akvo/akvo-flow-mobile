@@ -24,7 +24,9 @@ import android.util.Log;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.entity.ApkData;
-import org.akvo.flow.domain.interactor.GetApkDataUseCase;
+import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.GetApkData;
+import org.akvo.flow.domain.interactor.SaveException;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.entity.ViewApkMapper;
@@ -64,6 +66,10 @@ public class ApkUpdateService extends IntentService {
     UseCase getApkData;
 
     @Inject
+    @Named("saveException")
+    UseCase saveException;
+
+    @Inject
     VersionHelper versionHelper;
 
     @Inject
@@ -84,6 +90,7 @@ public class ApkUpdateService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         getApkData.unSubscribe();
+        saveException.unSubscribe();
     }
 
     @Override
@@ -107,20 +114,23 @@ public class ApkUpdateService extends IntentService {
 
         Map<String, String> params = new HashMap<>(1);
         //TODO: very ugly, have datasource for server base url
-        params.put(GetApkDataUseCase.BASE_URL_KEY, StatusUtil.getServerBase(this));
+        params.put(GetApkData.BASE_URL_KEY, StatusUtil.getServerBase(this));
         //TODO: create default subscriber to avoid repeating code
-        getApkData.execute(new Subscriber<ApkData>() {
-            @Override
-            public void onCompleted() {
-                //EMPTY
-            }
-
+        getApkData.execute(new DefaultSubscriber<ApkData>() {
             @Override
             public void onError(Throwable e) {
-                //TODO: check exceptions
+                //TODO: verify which exception can be ignored and which not
                 Log.e(TAG, "Could not call apk version service", e);
-                //PersistentUncaughtExceptionHandler.recordException(e);
-                //TODO: refactor this
+                Map<String, Throwable> exceptionParams = new HashMap<>(1);
+                exceptionParams.put(SaveException.EXCEPTION_PARAM_KEY, e);
+                saveException.execute(new DefaultSubscriber<Boolean>() {
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Error saving exception", e);
+                    }
+
+                }, exceptionParams);
             }
 
             @Override

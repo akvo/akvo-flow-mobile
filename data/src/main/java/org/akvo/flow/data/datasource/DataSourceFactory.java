@@ -17,7 +17,7 @@
 
 package org.akvo.flow.data.datasource;
 
-import org.akvo.flow.data.datasource.network.NetworkApkDataSource;
+import org.akvo.flow.data.datasource.apk.NetworkApkDataSource;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

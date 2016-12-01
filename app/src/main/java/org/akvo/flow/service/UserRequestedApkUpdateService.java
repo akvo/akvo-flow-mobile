@@ -82,7 +82,7 @@ public class UserRequestedApkUpdateService extends IntentService {
         }
 
         try {
-            Pair<Boolean, ApkData> result = apkUpdateHelper.shouldUpdate(this, StatusUtil.getServerBase(this));
+            Pair<Boolean, ApkData> result = apkUpdateHelper.shouldUpdate(StatusUtil.getServerBase(this));
             // There is a newer version. Fire the 'Download and Install' Activity.
             if (result.first) {
                 navigator.navigateToAppUpdate(this, result.second);

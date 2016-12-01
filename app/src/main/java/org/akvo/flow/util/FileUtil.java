@@ -393,7 +393,7 @@ public class FileUtil {
                 }
 
                 String versionName = version.getName();
-                if (!PlatformUtil.isNewerVersion(maxVersion, versionName)) {
+                if (!VersionHelper.isNewerVersion(maxVersion, versionName)) {
                     // Delete old versions
                     for (File apk : apks) {
                         apk.delete();

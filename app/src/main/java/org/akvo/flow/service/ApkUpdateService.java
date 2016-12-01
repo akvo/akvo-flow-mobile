@@ -18,7 +18,6 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
@@ -76,7 +75,7 @@ public class ApkUpdateService extends IntentService {
         }
 
         try {
-            Pair<Boolean, ApkData> result = apkUpdateHelper.shouldUpdate(this, StatusUtil.getServerBase(this));
+            Pair<Boolean, ApkData> result = apkUpdateHelper.shouldUpdate(StatusUtil.getServerBase(this));
             // There is a newer version. Fire the 'Download and Install' Activity.
             if (result.first) {
                 navigator.navigateToAppUpdate(this, result.second);

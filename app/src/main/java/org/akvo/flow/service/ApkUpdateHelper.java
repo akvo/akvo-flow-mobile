@@ -15,17 +15,17 @@
  */
 package org.akvo.flow.service;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 
 import java.io.IOException;
+
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.api.service.ApkApiService;
 import org.akvo.flow.domain.apkupdate.ApkData;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.util.VersionHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,26 +35,29 @@ public class ApkUpdateHelper {
 
     private final ApkApiService apkApiService;
     private final ApkUpdateMapper apkUpdateMapper;
+    private final VersionHelper versionHelper;
 
     @Inject
-    public ApkUpdateHelper(ApkApiService apkApiService, ApkUpdateMapper apkUpdateMapper) {
+    public ApkUpdateHelper(ApkApiService apkApiService, ApkUpdateMapper apkUpdateMapper, VersionHelper versionHelper) {
         this.apkApiService = apkApiService;
         this.apkUpdateMapper = apkUpdateMapper;
+        this.versionHelper = versionHelper;
     }
 
-    Pair<Boolean, ApkData> shouldUpdate(@NonNull Context context, String serverBase) throws IOException, JSONException {
+    Pair<Boolean, ApkData> shouldUpdate(String serverBase) throws IOException, JSONException {
         JSONObject json = apkApiService.getApkDataObject(serverBase);
         ApkData data = apkUpdateMapper.transform(json);
-        return new Pair<>(shouldAppBeUpdated(data, context), data);
+        return new Pair<>(shouldAppBeUpdated(data), data);
     }
 
-    private boolean shouldAppBeUpdated(@Nullable ApkData data, @NonNull Context context) {
+    private boolean shouldAppBeUpdated(@Nullable ApkData data) {
         if (data == null) {
             return false;
         }
-        String version = data.getVersion();
-        return StringUtil.isValid(version)
-            && PlatformUtil.isNewerVersion(PlatformUtil.getVersionName(context), version)
+        String remoteVersionName = data.getVersion();
+        String currentVersionName = BuildConfig.VERSION_NAME;
+        return StringUtil.isValid(remoteVersionName)
+            && versionHelper.isNewerVersion(currentVersionName, remoteVersionName)
             && StringUtil.isValid(data.getFileUrl());
     }
 }

@@ -41,8 +41,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import rx.Subscriber;
-
 /**
  * This background service will check the rest api for a new version of the APK.
  * If found, it will display a notification, requesting permission to download and
@@ -95,17 +93,6 @@ public class ApkUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        //TODO: refactor those as well
-//        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
-        checkUpdates();
-
-    }
-
-    /**
-     * Check if new FLOW versions are available to installAppUpdate. If a new version is available,
-     * we display a notification, requesting the user to download it.
-     */
-    private void checkUpdates() {
         //TODO: check if allowed to access internet
         if (!StatusUtil.hasDataConnection(this)) {
             Log.d(TAG, "No internet connection. Can't perform the requested operation");

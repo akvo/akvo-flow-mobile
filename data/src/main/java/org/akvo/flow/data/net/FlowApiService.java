@@ -15,34 +15,16 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.net;
 
-import android.app.Activity;
+import org.akvo.flow.data.entity.ApiApkData;
+import org.akvo.flow.data.util.Constants;
 
-import org.akvo.flow.injector.PerActivity;
+import retrofit.http.GET;
+import rx.Observable;
 
-import dagger.Module;
-import dagger.Provides;
+public interface FlowApiService {
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
-
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
-    }
-
+    @GET(Constants.APK_VERSION_SERVICE_PATH)
+    Observable<ApiApkData> loadApkData();
 }

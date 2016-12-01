@@ -111,7 +111,7 @@ public class AppUpdateActivity extends Activity {
      * @return filename of the already downloaded file, if exists. Null otherwise
      */
     private String checkLocalFile() {
-        final String latestVersion = FileUtil.checkDownloadedVersions(this);
+        final String latestVersion = FileUtil.checkDownloadedVersions();
         if (latestVersion != null) {
             if (mMd5Checksum != null) {
                 // The file was found, but we need to ensure the checksum matches,

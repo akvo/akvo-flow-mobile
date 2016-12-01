@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import org.akvo.flow.activity.AppUpdateActivity;
-import org.akvo.flow.domain.apkupdate.ApkData;
+import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.util.StringUtil;
 
 import javax.inject.Inject;
@@ -32,7 +32,7 @@ public class Navigator {
     public Navigator() {
     }
 
-    public void navigateToAppUpdate(@NonNull Context context, @NonNull ApkData data) {
+    public void navigateToAppUpdate(@NonNull Context context, @NonNull ViewApkData data) {
         Intent i = new Intent(context, AppUpdateActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         i.putExtra(AppUpdateActivity.EXTRA_URL, data.getFileUrl());

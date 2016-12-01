@@ -32,6 +32,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
@@ -96,7 +97,7 @@ public class ExceptionReportingService extends Service {
             database = new SurveyDbAdapter(this);
             database.open();
             deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-            version = PlatformUtil.getVersionName(this);
+            version = BuildConfig.VERSION_NAME;
             phoneNumber = StatusUtil.getPhoneNumber(this);
             imei = StatusUtil.getImei(this);
         } finally {

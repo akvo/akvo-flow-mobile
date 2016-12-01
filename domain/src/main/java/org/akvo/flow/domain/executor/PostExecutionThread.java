@@ -15,34 +15,16 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.domain.executor;
 
-import android.app.Activity;
-
-import org.akvo.flow.injector.PerActivity;
-
-import dagger.Module;
-import dagger.Provides;
+import rx.Scheduler;
 
 /**
- * A module to wrap the Activity state and expose it to the graph.
+ * Thread abstraction created to change the execution context from any thread to any other thread.
+ * Useful to encapsulate a UI Thread for example, since some job will be done in background, an
+ * implementation of this interface will change context and update the UI.
  */
-@Module
-public class ActivityModule {
+public interface PostExecutionThread {
 
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
-    }
-
+    Scheduler getScheduler();
 }

@@ -35,6 +35,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.serialization.response.SurveyedLocaleParser;
 import org.akvo.flow.domain.response.SurveyedLocalesResponse;
 import org.akvo.flow.app.FlowApp;
@@ -142,7 +143,7 @@ public class FlowApi {
         return Param.PHONE_NUMBER + URLEncode(PHONE_NUMBER)
                 + "&" + Param.ANDROID_ID + URLEncode(PlatformUtil.getAndroidID(context))
                 + "&" + Param.IMEI + URLEncode(IMEI)
-                + "&" + Param.VERSION + URLEncode(PlatformUtil.getVersionName(context))
+                + "&" + Param.VERSION + URLEncode(BuildConfig.VERSION_NAME)
                 + "&" + Param.DEVICE_ID + URLEncode(StatusUtil.getDeviceId(context));
     }
     

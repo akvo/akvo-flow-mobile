@@ -15,31 +15,25 @@
  *
  */
 
-package org.akvo.flow.domain.apkupdate;
+package org.akvo.flow.data.datasource;
 
-import android.support.annotation.Nullable;
-
-import org.akvo.flow.presentation.entity.ViewApkData;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.akvo.flow.data.datasource.network.NetworkApkDataSource;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-@Deprecated
-public class ApkUpdateMapper {
+@Singleton
+public class DataSourceFactory {
+
+    //TODO: make this lazy?
+    private final NetworkApkDataSource networkApkDataSource;
 
     @Inject
-    public ApkUpdateMapper() {
+    public DataSourceFactory(NetworkApkDataSource networkApkDataSource) {
+        this.networkApkDataSource = networkApkDataSource;
     }
 
-    @Nullable
-    public ViewApkData transform(@Nullable JSONObject json) throws JSONException {
-        if (json == null) {
-            return null;
-        }
-        String latestVersion = json.getString("version");
-        String apkUrl = json.getString("fileName");
-        String md5Checksum = json.optString("md5Checksum", null);
-        return new ViewApkData(latestVersion, apkUrl, md5Checksum);
+    public NetworkApkDataSource createNetworkDataSource() {
+        return networkApkDataSource;
     }
 }

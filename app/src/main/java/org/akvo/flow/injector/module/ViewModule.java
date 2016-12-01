@@ -17,32 +17,20 @@
 
 package org.akvo.flow.injector.module;
 
-import android.app.Activity;
+import org.akvo.flow.domain.interactor.GetApkDataUseCase;
+import org.akvo.flow.domain.interactor.UseCase;
 
-import org.akvo.flow.injector.PerActivity;
+import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
 @Module
-public class ActivityModule {
+public class ViewModule {
 
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
     @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
+    @Named("getApkData")
+    UseCase provideApkDataUseCase (GetApkDataUseCase getApkDataUseCase) {
+        return getApkDataUseCase;
     }
-
 }

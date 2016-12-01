@@ -15,31 +15,31 @@
  *
  */
 
-package org.akvo.flow.domain.apkupdate;
+package org.akvo.flow.data.datasource.network;
 
-import android.support.annotation.Nullable;
 
-import org.akvo.flow.presentation.entity.ViewApkData;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.support.annotation.NonNull;
+
+import org.akvo.flow.data.datasource.ApkDataSource;
+import org.akvo.flow.data.entity.ApiApkData;
+import org.akvo.flow.data.net.FlowRestApi;
 
 import javax.inject.Inject;
 
-@Deprecated
-public class ApkUpdateMapper {
+import rx.Observable;
+
+public class NetworkApkDataSource implements ApkDataSource {
+
+    private final FlowRestApi restApi;
 
     @Inject
-    public ApkUpdateMapper() {
+    public NetworkApkDataSource(FlowRestApi restApi) {
+        this.restApi = restApi;
     }
 
-    @Nullable
-    public ViewApkData transform(@Nullable JSONObject json) throws JSONException {
-        if (json == null) {
-            return null;
-        }
-        String latestVersion = json.getString("version");
-        String apkUrl = json.getString("fileName");
-        String md5Checksum = json.optString("md5Checksum", null);
-        return new ViewApkData(latestVersion, apkUrl, md5Checksum);
+    //TODO: baseUrl should be injected
+    @Override
+    public Observable<ApiApkData> getApkData(@NonNull String baseUrl) {
+        return restApi.loadApkData(baseUrl);
     }
 }

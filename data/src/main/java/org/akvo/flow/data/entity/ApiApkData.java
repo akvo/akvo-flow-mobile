@@ -15,31 +15,36 @@
  *
  */
 
-package org.akvo.flow.domain.apkupdate;
+package org.akvo.flow.data.entity;
 
-import android.support.annotation.Nullable;
+import com.google.gson.annotations.SerializedName;
 
-import org.akvo.flow.presentation.entity.ViewApkData;
-import org.json.JSONException;
-import org.json.JSONObject;
+public class ApiApkData {
 
-import javax.inject.Inject;
+    @SerializedName("version")
+    private final String version;
 
-@Deprecated
-public class ApkUpdateMapper {
+    @SerializedName("fileName")
+    private final String fileUrl;
 
-    @Inject
-    public ApkUpdateMapper() {
+    @SerializedName("md5Checksum")
+    private final String md5Checksum;
+
+    public ApiApkData(String version, String fileUrl, String md5Checksum) {
+        this.version = version;
+        this.fileUrl = fileUrl;
+        this.md5Checksum = md5Checksum;
     }
 
-    @Nullable
-    public ViewApkData transform(@Nullable JSONObject json) throws JSONException {
-        if (json == null) {
-            return null;
-        }
-        String latestVersion = json.getString("version");
-        String apkUrl = json.getString("fileName");
-        String md5Checksum = json.optString("md5Checksum", null);
-        return new ViewApkData(latestVersion, apkUrl, md5Checksum);
+    public String getVersion() {
+        return version;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public String getMd5Checksum() {
+        return md5Checksum;
     }
 }

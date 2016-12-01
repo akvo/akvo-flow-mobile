@@ -24,7 +24,7 @@ import android.util.Log;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.domain.apkupdate.ApkData;
+import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.StatusUtil;
@@ -40,6 +40,7 @@ import javax.inject.Inject;
  *
  * @author Christopher Fagiani
  */
+@Deprecated //Will soon be replaced
 public class UserRequestedApkUpdateService extends IntentService {
 
     private static final String TAG = "USER_REQ_APK_UPDATE";
@@ -82,7 +83,7 @@ public class UserRequestedApkUpdateService extends IntentService {
         }
 
         try {
-            Pair<Boolean, ApkData> result = apkUpdateHelper.shouldUpdate(StatusUtil.getServerBase(this));
+            Pair<Boolean, ViewApkData> result = apkUpdateHelper.shouldUpdate(StatusUtil.getServerBase(this));
             // There is a newer version. Fire the 'Download and Install' Activity.
             if (result.first) {
                 navigator.navigateToAppUpdate(this, result.second);

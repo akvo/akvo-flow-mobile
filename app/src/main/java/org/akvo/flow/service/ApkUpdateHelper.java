@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.api.service.ApkApiService;
-import org.akvo.flow.domain.apkupdate.ApkData;
+import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.VersionHelper;
@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import javax.inject.Inject;
 
+@Deprecated
 public class ApkUpdateHelper {
 
     private final ApkApiService apkApiService;
@@ -44,13 +45,13 @@ public class ApkUpdateHelper {
         this.versionHelper = versionHelper;
     }
 
-    Pair<Boolean, ApkData> shouldUpdate(String serverBase) throws IOException, JSONException {
+    Pair<Boolean, ViewApkData> shouldUpdate(String serverBase) throws IOException, JSONException {
         JSONObject json = apkApiService.getApkDataObject(serverBase);
-        ApkData data = apkUpdateMapper.transform(json);
+        ViewApkData data = apkUpdateMapper.transform(json);
         return new Pair<>(shouldAppBeUpdated(data), data);
     }
 
-    private boolean shouldAppBeUpdated(@Nullable ApkData data) {
+    private boolean shouldAppBeUpdated(@Nullable ViewApkData data) {
         if (data == null) {
             return false;
         }

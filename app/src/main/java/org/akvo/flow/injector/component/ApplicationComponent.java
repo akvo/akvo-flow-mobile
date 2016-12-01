@@ -20,7 +20,11 @@ package org.akvo.flow.injector.component;
 import android.content.Context;
 
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
+import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.UserRequestedApkUpdateService;
@@ -31,17 +35,24 @@ import dagger.Component;
 
 @Singleton
 @Component(modules = {
-        ApplicationModule.class
+        ApplicationModule.class, ViewModule.class
 })
 public interface ApplicationComponent {
+
+    ThreadExecutor getThreadExecutor();
+
+    PostExecutionThread getPostExecutionThread();
+
+    Context context();
+
+    ApkRepository apkRepository();
 
     void inject(FlowApp app);
 
     void inject(BaseActivity baseActivity);
 
-    Context context();
-
     void inject(UserRequestedApkUpdateService userRequestedApkUpdateService);
 
     void inject(ApkUpdateService apkUpdateService);
+
 }

@@ -15,34 +15,15 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.datasource;
 
-import android.app.Activity;
+import android.support.annotation.NonNull;
 
-import org.akvo.flow.injector.PerActivity;
+import org.akvo.flow.data.entity.ApiApkData;
 
-import dagger.Module;
-import dagger.Provides;
+import rx.Observable;
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
+public interface ApkDataSource {
 
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
-    }
-
+    Observable<ApiApkData> getApkData(@NonNull String baseUrl);
 }

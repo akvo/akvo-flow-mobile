@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
@@ -283,7 +285,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     private void onAboutOptionTap(Resources resources) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String txt = resources.getString(R.string.abouttext) + " " + PlatformUtil.getVersionName(this);
+        String txt = resources.getString(R.string.abouttext) + " " + BuildConfig.VERSION_NAME;
         builder.setTitle(R.string.abouttitle);
         builder.setMessage(txt);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {

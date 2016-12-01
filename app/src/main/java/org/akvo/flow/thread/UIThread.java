@@ -15,31 +15,29 @@
  *
  */
 
-package org.akvo.flow.domain.apkupdate;
+package org.akvo.flow.thread;
 
-import android.support.annotation.Nullable;
-
-import org.akvo.flow.presentation.entity.ViewApkData;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.akvo.flow.domain.executor.PostExecutionThread;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-@Deprecated
-public class ApkUpdateMapper {
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
+
+/**
+ * MainThread (UI Thread) implementation based on a {@link Scheduler}
+ * which will execute actions on the Android UI thread
+ */
+@Singleton
+public class UIThread implements PostExecutionThread {
 
     @Inject
-    public ApkUpdateMapper() {
+    public UIThread() {
     }
 
-    @Nullable
-    public ViewApkData transform(@Nullable JSONObject json) throws JSONException {
-        if (json == null) {
-            return null;
-        }
-        String latestVersion = json.getString("version");
-        String apkUrl = json.getString("fileName");
-        String md5Checksum = json.optString("md5Checksum", null);
-        return new ViewApkData(latestVersion, apkUrl, md5Checksum);
+    @Override
+    public Scheduler getScheduler() {
+        return AndroidSchedulers.mainThread();
     }
 }

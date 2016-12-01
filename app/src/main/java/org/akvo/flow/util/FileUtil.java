@@ -42,6 +42,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 
 /**
@@ -66,7 +67,7 @@ public class FileUtil {
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK, RES};
+    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK, RES}
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -116,7 +117,7 @@ public class FileUtil {
      * @param internal true for app specific resources, false otherwise
      * @return The root directory for this kind of resources
      */
-    private static final String getFilesStorageDir(boolean internal) {
+    private static String getFilesStorageDir(boolean internal) {
         if (internal) {
             return FlowApp.getApp().getExternalFilesDir(null).getAbsolutePath();
         }
@@ -142,7 +143,7 @@ public class FileUtil {
     public static String readFileAsString(File file) throws IOException {
         StringBuilder contents = new StringBuilder();
         BufferedReader input = new BufferedReader(new FileReader(file));
-        String line = null;
+        String line;
         try {
             while ((line = input.readLine()) != null) {
                 contents.append(line);
@@ -377,10 +378,10 @@ public class FileUtil {
      *
      * @return the path and version of a newer APK, if found, null otherwise
      */
-    public static String checkDownloadedVersions(Context context) {
-        final String installedVer = PlatformUtil.getVersionName(context);
+    public static String checkDownloadedVersions() {
+        VersionHelper helper = new VersionHelper();
 
-        String maxVersion = installedVer;// Keep track of newest version available
+        String maxVersion = BuildConfig.VERSION_NAME;// Keep track of newest version available
         String apkPath = null;
 
         File appsLocation = getFilesDir(FileType.APK);
@@ -393,7 +394,7 @@ public class FileUtil {
                 }
 
                 String versionName = version.getName();
-                if (!VersionHelper.isNewerVersion(maxVersion, versionName)) {
+                if (!helper.isNewerVersion(maxVersion, versionName)) {
                     // Delete old versions
                     for (File apk : apks) {
                         apk.delete();

@@ -88,11 +88,11 @@ public class SurveyedDataPointSyncService extends IntentService {
             if (correctSync) {
                 NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
                         String.format(getString(R.string.synced_records),
-                                syncedRecords), true, true,
+                                syncedRecords), false, false,
                         ConstantUtil.NOTIFICATION_RECORD_SYNC);
             } else {
                 NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.syncing_records),
-                        getString(R.string.syncing_corrupted_datapoints_error), true, true,
+                        getString(R.string.syncing_corrupted_datapoints_error), false, false,
                         ConstantUtil.NOTIFICATION_RECORD_SYNC);
             }
         } catch (HttpException e) {

@@ -19,6 +19,7 @@ package org.akvo.flow.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
 import android.util.Log;
@@ -32,7 +33,6 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 
 import java.io.IOException;
@@ -123,13 +123,13 @@ public class SurveyedDataPointSyncService extends IntentService {
     /**
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
-    private Pair<Set<String>, Boolean> sync(SurveyDbAdapter database, FlowApi api, long surveyGroupId)
+    @NonNull
+    private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbAdapter database, @NonNull FlowApi api, long surveyGroupId)
             throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
-        List<SurveyedLocale> locales = api.getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime,
-                PlatformUtil.getAndroidID(this));
+        List<SurveyedLocale> locales = api.getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime);
         boolean correctData = true;
         if (locales != null) {
             for (SurveyedLocale locale : locales) {

@@ -16,21 +16,22 @@
 
 package org.akvo.flow.service;
 
-import android.location.Location;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.app.Service;
 import android.content.Intent;
 import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StatusUtil;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * service for sending location beacons on a set interval to the server. This
@@ -39,13 +40,13 @@ import org.akvo.flow.util.StatusUtil;
  * @author Christopher Fagiani
  */
 public class LocationService extends Service {
+    @Nullable
     private static Timer timer;
     private LocationManager locMgr;
     private Criteria locationCriteria;
     private static final long INITIAL_DELAY = 60000;
     private static final long INTERVAL = 1800000;
     private static boolean sendBeacon = true;
-    private static final String TAG = "LocationService";
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -61,7 +62,6 @@ public class LocationService extends Service {
         // call endService if they change the preference to false after we're
         // already started
         SurveyDbAdapter database = null;
-        final String server = StatusUtil.getServerBase(this);
         try {
             database = new SurveyDbAdapter(this);
 
@@ -83,6 +83,7 @@ public class LocationService extends Service {
 
                 @Override
                 public void run() {
+                    //TODO: refactor to not reference service but use a weak reference
                     if (sendBeacon && StatusUtil.hasDataConnection(LocationService.this)) {
                         String provider = locMgr.getBestProvider(locationCriteria, true);
                         if (provider != null) {
@@ -96,7 +97,7 @@ public class LocationService extends Service {
                                 longitude = lastKnownLocation.getLongitude();
                                 accuracy = lastKnownLocation.getAccuracy();
                             }
-                            flowApi.sendLocation(server, latitude, longitude, accuracy);
+                            flowApi.sendLocation(StatusUtil.getServerBase(LocationService.this), latitude, longitude, accuracy);
                         }
                     }
                 }

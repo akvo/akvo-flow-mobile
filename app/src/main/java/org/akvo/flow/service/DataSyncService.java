@@ -19,6 +19,8 @@ package org.akvo.flow.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -168,6 +170,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
+    @NonNull
     private File getSurveyInstanceFile(String uuid) {
         return new File(FileUtil.getFilesDir(FileType.DATA), uuid + ConstantUtil.ARCHIVE_SUFFIX);
     }
@@ -190,6 +193,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
+    @NonNull
     private long[] getUnexportedSurveys() {
         long[] surveyInstanceIds = new long[0];// Avoid null cases
         Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED);
@@ -250,7 +254,7 @@ public class DataSyncService extends IntentService {
             zos.close();
             Log.i(TAG, "Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
             return zipFileData;
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (@NonNull IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             PersistentUncaughtExceptionHandler.recordException(e);
             Log.e(TAG, e.getMessage());
             return null;
@@ -261,7 +265,7 @@ public class DataSyncService extends IntentService {
      * Writes the contents of text to a zip entry within the Zip file behind zos
      * named fileName
      */
-    private void writeTextToZip(ZipOutputStream zos, String text, String fileName) throws IOException {
+    private void writeTextToZip(@NonNull ZipOutputStream zos, @NonNull String text, String fileName) throws IOException {
         Log.i(TAG, "Writing zip entry");
         zos.putNextEntry(new ZipEntry(fileName));
         byte[] allBytes = text.getBytes(UTF_8_CHARSET);
@@ -274,7 +278,8 @@ public class DataSyncService extends IntentService {
      * Iterate over the survey data returned from the database and populate the
      * ZipFileData information, setting the UUID, Survey ID, image paths, and String data.
      */
-    private FormInstance processFormInstance(long surveyInstanceId, List<String> imagePaths) {
+    @NonNull
+    private FormInstance processFormInstance(long surveyInstanceId, @NonNull List<String> imagePaths) {
         FormInstance formInstance = new FormInstance();
         List<Response> responses = new ArrayList<>();
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
@@ -366,7 +371,8 @@ public class DataSyncService extends IntentService {
 
     // replace troublesome chars in user-provided values
     // replaceAll() compiles a Pattern, and so is inefficient inside a loop
-    private String cleanVal(String val) {
+    @Nullable
+    private String cleanVal(@Nullable String val) {
         if (val != null) {
             if (val.contains(DELIMITER)) {
                 val = val.replace(DELIMITER, SPACE);
@@ -439,7 +445,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(String filename, String formId, String serverBase) {
+    private boolean syncFile(@NonNull String filename, @NonNull String formId, @NonNull String serverBase) {
         if (TextUtils.isEmpty(filename) || filename.lastIndexOf(".") < 0) {
             return false;
         }
@@ -493,7 +499,7 @@ public class DataSyncService extends IntentService {
         return synced;
     }
 
-    private boolean sendFile(String fileAbsolutePath, String dir, String contentType, boolean isPublic, int retries) {
+    private boolean sendFile(@NonNull String fileAbsolutePath, String dir, String contentType, boolean isPublic, int retries) {
         final File file = new File(fileAbsolutePath);
         if (!file.exists()) {
             return false;
@@ -531,14 +537,11 @@ public class DataSyncService extends IntentService {
      * 1- Request the list of files to the server
      * 2- Update the status of those files in the local database
      */
-    private void checkDeviceNotifications(String serverBase) {
+    private void checkDeviceNotifications(@NonNull String serverBase) {
         FlowApi flowApi = new FlowApi();
         try {
-            StringBuilder surveyIdsBuilder = new StringBuilder();
-            for (String id : mDatabase.getSurveyIds()) {
-                surveyIdsBuilder.append("&formId=").append(id);
-            }
-            JSONObject jResponse = flowApi.getDeviceNotification(serverBase, surveyIdsBuilder.toString());
+            String[] surveyIds = mDatabase.getSurveyIds();
+            JSONObject jResponse = flowApi.getDeviceNotification(serverBase, surveyIds);
 
             if (jResponse != null) {
                 List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
@@ -576,7 +579,8 @@ public class DataSyncService extends IntentService {
      * Given a json array, return the list of contained filenames,
      * formatting the path to match the structure of the sdcard's files.
      */
-    private List<String> parseFiles(JSONArray jFiles) throws JSONException {
+    @NonNull
+    private List<String> parseFiles(@Nullable JSONArray jFiles) throws JSONException {
         List<String> files = new ArrayList<>();
         if (jFiles != null) {
             for (int i = 0; i < jFiles.length(); i++) {
@@ -597,7 +601,8 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private static String getDestName(String filename) {
+    @NonNull
+    private static String getDestName(@NonNull String filename) {
         if (filename.contains("/")) {
             return filename.substring(filename.lastIndexOf("/") + 1);
         } else if (filename.contains("\\")) {
@@ -665,7 +670,7 @@ public class DataSyncService extends IntentService {
         NotificationHelper.displayNonOnGoingErrorNotification(this, notificationId, text, title);
     }
 
-    private String contentType(String ext) {
+    private String contentType(@NonNull String ext) {
         switch (ext) {
             case ConstantUtil.PNG_SUFFIX:
                 return PNG_CONTENT_TYPE;
@@ -697,10 +702,15 @@ public class DataSyncService extends IntentService {
      */
     class ZipFileData {
 
+        @Nullable
         String uuid = null;
+        @Nullable
         String formId = null;
+        @Nullable
         String formName = null;
+        @Nullable
         String filename = null;
+        @Nullable
         String data = null;
         final List<String> imagePaths = new ArrayList<>();
     }

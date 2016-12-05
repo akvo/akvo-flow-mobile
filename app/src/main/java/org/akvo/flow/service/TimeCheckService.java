@@ -19,15 +19,17 @@ package org.akvo.flow.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
+
+import org.akvo.flow.activity.TimeCheckActivity;
+import org.akvo.flow.api.FlowApi;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.StatusUtil;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-import org.akvo.flow.activity.TimeCheckActivity;
-import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.StatusUtil;
 
 import static org.akvo.flow.util.StringUtil.isValid;
 
@@ -55,14 +57,9 @@ public class TimeCheckService extends IntentService {
 
         // Since a misconfigured date/time might be considering the SSL certificate as expired,
         // we'll use HTTP by default, instead of HTTPS
-        String serverBase = StatusUtil.getServerBase(this);
-        if (serverBase.startsWith("https")) {
-            serverBase = "http" + serverBase.substring("https".length());
-        }
-
         try {
             FlowApi flowApi = new FlowApi();
-            String time = flowApi.getServerTime(serverBase);
+            String time = flowApi.getServerTime(StatusUtil.getServerBase(this));
 
             if (isValid(time)) {
                 DateFormat df = new SimpleDateFormat(PATTERN);

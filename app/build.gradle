@@ -1,14 +1,5 @@
 apply plugin: 'com.android.application'
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -44,7 +35,6 @@ android {
             keyAlias RELEASE_KEY_ALIAS
             keyPassword RELEASE_KEY_PASSWORD
         }
-
         buildTypes {
             release {
                 signingConfig signingConfigs.flowRelease
@@ -80,9 +70,10 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-annotations:21.0.0'
-    compile 'com.google.android.gms:play-services:4.0.30'
+    compile 'com.google.android.gms:play-services-base:7.5.0'
+    compile 'com.google.android.gms:play-services-maps:7.5.0'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
-    compile 'com.google.maps.android:android-maps-utils:0.3.3'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
 

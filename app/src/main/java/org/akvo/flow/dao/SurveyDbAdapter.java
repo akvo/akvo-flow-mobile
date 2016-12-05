@@ -16,16 +16,6 @@
 
 package org.akvo.flow.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -45,6 +35,16 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well
@@ -176,12 +176,11 @@ public class SurveyDbAdapter {
     }
 
     public interface SurveyInstanceStatus {
-        int UNKNOWN = 0;
-        int SAVED = 1;
-        int SUBMITTED = 2;
-        int EXPORTED = 3;
-        int SYNCED = 4;
-        int DOWNLOADED = 5;
+        int SAVED      = 0;
+        int SUBMITTED  = 1;
+        int EXPORTED   = 2;
+        int SYNCED     = 3;
+        int DOWNLOADED = 4;
     }
 
     public interface TransmissionStatus {

@@ -67,6 +67,9 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     private static final String LABEL = "label";
     private static final String DESC = "desc";
 
+    //TODO: this will be replaced by a year placed in a properties file
+    private static final String CURRENT_YEAR = "2017";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settingsmenu);
@@ -284,9 +287,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     private void onAboutOptionTap(Resources resources) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        Calendar calendar = Calendar.getInstance();
-        int todayYear = calendar.get(Calendar.YEAR);
-        String txt = resources.getString(R.string.about_text, todayYear, PlatformUtil.getVersionName(this));
+        String txt = resources.getString(R.string.about_text, CURRENT_YEAR, PlatformUtil.getVersionName(this));
         builder.setTitle(R.string.abouttitle);
         builder.setMessage(txt);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {

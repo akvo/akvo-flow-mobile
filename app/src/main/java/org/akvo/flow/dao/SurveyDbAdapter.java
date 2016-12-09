@@ -204,7 +204,6 @@ public class SurveyDbAdapter {
             "INSERT INTO preferences VALUES('user.storelast','false')",
             "INSERT INTO preferences VALUES('data.cellular.upload','true')",
             "INSERT INTO preferences VALUES('user.lastuser.id','')",
-            "INSERT INTO preferences VALUES('location.sendbeacon','false')",
             "INSERT INTO preferences VALUES('backend.server','')",
             "INSERT INTO preferences VALUES('screen.keepon','true')",
             "INSERT INTO preferences VALUES('survey.textsize','LARGE')",

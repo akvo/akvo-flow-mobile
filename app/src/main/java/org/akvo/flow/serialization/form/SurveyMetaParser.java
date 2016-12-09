@@ -18,18 +18,17 @@ package org.akvo.flow.serialization.form;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 /**
  * Parser for Survey definitions (CSV). No question-answer pairs
  * will be returned.
- *
  */
 public class SurveyMetaParser {
 
@@ -43,7 +42,7 @@ public class SurveyMetaParser {
         survey.setName(touple[Attr.NAME]);
         survey.setLanguage(touple[Attr.LANGUAGE]);
         survey.setVersion(Double.parseDouble(touple[Attr.VERSION]));
-        
+
         // Parse the SurveyGroup
         long groupId = Long.parseLong(touple[Attr.GROUP_ID]);
         String groupName = touple[Attr.GROUP_NAME];
@@ -56,17 +55,17 @@ public class SurveyMetaParser {
         }
 
         SurveyGroup group = new SurveyGroup(groupId, groupName, registerSurveyId, monitored);
-        
+
         survey.setSurveyGroup(group);
-        
+
         survey.setType(ConstantUtil.FILE_SURVEY_LOCATION_TYPE);
         return survey;
     }
-    
+
     /**
      * Survey metadata feeds might contain no phone, thus we will
      * need to prepend the rows with a fake comma to ensure consistency.
-     * 
+     *
      * @param response
      * @param addColumn
      * @return survey list
@@ -86,7 +85,7 @@ public class SurveyMetaParser {
                 surveyList.add(survey);
             }
         }
-        
+
         return surveyList;
     }
 
@@ -95,19 +94,19 @@ public class SurveyMetaParser {
     }
 
     interface Attr {
-        int DEVICE       = 0;// Unused attribute. Should not be sent
-        int ID           = 1;
-        int NAME         = 2;
-        int LANGUAGE     = 3;
-        int VERSION      = 4;
-        
+        int DEVICE = 0;// Unused attribute. Should not be sent
+        int ID = 1;
+        int NAME = 2;
+        int LANGUAGE = 3;
+        int VERSION = 4;
+
         // SurveyGroup information
-        int GROUP_ID                  = 5;
-        int GROUP_NAME                = 6;
-        int GROUP_MONITORED           = 7;
+        int GROUP_ID = 5;
+        int GROUP_NAME = 6;
+        int GROUP_MONITORED = 7;
         int GROUP_REGISTRATION_SURVEY = 8;
-        
-        int COUNT    = 9;// Length of column array
+
+        int COUNT = 9;// Length of column array
     }
 
 }

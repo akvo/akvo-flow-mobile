@@ -132,7 +132,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             mDrawerLayout.openDrawer(Gravity.START);
         }
 
-        if (savedInstanceState == null || supportFragmentManager.findFragmentByTag(DATA_POINTS_FRAGMENT_TAG) == null) {
+        if (savedInstanceState == null
+                || supportFragmentManager.findFragmentByTag(DATA_POINTS_FRAGMENT_TAG) == null) {
             DatapointsFragment datapointsFragment = DatapointsFragment.newInstance(mSurveyGroup);
             supportFragmentManager.beginTransaction()
                     .replace(R.id.content_frame, datapointsFragment, DATA_POINTS_FRAGMENT_TAG)
@@ -329,7 +330,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
                 readOnly = status != SurveyDbAdapter.SurveyInstanceStatus.SAVED;
             } else {
-                formInstanceId = mDatabase.createSurveyRespondent(formId, registrationForm.getVersion(), user, surveyedLocaleId);
+                formInstanceId = mDatabase
+                        .createSurveyRespondent(formId, registrationForm.getVersion(), user,
+                                surveyedLocaleId);
             }
             c.close();
 
@@ -355,7 +358,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     private void displaySelectedUser() {
         User user = FlowApp.getApp().getUser();
         if (user != null) {
-            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
+                    Toast.LENGTH_LONG).show();
         }
     }
 

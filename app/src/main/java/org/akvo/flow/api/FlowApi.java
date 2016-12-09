@@ -111,11 +111,11 @@ public class FlowApi {
 
     /**
      * Sends the location beacon to the server
-     * <p>
      * The response is ignored
      */
-    public void sendLocation(@NonNull String serverBase, @Nullable Double latitude, @Nullable Double longitude,
-                             @Nullable Float accuracy) {
+    public void sendLocation(@NonNull String serverBase, @Nullable Double latitude,
+            @Nullable Double longitude,
+            @Nullable Float accuracy) {
         try {
             String url = buildLocationUrl(serverBase, latitude, longitude, accuracy);
             HttpUtil.httpGet(url);
@@ -125,8 +125,9 @@ public class FlowApi {
     }
 
     @NonNull
-    private String buildLocationUrl(@NonNull String serverBase, @Nullable Double latitude, @Nullable Double
-            longitude, @Nullable Float accuracy) {
+    private String buildLocationUrl(@NonNull String serverBase, @Nullable Double latitude,
+            @Nullable Double
+                    longitude, @Nullable Float accuracy) {
         Uri.Builder builder = Uri.parse(serverBase).buildUpon();
         builder.appendPath(Path.BEACON_SERVICE);
         builder.appendQueryParameter(Param.PARAM_ACTION, Param.VALUE_BEACON);
@@ -136,10 +137,10 @@ public class FlowApi {
             builder.appendQueryParameter(Param.LON, longitude + "");
             builder.appendQueryParameter(Param.ACC, accuracy + "");
         }
-        builder.appendQueryParameter(Param.OS_VERSION, "Android " + android.os.Build.VERSION.RELEASE);
+        builder.appendQueryParameter(Param.OS_VERSION,
+                "Android " + android.os.Build.VERSION.RELEASE);
         return builder.build().toString();
     }
-
 
     /**
      * Request the notifications GAE has ready for us, like the list of missing files.
@@ -148,7 +149,8 @@ public class FlowApi {
      * @throws Exception
      */
     @Nullable
-    public JSONObject getDeviceNotification(@NonNull String serverBase, @NonNull String[] surveyIds) throws Exception {
+    public JSONObject getDeviceNotification(@NonNull String serverBase, @NonNull String[] surveyIds)
+            throws Exception {
         // Send the list of surveys we've got downloaded, getting notified of the deleted ones
         String url = buildDeviceNotificationUrl(serverBase, surveyIds);
         String response = HttpUtil.httpGet(url);
@@ -159,7 +161,8 @@ public class FlowApi {
     }
 
     @NonNull
-    private String buildDeviceNotificationUrl(@NonNull String serverBase, @NonNull String[] surveyIds) {
+    private String buildDeviceNotificationUrl(@NonNull String serverBase,
+            @NonNull String[] surveyIds) {
         Uri.Builder builder = Uri.parse(serverBase).buildUpon();
         builder.appendPath(Path.DEVICE_NOTIFICATION);
         appendDeviceParams(builder);
@@ -170,7 +173,8 @@ public class FlowApi {
     }
 
     @NonNull
-    public List<Survey> getSurveyHeader(@NonNull String serverBaseUrl, @NonNull String surveyId) throws IOException {
+    public List<Survey> getSurveyHeader(@NonNull String serverBaseUrl, @NonNull String surveyId)
+            throws IOException {
         final String url = buildSurveyHeaderUrl(serverBaseUrl, surveyId);
         String response = HttpUtil.httpGet(url);
         if (response != null) {
@@ -213,8 +217,9 @@ public class FlowApi {
      * Sends a message to the service with the file name that was just uploaded
      * so it can start processing the file
      */
-    public int sendProcessingNotification(@NonNull String serverBaseUrl, @NonNull String formId, @NonNull String
-            action, @NonNull String fileName) {
+    public int sendProcessingNotification(@NonNull String serverBaseUrl, @NonNull String formId,
+            @NonNull String
+                    action, @NonNull String fileName) {
         String url = buildProcessingNotificationUrl(serverBaseUrl, formId, action, fileName);
         try {
             HttpUtil.httpGet(url);
@@ -229,7 +234,8 @@ public class FlowApi {
     }
 
     @NonNull
-    private String buildProcessingNotificationUrl(@NonNull String serverBaseUrl, @NonNull String formId, @NonNull
+    private String buildProcessingNotificationUrl(@NonNull String serverBaseUrl,
+            @NonNull String formId, @NonNull
             String action, @NonNull String fileName) {
         Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
         builder.appendPath(Path.NOTIFICATION);
@@ -241,7 +247,8 @@ public class FlowApi {
     }
 
     @Nullable
-    public List<SurveyedLocale> getSurveyedLocales(@NonNull String serverBaseUrl, long surveyGroup, @NonNull String timestamp)
+    public List<SurveyedLocale> getSurveyedLocales(@NonNull String serverBaseUrl, long surveyGroup,
+            @NonNull String timestamp)
             throws IOException {
         // Note: To compute the HMAC auth token, query params must be alphabetically ordered
         String url = buildSyncUrl(serverBaseUrl, surveyGroup, timestamp);
@@ -258,7 +265,8 @@ public class FlowApi {
     }
 
     @NonNull
-    private String buildSyncUrl(@NonNull String serverBaseUrl, long surveyGroup, @NonNull String timestamp) {
+    private String buildSyncUrl(@NonNull String serverBaseUrl, long surveyGroup,
+            @NonNull String timestamp) {
         // Note: To compute the HMAC auth token, query params must be alphabetically ordered
         StringBuilder queryStringBuilder = new StringBuilder();
         appendParam(queryStringBuilder, Param.ANDROID_ID, encodeParam(ANDROID_ID));
@@ -273,7 +281,8 @@ public class FlowApi {
                 Param.SEPARATOR + Param.HMAC + Param.EQUALS + getAuthorization(query);
     }
 
-    private void appendParam(@NonNull StringBuilder queryStringBuilder, @NonNull String paramName, @NonNull String paramValue) {
+    private void appendParam(@NonNull StringBuilder queryStringBuilder, @NonNull String paramName,
+            @NonNull String paramValue) {
         queryStringBuilder.append(paramName).append(Param.EQUALS).append(paramValue).append(Param
                 .SEPARATOR);
     }

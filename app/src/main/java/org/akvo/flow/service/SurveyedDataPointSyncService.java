@@ -45,9 +45,9 @@ public class SurveyedDataPointSyncService extends IntentService {
     private static final String TAG = SurveyedDataPointSyncService.class.getSimpleName();
 
     public static final String SURVEY_GROUP = "survey_group";
-    
+
     private final Handler mHandler = new Handler();
-    
+
     public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
@@ -61,9 +61,10 @@ public class SurveyedDataPointSyncService extends IntentService {
         FlowApi api = new FlowApi();
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         boolean correctSync = true;
-        NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                                                           getString(R.string.pleasewait), true, true,
-                                                           ConstantUtil.NOTIFICATION_RECORD_SYNC);
+        NotificationHelper
+                .displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                        getString(R.string.pleasewait), true, true,
+                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
         try {
             Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
@@ -79,19 +80,22 @@ public class SurveyedDataPointSyncService extends IntentService {
                 }
                 syncedRecords += batch.size();
                 sendBroadcastNotification();// Keep the UI fresh!
-                NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                                                                   String.format(getString(R.string.synced_records),
-                                                                                 syncedRecords), true, true,
-                                                                   ConstantUtil.NOTIFICATION_RECORD_SYNC);
+                NotificationHelper
+                        .displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                                String.format(getString(R.string.synced_records),
+                                        syncedRecords), true, true,
+                                ConstantUtil.NOTIFICATION_RECORD_SYNC);
                 lastBatch = batch;
             }
             if (correctSync) {
-                NotificationHelper.displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                        String.format(getString(R.string.synced_records),
-                                syncedRecords), false, false,
-                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
+                NotificationHelper
+                        .displayNotificationWithProgress(this, getString(R.string.syncing_records),
+                                String.format(getString(R.string.synced_records),
+                                        syncedRecords), false, false,
+                                ConstantUtil.NOTIFICATION_RECORD_SYNC);
             } else {
-                NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.syncing_records),
+                NotificationHelper.displayErrorNotificationWithProgress(this,
+                        getString(R.string.syncing_records),
                         getString(R.string.syncing_corrupted_datapoints_error), false, false,
                         ConstantUtil.NOTIFICATION_RECORD_SYNC);
             }
@@ -105,14 +109,17 @@ public class SurveyedDataPointSyncService extends IntentService {
                     break;
             }
             displayToast(message);
-            NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.sync_error), message, false,
-                                                               false, ConstantUtil.NOTIFICATION_RECORD_SYNC);
+            NotificationHelper
+                    .displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
+                            message, false,
+                            false, ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
             displayToast(getString(R.string.network_error));
-            NotificationHelper.displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
-                                                               getString(R.string.network_error), false, false,
-                                                               ConstantUtil.NOTIFICATION_RECORD_SYNC);
+            NotificationHelper
+                    .displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
+                            getString(R.string.network_error), false, false,
+                            ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } finally {
             database.close();
         }
@@ -124,12 +131,14 @@ public class SurveyedDataPointSyncService extends IntentService {
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
     @NonNull
-    private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbAdapter database, @NonNull FlowApi api, long surveyGroupId)
+    private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbAdapter database, @NonNull FlowApi api,
+            long surveyGroupId)
             throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
-        List<SurveyedLocale> locales = api.getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime);
+        List<SurveyedLocale> locales = api
+                .getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime);
         boolean correctData = true;
         if (locales != null) {
             for (SurveyedLocale locale : locales) {

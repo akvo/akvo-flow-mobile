@@ -50,12 +50,12 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private static final String TAG = ResponseListFragment.class.getSimpleName();
 
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
-    private static final String EXTRA_RECORD       = "record";
+    private static final String EXTRA_RECORD = "record";
 
     // TODO: Move all id constants to ConstantUtil
-    private static int SURVEY_ID_KEY          = R.integer.surveyidkey;
+    private static int SURVEY_ID_KEY = R.integer.surveyidkey;
     private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
-    private static int FINISHED_KEY           = R.integer.finishedkey;
+    private static int FINISHED_KEY = R.integer.finishedkey;
 
     // Context menu items
     private static final int DELETE_ONE = 0;
@@ -132,17 +132,19 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         menu.add(0, VIEW_HISTORY, 0, R.string.transmissionhist);
 
         // Allow deletion only for 'saved' responses
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         View itemView = info.targetView;
-        if (!(Boolean)itemView.getTag(FINISHED_KEY)) {
+        if (!(Boolean) itemView.getTag(FINISHED_KEY)) {
             menu.add(0, DELETE_ONE, 2, R.string.deleteresponse);
         }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        Long surveyInstanceId = mAdapter.getItemId(info.position);// This ID is the _id column in the SQLite db
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        Long surveyInstanceId = mAdapter
+                .getItemId(info.position);// This ID is the _id column in the SQLite db
         switch (item.getItemId()) {
             case DELETE_ONE:
                 deleteSurveyInstance(surveyInstanceId);
@@ -200,7 +202,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
 
         // Read-only vs editable
-        if ((Boolean)view.getTag(FINISHED_KEY)) {
+        if ((Boolean) view.getTag(FINISHED_KEY)) {
             i.putExtra(ConstantUtil.READONLY_KEY, true);
         } else {
             i.putExtra(ConstantUtil.SINGLE_SURVEY_KEY, true);

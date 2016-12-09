@@ -15,9 +15,9 @@
 
 package org.akvo.flow.domain.response;
 
-import java.util.List;
+        import org.akvo.flow.domain.SurveyedLocale;
 
-import org.akvo.flow.domain.SurveyedLocale;
+        import java.util.List;
 
 public class SurveyedLocalesResponse {
     private List<SurveyedLocale> mSurveyedLocales;
@@ -27,7 +27,7 @@ public class SurveyedLocalesResponse {
         mSurveyedLocales = surveyedLocales;
         mError = error;
     }
-    
+
     public List<SurveyedLocale> getSurveyedLocales() {
         return mSurveyedLocales;
     }

@@ -55,7 +55,7 @@ import java.util.zip.ZipInputStream;
 
 /**
  * This activity will check for new surveys on the device and install as needed
- * 
+ *
  * @author Christopher Fagiani
  */
 public class SurveyDownloadService extends IntentService {
@@ -77,7 +77,8 @@ public class SurveyDownloadService extends IntentService {
                 databaseAdaptor = new SurveyDbAdapter(this);
                 databaseAdaptor.open();
 
-                String[] surveyIds = intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
+                String[] surveyIds =
+                        intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
                 checkAndDownload(surveyIds);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
@@ -213,7 +214,7 @@ public class SurveyDownloadService extends IntentService {
     /**
      * checks to see if we should pre-cache help media files (based on the
      * property in the settings db) and, if we should, downloads the files
-     * 
+     *
      * @param survey
      */
     private void downloadResources(@NonNull Survey survey) {
@@ -242,7 +243,8 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
-    private void downloadResources(@NonNull final String sid, @NonNull final Set<String> resources) {
+    private void downloadResources(@NonNull final String sid,
+            @NonNull final Set<String> resources) {
         databaseAdaptor.markSurveyHelpDownloaded(sid, false);
         boolean ok = true;
         for (String resource : resources) {
@@ -318,7 +320,7 @@ public class SurveyDownloadService extends IntentService {
     /**
      * invokes a service call to list all surveys that have been designated for
      * this device (based on phone number).
-     * 
+     *
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
@@ -339,7 +341,8 @@ public class SurveyDownloadService extends IntentService {
     }
 
     private void displayErrorNotification(int id, String msg) {
-        NotificationHelper.displayErrorNotification(getString(R.string.error_form_sync_title), msg, this, id);
+        NotificationHelper
+                .displayErrorNotification(getString(R.string.error_form_sync_title), msg, this, id);
     }
 
     private void displayNotification(int synced, int failed, int total) {
@@ -350,8 +353,9 @@ public class SurveyDownloadService extends IntentService {
                 synced, failed)
                 : String.format(getString(R.string.data_sync_synced), synced);
 
-        NotificationHelper.displayNotification(this, total, title, text, ConstantUtil.NOTIFICATION_FORMS_SYNCED, !finished,
-                                               synced + failed);
+        NotificationHelper.displayNotification(this, total, title, text,
+                ConstantUtil.NOTIFICATION_FORMS_SYNCED, !finished,
+                synced + failed);
     }
 
     /**

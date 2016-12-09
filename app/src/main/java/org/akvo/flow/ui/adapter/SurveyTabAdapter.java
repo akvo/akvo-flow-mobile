@@ -13,6 +13,7 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+
 package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
@@ -37,7 +38,8 @@ import org.akvo.flow.ui.view.SubmitTab;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
+public class SurveyTabAdapter extends PagerAdapter
+        implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
 
     private static final String TAG = SurveyTabAdapter.class.getSimpleName();
 
@@ -51,8 +53,9 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private List<QuestionGroupTab> mQuestionGroupTabs;
     private SubmitTab mSubmitTab;
 
-    public SurveyTabAdapter(Context context, ActionBar actionBar, ViewPager pager, SurveyListener surveyListener,
-                            QuestionInteractionListener questionListener) {
+    public SurveyTabAdapter(Context context, ActionBar actionBar, ViewPager pager,
+            SurveyListener surveyListener,
+            QuestionInteractionListener questionListener) {
         mContext = context;
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
@@ -67,7 +70,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         for (QuestionGroup group : mQuestionGroups) {
             QuestionGroupTab questionGroupTab =
-                new QuestionGroupTab(mContext, group, mSurveyListener, mQuestionListener);
+                    new QuestionGroupTab(mContext, group, mSurveyListener, mQuestionListener);
             mQuestionGroupTabs.add(questionGroupTab);
         }
 
@@ -83,7 +86,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
 
         if (mSubmitTab != null) {
-            mActionBar.addTab(mActionBar.newTab().setText(R.string.submitbutton).setTabListener(this));
+            mActionBar.addTab(mActionBar.newTab().setText(R.string.submitbutton)
+                    .setTabListener(this));
         }
 
         mPager.setOnPageChangeListener(this);

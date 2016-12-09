@@ -174,7 +174,8 @@ public class HttpUtil {
         return builder.toString();
     }
 
-    public static void copyStream(@NonNull InputStream in, @NonNull OutputStream out) throws IOException {
+    public static void copyStream(@NonNull InputStream in, @NonNull OutputStream out)
+            throws IOException {
         byte[] b = new byte[BUFFER_SIZE];
         int read;
         while ((read = in.read(b)) != -1) {

@@ -12,6 +12,7 @@
  * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  *
  */
+
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
@@ -59,7 +60,8 @@ public class DatapointsFragment extends Fragment {
      * BroadcastReceiver to notify of records synchronisation. This should be
      * fired from SurveyedLocalesSyncService.
      */
-    private final BroadcastReceiver mSurveyedLocalesSyncReceiver = new DataPointSyncBroadcastReceiver(this);
+    private final BroadcastReceiver mSurveyedLocalesSyncReceiver = new DataPointSyncBroadcastReceiver(
+            this);
 
     private SurveyDbAdapter mDatabase;
     private TabsAdapter mTabsAdapter;
@@ -93,7 +95,8 @@ public class DatapointsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroup = (SurveyGroup) getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+        mSurveyGroup = (SurveyGroup) getArguments()
+                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -129,18 +132,21 @@ public class DatapointsFragment extends Fragment {
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
         mDatabase.deleteEmptyRecords();
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mSurveyedLocalesSyncReceiver,
-                new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(mSurveyedLocalesSyncReceiver,
+                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mSurveyedLocalesSyncReceiver);
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(mSurveyedLocalesSyncReceiver);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
         mPager = (ViewPager) v.findViewById(R.id.pager);
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) v.findViewById(R.id.tabs);
@@ -196,7 +202,8 @@ public class DatapointsFragment extends Fragment {
                 }
                 return true;
             case R.id.stats:
-                StatsDialogFragment dialogFragment = StatsDialogFragment.newInstance(mSurveyGroup.getId());
+                StatsDialogFragment dialogFragment = StatsDialogFragment
+                        .newInstance(mSurveyGroup.getId());
                 dialogFragment.show(getFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
                 return true;
             default:
@@ -223,7 +230,8 @@ public class DatapointsFragment extends Fragment {
 
         public void refreshFragments(SurveyGroup newSurveyGroup) {
             this.surveyGroup = newSurveyGroup;
-            SurveyedLocaleListFragment listFragment = (SurveyedLocaleListFragment) fragmentsRef.get(POSITION_LIST);
+            SurveyedLocaleListFragment listFragment = (SurveyedLocaleListFragment) fragmentsRef
+                    .get(POSITION_LIST);
             MapFragment mapFragment = (MapFragment) fragmentsRef.get(POSITION_MAP);
 
             if (listFragment != null) {
@@ -237,7 +245,8 @@ public class DatapointsFragment extends Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             if (position == POSITION_LIST) {
-                SurveyedLocaleListFragment surveyedLocaleListFragment = (SurveyedLocaleListFragment) super.instantiateItem(container, position);
+                SurveyedLocaleListFragment surveyedLocaleListFragment = (SurveyedLocaleListFragment) super
+                        .instantiateItem(container, position);
                 fragmentsRef.put(POSITION_LIST, surveyedLocaleListFragment);
                 return surveyedLocaleListFragment;
             } else {

@@ -36,7 +36,7 @@ import java.util.TimerTask;
 /**
  * service for sending location beacons on a set interval to the server. This
  * can be disabled via the properties menu
- * 
+ *
  * @author Christopher Fagiani
  */
 public class LocationService extends Service {
@@ -97,7 +97,8 @@ public class LocationService extends Service {
                                 longitude = lastKnownLocation.getLongitude();
                                 accuracy = lastKnownLocation.getAccuracy();
                             }
-                            flowApi.sendLocation(StatusUtil.getServerBase(LocationService.this), latitude, longitude, accuracy);
+                            flowApi.sendLocation(StatusUtil.getServerBase(LocationService.this),
+                                    latitude, longitude, accuracy);
                         }
                     }
                 }

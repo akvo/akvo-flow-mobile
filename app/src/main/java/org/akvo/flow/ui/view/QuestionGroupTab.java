@@ -13,6 +13,7 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+
 package org.akvo.flow.ui.view;
 
 import android.animation.LayoutTransition;
@@ -60,7 +61,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private Repetitions mRepetitions;// Repetition IDs
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
-                            QuestionInteractionListener questionListener) {
+            QuestionInteractionListener questionListener) {
         super(context);
         mQuestionGroup = group;
         mSurveyListener = surveyListener;
@@ -228,7 +229,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void updateRepetitionsHeader() {
-        mRepetitionsText.setText(getContext().getString(R.string.repetitions) + mRepetitions.size());
+        mRepetitionsText
+                .setText(getContext().getString(R.string.repetitions) + mRepetitions.size());
     }
 
     private void loadGroup() {
@@ -237,14 +239,17 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
     private void loadGroup(int index) {
         final int repetitionId =
-            mRepetitions.size() <= index ? mRepetitions.next() : mRepetitions.getRepetitionId(index);
+                mRepetitions.size() <= index ?
+                        mRepetitions.next() :
+                        mRepetitions.getRepetitionId(index);
         final int position = index + 1;// Visual indicator.
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
             RepetitionHeader header =
-                new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId, position,
-                                     mSurveyListener.isReadOnly() ? null : this);
+                    new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
+                            position,
+                            mSurveyListener.isReadOnly() ? null : this);
             mHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -252,7 +257,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
-                q = Question.copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
+                q = Question
+                        .copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
             }
 
             QuestionView questionView;
@@ -261,9 +267,11 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener, ConstantUtil.PHOTO_QUESTION_TYPE);
+                questionView = new MediaQuestionView(context, q, mSurveyListener,
+                        ConstantUtil.PHOTO_QUESTION_TYPE);
             } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener, ConstantUtil.VIDEO_QUESTION_TYPE);
+                questionView = new MediaQuestionView(context, q, mSurveyListener,
+                        ConstantUtil.VIDEO_QUESTION_TYPE);
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new GeoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {

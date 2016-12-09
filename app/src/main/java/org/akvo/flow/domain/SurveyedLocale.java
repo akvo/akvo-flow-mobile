@@ -31,7 +31,7 @@ import java.util.List;
 public class SurveyedLocale implements Serializable, ClusterItem {
 
     private static final long serialVersionUID = -3556354410813212814L;
-    
+
     private String mId;
     private String mName;
     private long mLastModified;
@@ -42,7 +42,7 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     private List<SurveyInstance> mSurveyInstances = null;
 
     public SurveyedLocale(String id, String name, long lastModified, long surveyGroupId,
-                          Double latitude, Double longitude) {
+            Double latitude, Double longitude) {
         mId = id;
         mName = name;
         mLastModified = lastModified;
@@ -66,27 +66,27 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     public long getLastModified() {
         return mLastModified;
     }
-    
+
     public String getId() {
         return mId;
     }
-    
+
     public Double getLatitude() {
         return mLatitude;
     }
-    
+
     public Double getLongitude() {
         return mLongitude;
     }
-    
+
     public void setSurveyInstances(List<SurveyInstance> surveyInstances) {
         mSurveyInstances = surveyInstances;
     }
-    
+
     public List<SurveyInstance> getSurveyInstances() {
         return mSurveyInstances;
     }
-    
+
     public String getName() {
         return mName;
     }

@@ -114,6 +114,7 @@
     <string name="sync_finished">Data Points Sync finished</string>
     <string name="synced_records">Synced %1$d Data Points</string>
     <string name="sync_error">Data Points Sync failed</string>
+    <string name="syncing_corrupted_datapoints_error">Some items were not synced correctly. Please sync again.</string>
     <string name="network_error">Network Error</string>
     <string name="loading">Loading...</string>
     <string name="prefill_title">Pre-fill Responses</string>
@@ -266,4 +267,5 @@
     <string name="apk_update_service_no_update">You are running the latest version of the app.</string>
     <string name="apk_update_service_error_update">There was an error when updating the app. Please try again.</string>
     <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
+
 </resources>

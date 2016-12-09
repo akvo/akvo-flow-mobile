@@ -71,11 +71,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
-    private static final int SCAN_ACTIVITY_REQUEST  = 3;
-    private static final int EXTERNAL_SOURCE_REQUEST  = 4;
-    private static final int CADDISFLY_REQUEST  = 5;
-    private static final int PLOTTING_REQUEST  = 6;
-    private static final int SIGNATURE_REQUEST  = 7;
+    private static final int SCAN_ACTIVITY_REQUEST = 3;
+    private static final int EXTERNAL_SOURCE_REQUEST = 4;
+    private static final int CADDISFLY_REQUEST = 5;
+    private static final int PLOTTING_REQUEST = 6;
+    private static final int SIGNATURE_REQUEST = 7;
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
@@ -112,14 +112,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
         final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
         mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
         mSurveyInstanceId = getIntent().getLongExtra(ConstantUtil.RESPONDENT_ID_KEY, 0);
-        mSurveyGroup = (SurveyGroup)getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
+        mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
         mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
 
-        mQuestionResponses = new HashMap<String, QuestionResponse>();
+        mQuestionResponses = new HashMap<>();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
-        loadSurvey(surveyId);// Load Survey. This task would be better off if executed in a worker thread
+        loadSurvey(
+                surveyId);// Load Survey. This task would be better off if executed in a worker thread
         loadLanguages();
 
         if (mSurvey == null) {
@@ -131,14 +132,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
         getSupportActionBar().setTitle(mSurvey.getName());
         getSupportActionBar().setSubtitle("v " + getVersion());
 
-        mPager = (ViewPager)findViewById(R.id.pager);
+        mPager = (ViewPager) findViewById(R.id.pager);
         mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
         mPager.setAdapter(mAdapter);
 
         // Initialize new survey or load previous responses
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
         if (!responses.isEmpty()) {
-            loadState(responses);
+            displayResponses(responses);
         }
 
         spaceLeftOnCard();
@@ -182,7 +183,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             response.setId(null);
             response.setRespondentId(mSurveyInstanceId);
         }
-        loadState(responses);
+        displayResponses(responses);
     }
 
     private void loadSurvey(String surveyId) {
@@ -198,7 +199,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
             Log.e(TAG, "Could not load survey xml file");
         } finally {
             if (in != null) {
-                try { in.close(); } catch (IOException e) {}
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
@@ -221,15 +225,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
     /**
      * Load state for the current survey instance
      */
-    private void loadState() {
+    private void loadResponses() {
         Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
-        loadState(responses);
+        displayResponses(responses);
     }
 
     /**
      * Load state with the provided responses map
      */
-    private void loadState(Map<String, QuestionResponse> responses) {
+    private void displayResponses(Map<String, QuestionResponse> responses) {
         mQuestionResponses = responses;
         mAdapter.reset();// Propagate the change
     }
@@ -281,8 +285,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
         if (!localeNameQuestions.isEmpty()) {
             boolean first = true;
             for (String questionId : localeNameQuestions) {
-                QuestionResponse questionResponse = mDatabase.getResponse(mSurveyInstanceId, questionId);
-                String answer = questionResponse != null ? questionResponse.getDatapointNameValue() : null;
+                QuestionResponse questionResponse = mDatabase
+                        .getResponse(mSurveyInstanceId, questionId);
+                String answer =
+                        questionResponse != null ? questionResponse.getDatapointNameValue() : null;
 
                 if (!TextUtils.isEmpty(answer)) {
                     if (!first) {
@@ -294,7 +300,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             // Make sure the value is not larger than 500 chars
             builder.setLength(Math.min(builder.length(), 500));
-            
+
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
                     SurveyedLocaleMeta.NAME);
         }
@@ -385,7 +391,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
-                        loadState();
+                        loadResponses();
                         spaceLeftOnCard();
                     }
                 });
@@ -399,7 +405,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         final String[] langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
         final boolean[] langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
-        final int[] langsSelectedMasterIndexArray = langsPrefData.getLangsSelectedMasterIndexArray();
+        final int[] langsSelectedMasterIndexArray = langsPrefData
+                .getLangsSelectedMasterIndexArray();
 
         ViewUtil.displayLanguageSelector(this, langsSelectedNameArray,
                 langsSelectedBooleanArray,
@@ -430,7 +437,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         switch (requestCode) {
             case PHOTO_ACTIVITY_REQUEST:
             case VIDEO_ACTIVITY_REQUEST:
-                String fileSuffix = requestCode == PHOTO_ACTIVITY_REQUEST ? IMAGE_SUFFIX : VIDEO_SUFFIX;
+                String fileSuffix =
+                        requestCode == PHOTO_ACTIVITY_REQUEST ? IMAGE_SUFFIX : VIDEO_SUFFIX;
                 File tmp = getTmpFile(requestCode == PHOTO_ACTIVITY_REQUEST);
 
                 // Ensure no image is saved in the DCIM folder
@@ -445,7 +453,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     maxImgSize = Integer.valueOf(maxImgSizePref);
                 }
 
-                if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(), maxImgSize)) {
+                if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
+                        maxImgSize)) {
                     Log.i(TAG, "Image resized to: " +
                             getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize]);
                     if (!tmp.delete()) { // must check return value to know if it failed
@@ -518,7 +527,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         saveState();
 
         // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyDbAdapter.SurveyInstanceStatus.SUBMITTED);
+        mDatabase.updateSurveyStatus(mSurveyInstanceId,
+                SurveyDbAdapter.SurveyInstanceStatus.SUBMITTED);
 
         // Make the current survey immutable
         mReadOnly = true;
@@ -651,15 +661,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
             Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
             intent.putExtras(event.getData());
             intent.setType(ConstantUtil.CADDISFLY_MIME);
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.use_external_source)),
-                    + EXTERNAL_SOURCE_REQUEST);
+            startActivityForResult(
+                    Intent.createChooser(intent, getString(R.string.use_external_source)),
+                    +EXTERNAL_SOURCE_REQUEST);
         } else if (QuestionInteractionEvent.CADDISFLY.equals(event.getEventType())) {
             mRequestQuestionId = event.getSource().getQuestion().getId();
             Intent intent = new Intent(ConstantUtil.CADDISFLY_ACTION);
             intent.putExtras(event.getData());
             intent.setType(ConstantUtil.CADDISFLY_MIME);
             startActivityForResult(Intent.createChooser(intent, getString(R.string.caddisfly_test)),
-                    + CADDISFLY_REQUEST);
+                    +CADDISFLY_REQUEST);
         } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
             Intent i = new Intent(this, GeoshapeActivity.class);
             if (event.getData() != null) {

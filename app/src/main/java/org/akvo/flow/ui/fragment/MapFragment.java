@@ -1,17 +1,16 @@
 /*
- *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ * This file is part of Akvo FLOW.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
 package org.akvo.flow.ui.fragment;
@@ -32,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -45,9 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
@@ -57,9 +55,13 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+
 //TODO: separate single data point and multiple into different classes for clarity
 public class MapFragment extends SupportMapFragment
-    implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener, OnMapReadyCallback {
+        implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener, OnMapReadyCallback {
 
     private static final String TAG = MapFragment.class.getSimpleName();
     public static final int MAP_ZOOM_LEVEL = 10;
@@ -91,7 +93,8 @@ public class MapFragment extends SupportMapFragment
         super.onCreate(savedInstanceState);
         mItems = new ArrayList<>();
 
-        mSurveyGroup = (SurveyGroup) getArguments().getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+        mSurveyGroup = (SurveyGroup) getArguments()
+                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
         mRecordId = getArguments().getString(RecordActivity.EXTRA_RECORD_ID);
         mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
     }
@@ -105,7 +108,8 @@ public class MapFragment extends SupportMapFragment
         try {
             mListener = (RecordListListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement SurveyedLocalesFragmentListener");
+            throw new ClassCastException(
+                    activity.toString() + " must implement SurveyedLocalesFragmentListener");
         }
     }
 
@@ -152,10 +156,14 @@ public class MapFragment extends SupportMapFragment
 
         final double scale = 1d;
         LatLngBounds newBounds =
-            bounds.including(new LatLng(ne.latitude + latDst / scale, ne.longitude + lonDst / scale))
-                  .including(new LatLng(sw.latitude - latDst / scale, ne.longitude + lonDst / scale))
-                  .including(new LatLng(sw.latitude - latDst / scale, sw.longitude - lonDst / scale))
-                  .including(new LatLng(ne.latitude + latDst / scale, sw.longitude - lonDst / scale));
+                bounds.including(
+                        new LatLng(ne.latitude + latDst / scale, ne.longitude + lonDst / scale))
+                        .including(new LatLng(sw.latitude - latDst / scale,
+                                ne.longitude + lonDst / scale))
+                        .including(new LatLng(sw.latitude - latDst / scale,
+                                sw.longitude - lonDst / scale))
+                        .including(new LatLng(ne.latitude + latDst / scale,
+                                sw.longitude - lonDst / scale));
 
         mClusterManager.clearItems();
         for (SurveyedLocale item : mItems) {
@@ -182,7 +190,8 @@ public class MapFragment extends SupportMapFragment
             position = new LatLng(record.getLatitude(), record.getLongitude());
         } else {
             // When multiple points are shown, center the map in user's location
-            LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            LocationManager manager = (LocationManager) getActivity()
+                    .getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             String provider = manager.getBestProvider(criteria, true);
@@ -216,7 +225,8 @@ public class MapFragment extends SupportMapFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View mapView = super.onCreateView(inflater, container, savedInstanceState);
 
         View v = inflater.inflate(R.layout.map_fragment, container, false);
@@ -249,11 +259,13 @@ public class MapFragment extends SupportMapFragment
 
     private void updateSingleRecord() {
         SurveyedLocale record = mDatabase.getSurveyedLocale(mRecordId);
-        if (mMap != null && record != null && record.getLatitude() != null && record.getLongitude() != null) {
+        if (mMap != null && record != null && record.getLatitude() != null
+                && record.getLongitude() != null) {
             mMap.clear();
-            mMap.addMarker(new MarkerOptions().position(new LatLng(record.getLatitude(), record.getLongitude()))
-                                              .title(record.getDisplayName(getActivity()))
-                                              .snippet(record.getId()));
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(record.getLatitude(), record.getLongitude()))
+                    .title(record.getDisplayName(getActivity()))
+                    .snippet(record.getId()));
             centerMap(record);
         }
     }
@@ -274,7 +286,8 @@ public class MapFragment extends SupportMapFragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId, ConstantUtil.ORDER_BY_NONE);
+        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId,
+                ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override
@@ -307,13 +320,15 @@ public class MapFragment extends SupportMapFragment
 
         private final WeakReference<Context> activityContextWeakRef;
 
-        public PointRenderer(GoogleMap map, Context context, ClusterManager<SurveyedLocale> clusterManager) {
+        public PointRenderer(GoogleMap map, Context context,
+                ClusterManager<SurveyedLocale> clusterManager) {
             super(context, map, clusterManager);
             this.activityContextWeakRef = new WeakReference<>(context);
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(SurveyedLocale item, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(SurveyedLocale item,
+                MarkerOptions markerOptions) {
             Context context = activityContextWeakRef.get();
             if (context != null) {
                 markerOptions.title(item.getDisplayName(context)).snippet(item.getId());

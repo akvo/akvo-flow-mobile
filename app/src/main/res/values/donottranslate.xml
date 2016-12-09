@@ -2,8 +2,5 @@
 <resources>
     <!--Intent Actions. Do not translate these strings-->
     <string name="action_surveys_sync" translatable="false">fieldsurvey.ACTION_SURVEYS_SYNC</string>
-    <string name="action_locales_sync" translatable="false">fieldsurvey.ACTION_LOCALES_SYNC</string>
-    <string name="action_data_sync" translatable="false">fieldsurvey.ACTION_DATA_SYNC</string>
-
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBPyguWZrQi2xcqs49WajwQ6FYeSHpaEFQ</string>
 </resources>

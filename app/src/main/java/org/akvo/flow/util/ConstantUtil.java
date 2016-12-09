@@ -1,24 +1,23 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ * This file is part of Akvo FLOW.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
 package org.akvo.flow.util;
 
 /**
  * Class to hold all public constants used in the application
- * 
+ *
  * @author Christopher Fagiani
  */
 public class ConstantUtil {
@@ -128,10 +127,7 @@ public class ConstantUtil {
      */
     public static final String USER_ID_KEY = "UID";
     public static final String SURVEY_ID_KEY = "SID";
-    public static final String ID_KEY = "_id";
     public static final String RESPONDENT_ID_KEY = "survey_respondent_id";
-    public static final String IMAGE_URL_LIST_KEY = "imageurls";
-    public static final String IMAGE_CAPTION_LIST_KEY = "imagecaps";
     public static final String READONLY_KEY = "readonly";
     public static final String SINGLE_SURVEY_KEY = "single_survey";
     public static final String SURVEY_GROUP = "survey_group";
@@ -168,12 +164,6 @@ public class ConstantUtil {
     public static final String ENGLISH_CODE = "en";
 
     /**
-     * html colors
-     */
-    public static final String WHITE_COLOR = "white";
-    public static final String BLACK_COLOR = "black";
-
-    /**
      * "code" to prevent unauthorized use of administrative settings/preferences
      */
     public static final String ADMIN_AUTH_CODE = "12345";
@@ -199,31 +189,31 @@ public class ConstantUtil {
      */
     public static final String RESOURCE_PACKAGE = "org.akvo.flow";
     public static final String RAW_RESOURCE = "raw";
-    
+
     /**
      * SurveyedLocale meta question IDs. Negative IDs to avoid collisions.
-     * Irrelevant for the server side, they are used to identify a locale meta-data 
+     * Irrelevant for the server side, they are used to identify a locale meta-data
      * response among the rest of the 'real' question answers
      */
     public static final String QUESTION_LOCALE_NAME = "-1";
     public static final String QUESTION_LOCALE_GEO = "-2";
-    
+
     /**
      * Order By
      */
-    public static final int ORDER_BY_NONE     = -1;
-    public static final int ORDER_BY_DATE     = 0;
+    public static final int ORDER_BY_NONE = -1;
+    public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS   = 2;
-    public static final int ORDER_BY_NAME     = 3;
+    public static final int ORDER_BY_STATUS = 2;
+    public static final int ORDER_BY_NAME = 3;
 
     /**
      * Max picture size
      * Values must match the ones set in arrays.
      * TODO: Preferences should be managed with SharedPreferences api, to avoid this error prone references
      */
-    public static final int IMAGE_SIZE_320_240  = 0;
-    public static final int IMAGE_SIZE_640_480  = 1;
+    public static final int IMAGE_SIZE_320_240 = 0;
+    public static final int IMAGE_SIZE_640_480 = 1;
     public static final int IMAGE_SIZE_1280_960 = 2;
 
     public static final int NOTIFICATION_RECORD_SYNC = 100;
@@ -251,6 +241,10 @@ public class ConstantUtil {
     public static final String CADDISFLY_RESPONSE = "response";
     public static final String CADDISFLY_IMAGE = "image";
     public static final String CADDISFLY_MIME = "text/plain";
+
+    //broadcasts
+    public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
+    public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
 
     /**
      * prevent instantiation

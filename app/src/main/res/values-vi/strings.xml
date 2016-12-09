@@ -216,7 +216,7 @@
   <string name="downloading_forms">Đang tải các biểu mẫu</string>
   <string name="error_form_sync_title">Lỗi khi đồng bộ hóa biểu mẫu</string>
   <string name="error_assignment_read">Không thể hiểu được việc chỉ định biểu mẫu từ bảng điều khiển Flow</string>
-  <string name="error_form_header">Phần trăm %1$d biểu mẫu không được hiểu từ bảng điều khiển Flow</string>
+  <string name="error_form_header">Phần trăm %1$s biểu mẫu không được hiểu từ bảng điều khiển Flow</string>
   <string name="error_form_download">Chắc chắn rằng biểu mẫu này đã được công bố, và ngày tháng/thời gian của khu vực của bạn là ok</string>
   <string name="form_deleted">Biểu mẫu này đã bị xóa</string>
   <!--Plotting-->

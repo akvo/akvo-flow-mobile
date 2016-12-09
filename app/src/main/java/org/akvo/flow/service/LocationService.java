@@ -16,45 +16,37 @@
 
 package org.akvo.flow.service;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.app.Service;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
-import android.util.Log;
+import android.support.annotation.Nullable;
 
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.StatusUtil;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * service for sending location beacons on a set interval to the server. This
  * can be disabled via the properties menu
- * 
+ *
  * @author Christopher Fagiani
  */
 public class LocationService extends Service {
+    @Nullable
     private static Timer timer;
     private LocationManager locMgr;
     private Criteria locationCriteria;
     private static final long INITIAL_DELAY = 60000;
     private static final long INTERVAL = 1800000;
     private static boolean sendBeacon = true;
-    private static final String BEACON_SERVICE_PATH = "/locationBeacon?action=beacon";
-    private static final String LAT = "&lat=";
-    private static final String LON = "&lon=";
-    private static final String ACC = "&acc=";
-    private static final String OS_VERSION = "&osVersion=";
-    private static final String TAG = "LocationService";
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -70,7 +62,6 @@ public class LocationService extends Service {
         // call endService if they change the preference to false after we're
         // already started
         SurveyDbAdapter database = null;
-        final String server = StatusUtil.getServerBase(this);
         try {
             database = new SurveyDbAdapter(this);
 
@@ -92,10 +83,22 @@ public class LocationService extends Service {
 
                 @Override
                 public void run() {
+                    //TODO: refactor to not reference service but use a weak reference
                     if (sendBeacon && StatusUtil.hasDataConnection(LocationService.this)) {
                         String provider = locMgr.getBestProvider(locationCriteria, true);
                         if (provider != null) {
-                            sendLocation(server, locMgr.getLastKnownLocation(provider));
+                            FlowApi flowApi = new FlowApi();
+                            Location lastKnownLocation = locMgr.getLastKnownLocation(provider);
+                            Double latitude = null;
+                            Double longitude = null;
+                            Float accuracy = null;
+                            if (lastKnownLocation != null) {
+                                latitude = lastKnownLocation.getLatitude();
+                                longitude = lastKnownLocation.getLongitude();
+                                accuracy = lastKnownLocation.getAccuracy();
+                            }
+                            flowApi.sendLocation(StatusUtil.getServerBase(LocationService.this),
+                                    latitude, longitude, accuracy);
                         }
                     }
                 }
@@ -110,24 +113,6 @@ public class LocationService extends Service {
         locMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationCriteria = new Criteria();
         locationCriteria.setAccuracy(Criteria.NO_REQUIREMENT);
-    }
-
-    /**
-     * sends the location beacon to the server
-     */
-    private void sendLocation(String serverBase, Location loc) {
-        if (serverBase != null) {
-            try {
-                String url = serverBase + BEACON_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
-                if (loc != null) {
-                    url += LAT + loc.getLatitude() + LON + loc.getLongitude() + ACC + loc.getAccuracy();
-                }
-                url += OS_VERSION + URLEncoder.encode("Android " + android.os.Build.VERSION.RELEASE);
-                HttpUtil.httpGet(url);
-            } catch (IOException e) {
-                Log.e(TAG, "Could not send location beacon", e);
-            }
-        }
     }
 
     public void onDestroy() {

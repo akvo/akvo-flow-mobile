@@ -24,11 +24,11 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -51,8 +51,8 @@ import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.DrawerFragment;
+import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
@@ -104,7 +104,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_menu_white_48dp, R.string.drawer_open, R.string.drawer_close) {
+                 R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
@@ -122,7 +122,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             }
         };
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());

@@ -16,7 +16,7 @@
     <string name="lon">Lon</string>
     <string name="elevation">Height</string>
     <string name="submitbutton">Submit</string>
-    <string name="geodialog">GPS must be enabled to do this. Select OK to go to\tthe settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
+    <string name="geodialog">GPS must be enabled to do this. Select OK to go to the settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
     <string name="resize_large_images">Resize large images</string>
     <string name="settingslabel">Settings</string>
     <string name="nouser">No Users!</string>
@@ -32,7 +32,7 @@
     <string name="aboutlabel">About</string>
     <string name="aboutdesc">Displays version information.</string>
     <string name="abouttitle">About - Akvo FLOW app</string>
-    <string name="about_text">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$d Stichting Akvo\nVersion %2$s</string>
+    <string name="about_text">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
     <string name="gpsstatuslabel">GPS Status</string>
     <string name="gpsstatusdesc">Launches the GPS Status application if you have it installed on this device.</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>

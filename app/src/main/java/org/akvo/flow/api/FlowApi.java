@@ -37,12 +37,12 @@ import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
-import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -223,7 +223,7 @@ public class FlowApi {
         String url = buildProcessingNotificationUrl(serverBaseUrl, formId, action, fileName);
         try {
             HttpUtil.httpGet(url);
-            return HttpStatus.SC_OK;
+            return HttpURLConnection.HTTP_OK;
         } catch (HttpException e) {
             Log.e(TAG, e.getStatus() + " response for formId: " + formId);
             return e.getStatus();

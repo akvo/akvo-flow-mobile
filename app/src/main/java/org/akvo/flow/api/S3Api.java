@@ -9,7 +9,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PropertyUtil;
-import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -113,7 +112,7 @@ public class S3Api {
             HttpUtil.copyStream(in, out);
 
             int status = conn.getResponseCode();
-            if (status != HttpStatus.SC_OK) {
+            if (status != HttpURLConnection.HTTP_OK) {
                 throw new IOException("Status Code: " + status + ". Expected: 200 - OK");
             }
         } finally {

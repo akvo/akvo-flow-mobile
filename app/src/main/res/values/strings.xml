@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Akvo FLOW</string>
     <string name="accuracy">Acc</string>
     <string name="searching">Searching...</string>
@@ -32,7 +32,7 @@
     <string name="aboutlabel">About</string>
     <string name="aboutdesc">Displays version information.</string>
     <string name="abouttitle">About - Akvo FLOW app</string>
-    <string name="about_text">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
+    <string name="about_text" tools:ignore="PluralsCandidate">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
     <string name="gpsstatuslabel">GPS Status</string>
     <string name="gpsstatusdesc">Launches the GPS Status application if you have it installed on this device.</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>
@@ -46,7 +46,6 @@
     <string name="savelastuserlabel">Keep the last selected user logged-in between sessions</string>
     <string name="uploadoptionlabel">Sync data over mobile network</string>
     <string name="surveylanglabel">Survey Languages</string>
-    <string name="beaconlabel">Send Location Beacons</string>
     <string name="scanbarcode">Scan Barcode</string>
     <string name="barcodeerror">Scanner not installed. Please install the Barcode Scanner app from the Android Market.</string>
     <string name="toosmallerr">Value is too small. Minimum value: </string>

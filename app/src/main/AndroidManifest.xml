@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.akvo.flow"
-          android:versionCode="6"
-          android:versionName="2.2.9">
-
-    <uses-sdk
-            android:minSdkVersion="10"
-            android:targetSdkVersion="19"/>
+          package="org.akvo.flow">
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>

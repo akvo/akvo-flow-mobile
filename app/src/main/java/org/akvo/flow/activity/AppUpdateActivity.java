@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -13,6 +13,7 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+
 package org.akvo.flow.activity;
 
 import android.app.Activity;
@@ -56,7 +57,9 @@ public class AppUpdateActivity extends Activity {
     private ProgressBar mProgress;
     private UpdateAsyncTask mTask;
 
-    String mUrl, mVersion, mMd5Checksum;
+    private String mUrl;
+    private String mVersion;
+    private String mMd5Checksum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +71,14 @@ public class AppUpdateActivity extends Activity {
         mVersion = getIntent().getStringExtra(EXTRA_VERSION);
         mMd5Checksum = getIntent().getStringExtra(EXTRA_CHECKSUM);
 
-        mInstallBtn = (Button)findViewById(R.id.install_btn);
-        mProgress = (ProgressBar)findViewById(R.id.progress);
+        mInstallBtn = (Button) findViewById(R.id.install_btn);
+        mProgress = (ProgressBar) findViewById(R.id.progress);
         mProgress.setMax(MAX_PROGRESS);// Values will be in percentage
 
         // If the file is already downloaded, just prompt the install text
         final String filename = checkLocalFile();
         if (filename != null) {
-            TextView updateTV = (TextView)findViewById(R.id.update_text);
+            TextView updateTV = (TextView) findViewById(R.id.update_text);
             updateTV.setText(R.string.clicktoinstall);
             mInstallBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -94,7 +97,7 @@ public class AppUpdateActivity extends Activity {
             });
         }
 
-        Button cancelBtn = (Button)findViewById(R.id.cancel_btn);
+        Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +113,7 @@ public class AppUpdateActivity extends Activity {
      * @return filename of the already downloaded file, if exists. Null otherwise
      */
     private String checkLocalFile() {
-        final String latestVersion = FileUtil.checkDownloadedVersions(this);
+        final String latestVersion = FileUtil.checkDownloadedVersions();
         if (latestVersion != null) {
             if (mMd5Checksum != null) {
                 // The file was found, but we need to ensure the checksum matches,
@@ -180,7 +183,8 @@ public class AppUpdateActivity extends Activity {
         @Override
         protected void onPostExecute(String filename) {
             if (TextUtils.isEmpty(filename)) {
-                Toast.makeText(AppUpdateActivity.this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(AppUpdateActivity.this, R.string.apk_upgrade_error,
+                        Toast.LENGTH_SHORT).show();
                 mInstallBtn.setText(R.string.retry);
                 mInstallBtn.setEnabled(true);
                 return;
@@ -191,7 +195,7 @@ public class AppUpdateActivity extends Activity {
         }
 
         @Override
-        protected void onCancelled () {
+        protected void onCancelled() {
             Log.d(TAG, "onCancelled() - APK update task cancelled");
             mProgress.setProgress(0);
             cleanupDownloads(mVersion);
@@ -205,6 +209,7 @@ public class AppUpdateActivity extends Activity {
         /**
          * Wipe any existing apk file, and create a new File for the new one, according to the
          * given version
+         *
          * @param location
          * @param version
          * @return
@@ -272,7 +277,8 @@ public class AppUpdateActivity extends Activity {
                     if (mMd5Checksum == null) {
                         // If we don't have a checksum yet, try to get it form the ETag header
                         String etag = conn.getHeaderField("ETag");
-                        mMd5Checksum = etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+                        mMd5Checksum =
+                                etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
                     }
                     // Compare the MD5, if found. Otherwise, rely on the 200 status code
                     ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);

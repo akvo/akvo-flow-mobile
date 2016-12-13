@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -340,7 +341,7 @@ public class FlowApi {
         builder.appendQueryParameter(Param.PHONE_NUMBER, PHONE_NUMBER);
         builder.appendQueryParameter(Param.ANDROID_ID, ANDROID_ID);
         builder.appendQueryParameter(Param.IMEI, IMEI);
-        builder.appendQueryParameter(Param.VERSION, PlatformUtil.getVersionName(context));
+        builder.appendQueryParameter(Param.VERSION, BuildConfig.VERSION_NAME);
         builder.appendQueryParameter(Param.DEVICE_ID, StatusUtil.getDeviceId(context));
     }
 

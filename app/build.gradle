@@ -7,66 +7,83 @@ repositories {
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
-    defaultConfig {
-        minSdkVersion 10
-        targetSdkVersion 21
-        applicationId "org.akvo.flow"
-        testApplicationId "org.akvo.flow.tests"
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
-        testHandleProfiling true
-        testFunctionalTest true
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-    signingConfigs {
+    def versionPropsFile = file('version.properties')
 
-        debug {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('debug-key/debug.keystore')
-            storePassword 'android'
-        }
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
 
-        flowRelease {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+        def versionMajor = versionProps['VERSION_MAJOR'].toInteger()
+        def versionMinor = versionProps['VERSION_MINOR'].toInteger()
+        def versionPatch = versionProps['VERSION_PATCH'].toInteger()
+        def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
+
+        defaultConfig {
+            versionCode versionCodeProperty
+            versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+            minSdkVersion 10
+            targetSdkVersion 21
+            applicationId "org.akvo.flow"
+            testApplicationId "org.akvo.flow.tests"
+            testInstrumentationRunner "android.test.InstrumentationTestRunner"
+            testHandleProfiling true
+            testFunctionalTest true
         }
-        buildTypes {
-            release {
-                signingConfig signingConfigs.flowRelease
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+        }
+        signingConfigs {
+
+            debug {
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+                storeFile file('debug-key/debug.keystore')
+                storePassword 'android'
+            }
+
+            flowRelease {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
+            buildTypes {
+                release {
+                    signingConfig signingConfigs.flowRelease
+                }
             }
         }
-    }
-    packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-    }
-
-    productFlavors {
-        flow {
+        packagingOptions {
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/NOTICE'
         }
-        biogas {
-        }
-        cookstoves {
-        }
-    }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
+        productFlavors {
+            flow {
+            }
+            biogas {
+            }
+            cookstoves {
+            }
+        }
 
-    lintOptions {
-        // set to true to turn off analysis progress reporting by lint
-        quiet false
-        // if true, stop the gradle build if errors are found
-        abortOnError false
-        // if true, only report errors
-        ignoreWarnings false
-        lintConfig file('lint.xml')
+        testOptions {
+            unitTests.returnDefaultValues = true
+        }
+
+        lintOptions {
+            // set to true to turn off analysis progress reporting by lint
+            quiet false
+            // if true, stop the gradle build if errors are found
+            abortOnError false
+            // if true, only report errors
+            ignoreWarnings false
+            lintConfig file('lint.xml')
+        }
+    } else {
+        throw new GradleException("Could not read version.properties!")
     }
 }
 

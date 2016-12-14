@@ -18,12 +18,10 @@ package org.akvo.flow.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.provider.Settings.Secure;
-import android.util.Log;
 import android.util.TypedValue;
 
 import java.io.File;
@@ -33,23 +31,6 @@ import java.util.UUID;
  * Utilities class to provide Android related functionalities
  */
 public class PlatformUtil {
-    private static final String TAG = PlatformUtil.class.getSimpleName();
-
-    /**
-     * Get the version name assigned in AndroidManifest.xml
-     * 
-     * @param context
-     * @return versionName
-     */
-    public static String getVersionName(Context context) {
-        try {
-            return context.getPackageManager().getPackageInfo(
-                    context.getPackageName(), 0).versionName;
-        } catch (NameNotFoundException e) {
-            Log.e(TAG, e.getMessage());
-            return "";
-        }
-    }
 
     /**
      * Check if a given version is newer than the current one.
@@ -90,7 +71,7 @@ public class PlatformUtil {
     }
 
     public static int getResource(Context context, int attr) {
-        TypedArray a = context.getTheme().obtainStyledAttributes(new int[]{attr});
+        TypedArray a = context.getTheme().obtainStyledAttributes(new int[] { attr });
         return a.getResourceId(0, 0);
     }
 
@@ -98,7 +79,8 @@ public class PlatformUtil {
      * Install the newest version of the app. This method will be called
      * either after the file download is completed, or upon the app being started,
      * if the newest version is found in the filesystem.
-     * @param context Context
+     *
+     * @param context  Context
      * @param filename Absolute path to the newer APK
      */
     public static void installAppUpdate(Context context, String filename) {
@@ -109,14 +91,15 @@ public class PlatformUtil {
         context.startActivity(intent);
     }
 
-    public static String uuid(){
+    public static String uuid() {
         return UUID.randomUUID().toString();
     }
 
-    public static String recordUuid(){
+    public static String recordUuid() {
         String base32Id = Base32.base32Uuid();
         // Put dashes between the 4-5 and 8-9 positions to increase readability
-        return base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id.substring(8);
+        return base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id
+                .substring(8);
     }
 
     public static String getAndroidID(Context context) {

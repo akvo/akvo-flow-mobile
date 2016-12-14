@@ -16,6 +16,17 @@
 
 package org.akvo.flow.util;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.media.ExifInterface;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.Log;
+
+import org.akvo.flow.BuildConfig;
+import org.akvo.flow.app.FlowApp;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -34,19 +45,9 @@ import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.media.ExifInterface;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.text.TextUtils;
-import android.util.Log;
-
-import org.akvo.flow.app.FlowApp;
-
 /**
  * utility for manipulating files
- * 
+ *
  * @author Christopher Fagiani
  */
 public class FileUtil {
@@ -66,12 +67,13 @@ public class FileUtil {
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK, RES};
+    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK, RES}
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
      * not be in the app-specific External Storage. The caller cannot assume anything about
      * the location.
+     *
      * @param type FileType to determine the type of resource attempting to use.
      * @return File representing the root directory for the given FileType.
      */
@@ -113,10 +115,11 @@ public class FileUtil {
     /**
      * Get the root of the files storage directory, depending on the resource being app internal
      * (not concerning the user) or not (users might need to pull the resource from the storage).
+     *
      * @param internal true for app specific resources, false otherwise
      * @return The root directory for this kind of resources
      */
-    private static final String getFilesStorageDir(boolean internal) {
+    private static String getFilesStorageDir(boolean internal) {
         if (internal) {
             return FlowApp.getApp().getExternalFilesDir(null).getAbsolutePath();
         }
@@ -142,7 +145,7 @@ public class FileUtil {
     public static String readFileAsString(File file) throws IOException {
         StringBuilder contents = new StringBuilder();
         BufferedReader input = new BufferedReader(new FileReader(file));
-        String line = null;
+        String line;
         try {
             while ((line = input.readLine()) != null) {
                 contents.append(line);
@@ -178,7 +181,7 @@ public class FileUtil {
     /**
      * reads the contents of an InputStream into a ByteArrayOutputStream.
      */
-    public static ByteArrayOutputStream read(InputStream is) throws IOException {
+    private static ByteArrayOutputStream read(InputStream is) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         copy(is, out);
         return out;
@@ -229,7 +232,7 @@ public class FileUtil {
     /**
      * Compute MD5 checksum of the given path's file
      */
-    public static byte[] getMD5Checksum(String path) {
+    private static byte[] getMD5Checksum(String path) {
         return getMD5Checksum(new File(path));
     }
 
@@ -251,9 +254,7 @@ public class FileUtil {
             }
 
             return md.digest();
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, e.getMessage());
-        } catch (IOException e) {
+        } catch (NoSuchAlgorithmException | IOException e) {
             Log.e(TAG, e.getMessage());
         } finally {
             close(in);
@@ -282,12 +283,12 @@ public class FileUtil {
      * that the two of them are the same, the datetime contained in their exif
      * metadata will be compared. If the exif does not contain a datetime, the
      * MD5 checksum of the images will be compared.
-     * 
+     *
      * @param image1 Absolute path to the first image
      * @param image2 Absolute path to the second image
      * @return true if their datetime is the same, false otherwise
      */
-    public static boolean compareImages(String image1, String image2) {
+    private static boolean compareImages(String image1, String image2) {
         boolean equals = false;
         try {
             ExifInterface exif1 = new ExifInterface(image1);
@@ -314,12 +315,12 @@ public class FileUtil {
      * the two of them are the same, the MD5 checksum will be compared. Note
      * that if any of the files does not exist, or if its checksum cannot be
      * computed, false will be returned.
-     * 
+     *
      * @param path1 Absolute path to the first file
      * @param path2 Absolute path to the second file
      * @return true if their MD5 checksum is the same, false otherwise.
      */
-    public static boolean compareFilesChecksum(String path1, String path2) {
+    private static boolean compareFilesChecksum(String path1, String path2) {
         final byte[] checksum1 = getMD5Checksum(path1);
         final byte[] checksum2 = getMD5Checksum(path2);
 
@@ -331,13 +332,13 @@ public class FileUtil {
      * folder. This method will try to spot those situations and remove the
      * duplicated image.
      *
-     * @param context Context
+     * @param context  Context
      * @param filepath The absolute path to the original image
      */
     public static void cleanDCIM(Context context, String filepath) {
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[]{
+                new String[] {
                         MediaStore.Images.ImageColumns.DATA,
                         MediaStore.Images.ImageColumns.DATE_TAKEN
                 },
@@ -377,10 +378,9 @@ public class FileUtil {
      *
      * @return the path and version of a newer APK, if found, null otherwise
      */
-    public static String checkDownloadedVersions(Context context) {
-        final String installedVer = PlatformUtil.getVersionName(context);
+    public static String checkDownloadedVersions() {
 
-        String maxVersion = installedVer;// Keep track of newest version available
+        String maxVersion = BuildConfig.VERSION_NAME;// Keep track of newest version available
         String apkPath = null;
 
         File appsLocation = getFilesDir(FileType.APK);
@@ -399,7 +399,7 @@ public class FileUtil {
                         apk.delete();
                     }
                     version.delete();
-                } else if (apks.length > 0){
+                } else if (apks.length > 0) {
                     maxVersion = versionName;
                     apkPath = apks[0].getAbsolutePath();// There should only be 1
                 }

@@ -22,6 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:saveEnabled="false"/>
 
             <TextView
@@ -29,6 +30,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/screenoptcheckbox"
+                android:layout_toStartOf="@id/screenoptcheckbox"
                 android:text="@string/screenoptlabel"
                 android:textSize="20sp" />
 
@@ -37,6 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/screenopttxt"
                 android:layout_toLeftOf="@id/screenoptcheckbox"
+                android:layout_toStartOf="@id/screenoptcheckbox"
                 android:text="@string/screenoptdesc"
                 android:textSize="14sp" />
         </RelativeLayout>
@@ -54,6 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:saveEnabled="false"/>
 
 
@@ -62,6 +66,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/uploadoptioncheckbox"
+                android:layout_toStartOf="@id/uploadoptioncheckbox"
                 android:layout_centerVertical="true"
                 android:text="@string/uploadoptionlabel"
                 android:textSize="20sp" />
@@ -115,31 +120,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/surveylanglabel"
                 android:textSize="14sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:background="@drawable/listitem_row_2"
-            android:gravity="center_vertical" >
-
-            <CheckBox
-                android:id="@+id/beaconcheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:saveEnabled="false"/>
-
-            <TextView
-                android:id="@+id/beaconlabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/beaconcheckbox"
-                android:layout_centerVertical="true"
-                android:text="@string/beaconlabel"
-                android:textSize="20sp" />
         </RelativeLayout>
 
         <RelativeLayout

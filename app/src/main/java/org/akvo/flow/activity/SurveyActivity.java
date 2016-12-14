@@ -46,13 +46,12 @@ import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
-import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.DrawerFragment;
+import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
@@ -234,7 +233,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 startService(new Intent(this, SurveyDownloadService.class));
                 startService(new Intent(this, DataSyncService.class));
             }
-            startService(new Intent(this, LocationService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
             startService(new Intent(this, ApkUpdateService.class));

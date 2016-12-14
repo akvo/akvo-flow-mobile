@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.akvo.flow"
-          android:versionCode="7"
-          android:versionName="2.2.10_alpha">
-
-    <uses-sdk
-            android:minSdkVersion="10"
-            android:targetSdkVersion="19"/>
+          package="org.akvo.flow">
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -91,7 +85,6 @@
 
         <service android:name=".service.DataSyncService"/>
         <service android:name=".service.SurveyDownloadService"/>
-        <service android:name=".service.LocationService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.ExceptionReportingService"/>
         <service android:name=".service.ApkUpdateService"/>

@@ -27,10 +27,6 @@
     <!-- Text -->
     <color name="text_primary">@color/black_main</color>
     <color name="text_primary_disabled">@color/black_disabled</color>
-    <color name="text_secondary">@color/orange_main</color>
-    <color name="text_secondary_disabled">@color/orange_disabled</color>
-    <color name="text_tertiary">@color/blue_main</color>
-    <color name="text_tertiary_disabled">@color/blue_disabled</color>
 
     <color name="action_bar_text">@color/orange_main</color>
 

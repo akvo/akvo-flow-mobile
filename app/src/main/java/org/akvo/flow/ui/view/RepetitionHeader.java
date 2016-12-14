@@ -18,6 +18,7 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -48,12 +49,12 @@ public class RepetitionHeader extends TextView implements View.OnTouchListener {
         setPadding(padding, padding, padding, padding);
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         setText(mTitle + " - " + pos);
-        setTextColor(getResources().getColor(R.color.text_color_secondary));
-        setBackgroundColor(getResources().getColor(R.color.background_alternate));
+        setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
+        setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
 
         // Show 'delete' icon if the OnDeleteListener param is not null
         if (mListener != null) {
-            Drawable deleteIcon = getContext().getResources().getDrawable(R.drawable.ic_trash);
+            Drawable deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_trash);
             setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
             setOnTouchListener(this);
         }

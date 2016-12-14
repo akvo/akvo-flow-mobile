@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -49,7 +49,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         RecordListListener {
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_RECORD_ID = "record";
-    
+
     private static final int POSITION_SURVEYS = 0;
     private static final int POSITION_RESPONSES = 1;
 
@@ -59,18 +59,18 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     private SurveyedLocale mRecord;
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
-    
+
     private ViewPager mPager;
 
     private String[] mTabs;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record_activity);
-        
+
         mTabs = getResources().getStringArray(R.array.record_tabs);
-        mPager = (ViewPager)findViewById(R.id.pager);
+        mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -78,15 +78,16 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
                 getSupportActionBar().setSelectedNavigationItem(position);
             }
         });
-        
+
         mDatabase = new SurveyDbAdapter(this);
-        
+
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(EXTRA_SURVEY_GROUP);
         setTitle(mSurveyGroup.getName());
-        
+
         setupActionBar();
     }
-    
+
+    //TODO: replace deprecated Tabs
     private void setupActionBar() {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -101,7 +102,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         actionBar.addTab(listTab);
         actionBar.addTab(responsesTab);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -146,8 +147,11 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
         long[] instances = mDatabase.getFormInstances(mRecord.getId(), surveyId,
                 SurveyInstanceStatus.SAVED);
-        long instance = instances.length > 0 ? instances[0]
-                : mDatabase.createSurveyRespondent(surveyId, survey.getVersion(), mUser, mRecord.getId());
+        long instance = instances.length > 0 ?
+                instances[0]
+                :
+                mDatabase.createSurveyRespondent(surveyId, survey.getVersion(), mUser,
+                        mRecord.getId());
 
         Intent i = new Intent(this, FormActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
@@ -159,7 +163,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     }
 
     class TabsAdapter extends FragmentPagerAdapter {
-        
+
         public TabsAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -168,7 +172,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         public int getCount() {
             return mTabs.length;
         }
-        
+
         @Override
         public Fragment getItem(int position) {
             switch (position) {
@@ -177,21 +181,21 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
                 case POSITION_RESPONSES:
                     return ResponseListFragment.instantiate(mSurveyGroup, mRecord);
             }
-            
+
             return null;
         }
-        
+
         @Override
         public CharSequence getPageTitle(int position) {
             return mTabs[position];
         }
-        
+
     }
-    
+
     // ==================================== //
     // =========== Options Menu =========== //
     // ==================================== //
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.datapoint_activity, menu);
@@ -209,7 +213,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
                 return super.onOptionsItemSelected(item);
         }
     }
-    
+
     @Override
     public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
     }

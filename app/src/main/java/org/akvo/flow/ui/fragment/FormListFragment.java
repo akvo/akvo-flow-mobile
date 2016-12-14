@@ -16,17 +16,17 @@
 
 package org.akvo.flow.ui.fragment;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +44,12 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 
 public class FormListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
         OnItemClickListener {
@@ -63,8 +69,11 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
     private SurveyAdapter mAdapter;
     private SurveyDbAdapter mDatabase;
     private SurveyListListener mListener;
-    
-    public static FormListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
+
+    public FormListFragment() {
+    }
+
+    public static FormListFragment newInstance(SurveyGroup surveyGroup, SurveyedLocale record) {
         FormListFragment fragment = new FormListFragment();
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
@@ -165,23 +174,27 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
 
             final SurveyInfo surveyInfo = getItem(position);
 
-            TextView surveyNameView = (TextView)listItem.findViewById(R.id.text1);
-            TextView surveyVersionView = (TextView)listItem.findViewById(R.id.text2);
+            TextView surveyNameView = (TextView)listItem.findViewById(R.id.survey_name_tv);
             TextView lastSubmissionTitle = (TextView)listItem.findViewById(R.id.date_label);
             TextView lastSubmissionView = (TextView)listItem.findViewById(R.id.date);
 
-            surveyNameView.setText(surveyInfo.mName);
-            surveyVersionView.setText("v" + surveyInfo.mVersion);
+            StringBuilder surveyExtraInfo = new StringBuilder(20);
+            surveyExtraInfo.append(" v").append(surveyInfo.mVersion);
 
             boolean enabled = isEnabled(surveyInfo.mId);
             if (surveyInfo.mDeleted) {
                 enabled = false;
-                surveyVersionView.append(" - " + getString(R.string.form_deleted));
+                surveyExtraInfo.append(" - " + getString(R.string.form_deleted));
             }
-
+            SpannableString versionSpannable = getSpannableString(
+                    getResources().getDimensionPixelSize(R.dimen.survey_version_text_size),
+                    surveyExtraInfo.toString());
+            SpannableString titleSpannable = getSpannableString(
+                    getResources().getDimensionPixelSize(R.dimen.survey_title_text_size),
+                    surveyInfo.mName);
+            surveyNameView.setText(TextUtils.concat(titleSpannable, versionSpannable));
             listItem.setEnabled(enabled);
             surveyNameView.setEnabled(enabled);
-            surveyVersionView.setEnabled(enabled);
 
             if (surveyInfo.mLastSubmission != null && !isRegistrationSurvey(surveyInfo.mId)) {
                 String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
@@ -200,7 +213,15 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
 
             return listItem;
         }
-        
+
+        @NonNull
+        private SpannableString getSpannableString(int textSize, String string) {
+            SpannableString spannable = new SpannableString(string);
+            spannable.setSpan(new AbsoluteSizeSpan(textSize), 0, string.length(),
+                    SPAN_INCLUSIVE_INCLUSIVE);
+            return spannable;
+        }
+
     }
 
     @Override

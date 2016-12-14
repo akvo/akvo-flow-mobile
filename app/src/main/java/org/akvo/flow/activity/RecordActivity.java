@@ -50,8 +50,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_RECORD_ID = "record";
     
-    //private static final String TAG = RecordActivity.class.getSimpleName();
-    
     private static final int POSITION_SURVEYS = 0;
     private static final int POSITION_RESPONSES = 1;
 
@@ -175,7 +173,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         public Fragment getItem(int position) {
             switch (position) {
                 case POSITION_SURVEYS:
-                    return FormListFragment.instantiate(mSurveyGroup, mRecord);
+                    return FormListFragment.newInstance(mSurveyGroup, mRecord);
                 case POSITION_RESPONSES:
                     return ResponseListFragment.instantiate(mSurveyGroup, mRecord);
             }

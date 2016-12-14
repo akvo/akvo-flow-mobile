@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -463,7 +464,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 3));
                     tv.setTextSize(ITEM_TEXT_SIZE);
-                    tv.setTextColor(getResources().getColor(R.color.black_disabled));
+                    tv.setTextColor(ContextCompat.getColor(getActivity(), R.color.black_disabled));
                     tv.setText(R.string.surveys);
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
@@ -507,8 +508,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     SurveyGroup sg = mSurveys.get(childPosition);
                     tv.setText(sg.getName());
                     if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
-                        tv.setTextColor(getResources().getColorStateList(mHighlightColor));
-                        v.setBackgroundColor(getResources().getColor(R.color.background_alternate));
+                        tv.setTextColor(ContextCompat.getColorStateList(getActivity(), mHighlightColor));
+                        v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_alternate));
                     }
                     v.setTag(sg);
                     break;

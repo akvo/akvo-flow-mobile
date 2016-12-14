@@ -5,6 +5,7 @@
 
     <color name="black_main">#000000</color>
     <color name="black_disabled">#8f8f8f</color>
+    <color name="black_transparent">#20000000</color>
 
     <color name="orange_main">#e17e26</color>
     <color name="orange_disabled">#80e17e26</color>

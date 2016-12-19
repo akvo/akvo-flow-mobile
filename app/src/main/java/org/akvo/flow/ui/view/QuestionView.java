@@ -16,11 +16,6 @@
 
 package org.akvo.flow.ui.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,6 +42,11 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
     private static final int PADDING_DIP = 8;
@@ -169,7 +169,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         boolean isFirst = true;
         StringBuilder text = new StringBuilder();
         if (mQuestion.isMandatory()) {
-            text.append("<i><b>");
+            text.append("<b>");
         }
 
         text.append(mQuestion.getOrder()).append(". ");// Prefix the text with the order
@@ -198,7 +198,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             }
         }
         if (mQuestion.isMandatory()) {
-            text = text.append("*</b></i>");
+            text = text.append("*</b>");
         }
         return Html.fromHtml(text.toString());
     }

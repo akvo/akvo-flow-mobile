@@ -54,5 +54,11 @@
         <item name="android:textColor">@color/button_tertiary_text</item>
     </style>
 
+    <style name="Spinner">
+        <!-- Color when pressed -->
+        <item name="colorAccent">@color/black_disabled</item>
+        <!-- Default color for the dropdown arrow and line -->
+        <item name="colorControlNormal">@color/black_disabled</item>
+    </style>
 
 </resources>

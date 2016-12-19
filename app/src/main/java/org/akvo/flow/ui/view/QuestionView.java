@@ -70,7 +70,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
-        final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
+        final int padding = (int) PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
         setPadding(padding, padding, padding, padding);
         if (sColors == null) {
             // must have enough colors for all enabled languages
@@ -84,7 +84,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     /**
      * Inflate the appropriate layout file, and retrieve the references to the common resources.
      * Subclasses' layout files should ALWAYS contain the question_header view.
-     *
      * Inflated layout will be attached to the View's root, thus all the elements within it
      * will be accessible by calling findViewById(int)
      *
@@ -94,8 +93,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(layoutRes, this, true);
 
-        mQuestionText = (TextView)findViewById(R.id.question_tv);
-        mTipImage = (ImageButton)findViewById(R.id.tip_ib);
+        mQuestionText = (TextView) findViewById(R.id.question_tv);
+        mTipImage = (ImageButton) findViewById(R.id.tip_ib);
 
         if (mQuestionText == null || mTipImage == null) {
             throw new RuntimeException(

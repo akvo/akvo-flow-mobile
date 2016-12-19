@@ -85,7 +85,6 @@
 
         <service android:name=".service.DataSyncService"/>
         <service android:name=".service.SurveyDownloadService"/>
-        <service android:name=".service.LocationService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.ExceptionReportingService"/>
         <service android:name=".service.ApkUpdateService"/>

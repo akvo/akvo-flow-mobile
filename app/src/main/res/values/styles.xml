@@ -34,7 +34,7 @@
         <item name="android:textColor">@color/tab_text_color</item>
     </style>
 
-    <style name="Flow.ListView" parent="@android:style/Widget.ListView">
+    <style name="Flow.ListView" parent="@style/Widget.AppCompat.ListView">
         <item name="android:cacheColorHint">@android:color/transparent</item>
         <item name="android:divider">@color/white</item>
     </style>

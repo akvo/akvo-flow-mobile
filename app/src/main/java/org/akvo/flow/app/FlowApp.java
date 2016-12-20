@@ -24,6 +24,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.getsentry.raven.RavenFactory;
+import com.getsentry.raven.android.Raven;
+
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
@@ -33,9 +37,13 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
+import org.akvo.flow.util.logging.CustomAndroidRavenFactory;
+import org.akvo.flow.util.logging.RavenTree;
 
 import java.util.Arrays;
 import java.util.Locale;
+
+import timber.log.Timber;
 
 public class FlowApp extends Application {
     private static final String TAG = FlowApp.class.getSimpleName();
@@ -48,8 +56,18 @@ public class FlowApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        initLogging();
         init();
         app = this;
+    }
+
+    private void initLogging() {
+        RavenFactory.registerFactory(new CustomAndroidRavenFactory(this));
+        Raven.init(this);
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
+        Timber.plant(new RavenTree());
     }
 
     public static FlowApp getApp() {

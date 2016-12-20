@@ -106,6 +106,10 @@
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version"/>
 
+        <meta-data
+                android:name="com.getsentry.raven.android.DSN"
+                android:value="@string/sentry_dns_test" />
+
         <provider
                 android:name=".dao.DataProvider"
                 android:authorities="org.akvo.flow"

@@ -45,6 +45,7 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -269,7 +270,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         return valid;
     }
 
-    class CascadeAdapter extends ArrayAdapter<Node> {
+    private static class CascadeAdapter extends ArrayAdapter<Node> {
 
         CascadeAdapter(Context context, List<Node> objects) {
             super(context, android.R.layout.simple_spinner_item, objects);
@@ -284,9 +285,18 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         }
 
         @Override
-        public View getDropDownView (int position, View convertView, ViewGroup parent) {
+        public View getDropDownView (final int position, View convertView, ViewGroup parent) {
             View view = super.getDropDownView(position, convertView, parent);
             setStyle(view, position);
+            if (view instanceof TextView) {
+                final TextView finalItem = (TextView) view;
+                view.post(new CascadeTextViewRunnable(finalItem, position, getCount() - 1));
+            }
+            if (position == getCount() - 1) {
+                parent.setPadding(parent.getPaddingLeft(), parent.getPaddingTop(),
+                        parent.getPaddingRight(), parent.getResources()
+                                .getDimensionPixelSize(R.dimen.cascade_bottom_margin));
+            }
             return view;
         }
 
@@ -302,6 +312,32 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
                 text.setPaintFlags(flags);
             } catch (ClassCastException e) {
                 Log.e("CascadeAdapter", "View cannot be casted to TextView!");
+            }
+        }
+
+        private static class CascadeTextViewRunnable implements Runnable {
+            private final WeakReference<TextView> textViewWeakReference;
+            private final int position;
+            private final int lastPosition;
+
+            public CascadeTextViewRunnable(TextView finalItem, int position, int lastPosition) {
+                this.textViewWeakReference = new WeakReference<>(finalItem);
+                this.position = position;
+                this.lastPosition = lastPosition;
+            }
+
+            @Override
+            public void run() {
+                TextView finalItem = textViewWeakReference.get();
+                if (finalItem != null) {
+                    finalItem.setSingleLine(false);
+//                    if (position == lastPosition) {
+//                        ViewGroup.LayoutParams params = finalItem.getLayoutParams();
+//                        finalItem.setPadding(finalItem.getPaddingLeft(), finalItem.getPaddingTop(),
+//                                finalItem.getPaddingRight(), finalItem.getResources()
+//                                        .getDimensionPixelSize(R.dimen.cascade_bottom_margin));
+//                    }
+                }
             }
         }
     }

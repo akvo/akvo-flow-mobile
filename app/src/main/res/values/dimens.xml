@@ -9,4 +9,6 @@
     <dimen name="survey_version_text_size">18sp</dimen>
     <dimen name="survey_title_text_size">22sp</dimen>
 
+    <dimen name="cascade_bottom_margin">16dp</dimen>
+
 </resources>

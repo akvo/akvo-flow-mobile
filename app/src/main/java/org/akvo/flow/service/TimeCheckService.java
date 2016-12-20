@@ -22,7 +22,6 @@ import android.util.Log;
 
 import org.akvo.flow.activity.TimeCheckActivity;
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.StatusUtil;
 
 import java.io.IOException;
@@ -45,7 +44,7 @@ public class TimeCheckService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
+        //Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         checkTime();
     }
 

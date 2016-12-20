@@ -24,7 +24,6 @@ import android.util.Log;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -126,7 +125,7 @@ public class ExceptionReportingService extends Service {
 
     public void onCreate() {
         super.onCreate();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
+        //Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**

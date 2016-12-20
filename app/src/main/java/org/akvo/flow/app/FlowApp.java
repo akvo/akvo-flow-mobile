@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.getsentry.raven.RavenFactory;
 import com.getsentry.raven.android.Raven;
+import com.getsentry.raven.dsn.Dsn;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
@@ -63,11 +64,17 @@ public class FlowApp extends Application {
 
     private void initLogging() {
         RavenFactory.registerFactory(new CustomAndroidRavenFactory(this));
-        Raven.init(this);
+        Raven.init(this, new Dsn("http://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14"));
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
         Timber.plant(new RavenTree());
+
+        Raven.capture(new Exception("Raven exception with new library"));
+
+//        Sentry.init(this, "http://sentry.support.akvo-ops.org/", "http://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14");
+////        Sentry.init(this, "http://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14");
+//        Sentry.captureException(new RuntimeException("Hello I'm a runtime exception"));
     }
 
     public static FlowApp getApp() {

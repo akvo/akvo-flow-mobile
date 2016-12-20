@@ -41,6 +41,7 @@ import org.akvo.flow.util.FileUtil.FileType;
  * 
  * @author Christopher Fagiani
  */
+@Deprecated
 public class PersistentUncaughtExceptionHandler implements
         UncaughtExceptionHandler {
     private static final String TAG = "UNCAUGHT_EXCEPTION_HANDLER";

@@ -93,7 +93,7 @@ public class SurveyDownloadService extends IntentService {
 
     public void onCreate() {
         super.onCreate();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
+        //Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**

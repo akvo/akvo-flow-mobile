@@ -56,6 +56,7 @@ public class CustomEventBuilderHelper extends AndroidEventBuilderHelper {
             eventBuilder.withTag(VERSION_NAME_TAG_KEY, versionName);
             int versionCode = packageInfo.versionCode;
             eventBuilder.withTag(VERSION_CODE_TAG_KEY, versionCode+"");
+            Timber.d("Raven : helpBuildingEvent"+eventBuilder.toString());
         } catch (PackageManager.NameNotFoundException e) {
             Timber.e("Error getting versionName and versionCode");
         }

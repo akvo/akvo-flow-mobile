@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 android {
@@ -94,7 +95,7 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
+    compile fileTree(include: '*.jar', dir: 'libs')
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-annotations:21.0.0'
     compile 'com.google.android.gms:play-services-base:7.5.0'
@@ -105,14 +106,14 @@ dependencies {
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
     compile 'com.jakewharton.timber:timber:4.4.0'
     compile 'com.getsentry.raven:raven-android:7.8.1'
+    compile 'com.joshdholtz.sentry:sentry-android:1.4.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile "org.powermock:powermock-module-junit4:1.6.2"
-    testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
-    testCompile "org.powermock:powermock-api-mockito:1.6.2"
-    testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
-
+    testCompile 'org.powermock:powermock-module-junit4:1.6.2'
+    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.2'
+    testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }

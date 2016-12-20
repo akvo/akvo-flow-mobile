@@ -24,6 +24,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+
+import org.akvo.flow.R;
+import org.akvo.flow.dao.SurveyDao;
+import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.NotificationHelper;
+import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.ViewUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,18 +49,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.ViewUtil;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -364,7 +365,7 @@ public class BootstrapService extends IntentService {
     public void onCreate() {
         super.onCreate();
         mHandler = new Handler();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
+        //Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**

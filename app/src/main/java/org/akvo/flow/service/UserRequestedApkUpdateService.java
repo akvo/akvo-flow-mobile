@@ -54,7 +54,7 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
+        //Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         checkUpdates();
     }
 

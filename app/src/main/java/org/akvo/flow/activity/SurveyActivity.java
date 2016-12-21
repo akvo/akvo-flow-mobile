@@ -66,8 +66,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
-    private static final int REQUEST_ADD_USER = 0;
-
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
 
@@ -147,7 +145,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         boolean noDevIdYet = false;
         if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
             noDevIdYet = true;
-            startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
+            navigator.navigateToAddUser(this);
         }
 
         startServices(noDevIdYet);
@@ -171,7 +169,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case REQUEST_ADD_USER:
+            case ConstantUtil.REQUEST_ADD_USER:
                 if (resultCode == RESULT_OK) {
                     displaySelectedUser();
                     Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
@@ -344,24 +342,15 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             }
             c.close();
 
-            Intent i = new Intent(this, FormActivity.class);
-            i.putExtra(ConstantUtil.USER_ID_KEY, user.getId());
-            i.putExtra(ConstantUtil.SURVEY_ID_KEY, formId);
-            i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, surveyedLocaleId);
-            i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, formInstanceId);
-            i.putExtra(ConstantUtil.READONLY_KEY, readOnly);
-            startActivity(i);
+            navigator.navigateToFormActivity(this, surveyedLocaleId, user, formId, formInstanceId, readOnly,
+                    mSurveyGroup);
         } else {
-            // Display form list and history
-            Intent intent = new Intent(this, RecordActivity.class);
-            Bundle extras = new Bundle();
-            extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
-            extras.putString(RecordActivity.EXTRA_RECORD_ID, surveyedLocaleId);
-            intent.putExtras(extras);
-            startActivity(intent);
+            navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
+
         }
     }
+
+
 
     private void displaySelectedUser() {
         User user = FlowApp.getApp().getUser();

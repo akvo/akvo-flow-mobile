@@ -249,6 +249,9 @@ public class ConstantUtil {
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
     public static final int FLEX_IN_SECONDS = 1 * 60 * 60; //1 hour
 
+    //requests
+    public static final int REQUEST_ADD_USER = 0;
+
     /**
      * prevent instantiation
      */

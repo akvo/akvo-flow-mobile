@@ -16,9 +16,7 @@
 
 package org.akvo.flow.service;
 
-import android.app.IntentService;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -33,9 +31,8 @@ import org.akvo.flow.util.StatusUtil;
 
 /**
  * This background service will check the rest api for a new version of the APK.
- * If found, it will display a notification, requesting permission to download and
- * installAppUpdate it. After clicking the notification, the app will download and installAppUpdate
- * the new APK.
+ * If found, it will display a {@link org.akvo.flow.activity.AppUpdateActivity}, requesting
+ * permission to download and installAppUpdate it.
  *
  * @author Christopher Fagiani
  */
@@ -46,13 +43,7 @@ public class ApkUpdateService extends GcmTaskService {
     private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
 
     public static void scheduleRepeat(Context context) {
-        //in this method, single Repeating task is scheduled (the target service that will be called is
-        // AppUpdateService.class)
         try {
-            savedUrl = SharedPreferencesHelper.getSavedUrl(context);
-            if (savedUrl == null) {
-                savedUrl = BaseUrlsConstants.CONFIG_FILE_URL;
-            }
             PeriodicTask periodic = new PeriodicTask.Builder()
                     //specify target service - must extend GcmTaskService
                     .setService(ApkUpdateService.class)
@@ -83,41 +74,34 @@ public class ApkUpdateService extends GcmTaskService {
         GcmNetworkManager.getInstance(context).cancelTask(TAG, ApkUpdateService.class);
     }
 
+    /**
+     *  Called when app is updated to a new version, reinstalled etc.
+     *  Repeating tasks have to be rescheduled
+     */
     @Override
     public void onInitializeTasks() {
-        //called when app is updated to a new version, reinstalled etc.
-        //you have to schedule your repeating tasks again
         super.onInitializeTasks();
         scheduleRepeat(this);
     }
 
-    @Override
-    public int onRunTask(TaskParams taskParams) {
-        checkUpdates();
-        return GcmNetworkManager.RESULT_SUCCESS;
-    }
-
-//    @Override
-//    protected void onHandleIntent(Intent intent) {
-//        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
-//        checkUpdates();
-//    }
-
     /**
      * Check if new FLOW versions are available to installAppUpdate. If a new version is available,
-     * we display a notification, requesting the user to download it.
+     * we display {@link org.akvo.flow.activity.AppUpdateActivity}, requesting the user to download it.
      */
-    private void checkUpdates() {
-        if (!StatusUtil.hasDataConnection(this)) {
-            Log.d(TAG, "No internet connection. Can't perform the requested operation");
-            return;
+    @Override
+    public int onRunTask(TaskParams taskParams) {
+        if (!StatusUtil.isConnectionAllowed(this)) {
+            Log.d(TAG, "No available authorised connection. Can't perform the requested operation");
+            return GcmNetworkManager.RESULT_SUCCESS;
         }
 
         try {
             apkUpdateHelper.shouldUpdate(this);
+            return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {
             Log.e(TAG, "Could not call apk version service", e);
             PersistentUncaughtExceptionHandler.recordException(e);
+            return GcmNetworkManager.RESULT_FAILURE;
         }
     }
 }

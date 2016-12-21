@@ -17,6 +17,7 @@
 package org.akvo.flow.service;
 
 import android.content.Context;
+import android.support.v4.util.Pair;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -25,8 +26,9 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 
 /**
@@ -45,7 +47,6 @@ public class ApkUpdateService extends GcmTaskService {
     public static void scheduleRepeat(Context context) {
         try {
             PeriodicTask periodic = new PeriodicTask.Builder()
-                    //specify target service - must extend GcmTaskService
                     .setService(ApkUpdateService.class)
                     //repeat every x seconds
                     .setPeriod(ConstantUtil.REPEAT_INTERVAL_IN_SECONDS)
@@ -57,9 +58,9 @@ public class ApkUpdateService extends GcmTaskService {
                     .setPersisted(true)
                     //if another task with same tag is already scheduled, replace it with this task
                     .setUpdateCurrent(true)
-                    //set required network state, this line is optional
+                    //set required network state
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                    //request that charging must be connected, this line is optional
+                    //request that charging needs not be connected
                     .setRequiresCharging(false).build();
             GcmNetworkManager.getInstance(context).schedule(periodic);
         } catch (Exception e) {
@@ -86,21 +87,26 @@ public class ApkUpdateService extends GcmTaskService {
 
     /**
      * Check if new FLOW versions are available to installAppUpdate. If a new version is available,
-     * we display {@link org.akvo.flow.activity.AppUpdateActivity}, requesting the user to download it.
+     * we display {@link org.akvo.flow.activity.AppUpdateActivity}, requesting the user to download
+     * it.
      */
     @Override
     public int onRunTask(TaskParams taskParams) {
+        Log.d(TAG, "onRunTask : ");
         if (!StatusUtil.isConnectionAllowed(this)) {
             Log.d(TAG, "No available authorised connection. Can't perform the requested operation");
             return GcmNetworkManager.RESULT_SUCCESS;
         }
 
         try {
-            apkUpdateHelper.shouldUpdate(this);
+            Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate(this);
+            if (booleanApkDataPair.first) {
+                //save to shared preferences
+                Prefs.saveApkData(this, booleanApkDataPair.second);
+            }
             return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {
-            Log.e(TAG, "Could not call apk version service", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Log.e(TAG, "Error with apk version service", e);
             return GcmNetworkManager.RESULT_FAILURE;
         }
     }

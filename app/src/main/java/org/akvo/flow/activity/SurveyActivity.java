@@ -36,23 +36,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -78,6 +81,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
     private CharSequence mDrawerTitle, mTitle;
+    private Navigator navigator = new Navigator();
 
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be
@@ -190,6 +194,13 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mDatabase.deleteEmptyRecords();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
+
+        ViewApkData apkData = Prefs.getApkData(this);
+        if (apkData != null && PlatformUtil
+                .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
+            Prefs.clearApkData(this);
+            navigator.navigateToAppUpdate(this, apkData);
+        }
     }
 
     @Override
@@ -235,7 +246,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             }
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
-            startService(new Intent(this, ApkUpdateService.class));
             startService(new Intent(this, TimeCheckService.class));
         }
     }

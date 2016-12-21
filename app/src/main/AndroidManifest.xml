@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <!-- For GcmTaskService -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <uses-feature android:name="android.hardware.camera"/>
 
@@ -87,10 +89,16 @@
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.ExceptionReportingService"/>
-        <service android:name=".service.ApkUpdateService"/>
         <service android:name=".service.UserRequestedApkUpdateService"/>
         <service android:name=".service.SurveyedDataPointSyncService"/>
         <service android:name=".service.TimeCheckService"/>
+        <service android:name=".service.ApkUpdateService"
+                 android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+                 android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
 
         <receiver android:name=".broadcast.SyncDataReceiver">
             <intent-filter>

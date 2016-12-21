@@ -247,7 +247,7 @@ public class ConstantUtil {
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
-    public static final int FLEX_IN_SECONDS = 30;
+    public static final int FLEX_IN_SECONDS = 1 * 60 * 60; //1 hour
 
     /**
      * prevent instantiation

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
-    <string name="app_name">Akvo FLOW</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Akvo Flow</string>
     <string name="accuracy">Acc</string>
     <string name="searching">Searching...</string>
     <string name="ready">Ready</string>
@@ -16,7 +16,7 @@
     <string name="lon">Lon</string>
     <string name="elevation">Height</string>
     <string name="submitbutton">Submit</string>
-    <string name="geodialog">GPS must be enabled to do this. Select OK to go to\tthe settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
+    <string name="geodialog">GPS must be enabled to do this. Select OK to go to the settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
     <string name="resize_large_images">Resize large images</string>
     <string name="settingslabel">Settings</string>
     <string name="nouser">No Users!</string>
@@ -31,8 +31,8 @@
     <string name="screenoptdesc">Prevents the screen from turning off while in survey entry mode. Be sure to manually shut the screen off (or exit the app) when not in use to avoid draining the battery.</string>
     <string name="aboutlabel">About</string>
     <string name="aboutdesc">Displays version information.</string>
-    <string name="abouttitle">About - Akvo FLOW app</string>
-    <string name="about_text">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$d Stichting Akvo\nVersion %2$s</string>
+    <string name="abouttitle">About - Akvo Flow app</string>
+    <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
     <string name="gpsstatuslabel">GPS Status</string>
     <string name="gpsstatusdesc">Launches the GPS Status application if you have it installed on this device.</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>
@@ -46,7 +46,6 @@
     <string name="savelastuserlabel">Keep the last selected user logged-in between sessions</string>
     <string name="uploadoptionlabel">Sync data over mobile network</string>
     <string name="surveylanglabel">Survey Languages</string>
-    <string name="beaconlabel">Send Location Beacons</string>
     <string name="scanbarcode">Scan Barcode</string>
     <string name="barcodeerror">Scanner not installed. Please install the Barcode Scanner app from the Android Market.</string>
     <string name="toosmallerr">Value is too small. Minimum value: </string>
@@ -114,7 +113,7 @@
     <string name="sync_finished">Data Points Sync finished</string>
     <string name="synced_records">Synced %1$d Data Points</string>
     <string name="sync_error">Data Points Sync failed</string>
-    <string name="syncing_corrupted_datapoints_error">Some items were not synced correctly. Please sync again.</string>
+    <string name="syncing_corrupted_data_points_error">Please sync again.</string>
     <string name="network_error">Network Error</string>
     <string name="loading">Loading...</string>
     <string name="prefill_title">Pre-fill Responses</string>
@@ -205,7 +204,7 @@
     <string name="status_submitted">Submitted</string>
     <string name="status_exported">Exported</string>
     <!--APK update-->
-    <string name="app_update_activity">Akvo FLOW Update</string>
+    <string name="app_update_activity">Akvo Flow Update</string>
     <string name="app_update">A new version of the FLOW app is available. Click \'Update\' to download and install the new version.</string>
     <string name="update">Update</string>
     <string name="not_now">Not now</string>

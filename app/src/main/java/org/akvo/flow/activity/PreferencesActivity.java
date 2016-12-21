@@ -16,8 +16,6 @@
 
 package org.akvo.flow.activity;
 
-import java.util.HashMap;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,23 +25,24 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.LangsPreferenceData;
+import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
-import org.akvo.flow.util.LangsPreferenceData;
-import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.ViewUtil;
+
+import java.util.HashMap;
 
 /**
  * Displays user editable preferences and takes care of persisting them to the
@@ -54,7 +53,6 @@ import org.akvo.flow.util.ViewUtil;
  */
 public class PreferencesActivity extends BackActivity implements OnClickListener,
         OnCheckedChangeListener {
-    private CheckBox beaconCheckbox;
     private CheckBox screenOnCheckbox;
     private CheckBox mobileDataCheckbox;
     private TextView languageTextView;
@@ -77,7 +75,6 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.preferences);
 
-        beaconCheckbox = (CheckBox) findViewById(R.id.beaconcheckbox);
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
         mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
         languageTextView = (TextView) findViewById(R.id.surveylangvalue);
@@ -92,7 +89,6 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
 
         // Setup event listeners
-        beaconCheckbox.setOnCheckedChangeListener(this);
         screenOnCheckbox.setOnCheckedChangeListener(this);
         mobileDataCheckbox.setOnCheckedChangeListener(this);
         findViewById(R.id.pref_locale).setOnClickListener(this);
@@ -112,13 +108,6 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
             screenOnCheckbox.setChecked(true);
         } else {
             screenOnCheckbox.setChecked(false);
-        }
-
-        val = settings.get(ConstantUtil.LOCATION_BEACON_SETTING_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            beaconCheckbox.setChecked(true);
-        } else {
-            beaconCheckbox.setChecked(false);
         }
 
         val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
@@ -208,29 +197,30 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                 break;
             case R.id.pref_server:
                 ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
-                        @Override
-                        public void onAuthenticated() {
-                            final EditText inputView = new EditText(PreferencesActivity.this);
-                            // one line only
-                            inputView.setSingleLine();
-                            inputView.setText(StatusUtil.getServerBase(PreferencesActivity.this));
-                            ViewUtil.ShowTextInputDialog(
-                                    PreferencesActivity.this, R.string.serverlabel,
-                                    R.string.serverlabel, inputView,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            String s = StringUtil.controlToSpace(inputView
-                                                    .getText().toString());
-                                            // drop any control chars, especially tabs
-                                            database.savePreference(
-                                                    ConstantUtil.SERVER_SETTING_KEY, s);
-                                            serverTextView.setText(StatusUtil.getServerBase(PreferencesActivity.this));
+                            @Override
+                            public void onAuthenticated() {
+                                final EditText inputView = new EditText(PreferencesActivity.this);
+                                // one line only
+                                inputView.setSingleLine();
+                                inputView.setText(StatusUtil.getServerBase(PreferencesActivity.this));
+                                ViewUtil.ShowTextInputDialog(
+                                        PreferencesActivity.this, R.string.serverlabel,
+                                        R.string.serverlabel, inputView,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String s = StringUtil.controlToSpace(inputView
+                                                        .getText().toString());
+                                                // drop any control chars, especially tabs
+                                                database.savePreference(
+                                                        ConstantUtil.SERVER_SETTING_KEY, s);
+                                                serverTextView.setText(
+                                                        StatusUtil.getServerBase(PreferencesActivity.this));
+                                            }
                                         }
-                                    }
-                            );
+                                );
+                            }
                         }
-                    }
                 );
                 break;
             case R.id.pref_deviceid:
@@ -311,15 +301,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
      */
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView == beaconCheckbox) {
-            database.savePreference(ConstantUtil.LOCATION_BEACON_SETTING_KEY, "" + isChecked);
-            if (isChecked) {
-                // if the option changed, kick the service so it reflects the change
-                startService(new Intent(this, LocationService.class));
-            } else {
-                stopService(new Intent(this, LocationService.class));
-            }
-        } else if (buttonView == screenOnCheckbox) {
+        if (buttonView == screenOnCheckbox) {
             database.savePreference(ConstantUtil.SCREEN_ON_KEY, "" + isChecked);
         } else if (buttonView == mobileDataCheckbox) {
             database.savePreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY, "" + isChecked);

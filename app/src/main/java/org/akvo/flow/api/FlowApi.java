@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -106,39 +107,6 @@ public class FlowApi {
         Uri.Builder builder = Uri.parse(serverBase).buildUpon();
         builder.appendPath(Path.TIME_CHECK);
         builder.appendQueryParameter(Param.TIMESTAMP, System.currentTimeMillis() + "");
-        return builder.build().toString();
-    }
-
-    /**
-     * Sends the location beacon to the server
-     * The response is ignored
-     */
-    public void sendLocation(@NonNull String serverBase, @Nullable Double latitude,
-            @Nullable Double longitude,
-            @Nullable Float accuracy) {
-        try {
-            String url = buildLocationUrl(serverBase, latitude, longitude, accuracy);
-            HttpUtil.httpGet(url);
-        } catch (IOException e) {
-            Log.e(TAG, "Could not send location beacon", e);
-        }
-    }
-
-    @NonNull
-    private String buildLocationUrl(@NonNull String serverBase, @Nullable Double latitude,
-            @Nullable Double
-                    longitude, @Nullable Float accuracy) {
-        Uri.Builder builder = Uri.parse(serverBase).buildUpon();
-        builder.appendPath(Path.BEACON_SERVICE);
-        builder.appendQueryParameter(Param.PARAM_ACTION, Param.VALUE_BEACON);
-        appendDeviceParams(builder);
-        if (latitude != null && longitude != null && accuracy != null) {
-            builder.appendQueryParameter(Param.LAT, latitude + "");
-            builder.appendQueryParameter(Param.LON, longitude + "");
-            builder.appendQueryParameter(Param.ACC, accuracy + "");
-        }
-        builder.appendQueryParameter(Param.OS_VERSION,
-                "Android " + android.os.Build.VERSION.RELEASE);
         return builder.build().toString();
     }
 
@@ -340,7 +308,7 @@ public class FlowApi {
         builder.appendQueryParameter(Param.PHONE_NUMBER, PHONE_NUMBER);
         builder.appendQueryParameter(Param.ANDROID_ID, ANDROID_ID);
         builder.appendQueryParameter(Param.IMEI, IMEI);
-        builder.appendQueryParameter(Param.VERSION, PlatformUtil.getVersionName(context));
+        builder.appendQueryParameter(Param.VERSION, BuildConfig.VERSION_NAME);
         builder.appendQueryParameter(Param.DEVICE_ID, StatusUtil.getDeviceId(context));
     }
 
@@ -352,7 +320,6 @@ public class FlowApi {
         String SURVEY_HEADER_SERVICE = "surveymanager";
         String DEVICE_NOTIFICATION = "devicenotification";
         String TIME_CHECK = "devicetimerest";
-        String BEACON_SERVICE = "locationBeacon";
     }
 
     interface Param {
@@ -366,17 +333,12 @@ public class FlowApi {
         String VERSION = "ver";
         String DEVICE_ID = "devId";
         String ANDROID_ID = "androidId";
-        String OS_VERSION = "osVersion";
-        String LAT = "lat";
-        String LON = "lon";
-        String ACC = "acc";
 
         String PARAM_ACTION = "action";
         String FORM_ID = "formID";
         String SURVEY_ID = "surveyId";
         String FILENAME = "fileName";
 
-        String VALUE_BEACON = "beacon";
         String VALUE_HEADER = "getSurveyHeader";
         String VALUE_SURVEY = "getAvailableSurveysDevice";
 

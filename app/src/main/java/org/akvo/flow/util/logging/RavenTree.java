@@ -29,15 +29,17 @@ class RavenTree extends Timber.Tree {
     @Override
     protected void log(int priority, @Nullable String tag, @Nullable String message,
             @Nullable Throwable t) {
-        //Do not send reports for verbose, debug or info
-        if (priority == Log.VERBOSE || priority == Log.DEBUG || priority == Log.INFO) {
+        if (!shouldSendLog(priority)) {
             return;
         }
 
-        if (t == null) {
-            Raven.capture(message);
-        } else {
+        if (t != null) {
             Raven.capture(t);
         }
+    }
+
+    //only error or assert will be sent
+    private boolean shouldSendLog(int priority) {
+        return priority == Log.ERROR || priority == Log.ASSERT;
     }
 }

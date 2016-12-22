@@ -19,7 +19,6 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -34,8 +33,10 @@ import org.akvo.flow.util.FileUtil;
 
 import java.io.File;
 
+import timber.log.Timber;
+
 public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener {
-    private static final String TAG = CaddisflyQuestionView.class.getSimpleName();
+
     private Button mButton;
     private View mResponseView;
     private String mValue;
@@ -89,7 +90,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             // Get optional image and store it as part of the response
             String image = data.getString(ConstantUtil.CADDISFLY_IMAGE);
 
-            Log.d(TAG, "caddisflyTestComplete - Response: " + mValue + ". Image: " + image);
+            Timber.d("caddisflyTestComplete - Response: " + mValue + ". Image: " + image);
 
             File src = !TextUtils.isEmpty(image) ? new File(image) : null;
             if (src != null && src.exists()) {
@@ -97,7 +98,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
                 File dst = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), src.getName());
 
                 if (!src.renameTo(dst)) {
-                    Log.e(TAG, String.format("Could not move file %s to %s",
+                    Timber.e(String.format("Could not move file %s to %s",
                             src.getAbsoluteFile(), dst.getAbsoluteFile()));
                 } else {
                     mImage = dst.getAbsolutePath();

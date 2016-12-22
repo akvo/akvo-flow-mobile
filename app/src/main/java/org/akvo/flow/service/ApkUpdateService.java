@@ -18,9 +18,10 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+
 import org.akvo.flow.util.StatusUtil;
+
+import timber.log.Timber;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -42,7 +43,6 @@ public class ApkUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-//        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         checkUpdates();
     }
 
@@ -52,15 +52,14 @@ public class ApkUpdateService extends IntentService {
      */
     private void checkUpdates() {
         if (!StatusUtil.hasDataConnection(this)) {
-            Log.d(TAG, "No internet connection. Can't perform the requested operation");
+            Timber.d("No internet connection. Can't perform the requested operation");
             return;
         }
 
         try {
             apkUpdateHelper.shouldUpdate(this);
         } catch (Exception e) {
-            Log.e(TAG, "Could not call apk version service", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, "Could not call apk version service");
         }
     }
 }

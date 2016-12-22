@@ -30,6 +30,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
+import timber.log.Timber;
+
 import static org.akvo.flow.util.StringUtil.isValid;
 
 public class TimeCheckService extends IntentService {
@@ -44,7 +46,6 @@ public class TimeCheckService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        //Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         checkTime();
     }
 
@@ -74,7 +75,7 @@ public class TimeCheckService extends IntentService {
                 }
             }
         } catch (IOException | ParseException e) {
-            Log.e(TAG, "Error fetching time: ", e);
+            Timber.e(e, "Error fetching time");
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,10 +16,6 @@
 
 package org.akvo.flow.ui.fragment;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -27,7 +23,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,10 +40,15 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import timber.log.Timber;
+
 public class FormListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
         OnItemClickListener {
-    private static final String TAG = FormListFragment.class.getSimpleName();
-    
+
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
     private static final String EXTRA_RECORD       = "record";
     
@@ -211,7 +211,7 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
+            Timber.w("onFinished() - Loader returned no data");
             return;
         }
 

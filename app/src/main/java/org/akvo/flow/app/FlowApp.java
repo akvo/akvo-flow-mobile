@@ -21,7 +21,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -33,14 +32,15 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
-import org.akvo.flow.util.logging.LoggingHelper;
 import org.akvo.flow.util.logging.LoggingFactory;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.Locale;
 
+import timber.log.Timber;
+
 public class FlowApp extends Application {
-    private static final String TAG = FlowApp.class.getSimpleName();
     private static FlowApp app;// Singleton
 
     private Locale mLocale;
@@ -190,7 +190,7 @@ public class FlowApp extends Application {
             database.open();
             language = database.getPreference(ConstantUtil.PREF_LOCALE);
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         } finally {
             database.close();
         }
@@ -204,7 +204,7 @@ public class FlowApp extends Application {
             database.open();
             database.savePreference(ConstantUtil.PREF_LOCALE, language);
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         } finally {
             database.close();
         }
@@ -226,7 +226,7 @@ public class FlowApp extends Application {
             // We check for the key not present in old devices: 'survey.languagespresent'
             // NOTE: 'survey.language' DID exist
             if (database.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY) == null) {
-                Log.d(TAG, "Recomputing available languages...");
+                Timber.d("Recomputing available languages...");
                 Toast.makeText(getApplicationContext(), R.string.configuring_languages, Toast.LENGTH_SHORT)
                         .show();
 
@@ -238,7 +238,7 @@ public class FlowApp extends Application {
                 // Recompute all the surveys, and store their languages
                 for (Survey survey : database.getSurveyList(SurveyGroup.ID_NONE)) {
                     String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
-                    Log.d(TAG, "Adding languages: " + Arrays.toString(langs));
+                    Timber.d("Adding languages: " + Arrays.toString(langs));
                     database.addLanguages(langs);
                 }
             }

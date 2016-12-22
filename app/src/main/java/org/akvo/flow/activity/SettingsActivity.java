@@ -29,7 +29,6 @@ import android.os.StatFs;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +57,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * Displays the settings menu and handles the user choices
  *
@@ -65,7 +66,6 @@ import java.util.Map;
  */
 public class SettingsActivity extends BackActivity implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = "SettingsActivity";
     private static final String LABEL = "label";
     private static final String DESC = "desc";
 
@@ -392,7 +392,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                             });
             builder.show();
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e, e.getMessage());
             Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
         }
     }

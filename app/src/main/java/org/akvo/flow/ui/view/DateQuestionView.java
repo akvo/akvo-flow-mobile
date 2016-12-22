@@ -20,7 +20,6 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -38,6 +37,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import timber.log.Timber;
+
 /**
  * Question for capturing a date (no time component). Once selected, the date
  * will be displayed on the screen using the locale-specific date format
@@ -48,7 +49,6 @@ import java.util.TimeZone;
  * @author Christohper Fagiani
  */
 public class DateQuestionView extends QuestionView implements View.OnClickListener {
-    private static final String TAG = DateQuestionView.class.getSimpleName();
 
     private EditText mDateTextEdit;
     private DateFormat mDateFormat;
@@ -147,7 +147,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
                 return new Date(Long.parseLong(value));
             }
         } catch (NumberFormatException e) {
-            Log.e(TAG, "parseDateValue() - Value is not a number: " + value);
+            Timber.e("parseDateValue() - Value is not a number: " + value);
         }
         return null;
     }

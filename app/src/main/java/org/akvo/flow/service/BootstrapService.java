@@ -23,7 +23,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDao;
@@ -49,6 +48,8 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+
+import timber.log.Timber;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -127,7 +128,7 @@ public class BootstrapService extends IntentService {
             String errorMessage = getString(R.string.bootstraperror);
             displayErrorNotification(errorMessage);
 
-            Log.e(TAG, "Bootstrap error", e);
+            Timber.e(e,"Bootstrap error");
         }
     }
 
@@ -169,7 +170,7 @@ public class BootstrapService extends IntentService {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            Log.d(TAG, "Processing entry: " + entry.getName());
+            Timber.d("Processing entry: " + entry.getName());
             String parts[] = entry.getName().split("/");
             String filename = parts[parts.length - 1];
             String id = parts.length > 1 ? parts[parts.length - 2] : "";
@@ -234,7 +235,7 @@ public class BootstrapService extends IntentService {
             InputStream in = new FileInputStream(surveyFile);
             loadedSurvey = SurveyDao.loadSurvey(survey, in);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not load survey xml file");
+            Timber.e("Could not load survey xml file");
         }
         if (loadedSurvey == null) {
             // Something went wrong, we cannot continue with this survey
@@ -365,7 +366,6 @@ public class BootstrapService extends IntentService {
     public void onCreate() {
         super.onCreate();
         mHandler = new Handler();
-        //Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**

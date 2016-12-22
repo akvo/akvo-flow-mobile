@@ -29,15 +29,17 @@ class SentryTree extends Timber.Tree {
     @Override
     protected void log(int priority, @Nullable String tag, @Nullable String message,
             @Nullable Throwable t) {
-        //Do not send reports for verbose, debug or info
-        if (priority == Log.VERBOSE || priority == Log.DEBUG || priority == Log.INFO) {
+        //We will only send stacktraces
+        if (!shouldSendLog(priority)) {
             return;
         }
 
-        if (t == null) {
-            Sentry.captureMessage(message);
-        } else {
+        if (t != null) {
             Sentry.captureException(t);
         }
+    }
+
+    private boolean shouldSendLog(int priority) {
+        return priority == Log.ERROR || priority == Log.ASSERT;
     }
 }

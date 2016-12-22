@@ -92,7 +92,6 @@ public class ApkUpdateService extends GcmTaskService {
      */
     @Override
     public int onRunTask(TaskParams taskParams) {
-        Log.d(TAG, "onRunTask : ");
         if (!StatusUtil.isConnectionAllowed(this)) {
             Log.d(TAG, "No available authorised connection. Can't perform the requested operation");
             return GcmNetworkManager.RESULT_SUCCESS;

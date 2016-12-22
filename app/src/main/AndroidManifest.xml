@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
           package="org.akvo.flow">
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -105,10 +104,6 @@
         <meta-data
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version"/>
-
-        <meta-data
-                android:name="com.getsentry.raven.android.DSN"
-                android:value="https://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14" />
 
         <provider
                 android:name=".dao.DataProvider"

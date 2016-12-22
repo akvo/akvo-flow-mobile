@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBuLUoucTMjv2kcGSN3s6tYy6YFa-9WV94</string>
+    <string name="sentry_dsn" translatable="false">http://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14</string>
 </resources>

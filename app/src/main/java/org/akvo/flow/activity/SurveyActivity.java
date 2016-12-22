@@ -154,7 +154,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
-        Timber.e("Testing raven ", new Exception("test"));
+        Timber.e(new Exception("SurveyActivity"), "Testing raven ");
     }
 
     private void initializeToolBar() {

@@ -24,11 +24,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.getsentry.raven.RavenFactory;
-import com.getsentry.raven.android.Raven;
-import com.getsentry.raven.dsn.Dsn;
-
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
@@ -38,8 +33,8 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
-import org.akvo.flow.util.logging.CustomAndroidRavenFactory;
-import org.akvo.flow.util.logging.RavenTree;
+import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.util.logging.ReportingFactory;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -54,6 +49,8 @@ public class FlowApp extends Application {
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
 
+    private final ReportingFactory reportingFactory = new ReportingFactory();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -63,18 +60,11 @@ public class FlowApp extends Application {
     }
 
     private void initLogging() {
-        RavenFactory.registerFactory(new CustomAndroidRavenFactory(this));
-        Raven.init(this, new Dsn("http://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14"));
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
-        Timber.plant(new RavenTree());
-
-        Raven.capture(new Exception("Raven exception with new library"));
-
-//        Sentry.init(this, "http://sentry.support.akvo-ops.org/", "http://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14");
-////        Sentry.init(this, "http://d3cc86780ecd410a86d941359bda1e75:79eac26c11d34e25b505dbba0bf341fb@sentry.support.akvo-ops.org/14");
-//        Sentry.captureException(new RuntimeException("Hello I'm a runtime exception"));
+        LoggingHelper helper = reportingFactory.createLoggingHelper(this);
+        helper.initDebugTree();
+        helper.initSentry();
+        helper.plantTimberTree();
+        Timber.e(new Exception("Testing sending exception"), "Testing sending exception");
     }
 
     public static FlowApp getApp() {
@@ -229,7 +219,7 @@ public class FlowApp extends Application {
      * any language stored in the device has properly set its languages in the
      * database, making them available to the user through the settings menu.
      */
-    private Runnable mSurveyChecker = new Runnable() {
+    private final Runnable mSurveyChecker = new Runnable() {
 
         @Override
         public void run() {

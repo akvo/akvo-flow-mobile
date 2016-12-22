@@ -18,30 +18,32 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
-import com.getsentry.raven.android.event.helper.AndroidEventBuilderHelper;
-import com.getsentry.raven.event.EventBuilder;
+import com.getsentry.raven.RavenFactory;
+import com.getsentry.raven.android.Raven;
+import com.getsentry.raven.dsn.Dsn;
 
-import java.util.Map;
+import org.akvo.flow.util.PropertyUtil;
 
-/**
- * Add custom tags to Raven crash reporting with information about device, model etc...
- */
-class CustomEventBuilderHelper extends AndroidEventBuilderHelper {
+import timber.log.Timber;
 
-    private final Map<String, String> tags;
+public class RavenHelper extends LoggingHelper {
 
-    public CustomEventBuilderHelper(Context applicationContext, @NonNull Map<String, String> tags) {
-        super(applicationContext);
-        this.tags = tags;
+    public RavenHelper(Context context) {
+        super(context);
     }
 
     @Override
-    public void helpBuildingEvent(EventBuilder eventBuilder) {
-        for (String key : tags.keySet()) {
-            eventBuilder.withTag(key, tags.get(key));
-        }
-        super.helpBuildingEvent(eventBuilder);
+    public void initSentry() {
+        addTags();
+        final PropertyUtil props = new PropertyUtil(context.getResources());
+        String sentryDsn = getSentryDsn(props);
+        RavenFactory.registerFactory(new CustomAndroidRavenFactory(context, tags));
+        Raven.init(context, new Dsn(sentryDsn));
+    }
+
+    @Override
+    public void plantTimberTree() {
+        Timber.plant(new RavenTree());
     }
 }

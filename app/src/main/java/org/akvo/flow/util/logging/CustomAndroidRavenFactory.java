@@ -18,23 +18,28 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.getsentry.raven.android.AndroidRavenFactory;
 import com.getsentry.raven.dsn.Dsn;
 
-public class CustomAndroidRavenFactory extends AndroidRavenFactory {
+import java.util.Map;
+
+class CustomAndroidRavenFactory extends AndroidRavenFactory {
 
     private final Context applicationContext;
+    private final Map<String, String> tags;
 
-    public CustomAndroidRavenFactory(Context applicationContext) {
+    public CustomAndroidRavenFactory(Context applicationContext, @NonNull Map<String, String> tags) {
         super(applicationContext);
         this.applicationContext = applicationContext;
+        this.tags = tags;
     }
 
     @Override
     public com.getsentry.raven.Raven createRavenInstance(Dsn dsn) {
         com.getsentry.raven.Raven ravenInstance = super.createRavenInstance(dsn);
-        ravenInstance.addBuilderHelper(new CustomEventBuilderHelper(applicationContext));
+        ravenInstance.addBuilderHelper(new CustomEventBuilderHelper(applicationContext, tags));
         return ravenInstance;
     }
 

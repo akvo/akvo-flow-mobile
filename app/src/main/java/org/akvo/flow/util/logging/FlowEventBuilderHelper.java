@@ -18,16 +18,30 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
-public class ReportingFactory {
+import com.getsentry.raven.android.event.helper.AndroidEventBuilderHelper;
+import com.getsentry.raven.event.EventBuilder;
 
-    private static final boolean USE_OLD_SENTRY = true;
+import java.util.Map;
 
-    public LoggingHelper createLoggingHelper(Context context) {
-        if (USE_OLD_SENTRY) {
-            return new SentryHelper(context);
-        } else {
-            return new RavenHelper(context);
+/**
+ * Add custom tags to Raven crash reporting with information about device, model etc...
+ */
+class FlowEventBuilderHelper extends AndroidEventBuilderHelper {
+
+    private final Map<String, String> tags;
+
+    public FlowEventBuilderHelper(Context applicationContext, @NonNull Map<String, String> tags) {
+        super(applicationContext);
+        this.tags = tags;
+    }
+
+    @Override
+    public void helpBuildingEvent(EventBuilder eventBuilder) {
+        for (String key : tags.keySet()) {
+            eventBuilder.withTag(key, tags.get(key));
         }
+        super.helpBuildingEvent(eventBuilder);
     }
 }

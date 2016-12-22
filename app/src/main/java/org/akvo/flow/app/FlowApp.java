@@ -34,12 +34,10 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.logging.LoggingHelper;
-import org.akvo.flow.util.logging.ReportingFactory;
+import org.akvo.flow.util.logging.LoggingFactory;
 
 import java.util.Arrays;
 import java.util.Locale;
-
-import timber.log.Timber;
 
 public class FlowApp extends Application {
     private static final String TAG = FlowApp.class.getSimpleName();
@@ -49,7 +47,7 @@ public class FlowApp extends Application {
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
 
-    private final ReportingFactory reportingFactory = new ReportingFactory();
+    private final LoggingFactory loggingFactory = new LoggingFactory();
 
     @Override
     public void onCreate() {
@@ -60,11 +58,10 @@ public class FlowApp extends Application {
     }
 
     private void initLogging() {
-        LoggingHelper helper = reportingFactory.createLoggingHelper(this);
+        LoggingHelper helper = loggingFactory.createLoggingHelper(this);
         helper.initDebugTree();
         helper.initSentry();
         helper.plantTimberTree();
-        Timber.e(new Exception("Testing sending exception"), "Testing sending exception");
     }
 
     public static FlowApp getApp() {
@@ -241,7 +238,7 @@ public class FlowApp extends Application {
                 // Recompute all the surveys, and store their languages
                 for (Survey survey : database.getSurveyList(SurveyGroup.ID_NONE)) {
                     String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
-                    Log.d(TAG, "Adding languages: " + langs.toString());
+                    Log.d(TAG, "Adding languages: " + Arrays.toString(langs));
                     database.addLanguages(langs);
                 }
             }

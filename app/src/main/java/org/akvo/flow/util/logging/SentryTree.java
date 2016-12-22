@@ -27,7 +27,8 @@ import timber.log.Timber;
 class SentryTree extends Timber.Tree {
 
     @Override
-    protected void log(int priority, @Nullable String tag, @Nullable String message, @Nullable Throwable t) {
+    protected void log(int priority, @Nullable String tag, @Nullable String message,
+            @Nullable Throwable t) {
         //Do not send reports for verbose, debug or info
         if (priority == Log.VERBOSE || priority == Log.DEBUG || priority == Log.INFO) {
             return;

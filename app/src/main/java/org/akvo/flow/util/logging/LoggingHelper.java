@@ -37,7 +37,7 @@ import timber.log.Timber;
 public abstract class LoggingHelper {
 
     private static final String PLATFORM_TAG_VALUE = "Android";
-    private static final String PLATFORM_TAG_KEY = "Android";
+    private static final String PLATFORM_TAG_KEY = "Platform";
     private static final String OS_VERSION_TAG_KEY = "OsVersion";
     private static final String DEVICE_TAG_KEY = "Device";
     private static final String VERSION_NAME_TAG_KEY = "VersionName";
@@ -63,7 +63,7 @@ public abstract class LoggingHelper {
             String versionName = packageInfo.versionName;
             tags.put(VERSION_NAME_TAG_KEY, versionName);
             int versionCode = packageInfo.versionCode;
-            tags.put(VERSION_CODE_TAG_KEY, versionCode+"");
+            tags.put(VERSION_CODE_TAG_KEY, versionCode + "");
         } catch (PackageManager.NameNotFoundException e) {
             Timber.e("Error getting versionName and versionCode");
         }

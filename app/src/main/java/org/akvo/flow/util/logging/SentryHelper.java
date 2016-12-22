@@ -55,7 +55,8 @@ public class SentryHelper extends LoggingHelper {
         Sentry.init(context, sentryBaseUrl, sentryDsn);
     }
 
-    @Override public void plantTimberTree() {
+    @Override
+    public void plantTimberTree() {
         Timber.plant(new SentryTree());
     }
 

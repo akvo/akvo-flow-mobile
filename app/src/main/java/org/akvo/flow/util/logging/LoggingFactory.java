@@ -19,31 +19,15 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 
-import com.getsentry.raven.RavenFactory;
-import com.getsentry.raven.android.Raven;
-import com.getsentry.raven.dsn.Dsn;
+public class LoggingFactory {
 
-import org.akvo.flow.util.PropertyUtil;
+    private static final boolean USE_OLD_SENTRY = true;
 
-import timber.log.Timber;
-
-public class RavenHelper extends LoggingHelper {
-
-    public RavenHelper(Context context) {
-        super(context);
-    }
-
-    @Override
-    public void initSentry() {
-        addTags();
-        final PropertyUtil props = new PropertyUtil(context.getResources());
-        String sentryDsn = getSentryDsn(props);
-        RavenFactory.registerFactory(new FlowAndroidRavenFactory(context, tags));
-        Raven.init(context, new Dsn(sentryDsn));
-    }
-
-    @Override
-    public void plantTimberTree() {
-        Timber.plant(new RavenTree());
+    public LoggingHelper createLoggingHelper(Context context) {
+        if (USE_OLD_SENTRY) {
+            return new SentryHelper(context);
+        } else {
+            return new RavenHelper(context);
+        }
     }
 }

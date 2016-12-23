@@ -58,6 +58,8 @@ import org.akvo.flow.util.ViewUtil;
 
 import java.lang.ref.WeakReference;
 
+import timber.log.Timber;
+
 public class SurveyActivity extends ActionBarActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
@@ -151,6 +153,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
+
+        Timber.e(new IllegalArgumentException("Testing extended class 3g sync off"));
     }
 
     private void initializeToolBar() {

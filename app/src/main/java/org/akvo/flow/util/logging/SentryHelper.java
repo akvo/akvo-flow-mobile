@@ -19,11 +19,9 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.joshdholtz.sentry.Sentry;
 
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.json.JSONException;
 
@@ -31,12 +29,7 @@ import java.util.Map;
 
 import timber.log.Timber;
 
-/**
- * Allows usage of the old sentry library
- */
 public class SentryHelper extends LoggingHelper {
-
-    private static final String SENTRY_BASE_URL = "http://sentry.support.akvo-ops.org/";
 
     public SentryHelper(Context context) {
         super(context);
@@ -47,12 +40,8 @@ public class SentryHelper extends LoggingHelper {
         addTags();
         Sentry.setCaptureListener(new FlowSentryCaptureListener(tags));
         final PropertyUtil props = new PropertyUtil(context.getResources());
-        String sentryBaseUrl = props.getProperty(ConstantUtil.SENTRY_URL);
-        if (TextUtils.isEmpty(sentryBaseUrl)) {
-            sentryBaseUrl = SENTRY_BASE_URL;
-        }
         String sentryDsn = getSentryDsn(props);
-        Sentry.init(context, sentryBaseUrl, sentryDsn);
+        Sentry.init(context, sentryDsn);
     }
 
     @Override
@@ -60,7 +49,7 @@ public class SentryHelper extends LoggingHelper {
         Timber.plant(new SentryTree());
     }
 
-    private static class FlowSentryCaptureListener extends Sentry.SentryEventCaptureListener {
+    private static class FlowSentryCaptureListener implements Sentry.SentryEventCaptureListener {
 
         private final Map<String, String> tags;
 

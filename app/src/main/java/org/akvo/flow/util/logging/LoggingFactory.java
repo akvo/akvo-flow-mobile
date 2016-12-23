@@ -21,10 +21,13 @@ import android.content.Context;
 
 public class LoggingFactory {
 
-    private static final boolean USE_OLD_SENTRY = true;
+    private static final boolean USE_SENTRY = false;
+
+    //TODO: replace this by 6 or higher once the server is updated
+    public static final String SENTRY_PROTOCOL_VERSION = "4";
 
     public LoggingHelper createLoggingHelper(Context context) {
-        if (USE_OLD_SENTRY) {
+        if (USE_SENTRY) {
             return new SentryHelper(context);
         } else {
             return new RavenHelper(context);

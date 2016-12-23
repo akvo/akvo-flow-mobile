@@ -40,6 +40,7 @@ public class RavenHelper extends LoggingHelper {
         String sentryDsn = getSentryDsn(props);
         RavenFactory.registerFactory(new FlowAndroidRavenFactory(context, tags));
         Raven.init(context, new Dsn(sentryDsn));
+        RavenFactory.registerFactory(new FlowAndroidRavenFactory(context, tags));
     }
 
     @Override

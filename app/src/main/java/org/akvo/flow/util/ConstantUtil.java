@@ -245,6 +245,13 @@ public class ConstantUtil {
     public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
 
+    //apk update
+    public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
+    public static final int FLEX_IN_SECONDS = 1 * 60 * 60; //1 hour
+
+    //requests
+    public static final int REQUEST_ADD_USER = 0;
+
     /**
      * prevent instantiation
      */

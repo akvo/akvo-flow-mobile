@@ -29,7 +29,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -155,8 +154,6 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
-
-        Timber.e(new IllegalArgumentException("Testing extended class 3g sync off"));
     }
 
     private void initializeToolBar() {
@@ -390,7 +387,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
+            Timber.i(TAG, "Surveys have been synchronised. Refreshing data...");
             SurveyActivity surveyActivity = activityWeakReference.get();
             if (surveyActivity != null) {
                 surveyActivity.reloadDrawer();

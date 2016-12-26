@@ -1489,7 +1489,8 @@ public class SurveyDbAdapter {
                 null, null,
                 SurveyInstanceColumns.SUBMITTED_DATE + " DESC");
         if (cursor != null && cursor.moveToFirst()) {
-            long surveyInstanceId = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+            long surveyInstanceId = cursor
+                    .getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
             cursor.close();
             return surveyInstanceId;
         }
@@ -1656,7 +1657,8 @@ public class SurveyDbAdapter {
         }
     }
 
-    private void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
+    private void syncSurveyInstances(List<SurveyInstance> surveyInstances,
+            String surveyedLocaleId) {
         for (SurveyInstance surveyInstance : surveyInstances) {
             Cursor cursor = database.query(Tables.SURVEY_INSTANCE, new String[] {
                             SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID

@@ -353,20 +353,22 @@ public class Sentry {
     }
 
     /**
-     * Decides if the stacktraces should be sent to the server
+     * Decides if the stacktrace should be sent to the server
      *
      * @return
      */
     public boolean shouldAttemptPost() {
         if (!StatusUtil.isConnectionAllowed(context)) {
+            //User did not allow using 3G and wifi is not connected
             return false;
         }
+        //Is the permission set in manifest?
         PackageManager pm = context.getPackageManager();
         int hasPerm = pm.checkPermission(permission.ACCESS_NETWORK_STATE, context.getPackageName());
         if (hasPerm != PackageManager.PERMISSION_GRANTED) {
             return false;
         }
-
+        //is there a connection?
         ConnectivityManager connectivityManager = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

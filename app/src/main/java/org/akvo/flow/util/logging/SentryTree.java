@@ -29,16 +29,22 @@ class SentryTree extends Timber.Tree {
     @Override
     protected void log(int priority, @Nullable String tag, @Nullable String message,
             @Nullable Throwable t) {
-        //We will only send stacktraces
+
         if (!shouldSendLog(priority)) {
             return;
         }
 
         if (t != null) {
+            //We will only send stacktraces for now
             Sentry.captureException(t);
         }
     }
 
+    /**
+     * Configure which level should be sent
+     * @param priority
+     * @return
+     */
     private boolean shouldSendLog(int priority) {
         return priority == Log.ERROR || priority == Log.ASSERT;
     }

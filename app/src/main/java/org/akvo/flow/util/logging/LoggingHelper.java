@@ -77,7 +77,8 @@ public abstract class LoggingHelper {
         }
     }
 
-    @NonNull String getSentryDsn(PropertyUtil props) {
+    @NonNull
+    String getSentryDsn(PropertyUtil props) {
         String sentryDsn = props.getProperty(ConstantUtil.SENTRY_DSN);
         if (TextUtils.isEmpty(sentryDsn)) {
             sentryDsn = context.getString(R.string.sentry_dsn);

@@ -19,18 +19,15 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 
+/**
+ * This class allows to easily switch implementations between a different crash reporting tools
+ */
 public class LoggingFactory {
-
-    private static final boolean USE_SENTRY = false;
 
     //TODO: replace this by 6 or higher once the server is updated
     public static final String SENTRY_PROTOCOL_VERSION = "4";
 
     public LoggingHelper createLoggingHelper(Context context) {
-        if (USE_SENTRY) {
-            return new SentryHelper(context);
-        } else {
-            return new RavenHelper(context);
-        }
+        return new SentryHelper(context);
     }
 }

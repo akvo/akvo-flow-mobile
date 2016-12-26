@@ -64,7 +64,7 @@ public class SentryHelper extends LoggingHelper {
                     builder.getTags().put(key, tags.get(key));
                 }
             } catch (JSONException e) {
-                Timber.e(e, "Error setting SentryEventCaptureListener");
+                Timber.e("Error setting SentryEventCaptureListener");
             }
 
             return builder;

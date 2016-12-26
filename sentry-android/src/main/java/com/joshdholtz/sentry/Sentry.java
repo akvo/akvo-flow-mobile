@@ -1,20 +1,14 @@
 package com.joshdholtz.sentry;
 
-import android.Manifest.permission;
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
-import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.logging.LoggingFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -86,14 +80,14 @@ public class Sentry {
 
     private static final String TAG = "Sentry";
 
-    //TODO: update this once server is updated to version 7 or 8
-    private final static String sentryVersion = LoggingFactory.SENTRY_PROTOCOL_VERSION;
-    private static final String sentryAndroidVersion = "1.5.2";
+    public static final String LATEST_SENTRY_VERSION = "7";
+    private static String sentryVersion;
 
     private static final int MAX_QUEUE_LENGTH = 50;
     private static final int MAX_BREADCRUMBS = 10;
 
     public static boolean debug = false;
+    private AbstractPermissionVerifier postPermissionVerifier;
 
     private Context context;
     private String baseUrl;
@@ -138,13 +132,16 @@ public class Sentry {
     }
 
     public static void init(Context context, String dsn) {
-        init(context, dsn, true);
+        init(context, dsn, true, new PostPermissionVerifier(), LATEST_SENTRY_VERSION);
     }
 
-    public static void init(Context context, String dsn, boolean setupUncaughtExceptionHandler) {
+    public static void init(Context context, String dsn, boolean setupUncaughtExceptionHandler,
+        AbstractPermissionVerifier verifier, String sentryVersion) {
         final Sentry sentry = Sentry.getInstance();
 
         sentry.context = context.getApplicationContext();
+        sentry.postPermissionVerifier = verifier;
+        sentry.sentryVersion = sentryVersion;
 
         Uri uri = Uri.parse(dsn);
         String port = "";
@@ -173,16 +170,16 @@ public class Sentry {
             public Thread newThread(Runnable runnable) {
                 final Thread thread = new Thread(runnable);
                 thread.setName(
-                        String.format(Locale.US, "Sentry HTTP Thread %d", count.incrementAndGet()));
+                    String.format(Locale.US, "Sentry HTTP Thread %d", count.incrementAndGet()));
                 return thread;
             }
         };
 
         return new ThreadPoolExecutor(
-                0, 1, // Keep 0 threads alive. Max pool size is 1.
-                60, TimeUnit.SECONDS, // Kill unused threads after this length.
-                new ArrayBlockingQueue<Runnable>(queueSize),
-                threadFactory, new ThreadPoolExecutor.DiscardPolicy()); // Discard exceptions
+            0, 1, // Keep 0 threads alive. Max pool size is 1.
+            60, TimeUnit.SECONDS, // Kill unused threads after this length.
+            new ArrayBlockingQueue<Runnable>(queueSize),
+            threadFactory, new ThreadPoolExecutor.DiscardPolicy()); // Discard exceptions
     }
 
     private static boolean getVerifySsl(String dsn) {
@@ -215,8 +212,8 @@ public class Sentry {
         if (!(currentHandler instanceof SentryUncaughtExceptionHandler)) {
             // Register default exceptions handler
             Thread.setDefaultUncaughtExceptionHandler(
-                    new SentryUncaughtExceptionHandler(currentHandler,
-                            InternalStorage.getInstance()));
+                new SentryUncaughtExceptionHandler(currentHandler,
+                    InternalStorage.getInstance()));
         }
 
         sendAllCachedCapturedEvents();
@@ -233,10 +230,10 @@ public class Sentry {
         final String secretKey = authorityParts[1];
 
         header.append("Sentry ")
-                .append(String.format("sentry_version=%s,", sentryVersion))
-                .append(String.format("sentry_client=sentry-android/%s,", sentryAndroidVersion))
-                .append(String.format("sentry_key=%s,", publicKey))
-                .append(String.format("sentry_secret=%s", secretKey));
+            .append(String.format("sentry_version=%s,", sentryVersion))
+            .append(String.format("sentry_client=sentry-android/%s,", BuildConfig.SENTRY_ANDROID_VERSION))
+            .append(String.format("sentry_key=%s,", publicKey))
+            .append(String.format("sentry_secret=%s", secretKey));
 
         return header.toString();
     }
@@ -269,8 +266,8 @@ public class Sentry {
 
     public static void captureMessage(String message, SentryEventLevel level) {
         Sentry.captureEvent(new SentryEventBuilder()
-                .setMessage(message)
-                .setLevel(level)
+            .setMessage(message)
+            .setLevel(level)
         );
     }
 
@@ -290,10 +287,10 @@ public class Sentry {
         String culprit = getCause(t, t.getMessage());
 
         Sentry.captureEvent(new SentryEventBuilder()
-                .setMessage(message)
-                .setCulprit(culprit)
-                .setLevel(level)
-                .setException(t)
+            .setMessage(message)
+            .setCulprit(culprit)
+            .setLevel(level)
+            .setException(t)
         );
 
     }
@@ -340,37 +337,23 @@ public class Sentry {
      *
      * @return
      */
-    public boolean shouldAttemptPost() {
-        if (!StatusUtil.isConnectionAllowed(context)) {
-            //User did not allow using 3G and wifi is not connected
-            return false;
-        }
-        //Is the permission set in manifest?
-        PackageManager pm = context.getPackageManager();
-        int hasPerm = pm.checkPermission(permission.ACCESS_NETWORK_STATE, context.getPackageName());
-        if (hasPerm != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
-        //is there a connection?
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    private boolean shouldAttemptPost() {
+        return postPermissionVerifier.shouldAttemptPost(context);
     }
 
     private static class ExSSLSocketFactory extends SSLSocketFactory {
         SSLContext sslContext = SSLContext.getInstance("TLS");
 
         ExSSLSocketFactory(SSLContext context)
-                throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
-                UnrecoverableKeyException {
+            throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
+            UnrecoverableKeyException {
             super(null);
             sslContext = context;
         }
 
         @Override
         public Socket createSocket(Socket socket, String host, int port, boolean autoClose)
-                throws IOException {
+            throws IOException {
             return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
         }
 
@@ -385,12 +368,12 @@ public class Sentry {
             X509TrustManager x509TrustManager = new X509TrustManager() {
                 @Override
                 public void checkClientTrusted(X509Certificate[] chain,
-                        String authType) throws CertificateException {
+                    String authType) throws CertificateException {
                 }
 
                 @Override
                 public void checkServerTrusted(X509Certificate[] chain,
-                        String authType) throws CertificateException {
+                    String authType) throws CertificateException {
                 }
 
                 @Override
@@ -420,11 +403,6 @@ public class Sentry {
             return;
         }
 
-        sendSentryEvent(request, sentry);
-
-    }
-
-    public static void sendSentryEvent(final SentryEventRequest request, final Sentry sentry) {
         sentry.executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -455,7 +433,7 @@ public class Sentry {
                 boolean success = false;
                 try {
                     httpPost.setHeader("X-Sentry-Auth", createXSentryAuthHeader(sentry.dsn));
-                    httpPost.setHeader("User-Agent", "sentry-android/" + sentryAndroidVersion);
+                    httpPost.setHeader("User-Agent", "sentry-android/" + BuildConfig.SENTRY_ANDROID_VERSION);
                     httpPost.setHeader("Content-Type", "application/json; charset=utf-8");
 
                     httpPost.setEntity(new StringEntity(request.getRequestData(), HTTP.UTF_8));
@@ -519,6 +497,7 @@ public class Sentry {
             }
 
         });
+
     }
 
     private static class SentryUncaughtExceptionHandler implements UncaughtExceptionHandler {
@@ -528,7 +507,7 @@ public class Sentry {
 
         // constructor
         public SentryUncaughtExceptionHandler(UncaughtExceptionHandler pDefaultExceptionHandler,
-                InternalStorage storage) {
+            InternalStorage storage) {
             defaultExceptionHandler = pDefaultExceptionHandler;
             this.storage = storage;
         }
@@ -631,7 +610,7 @@ public class Sentry {
                 FileInputStream fis = context.openFileInput(FILE_NAME);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 List<SentryEventRequest> requests = (ArrayList<SentryEventRequest>) ois
-                        .readObject();
+                    .readObject();
                 ois.close();
                 fis.close();
                 return requests;
@@ -671,7 +650,7 @@ public class Sentry {
         final Map<String, String> data = new HashMap<>();
 
         Breadcrumb(long timestamp, Type type, String message, String category,
-                SentryEventLevel level) {
+            SentryEventLevel level) {
             this.timestamp = timestamp;
             this.type = type;
             this.message = message;
@@ -698,11 +677,11 @@ public class Sentry {
      */
     public static void addNavigationBreadcrumb(String category, String from, String to) {
         final Breadcrumb b = new Breadcrumb(
-                System.currentTimeMillis() / 1000,
-                Breadcrumb.Type.Navigation,
-                "",
-                category,
-                SentryEventLevel.INFO);
+            System.currentTimeMillis() / 1000,
+            Breadcrumb.Type.Navigation,
+            "",
+            category,
+            SentryEventLevel.INFO);
 
         b.data.put("from", from);
         b.data.put("to", to);
@@ -722,11 +701,11 @@ public class Sentry {
     public static void addHttpBreadcrumb(String url, String method, int statusCode) {
         final String reason = EnglishReasonPhraseCatalog.INSTANCE.getReason(statusCode, Locale.US);
         final Breadcrumb b = new Breadcrumb(
-                System.currentTimeMillis() / 1000,
-                Breadcrumb.Type.HTTP,
-                "",
-                String.format("http.%s", method.toLowerCase()),
-                SentryEventLevel.INFO);
+            System.currentTimeMillis() / 1000,
+            Breadcrumb.Type.HTTP,
+            "",
+            String.format("http.%s", method.toLowerCase()),
+            SentryEventLevel.INFO);
 
         b.data.put("url", url);
         b.data.put("method", method);
@@ -749,11 +728,11 @@ public class Sentry {
      */
     public static void addBreadcrumb(String category, String message) {
         getInstance().pushBreadcrumb(new Breadcrumb(
-                System.currentTimeMillis() / 1000,
-                Breadcrumb.Type.Default,
-                message,
-                category,
-                SentryEventLevel.INFO));
+            System.currentTimeMillis() / 1000,
+            Breadcrumb.Type.Default,
+            message,
+            category,
+            SentryEventLevel.INFO));
     }
 
     private JSONArray currentBreadcrumbs() {
@@ -854,9 +833,9 @@ public class Sentry {
             String culprit = getCause(t, t.getMessage());
 
             this.setMessage(t.getMessage())
-                    .setCulprit(culprit)
-                    .setLevel(level)
-                    .setException(t);
+                .setCulprit(culprit)
+                .setLevel(level)
+                .setException(t);
         }
 
         /**
@@ -1168,7 +1147,7 @@ public class Sentry {
         static AppInfo Read(final Context context) {
             try {
                 final PackageInfo info = context.getPackageManager()
-                        .getPackageInfo(context.getPackageName(), 0);
+                    .getPackageInfo(context.getPackageName(), 0);
                 return new AppInfo(info.packageName, info.versionName, info.versionCode);
             } catch (Exception e) {
                 Log.e(TAG, "Error reading package context", e);
@@ -1219,7 +1198,7 @@ public class Sentry {
 
             final int orient = context.getResources().getConfiguration().orientation;
             device.put("orientation", orient == Configuration.ORIENTATION_LANDSCAPE ?
-                    "landscape" : "portrait");
+                "landscape" : "portrait");
 
             // Read screen resolution in the format "800x600"
             // Normalised to have wider side first.
@@ -1228,9 +1207,9 @@ public class Sentry {
                 final DisplayMetrics metrics = new DisplayMetrics();
                 ((WindowManager) windowManager).getDefaultDisplay().getMetrics(metrics);
                 device.put("screen_resolution",
-                        String.format("%sx%s",
-                                Math.max(metrics.widthPixels, metrics.heightPixels),
-                                Math.min(metrics.widthPixels, metrics.heightPixels)));
+                    String.format("%sx%s",
+                        Math.max(metrics.widthPixels, metrics.heightPixels),
+                        Math.min(metrics.widthPixels, metrics.heightPixels)));
             }
 
         } catch (Exception e) {

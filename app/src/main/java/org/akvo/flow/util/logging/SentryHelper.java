@@ -41,7 +41,8 @@ public class SentryHelper extends LoggingHelper {
         Sentry.setCaptureListener(new FlowSentryCaptureListener(tags));
         final PropertyUtil props = new PropertyUtil(context.getResources());
         String sentryDsn = getSentryDsn(props);
-        Sentry.init(context, sentryDsn);
+        Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),
+                LoggingFactory.SENTRY_PROTOCOL_VERSION);
     }
 
     @Override

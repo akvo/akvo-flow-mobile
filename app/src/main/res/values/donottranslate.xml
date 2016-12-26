@@ -3,5 +3,4 @@
     <!--Intent Actions. Do not translate these strings-->
     <string name="action_surveys_sync" translatable="false">fieldsurvey.ACTION_SURVEYS_SYNC</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBPyguWZrQi2xcqs49WajwQ6FYeSHpaEFQ</string>
-    <string name="sentry_dsn" translatable="false">http://3f5bc1fb1c1f4c579bc11a53e41281c2:aef0c01496f8447d899a2674961a4e15@sentry.support.akvo-ops.org/16</string>
 </resources>

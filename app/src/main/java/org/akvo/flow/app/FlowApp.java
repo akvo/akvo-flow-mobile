@@ -29,6 +29,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
@@ -54,7 +55,12 @@ public class FlowApp extends Application {
         super.onCreate();
         initLogging();
         init();
+        startUpdateService();
         app = this;
+    }
+
+    private void startUpdateService() {
+        ApkUpdateService.scheduleRepeat(this);
     }
 
     private void initLogging() {

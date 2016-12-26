@@ -16,50 +16,98 @@
 
 package org.akvo.flow.service;
 
-import android.app.IntentService;
-import android.content.Intent;
+import android.content.Context;
+import android.support.v4.util.Pair;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.GcmTaskService;
+import com.google.android.gms.gcm.PeriodicTask;
+import com.google.android.gms.gcm.Task;
+import com.google.android.gms.gcm.TaskParams;
+
+import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 
 import timber.log.Timber;
 
 /**
  * This background service will check the rest api for a new version of the APK.
- * If found, it will display a notification, requesting permission to download and
- * installAppUpdate it. After clicking the notification, the app will download and installAppUpdate
- * the new APK.
+ * If found, it will display a {@link org.akvo.flow.activity.AppUpdateActivity}, requesting
+ * permission to download and installAppUpdate it.
  *
  * @author Christopher Fagiani
  */
-public class ApkUpdateService extends IntentService {
+public class ApkUpdateService extends GcmTaskService {
 
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
 
-    public ApkUpdateService() {
-        super(TAG);
+    public static void scheduleRepeat(Context context) {
+        try {
+            PeriodicTask periodic = new PeriodicTask.Builder()
+                    .setService(ApkUpdateService.class)
+                    //repeat every x seconds
+                    .setPeriod(ConstantUtil.REPEAT_INTERVAL_IN_SECONDS)
+                    //specify how much earlier the task can be executed (in seconds)
+                    .setFlex(ConstantUtil.FLEX_IN_SECONDS)
+                    //tag that is unique to this task (can be used to cancel task)
+                    .setTag(TAG)
+                    //whether the task persists after device reboot
+                    .setPersisted(true)
+                    //if another task with same tag is already scheduled, replace it with this task
+                    .setUpdateCurrent(true)
+                    //set required network state
+                    .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                    //request that charging needs not be connected
+                    .setRequiresCharging(false).build();
+            GcmNetworkManager.getInstance(context).schedule(periodic);
+        } catch (Exception e) {
+            Timber.e(e, "scheduleRepeat failed");
+        }
     }
 
+    /**
+     * Cancels the repeated task
+     */
+    public static void cancelRepeat(Context context) {
+        GcmNetworkManager.getInstance(context).cancelTask(TAG, ApkUpdateService.class);
+    }
+
+    /**
+     *  Called when app is updated to a new version, reinstalled etc.
+     *  Repeating tasks have to be rescheduled
+     */
     @Override
-    protected void onHandleIntent(Intent intent) {
-        checkUpdates();
+    public void onInitializeTasks() {
+        super.onInitializeTasks();
+        scheduleRepeat(this);
     }
 
     /**
      * Check if new FLOW versions are available to installAppUpdate. If a new version is available,
-     * we display a notification, requesting the user to download it.
+     * we display {@link org.akvo.flow.activity.AppUpdateActivity}, requesting the user to download
+     * it.
      */
-    private void checkUpdates() {
-        if (!StatusUtil.hasDataConnection(this)) {
-            Timber.d("No internet connection. Can't perform the requested operation");
-            return;
+    @Override
+    public int onRunTask(TaskParams taskParams) {
+        if (!StatusUtil.isConnectionAllowed(this)) {
+            Timber.d("No available authorised connection. Can't perform the requested operation");
+            return GcmNetworkManager.RESULT_SUCCESS;
         }
 
         try {
-            apkUpdateHelper.shouldUpdate(this);
+            Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate(this);
+            if (booleanApkDataPair.first) {
+                //save to shared preferences
+                Prefs.saveApkData(this, booleanApkDataPair.second);
+            }
+            return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {
-            Timber.e(e, "Could not call apk version service");
+            Timber.e(e, "Error with apk version service");
+            return GcmNetworkManager.RESULT_FAILURE;
         }
     }
 }

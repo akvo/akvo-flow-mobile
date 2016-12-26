@@ -55,7 +55,7 @@ import java.util.StringTokenizer;
  */
 public class SurveyDbAdapter {
 
-    public static final int DOES_NOT_EXIST = -1;
+    private static final int DOES_NOT_EXIST = -1;
 
     public interface Tables {
         String SURVEY = "survey";
@@ -230,7 +230,7 @@ public class SurveyDbAdapter {
      */
     static class DatabaseHelper extends SQLiteOpenHelper {
         private static SQLiteDatabase database;
-        private static volatile Object LOCK_OBJ = new Object();
+        private static final Object LOCK_OBJ = new Object();
         private volatile static int instanceCount = 0;
 
         DatabaseHelper(Context context) {
@@ -324,8 +324,8 @@ public class SurveyDbAdapter {
                     + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
             createIndexes(db);
-            for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
-                db.execSQL(DEFAULT_INSERTS[i]);
+            for (String DEFAULT_INSERT : DEFAULT_INSERTS) {
+                db.execSQL(DEFAULT_INSERT);
             }
         }
 
@@ -623,7 +623,7 @@ public class SurveyDbAdapter {
     }
 
     public Map<String, QuestionResponse> getResponses(long surveyInstanceId) {
-        Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
+        Map<String, QuestionResponse> responses = new HashMap<>();
 
         Cursor cursor = database.query(Tables.RESPONSE,
                 new String[] {
@@ -776,7 +776,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public List<Survey> checkSurveyVersions(List<Survey> surveys) {
-        List<Survey> outOfDateSurveys = new ArrayList<Survey>();
+        List<Survey> outOfDateSurveys = new ArrayList<>();
         for (int i = 0; i < surveys.size(); i++) {
             Cursor cursor = database.query(Tables.SURVEY,
                     new String[] {
@@ -894,7 +894,7 @@ public class SurveyDbAdapter {
      * Lists all settings from the database
      */
     public HashMap<String, String> getPreferences() {
-        HashMap<String, String> settings = new HashMap<String, String>();
+        HashMap<String, String> settings = new HashMap<>();
         Cursor cursor = database.query(Tables.PREFERENCES, new String[] {
                 PreferencesColumns.KEY, PreferencesColumns.VALUE
         }, null, null, null, null, null);
@@ -1007,8 +1007,8 @@ public class SurveyDbAdapter {
                 new String[] { fileName });
     }
 
-    public List<FileTransmission> getFileTransmissions(Cursor cursor) {
-        List<FileTransmission> transmissions = new ArrayList<FileTransmission>();
+    private List<FileTransmission> getFileTransmissions(Cursor cursor) {
+        List<FileTransmission> transmissions = new ArrayList<>();
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -1021,7 +1021,7 @@ public class SurveyDbAdapter {
                 final int fileCol = cursor.getColumnIndexOrThrow(TransmissionColumns.FILENAME);
                 final int statusCol = cursor.getColumnIndexOrThrow(TransmissionColumns.STATUS);
 
-                transmissions = new ArrayList<FileTransmission>();
+                transmissions = new ArrayList<>();
                 do {
                     FileTransmission trans = new FileTransmission();
                     trans.setId(cursor.getLong(idCol));
@@ -1143,8 +1143,8 @@ public class SurveyDbAdapter {
                 });
     }
 
-    public HashSet<String> stringToSet(String item) {
-        HashSet<String> set = new HashSet<String>();
+    private HashSet<String> stringToSet(String item) {
+        HashSet<String> set = new HashSet<>();
         StringTokenizer strTok = new StringTokenizer(item, ",");
         while (strTok.hasMoreTokens()) {
             set.add(strTok.nextToken());
@@ -1152,7 +1152,7 @@ public class SurveyDbAdapter {
         return set;
     }
 
-    public String setToString(HashSet<String> set) {
+    private String setToString(HashSet<String> set) {
         boolean isFirst = true;
         StringBuilder buffer = new StringBuilder();
         Iterator<String> itr = set.iterator();
@@ -1303,7 +1303,7 @@ public class SurveyDbAdapter {
         return locale;
     }
 
-    public static Survey getSurvey(Cursor cursor) {
+    private static Survey getSurvey(Cursor cursor) {
         Survey survey = new Survey();
         survey.setId(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID)));
         survey.setName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.NAME)));
@@ -1354,7 +1354,7 @@ public class SurveyDbAdapter {
         return s;
     }
 
-    public Cursor getSurveys(long surveyGroupId) {
+    private Cursor getSurveys(long surveyGroupId) {
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = null;
         if (surveyGroupId > 0) {
@@ -1381,7 +1381,7 @@ public class SurveyDbAdapter {
         // Reuse getSurveys() method
         Cursor cursor = getSurveys(surveyGroupId);
 
-        ArrayList<Survey> surveys = new ArrayList<Survey>();
+        ArrayList<Survey> surveys = new ArrayList<>();
 
         if (cursor != null) {
             if (cursor.getCount() > 0) {
@@ -1446,7 +1446,7 @@ public class SurveyDbAdapter {
         String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.STATUS + "= ?" +
                 " AND " + SurveyInstanceColumns.RECORD_ID + "= ?";
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         args.add(surveyId);
         args.add(String.valueOf(status));
         args.add(recordId);
@@ -1489,13 +1489,15 @@ public class SurveyDbAdapter {
                 null, null,
                 SurveyInstanceColumns.SUBMITTED_DATE + " DESC");
         if (cursor != null && cursor.moveToFirst()) {
-            return cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+            long surveyInstanceId = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+            cursor.close();
+            return surveyInstanceId;
         }
 
         return null;
     }
 
-    public String getSurveyedLocaleId(long surveyInstanceId) {
+    private String getSurveyedLocaleId(long surveyInstanceId) {
         Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
                         SurveyInstanceColumns._ID, SurveyInstanceColumns.RECORD_ID
@@ -1622,7 +1624,7 @@ public class SurveyDbAdapter {
     // =========== SurveyedLocales synchronization =========== //
     // ======================================================= //
 
-    public void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
+    private void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
         for (QuestionResponse response : responses) {
             Cursor cursor = database.query(Tables.RESPONSE,
                     new String[] { ResponseColumns.SURVEY_INSTANCE_ID, ResponseColumns.QUESTION_ID
@@ -1654,7 +1656,7 @@ public class SurveyDbAdapter {
         }
     }
 
-    public void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
+    private void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
         for (SurveyInstance surveyInstance : surveyInstances) {
             Cursor cursor = database.query(Tables.SURVEY_INSTANCE, new String[] {
                             SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID
@@ -1749,7 +1751,7 @@ public class SurveyDbAdapter {
      * @param surveyGroupId id of the SurveyGroup
      * @param time          String containing the timestamp
      */
-    public void setSyncTime(long surveyGroupId, String time) {
+    private void setSyncTime(long surveyGroupId, String time) {
         ContentValues values = new ContentValues();
         values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
         values.put(SyncTimeColumns.TIME, time);

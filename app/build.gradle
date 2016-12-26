@@ -116,5 +116,4 @@ dependencies {
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
-    compile project(':sentry-android')
 }

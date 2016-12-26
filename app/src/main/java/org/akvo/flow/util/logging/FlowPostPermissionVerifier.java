@@ -17,17 +17,13 @@
 
 package org.akvo.flow.util.logging;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 
-import com.joshdholtz.sentry.AbstractPermissionVerifier;
+import com.joshdholtz.sentry.PostPermissionVerifier;
 
 import org.akvo.flow.util.StatusUtil;
 
-public class FlowPostPermissionVerifier extends AbstractPermissionVerifier {
+public class FlowPostPermissionVerifier extends PostPermissionVerifier {
 
     public FlowPostPermissionVerifier() {
     }
@@ -43,17 +39,6 @@ public class FlowPostPermissionVerifier extends AbstractPermissionVerifier {
             //User did not allow using 3G and wifi is not connected
             return false;
         }
-        //Is the permission set in manifest?
-        PackageManager pm = context.getPackageManager();
-        int hasPerm = pm.checkPermission(Manifest.permission.ACCESS_NETWORK_STATE,
-                context.getPackageName());
-        if (hasPerm != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
-        //is there a connection?
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        return super.shouldAttemptPost(context);
     }
 }

@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 
 import com.joshdholtz.sentry.Sentry;
 
-import org.akvo.flow.util.PropertyUtil;
 import org.json.JSONException;
 
 import java.util.Map;
@@ -39,8 +38,8 @@ public class SentryHelper extends LoggingHelper {
     public void initSentry() {
         addTags();
         Sentry.setCaptureListener(new FlowSentryCaptureListener(tags));
-        final PropertyUtil props = new PropertyUtil(context.getResources());
-        String sentryDsn = getSentryDsn(props);
+
+        String sentryDsn = getSentryDsn(context.getResources());
         Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),
                 LoggingFactory.SENTRY_PROTOCOL_VERSION);
     }

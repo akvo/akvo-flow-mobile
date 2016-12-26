@@ -20,12 +20,12 @@ package org.akvo.flow.util.logging;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.R;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 
@@ -78,10 +78,11 @@ public abstract class LoggingHelper {
     }
 
     @NonNull
-    String getSentryDsn(PropertyUtil props) {
+    String getSentryDsn(Resources resources) {
+        final PropertyUtil props = new PropertyUtil(resources);
         String sentryDsn = props.getProperty(ConstantUtil.SENTRY_DSN);
         if (TextUtils.isEmpty(sentryDsn)) {
-            sentryDsn = context.getString(R.string.sentry_dsn);
+            throw new IllegalArgumentException("Missing sentry dsn");
         }
         return sentryDsn;
     }

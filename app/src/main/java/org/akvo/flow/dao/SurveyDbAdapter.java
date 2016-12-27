@@ -197,16 +197,15 @@ public class SurveyDbAdapter {
 
     /**
      * TODO: Double check these inserts, and use Constants!
+     *
+     * @Deprecated
      */
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
             "INSERT INTO preferences VALUES('survey.languagespresent','')",
-            "INSERT INTO preferences VALUES('user.storelast','false')",
             "INSERT INTO preferences VALUES('data.cellular.upload','true')",
-            "INSERT INTO preferences VALUES('user.lastuser.id','')",
             "INSERT INTO preferences VALUES('backend.server','')",
             "INSERT INTO preferences VALUES('screen.keepon','true')",
-            "INSERT INTO preferences VALUES('survey.textsize','LARGE')",
             "INSERT INTO preferences VALUES('" + ConstantUtil.MAX_IMG_SIZE + "',"
                     + String.valueOf(ConstantUtil.IMAGE_SIZE_320_240) + ")"
     };
@@ -1114,7 +1113,6 @@ public class SurveyDbAdapter {
         executeSql("DELETE FROM " + Tables.SURVEY);
         executeSql("DELETE FROM " + Tables.SURVEY_GROUP);
         executeSql("DELETE FROM " + Tables.USER);
-        executeSql("UPDATE preferences SET value = '' WHERE key = 'user.lastuser.id'");
     }
 
     /**

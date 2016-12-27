@@ -37,6 +37,7 @@ import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
@@ -128,12 +129,9 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
             serverTextView.setText(props.getProperty(ConstantUtil.SERVER_BASE));
         }
 
-        val = settings.get(ConstantUtil.MAX_IMG_SIZE);
-        if (val != null && val.trim().length() > 0) {
-            maxImgSizeTextView.setText(maxImgSizes[Integer.parseInt(val)]);
-        } else {
-            maxImgSizeTextView.setText(maxImgSizes[0]);
-        }
+        int maxImgSize = Prefs
+                .getInt(this, Prefs.MAX_IMG_SIZE, ConstantUtil.IMAGE_SIZE_320_240);
+        maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
 
         val = settings.get(ConstantUtil.DEVICE_IDENT_KEY);
         if (val != null) {
@@ -257,13 +255,9 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                 );
                 break;
             case R.id.pref_resize:
-                String[] keys = new String[maxImgSizes.length];
-                for (int i = 0; i < maxImgSizes.length; i++) {
-                    keys[i] = String.valueOf(i);
-                }
-                showPreferenceDialogBase(R.string.resize_large_images,
-                        ConstantUtil.MAX_IMG_SIZE,
-                        keys, maxImgSizes, maxImgSizeTextView);
+                showPreferenceDialog(R.string.resize_large_images,
+                        Prefs.MAX_IMG_SIZE,
+                         maxImgSizes, maxImgSizeTextView);
                 break;
         }
     }
@@ -286,6 +280,33 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         database.savePreference(settingKey, keys[which]);
+                        currentValView.setText(values[which]);
+                        if (dialog != null) {
+                            dialog.dismiss();
+                        }
+                    }
+                }
+        );
+        builder.show();
+    }
+
+    /**
+     * displays a dialog that allows the user to choose a setting from a string
+     * array
+     *
+     * @param titleId        - resource id of dialog title
+     * @param settingKey     - key of setting to edit
+     * @param values         - string array containing values (text mapping of the key)
+     * @param currentValView - view to update with value selected
+     */
+    private void showPreferenceDialog(int titleId, final String settingKey, final String[] values,
+            final TextView currentValView) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(titleId).setItems(values,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Prefs.setInt(currentValView.getContext(), settingKey, which);
                         currentValView.setText(values[which]);
                         if (dialog != null) {
                             dialog.dismiss();

@@ -205,9 +205,7 @@ public class SurveyDbAdapter {
             "INSERT INTO preferences VALUES('survey.languagespresent','')",
             "INSERT INTO preferences VALUES('data.cellular.upload','true')",
             "INSERT INTO preferences VALUES('backend.server','')",
-            "INSERT INTO preferences VALUES('screen.keepon','true')",
-            "INSERT INTO preferences VALUES('" + ConstantUtil.MAX_IMG_SIZE + "',"
-                    + String.valueOf(ConstantUtil.IMAGE_SIZE_320_240) + ")"
+            "INSERT INTO preferences VALUES('screen.keepon','true')"
     };
 
     private static final String DATABASE_NAME = "surveydata";

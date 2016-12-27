@@ -54,6 +54,7 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
@@ -455,11 +456,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 String filename = PlatformUtil.uuid() + fileSuffix;
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
-                int maxImgSize = ConstantUtil.IMAGE_SIZE_320_240;
-                String maxImgSizePref = mDatabase.getPreference(ConstantUtil.MAX_IMG_SIZE);
-                if (!TextUtils.isEmpty(maxImgSizePref)) {
-                    maxImgSize = Integer.valueOf(maxImgSizePref);
-                }
+                int maxImgSize = Prefs
+                        .getInt(this, Prefs.MAX_IMG_SIZE, ConstantUtil.IMAGE_SIZE_320_240);
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {

@@ -33,6 +33,12 @@ public class Prefs {
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
     public static final String KEY_APK_DATA = "apk_data";
+    public static final String PREF_LOCALE = "pref.locale";
+    public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
+    public static final String SERVER_SETTING_KEY = "backend.server";
+    public static final String SCREEN_ON_KEY = "screen.keepon";
+    public static final String DEVICE_IDENT_KEY = "device.identifier";
+    public static final String MAX_IMG_SIZE = "media.img.maxsize";
 
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;

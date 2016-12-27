@@ -19,7 +19,6 @@ package org.akvo.flow.app;
 import android.app.Application;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -46,7 +45,9 @@ public class FlowApp extends Application {
     private static final String TAG = FlowApp.class.getSimpleName();
     private static FlowApp app;// Singleton
 
+    //TODO: use shared pref?
     private Locale mLocale;
+
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
 
@@ -90,6 +91,8 @@ public class FlowApp extends Application {
         // Load custom locale into the app. If the locale has not previously been configured
         // check if the device has a compatible language active. Otherwise, fall back to English
         String language = loadLocalePref();
+
+        //TODO: this is not necessary as by default locale is english anyway
         if (TextUtils.isEmpty(language)) {
             language = Locale.getDefault().getLanguage();
             // Is that available in our language list?
@@ -98,6 +101,7 @@ public class FlowApp extends Application {
                 language = ConstantUtil.ENGLISH_CODE;// TODO: Move this constant to @strings
             }
         }
+        //TODO: only set the language if it is diferent than the device locale
         setAppLanguage(language, false);
 
         loadLastUser();
@@ -185,30 +189,12 @@ public class FlowApp extends Application {
     }
 
     private String loadLocalePref() {
-        String language = null;
-        SurveyDbAdapter database = new SurveyDbAdapter(this);
-        try {
-            database.open();
-            language = database.getPreference(ConstantUtil.PREF_LOCALE);
-        } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
-        } finally {
-            database.close();
-        }
-
-        return language;
+        //TODO: what to use by default???
+        return Prefs.getString(this, Prefs.PREF_LOCALE, null);
     }
 
     private void saveLocalePref(String language) {
-        SurveyDbAdapter database = new SurveyDbAdapter(this);
-        try {
-            database.open();
-            database.savePreference(ConstantUtil.PREF_LOCALE, language);
-        } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
-        } finally {
-            database.close();
-        }
+        Prefs.setString(this, Prefs.PREF_LOCALE, language);
     }
 
     /**

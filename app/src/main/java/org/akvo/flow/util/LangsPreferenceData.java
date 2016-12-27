@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -37,7 +37,7 @@ public class LangsPreferenceData {
         return langsSelectedNameArray;
     }
 
-    public void setLangsSelectedNameArray(String[] langsSelectedNameArray) {
+    private void setLangsSelectedNameArray(String[] langsSelectedNameArray) {
         this.langsSelectedNameArray = langsSelectedNameArray;
     }
 
@@ -45,7 +45,7 @@ public class LangsPreferenceData {
         return langsSelectedBooleanArray;
     }
 
-    public void setLangsSelectedBooleanArray(boolean[] langsSelectedBooleanArray) {
+    private void setLangsSelectedBooleanArray(boolean[] langsSelectedBooleanArray) {
         this.langsSelectedBooleanArray = langsSelectedBooleanArray;
     }
 
@@ -53,7 +53,7 @@ public class LangsPreferenceData {
         return langsSelectedMasterIndexArray;
     }
 
-    public void setLangsSelectedMasterIndexArray(
+    private void setLangsSelectedMasterIndexArray(
             int[] langsSelectedMasterIndexArray) {
         this.langsSelectedMasterIndexArray = langsSelectedMasterIndexArray;
     }

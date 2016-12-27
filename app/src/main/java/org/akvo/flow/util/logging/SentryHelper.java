@@ -19,6 +19,7 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.joshdholtz.sentry.Sentry;
 
@@ -40,13 +41,11 @@ public class SentryHelper extends LoggingHelper {
         Sentry.setCaptureListener(new FlowSentryCaptureListener(tags));
 
         String sentryDsn = getSentryDsn(context.getResources());
-        Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),
-                LoggingFactory.SENTRY_PROTOCOL_VERSION);
-    }
-
-    @Override
-    public void plantTimberTree() {
-        Timber.plant(new SentryTree());
+        if (!TextUtils.isEmpty(sentryDsn)) {
+            Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),
+                    LoggingFactory.SENTRY_PROTOCOL_VERSION);
+            Timber.plant(new SentryTree());
+        }
     }
 
     private static class FlowSentryCaptureListener implements Sentry.SentryEventCaptureListener {

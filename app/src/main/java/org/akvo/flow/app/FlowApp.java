@@ -67,7 +67,6 @@ public class FlowApp extends Application {
         LoggingHelper helper = loggingFactory.createLoggingHelper(this);
         helper.initDebugTree();
         helper.initSentry();
-        helper.plantTimberTree();
     }
 
     public static FlowApp getApp() {

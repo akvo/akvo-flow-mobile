@@ -22,8 +22,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.util.ConstantUtil;
@@ -43,9 +42,10 @@ public abstract class LoggingHelper {
     private static final String VERSION_NAME_TAG_KEY = "VersionName";
     private static final String VERSION_CODE_TAG_KEY = "VersionCode";
     private static final String INSTANCE_ID_KEY = "appId";
+    private static final int NUMBER_OF_TAGS = 7;
 
     final Context context;
-    final Map<String, String> tags = new HashMap<>(6);
+    final Map<String, String> tags = new HashMap<>(NUMBER_OF_TAGS);
 
     LoggingHelper(Context context) {
         this.context = context;
@@ -61,8 +61,8 @@ public abstract class LoggingHelper {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
             String versionName = packageInfo.versionName;
-            tags.put(VERSION_NAME_TAG_KEY, versionName);
             int versionCode = packageInfo.versionCode;
+            tags.put(VERSION_NAME_TAG_KEY, versionName);
             tags.put(VERSION_CODE_TAG_KEY, versionCode + "");
         } catch (PackageManager.NameNotFoundException e) {
             Timber.e("Error getting versionName and versionCode");
@@ -77,15 +77,10 @@ public abstract class LoggingHelper {
         }
     }
 
-    @NonNull
+    @Nullable
     String getSentryDsn(Resources resources) {
         final PropertyUtil props = new PropertyUtil(resources);
         String sentryDsn = props.getProperty(ConstantUtil.SENTRY_DSN);
-        if (TextUtils.isEmpty(sentryDsn)) {
-            throw new IllegalArgumentException("Missing sentry dsn");
-        }
         return sentryDsn;
     }
-
-    public abstract void plantTimberTree();
 }

@@ -65,6 +65,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
     private static final String TAG = FormActivity.class.getSimpleName();
@@ -202,6 +204,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 try {
                     in.close();
                 } catch (IOException e) {
+                    //EMPTY
                 }
             }
         }
@@ -399,9 +402,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void displayLanguagesDialog() {
         // TODO: language management should be simplified
+        String setLanguage = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
+        String presentLanguage = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
+        Timber.d("setLanguage: %s; presentLanguage: %s ", setLanguage, presentLanguage);
         LangsPreferenceData langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
-                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY),
-                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY));
+                setLanguage,
+                presentLanguage);
 
         final String[] langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
         final boolean[] langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
@@ -416,10 +422,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
                             dialog.dismiss();
                         }
 
+                        String value = LangsPreferenceUtil.formLangPreferenceString(
+                                langsSelectedBooleanArray,
+                                langsSelectedMasterIndexArray);
+                        Timber.d("Will save survey.language value : %s", value);
                         mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
-                                LangsPreferenceUtil.formLangPreferenceString(
-                                        langsSelectedBooleanArray,
-                                        langsSelectedMasterIndexArray));
+                                value);
 
                         loadLanguages();
                         mAdapter.notifyOptionsChanged();
@@ -709,7 +717,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("cardMBAvaliable", megaAvailable);
         // Commit the edits!
-        editor.commit();
+        editor.apply();
 
         if (megaAvailable <= 0L) {// All out, OR media not mounted
             // Bounce user

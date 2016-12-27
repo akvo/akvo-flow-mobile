@@ -37,6 +37,7 @@ import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import timber.log.Timber;
@@ -216,7 +217,7 @@ public class FlowApp extends Application {
      * any language stored in the device has properly set its languages in the
      * database, making them available to the user through the settings menu.
      */
-    private Runnable mSurveyChecker = new Runnable() {
+    private final Runnable mSurveyChecker = new Runnable() {
 
         @Override
         public void run() {
@@ -227,7 +228,8 @@ public class FlowApp extends Application {
             // NOTE: 'survey.language' DID exist
             if (database.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY) == null) {
                 Log.d(TAG, "Recomputing available languages...");
-                Toast.makeText(getApplicationContext(), R.string.configuring_languages, Toast.LENGTH_SHORT)
+                Toast.makeText(getApplicationContext(), R.string.configuring_languages,
+                        Toast.LENGTH_SHORT)
                         .show();
 
                 // First, we add the default property, to avoid null cases within
@@ -236,9 +238,10 @@ public class FlowApp extends Application {
                 database.savePreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY, "");
 
                 // Recompute all the surveys, and store their languages
-                for (Survey survey : database.getSurveyList(SurveyGroup.ID_NONE)) {
+                List<Survey> surveyList = database.getSurveyList(SurveyGroup.ID_NONE);
+                for (Survey survey : surveyList) {
                     String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
-                    Log.d(TAG, "Adding languages: " + langs.toString());
+                    Log.d(TAG, "Adding languages: " + Arrays.toString(langs));
                     database.addLanguages(langs);
                 }
             }

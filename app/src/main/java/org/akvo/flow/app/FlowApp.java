@@ -190,11 +190,11 @@ public class FlowApp extends Application {
 
     private String loadLocalePref() {
         //TODO: what to use by default???
-        return Prefs.getString(this, Prefs.PREF_LOCALE, null);
+        return Prefs.getString(this, Prefs.KEY_LOCALE, null);
     }
 
     private void saveLocalePref(String language) {
-        Prefs.setString(this, Prefs.PREF_LOCALE, language);
+        Prefs.setString(this, Prefs.KEY_LOCALE, language);
     }
 
     /**

@@ -293,7 +293,7 @@ public class DataSyncService extends IntentService {
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
         if (data != null && data.moveToFirst()) {
-            String deviceIdentifier = Prefs.getString(getApplicationContext(), Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE);
+            String deviceIdentifier = Prefs.getString(getApplicationContext(), Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
             deviceIdentifier = cleanVal(deviceIdentifier);
             // evaluate indices once, outside the loop
             int survey_fk_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);

@@ -79,9 +79,6 @@ public class SurveyDbAdapter {
     private static final String[] DEFAULT_INSERTS = new String[] {
             "INSERT INTO preferences VALUES('survey.language','')",
             "INSERT INTO preferences VALUES('survey.languagespresent','')",
-            "INSERT INTO preferences VALUES('data.cellular.upload','true')",
-            "INSERT INTO preferences VALUES('backend.server','')",
-            "INSERT INTO preferences VALUES('screen.keepon','true')"
     };
 
     private final Context context;

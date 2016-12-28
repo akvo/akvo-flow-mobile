@@ -32,27 +32,25 @@ import org.akvo.flow.util.ConstantUtil;
  */
 public class Prefs {
 
-    //TODO: rename some of these
     public static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
     public static final String KEY_APK_DATA = "apk_data";
-    public static final String PREF_LOCALE = "pref.locale";
-    public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
-    public static final String SERVER_SETTING_KEY = "backend.server";
-    public static final String SCREEN_ON_KEY = "screen.keepon";
-    public static final String DEVICE_IDENT_KEY = "device.identifier";
-    public static final String MAX_IMG_SIZE = "media.img.maxsize";
+    public static final String KEY_LOCALE = "pref.locale";
+    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    public static final String KEY_BACKEND_SERVER = "backend.server";
+    public static final String KEY_SCREEN_ON = "screen.keepon";
+    public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
+    public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
 
     private static final String PREFS_NAME = "flow_prefs";
-
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
     //TODO: make this more device specific to avoid duplicates
-    public static final String DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE = "unset";
-    public static final int DEFAULT_IMAGE_SIZE_PREF_VALUE = ConstantUtil.IMAGE_SIZE_320_240;
-    public static final boolean DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE = false;
-    public static final boolean DEFAULT_SCREEN_ON_PREF_VALUE = true;
+    public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
+    public static final int DEFAULT_VALUE_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
+    public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
 
     private static GsonMapper gsonMapper = new GsonMapper();
 
@@ -119,20 +117,20 @@ public class Prefs {
 
         String deviceIdentifier = insertablePreferences.getDeviceIdentifier();
         if (!TextUtils.isEmpty(deviceIdentifier)) {
-            Prefs.setString(context, DEVICE_IDENT_KEY, deviceIdentifier);
+            Prefs.setString(context, KEY_DEVICE_IDENTIFIER, deviceIdentifier);
         }
 
-        if (DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE != insertablePreferences.isCellularDataEnabled()) {
-            Prefs.setBoolean(context, CELL_UPLOAD_SETTING_KEY,
+        if (DEFAULT_VALUE_CELL_UPLOAD != insertablePreferences.isCellularDataEnabled()) {
+            Prefs.setBoolean(context, KEY_CELL_UPLOAD,
                     insertablePreferences.isCellularDataEnabled());
         }
 
-        if (DEFAULT_SCREEN_ON_PREF_VALUE != insertablePreferences.isScreenOn()) {
-            Prefs.setBoolean(context, SCREEN_ON_KEY, insertablePreferences.isScreenOn());
+        if (DEFAULT_VALUE_SCREEN_ON != insertablePreferences.isScreenOn()) {
+            Prefs.setBoolean(context, KEY_SCREEN_ON, insertablePreferences.isScreenOn());
         }
 
-        if (DEFAULT_IMAGE_SIZE_PREF_VALUE != insertablePreferences.getImageSize()) {
-            Prefs.setInt(context, MAX_IMG_SIZE, insertablePreferences.getImageSize());
+        if (DEFAULT_VALUE_IMAGE_SIZE != insertablePreferences.getImageSize()) {
+            Prefs.setInt(context, KEY_MAX_IMG_SIZE, insertablePreferences.getImageSize());
         }
     }
 }

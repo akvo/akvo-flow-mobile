@@ -142,6 +142,7 @@ public class ConstantUtil {
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
+    
     /**
      * intents
      */

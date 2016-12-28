@@ -71,7 +71,7 @@ public class AddUserActivity extends Activity implements TextWatcher, TextView.O
         SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
         long uid = db.createOrUpdateUser(null, username);
         db.close();
-        Prefs.setString(this, Prefs.DEVICE_IDENT_KEY, deviceId);
+        Prefs.setString(this, Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
 
         // Select the newly created user, and exit the Activity
         FlowApp.getApp().setUser(new User(uid, username));

@@ -34,14 +34,14 @@ import java.net.URL;
 
 /**
  * utilities for checking system state
- * 
+ *
  * @author Christopher Fagiani
  */
 public class StatusUtil {
 
     /**
      * checks whether or not we have a usable data connection
-     * 
+     *
      * @param context
      * @return
      */
@@ -94,7 +94,7 @@ public class StatusUtil {
 
     /**
      * gets the device's primary phone number
-     * 
+     *
      * @return
      */
     public static String getPhoneNumber(Context context) {
@@ -113,7 +113,7 @@ public class StatusUtil {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                 return "";
             }
-            WifiManager wifiMgr = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             if (wifiMgr != null) {
                 // presumably if we don't have a cell connection, then we must
                 // be connected by WIFI so this should work
@@ -128,7 +128,7 @@ public class StatusUtil {
 
     /**
      * gets the device's IMEI (MEID or ESN for CDMA phone)
-     * 
+     *
      * @return
      */
     public static String getImei(Context context) {
@@ -143,31 +143,34 @@ public class StatusUtil {
         }
         return number;
     }
-    
+
     public static boolean hasExternalStorage() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
     /**
      * syncOver3G checks the value of 'Sync over 3G' setting
+     *
      * @param context
      * @return true if the flag is enabled, false otherwise
      */
     private static boolean syncOver3G(Context context) {
-        return Prefs.getBoolean(context, Prefs.CELL_UPLOAD_SETTING_KEY,
-                Prefs.DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE);
+        return Prefs.getBoolean(context, Prefs.KEY_CELL_UPLOAD,
+                Prefs.DEFAULT_VALUE_CELL_UPLOAD);
     }
 
     /**
      * Get the specified server URL. If no custom server has been set (debug),
      * the default one will be returned.
+     *
      * @param context
      * @return server URL string
      */
     public static String getServerBase(Context context) {
-        String serverBase = Prefs.getString(context, Prefs.SERVER_SETTING_KEY, null);
+        String serverBase = Prefs.getString(context, Prefs.KEY_BACKEND_SERVER, null);
         if (TextUtils.isEmpty(serverBase)) {
-            serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
+            serverBase = new PropertyUtil(context.getResources())
+                    .getProperty(ConstantUtil.SERVER_BASE);
         }
         return serverBase;
     }
@@ -178,7 +181,8 @@ public class StatusUtil {
     public static String getApplicationId(Context context) {
         // Directly fetch the server from the properties file. A local serverBase found in the DB
         // will cause a permanent mismatch for all surveys, since XML files will contain original application
-        String serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
+        String serverBase = new PropertyUtil(context.getResources())
+                .getProperty(ConstantUtil.SERVER_BASE);
         try {
             // Match instance name from server base, for example:
             // https://akvoflow-X.appspot.com --> akvoflow-X
@@ -191,5 +195,5 @@ public class StatusUtil {
         }
         return null;
     }
-    
+
 }

@@ -326,7 +326,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
         mPager.setKeepScreenOn(
-                Prefs.getBoolean(this, Prefs.SCREEN_ON_KEY, Prefs.DEFAULT_SCREEN_ON_PREF_VALUE));
+                Prefs.getBoolean(this, Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
     }
 
     @Override
@@ -456,7 +456,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
                 int maxImgSize = Prefs
-                        .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE_PREF_VALUE);
+                        .getInt(this, Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {

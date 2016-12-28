@@ -120,18 +120,18 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
 
     private void populateFromSharedPreferences() {
         screenOnCheckbox.setChecked(
-                Prefs.getBoolean(this, Prefs.SCREEN_ON_KEY, Prefs.DEFAULT_SCREEN_ON_PREF_VALUE));
+                Prefs.getBoolean(this, Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
 
-        mobileDataCheckbox.setChecked(Prefs.getBoolean(this, Prefs.CELL_UPLOAD_SETTING_KEY,
-                Prefs.DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE));
+        mobileDataCheckbox.setChecked(Prefs.getBoolean(this, Prefs.KEY_CELL_UPLOAD,
+                Prefs.DEFAULT_VALUE_CELL_UPLOAD));
 
         serverTextView.setText(StatusUtil.getServerBase(this));
 
         int maxImgSize = Prefs
-                .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE_PREF_VALUE);
+                .getInt(this, Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
         maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
-        identTextView.setText(Prefs.getString(this, Prefs.DEVICE_IDENT_KEY,
-                Prefs.DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE));
+        identTextView.setText(Prefs.getString(this, Prefs.KEY_DEVICE_IDENTIFIER,
+                Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER));
     }
 
     /**
@@ -220,20 +220,20 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                         new StringPreferencesAuthDialogListener(this, dialogListenerId,
                                 R.string.identlabel,
                                 R.string.setidentlabel,
-                                Prefs.getString(this, Prefs.DEVICE_IDENT_KEY,
-                                        Prefs.DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE))
+                                Prefs.getString(this, Prefs.KEY_DEVICE_IDENTIFIER,
+                                        Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER))
                 );
                 break;
             case R.id.pref_resize:
                 showPreferenceDialog(R.string.resize_large_images,
-                        Prefs.MAX_IMG_SIZE,
+                        Prefs.KEY_MAX_IMG_SIZE,
                          maxImgSizes, maxImgSizeTextView);
                 break;
         }
     }
 
     private void saveBackendUrl(String userInput) {
-        Prefs.setString(PreferencesActivity.this, Prefs.SERVER_SETTING_KEY, userInput);
+        Prefs.setString(PreferencesActivity.this, Prefs.KEY_BACKEND_SERVER, userInput);
         serverTextView.setText(userInput);
     }
 
@@ -270,9 +270,9 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView == screenOnCheckbox) {
-            Prefs.setBoolean(this, Prefs.SCREEN_ON_KEY, isChecked);
+            Prefs.setBoolean(this, Prefs.KEY_SCREEN_ON, isChecked);
         } else if (buttonView == mobileDataCheckbox) {
-            Prefs.setBoolean(this, Prefs.CELL_UPLOAD_SETTING_KEY, isChecked);
+            Prefs.setBoolean(this, Prefs.KEY_CELL_UPLOAD, isChecked);
         }
     }
 
@@ -292,7 +292,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
 
     private void saveNewDeviceId(String deviceId) {
         identTextView.setText(deviceId);
-        Prefs.setString(this, Prefs.DEVICE_IDENT_KEY, deviceId);
+        Prefs.setString(this, Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
         // Trigger the SurveyDownload Service, in order to force
         // a backend connection with the new Device ID
         startService(new Intent(this,

@@ -31,12 +31,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.ResponseColumns;
+import org.akvo.flow.data.database.SurveyInstanceColumns;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.TransmissionStatus;
+import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.FormInstance;
@@ -46,6 +46,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.NotificationHelper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
@@ -292,12 +293,8 @@ public class DataSyncService extends IntentService {
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
         if (data != null && data.moveToFirst()) {
-            String deviceIdentifier = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-            if (deviceIdentifier == null) {
-                deviceIdentifier = "unset";
-            } else {
-                deviceIdentifier = cleanVal(deviceIdentifier);
-            }
+            String deviceIdentifier = Prefs.getString(getApplicationContext(), Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER);
+            deviceIdentifier = cleanVal(deviceIdentifier);
             // evaluate indices once, outside the loop
             int survey_fk_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);
             int question_fk_col = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);

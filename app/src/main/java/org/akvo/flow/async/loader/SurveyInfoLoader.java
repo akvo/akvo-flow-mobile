@@ -20,13 +20,10 @@ import android.content.Context;
 import android.database.Cursor;
 
 import org.akvo.flow.async.loader.base.DataLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.Tables;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.data.database.SurveyColumns;
+import org.akvo.flow.data.database.SurveyInstanceColumns;
 
 /**
  * Loader to query the database and return the list of surveys. This Loader will

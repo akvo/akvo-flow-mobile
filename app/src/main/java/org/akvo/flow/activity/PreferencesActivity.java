@@ -31,18 +31,19 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.ViewUtil;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 /**
@@ -130,10 +131,10 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         }
 
         int maxImgSize = Prefs
-                .getInt(this, Prefs.MAX_IMG_SIZE, ConstantUtil.IMAGE_SIZE_320_240);
+                .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE);
         maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
 
-        val = settings.get(ConstantUtil.DEVICE_IDENT_KEY);
+        val = Prefs.getString(this, Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER);
         if (val != null) {
             identTextView.setText(val);
         }
@@ -223,35 +224,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                 break;
             case R.id.pref_deviceid:
                 ViewUtil.showAdminAuthDialog(this,
-                        new ViewUtil.AdminAuthDialogListener() {
-                            @Override
-                            public void onAuthenticated() {
-                                final EditText inputView = new EditText(PreferencesActivity.this);
-                                // one line only
-                                inputView.setSingleLine();
-                                ViewUtil.ShowTextInputDialog(
-                                        PreferencesActivity.this,
-                                        R.string.identlabel,
-                                        R.string.setidentlabel, inputView,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                String s = StringUtil.controlToSpace(inputView
-                                                        .getText().toString());
-                                                // drop any control chars,
-                                                // especially tabs
-                                                identTextView.setText(s);
-                                                database.savePreference(
-                                                        ConstantUtil.DEVICE_IDENT_KEY, s);
-                                                // Trigger the SurveyDownload Service, in order to force
-                                                // a backend connection with the new Device ID
-                                                startService(new Intent(PreferencesActivity.this,
-                                                        SurveyDownloadService.class));
-                                            }
-                                        }
-                                );
-                            }
-                        }
+                        new PreferencesAuthDialogListener()
                 );
                 break;
             case R.id.pref_resize:
@@ -343,4 +316,42 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         builder.show();
     }
 
+    private static class PreferencesAuthDialogListener implements ViewUtil.AdminAuthDialogListener {
+
+        WeakReference<PreferencesActivity> activityWeakReference;
+
+        @Override
+        public void onAuthenticated() {
+
+            final PreferencesActivity preferencesActivity = activityWeakReference.get();
+            if (preferencesActivity != null) {
+                final EditText inputView = new EditText(preferencesActivity);
+                // one line only
+                inputView.setSingleLine();
+                ViewUtil.ShowTextInputDialog(preferencesActivity, R.string.identlabel,
+                        R.string.setidentlabel, inputView,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                /**
+                                 * Drop any control chars, especially tabs
+                                 */
+                                String newDeviceId = StringUtil.controlToSpace(inputView
+                                        .getText().toString());
+                                preferencesActivity.useNewDeviceId(newDeviceId);
+                            }
+                        }
+                );
+            }
+        }
+    }
+
+    private void useNewDeviceId(String deviceId) {
+        identTextView.setText(deviceId);
+        Prefs.setString(this, Prefs.DEVICE_IDENT_KEY, deviceId);
+        // Trigger the SurveyDownload Service, in order to force
+        // a backend connection with the new Device ID
+        startService(new Intent(this,
+                SurveyDownloadService.class));
+    }
 }

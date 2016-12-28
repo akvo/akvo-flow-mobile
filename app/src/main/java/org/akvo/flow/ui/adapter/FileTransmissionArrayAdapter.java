@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.FileTransmission;
-import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
+import org.akvo.flow.data.database.TransmissionStatus;
 
 /**
  * Adapter that converts FileTransmission objects for display in a list view.

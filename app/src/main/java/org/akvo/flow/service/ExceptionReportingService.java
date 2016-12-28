@@ -23,13 +23,13 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.StatusUtil;
 
 import java.io.File;
@@ -90,20 +90,14 @@ public class ExceptionReportingService extends Service {
      * the server via a REST call
      */
     public int onStartCommand(final Intent intent, int flags, int startid) {
-        SurveyDbAdapter database = null;
         final String server = StatusUtil.getServerBase(this);
 
         try {
-            database = new SurveyDbAdapter(this);
-            database.open();
-            deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
+            deviceId = Prefs.getString(getApplicationContext(), Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER);
             version = BuildConfig.VERSION_NAME;
             phoneNumber = StatusUtil.getPhoneNumber(this);
             imei = StatusUtil.getImei(this);
         } finally {
-            if (database != null) {
-                database.close();
-            }
         }
         // Safe to lazy initialize the static field, since this method
         // will always be called in the Main Thread

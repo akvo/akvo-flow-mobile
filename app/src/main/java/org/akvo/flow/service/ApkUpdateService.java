@@ -28,7 +28,7 @@ import com.google.android.gms.gcm.TaskParams;
 
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.StatusUtil;
 
 /**

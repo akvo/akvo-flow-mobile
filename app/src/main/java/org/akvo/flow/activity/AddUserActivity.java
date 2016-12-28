@@ -27,11 +27,12 @@ import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.data.preference.Prefs;
 
 public class AddUserActivity extends Activity implements TextWatcher, TextView.OnEditorActionListener {
 
@@ -63,13 +64,14 @@ public class AddUserActivity extends Activity implements TextWatcher, TextView.O
         });
     }
 
+    //TODO: database operations should be done on separate thread
     private void saveUserData() {
         String username = mName.getText().toString().trim();
         String deviceId = mID.getText().toString().trim();
         SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
         long uid = db.createOrUpdateUser(null, username);
-        db.savePreference(ConstantUtil.DEVICE_IDENT_KEY, deviceId);
         db.close();
+        Prefs.setString(this, Prefs.DEVICE_IDENT_KEY, deviceId);
 
         // Select the newly created user, and exit the Activity
         FlowApp.getApp().setUser(new User(uid, username));

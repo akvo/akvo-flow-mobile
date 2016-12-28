@@ -27,8 +27,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.FormInstanceQuery;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.SurveyDbAdapter.FormInstanceQuery;
 import org.akvo.flow.util.PlatformUtil;
 
 import java.util.Date;

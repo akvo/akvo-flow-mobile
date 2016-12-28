@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.async.loader.StatsLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 
 public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<StatsLoader.Stats> {
     private static final String TAG = StatsDialogFragment.class.getSimpleName();

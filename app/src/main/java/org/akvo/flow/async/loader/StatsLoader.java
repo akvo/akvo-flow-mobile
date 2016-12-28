@@ -20,13 +20,12 @@ import android.content.Context;
 import android.database.Cursor;
 
 import org.akvo.flow.async.loader.base.DataLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.Tables;
-import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.RecordQuery;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.data.database.RecordColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter.RecordQuery;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class StatsLoader extends DataLoader<StatsLoader.Stats> {
     private long mSurveyGroupId;

@@ -20,7 +20,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import org.akvo.flow.async.loader.base.DataLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleLoader extends DataLoader<Cursor> {

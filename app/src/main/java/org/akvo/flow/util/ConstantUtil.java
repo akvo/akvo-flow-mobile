@@ -142,7 +142,8 @@ public class ConstantUtil {
     public static final String SERVER_SETTING_KEY = "backend.server";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
-
+    public static final String MAX_IMG_SIZE = "media.img.maxsize";
+    public static final String PREF_LOCALE = "pref.locale";
     /**
      * intents
      */

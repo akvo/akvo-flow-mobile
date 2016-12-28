@@ -26,7 +26,7 @@ import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;

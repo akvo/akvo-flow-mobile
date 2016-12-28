@@ -27,7 +27,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -163,13 +163,6 @@ public class StatusUtil {
         db.close();
 
         return use3G;
-    }
-
-    public static String getDeviceId(Context context) {
-        SurveyDbAdapter db = new SurveyDbAdapter(context).open();
-        String value = db.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-        db.close();
-        return value;
     }
 
     /**

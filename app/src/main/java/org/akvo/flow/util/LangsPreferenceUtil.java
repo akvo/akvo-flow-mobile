@@ -24,7 +24,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
+import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;

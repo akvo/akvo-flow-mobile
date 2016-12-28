@@ -18,7 +18,7 @@ package org.akvo.flow.async.loader.base;
 
 import android.content.Context;
 
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 
 public abstract class DataLoader<D> extends AsyncLoader<D> {
     private SurveyDbAdapter mDatabase;

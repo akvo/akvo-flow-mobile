@@ -36,6 +36,7 @@ import org.akvo.flow.serialization.response.SurveyedLocaleParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.apache.http.HttpStatus;
@@ -309,7 +310,8 @@ public class FlowApi {
         builder.appendQueryParameter(Param.ANDROID_ID, ANDROID_ID);
         builder.appendQueryParameter(Param.IMEI, IMEI);
         builder.appendQueryParameter(Param.VERSION, BuildConfig.VERSION_NAME);
-        builder.appendQueryParameter(Param.DEVICE_ID, StatusUtil.getDeviceId(context));
+        builder.appendQueryParameter(Param.DEVICE_ID,
+                Prefs.getString(context, Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER));
     }
 
     interface Path {

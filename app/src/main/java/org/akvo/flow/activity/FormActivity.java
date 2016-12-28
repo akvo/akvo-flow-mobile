@@ -34,10 +34,10 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -54,7 +54,7 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
@@ -457,7 +457,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
                 int maxImgSize = Prefs
-                        .getInt(this, Prefs.MAX_IMG_SIZE, ConstantUtil.IMAGE_SIZE_320_240);
+                        .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE);
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {
@@ -534,7 +534,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         // if we have no missing responses, submit the survey
         mDatabase.updateSurveyStatus(mSurveyInstanceId,
-                SurveyDbAdapter.SurveyInstanceStatus.SUBMITTED);
+                SurveyInstanceStatus.SUBMITTED);
 
         // Make the current survey immutable
         mReadOnly = true;

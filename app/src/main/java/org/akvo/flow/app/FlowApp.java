@@ -25,15 +25,15 @@ import android.widget.Toast;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 
 import java.util.Arrays;
 import java.util.List;

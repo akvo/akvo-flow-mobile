@@ -39,7 +39,7 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.async.loader.SurveyInfoLoader;
 import org.akvo.flow.async.loader.SurveyInfoLoader.SurveyQuery;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.PlatformUtil;

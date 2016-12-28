@@ -29,15 +29,15 @@ public class PreferenceMapper {
         }
 
         String deviceIdentifier = migratablePreferences.getDeviceIdentifier();
-        boolean cellularUpload = Prefs.DEFAULT_CELLULAR_DATA_UPLOAD;
+        boolean cellularUpload = Prefs.DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE;
         if (!TextUtils.isEmpty(migratablePreferences.getCellularDataUpload())) {
             cellularUpload = "true".equals(migratablePreferences.getCellularDataUpload());
         }
-        boolean screenOn = Prefs.DEFAULT_SCREEN_ON;
+        boolean screenOn = Prefs.DEFAULT_SCREEN_ON_PREF_VALUE;
         if (!TextUtils.isEmpty(migratablePreferences.getScreenOn())) {
             screenOn = "true".equals(migratablePreferences.getScreenOn());
         }
-        int imgSize = Prefs.DEFAULT_IMAGE_SIZE;
+        int imgSize = Prefs.DEFAULT_IMAGE_SIZE_PREF_VALUE;
         if (!TextUtils.isEmpty(migratablePreferences.getImageSize())) {
             imgSize = Integer.parseInt(migratablePreferences.getImageSize());
         }

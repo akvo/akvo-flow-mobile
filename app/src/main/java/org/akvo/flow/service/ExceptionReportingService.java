@@ -93,7 +93,7 @@ public class ExceptionReportingService extends Service {
         final String server = StatusUtil.getServerBase(this);
 
         try {
-            deviceId = Prefs.getString(getApplicationContext(), Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER);
+            deviceId = Prefs.getString(getApplicationContext(), Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE);
             version = BuildConfig.VERSION_NAME;
             phoneNumber = StatusUtil.getPhoneNumber(this);
             imei = StatusUtil.getImei(this);

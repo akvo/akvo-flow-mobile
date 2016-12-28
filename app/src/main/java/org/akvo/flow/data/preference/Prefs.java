@@ -48,10 +48,11 @@ public class Prefs {
 
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
-    public static final String DEFAULT_DEVICE_IDENTIFIER = "unset";
-    public static final int DEFAULT_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
-    public static final boolean DEFAULT_CELLULAR_DATA_UPLOAD = false;
-    public static final boolean DEFAULT_SCREEN_ON = true;
+    //TODO: make this more device specific to avoid duplicates
+    public static final String DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE = "unset";
+    public static final int DEFAULT_IMAGE_SIZE_PREF_VALUE = ConstantUtil.IMAGE_SIZE_320_240;
+    public static final boolean DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE = false;
+    public static final boolean DEFAULT_SCREEN_ON_PREF_VALUE = true;
 
     private static GsonMapper gsonMapper = new GsonMapper();
 
@@ -121,16 +122,16 @@ public class Prefs {
             Prefs.setString(context, DEVICE_IDENT_KEY, deviceIdentifier);
         }
 
-        if (DEFAULT_CELLULAR_DATA_UPLOAD != insertablePreferences.isCellularDataEnabled()) {
+        if (DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE != insertablePreferences.isCellularDataEnabled()) {
             Prefs.setBoolean(context, CELL_UPLOAD_SETTING_KEY,
                     insertablePreferences.isCellularDataEnabled());
         }
 
-        if (DEFAULT_SCREEN_ON != insertablePreferences.isScreenOn()) {
+        if (DEFAULT_SCREEN_ON_PREF_VALUE != insertablePreferences.isScreenOn()) {
             Prefs.setBoolean(context, SCREEN_ON_KEY, insertablePreferences.isScreenOn());
         }
 
-        if (DEFAULT_IMAGE_SIZE != insertablePreferences.getImageSize()) {
+        if (DEFAULT_IMAGE_SIZE_PREF_VALUE != insertablePreferences.getImageSize()) {
             Prefs.setInt(context, MAX_IMG_SIZE, insertablePreferences.getImageSize());
         }
     }

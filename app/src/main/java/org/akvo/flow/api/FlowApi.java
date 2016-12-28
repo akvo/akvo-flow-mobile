@@ -311,7 +311,7 @@ public class FlowApi {
         builder.appendQueryParameter(Param.IMEI, IMEI);
         builder.appendQueryParameter(Param.VERSION, BuildConfig.VERSION_NAME);
         builder.appendQueryParameter(Param.DEVICE_ID,
-                Prefs.getString(context, Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER));
+                Prefs.getString(context, Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE));
     }
 
     interface Path {

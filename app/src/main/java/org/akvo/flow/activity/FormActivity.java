@@ -36,8 +36,9 @@ import android.view.SubMenu;
 import org.akvo.flow.R;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
 import org.akvo.flow.data.database.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -54,7 +55,6 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
@@ -325,9 +325,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         super.onResume();
         mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
-        if (Boolean.valueOf(mDatabase.getPreference(ConstantUtil.SCREEN_ON_KEY))) {
-            mPager.setKeepScreenOn(true);
-        }
+        mPager.setKeepScreenOn(
+                Prefs.getBoolean(this, Prefs.SCREEN_ON_KEY, Prefs.DEFAULT_SCREEN_ON_PREF_VALUE));
     }
 
     @Override
@@ -457,7 +456,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
                 int maxImgSize = Prefs
-                        .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE);
+                        .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE_PREF_VALUE);
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {

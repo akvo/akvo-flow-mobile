@@ -32,12 +32,12 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
@@ -104,15 +104,10 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
      * loads the preferences from the DB and sets their current value in the UI
      */
     private void populateFields() {
-        HashMap<String, String> settings = database.getPreferences();
-        String val = settings.get(ConstantUtil.SCREEN_ON_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            screenOnCheckbox.setChecked(true);
-        } else {
-            screenOnCheckbox.setChecked(false);
-        }
+        screenOnCheckbox.setChecked(Prefs.getBoolean(this, Prefs.SCREEN_ON_KEY, Prefs.DEFAULT_SCREEN_ON_PREF_VALUE));
 
-        val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
+        HashMap<String, String> settings = database.getPreferences();
+        String val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
         mobileDataCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
 
         val = settings.get(ConstantUtil.SURVEY_LANG_SETTING_KEY);
@@ -131,13 +126,12 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         }
 
         int maxImgSize = Prefs
-                .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE);
+                .getInt(this, Prefs.MAX_IMG_SIZE, Prefs.DEFAULT_IMAGE_SIZE_PREF_VALUE);
         maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
 
-        val = Prefs.getString(this, Prefs.DEVICE_IDENT_KEY, Prefs.DEFAULT_DEVICE_IDENTIFIER);
-        if (val != null) {
-            identTextView.setText(val);
-        }
+        val = Prefs.getString(this, Prefs.DEVICE_IDENT_KEY,
+                Prefs.DEFAULT_DEVICE_IDENTIFIER_PREF_VALUE);
+        identTextView.setText(val);
 
         localeTextView.setText(FlowApp.getApp().getAppDisplayLanguage());
     }
@@ -296,7 +290,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView == screenOnCheckbox) {
-            database.savePreference(ConstantUtil.SCREEN_ON_KEY, "" + isChecked);
+            Prefs.setBoolean(this, Prefs.SCREEN_ON_KEY, isChecked);
         } else if (buttonView == mobileDataCheckbox) {
             database.savePreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY, "" + isChecked);
         }

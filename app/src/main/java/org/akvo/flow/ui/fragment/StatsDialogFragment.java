@@ -29,7 +29,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.async.loader.StatsLoader;
+import org.akvo.flow.data.loader.StatsLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 
 public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<StatsLoader.Stats> {

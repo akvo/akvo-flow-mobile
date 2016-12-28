@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CascadeDB {
+
     public static final String TABLE_NODE = "nodes";
 
     private String mDBPath;

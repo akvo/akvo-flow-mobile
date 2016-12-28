@@ -14,12 +14,12 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.async.loader;
+package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.async.loader.base.DataLoader;
+import org.akvo.flow.data.loader.base.DataLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.util.ConstantUtil;
 

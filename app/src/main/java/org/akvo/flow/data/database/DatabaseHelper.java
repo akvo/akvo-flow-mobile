@@ -21,7 +21,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import org.akvo.flow.data.preference.InsertablePreferences;
 import org.akvo.flow.data.preference.MigratablePreferences;
@@ -40,7 +39,7 @@ import timber.log.Timber;
  *
  * @author Christopher Fagiani
  */
-class DatabaseHelper extends SQLiteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "surveydata";
     private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
@@ -57,7 +56,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     private final PreferenceHandler preferenceHandler = new PreferenceHandler();
     private WeakReference<Context> contextWeakReference;
 
-    DatabaseHelper(Context context) {
+    public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.contextWeakReference = new WeakReference<>(context);
     }

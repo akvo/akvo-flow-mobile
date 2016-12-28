@@ -21,13 +21,13 @@ public class Tables {
 
     public static final String PREFERENCES = "preferences";
 
-    static final String SURVEY = "survey";
-    static final String SURVEY_INSTANCE = "survey_instance";
+    public static final String SURVEY = "survey";
+    public static final String SURVEY_INSTANCE = "survey_instance";
     static final String RESPONSE = "response";
     static final String USER = "user";
     static final String TRANSMISSION = "transmission";
     static final String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
-    static final String RECORD = "record";// Introduced in Point Updates
+    public static final String RECORD = "record";// Introduced in Point Updates
     static final String SYNC_TIME = "sync_time";// Introduced in Point Updates
 
 }

@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter.DatabaseHelper;
+import org.akvo.flow.data.database.DatabaseHelper;
 import org.akvo.flow.data.database.RecordColumns;
 import org.akvo.flow.data.database.Tables;
 

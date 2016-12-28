@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -35,7 +35,7 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = MediaSyncTask.class.getSimpleName();
 
     public interface DownloadListener {
-        public void onResourceDownload(boolean done);
+        void onResourceDownload(boolean done);
     }
 
     private WeakReference<DownloadListener> mListener;// Use a WeakReferences to avoid memory leaks

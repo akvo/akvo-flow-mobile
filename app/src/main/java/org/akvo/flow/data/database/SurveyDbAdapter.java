@@ -64,6 +64,9 @@ public class SurveyDbAdapter {
             + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
             + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
 
+    public static final String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
+            + "survey.survey_id=survey_instance.survey_id";
+
     private static final int DOES_NOT_EXIST = -1;
 
     private DatabaseHelper databaseHelper;

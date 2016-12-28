@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -14,12 +14,12 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.async.loader;
+package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.async.loader.base.DataLoader;
+import org.akvo.flow.data.loader.base.DataLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.Tables;
 import org.akvo.flow.data.database.SurveyColumns;
@@ -42,7 +42,7 @@ public class SurveyInfoLoader extends DataLoader<Cursor> {
 
     @Override
     protected Cursor loadData(SurveyDbAdapter database) {
-        String table = Tables.SURVEY_JOIN_SURVEY_INSTANCE;
+        String table = SurveyDbAdapter.SURVEY_JOIN_SURVEY_INSTANCE;
         if (mRecordId != null) {
             // Add record id to the join condition. If put in the where, the left join won't work
             table +=  " AND " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -14,23 +14,23 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.flow.async.loader;
+package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.async.loader.base.DataLoader;
+import org.akvo.flow.data.loader.base.DataLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 
-public class UserLoader extends DataLoader<Cursor> {
+public class SurveyGroupLoader extends DataLoader<Cursor> {
 
-    public UserLoader(Context context, SurveyDbAdapter db) {
+    public SurveyGroupLoader(Context context, SurveyDbAdapter db) {
         super(context, db);
     }
 
     @Override
     protected Cursor loadData(SurveyDbAdapter database) {
-        return database.getUsers();
+        return database.getSurveyGroups();
     }
 
 }

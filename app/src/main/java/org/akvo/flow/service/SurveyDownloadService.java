@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
+import timber.log.Timber;
+
 /**
  * This activity will check for new surveys on the device and install as needed
  *
@@ -62,9 +64,14 @@ public class SurveyDownloadService extends IntentService {
 
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
-    public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated
+    /**
+     * Intent parameter to specify which survey needs to be downloaded
+     */
+    public static final String EXTRA_SURVEY_ID = "survey";
+    public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
 
     private static final String DEFAULT_TYPE = "Survey";
+    public static final String TEST_SURVEY_ID = "0";
 
     private SurveyDbAdapter databaseAdaptor;
 
@@ -73,23 +80,40 @@ public class SurveyDownloadService extends IntentService {
     }
 
     public void onHandleIntent(@Nullable Intent intent) {
-        if (StatusUtil.hasDataConnection(this)) {
-            try {
-                databaseAdaptor = new SurveyDbAdapter(this);
-                databaseAdaptor.open();
-
-                String[] surveyIds =
-                        intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
-                checkAndDownload(surveyIds);
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
-                PersistentUncaughtExceptionHandler.recordException(e);
-            } finally {
-                databaseAdaptor.close();
+        try {
+            databaseAdaptor = new SurveyDbAdapter(this);
+            databaseAdaptor.open();
+            if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
+                downloadSurvey(intent);
+            } else if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
+                reDownloadAllSurveys(intent);
+            } else {
+                checkAndDownload(null);
             }
+        } catch (Exception e) {
+            Timber.e(e, e.getMessage());
+            PersistentUncaughtExceptionHandler.recordException(e);
+        } finally {
+            databaseAdaptor.close();
+            sendBroadcastNotification(this);
         }
+    }
 
-        sendBroadcastNotification(this);
+    private void reDownloadAllSurveys(@NonNull Intent intent) {
+        intent.removeExtra(EXTRA_DELETE_SURVEYS);
+        String[] surveyIds = databaseAdaptor.getSurveyIds();
+        databaseAdaptor.deleteAllSurveys();
+        checkAndDownload(surveyIds);
+    }
+
+    private void downloadSurvey(@NonNull Intent intent) {
+        String surveyId = intent.getStringExtra(EXTRA_SURVEY_ID);
+        intent.removeExtra(EXTRA_SURVEY_ID);
+        if (TEST_SURVEY_ID.equals(surveyId)) {
+            databaseAdaptor.reinstallTestSurvey();
+        } else {
+            checkAndDownload(new String[] { surveyId });
+        }
     }
 
     public void onCreate() {
@@ -104,6 +128,10 @@ public class SurveyDownloadService extends IntentService {
      * on the device, the surveys will be replaced with the new ones.
      */
     private void checkAndDownload(@Nullable String[] surveyIds) {
+        if (!StatusUtil.hasDataConnection(this)) {
+            //No internet or not allowed to sync
+            return;
+        }
         // Load preferences
         final String serverBase = StatusUtil.getServerBase(this);
 
@@ -364,7 +392,7 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    private static void sendBroadcastNotification(@NonNull Context context) {
+    private void sendBroadcastNotification(@NonNull Context context) {
         Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
         context.sendBroadcast(intentBroadcast);
     }

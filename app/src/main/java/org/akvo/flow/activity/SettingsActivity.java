@@ -240,16 +240,11 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 inputDialog.setView(input);
                 inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String value = input.getText().toString().trim();
-                        if ("0".equals(value)) {
-                            SurveyDbAdapter database = new SurveyDbAdapter(SettingsActivity.this);
-                            database.open();
-                            database.reinstallTestSurvey();
-                            database.close();
-                        } else if (!TextUtils.isEmpty(value)) {
+                        String surveyId = input.getText().toString().trim();
+                        if (!TextUtils.isEmpty(surveyId)) {
                             Intent i = new Intent(SettingsActivity.this,
                                     SurveyDownloadService.class);
-                            i.putExtra(SurveyDownloadService.EXTRA_SURVEYS, new String[] { value });
+                            i.putExtra(SurveyDownloadService.EXTRA_SURVEY_ID, surveyId);
                             SettingsActivity.this.startService(i);
                         }
                     }
@@ -276,13 +271,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Context c = SettingsActivity.this;
-                        SurveyDbAdapter database = new SurveyDbAdapter(c);
-                        database.open();
-                        String[] surveyIds = database.getSurveyIds();
-                        database.deleteAllSurveys();
-                        database.close();
                         Intent i = new Intent(c, SurveyDownloadService.class);
-                        i.putExtra(SurveyDownloadService.EXTRA_SURVEYS, surveyIds);
+                        i.putExtra(SurveyDownloadService.EXTRA_DELETE_SURVEYS, true);
                         c.startService(i);
                     }
                 });

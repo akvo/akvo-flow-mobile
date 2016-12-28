@@ -715,8 +715,15 @@ public class SurveyDbAdapter {
      * The survey xml must exist in the APK
      */
     public void reinstallTestSurvey() {
-        executeSql(
-                "insert into survey values(999991,'Sample Survey', 1.0,'Survey','res','testsurvey','english','N','N')");
+        ContentValues values = new ContentValues();
+        values.put(SurveyColumns.SURVEY_ID, "999991");
+        values.put(SurveyColumns.NAME, "Sample Survey");
+        values.put(SurveyColumns.VERSION, 1.0);
+        values.put(SurveyColumns.TYPE, "Survey");
+        values.put(SurveyColumns.LOCATION, "res");
+        values.put(SurveyColumns.FILENAME, "999991.xml");
+        values.put(SurveyColumns.LANGUAGE, "en");
+        database.insert(Tables.SURVEY, null, values);
     }
 
     /**

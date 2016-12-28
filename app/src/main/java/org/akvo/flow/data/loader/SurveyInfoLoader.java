@@ -19,43 +19,47 @@ package org.akvo.flow.data.loader;
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.data.loader.base.DataLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.Tables;
 import org.akvo.flow.data.database.SurveyColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyInstanceColumns;
+import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.data.loader.base.AsyncLoader;
 
 /**
  * Loader to query the database and return the list of surveys. This Loader will
  * include the latest submission date for each survey, if exists.
  */
-public class SurveyInfoLoader extends DataLoader<Cursor> {
-    private long mSurveyGroupId;
-    private String mRecordId;
+public class SurveyInfoLoader extends AsyncLoader<Cursor> {
 
-    public SurveyInfoLoader(Context context, SurveyDbAdapter db, long surveyGroupId,
-                            String recordId) {
-        super(context, db);
+    private final long mSurveyGroupId;
+    private final String mRecordId;
+
+    public SurveyInfoLoader(Context context, long surveyGroupId,
+            String recordId) {
+        super(context);
         mSurveyGroupId = surveyGroupId;
         mRecordId = recordId;
     }
 
     @Override
-    protected Cursor loadData(SurveyDbAdapter database) {
+    public Cursor loadInBackground() {
         String table = SurveyDbAdapter.SURVEY_JOIN_SURVEY_INSTANCE;
         if (mRecordId != null) {
             // Add record id to the join condition. If put in the where, the left join won't work
             table +=  " AND " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID
                     + "='" + mRecordId + "'";
         }
-
-        return database.query(table,
+        SurveyDbAdapter database = new SurveyDbAdapter(getContext());
+        database.open();
+        Cursor query = database.query(table,
                 SurveyQuery.PROJECTION,
                 SurveyColumns.SURVEY_GROUP_ID + " = ?",
                 new String[] { String.valueOf(mSurveyGroupId) },
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
                 null,
                 SurveyColumns.NAME);
+        database.close();
+        return query;
     }
 
     public interface SurveyQuery {

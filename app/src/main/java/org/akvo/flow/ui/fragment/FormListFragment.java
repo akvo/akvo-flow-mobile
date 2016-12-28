@@ -27,7 +27,6 @@ import android.support.v4.content.Loader;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +38,6 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.data.loader.SurveyInfoLoader;
 import org.akvo.flow.data.loader.SurveyInfoLoader.SurveyQuery;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.PlatformUtil;
@@ -49,25 +47,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 
 public class FormListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
         OnItemClickListener {
-    private static final String TAG = FormListFragment.class.getSimpleName();
 
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
     private static final String EXTRA_RECORD = "record";
 
-    public interface SurveyListListener {
-        void onSurveyClick(String surveyId);
-    }
-
     private SurveyGroup mSurveyGroup;
     private SurveyedLocale mRecord;
     private boolean mRegistered;
-
     private SurveyAdapter mAdapter;
-    private SurveyDbAdapter mDatabase;
     private SurveyListListener mListener;
 
     public FormListFragment() {
@@ -117,15 +110,7 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase = new SurveyDbAdapter(getActivity());
-        mDatabase.open();
         getLoaderManager().restartLoader(0, null, this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mDatabase.close();
     }
 
     @Override
@@ -228,18 +213,19 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyInfoLoader(getActivity(), mDatabase, mSurveyGroup.getId(),
+        return new SurveyInfoLoader(getActivity(), mSurveyGroup.getId(),
                 mRecord.getId());
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
+            Timber.e("onLoadFinished() - Loader returned no data");
             return;
         }
 
         mAdapter.clear();
+        //TODO: move this logic to loader
         List<SurveyInfo> surveys = new ArrayList<>();// Buffer items before adapter addition
         mRegistered = false; // Calculate if this record is registered yet
         if (cursor.moveToFirst()) {
@@ -283,6 +269,11 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
         String mVersion;
         Long mLastSubmission;
         boolean mDeleted;
+    }
+
+    public interface SurveyListListener {
+
+        void onSurveyClick(String surveyId);
     }
 
 }

@@ -238,7 +238,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
                 input.setKeyListener(new DigitsKeyListener(false, false));
                 inputDialog.setView(input);
-                inputDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String value = input.getText().toString().trim();
                         if ("0".equals(value)) {
@@ -255,7 +255,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                     }
                 });
 
-                inputDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                inputDialog.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Canceled.
                     }

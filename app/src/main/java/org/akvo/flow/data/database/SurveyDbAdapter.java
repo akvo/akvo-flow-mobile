@@ -72,15 +72,6 @@ public class SurveyDbAdapter {
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
-    /**
-     * TODO: Double check these inserts, and use Constants!
-     *
-     */
-    private static final String[] DEFAULT_INSERTS = new String[] {
-            "INSERT INTO preferences VALUES('survey.language','')",
-            "INSERT INTO preferences VALUES('survey.languagespresent','')",
-    };
-
     private final Context context;
 
     /**

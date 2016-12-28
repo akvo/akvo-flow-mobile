@@ -59,6 +59,7 @@ import java.util.zip.ZipInputStream;
  * @author Christopher Fagiani
  */
 public class SurveyDownloadService extends IntentService {
+
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
     public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated

@@ -28,6 +28,7 @@ import org.akvo.flow.data.preference.PreferenceExtractor;
 import org.akvo.flow.data.preference.PreferenceHandler;
 import org.akvo.flow.data.preference.PreferenceMapper;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.ConstantUtil;
 
 import java.lang.ref.WeakReference;
 
@@ -49,6 +50,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int VER_CADDISFLY_QN = 82;
     private static final int VER_PREFERENCES_MIGRATE = 83;
     private static final int DATABASE_VERSION = VER_PREFERENCES_MIGRATE;
+
+    /**
+     * Default values for languages
+     */
+    private static final String[] DEFAULT_INSERTS = new String[] {
+            "INSERT INTO preferences VALUES('"+ ConstantUtil.SURVEY_LANG_SETTING_KEY+"','')",
+            "INSERT INTO preferences VALUES('"+ ConstantUtil.SURVEY_LANG_PRESENT_KEY+"','')",
+    };
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -148,6 +157,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
         createIndexes(db);
+        for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
+            db.execSQL(DEFAULT_INSERTS[i]);
+        }
     }
 
     @Override

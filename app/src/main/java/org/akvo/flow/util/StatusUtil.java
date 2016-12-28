@@ -27,7 +27,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.preference.Prefs;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -78,7 +78,7 @@ public class StatusUtil {
      */
     public static boolean isConnectionAllowed(Context context) {
         //user allowed 3g usage
-        if (StatusUtil.syncOver3G(context)) {
+        if (syncOver3G(context)) {
             return true;
         }
         //only if wifi is connected can we attempt a connection
@@ -154,15 +154,8 @@ public class StatusUtil {
      * @return true if the flag is enabled, false otherwise
      */
     private static boolean syncOver3G(Context context) {
-        SurveyDbAdapter db = new SurveyDbAdapter(context);
-        db.open();
-
-        String value = db.getPreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
-        boolean use3G = value != null && Boolean.valueOf(value);
-
-        db.close();
-
-        return use3G;
+        return Prefs.getBoolean(context, Prefs.CELL_UPLOAD_SETTING_KEY,
+                Prefs.DEFAULT_CELLULAR_DATA_UPLOAD_PREF_VALUE);
     }
 
     /**
@@ -172,13 +165,10 @@ public class StatusUtil {
      * @return server URL string
      */
     public static String getServerBase(Context context) {
-        SurveyDbAdapter db = new SurveyDbAdapter(context).open();
-        String serverBase = db.getPreference(ConstantUtil.SERVER_SETTING_KEY);
+        String serverBase = Prefs.getString(context, Prefs.SERVER_SETTING_KEY, null);
         if (TextUtils.isEmpty(serverBase)) {
             serverBase = new PropertyUtil(context.getResources()).getProperty(ConstantUtil.SERVER_BASE);
         }
-        db.close();
-
         return serverBase;
     }
 

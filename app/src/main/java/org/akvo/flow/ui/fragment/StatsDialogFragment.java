@@ -28,11 +28,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.loader.models.Stats;
 import org.akvo.flow.data.loader.StatsLoader;
 
 import timber.log.Timber;
 
-public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<StatsLoader.Stats> {
+public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
 
     public static final String SURVEY_GROUP_ID_EXTRA = "surveyGroupId";
 
@@ -85,12 +86,12 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     // ==================================== //
 
     @Override
-    public Loader<StatsLoader.Stats> onCreateLoader(int id, Bundle args) {
+    public Loader<Stats> onCreateLoader(int id, Bundle args) {
         return new StatsLoader(getActivity(), mSurveyGroupId);
     }
 
     @Override
-    public void onLoadFinished(Loader<StatsLoader.Stats> loader, StatsLoader.Stats stats) {
+    public void onLoadFinished(Loader<Stats> loader, Stats stats) {
         if (stats == null) {
             Timber.e("onLoadFinished() - Loader returned no data");
             return;
@@ -101,7 +102,7 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     }
 
     @Override
-    public void onLoaderReset(Loader<StatsLoader.Stats> loader) {
+    public void onLoaderReset(Loader<Stats> loader) {
         // EMPTY
     }
 

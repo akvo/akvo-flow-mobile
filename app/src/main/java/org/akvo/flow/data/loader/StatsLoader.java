@@ -24,10 +24,11 @@ import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyDbAdapter.RecordQuery;
 import org.akvo.flow.data.database.Tables;
 import org.akvo.flow.data.loader.base.AsyncLoader;
+import org.akvo.flow.data.loader.models.Stats;
 
 import java.util.Calendar;
 
-public class StatsLoader extends AsyncLoader<StatsLoader.Stats> {
+public class StatsLoader extends AsyncLoader<Stats> {
 
     private final long mSurveyGroupId;
 
@@ -81,11 +82,4 @@ public class StatsLoader extends AsyncLoader<StatsLoader.Stats> {
                 },
                 null, null, null);
     }
-
-    public static class Stats {
-        public int mTotal;
-        public int mThisWeek;
-        public int mToday;
-    }
-
 }

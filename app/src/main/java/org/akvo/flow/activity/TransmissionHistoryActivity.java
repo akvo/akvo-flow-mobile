@@ -16,9 +16,6 @@
 
 package org.akvo.flow.activity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Window;
@@ -26,8 +23,11 @@ import android.view.Window;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
+import org.akvo.flow.util.ConstantUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity to show the transmission history of all files in a survey submission
@@ -76,10 +76,6 @@ public class TransmissionHistoryActivity extends ListActivity {
         if (outState != null) {
             outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, respondentId);
         }
-    }
-
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     protected void onPause() {

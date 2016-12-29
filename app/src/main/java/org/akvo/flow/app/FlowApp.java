@@ -19,6 +19,7 @@ package org.akvo.flow.app;
 import android.app.Application;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -188,8 +189,8 @@ public class FlowApp extends Application {
         }
     }
 
+    @Nullable
     private String loadLocalePref() {
-        //TODO: what to use by default???
         return Prefs.getString(this, Prefs.KEY_LOCALE, null);
     }
 

@@ -18,31 +18,38 @@ package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.util.Pair;
 
 import org.akvo.flow.data.database.SurveyColumns;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyInstanceColumns;
 import org.akvo.flow.data.database.Tables;
 import org.akvo.flow.data.loader.base.AsyncLoader;
+import org.akvo.flow.data.loader.models.SurveyInfo;
+import org.akvo.flow.domain.SurveyGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Loader to query the database and return the list of surveys. This Loader will
  * include the latest submission date for each survey, if exists.
  */
-public class SurveyInfoLoader extends AsyncLoader<Cursor> {
+public class SurveyInfoLoader extends AsyncLoader<Pair<List<SurveyInfo>, Boolean>> {
 
     private final long mSurveyGroupId;
     private final String mRecordId;
+    private final SurveyGroup mSurveyGroup;
 
-    public SurveyInfoLoader(Context context, long surveyGroupId,
-            String recordId) {
+    public SurveyInfoLoader(Context context, String recordId, SurveyGroup mSurveyGroup) {
         super(context);
-        mSurveyGroupId = surveyGroupId;
-        mRecordId = recordId;
+        this.mSurveyGroup = mSurveyGroup;
+        this.mSurveyGroupId = mSurveyGroup.getId();
+        this.mRecordId = recordId;
     }
 
     @Override
-    public Cursor loadInBackground() {
+    public Pair<List<SurveyInfo>, Boolean> loadInBackground() {
         String table = SurveyDbAdapter.SURVEY_JOIN_SURVEY_INSTANCE;
         if (mRecordId != null) {
             // Add record id to the join condition. If put in the where, the left join won't work
@@ -51,7 +58,7 @@ public class SurveyInfoLoader extends AsyncLoader<Cursor> {
         }
         SurveyDbAdapter database = new SurveyDbAdapter(getContext());
         database.open();
-        Cursor query = database.query(table,
+        Cursor cursor = database.query(table,
                 SurveyQuery.PROJECTION,
                 SurveyColumns.SURVEY_GROUP_ID + " = ?",
                 new String[] { String.valueOf(mSurveyGroupId) },
@@ -59,7 +66,35 @@ public class SurveyInfoLoader extends AsyncLoader<Cursor> {
                 null,
                 SurveyColumns.NAME);
         database.close();
-        return query;
+        List<SurveyInfo> surveys = new ArrayList<>();// Buffer items before adapter addition
+        boolean registered = false; // Calculate if this record is registered yet
+        if (cursor.moveToFirst()) {
+            do {
+
+                String id = cursor.getString(SurveyQuery.SURVEY_ID);
+                String name = cursor.getString(SurveyQuery.NAME);
+                String version = String.valueOf(cursor.getFloat(SurveyQuery.VERSION));
+                Long lastSubmission = null;
+                if (!cursor.isNull(SurveyQuery.SUBMITTED)) {
+                    lastSubmission = cursor.getLong(SurveyQuery.SUBMITTED);
+                    registered = true;
+                }
+                boolean deleted = cursor.getInt(SurveyQuery.DELETED) == 1;
+                boolean registrationSurvey = isRegistrationSurvey(id);
+                SurveyInfo s = new SurveyInfo(id, name, version, lastSubmission, deleted,
+                        registrationSurvey);
+                if (mSurveyGroup.isMonitored() && registrationSurvey) {
+                    surveys.add(0, s);// Make sure registration survey is at the top
+                } else {
+                    surveys.add(s);
+                }
+            } while (cursor.moveToNext());
+        }
+        return new Pair<>(surveys, registered);
+    }
+
+    private boolean isRegistrationSurvey(String surveyId) {
+        return surveyId.equals(mSurveyGroup.getRegisterSurveyId());
     }
 
     public interface SurveyQuery {

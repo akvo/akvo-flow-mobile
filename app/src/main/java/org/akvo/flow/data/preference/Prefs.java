@@ -46,7 +46,6 @@ public class Prefs {
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
-    //TODO: make this more device specific to avoid duplicates
     public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     public static final int DEFAULT_VALUE_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
     public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
@@ -109,7 +108,7 @@ public class Prefs {
         getPrefs(context).edit().remove(KEY_APK_DATA).apply();
     }
 
-    public static void migrateUserPreferences(Context context,
+    public static void insertUserPreferences(Context context,
             @Nullable InsertablePreferences insertablePreferences) {
         if (insertablePreferences == null) {
             return;

@@ -17,12 +17,12 @@
 
 package org.akvo.flow.data.database;
 
-public interface RecordColumns {
-    String _ID = "_id";
-    String RECORD_ID = "record_id";
-    String SURVEY_GROUP_ID = "survey_group_id";
-    String NAME = "name";
-    String LATITUDE = "latitude";
-    String LONGITUDE = "longitude";
-    String LAST_MODIFIED = "last_modified";
+public class RecordColumns {
+    public static final String _ID = "_id";
+    public static final String RECORD_ID = "record_id";
+    public static final String SURVEY_GROUP_ID = "survey_group_id";
+    public static final String NAME = "name";
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
+    public static final String LAST_MODIFIED = "last_modified";
 }

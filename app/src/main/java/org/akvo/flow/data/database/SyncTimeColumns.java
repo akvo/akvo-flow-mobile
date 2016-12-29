@@ -17,8 +17,8 @@
 
 package org.akvo.flow.data.database;
 
-public interface SyncTimeColumns {
-    String _ID = "_id";
-    String SURVEY_GROUP_ID = "survey_group_id";
-    String TIME = "time";
+public class SyncTimeColumns {
+    public static final String _ID = "_id";
+    public static final String SURVEY_GROUP_ID = "survey_group_id";
+    public static final String TIME = "time";
 }

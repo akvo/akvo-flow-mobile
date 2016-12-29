@@ -17,9 +17,6 @@
 
 package org.akvo.flow.data.loader.models;
 
-/**
- * Wrapper for the data displayed in the list
- */
 public class SurveyInfo {
 
     private final String id;

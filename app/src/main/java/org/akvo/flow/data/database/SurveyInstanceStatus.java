@@ -17,10 +17,10 @@
 
 package org.akvo.flow.data.database;
 
-public interface SurveyInstanceStatus {
-    int SAVED = 0;
-    int SUBMITTED = 1;
-    int EXPORTED = 2;
-    int SYNCED = 3;
-    int DOWNLOADED = 4;
+public class SurveyInstanceStatus {
+    public static final int SAVED = 0;
+    public static final int SUBMITTED = 1;
+    public static final int EXPORTED = 2;
+    public static final int SYNCED = 3;
+    public static final int DOWNLOADED = 4;
 }

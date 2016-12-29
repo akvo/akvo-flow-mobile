@@ -402,12 +402,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void displayLanguagesDialog() {
         // TODO: language management should be simplified
-        String setLanguage = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
-        String presentLanguage = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
-        Timber.d("setLanguage: %s; presentLanguage: %s ", setLanguage, presentLanguage);
         LangsPreferenceData langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
-                setLanguage,
-                presentLanguage);
+                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY),
+                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY));
 
         final String[] langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
         final boolean[] langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
@@ -422,12 +419,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
                             dialog.dismiss();
                         }
 
-                        String value = LangsPreferenceUtil.formLangPreferenceString(
-                                langsSelectedBooleanArray,
-                                langsSelectedMasterIndexArray);
-                        Timber.d("Will save survey.language value : %s", value);
                         mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
-                                value);
+                                LangsPreferenceUtil.formLangPreferenceString(
+                                        langsSelectedBooleanArray,
+                                        langsSelectedMasterIndexArray));
 
                         loadLanguages();
                         mAdapter.notifyOptionsChanged();
@@ -707,6 +702,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         // One binary megabyte equals 1 048 576 bytes.
         long megaAvailable = (long) Math.floor(sdAvailSize / 1048576.0);
 
+        //TODO: use class Prefs
         // keep track of changes
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         // assume we had space before

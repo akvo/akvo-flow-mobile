@@ -22,22 +22,22 @@ package org.akvo.flow.data.database;
  * on synced surveys, it just represents the name of the submitter (not matching a local user).
  * This is just a temporary implementation before a more robust login system is integrated.
  */
-public interface SurveyInstanceColumns {
-    String _ID = "_id";
-    String UUID = "uuid";
-    String SURVEY_ID = "survey_id";
-    String USER_ID = "user_id";
-    String RECORD_ID = "surveyed_locale_id";
-    String START_DATE = "start_date";
-    String SAVED_DATE = "saved_date";
-    String SUBMITTED_DATE = "submitted_date";
-    String EXPORTED_DATE = "exported_date";
-    String SYNC_DATE = "sync_date";
+public class SurveyInstanceColumns {
+    public static final String _ID = "_id";
+    public static final String UUID = "uuid";
+    public static final String SURVEY_ID = "survey_id";
+    public static final String USER_ID = "user_id";
+    public static final String RECORD_ID = "surveyed_locale_id";
+    public static final String START_DATE = "start_date";
+    public static final String SAVED_DATE = "saved_date";
+    public static final String SUBMITTED_DATE = "submitted_date";
+    public static final String EXPORTED_DATE = "exported_date";
+    public static final String SYNC_DATE = "sync_date";
     /**
      * Denormalized value. see {@link SurveyInstanceStatus}
      **/
-    String STATUS = "status";
-    String DURATION = "duration";
-    String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
-    String VERSION = "version";
+    public static final String STATUS = "status";
+    public static final String DURATION = "duration";
+    public static final String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
+    public static final String VERSION = "version";
 }

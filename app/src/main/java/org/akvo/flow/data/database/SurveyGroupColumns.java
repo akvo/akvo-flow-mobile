@@ -17,10 +17,10 @@
 
 package org.akvo.flow.data.database;
 
-public interface SurveyGroupColumns {
-    String _ID = "_id";
-    String SURVEY_GROUP_ID = "survey_group_id";
-    String NAME = "name";
-    String REGISTER_SURVEY_ID = "register_survey_id";
-    String MONITORED = "monitored";
+public class SurveyGroupColumns {
+    public static final String _ID = "_id";
+    public static final String SURVEY_GROUP_ID = "survey_group_id";
+    public static final String NAME = "name";
+    public static final String REGISTER_SURVEY_ID = "register_survey_id";
+    public static final String MONITORED = "monitored";
 }

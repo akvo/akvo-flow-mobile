@@ -17,16 +17,16 @@
 
 package org.akvo.flow.data.database;
 
-public interface SurveyColumns {
-    String _ID = "_id";
-    String SURVEY_ID = "survey_id";
-    String SURVEY_GROUP_ID = "survey_group_id";
-    String NAME = "display_name";
-    String VERSION = "version";
-    String TYPE = "type";
-    String LOCATION = "location";
-    String FILENAME = "filename";
-    String LANGUAGE = "language";
-    String HELP_DOWNLOADED = "help_downloaded_flag";
-    String DELETED = "deleted";
+public class SurveyColumns {
+    public static final String _ID = "_id";
+    public static final String SURVEY_ID = "survey_id";
+    public static final String SURVEY_GROUP_ID = "survey_group_id";
+    public static final String NAME = "display_name";
+    public static final String VERSION = "version";
+    public static final String TYPE = "type";
+    public static final String LOCATION = "location";
+    public static final String FILENAME = "filename";
+    public static final String LANGUAGE = "language";
+    public static final String HELP_DOWNLOADED = "help_downloaded_flag";
+    public static final String DELETED = "deleted";
 }

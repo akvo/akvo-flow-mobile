@@ -213,7 +213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         MigratablePreferences migratablePreferences = preferenceExtractor
                 .create(preferenceHandler, db);
         InsertablePreferences insertablePreferences = mapper.transform(migratablePreferences);
-        Prefs.migrateUserPreferences(context, insertablePreferences);
+        Prefs.insertUserPreferences(context, insertablePreferences);
     }
 
     @Override

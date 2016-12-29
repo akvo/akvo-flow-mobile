@@ -25,8 +25,6 @@ import android.support.annotation.Nullable;
 import org.akvo.flow.data.database.PreferencesColumns;
 import org.akvo.flow.data.database.Tables;
 
-import java.util.HashMap;
-
 public class PreferenceHandler {
 
     public PreferenceHandler() {
@@ -72,24 +70,5 @@ public class PreferenceHandler {
             updatedValues.put(PreferencesColumns.KEY, key);
             db.insert(Tables.PREFERENCES, null, updatedValues);
         }
-    }
-
-    public HashMap<String, String> getPreferences(SQLiteDatabase database) {
-        HashMap<String, String> settings = new HashMap<>();
-        Cursor cursor = database.query(Tables.PREFERENCES, new String[] {
-                PreferencesColumns.KEY, PreferencesColumns.VALUE
-        }, null, null, null, null, null);
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                do {
-                    settings.put(cursor.getString(cursor
-                            .getColumnIndexOrThrow(PreferencesColumns.KEY)), cursor
-                            .getString(cursor.getColumnIndexOrThrow(PreferencesColumns.VALUE)));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return settings;
     }
 }

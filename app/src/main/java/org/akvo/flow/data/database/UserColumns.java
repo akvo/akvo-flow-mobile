@@ -17,9 +17,9 @@
 
 package org.akvo.flow.data.database;
 
-public interface UserColumns {
-    String _ID = "_id";
-    String NAME = "name";
-    String EMAIL = "email";
-    String DELETED = "deleted";// 0 or 1
+public class UserColumns {
+    public static final String _ID = "_id";
+    public static final String NAME = "name";
+    public static final String EMAIL = "email";
+    public static final String DELETED = "deleted";// 0 or 1
 }

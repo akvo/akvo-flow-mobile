@@ -17,10 +17,10 @@
 
 package org.akvo.flow.data.database;
 
-public interface TransmissionStatus {
-    int QUEUED = 0;
-    int IN_PROGRESS = 1;
-    int SYNCED = 2;
-    int FAILED = 3;
-    int FORM_DELETED = 4;
+public class TransmissionStatus {
+    public static final int QUEUED = 0;
+    public static final int IN_PROGRESS = 1;
+    public static final int SYNCED = 2;
+    public static final int FAILED = 3;
+    public static final int FORM_DELETED = 4;
 }

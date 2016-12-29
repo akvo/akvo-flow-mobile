@@ -17,12 +17,12 @@
 
 package org.akvo.flow.data.database;
 
-public interface ResponseColumns {
-    String _ID = "_id";
-    String SURVEY_INSTANCE_ID = "survey_instance_id";
-    String QUESTION_ID = "question_id";
-    String ANSWER = "answer";
-    String TYPE = "type";
-    String INCLUDE = "include";
-    String FILENAME = "filename";
+public class ResponseColumns {
+    public static final String _ID = "_id";
+    public static final String SURVEY_INSTANCE_ID = "survey_instance_id";
+    public static final String QUESTION_ID = "question_id";
+    public static final String ANSWER = "answer";
+    public static final String TYPE = "type";
+    public static final String INCLUDE = "include";
+    public static final String FILENAME = "filename";
 }

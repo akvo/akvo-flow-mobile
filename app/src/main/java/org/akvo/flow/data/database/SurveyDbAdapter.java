@@ -48,6 +48,8 @@ import java.util.StringTokenizer;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.data.database.SurveyInstanceStatus.SAVED;
+
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
@@ -146,7 +148,7 @@ public class SurveyDbAdapter {
             case SurveyInstanceStatus.SUBMITTED:
                 dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
                 break;
-            case SurveyInstanceStatus.SAVED:
+            case SAVED:
                 dateColumn = SurveyInstanceColumns.SAVED_DATE;
                 break;
             default:

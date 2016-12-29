@@ -107,9 +107,9 @@ public class SurveyInfoLoader extends AsyncLoader<Pair<List<SurveyInfo>, Boolean
         };
 
         int SURVEY_ID = 0;
-        int NAME      = 1;
-        int VERSION   = 2;
-        int DELETED   = 3;
+        int NAME = 1;
+        int VERSION = 2;
+        int DELETED = 3;
         int SUBMITTED = 4;
     }
 }

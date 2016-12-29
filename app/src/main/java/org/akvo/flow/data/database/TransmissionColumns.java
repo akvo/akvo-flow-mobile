@@ -17,12 +17,12 @@
 
 package org.akvo.flow.data.database;
 
-public interface TransmissionColumns {
-    String _ID = "_id";
-    String SURVEY_INSTANCE_ID = "survey_instance_id";
-    String SURVEY_ID = "survey_id";
-    String FILENAME = "filename";
-    String STATUS = "status";// separate table/constants?
-    String START_DATE = "start_date";// do we really need this column?
-    String END_DATE = "end_date";
+public class TransmissionColumns {
+    public static final String _ID = "_id";
+    public static final String SURVEY_INSTANCE_ID = "survey_instance_id";
+    public static final String SURVEY_ID = "survey_id";
+    public static final String FILENAME = "filename";
+    public static final String STATUS = "status";// separate table/constants?
+    public static final String START_DATE = "start_date";// do we really need this column?
+    public static final String END_DATE = "end_date";
 }

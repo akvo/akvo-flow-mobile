@@ -19,6 +19,7 @@ package org.akvo.flow.ui.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.akvo.flow.data.loader.models.SurveyInfo;
 import org.akvo.flow.domain.SurveyGroup;
@@ -36,8 +37,10 @@ public class ViewSurveyInfoMapper {
         String time = null;
         boolean enabled;
         StringBuilder surveyExtraInfoBuilder = new StringBuilder(20);
-        String version = surveyInfo == null ? "" : surveyInfo.getVersion();
-        surveyExtraInfoBuilder.append(" v").append(version);
+        String version = surveyInfo.getVersion();
+        if (!TextUtils.isEmpty(version)) {
+            surveyExtraInfoBuilder.append(" v").append(version);
+        }
         enabled = isSurveyEnabled(surveyInfo, mSurveyGroup, mRegistered);
         if (surveyInfo.isDeleted()) {
             enabled = false;
@@ -47,10 +50,8 @@ public class ViewSurveyInfoMapper {
         if (surveyInfo.getLastSubmission() != null && !surveyInfo.isRegistrationSurvey()) {
             time = new PrettyTime().format(new Date(surveyInfo.getLastSubmission()));
         }
-        ViewSurveyInfo viewSurveyInfo = new ViewSurveyInfo(surveyInfo.getId(),
-                surveyInfo.getName(),
-                surveyExtraInfo, time, enabled);
-        return viewSurveyInfo;
+        return new ViewSurveyInfo(surveyInfo.getId(), surveyInfo.getName(), surveyExtraInfo, time,
+                enabled);
     }
 
     @NonNull
@@ -70,6 +71,7 @@ public class ViewSurveyInfoMapper {
         return viewSurveyInfos;
     }
 
+    //TODO: this is a bit confusing
     private boolean isSurveyEnabled(SurveyInfo surveyInfo, SurveyGroup surveyGroup,
             boolean registered) {
         if (surveyGroup.isMonitored()) {

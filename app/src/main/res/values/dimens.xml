@@ -6,4 +6,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="survey_version_text_size">18sp</dimen>
+    <dimen name="survey_title_text_size">22sp</dimen>
+
 </resources>

@@ -24,12 +24,11 @@ import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.Prefs;
 
 //TODO: this should be moved to data package
-//TODO: Prefs should not be static
 public class ApkUpdateStore {
 
     public static final String KEY_APK_DATA = "apk_data";
     public static final String KEY_APP_UPDATE_LAST_NOTIFIED = "update_notified_last_time";
-    public static final int NOT_NOTIFIED = -1;
+    public static final long NOT_NOTIFIED = -1;
 
     private final GsonMapper gsonMapper;
     private final Prefs preferences;
@@ -74,7 +73,9 @@ public class ApkUpdateStore {
         if (lastNotified == NOT_NOTIFIED) {
             return true;
         }
-        return System.currentTimeMillis() - lastNotified
+        long currentTimeMillis = System.currentTimeMillis();
+        long l = currentTimeMillis - lastNotified;
+        return l
                 >= ConstantUtil.UPDATE_NOTIFICATION_DELAY_IN_MS;
     }
 }

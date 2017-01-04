@@ -43,6 +43,8 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
+import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
@@ -80,6 +82,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     private DrawerFragment mDrawer;
     private CharSequence mDrawerTitle, mTitle;
     private Navigator navigator = new Navigator();
+
+    private Prefs prefs;
+    private ApkUpdateStore apkUpdateStore;
 
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be
@@ -141,9 +146,10 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                     .commit();
         }
 
+        prefs = new Prefs(getApplicationContext());
         // Start the setup Activity if necessary.
         boolean noDevIdYet = false;
-        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
             noDevIdYet = true;
             navigator.navigateToAddUser(this);
         }
@@ -154,6 +160,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
+        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
     }
 
     private void initializeToolBar() {
@@ -172,12 +179,12 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
             case ConstantUtil.REQUEST_ADD_USER:
                 if (resultCode == RESULT_OK) {
                     displaySelectedUser();
-                    Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
+                    prefs.setBoolean(Prefs.KEY_SETUP, true);
                     // Trigger the delayed services, so the first
                     // backend connections uses the new Device ID
                     startService(new Intent(this, SurveyDownloadService.class));
                     startService(new Intent(this, DataSyncService.class));
-                } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+                } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
                     finish();
                 }
                 break;
@@ -193,10 +200,11 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
 
-        ViewApkData apkData = Prefs.getApkData(this);
-        if (apkData != null && PlatformUtil
+        ViewApkData apkData = apkUpdateStore.getApkData();
+        boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
+        if (apkData != null && shouldNotifyUpdate && PlatformUtil
                 .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
-            Prefs.clearApkData(this);
+            apkUpdateStore.saveAppUpdateNotifiedTime();
             navigator.navigateToAppUpdate(this, apkData);
         }
     }

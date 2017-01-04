@@ -73,9 +73,7 @@ public class ApkUpdateStore {
         if (lastNotified == NOT_NOTIFIED) {
             return true;
         }
-        long currentTimeMillis = System.currentTimeMillis();
-        long l = currentTimeMillis - lastNotified;
-        return l
+        return System.currentTimeMillis() - lastNotified
                 >= ConstantUtil.UPDATE_NOTIFICATION_DELAY_IN_MS;
     }
 }

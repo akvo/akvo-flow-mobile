@@ -18,17 +18,16 @@ package org.akvo.flow.serialization.response;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.akvo.flow.domain.SurveyInstance;
+import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.domain.response.SurveyedLocalesResponse;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import org.akvo.flow.domain.response.SurveyedLocalesResponse;
-import org.akvo.flow.domain.SurveyInstance;
-import org.akvo.flow.domain.SurveyedLocale;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SurveyedLocaleParser {
     private static final String TAG = SurveyedLocaleParser.class.getSimpleName();
@@ -39,7 +38,7 @@ public class SurveyedLocaleParser {
         try {
             JSONObject jResponse = new JSONObject(response);
             JSONArray jSurveyedLocales = jResponse.getJSONArray(Attrs.SURVEYED_LOCALE_DATA);
-            for (int i=0; i<jSurveyedLocales.length(); i++) {
+            for (int i = 0; i < jSurveyedLocales.length(); i++) {
                 JSONObject jSurveyedLocale = jSurveyedLocales.getJSONObject(i);
                 SurveyedLocale surveyedLocale = parseSurveyedLocale(jSurveyedLocale);
                 surveyedLocales.add(surveyedLocale);
@@ -59,16 +58,19 @@ public class SurveyedLocaleParser {
         String id = jSurveyedLocale.getString(Attrs.ID);
         long lastModified = jSurveyedLocale.getLong(Attrs.LAST_MODIFIED);
         long surveyGroupId = jSurveyedLocale.getLong(Attrs.SURVEY_GROUP_ID);
-        Double latitude = jSurveyedLocale.has(Attrs.LATITUDE) && !jSurveyedLocale.isNull(Attrs.LATITUDE) ?
-                jSurveyedLocale.getDouble(Attrs.LATITUDE) : null;
-        Double longitude = jSurveyedLocale.has(Attrs.LONGITUDE) && !jSurveyedLocale.isNull(Attrs.LONGITUDE) ?
-            jSurveyedLocale.getDouble(Attrs.LONGITUDE) : null;
+        Double latitude =
+                jSurveyedLocale.has(Attrs.LATITUDE) && !jSurveyedLocale.isNull(Attrs.LATITUDE) ?
+                        jSurveyedLocale.getDouble(Attrs.LATITUDE) : null;
+        Double longitude =
+                jSurveyedLocale.has(Attrs.LONGITUDE) && !jSurveyedLocale.isNull(Attrs.LONGITUDE) ?
+                        jSurveyedLocale.getDouble(Attrs.LONGITUDE) : null;
 
         String name = jSurveyedLocale.has(Attrs.NAME) && !jSurveyedLocale.isNull(Attrs.NAME) ?
-            jSurveyedLocale.getString(Attrs.NAME) : null;
+                jSurveyedLocale.getString(Attrs.NAME) : null;
 
         JSONArray jSurveyInstances = jSurveyedLocale.getJSONArray(Attrs.SURVEY_INSTANCES);
-        List<SurveyInstance> surveyInstances = new SurveyInstanceParser().parseList(jSurveyInstances);
+        List<SurveyInstance> surveyInstances = new SurveyInstanceParser()
+                .parseList(jSurveyInstances);
 
         SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, lastModified, surveyGroupId,
                 latitude, longitude);
@@ -76,19 +78,19 @@ public class SurveyedLocaleParser {
 
         return surveyedLocale;
     }
-    
+
     interface Attrs {
         // Main response
-        String SURVEYED_LOCALE_DATA  = "surveyedLocaleData";
-        
+        String SURVEYED_LOCALE_DATA = "surveyedLocaleData";
+
         // SurveyedLocale
-        String ID               = "id";
-        String SURVEY_GROUP_ID  = "surveyGroupId";
-        String NAME             = "displayName";
-        String LATITUDE         = "lat";
-        String LONGITUDE        = "lon";
+        String ID = "id";
+        String SURVEY_GROUP_ID = "surveyGroupId";
+        String NAME = "displayName";
+        String LATITUDE = "lat";
+        String LONGITUDE = "lon";
         String SURVEY_INSTANCES = "surveyInstances";
-        String LAST_MODIFIED    = "lastUpdateDateTime";
+        String LAST_MODIFIED = "lastUpdateDateTime";
     }
 
 }

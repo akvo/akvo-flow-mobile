@@ -25,12 +25,13 @@ import android.support.annotation.NonNull;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
 import org.akvo.flow.R;
 import org.akvo.flow.service.ServiceToastRunnable;
 
 /**
  * Utility class to handle common features for the View tier
- * 
+ *
  * @author Christopher Fagiani
  */
 public class ViewUtil {
@@ -40,7 +41,7 @@ public class ViewUtil {
      * the affirmative button is clicked, the Location Settings panel is
      * launched. If the negative button is clicked, it will just close the
      * dialog
-     * 
+     *
      * @param parentContext
      */
     public static void showGPSDialog(final Context parentContext) {
@@ -67,12 +68,12 @@ public class ViewUtil {
     /**
      * displays a simple dialog box with only a single, positive button using
      * the resource ids of the strings passed in for the title and text.
-     * 
+     *
      * @param titleId
      * @param textId
      * @param parentContext
      */
-    public static void showConfirmDialog(int titleId, int textId,
+    private static void showConfirmDialog(int titleId, int textId,
             Context parentContext) {
         showConfirmDialog(titleId, textId, parentContext, false,
                 new DialogInterface.OnClickListener() {
@@ -88,7 +89,7 @@ public class ViewUtil {
      * displays a simple dialog box with a single positive button and an
      * optional (based on a flag) cancel button using the resource ids of the
      * strings passed in for the title and text.
-     * 
+     *
      * @param titleId
      * @param textId
      * @param parentContext
@@ -112,17 +113,17 @@ public class ViewUtil {
      * optional (based on a flag) cancel button using the resource ids of the
      * strings passed in for the title and text. users can install listeners for
      * both the positive and negative buttons
-     * 
+     *
      * @param titleId
      * @param textId
      * @param parentContext
      * @param includeNegative
      * @param positiveListener - if includeNegative is false, this will also be
-     *            bound to the cancel handler
+     *                         bound to the cancel handler
      * @param negativeListener - only used if includeNegative is true - if the
-     *            negative listener is non-null, it will also be bound to the
-     *            cancel listener so pressing back to dismiss the dialog will
-     *            have the same effect as clicking the negative button.
+     *                         negative listener is non-null, it will also be bound to the
+     *                         cancel listener so pressing back to dismiss the dialog will
+     *                         have the same effect as clicking the negative button.
      */
     public static void showConfirmDialog(int titleId, int textId,
             Context parentContext, boolean includeNegative,
@@ -159,17 +160,17 @@ public class ViewUtil {
      * optional (based on a flag) cancel button using the resource id of the
      * string passed in for the title, and a String parameter for the text.
      * users can install listeners for both the positive and negative buttons
-     * 
+     *
      * @param titleId
      * @param text
      * @param parentContext
      * @param includeNegative
      * @param positiveListener - if includeNegative is false, this will also be
-     *            bound to the cancel handler
+     *                         bound to the cancel handler
      * @param negativeListener - only used if includeNegative is true - if the
-     *            negative listener is non-null, it will also be bound to the
-     *            cancel listener so pressing back to dismiss the dialog will
-     *            have the same effect as clicking the negative button.
+     *                         negative listener is non-null, it will also be bound to the
+     *                         cancel listener so pressing back to dismiss the dialog will
+     *                         have the same effect as clicking the negative button.
      */
     public static void showConfirmDialog(int titleId, String text,
             Context parentContext, boolean includeNegative,
@@ -318,7 +319,7 @@ public class ViewUtil {
             DialogInterface.OnClickListener clickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
         LinearLayout main = new LinearLayout(parentContext);
-        main.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+        main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
         main.setOrientation(LinearLayout.VERTICAL);
         builder.setTitle(title);
@@ -342,12 +343,14 @@ public class ViewUtil {
 
     /**
      * Display a UI Toast using the Handler's thread (main thread)
-     * @param msg message to display
-     * @param uiThreadHandler the handler to use
+     *
+     * @param msg                message to display
+     * @param uiThreadHandler    the handler to use
      * @param applicationContext the Context to use for the toast
      */
-    public static void displayToastFromService(@NonNull final String msg, @NonNull Handler uiThreadHandler,
-                                               @NonNull final Context applicationContext) {
+    public static void displayToastFromService(@NonNull final String msg,
+            @NonNull Handler uiThreadHandler,
+            @NonNull final Context applicationContext) {
         uiThreadHandler.post(new ServiceToastRunnable(applicationContext, msg));
     }
 
@@ -358,5 +361,5 @@ public class ViewUtil {
     public interface AdminAuthDialogListener {
         void onAuthenticated();
     }
-    
+
 }

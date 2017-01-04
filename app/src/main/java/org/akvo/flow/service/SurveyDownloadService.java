@@ -1,42 +1,31 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ * This file is part of Akvo FLOW.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
 package org.akvo.flow.service;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.zip.ZipInputStream;
 
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.dao.SurveyDao;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Question;
@@ -53,9 +42,20 @@ import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.zip.ZipInputStream;
+
 /**
  * This activity will check for new surveys on the device and install as needed
- * 
+ *
  * @author Christopher Fagiani
  */
 public class SurveyDownloadService extends IntentService {
@@ -65,22 +65,20 @@ public class SurveyDownloadService extends IntentService {
 
     private static final String DEFAULT_TYPE = "Survey";
 
-    private static final String SURVEY_LIST_SERVICE_PATH = "/surveymanager?action=getAvailableSurveysDevice";
-    private static final String SURVEY_HEADER_SERVICE_PATH = "/surveymanager?action=getSurveyHeader&surveyId=";
-
     private SurveyDbAdapter databaseAdaptor;
 
     public SurveyDownloadService() {
         super(TAG);
     }
 
-    public void onHandleIntent(Intent intent) {
+    public void onHandleIntent(@Nullable Intent intent) {
         if (StatusUtil.hasDataConnection(this)) {
             try {
                 databaseAdaptor = new SurveyDbAdapter(this);
                 databaseAdaptor.open();
 
-                String[] surveyIds = intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
+                String[] surveyIds =
+                        intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
                 checkAndDownload(surveyIds);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
@@ -104,7 +102,7 @@ public class SurveyDownloadService extends IntentService {
      * passed in, then those specific surveys will be downloaded. If they're already
      * on the device, the surveys will be replaced with the new ones.
      */
-    private void checkAndDownload(String[] surveyIds) throws IOException {
+    private void checkAndDownload(@Nullable String[] surveyIds) {
         // Load preferences
         final String serverBase = StatusUtil.getServerBase(this);
 
@@ -152,7 +150,7 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
-    private void syncSurveyGroups(List<Survey> surveys) {
+    private void syncSurveyGroups(@NonNull List<Survey> surveys) {
         for (Survey s : surveys) {
             // Assign registration form id, if missing.
             SurveyGroup sg = s.getSurveyGroup();
@@ -167,7 +165,7 @@ public class SurveyDownloadService extends IntentService {
      * Downloads the survey based on the ID and then updates the survey object
      * with the filename and location
      */
-    private void downloadSurvey(Survey survey) throws IOException {
+    private void downloadSurvey(@NonNull Survey survey) throws IOException {
         final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
         final File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
@@ -188,7 +186,8 @@ public class SurveyDownloadService extends IntentService {
         survey.setLocation(ConstantUtil.FILE_LOCATION);
     }
 
-    private Survey loadSurvey(Survey survey) {
+    @Nullable
+    private Survey loadSurvey(@NonNull Survey survey) {
         InputStream in = null;
         Survey hydratedDurvey = null;
         try {
@@ -215,15 +214,15 @@ public class SurveyDownloadService extends IntentService {
     /**
      * checks to see if we should pre-cache help media files (based on the
      * property in the settings db) and, if we should, downloads the files
-     * 
+     *
      * @param survey
      */
-    private void downloadResources(Survey survey) {
+    private void downloadResources(@NonNull Survey survey) {
         Survey hydratedSurvey = loadSurvey(survey);
         if (hydratedSurvey != null) {
             // collect files in a set just in case the same binary is
             // used in multiple questions we only need to download once
-            Set<String> resources = new HashSet<String>();
+            Set<String> resources = new HashSet<>();
             for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
                 for (Question question : group.getQuestions()) {
                     if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
@@ -244,7 +243,8 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
-    private void downloadResources(final String sid, final Set<String> resources) {
+    private void downloadResources(@NonNull final String sid,
+            @NonNull final Set<String> resources) {
         databaseAdaptor.markSurveyHelpDownloaded(sid, false);
         boolean ok = true;
         for (String resource : resources) {
@@ -253,24 +253,9 @@ public class SurveyDownloadService extends IntentService {
                 // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
                 // Naive check to determine whether or not this is an absolute filename
                 if (resource.startsWith("http")) {
-                    final String filename = new File(resource).getName();
-                    final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
-                    if (!surveyDir.exists()) {
-                        surveyDir.mkdir();
-                    }
-                    HttpUtil.httpGet(resource, new File(surveyDir, filename));
+                    downloadGaeResource(sid, resource);
                 } else {
-                    // resource is just a filename
-                    final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
-                    final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-                    final File resDir = FileUtil.getFilesDir(FileType.RES);
-                    final File file = new File(resDir, filename);
-                    S3Api s3 = new S3Api(SurveyDownloadService.this);
-                    s3.syncFile(objectKey, file);
-                    FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
-                    if (!file.delete()) {
-                        Log.e(TAG, "Error deleting resource zip file");
-                    }
+                    downloadS3Resource(resource);
                 }
             } catch (Exception e) {
                 ok = false;
@@ -287,25 +272,46 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
+    private void downloadS3Resource(String resource) throws IOException {
+        // resource is just a filename
+        final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
+        final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
+        final File resDir = FileUtil.getFilesDir(FileType.RES);
+        final File file = new File(resDir, filename);
+        S3Api s3 = new S3Api(SurveyDownloadService.this);
+        s3.syncFile(objectKey, file);
+        FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
+        if (!file.delete()) {
+            Log.e(TAG, "Error deleting resource zip file");
+        }
+    }
+
+    private void downloadGaeResource(@NonNull String sid, @NonNull String url) throws IOException {
+        final String filename = new File(url).getName();
+        final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
+        if (!surveyDir.exists()) {
+            surveyDir.mkdir();
+        }
+        HttpUtil.httpGet(url, new File(surveyDir, filename));
+    }
+
     /**
      * invokes a service call to get the header information for multiple surveys
      */
-    private List<Survey> getSurveyHeaders(String serverBase, String[] surveyIds) {
-        List<Survey> surveys = new ArrayList<Survey>();
+    @NonNull
+    private List<Survey> getSurveyHeaders(@NonNull String serverBase, @NonNull String[] surveyIds) {
+        List<Survey> surveys = new ArrayList<>();
+        FlowApi flowApi = new FlowApi();
         for (String id : surveyIds) {
             try {
-                final String url = serverBase + SURVEY_HEADER_SERVICE_PATH + id + "&" + FlowApi.getDeviceParams();
-                String response = HttpUtil.httpGet(url);
-                if (response != null) {
-                    surveys.addAll(new SurveyMetaParser().parseList(response, true));
-                }
+                surveys.addAll(flowApi.getSurveyHeader(serverBase, id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
                     PersistentUncaughtExceptionHandler.recordException(e);
                 }
                 Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
-                        String.format(getString(R.string.error_form_header), id));
+                        getString(R.string.error_form_header, id));
             }
         }
         return surveys;
@@ -314,19 +320,16 @@ public class SurveyDownloadService extends IntentService {
     /**
      * invokes a service call to list all surveys that have been designated for
      * this device (based on phone number).
-     * 
+     *
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
-    private List<Survey> checkForSurveys(String serverBase) {
-        List<Survey> surveys = new ArrayList<Survey>();
+    private List<Survey> checkForSurveys(@NonNull String serverBase) {
+        List<Survey> surveys = new ArrayList<>();
+        FlowApi api = new FlowApi();
         try {
-            final String url = serverBase + SURVEY_LIST_SERVICE_PATH + "&" + FlowApi.getDeviceParams();
-            String response = HttpUtil.httpGet(url);
-            if (response != null) {
-                surveys = new SurveyMetaParser().parseList(response);
-            }
-        } catch (IllegalArgumentException | IOException e) {
+            surveys = api.getSurveys(serverBase);
+        } catch (@NonNull IllegalArgumentException | IOException e) {
             if (e instanceof IllegalArgumentException) {
                 PersistentUncaughtExceptionHandler.recordException(e);
             }
@@ -338,7 +341,8 @@ public class SurveyDownloadService extends IntentService {
     }
 
     private void displayErrorNotification(int id, String msg) {
-        NotificationHelper.displayErrorNotification(getString(R.string.error_form_sync_title), msg, this, id);
+        NotificationHelper
+                .displayErrorNotification(getString(R.string.error_form_sync_title), msg, this, id);
     }
 
     private void displayNotification(int synced, int failed, int total) {
@@ -349,8 +353,9 @@ public class SurveyDownloadService extends IntentService {
                 synced, failed)
                 : String.format(getString(R.string.data_sync_synced), synced);
 
-        NotificationHelper.displayNotification(this, total, title, text, ConstantUtil.NOTIFICATION_FORMS_SYNCED, !finished,
-                                               synced + failed);
+        NotificationHelper.displayNotification(this, total, title, text,
+                ConstantUtil.NOTIFICATION_FORMS_SYNCED, !finished,
+                synced + failed);
     }
 
     /**
@@ -358,7 +363,7 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    public static void sendBroadcastNotification(Context context) {
+    private static void sendBroadcastNotification(@NonNull Context context) {
         Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
         context.sendBroadcast(intentBroadcast);
     }

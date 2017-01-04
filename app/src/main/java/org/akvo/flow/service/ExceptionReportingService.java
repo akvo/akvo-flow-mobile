@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -16,6 +16,22 @@
 
 package org.akvo.flow.service;
 
+import android.app.Service;
+import android.content.Intent;
+import android.os.Environment;
+import android.os.IBinder;
+import android.util.Log;
+
+import org.akvo.flow.BuildConfig;
+import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.HttpUtil;
+import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.StatusUtil;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.DateFormat;
@@ -26,30 +42,15 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.Environment;
-import android.os.IBinder;
-import android.util.Log;
-
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.StatusUtil;
-
 /**
  * service that periodically checks for stack trace files on the file system
  * and, if found, uploads them to the server. After a file is uploaded, the
  * trace file is deleted from the file system.
- * 
+ *
  * @author Christopher Fagiani
  */
 public class ExceptionReportingService extends Service {
-    private static final String TAG = "EXCEPTION_REPORTING_SERVICE";
+    private static final String TAG = "EXCEPTION_REPORTING";
     private static final String EXCEPTION_SERVICE_PATH = "/remoteexception";
     private static final String ACTION_PARAM = "action";
     private static final String ACTION_VALUE = "saveTrace";
@@ -96,7 +97,7 @@ public class ExceptionReportingService extends Service {
             database = new SurveyDbAdapter(this);
             database.open();
             deviceId = database.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-            version = PlatformUtil.getVersionName(this);
+            version = BuildConfig.VERSION_NAME;
             phoneNumber = StatusUtil.getPhoneNumber(this);
             imei = StatusUtil.getImei(this);
         } finally {
@@ -113,7 +114,8 @@ public class ExceptionReportingService extends Service {
                 @Override
                 public void run() {
                     if (StatusUtil.hasDataConnection(ExceptionReportingService.this) &&
-                            Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                            Environment.MEDIA_MOUNTED
+                                    .equals(Environment.getExternalStorageState())) {
                         submitStackTraces(server);
                     }
                 }
@@ -129,7 +131,7 @@ public class ExceptionReportingService extends Service {
 
     /**
      * Returns all stack trace files on the files system
-     * 
+     *
      * @return
      */
     private String[] getTraceFiles(File dir) {
@@ -145,7 +147,7 @@ public class ExceptionReportingService extends Service {
      * Look in the trace directory for any files. If any are found, upload to
      * the server and, on success, delete the file.
      */
-    public void submitStackTraces(String server) {
+    private void submitStackTraces(String server) {
         try {
             File dir = FileUtil.getFilesDir(FileType.STACKTRACE);
             String[] list = getTraceFiles(dir);
@@ -156,7 +158,7 @@ public class ExceptionReportingService extends Service {
 
                     // We cannot use the standard FlowApi.getDeviceParams, fot this service uses
                     // a different naming convention...
-                    Map<String, String> params = new HashMap<String, String>();
+                    Map<String, String> params = new HashMap<>();
                     params.put(ACTION_PARAM, ACTION_VALUE);
                     params.put(PHONE_PARAM, phoneNumber);
                     params.put(IMEI_PARAM, imei);

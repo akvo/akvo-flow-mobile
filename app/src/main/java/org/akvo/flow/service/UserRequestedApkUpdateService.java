@@ -19,10 +19,14 @@ package org.akvo.flow.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.util.Pair;
 import android.util.Log;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
+import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -39,6 +43,7 @@ public class UserRequestedApkUpdateService extends IntentService {
     private static final String TAG = "USER_REQ_APK_UPDATE";
 
     private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
+    private final Navigator navigator = new Navigator();
 
     public UserRequestedApkUpdateService() {
         super(TAG);
@@ -70,7 +75,11 @@ public class UserRequestedApkUpdateService extends IntentService {
         }
 
         try {
-            if (!apkUpdateHelper.shouldUpdate(this)) {
+            Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate(this);
+            if (booleanApkDataPair.first) {
+                // There is a newer version. Fire the 'Download and Install' Activity.
+                navigator.navigateToAppUpdate(this, booleanApkDataPair.second);
+            } else {
                 ViewUtil.displayToastFromService(getString(R.string.apk_update_service_no_update), uiHandler,
                                                  getApplicationContext());
             }

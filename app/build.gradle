@@ -8,27 +8,41 @@ repositories {
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-    defaultConfig {
-        minSdkVersion 10
-        targetSdkVersion 21
-        applicationId "org.akvo.flow"
-        testApplicationId "org.akvo.flow.tests"
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
-        testHandleProfiling true
-        testFunctionalTest true
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-    signingConfigs {
+    def versionPropsFile = file('version.properties')
 
-        debug {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('debug-key/debug.keystore')
-            storePassword 'android'
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+        def versionMajor = versionProps['VERSION_MAJOR'].toInteger()
+        def versionMinor = versionProps['VERSION_MINOR'].toInteger()
+        def versionPatch = versionProps['VERSION_PATCH'].toInteger()
+        def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
+
+        defaultConfig {
+            versionCode versionCodeProperty
+            versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+            minSdkVersion 10
+            targetSdkVersion 21
+            applicationId "org.akvo.flow"
+            testApplicationId "org.akvo.flow.tests"
+            testInstrumentationRunner "android.test.InstrumentationTestRunner"
+            testHandleProfiling true
+            testFunctionalTest true
         }
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+        }
+        signingConfigs {
+
+            debug {
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+                storeFile file('debug-key/debug.keystore')
+                storePassword 'android'
+            }
 
         flowRelease {
             storeFile file(RELEASE_STORE_FILE)
@@ -56,17 +70,30 @@ android {
         exclude '.readme'
     }
 
-    productFlavors {
-        flow {
+        productFlavors {
+            flow {
+            }
+            biogas {
+            }
+            cookstoves {
+            }
         }
-        biogas {
-        }
-        cookstoves {
-        }
-    }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
+        testOptions {
+            unitTests.returnDefaultValues = true
+        }
+
+        lintOptions {
+            // set to true to turn off analysis progress reporting by lint
+            quiet false
+            // if true, stop the gradle build if errors are found
+            abortOnError false
+            // if true, only report errors
+            ignoreWarnings false
+            lintConfig file('lint.xml')
+        }
+    } else {
+        throw new GradleException("Could not read version.properties!")
     }
 }
 
@@ -80,11 +107,14 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-annotations:21.0.0'
-    compile 'com.google.android.gms:play-services:4.0.30'
+    compile 'com.google.android.gms:play-services-base:7.5.0'
+    compile 'com.google.android.gms:play-services-maps:7.5.0'
+    compile 'com.google.android.gms:play-services-gcm:7.5.0'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
-    compile 'com.google.maps.android:android-maps-utils:0.3.3'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
+    compile 'com.google.code.gson:gson:2.3'
     apt 'com.google.dagger:dagger-compiler:2.4'
     compile 'com.google.dagger:dagger:2.4'
 

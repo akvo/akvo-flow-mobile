@@ -15,17 +15,50 @@
  */
 package org.akvo.flow.domain.apkupdate;
 
-public class ApkData {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ViewApkData implements Parcelable {
 
     private final String version;
     private final String fileUrl;
     private final String md5Checksum;
 
-    public ApkData(String version, String fileUrl, String md5Checksum) {
+    public ViewApkData(String version, String fileUrl, String md5Checksum) {
         this.version = version;
         this.fileUrl = fileUrl;
         this.md5Checksum = md5Checksum;
     }
+
+    protected ViewApkData(Parcel in) {
+        version = (String) in.readValue(String.class.getClassLoader());
+        fileUrl = (String) in.readValue(String.class.getClassLoader());
+        md5Checksum = (String) in.readValue(String.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(version);
+        dest.writeValue(fileUrl);
+        dest.writeValue(md5Checksum);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ViewApkData> CREATOR = new Creator<ViewApkData>() {
+        @Override
+        public ViewApkData createFromParcel(Parcel in) {
+            return new ViewApkData(in);
+        }
+
+        @Override
+        public ViewApkData[] newArray(int size) {
+            return new ViewApkData[size];
+        }
+    };
 
     public String getVersion() {
         return version;

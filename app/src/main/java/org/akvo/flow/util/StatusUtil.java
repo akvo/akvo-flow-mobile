@@ -71,6 +71,28 @@ public class StatusUtil {
     }
 
     /**
+     * Checks whether or not we are allowed to connect
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isConnectionAllowed(Context context) {
+        //user allowed 3g usage
+        if (StatusUtil.syncOver3G(context)) {
+            return true;
+        }
+        //only if wifi is connected can we attempt a connection
+        return isWifiConnected(context);
+    }
+
+    private static boolean isWifiConnected(Context context) {
+        ConnectivityManager connectionManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiCheck = connectionManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return wifiCheck.isConnected();
+    }
+
+    /**
      * gets the device's primary phone number
      * 
      * @return

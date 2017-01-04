@@ -30,6 +30,7 @@ import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
@@ -55,7 +56,12 @@ public class FlowApp extends Application {
         super.onCreate();
         initializeInjector();
         init();
+        startUpdateService();
         app = this;
+    }
+
+    private void startUpdateService() {
+        ApkUpdateService.scheduleRepeat(this);
     }
 
     private void initializeInjector() {

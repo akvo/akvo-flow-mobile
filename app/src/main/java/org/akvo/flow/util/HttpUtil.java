@@ -1,22 +1,26 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ * This file is part of Akvo FLOW.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
 package org.akvo.flow.util;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
+
+import org.akvo.flow.exception.HttpException;
+import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,21 +39,21 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.akvo.flow.exception.HttpException;
-import org.apache.http.HttpStatus;
-
 /**
  * Simple utility to make http calls and read the responses
- * 
+ *
  * @author Christopher Fagiani
  */
 public class HttpUtil {
+
     private static final String TAG = HttpUtil.class.getSimpleName();
     private static final int BUFFER_SIZE = 8192;
 
+    @NonNull
     public static String httpGet(String url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) (new URL(url).openConnection());
         final long t0 = System.currentTimeMillis();
+
         try {
             int status = getStatusCode(conn);
             if (status != HttpStatus.SC_OK) {
@@ -66,7 +70,7 @@ public class HttpUtil {
         }
     }
 
-    public static void httpGet(String url, File dst) throws IOException {
+    public static void httpGet(String url, @NonNull File dst) throws IOException {
         InputStream in = null;
         OutputStream out = null;
         HttpURLConnection conn = null;
@@ -98,7 +102,7 @@ public class HttpUtil {
     public static String httpPost(String url, Map<String, String> params) throws IOException {
         OutputStream out = null;
         InputStream in = null;
-        Writer writer = null;
+        Writer writer;
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) new URL(url).openConnection();
@@ -128,7 +132,7 @@ public class HttpUtil {
         }
     }
 
-    public static int getStatusCode(HttpURLConnection conn) throws IOException {
+    private static int getStatusCode(@NonNull HttpURLConnection conn) throws IOException {
         try {
             return conn.getResponseCode();
         } catch (IOException e) {
@@ -140,7 +144,8 @@ public class HttpUtil {
         }
     }
 
-    public static String getQuery(Map<String, String> params) {
+    @NonNull
+    private static String getQuery(@Nullable Map<String, String> params) {
         if (params == null) {
             return "";
         }
@@ -153,7 +158,7 @@ public class HttpUtil {
         return builder.length() > 0 ? builder.substring(1) : builder.toString();
     }
 
-    public static String readStream(InputStream in) throws IOException {
+    private static String readStream(@NonNull InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder builder = new StringBuilder();
 
@@ -169,7 +174,8 @@ public class HttpUtil {
         return builder.toString();
     }
 
-    public static void copyStream(InputStream in, OutputStream out) throws IOException {
+    public static void copyStream(@NonNull InputStream in, @NonNull OutputStream out)
+            throws IOException {
         byte[] b = new byte[BUFFER_SIZE];
         int read;
         while ((read = in.read(b)) != -1) {

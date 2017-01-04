@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -57,8 +59,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClickListener,
-        OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener {
+public class GeoshapeActivity extends ActionBarActivity
+    implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener,
+    OnMapReadyCallback {
+
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
     private static final String JSON_COORDINATES = "coordinates";
@@ -69,6 +73,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
 
     private static final String TAG = GeoshapeActivity.class.getSimpleName();
     private static final float ACCURACY_THRESHOLD = 20f;
+    public static final int MAP_ZOOM_LEVEL = 10;
 
     private List<Feature> mFeatures;// Saved features
     private Feature mCurrentFeature;// Ongoing feature
@@ -82,6 +87,8 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
     private View mClearPointBtn;
     private TextView mFeatureName;
     private TextView mAccuracy;
+
+    @Nullable
     private GoogleMap mMap;
 
     @Override
@@ -92,13 +99,13 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mFeatures = new ArrayList<>();
-        mMap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
 
         View addPointBtn = findViewById(R.id.add_point_btn);
         View clearFeatureBtn = findViewById(R.id.clear_feature_btn);
         mFeatureMenu = findViewById(R.id.feature_menu);
-        mFeatureName = (TextView)findViewById(R.id.feature_name);
-        mAccuracy = (TextView)findViewById(R.id.accuracy);
+        mFeatureName = (TextView) findViewById(R.id.feature_name);
+        mAccuracy = (TextView) findViewById(R.id.accuracy);
         mClearPointBtn = findViewById(R.id.clear_point_btn);
         findViewById(R.id.properties).setOnClickListener(mFeatureMenuListener);
 
@@ -117,14 +124,13 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
             addPointBtn.setVisibility(View.GONE);
             clearFeatureBtn.setVisibility(View.GONE);
         }
+    }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
         initMap();
-
-        String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
-        if (!TextUtils.isEmpty(geoJSON)) {
-            load(geoJSON);
-            mCentered = true;
-        }
+        updateMapCenter();
     }
 
     private void initMap() {
@@ -135,6 +141,16 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
             if (mManualInput) {
                 mMap.setOnMapLongClickListener(this);
                 mMap.setOnMarkerDragListener(this);
+            }
+        }
+    }
+
+    private void updateMapCenter() {
+        if (mMap != null) {
+            String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
+            if (!TextUtils.isEmpty(geoJSON)) {
+                load(geoJSON);
+                mCentered = true;
             }
         }
     }
@@ -226,7 +242,6 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
     private View.OnClickListener mFeatureMenuListener = new View.OnClickListener() {
@@ -238,36 +253,34 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
 
             switch (v.getId()) {
                 case R.id.add_point_btn:
-                    Location location = mMap.getMyLocation();
+                    Location location = mMap == null? null : mMap.getMyLocation();
                     if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
                     } else {
                         Toast.makeText(GeoshapeActivity.this,
-                                location != null ? R.string.location_inaccurate : R.string.location_unknown,
-                                Toast.LENGTH_LONG).show();
+                                       location != null ? R.string.location_inaccurate : R.string.location_unknown,
+                                       Toast.LENGTH_LONG).show();
                     }
                     break;
                 case R.id.clear_point_btn:
-                    ViewUtil.showConfirmDialog(R.string.clear_point_title,
-                            R.string.clear_point_text, GeoshapeActivity.this, true,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mCurrentFeature.removePoint();
-                                    selectFeature(mCurrentFeature, null);
-                                }
-                            });
+                    ViewUtil.showConfirmDialog(R.string.clear_point_title, R.string.clear_point_text,
+                                               GeoshapeActivity.this, true, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mCurrentFeature.removePoint();
+                                selectFeature(mCurrentFeature, null);
+                            }
+                        });
                     break;
                 case R.id.clear_feature_btn:
-                    ViewUtil.showConfirmDialog(R.string.clear_feature_title,
-                            R.string.clear_feature_text, GeoshapeActivity.this, true,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mCurrentFeature.delete();
-                                    selectFeature(null, null);
-                                }
-                            });
+                    ViewUtil.showConfirmDialog(R.string.clear_feature_title, R.string.clear_feature_text,
+                                               GeoshapeActivity.this, true, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mCurrentFeature.delete();
+                                selectFeature(null, null);
+                            }
+                        });
                     break;
                 case R.id.properties:
                     displayProperties();
@@ -277,16 +290,12 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
     };
 
     private void displayProperties() {
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line);
         for (Feature.Property property : mCurrentFeature.getProperties()) {
             adapter.add(String.format("%s: %s", property.mDisplayName, property.mDisplayValue));
         }
 
-        new AlertDialog.Builder(GeoshapeActivity.this)
-                .setTitle("Properties")
-                .setAdapter(adapter, null)
-                .show();
+        new AlertDialog.Builder(GeoshapeActivity.this).setTitle("Properties").setAdapter(adapter, null).show();
     }
 
     /**
@@ -360,7 +369,7 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
             if (jFeatures == null || jFeatures.length() == 0) {
                 return;
             }
-            for (int i=0; i<jFeatures.length(); i++) {
+            for (int i = 0; i < jFeatures.length(); i++) {
                 JSONObject jFeature = jFeatures.getJSONObject(i);
                 JSONObject jGeometry = jFeature.getJSONObject(JSON_GEOMETRY);
                 JSONArray jCoordinates = jGeometry.getJSONArray(JSON_COORDINATES);
@@ -373,9 +382,10 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
                 }
                 // Load point list
                 List<LatLng> points = new ArrayList<>();
-                for (int j=0; j<lastCoordinate; j++) {
+                for (int j = 0; j < lastCoordinate; j++) {
                     JSONArray jPoint = jCoordinates.getJSONArray(j);
-                    LatLng point = new LatLng(jPoint.getDouble(1), jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)
+                    LatLng point =
+                        new LatLng(jPoint.getDouble(1), jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)
                     points.add(point);
                     builder.include(point);
                 }
@@ -416,14 +426,13 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
         if (mCurrentFeature == null) {
             return;
         }
-        ViewUtil.showConfirmDialog(R.string.add_point_title,
-                R.string.add_point_text, GeoshapeActivity.this, true,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        addPoint(latLng);
-                    }
-                });
+        ViewUtil.showConfirmDialog(R.string.add_point_title, R.string.add_point_text, GeoshapeActivity.this, true,
+                                   new DialogInterface.OnClickListener() {
+                                       @Override
+                                       public void onClick(DialogInterface dialog, int which) {
+                                           addPoint(latLng);
+                                       }
+                                   });
     }
 
     @Override
@@ -465,8 +474,8 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
     public void onMyLocationChange(Location location) {
         Log.i(TAG, "onMyLocationChange() - " + location);
         if (location != null && location.hasAccuracy()) {
-            mAccuracy.setText(getString(R.string.accuracy) + ": "
-                    + new DecimalFormat("#").format(location.getAccuracy()) + "m");
+            mAccuracy.setText(
+                getString(R.string.accuracy) + ": " + new DecimalFormat("#").format(location.getAccuracy()) + "m");
             if (location.getAccuracy() <= ACCURACY_THRESHOLD) {
                 mAccuracy.setTextColor(getResources().getColor(R.color.button_green));
             } else {
@@ -474,9 +483,15 @@ public class GeoshapeActivity extends ActionBarActivity implements OnMapLongClic
             }
             if (!mCentered) {
                 LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
-                mCentered = true;
+                centerMapOnLocation(position);
             }
+        }
+    }
+
+    private void centerMapOnLocation(LatLng position) {
+        if (mMap != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, MAP_ZOOM_LEVEL));
+            mCentered = true;
         }
     }
 }

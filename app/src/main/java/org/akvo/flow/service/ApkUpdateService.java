@@ -26,6 +26,8 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
+import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
+import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
@@ -40,6 +42,9 @@ import org.akvo.flow.util.StatusUtil;
  */
 public class ApkUpdateService extends GcmTaskService {
 
+    /**
+     * Tag that is unique to this task (can be used to cancel task)
+     */
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
@@ -52,7 +57,6 @@ public class ApkUpdateService extends GcmTaskService {
                     .setPeriod(ConstantUtil.REPEAT_INTERVAL_IN_SECONDS)
                     //specify how much earlier the task can be executed (in seconds)
                     .setFlex(ConstantUtil.FLEX_IN_SECONDS)
-                    //tag that is unique to this task (can be used to cancel task)
                     .setTag(TAG)
                     //whether the task persists after device reboot
                     .setPersisted(true)
@@ -101,7 +105,8 @@ public class ApkUpdateService extends GcmTaskService {
             Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate(this);
             if (booleanApkDataPair.first) {
                 //save to shared preferences
-                Prefs.saveApkData(this, booleanApkDataPair.second);
+                ApkUpdateStore store = new ApkUpdateStore(new GsonMapper(), new Prefs(this));
+                store.updateApkData(booleanApkDataPair.second);
             }
             return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {

@@ -2,7 +2,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
            xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Light Styles -->
     <style name="Flow.ActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
         <item name="android:backgroundStacked" tools:targetApi="14">@drawable/ab_stacked_solid_flow</item>
         <item name="backgroundStacked">@drawable/ab_stacked_solid_flow</item>
@@ -15,6 +14,11 @@
 
         <item name="android:subtitleTextStyle" tools:targetApi="11">@style/Flow.ActionBar.Text</item>
         <item name="subtitleTextStyle">@style/Flow.ActionBar.Text</item>
+    </style>
+
+    <style name="Flow.PopupMenuListView" parent="@style/Widget.AppCompat.ListView.DropDown">
+        <item name="android:divider">@color/black_transparent</item>
+        <item name="android:dividerHeight">1dp</item>
     </style>
 
     <style name="Flow.ActionBar.Tabs" parent="@style/Widget.AppCompat.ActionBar.TabView">
@@ -30,7 +34,7 @@
         <item name="android:textColor">@color/tab_text_color</item>
     </style>
 
-    <style name="Flow.ListView" parent="@android:style/Widget.ListView">
+    <style name="Flow.ListView" parent="@style/Widget.AppCompat.ListView">
         <item name="android:cacheColorHint">@android:color/transparent</item>
         <item name="android:divider">@color/white</item>
     </style>
@@ -50,7 +54,11 @@
         <item name="android:textColor">@color/button_tertiary_text</item>
     </style>
 
-    <!-- Dark Styles -->
-    <!-- TODO -->
+    <style name="Spinner">
+        <!-- Color when pressed -->
+        <item name="colorAccent">@color/black_disabled</item>
+        <!-- Default color for the dropdown arrow and line -->
+        <item name="colorControlNormal">@color/black_disabled</item>
+    </style>
 
 </resources>

@@ -45,10 +45,12 @@ public class FlowApp extends Application {
     private Locale mLocale;
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
+    private Prefs prefs;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        prefs = new Prefs(getApplicationContext());
         init();
         startUpdateService();
         app = this;
@@ -96,14 +98,14 @@ public class FlowApp extends Application {
         loadLastUser();
 
         // Load last survey group
-        mSurveyGroupId = Prefs.getLong(this, Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        mSurveyGroupId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
 
         mSurveyChecker.run();// Ensure surveys have put their languages
     }
     
     public void setUser(User user) {
         mUser = user;
-        Prefs.setLong(this, Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
+        prefs.setLong(Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
     }
     
     public User getUser() {
@@ -112,7 +114,7 @@ public class FlowApp extends Application {
     
     public void setSurveyGroupId(long surveyGroupId) {
         mSurveyGroupId = surveyGroupId;
-        Prefs.setLong(this, Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
     }
     
     public long getSurveyGroupId() {
@@ -143,11 +145,11 @@ public class FlowApp extends Application {
         database.open();
 
         // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades
-        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
-            Prefs.setBoolean(this, Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
+        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
+            prefs.setBoolean(Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
         }
 
-        long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
+        long id = prefs.getLong(Prefs.KEY_USER_ID, -1);
         if (id != -1) {
             Cursor cur = database.getUser(id);
             if (cur.moveToFirst()) {

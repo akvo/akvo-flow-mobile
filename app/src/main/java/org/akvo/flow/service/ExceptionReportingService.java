@@ -104,6 +104,7 @@ public class ExceptionReportingService extends Service {
         phoneNumber = StatusUtil.getPhoneNumber(applicationContext);
         imei = StatusUtil.getImei(applicationContext);
         server = new ServerManager(applicationContext).getServerBase();
+        connectivityStateManager = new ConnectivityStateManager(applicationContext);
 
         // Safe to lazy initialize the static field, since this method
         // will always be called in the Main Thread

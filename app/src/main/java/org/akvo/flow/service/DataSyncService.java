@@ -49,7 +49,6 @@ import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
-import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,6 +56,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -492,11 +492,11 @@ public class DataSyncService extends IntentService {
             FlowApi api = new FlowApi();
             switch (api.sendProcessingNotification(serverBase, formId, action,
                     getDestName(filename))) {
-                case HttpStatus.SC_OK:
+                case HttpURLConnection.HTTP_OK:
                     status = TransmissionStatus.SYNCED;// Mark everything completed
                     synced = true;
                     break;
-                case HttpStatus.SC_NOT_FOUND:
+                case HttpURLConnection.HTTP_NOT_FOUND:
                     // This form has been deleted in the dashboard, thus we cannot sync it
                     displayErrorNotification(formId);
                     status = TransmissionStatus.FORM_DELETED;

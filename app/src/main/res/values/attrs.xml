@@ -2,11 +2,6 @@
 <resources>
     <declare-styleable name="FlowTheme">
 
-        <!-- TEXT -->
-        <attr name="textColorPrimary" format="reference|color" />
-        <attr name="textColorSecondary" format="reference|color" />
-        <attr name="textColorTertiary" format="reference|color" />
-
         <!-- BACKGROUND -->
         <attr name="listitem_bg1" format="reference|color" />
         <attr name="listitem_bg2" format="reference|color" />

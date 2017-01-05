@@ -34,7 +34,6 @@ import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PlatformUtil;
-import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -296,7 +295,7 @@ public class AppUpdateActivity extends Activity {
 
                 final int status = conn.getResponseCode();
 
-                if (status == HttpStatus.SC_OK) {
+                if (status == HttpURLConnection.HTTP_OK) {
                     final String checksum = FileUtil.hexMd5(new File(localPath));
                     if (TextUtils.isEmpty(checksum)) {
                         throw new IOException("Downloaded file is not available");

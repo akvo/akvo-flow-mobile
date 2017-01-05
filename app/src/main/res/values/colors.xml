@@ -5,6 +5,7 @@
 
     <color name="black_main">#000000</color>
     <color name="black_disabled">#8f8f8f</color>
+    <color name="black_transparent">#20000000</color>
 
     <color name="orange_main">#e17e26</color>
     <color name="orange_disabled">#80e17e26</color>
@@ -26,10 +27,6 @@
     <!-- Text -->
     <color name="text_primary">@color/black_main</color>
     <color name="text_primary_disabled">@color/black_disabled</color>
-    <color name="text_secondary">@color/orange_main</color>
-    <color name="text_secondary_disabled">@color/orange_disabled</color>
-    <color name="text_tertiary">@color/blue_main</color>
-    <color name="text_tertiary_disabled">@color/blue_disabled</color>
 
     <color name="action_bar_text">@color/orange_main</color>
 

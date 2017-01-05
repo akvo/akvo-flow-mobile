@@ -35,6 +35,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -102,7 +103,7 @@ public class SurveyedDataPointSyncService extends IntentService {
             Log.e(TAG, e.getMessage(), e);
             String message = e.getMessage();
             switch (e.getStatus()) {
-                case HttpException.Status.SC_FORBIDDEN:
+                case HttpURLConnection.HTTP_FORBIDDEN:
                     // A missing assignment might be the issue. Let's hint the user.
                     message = getString(R.string.error_assignment_text);
                     break;

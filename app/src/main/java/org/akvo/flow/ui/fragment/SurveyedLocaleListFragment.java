@@ -179,7 +179,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
         if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
             // Warn user that the location is unknown
-            Toast.makeText(getActivity(), "Unknown Location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.locale_list_error_unknown_location, Toast.LENGTH_SHORT).show();
             return;
         }
         getLoaderManager().restartLoader(0, null, this);

@@ -16,11 +16,6 @@
 
 package org.akvo.flow.ui.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,6 +43,11 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
     private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
@@ -70,7 +70,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
-        final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
+        final int padding = (int) PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
         setPadding(padding, padding, padding, padding);
         if (sColors == null) {
             // must have enough colors for all enabled languages
@@ -84,7 +84,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     /**
      * Inflate the appropriate layout file, and retrieve the references to the common resources.
      * Subclasses' layout files should ALWAYS contain the question_header view.
-     *
      * Inflated layout will be attached to the View's root, thus all the elements within it
      * will be accessible by calling findViewById(int)
      *
@@ -94,8 +93,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(layoutRes, this, true);
 
-        mQuestionText = (TextView)findViewById(R.id.question_tv);
-        mTipImage = (ImageButton)findViewById(R.id.tip_ib);
+        mQuestionText = (TextView) findViewById(R.id.question_tv);
+        mTipImage = (ImageButton) findViewById(R.id.tip_ib);
 
         if (mQuestionText == null || mTipImage == null) {
             throw new RuntimeException(
@@ -169,7 +168,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         boolean isFirst = true;
         StringBuilder text = new StringBuilder();
         if (mQuestion.isMandatory()) {
-            text.append("<i><b>");
+            text.append("<b>");
         }
 
         text.append(mQuestion.getOrder()).append(". ");// Prefix the text with the order
@@ -198,7 +197,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             }
         }
         if (mQuestion.isMandatory()) {
-            text = text.append("*</b></i>");
+            text = text.append("*</b>");
         }
         return Html.fromHtml(text.toString());
     }

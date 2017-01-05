@@ -20,7 +20,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.akvo.flow.exception.HttpException;
-import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -56,7 +55,7 @@ public class HttpUtil {
 
         try {
             int status = getStatusCode(conn);
-            if (status != HttpStatus.SC_OK) {
+            if (status != HttpURLConnection.HTTP_OK) {
                 throw new HttpException(conn.getResponseMessage(), status);
             }
             InputStream in = new BufferedInputStream(conn.getInputStream());
@@ -83,7 +82,7 @@ public class HttpUtil {
             copyStream(in, out);
 
             int status = conn.getResponseCode();
-            if (status != HttpStatus.SC_OK) {
+            if (status != HttpURLConnection.HTTP_OK) {
                 // TODO: Use custom exception?
                 throw new IOException("Status Code: " + status + ". Expected: 200 - OK");
             }
@@ -119,7 +118,7 @@ public class HttpUtil {
             in = new BufferedInputStream(conn.getInputStream());
 
             int status = getStatusCode(conn);
-            if (status != HttpStatus.SC_OK) {
+            if (status != HttpURLConnection.HTTP_OK) {
                 throw new HttpException(conn.getResponseMessage(), status);
             }
             return readStream(in);

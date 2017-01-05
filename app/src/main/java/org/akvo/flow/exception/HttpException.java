@@ -16,8 +16,6 @@
 
 package org.akvo.flow.exception;
 
-import org.apache.http.HttpStatus;
-
 import java.io.IOException;
 
 /**
@@ -30,7 +28,7 @@ public class HttpException extends IOException {
      * This error codes extend the already existent HTTP status codes, in order to communicate
      * internal API error codes not present in the http layer.
      */
-    public interface Status extends HttpStatus {
+    public interface Status {
         // Custom codes start on 600 (preserving any existent http status unchanged)
         int MALFORMED_RESPONSE = 600;
     }

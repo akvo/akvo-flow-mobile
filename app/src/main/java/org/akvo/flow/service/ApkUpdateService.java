@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
 *
 * This file is part of Akvo FLOW.
 *
@@ -26,10 +26,12 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
-import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
+import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.util.ConstantUtil;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -40,9 +42,12 @@ import org.akvo.flow.util.StatusUtil;
  */
 public class ApkUpdateService extends GcmTaskService {
 
+    /**
+     * Tag that is unique to this task (can be used to cancel task)
+     */
     private static final String TAG = "APK_UPDATE_SERVICE";
 
-    private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
+    private ApkUpdateHelper apkUpdateHelper;
 
     public static void scheduleRepeat(Context context) {
         try {
@@ -52,7 +57,6 @@ public class ApkUpdateService extends GcmTaskService {
                     .setPeriod(ConstantUtil.REPEAT_INTERVAL_IN_SECONDS)
                     //specify how much earlier the task can be executed (in seconds)
                     .setFlex(ConstantUtil.FLEX_IN_SECONDS)
-                    //tag that is unique to this task (can be used to cancel task)
                     .setTag(TAG)
                     //whether the task persists after device reboot
                     .setPersisted(true)
@@ -92,21 +96,32 @@ public class ApkUpdateService extends GcmTaskService {
      */
     @Override
     public int onRunTask(TaskParams taskParams) {
-        if (!StatusUtil.isConnectionAllowed(this)) {
+        Context applicationContext = getApplicationContext();
+        apkUpdateHelper = new ApkUpdateHelper(applicationContext);
+        ConnectivityStateManager connectivityStateManager = new ConnectivityStateManager(
+                applicationContext);
+        Prefs prefs = new Prefs(applicationContext);
+        if (!syncOverMobileNetworksAllowed(prefs) && !connectivityStateManager.isWifiConnected()) {
             Log.d(TAG, "No available authorised connection. Can't perform the requested operation");
             return GcmNetworkManager.RESULT_SUCCESS;
         }
 
         try {
-            Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate(this);
+            Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate();
             if (booleanApkDataPair.first) {
                 //save to shared preferences
-                Prefs.saveApkData(this, booleanApkDataPair.second);
+                ApkUpdateStore store = new ApkUpdateStore(new GsonMapper(), prefs);
+                store.updateApkData(booleanApkDataPair.second);
             }
             return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {
             Log.e(TAG, "Error with apk version service", e);
             return GcmNetworkManager.RESULT_FAILURE;
         }
+    }
+
+    private boolean syncOverMobileNetworksAllowed(Prefs prefs) {
+        return prefs.getBoolean(Prefs.KEY_CELL_UPLOAD,
+                Prefs.DEFAULT_VALUE_CELL_UPLOAD);
     }
 }

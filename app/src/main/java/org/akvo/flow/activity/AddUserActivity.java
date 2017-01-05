@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -71,7 +71,8 @@ public class AddUserActivity extends Activity implements TextWatcher, TextView.O
         SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
         long uid = db.createOrUpdateUser(null, username);
         db.close();
-        Prefs.setString(this, Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
+        Prefs prefs = new Prefs(getApplicationContext());
+        prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
 
         // Select the newly created user, and exit the Activity
         FlowApp.getApp().setUser(new User(uid, username));

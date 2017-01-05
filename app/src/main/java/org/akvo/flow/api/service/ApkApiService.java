@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -15,15 +15,14 @@
  */
 package org.akvo.flow.api.service;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import java.io.IOException;
+
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.StatusUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class ApkApiService {
 
@@ -31,8 +30,8 @@ public class ApkApiService {
         "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
 
     @Nullable
-    public JSONObject getApkDataObject(@NonNull Context context) throws IOException, JSONException {
-        final String url = StatusUtil.getServerBase(context) + APK_VERSION_SERVICE_PATH;
+    public JSONObject getApkDataObject(String baseUrl) throws IOException, JSONException {
+        final String url = baseUrl + APK_VERSION_SERVICE_PATH;
         String response = HttpUtil.httpGet(url);
         if (!TextUtils.isEmpty(response)) {
             return new JSONObject(response);

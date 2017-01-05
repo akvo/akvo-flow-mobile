@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -17,19 +17,22 @@
 package org.akvo.flow.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StatusUtil;
 
 import java.io.File;
@@ -77,6 +80,9 @@ public class ExceptionReportingService extends Service {
     private String deviceId;
     private String phoneNumber;
     private String imei;
+    private Prefs prefs;
+    private ConnectivityStateManager connectivityStateManager;
+    private String server;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -90,15 +96,15 @@ public class ExceptionReportingService extends Service {
      * the server via a REST call
      */
     public int onStartCommand(final Intent intent, int flags, int startid) {
-        final String server = StatusUtil.getServerBase(this);
+        Context applicationContext = getApplicationContext();
+        prefs = new Prefs(applicationContext);
+        deviceId = prefs
+                .getString(Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
+        version = BuildConfig.VERSION_NAME;
+        phoneNumber = StatusUtil.getPhoneNumber(applicationContext);
+        imei = StatusUtil.getImei(applicationContext);
+        server = new ServerManager(applicationContext).getServerBase();
 
-        try {
-            deviceId = Prefs.getString(getApplicationContext(), Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
-            version = BuildConfig.VERSION_NAME;
-            phoneNumber = StatusUtil.getPhoneNumber(this);
-            imei = StatusUtil.getImei(this);
-        } finally {
-        }
         // Safe to lazy initialize the static field, since this method
         // will always be called in the Main Thread
         if (timer == null) {
@@ -107,15 +113,24 @@ public class ExceptionReportingService extends Service {
 
                 @Override
                 public void run() {
-                    if (StatusUtil.hasDataConnection(ExceptionReportingService.this) &&
-                            Environment.MEDIA_MOUNTED
-                                    .equals(Environment.getExternalStorageState())) {
+                    if (isConnectionAvailable() && isStorageAvailable()) {
                         submitStackTraces(server);
                     }
                 }
             }, INITIAL_DELAY, INTERVAL);
         }
         return Service.START_STICKY;
+    }
+
+    private boolean isConnectionAvailable() {
+        return connectivityStateManager.isConnectionAvailable(
+                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD,
+                        Prefs.DEFAULT_VALUE_CELL_UPLOAD));
+    }
+
+    private boolean isStorageAvailable() {
+        return Environment.MEDIA_MOUNTED
+                .equals(Environment.getExternalStorageState());
     }
 
     public void onCreate() {

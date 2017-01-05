@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -209,11 +209,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void migratePreferences(Context context, SQLiteDatabase db) {
         PreferenceMapper mapper = new PreferenceMapper();
+        Prefs prefs = new Prefs(context.getApplicationContext());
         PreferenceExtractor preferenceExtractor = new PreferenceExtractor();
         MigratablePreferences migratablePreferences = preferenceExtractor
                 .create(preferenceHandler, db);
         InsertablePreferences insertablePreferences = mapper.transform(migratablePreferences);
-        Prefs.insertUserPreferences(context, insertablePreferences);
+        prefs.insertUserPreferences(insertablePreferences);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -33,7 +33,6 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -58,7 +57,7 @@ public class SurveyedDataPointSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         int syncedRecords = 0;
-        FlowApi api = new FlowApi();
+        FlowApi api = new FlowApi(getApplicationContext());
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         boolean correctSync = true;
         NotificationHelper
@@ -138,7 +137,7 @@ public class SurveyedDataPointSyncService extends IntentService {
         Set<String> records = new HashSet<>();
         Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         List<SurveyedLocale> locales = api
-                .getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime);
+                .getSurveyedLocales(surveyGroupId, syncTime);
         boolean correctData = true;
         if (locales != null) {
             for (SurveyedLocale locale : locales) {

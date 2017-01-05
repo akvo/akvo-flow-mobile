@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -28,19 +28,20 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,6 +75,8 @@ public class SurveyDownloadService extends IntentService {
     public static final String TEST_SURVEY_ID = "0";
 
     private SurveyDbAdapter databaseAdaptor;
+    private Prefs prefs;
+    private ConnectivityStateManager connectivityStateManager;
 
     public SurveyDownloadService() {
         super(TAG);
@@ -83,6 +86,8 @@ public class SurveyDownloadService extends IntentService {
         try {
             databaseAdaptor = new SurveyDbAdapter(this);
             databaseAdaptor.open();
+            prefs = new Prefs(getApplicationContext());
+            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
                 downloadSurvey(intent);
             } else if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
@@ -128,18 +133,17 @@ public class SurveyDownloadService extends IntentService {
      * on the device, the surveys will be replaced with the new ones.
      */
     private void checkAndDownload(@Nullable String[] surveyIds) {
-        if (!StatusUtil.hasDataConnection(this)) {
+        if (!connectivityStateManager.isConnectionAvailable(
+                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
             //No internet or not allowed to sync
             return;
         }
-        // Load preferences
-        final String serverBase = StatusUtil.getServerBase(this);
 
         List<Survey> surveys;
         if (surveyIds != null) {
-            surveys = getSurveyHeaders(serverBase, surveyIds);
+            surveys = getSurveyHeaders(surveyIds);
         } else {
-            surveys = checkForSurveys(serverBase);
+            surveys = checkForSurveys();
         }
 
         // Update all survey groups
@@ -328,12 +332,12 @@ public class SurveyDownloadService extends IntentService {
      * invokes a service call to get the header information for multiple surveys
      */
     @NonNull
-    private List<Survey> getSurveyHeaders(@NonNull String serverBase, @NonNull String[] surveyIds) {
+    private List<Survey> getSurveyHeaders(@NonNull String[] surveyIds) {
         List<Survey> surveys = new ArrayList<>();
-        FlowApi flowApi = new FlowApi();
+        FlowApi flowApi = new FlowApi(getApplicationContext());
         for (String id : surveyIds) {
             try {
-                surveys.addAll(flowApi.getSurveyHeader(serverBase, id));
+                surveys.addAll(flowApi.getSurveyHeader(id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
                     PersistentUncaughtExceptionHandler.recordException(e);
@@ -353,11 +357,11 @@ public class SurveyDownloadService extends IntentService {
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
-    private List<Survey> checkForSurveys(@NonNull String serverBase) {
+    private List<Survey> checkForSurveys() {
         List<Survey> surveys = new ArrayList<>();
-        FlowApi api = new FlowApi();
+        FlowApi api = new FlowApi(getApplicationContext());
         try {
-            surveys = api.getSurveys(serverBase);
+            surveys = api.getSurveys();
         } catch (@NonNull IllegalArgumentException | IOException e) {
             if (e instanceof IllegalArgumentException) {
                 PersistentUncaughtExceptionHandler.recordException(e);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -51,10 +51,12 @@ public class FlowApp extends Application {
 
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
+    private Prefs prefs;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        prefs = new Prefs(getApplicationContext());
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
@@ -108,14 +110,14 @@ public class FlowApp extends Application {
         loadLastUser();
 
         // Load last survey group
-        mSurveyGroupId = Prefs.getLong(this, Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        mSurveyGroupId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
 
         mSurveyChecker.run();// Ensure surveys have put their languages
     }
     
     public void setUser(User user) {
         mUser = user;
-        Prefs.setLong(this, Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
+        prefs.setLong(Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
     }
     
     public User getUser() {
@@ -124,7 +126,7 @@ public class FlowApp extends Application {
     
     public void setSurveyGroupId(long surveyGroupId) {
         mSurveyGroupId = surveyGroupId;
-        Prefs.setLong(this, Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
     }
     
     public long getSurveyGroupId() {
@@ -155,11 +157,11 @@ public class FlowApp extends Application {
         database.open();
 
         // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades
-        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
-            Prefs.setBoolean(this, Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
+        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
+            prefs.setBoolean(Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
         }
 
-        long id = Prefs.getLong(this, Prefs.KEY_USER_ID, -1);
+        long id = prefs.getLong(Prefs.KEY_USER_ID, -1);
         if (id != -1) {
             Cursor cur = database.getUser(id);
             if (cur.moveToFirst()) {
@@ -191,11 +193,11 @@ public class FlowApp extends Application {
 
     @Nullable
     private String loadLocalePref() {
-        return Prefs.getString(this, Prefs.KEY_LOCALE, null);
+        return prefs.getString(Prefs.KEY_LOCALE, null);
     }
 
     private void saveLocalePref(String language) {
-        Prefs.setString(this, Prefs.KEY_LOCALE, language);
+        prefs.setString(Prefs.KEY_LOCALE, language);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -29,10 +29,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.StatusUtil;
 import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
@@ -42,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -92,7 +94,8 @@ public class AppUpdateActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     mInstallBtn.setEnabled(false);
-                    mTask = new UpdateAsyncTask();
+                    mTask = new UpdateAsyncTask(AppUpdateActivity.this, mUrl, mVersion,
+                            mMd5Checksum);
                     mTask.execute();
                 }
             });
@@ -149,14 +152,35 @@ public class AppUpdateActivity extends Activity {
         return mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING;
     }
 
-    class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
+    private static class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
+
+        private final Prefs prefs;
+        private final String mUrl;
+        private final String mVersion;
+        private final WeakReference<AppUpdateActivity> activityWeakReference;
+        private final ConnectivityStateManager connectivityStateManager;
+        private String mMd5Checksum;
+
+        public UpdateAsyncTask(AppUpdateActivity context, String mUrl, String mVersion,
+                String mMd5Checksum) {
+            this.prefs = new Prefs(context);
+            this.mUrl = mUrl;
+            this.mVersion = mVersion;
+            this.activityWeakReference = new WeakReference<>(context);
+            this.connectivityStateManager = new ConnectivityStateManager(context);
+            this.mMd5Checksum = mMd5Checksum;
+        }
 
         @Override
         protected String doInBackground(Void... params) {
             // Create parent directories, and delete files, if necessary
             String filename = createFile(mUrl, mVersion).getAbsolutePath();
 
-            if (downloadApk(mUrl, filename) && !isCancelled()) {
+            boolean syncOver3GAllowed = prefs
+                    .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
+            if (!connectivityStateManager.isConnectionAvailable(syncOver3GAllowed)) {
+                Log.e(TAG, "No internet connection available. Can't perform the requested operation");
+            } else if (downloadApk(mUrl, filename) && !isCancelled()) {
                 return filename;
             }
             // Clean up sd-card to ensure no corrupted file is leaked.
@@ -176,29 +200,36 @@ public class AppUpdateActivity extends Activity {
             if (percentComplete > MAX_PROGRESS) {
                 percentComplete = MAX_PROGRESS;
             }
-
             Log.d(TAG, "onProgressUpdate() - APK update: " + percentComplete + "%");
-            mProgress.setProgress(percentComplete);
+            notifyProgress(percentComplete);
+        }
+
+        private void notifyProgress(int percentComplete) {
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
+            if (appUpdateActivity != null) {
+                appUpdateActivity.updateDownloadProgress(percentComplete);
+            }
         }
 
         @Override
         protected void onPostExecute(String filename) {
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
             if (TextUtils.isEmpty(filename)) {
-                Toast.makeText(AppUpdateActivity.this, R.string.apk_upgrade_error,
-                        Toast.LENGTH_SHORT).show();
-                mInstallBtn.setText(R.string.retry);
-                mInstallBtn.setEnabled(true);
+                if (appUpdateActivity != null) {
+                    appUpdateActivity.onDownloadError();
+                }
                 return;
             }
 
-            PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
-            finish();
+            if (appUpdateActivity != null) {
+                appUpdateActivity.onDownloadSuccess(filename);
+            }
         }
 
         @Override
         protected void onCancelled() {
             Log.d(TAG, "onCancelled() - APK update task cancelled");
-            mProgress.setProgress(0);
+            notifyProgress(0);
             cleanupDownloads(mVersion);
         }
 
@@ -234,10 +265,6 @@ public class AppUpdateActivity extends Activity {
          */
         private boolean downloadApk(String location, String localPath) {
             Log.i(TAG, "App Update: Downloading new version " + mVersion + " from " + mUrl);
-            if (!StatusUtil.hasDataConnection(AppUpdateActivity.this)) {
-                Log.e(TAG, "No internet connection. Can't perform the requested operation");
-                return false;
-            }
 
             boolean ok = false;
             InputStream in = null;
@@ -299,5 +326,20 @@ public class AppUpdateActivity extends Activity {
 
             return ok;
         }
+    }
+
+    private void onDownloadSuccess(String filename) {
+        PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
+        finish();
+    }
+
+    private void onDownloadError() {
+        Toast.makeText(this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
+        mInstallBtn.setText(R.string.retry);
+        mInstallBtn.setEnabled(true);
+    }
+
+    private void updateDownloadProgress(int percentComplete) {
+        mProgress.setProgress(percentComplete);
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -66,8 +66,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import timber.log.Timber;
-
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
     private static final String TAG = FormActivity.class.getSimpleName();
@@ -101,6 +99,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
     private SurveyDbAdapter mDatabase;
+    private Prefs prefs;
 
     private String[] mLanguages;
 
@@ -121,6 +120,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mQuestionResponses = new HashMap<>();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
+        prefs = new Prefs(getApplicationContext());
 
         loadSurvey(
                 surveyId);// Load Survey. This task would be better off if executed in a worker thread
@@ -326,7 +326,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
         mPager.setKeepScreenOn(
-                Prefs.getBoolean(this, Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
+                prefs.getBoolean(Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
     }
 
     @Override
@@ -450,8 +450,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 String filename = PlatformUtil.uuid() + fileSuffix;
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
-                int maxImgSize = Prefs
-                        .getInt(this, Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
+                int maxImgSize = prefs
+                        .getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {

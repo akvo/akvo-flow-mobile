@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -21,8 +21,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.StatusUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,23 +39,28 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
         void onResourceDownload(boolean done);
     }
 
-    private WeakReference<DownloadListener> mListener;// Use a WeakReferences to avoid memory leaks
-    private Context mContext;
-    private File mFile;
+    private final WeakReference<DownloadListener> mListener;
+    private final Context mContext;
+    private final File mFile;
+    private final ConnectivityStateManager connectivityStateManager;
+    private final Prefs prefs;
 
     /**
      * Download a media file. Provided file must be already updated to use the local filesystem path.
      */
     public MediaSyncTask(Context context, File file, DownloadListener listener) {
-        mContext = context.getApplicationContext();
-        mListener = new WeakReference<>(listener);
-        mFile = file;
+        this.mContext = context.getApplicationContext();
+        this.mListener = new WeakReference<>(listener);
+        this.mFile = file;
+        this.connectivityStateManager = new ConnectivityStateManager(mContext);
+        this.prefs = new Prefs(mContext);
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        if (!StatusUtil.hasDataConnection(mContext)) {
-            Log.d(TAG, "No internet connection. Can't perform the requested operation");
+        if (!connectivityStateManager.isConnectionAvailable(
+                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
+            Log.d(TAG, "No internet connection available. Can't perform the requested operation");
             return false;
         }
 

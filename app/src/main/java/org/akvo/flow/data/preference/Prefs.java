@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -22,8 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.domain.apkupdate.GsonMapper;
-import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 
 /**
@@ -35,7 +33,6 @@ public class Prefs {
     public static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
-    public static final String KEY_APK_DATA = "apk_data";
     public static final String KEY_LOCALE = "pref.locale";
     public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     public static final String KEY_BACKEND_SERVER = "backend.server";
@@ -51,85 +48,73 @@ public class Prefs {
     public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
 
-    private static GsonMapper gsonMapper = new GsonMapper();
+    private final Context context;
 
-    private static SharedPreferences getPrefs(Context context) {
+    public Prefs(Context context) {
+        this.context = context;
+    }
+
+    private SharedPreferences getPrefs() {
         return context.getSharedPreferences(PREFS_NAME, PREFS_MODE);
     }
 
-    public static String getString(Context context, String key, String defValue) {
-        return getPrefs(context).getString(key, defValue);
+    public String getString(String key, String defValue) {
+        return getPrefs().getString(key, defValue);
     }
 
-    public static void setString(Context context, String key, String value) {
-        getPrefs(context).edit().putString(key, value).apply();
+    public void setString(String key, String value) {
+        getPrefs().edit().putString(key, value).apply();
     }
 
-    public static boolean getBoolean(Context context, String key, boolean defValue) {
-        return getPrefs(context).getBoolean(key, defValue);
+    public boolean getBoolean(String key, boolean defValue) {
+        return getPrefs().getBoolean(key, defValue);
     }
 
-    public static void setBoolean(Context context, String key, boolean value) {
-        getPrefs(context).edit().putBoolean(key, value).apply();
+    public void setBoolean(String key, boolean value) {
+        getPrefs().edit().putBoolean(key, value).apply();
     }
 
-    public static long getLong(Context context, String key, long defValue) {
-        return getPrefs(context).getLong(key, defValue);
+    public long getLong(String key, long defValue) {
+        return getPrefs().getLong(key, defValue);
     }
 
-    public static void setLong(Context context, String key, long value) {
-        getPrefs(context).edit().putLong(key, value).apply();
+    public void setLong(String key, long value) {
+        getPrefs().edit().putLong(key, value).apply();
     }
 
-    public static int getInt(Context context, String key, int defValue) {
-        return getPrefs(context).getInt(key, defValue);
+    public int getInt(String key, int defValue) {
+        return getPrefs().getInt(key, defValue);
     }
 
-    public static void setInt(Context context, String key, int value) {
-        getPrefs(context).edit().putInt(key, value).apply();
+    public void setInt(String key, int value) {
+        getPrefs().edit().putInt(key, value).apply();
     }
 
-    //TODO: extract all those methods below to other classes
-
-    public static void saveApkData(Context context, ViewApkData apkData) {
-        setString(context, KEY_APK_DATA, gsonMapper.write(apkData, ViewApkData.class));
+    public void removePreference(String key) {
+        getPrefs().edit().remove(key).apply();
     }
 
-    @Nullable
-    public static ViewApkData getApkData(Context context) {
-        String apkDataString = getString(context, KEY_APK_DATA, null);
-        if (apkDataString == null) {
-            return null;
-        }
-        return gsonMapper.read(apkDataString, ViewApkData.class);
-    }
-
-    public static void clearApkData(Context context) {
-        getPrefs(context).edit().remove(KEY_APK_DATA).apply();
-    }
-
-    public static void insertUserPreferences(Context context,
-            @Nullable InsertablePreferences insertablePreferences) {
+    public void insertUserPreferences(@Nullable InsertablePreferences insertablePreferences) {
         if (insertablePreferences == null) {
             return;
         }
 
         String deviceIdentifier = insertablePreferences.getDeviceIdentifier();
         if (!TextUtils.isEmpty(deviceIdentifier)) {
-            Prefs.setString(context, KEY_DEVICE_IDENTIFIER, deviceIdentifier);
+            setString(KEY_DEVICE_IDENTIFIER, deviceIdentifier);
         }
 
         if (DEFAULT_VALUE_CELL_UPLOAD != insertablePreferences.isCellularDataEnabled()) {
-            Prefs.setBoolean(context, KEY_CELL_UPLOAD,
+            setBoolean(KEY_CELL_UPLOAD,
                     insertablePreferences.isCellularDataEnabled());
         }
 
         if (DEFAULT_VALUE_SCREEN_ON != insertablePreferences.isScreenOn()) {
-            Prefs.setBoolean(context, KEY_SCREEN_ON, insertablePreferences.isScreenOn());
+            setBoolean(KEY_SCREEN_ON, insertablePreferences.isScreenOn());
         }
 
         if (DEFAULT_VALUE_IMAGE_SIZE != insertablePreferences.getImageSize()) {
-            Prefs.setInt(context, KEY_MAX_IMG_SIZE, insertablePreferences.getImageSize());
+            setInt(KEY_MAX_IMG_SIZE, insertablePreferences.getImageSize());
         }
     }
 }

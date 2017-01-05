@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -38,7 +38,7 @@ import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -63,6 +63,8 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     private TextView localeTextView;
 
     private SurveyDbAdapter database;
+    private Prefs prefs;
+    private ServerManager serverManager;
 
     private LangsPreferenceData langsPrefData;
     private String[] langsSelectedNameArray;
@@ -82,6 +84,8 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         identTextView = (TextView) findViewById(R.id.identvalue);
         maxImgSizeTextView = (TextView) findViewById(R.id.max_img_size_txt);
         localeTextView = (TextView) findViewById(R.id.locale_name);
+        prefs = new Prefs(getApplicationContext());
+        serverManager = new ServerManager(getApplicationContext());
 
         Resources res = getResources();
 
@@ -119,18 +123,17 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     }
 
     private void populateFromSharedPreferences() {
-        screenOnCheckbox.setChecked(
-                Prefs.getBoolean(this, Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
+        screenOnCheckbox
+                .setChecked(prefs.getBoolean(Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
 
-        mobileDataCheckbox.setChecked(Prefs.getBoolean(this, Prefs.KEY_CELL_UPLOAD,
+        mobileDataCheckbox.setChecked(prefs.getBoolean(Prefs.KEY_CELL_UPLOAD,
                 Prefs.DEFAULT_VALUE_CELL_UPLOAD));
 
-        serverTextView.setText(StatusUtil.getServerBase(this));
+        serverTextView.setText(serverManager.getServerBase());
 
-        int maxImgSize = Prefs
-                .getInt(this, Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
+        int maxImgSize = prefs.getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
         maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
-        identTextView.setText(Prefs.getString(this, Prefs.KEY_DEVICE_IDENTIFIER,
+        identTextView.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER,
                 Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER));
     }
 
@@ -202,7 +205,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                         new StringPreferencesAuthDialogListener(this, dialogListener,
                                 R.string.serverlabel,
                                 R.string.serverlabel,
-                                StatusUtil.getServerBase(PreferencesActivity.this))
+                                serverManager.getServerBase())
                 );
                 break;
             case R.id.pref_deviceid:
@@ -220,7 +223,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                         new StringPreferencesAuthDialogListener(this, dialogListenerId,
                                 R.string.identlabel,
                                 R.string.setidentlabel,
-                                Prefs.getString(this, Prefs.KEY_DEVICE_IDENTIFIER,
+                                prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER,
                                         Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER))
                 );
                 break;
@@ -233,7 +236,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     }
 
     private void saveBackendUrl(String userInput) {
-        Prefs.setString(PreferencesActivity.this, Prefs.KEY_BACKEND_SERVER, userInput);
+        prefs.setString(Prefs.KEY_BACKEND_SERVER, userInput);
         serverTextView.setText(userInput);
     }
 
@@ -253,7 +256,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Prefs.setInt(currentValView.getContext(), settingKey, which);
+                        prefs.setInt(settingKey, which);
                         currentValView.setText(values[which]);
                         if (dialog != null) {
                             dialog.dismiss();
@@ -270,9 +273,9 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView == screenOnCheckbox) {
-            Prefs.setBoolean(this, Prefs.KEY_SCREEN_ON, isChecked);
+            prefs.setBoolean(Prefs.KEY_SCREEN_ON, isChecked);
         } else if (buttonView == mobileDataCheckbox) {
-            Prefs.setBoolean(this, Prefs.KEY_CELL_UPLOAD, isChecked);
+            prefs.setBoolean(Prefs.KEY_CELL_UPLOAD, isChecked);
         }
     }
 
@@ -292,7 +295,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
 
     private void saveNewDeviceId(String deviceId) {
         identTextView.setText(deviceId);
-        Prefs.setString(this, Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
+        prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
         // Trigger the SurveyDownload Service, in order to force
         // a backend connection with the new Device ID
         startService(new Intent(this,

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -22,6 +22,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.provider.Settings.Secure;
+import android.support.annotation.Nullable;
 import android.util.TypedValue;
 
 import java.io.File;
@@ -33,6 +34,9 @@ import java.util.UUID;
 public class PlatformUtil {
 
     /**
+     * TODO: use versionCode to compare versions as versionName field does not have to be X.Y.Z
+     * format
+     *
      * Check if a given version is newer than the current one.
      * Versions are expected to be formatted in a dot-decimal notation: X.Y.Z,
      * being X, Y, and Z integers, and each number separated by a full stop (dot).
@@ -41,7 +45,11 @@ public class PlatformUtil {
      * @param newVersion
      * @return true if the second version is newer than the first one, false otherwise
      */
-    public static boolean isNewerVersion(String installedVersion, String newVersion) {
+    public static boolean isNewerVersion(@Nullable String installedVersion,
+            @Nullable String newVersion) {
+        if (installedVersion == null || newVersion == null) {
+            return false;
+        }
         // Ensure the Strings are properly formatted
         final String regex = "^\\d+(\\.\\d+)*$";// Check dot-decimal notation
         if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {
@@ -105,5 +113,4 @@ public class PlatformUtil {
     public static String getAndroidID(Context context) {
         return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
     }
-
 }

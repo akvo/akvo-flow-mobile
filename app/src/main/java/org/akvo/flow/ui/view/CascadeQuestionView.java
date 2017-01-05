@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -48,7 +48,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CascadeQuestionView extends QuestionView implements AdapterView.OnItemSelectedListener {
+public class CascadeQuestionView extends QuestionView
+        implements AdapterView.OnItemSelectedListener {
     private static final String TAG = CascadeQuestionView.class.getSimpleName();
     private static final int POSITION_NONE = -1;// no spinner position id
 
@@ -69,13 +70,13 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     private void init() {
         setQuestionView(R.layout.cascade_question_view);
 
-        mSpinnerContainer = (LinearLayout)findViewById(R.id.cascade_content);
+        mSpinnerContainer = (LinearLayout) findViewById(R.id.cascade_content);
 
         // Load level names
         List<Level> levels = getQuestion().getLevels();
         if (levels != null) {
             mLevels = new String[levels.size()];
-            for (int i=0; i<levels.size(); i++) {
+            for (int i = 0; i < levels.size(); i++) {
                 mLevels[i] = levels.get(i).getText();
             }
         }
@@ -120,7 +121,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         long parent = ID_ROOT;
         if (updatedSpinnerIndex != POSITION_NONE) {
-            Node node = (Node)getSpinner(updatedSpinnerIndex).getSelectedItem();
+            Node node = (Node) getSpinner(updatedSpinnerIndex).getSelectedItem();
             if (node.getId() == ID_NONE) {
                 // if this is the first level, it means we've got no answer at all
                 mFinished = false;
@@ -147,8 +148,8 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View view = inflater.inflate(R.layout.cascading_level_item, mSpinnerContainer, false);
-        final TextView text = (TextView)view.findViewById(R.id.text);
-        final Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
+        final TextView text = (TextView) view.findViewById(R.id.text);
+        final Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
 
         text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
@@ -174,7 +175,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        final int index = (Integer)parent.getTag();
+        final int index = (Integer) parent.getTag();
         updateSpinners(index);
         captureResponse();
         setError(null);
@@ -204,7 +205,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         while (index < values.size()) {
             int valuePosition = POSITION_NONE;
             List<Node> spinnerValues = mDatabase.getValues(parentId);
-            for (int pos=0; pos<spinnerValues.size(); pos++) {
+            for (int pos = 0; pos < spinnerValues.size(); pos++) {
                 Node node = spinnerValues.get(pos);
                 CascadeNode v = values.get(index);
                 if (node.getName().equals(v.getName())) {
@@ -241,8 +242,8 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     @Override
     public void captureResponse(boolean suppressListeners) {
         List<CascadeNode> values = new ArrayList<>();
-        for (int i=0; i<mSpinnerContainer.getChildCount(); i++) {
-            Node node = (Node)getSpinner(i).getSelectedItem();
+        for (int i = 0; i < mSpinnerContainer.getChildCount(); i++) {
+            Node node = (Node) getSpinner(i).getSelectedItem();
             if (node.getId() != ID_NONE) {
                 CascadeNode v = new CascadeNode();
                 v.setName(node.getName());
@@ -257,7 +258,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
     }
 
     private Spinner getSpinner(int position) {
-        return (Spinner)mSpinnerContainer.getChildAt(position).findViewById(R.id.spinner);
+        return (Spinner) mSpinnerContainer.getChildAt(position).findViewById(R.id.spinner);
     }
 
     @Override
@@ -269,22 +270,22 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
         return valid;
     }
 
-    class CascadeAdapter extends ArrayAdapter<Node> {
+    private static class CascadeAdapter extends ArrayAdapter<Node> {
 
         CascadeAdapter(Context context, List<Node> objects) {
-            super(context, android.R.layout.simple_spinner_item, objects);
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            super(context, R.layout.cascade_spinner_item, R.id.cascade_spinner_item_text, objects);
+            setDropDownViewResource(R.layout.cascade_spinner_item);
         }
 
         @Override
-        public View getView (int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             setStyle(view, position);
             return view;
         }
 
         @Override
-        public View getDropDownView (int position, View convertView, ViewGroup parent) {
+        public View getDropDownView(final int position, View convertView, ViewGroup parent) {
             View view = super.getDropDownView(position, convertView, parent);
             setStyle(view, position);
             return view;
@@ -292,7 +293,7 @@ public class CascadeQuestionView extends QuestionView implements AdapterView.OnI
 
         private void setStyle(View view, int position) {
             try {
-                TextView text = (TextView)view;
+                TextView text = (TextView) view.findViewById(R.id.cascade_spinner_item_text);
                 int flags = text.getPaintFlags();
                 if (position == 0) {
                     flags |= Paint.FAKE_BOLD_TEXT_FLAG;

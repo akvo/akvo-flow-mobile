@@ -39,6 +39,7 @@ public class Prefs {
     public static final String KEY_SCREEN_ON = "screen.keepon";
     public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
+    public static final String KEY_SPACE_AVAILABLE = "cardMBAvaliable";
 
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
@@ -47,6 +48,7 @@ public class Prefs {
     public static final int DEFAULT_VALUE_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
     public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
+    public static final long DEF_VALUE_SPACE_AVAILABLE = 101L;
 
     private final Context context;
 

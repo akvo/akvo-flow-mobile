@@ -19,7 +19,6 @@ package org.akvo.flow.activity;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -146,7 +145,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         spaceLeftOnCard();
-        Log.d(TAG, "form activity");
     }
 
     /**
@@ -702,15 +700,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         // One binary megabyte equals 1 048 576 bytes.
         long megaAvailable = (long) Math.floor(sdAvailSize / 1048576.0);
 
-        //TODO: use class Prefs
         // keep track of changes
-        SharedPreferences settings = getPreferences(MODE_PRIVATE);
         // assume we had space before
-        long lastMegaAvailable = settings.getLong("cardMBAvaliable", 101L);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putLong("cardMBAvaliable", megaAvailable);
-        // Commit the edits!
-        editor.apply();
+        long lastMegaAvailable = prefs
+                .getLong(Prefs.KEY_SPACE_AVAILABLE, Prefs.DEF_VALUE_SPACE_AVAILABLE);
+        prefs.setLong(Prefs.KEY_SPACE_AVAILABLE, megaAvailable);
 
         if (megaAvailable <= 0L) {// All out, OR media not mounted
             // Bounce user

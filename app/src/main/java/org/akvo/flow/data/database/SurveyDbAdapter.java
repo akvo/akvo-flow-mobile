@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -24,7 +24,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import org.akvo.flow.R;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -36,14 +35,10 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import timber.log.Timber;
 
@@ -91,7 +86,7 @@ public class SurveyDbAdapter {
      * @throws SQLException if the database could be neither opened or created
      */
     public SurveyDbAdapter open() throws SQLException {
-        databaseHelper = new DatabaseHelper(context);
+        databaseHelper = new DatabaseHelper(context, new LanguageTable());
         database = databaseHelper.getWritableDatabase();
         return this;
     }
@@ -456,8 +451,7 @@ public class SurveyDbAdapter {
         updatedValues.put(SurveyColumns.LOCATION, survey.getLocation());
         updatedValues.put(SurveyColumns.FILENAME, survey.getFileName());
         updatedValues.put(SurveyColumns.NAME, survey.getName());
-        updatedValues.put(SurveyColumns.LANGUAGE, survey.getLanguage() != null ? survey
-                .getLanguage().toLowerCase() : ConstantUtil.ENGLISH_CODE);
+        updatedValues.put(SurveyColumns.LANGUAGE, survey.getDefaultLanguageCode());
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, surveyGroupId);
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, survey.isHelpDownloaded() ? 1 : 0);
         //updatedValues.put(SurveyColumns., ConstantUtil.NOT_DELETED);
@@ -498,20 +492,6 @@ public class SurveyDbAdapter {
         }
 
         return survey;
-    }
-
-    /**
-     * returns the value of a single setting identified by the key passed in
-     */
-    public String getPreference(String key) {
-        return databaseHelper.findPreference(database, key);
-    }
-
-    /**
-     * persists setting to the db
-     */
-    public void savePreference(String key, String value) {
-        databaseHelper.savePreference(database, key, value);
     }
 
     /**
@@ -742,70 +722,6 @@ public class SurveyDbAdapter {
                 new String[] {
                         id.toString()
                 });
-    }
-
-    private HashSet<String> stringToSet(String item) {
-        HashSet<String> set = new HashSet<>();
-        StringTokenizer strTok = new StringTokenizer(item, ",");
-        while (strTok.hasMoreTokens()) {
-            set.add(strTok.nextToken());
-        }
-        return set;
-    }
-
-    private String setToString(HashSet<String> set) {
-        boolean isFirst = true;
-        StringBuilder buffer = new StringBuilder();
-        Iterator<String> itr = set.iterator();
-
-        for (int i = 0; i < set.size(); i++) {
-            if (!isFirst) {
-                buffer.append(",");
-            } else {
-                isFirst = false;
-            }
-            buffer.append(itr.next());
-        }
-        return buffer.toString();
-    }
-
-    public void addLanguages(String[] values) {
-        // values holds the 2-letter codes of the languages. We first have to
-        // find out what the indexes are
-
-        String[] langCodesArray = context.getResources().getStringArray(
-                R.array.alllanguagecodes);
-        int[] valuesIndex = new int[values.length];
-        List<String> langCodesList = Arrays.asList(langCodesArray);
-        int index;
-        for (int i = 0; i < values.length; i++) {
-            index = langCodesList.indexOf(values[i]);
-            if (index != -1) {
-                valuesIndex[i] = index;
-            }
-        }
-
-        String langsSelection = getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
-        String langsPresentIndexes = getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
-
-        HashSet<String> langsSelectionSet = stringToSet(langsSelection);
-        HashSet<String> langsPresentIndexesSet = stringToSet(langsPresentIndexes);
-
-        for (int i = 0; i < values.length; i++) {
-            // values[0] holds the default language. That is the one that will
-            // be turned 'on'.
-            if (i == 0) {
-                langsSelectionSet.add(valuesIndex[i] + "");
-            }
-            langsPresentIndexesSet.add(valuesIndex[i] + "");
-        }
-
-        String newLangsSelection = setToString(langsSelectionSet);
-        String newLangsPresentIndexes = setToString(langsPresentIndexesSet);
-
-        savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY, newLangsSelection);
-        savePreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY,
-                newLangsPresentIndexes);
     }
 
     public void addSurveyGroup(SurveyGroup surveyGroup) {

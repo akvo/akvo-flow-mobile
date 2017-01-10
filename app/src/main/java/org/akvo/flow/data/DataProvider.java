@@ -29,6 +29,7 @@ import android.support.annotation.Nullable;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.DatabaseHelper;
+import org.akvo.flow.data.database.LanguageTable;
 import org.akvo.flow.data.database.RecordColumns;
 import org.akvo.flow.data.database.Tables;
 
@@ -53,7 +54,7 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mDatabaseHelper = new DatabaseHelper(getContext());
+        mDatabaseHelper = new DatabaseHelper(getContext(), new LanguageTable());
         return false;
     }
 

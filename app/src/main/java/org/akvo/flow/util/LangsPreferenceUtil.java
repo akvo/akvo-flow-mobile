@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -18,28 +18,11 @@ package org.akvo.flow.util;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.dao.SurveyDao;
-import org.akvo.flow.domain.AltText;
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * utility class for manipulating the preference settings that allow for
@@ -48,7 +31,6 @@ import java.util.Set;
  * @author Mark Westra
  */
 public class LangsPreferenceUtil {
-    private static final String TAG = "LANGUAGE_SERVICE";
 
     /**
      * returns an arrayList of language codes that are active.
@@ -125,86 +107,6 @@ public class LangsPreferenceUtil {
                 ArrayUtil.toPrimitiveBooleanArray(langsSelectedBooleanList),
                 ArrayUtil.toPrimitiveIntArray(langsSelectedMasterIndexList));
 
-    }
-
-    /**
-     * Find all the languages available for a given survey
-     * @param context
-     * @param survey
-     * @return an array with at least {'en'}, other languages are appended if available
-     */
-    @NonNull
-    public static String[] determineLanguages(@NonNull Context context, @NonNull Survey survey) {
-        /**
-         * Represents the survey languages we receive from the server
-         * Set of strings with language codes (ej: 'en')
-         *
-         */
-        Set<String> availableSurveyLanguages = new LinkedHashSet<>();
-
-        try {
-            InputStream in;
-            if (ConstantUtil.RESOURCE_LOCATION.equalsIgnoreCase(survey.getLocation())) {
-                in = loadFromRawResource(context, survey);
-            } else {
-                in = loadFromFile(survey);
-            }
-            Survey hydratedSurvey = SurveyDao.loadSurvey(survey, in);
-
-            appendAllLanguages(survey, availableSurveyLanguages, hydratedSurvey);
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not parse survey file", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
-        }
-        return availableSurveyLanguages.toArray(new String[availableSurveyLanguages.size()]);
-    }
-
-    private static void appendAllLanguages(@NonNull Survey survey,
-            @NonNull Set<String> availableSurveyLanguages, @Nullable Survey hydratedSurvey) {
-        if (hydratedSurvey != null) {
-            // add main language to survey object. It is used in the next
-            // section to populate the languages
-            String surveyMainLanguage = hydratedSurvey.getLanguage();
-            survey.setLanguage(surveyMainLanguage);
-            if (!TextUtils.isEmpty(surveyMainLanguage)) {
-                //start by inserting the default language in the beginning
-                availableSurveyLanguages.add(surveyMainLanguage);
-            }
-            appendQuestionGroupLanguages(availableSurveyLanguages,
-                    hydratedSurvey.getQuestionGroups());
-        }
-    }
-
-    private static void appendQuestionGroupLanguages(Set<String> availableSurveyLanguages,
-            List<QuestionGroup> questionGroups) {
-        if (questionGroups != null) {
-            int size = questionGroups.size();
-            for (int i = 0; i < size; i++) {
-                ArrayList<Question> questions = questionGroups.get(i).getQuestions();
-                if (questions != null) {
-                    for (Question question : questions) {
-                        Map<String, AltText> questionAltTextMap = question.getAltTextMap();
-                        if (questionAltTextMap != null) {
-                            availableSurveyLanguages.addAll(questionAltTextMap.keySet());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @NonNull
-    private static InputStream loadFromFile(Survey survey) throws FileNotFoundException {
-        File f = new File(FileUtil.getFilesDir(FileUtil.FileType.FORMS), survey.getFileName());
-        return new FileInputStream(f);
-    }
-
-    @NonNull
-    private static InputStream loadFromRawResource(Context context, Survey survey) {
-        Resources res = context.getResources();
-        return res.openRawResource(
-                res.getIdentifier(survey.getFileName(), ConstantUtil.RAW_RESOURCE,
-                        ConstantUtil.RESOURCE_PACKAGE));
     }
 
 }

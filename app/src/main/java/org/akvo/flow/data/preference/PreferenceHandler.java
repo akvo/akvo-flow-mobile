@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -17,7 +17,6 @@
 
 package org.akvo.flow.data.preference;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
@@ -52,23 +51,5 @@ public class PreferenceHandler {
             cursor.close();
         }
         return value;
-    }
-
-    /**
-     * persists setting to the db
-     */
-    public void savePreference(SQLiteDatabase db, String key, String value) {
-        ContentValues updatedValues = new ContentValues();
-        updatedValues.put(PreferencesColumns.VALUE, value);
-        int updated = db.update(Tables.PREFERENCES, updatedValues,
-                PreferencesColumns.KEY
-                        + " = ?",
-                new String[] {
-                        key
-                });
-        if (updated <= 0) {
-            updatedValues.put(PreferencesColumns.KEY, key);
-            db.insert(Tables.PREFERENCES, null, updatedValues);
-        }
     }
 }

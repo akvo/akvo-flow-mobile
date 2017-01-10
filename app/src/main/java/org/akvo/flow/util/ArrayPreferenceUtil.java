@@ -54,30 +54,4 @@ public class ArrayPreferenceUtil {
         return new ArrayPreferenceData(stringArray, selectedItems);
     }
 
-    /**
-     * uses the values in the two arrays passed in to form a comma delimited
-     * list of the items that are selected.
-     * 
-     * @param values
-     * @param selected
-     * @return
-     */
-    public static String formSelectedItemString(String[] values,
-            boolean[] selected) {
-        boolean isFirst = true;
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < selected.length; i++) {
-            if (selected[i]) {
-                if (!isFirst) {
-                    buffer.append(",");
-
-                } else {
-                    isFirst = false;
-                }
-                buffer.append(values[i]);
-            }
-        }
-        return buffer.toString();
-    }
-
 }

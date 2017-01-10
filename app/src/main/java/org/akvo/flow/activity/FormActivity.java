@@ -17,6 +17,7 @@
 package org.akvo.flow.activity;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -33,10 +35,12 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.SurveyLanguagesDataSource;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.SurveyLanguagesDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
@@ -64,6 +68,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
@@ -98,11 +105,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
     private SurveyDbAdapter mDatabase;
+    private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
 
     private String[] mLanguages;
 
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
+    private String surveyId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +119,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         setContentView(R.layout.form_activity);
 
         // Read all the params. Note that the survey instance id is now mandatory
-        final String surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
+        surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
         mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
         mSurveyInstanceId = getIntent().getLongExtra(ConstantUtil.RESPONDENT_ID_KEY, 0);
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
@@ -119,10 +128,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mQuestionResponses = new HashMap<>();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
+
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(getApplicationContext());
+
         prefs = new Prefs(getApplicationContext());
 
-        loadSurvey(
-                surveyId);// Load Survey. This task would be better off if executed in a worker thread
+        //TODO: move all loading to worker thread
+        loadSurvey(surveyId);
         loadLanguages();
 
         if (mSurvey == null) {
@@ -387,7 +399,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void clearSurvey() {
-        ViewUtil.showConfirmDialog(R.string.cleartitle, R.string.cleardesc, this, true,
+        showConfirmDialog(R.string.cleartitle, R.string.cleardesc, this, true,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -409,23 +421,155 @@ public class FormActivity extends BackActivity implements SurveyListener,
         final int[] langsSelectedMasterIndexArray = langsPrefData
                 .getLangsSelectedMasterIndexArray();
 
-        ViewUtil.displayLanguageSelector(this, langsSelectedNameArray,
-                langsSelectedBooleanArray,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int clicked) {
-                        if (dialog != null) {
-                            dialog.dismiss();
+//        final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int clicked) {
+//                if (dialog != null) {
+//                    dialog.dismiss();
+//                }
+//
+//                mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
+//                        LangsPreferenceUtil.formLangPreferenceString(
+//                                langsSelectedBooleanArray,
+//                                langsSelectedMasterIndexArray));
+//
+//                //TODO: use loader
+//                loadLanguages();
+//                mAdapter.notifyOptionsChanged();
+//            }
+//        };
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.surveylanglabel)
+                .setMultiChoiceItems(langsSelectedNameArray, langsSelectedBooleanArray,
+                        new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                    int which, boolean isChecked) {
+                                switch (which) {
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        break;
+                                }
+                            }
+                        })
+                .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        boolean isValid = false;
+                        if (true) {
+                            for (int i = 0; i < langsSelectedBooleanArray.length; i++) {
+                                if (langsSelectedBooleanArray[i]) {
+                                    isValid = true;
+                                    break;
+                                }
+                            }
+                        } else {
+                            isValid = true;
                         }
+                        if (isValid) {
+                            if (dialog != null) {
+                                dialog.dismiss();
+                            }
 
-                        mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
-                                LangsPreferenceUtil.formLangPreferenceString(
-                                        langsSelectedBooleanArray,
-                                        langsSelectedMasterIndexArray));
+//                            mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
+//                                    LangsPreferenceUtil.formLangPreferenceString(
+//                                            langsSelectedBooleanArray,
+//                                            langsSelectedMasterIndexArray));
 
-                        loadLanguages();
-                        mAdapter.notifyOptionsChanged();
+                            //TODO: save
+
+                            //TODO: use loader
+                            loadLanguages();
+                            mAdapter.notifyOptionsChanged();
+                        } else {
+                            ViewUtil.showConfirmDialog(R.string.langmandatorytitle,
+                                    R.string.langmandatorytext, FormActivity.this, false,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(
+                                                DialogInterface dialog,
+                                                int which) {
+                                            if (dialog != null) {
+                                                dialog.dismiss();
+                                            }
+//                                            displayLanguageSelectionDialog(FormActivity.this,
+//                                                    langsSelectedBooleanArray, listener,
+//                                                    R.string.surveylanglabel,
+//                                                    langsSelectedNameArray,
+//                                                    true,
+//                                                    R.string.langmandatorytitle,
+//                                                    R.string.langmandatorytext);
+                                        }
+                                    });
+                        }
                     }
-                });
+                }).create();
+        alertDialog.show();
+    }
+
+    /**
+     * displays a dialog box for allowing selection of countries from a list
+     */
+    private void displayLanguageSelectionDialog(final Context context,
+            final boolean[] selections,
+            final DialogInterface.OnClickListener listener,
+            final int labelResourceId, final CharSequence[] languages,
+            final boolean selectionMandatory,
+            final int mandatoryTitleResourceId,
+            final int mandatoryTextResourceId) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context)
+                .setTitle(labelResourceId)
+                .setMultiChoiceItems(languages, selections,
+                        new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                    int which, boolean isChecked) {
+                                switch (which) {
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        break;
+                                }
+                            }
+                        })
+                .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        boolean isValid = false;
+                        if (selectionMandatory) {
+                            for (int i = 0; i < selections.length; i++) {
+                                if (selections[i]) {
+                                    isValid = true;
+                                    break;
+                                }
+                            }
+                        } else {
+                            isValid = true;
+                        }
+                        if (isValid) {
+                            listener.onClick(dialog, which);
+                        } else {
+                            ViewUtil.showConfirmDialog(mandatoryTitleResourceId,
+                                    mandatoryTextResourceId, context, false,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(
+                                                DialogInterface dialog,
+                                                int which) {
+                                            if (dialog != null) {
+                                                dialog.dismiss();
+                                            }
+                                            displayLanguageSelectionDialog(context,
+                                                    selections, listener,
+                                                    labelResourceId,
+                                                    languages,
+                                                    selectionMandatory,
+                                                    mandatoryTitleResourceId,
+                                                    mandatoryTextResourceId);
+                                        }
+                                    });
+                        }
+                    }
+                }).create();
+        alertDialog.show();
     }
 
     @Override
@@ -480,23 +624,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mRequestQuestionId = null;// Reset the tmp reference
     }
 
+    @NonNull
     private String getDefaultLang() {
-        String lang = mSurvey.getLanguage();
-        if (TextUtils.isEmpty(lang)) {
-            lang = ConstantUtil.ENGLISH_CODE;
-        }
-        return lang;
+        //TODO: check if survey is null?
+        return mSurvey.getDefaultLanguageCode();
     }
 
     private void loadLanguages() {
-        String langsSelection = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY);
-        String langsPresentIndexes = mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
-        LangsPreferenceData langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
-                langsSelection, langsPresentIndexes);
-        mLanguages = LangsPreferenceUtil.getSelectedLangCodes(this,
-                langsPrefData.getLangsSelectedMasterIndexArray(),
-                langsPrefData.getLangsSelectedBooleanArray(),
-                R.array.alllanguagecodes);
+        Set<String> languagePreferences = surveyLanguagesDataSource
+                .getLanguagePreferences(surveyId);
+        mLanguages = languagePreferences.toArray(new String[languagePreferences.size()]);
     }
 
     @Override
@@ -535,7 +672,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
         sendBroadcast(i);
 
-        ViewUtil.showConfirmDialog(R.string.submitcompletetitle, R.string.submitcompletetext,
+        showConfirmDialog(R.string.submitcompletetitle, R.string.submitcompletetext,
                 this, false,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -708,7 +845,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         if (megaAvailable <= 0L) {// All out, OR media not mounted
             // Bounce user
-            ViewUtil.showConfirmDialog(R.string.nocardspacetitle,
+            showConfirmDialog(R.string.nocardspacetitle,
                     R.string.nocardspacedialog, this, false,
                     new DialogInterface.OnClickListener() {
                         @Override
@@ -730,7 +867,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     // display how much space is left
                     String s = getResources().getString(R.string.lowcardspacedialog);
                     s = s.replace("%%%", Long.toString(megaAvailable));
-                    ViewUtil.showConfirmDialog(
+                    showConfirmDialog(
                             R.string.lowcardspacetitle,
                             s,
                             this,

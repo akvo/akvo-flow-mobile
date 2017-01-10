@@ -96,10 +96,12 @@ public class CascadeDB {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            //EMPTY
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            //EMPTY
         }
 
     }

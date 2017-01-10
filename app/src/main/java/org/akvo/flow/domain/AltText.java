@@ -22,6 +22,10 @@ package org.akvo.flow.domain;
  * @author Christopher Fagiani
  */
 public class AltText {
+
+    /**
+     * Language code
+     */
     private String language;
     private String type;
     private String text;

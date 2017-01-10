@@ -20,7 +20,6 @@ package org.akvo.flow.data.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.Nullable;
 
 import org.akvo.flow.data.preference.InsertablePreferences;
 import org.akvo.flow.data.preference.MigratablePreferences;
@@ -28,7 +27,6 @@ import org.akvo.flow.data.preference.PreferenceExtractor;
 import org.akvo.flow.data.preference.PreferenceHandler;
 import org.akvo.flow.data.preference.PreferenceMapper;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConstantUtil;
 
 import java.lang.ref.WeakReference;
 
@@ -49,25 +47,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int VER_FORM_VERSION = 81;
     private static final int VER_CADDISFLY_QN = 82;
     private static final int VER_PREFERENCES_MIGRATE = 83;
-    private static final int DATABASE_VERSION = VER_PREFERENCES_MIGRATE;
-
-    /**
-     * Default values for languages
-     */
-    private static final String[] DEFAULT_INSERTS = new String[] {
-            "INSERT INTO preferences VALUES('"+ ConstantUtil.SURVEY_LANG_SETTING_KEY+"','')",
-            "INSERT INTO preferences VALUES('"+ ConstantUtil.SURVEY_LANG_PRESENT_KEY+"','')",
-    };
+    private static final int VER_LANGUAGES_MIGRATE = 84;
+    private static final int DATABASE_VERSION = VER_LANGUAGES_MIGRATE;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
     private final PreferenceHandler preferenceHandler = new PreferenceHandler();
     private WeakReference<Context> contextWeakReference;
+    private final LanguageTable languageTable;
 
-    public DatabaseHelper(Context context) {
+    public DatabaseHelper(Context context, LanguageTable languageTable) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.contextWeakReference = new WeakReference<>(context);
+        this.languageTable = languageTable;
     }
 
     @Override
@@ -155,11 +148,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
                 + SyncTimeColumns.TIME + " TEXT,"
                 + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
-
+        languageTable.onCreate(db);
         createIndexes(db);
-        for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
-            db.execSQL(DEFAULT_INSERTS[i]);
-        }
     }
 
     @Override
@@ -202,8 +192,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
-
+            languageTable.dropTable(db);
             onCreate(db);
+        } else if (oldVersion < VER_LANGUAGES_MIGRATE) {
+            //add new languages table
+            languageTable.onCreate(db);
         }
     }
 
@@ -259,20 +252,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "(" + SurveyInstanceColumns.STATUS + ")");
         db.execSQL("CREATE INDEX response_modified_idx ON " + Tables.SURVEY_INSTANCE
                 + "(" + SurveyInstanceColumns.SUBMITTED_DATE + ")");
-    }
-
-    /**
-     * returns the value of a single setting identified by the key passed in
-     */
-    @Nullable
-    public String findPreference(SQLiteDatabase db, String key) {
-        return preferenceHandler.findPreference(db, key);
-    }
-
-    /**
-     * persists setting to the db
-     */
-    public void savePreference(SQLiteDatabase db, String key, String value) {
-        preferenceHandler.savePreference(db, key, value);
     }
 }

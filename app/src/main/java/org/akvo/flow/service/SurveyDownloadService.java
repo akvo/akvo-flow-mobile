@@ -40,7 +40,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.NotificationHelper;
 
 import java.io.File;
@@ -159,8 +158,6 @@ public class SurveyDownloadService extends IntentService {
                 try {
                     downloadSurvey(survey);
                     databaseAdaptor.saveSurvey(survey);
-                    String[] langs = LangsPreferenceUtil.determineLanguages(this, survey);
-                    databaseAdaptor.addLanguages(langs);
                     downloadResources(survey);
                     synced++;
                 } catch (IOException e) {

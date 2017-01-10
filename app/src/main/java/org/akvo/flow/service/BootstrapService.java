@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -24,6 +24,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+
+import org.akvo.flow.R;
+import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.NotificationHelper;
+import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.ViewUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,18 +49,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import org.akvo.flow.R;
-import org.akvo.flow.data.dao.SurveyDao;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.ViewUtil;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -273,8 +274,6 @@ public class BootstrapService extends IntentService {
     private void updateSurveyStorage(@NonNull Survey survey) {
         databaseAdapter.addSurveyGroup(survey.getSurveyGroup());
         databaseAdapter.saveSurvey(survey);
-        String[] languages = LangsPreferenceUtil.determineLanguages(this, survey);
-        databaseAdapter.addLanguages(languages);
     }
 
     @NonNull

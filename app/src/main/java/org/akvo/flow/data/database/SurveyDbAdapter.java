@@ -25,7 +25,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.preference.PreferenceHandler;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -506,29 +505,6 @@ public class SurveyDbAdapter {
      */
     public String getPreference(String key) {
         return databaseHelper.findPreference(database, key);
-    }
-
-    /**
-     * Lists all settings from the database
-     * TODO: move to {@link PreferenceHandler}
-     */
-    public HashMap<String, String> getPreferences() {
-        HashMap<String, String> settings = new HashMap<>();
-        Cursor cursor = database.query(Tables.PREFERENCES, new String[] {
-                PreferencesColumns.KEY, PreferencesColumns.VALUE
-        }, null, null, null, null, null);
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                do {
-                    settings.put(cursor.getString(cursor
-                            .getColumnIndexOrThrow(PreferencesColumns.KEY)), cursor
-                            .getString(cursor.getColumnIndexOrThrow(PreferencesColumns.VALUE)));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return settings;
     }
 
     /**

@@ -115,4 +115,6 @@ dependencies {
 
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestCompile 'com.nanohttpd:nanohttpd:2.2.0'
+    androidTestCompile 'com.android.support.test:rules:0.5'
 }

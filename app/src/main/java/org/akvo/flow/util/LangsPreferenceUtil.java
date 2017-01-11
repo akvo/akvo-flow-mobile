@@ -16,6 +16,14 @@
 
 package org.akvo.flow.util;
 
+import android.content.Context;
+import android.content.res.Resources;
+
+import org.akvo.flow.R;
+import org.akvo.flow.dao.SurveyDao;
+import org.akvo.flow.domain.Question;
+import org.akvo.flow.domain.Survey;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,15 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-
-import android.content.Context;
-import android.content.res.Resources;
-import android.util.Log;
+import timber.log.Timber;
 
 /**
  * utility class for manipulating the preference settings that allow for
@@ -167,8 +167,7 @@ public class LangsPreferenceUtil {
                 }
             }
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not parse survey survey file", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, "Could not parse survey survey file");
         }
         // put everything in an array, with the default language in the first
         // position.

@@ -19,7 +19,6 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.graphics.Paint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.CascadeNode;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
@@ -47,10 +45,11 @@ import org.akvo.flow.util.FileUtil.FileType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import timber.log.Timber;
 
 public class CascadeQuestionView extends QuestionView
         implements AdapterView.OnItemSelectedListener {
-    private static final String TAG = CascadeQuestionView.class.getSimpleName();
+
     private static final int POSITION_NONE = -1;// no spinner position id
 
     private static final long ID_NONE = -1;// no node id
@@ -233,8 +232,7 @@ public class CascadeQuestionView extends QuestionView
         updateSpinners(POSITION_NONE);
         if (mDatabase == null) {
             String error = "Cannot load cascade resource: " + getQuestion().getSrc();
-            Log.e(TAG, error);
-            PersistentUncaughtExceptionHandler.recordException(new IllegalStateException(error));
+            Timber.e(new IllegalStateException(error), error);
             setError(error);
         }
     }
@@ -302,7 +300,7 @@ public class CascadeQuestionView extends QuestionView
                 }
                 text.setPaintFlags(flags);
             } catch (ClassCastException e) {
-                Log.e("CascadeAdapter", "View cannot be casted to TextView!");
+                Timber.e("View cannot be casted to TextView!");
             }
         }
     }

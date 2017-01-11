@@ -16,20 +16,18 @@
 
 package org.akvo.flow.serialization.response;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.util.ConstantUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.util.ConstantUtil;
+import timber.log.Timber;
 
 public class QuestionResponseParser {
-    private static final String TAG = QuestionResponseParser.class.getSimpleName();
 
     public QuestionResponse parse(JSONObject jSurveyedLocale) {
         try {
@@ -38,7 +36,7 @@ public class QuestionResponseParser {
             
             return new QuestionResponse(val, ConstantUtil.VALUE_RESPONSE_TYPE, questionId);
         } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
             return null;
         }
     }
@@ -54,7 +52,7 @@ public class QuestionResponseParser {
                 }
             }
         } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
         
         return responses;

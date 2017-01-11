@@ -1,6 +1,21 @@
-package org.akvo.flow.serialization.response.value;
+/*
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *
+ * This file is part of Akvo FLOW.
+ *
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ * either version 3 of the License or any later version.
+ *
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
+ *
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
+ */
 
-import android.util.Log;
+package org.akvo.flow.serialization.response.value;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,15 +26,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class CascadeValue {
-    private static final String TAG = CascadeValue.class.getSimpleName();
 
     public static String serialize(List<CascadeNode> values) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(values);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
         return "";
     }
@@ -29,7 +45,7 @@ public class CascadeValue {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(data, new TypeReference<List<CascadeNode>>(){});
         } catch (IOException e) {
-            Log.e(TAG, "Value is not a valid JSON response: " + data);
+            Timber.e("Value is not a valid JSON response: " + data);
         }
 
         // Default to old format

@@ -21,7 +21,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -34,12 +33,15 @@ import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
+import org.akvo.flow.util.logging.LoggingFactory;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.Locale;
 
+import timber.log.Timber;
+
 public class FlowApp extends Application {
-    private static final String TAG = FlowApp.class.getSimpleName();
     private static FlowApp app;// Singleton
 
     private Locale mLocale;
@@ -47,10 +49,13 @@ public class FlowApp extends Application {
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
 
+    private final LoggingFactory loggingFactory = new LoggingFactory();
+
     @Override
     public void onCreate() {
         super.onCreate();
         prefs = new Prefs(getApplicationContext());
+        initLogging();
         init();
         startUpdateService();
         app = this;
@@ -58,6 +63,12 @@ public class FlowApp extends Application {
 
     private void startUpdateService() {
         ApkUpdateService.scheduleRepeat(this);
+    }
+
+    private void initLogging() {
+        LoggingHelper helper = loggingFactory.createLoggingHelper(this);
+        helper.initDebugTree();
+        helper.initSentry();
     }
 
     public static FlowApp getApp() {
@@ -186,7 +197,7 @@ public class FlowApp extends Application {
             database.open();
             language = database.getPreference(ConstantUtil.PREF_LOCALE);
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         } finally {
             database.close();
         }
@@ -200,7 +211,7 @@ public class FlowApp extends Application {
             database.open();
             database.savePreference(ConstantUtil.PREF_LOCALE, language);
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         } finally {
             database.close();
         }
@@ -212,7 +223,7 @@ public class FlowApp extends Application {
      * any language stored in the device has properly set its languages in the
      * database, making them available to the user through the settings menu.
      */
-    private Runnable mSurveyChecker = new Runnable() {
+    private final Runnable mSurveyChecker = new Runnable() {
 
         @Override
         public void run() {
@@ -222,7 +233,7 @@ public class FlowApp extends Application {
             // We check for the key not present in old devices: 'survey.languagespresent'
             // NOTE: 'survey.language' DID exist
             if (database.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY) == null) {
-                Log.d(TAG, "Recomputing available languages...");
+                Timber.d("Recomputing available languages...");
                 Toast.makeText(getApplicationContext(), R.string.configuring_languages, Toast.LENGTH_SHORT)
                         .show();
 
@@ -234,7 +245,7 @@ public class FlowApp extends Application {
                 // Recompute all the surveys, and store their languages
                 for (Survey survey : database.getSurveyList(SurveyGroup.ID_NONE)) {
                     String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
-                    Log.d(TAG, "Adding languages: " + langs.toString());
+                    Timber.d("Adding languages: " + Arrays.toString(langs));
                     database.addLanguages(langs);
                 }
             }

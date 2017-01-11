@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
@@ -58,9 +57,9 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public class FlowApi {
+import timber.log.Timber;
 
-    private static final String TAG = FlowApi.class.getSimpleName();
+public class FlowApi {
 
     //These values never change
     private static final String API_KEY;
@@ -96,7 +95,7 @@ public class FlowApi {
                 json = new JSONObject(response);
                 time = json.getString("time");
             } catch (JSONException e1) {
-                Log.e(TAG, "Error fetching time: ", e1);
+                Timber.e(e1, "Error fetching time");
             }
         }
         return time;
@@ -193,10 +192,10 @@ public class FlowApi {
             HttpUtil.httpGet(url);
             return HttpURLConnection.HTTP_OK;
         } catch (HttpException e) {
-            Log.e(TAG, e.getStatus() + " response for formId: " + formId);
+            Timber.e(e.getStatus() + " response for formId: " + formId);
             return e.getStatus();
         } catch (Exception e) {
-            Log.e(TAG, "GAE sync notification failed for file: " + fileName);
+            Timber.e("GAE sync notification failed for file: " + fileName);
             return ERROR_UNKNOWN;
         }
     }
@@ -262,7 +261,7 @@ public class FlowApi {
         try {
             return URLEncoder.encode(param, CHARSET_UTF8);
         } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
             return "";
         }
     }
@@ -285,7 +284,7 @@ public class FlowApi {
 
             authorization = Base64.encodeToString(rawHmac, Base64.DEFAULT);
         } catch (@NonNull NoSuchAlgorithmException | InvalidKeyException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
         return authorization;
@@ -298,7 +297,7 @@ public class FlowApi {
         try {
             return URLEncoder.encode(dateFormat.format(new Date()), CHARSET_UTF8);
         } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
             return null;
         }
     }

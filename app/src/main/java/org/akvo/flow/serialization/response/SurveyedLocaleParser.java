@@ -16,12 +16,9 @@
 
 package org.akvo.flow.serialization.response;
 
-import android.util.Log;
-
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.response.SurveyedLocalesResponse;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,8 +26,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class SurveyedLocaleParser {
-    private static final String TAG = SurveyedLocaleParser.class.getSimpleName();
 
     public SurveyedLocalesResponse parseResponse(String response) {
         final List<SurveyedLocale> surveyedLocales = new ArrayList<SurveyedLocale>();
@@ -46,8 +44,7 @@ public class SurveyedLocaleParser {
         } catch (JSONException e) {
             // Something went wrong in the parsing. We consider this invalid data,
             // and will stop the sync, to avoid storing corrupted data.
-            PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage(), e);
+            Timber.e(e, e.getMessage());
             error = "Invalid JSON response";
         }
 

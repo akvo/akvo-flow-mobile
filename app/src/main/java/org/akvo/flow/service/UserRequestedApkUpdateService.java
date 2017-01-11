@@ -20,15 +20,15 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
+
+import timber.log.Timber;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -59,7 +59,6 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         checkUpdates();
     }
 
@@ -84,8 +83,7 @@ public class UserRequestedApkUpdateService extends IntentService {
                                                  getApplicationContext());
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error checking updates", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, "Error checking updates");
             ViewUtil.displayToastFromService(getString(R.string.apk_update_service_error_update), uiHandler,
                                              getApplicationContext());
         }

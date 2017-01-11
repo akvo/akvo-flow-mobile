@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -32,8 +31,9 @@ import org.akvo.flow.R;
 import org.akvo.flow.async.loader.StatsLoader;
 import org.akvo.flow.dao.SurveyDbAdapter;
 
+import timber.log.Timber;
+
 public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<StatsLoader.Stats> {
-    private static final String TAG = StatsDialogFragment.class.getSimpleName();
 
     private long mSurveyGroupId;
     private SurveyDbAdapter mDatabase;
@@ -105,7 +105,7 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     @Override
     public void onLoadFinished(Loader<StatsLoader.Stats> loader, StatsLoader.Stats stats) {
         if (stats == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
+            Timber.w("onFinished() - Loader returned no data");
             return;
         }
         mTotalView.setText(String.valueOf(stats.mTotal));

@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -37,6 +36,8 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.text.DecimalFormat;
+
+import timber.log.Timber;
 
 /**
  * Question that can handle geographic location input. This question can also
@@ -126,7 +127,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
                     + (int) ((Math.abs(lon) * 10000d)));
             return Long.toString(code, 36);
         } catch (NumberFormatException e) {
-            Log.e("GeoQuestionView", "Code cannot be generated: " + e.getMessage());
+            Timber.e("Code cannot be generated: " + e.getMessage());
             return "";
         }
     }

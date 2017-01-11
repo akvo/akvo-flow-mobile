@@ -18,7 +18,6 @@ package org.akvo.flow.service;
 
 import android.content.Context;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
@@ -32,6 +31,8 @@ import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
+
+import timber.log.Timber;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -68,7 +69,7 @@ public class ApkUpdateService extends GcmTaskService {
                     .setRequiresCharging(false).build();
             GcmNetworkManager.getInstance(context).schedule(periodic);
         } catch (Exception e) {
-            Log.e(TAG, "scheduleRepeat failed", e);
+            Timber.e(e, "scheduleRepeat failed");
         }
     }
 
@@ -97,7 +98,7 @@ public class ApkUpdateService extends GcmTaskService {
     @Override
     public int onRunTask(TaskParams taskParams) {
         if (!StatusUtil.isConnectionAllowed(this)) {
-            Log.d(TAG, "No available authorised connection. Can't perform the requested operation");
+            Timber.d("No available authorised connection. Can't perform the requested operation");
             return GcmNetworkManager.RESULT_SUCCESS;
         }
 
@@ -110,7 +111,7 @@ public class ApkUpdateService extends GcmTaskService {
             }
             return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {
-            Log.e(TAG, "Error with apk version service", e);
+            Timber.e(e, "Error with apk version service");
             return GcmNetworkManager.RESULT_FAILURE;
         }
     }

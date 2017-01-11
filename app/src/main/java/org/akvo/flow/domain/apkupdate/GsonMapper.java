@@ -17,8 +17,6 @@
 
 package org.akvo.flow.domain.apkupdate;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -27,6 +25,8 @@ import com.google.gson.JsonSyntaxException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+
+import timber.log.Timber;
 
 public class GsonMapper {
 
@@ -42,7 +42,7 @@ public class GsonMapper {
         try {
             return this.mapper.fromJson(content, type);
         } catch (JsonSyntaxException e) {
-            Log.e(TAG, "Error mapping json to class '" + type + "' with contents: '" + content + "'", e);
+            Timber.e(e, "Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
         }
     }
@@ -51,7 +51,7 @@ public class GsonMapper {
         try {
             return this.mapper.fromJson(content, type);
         } catch (JsonSyntaxException e) {
-            Log.e(TAG, "Error mapping json to class '" + type + "' with contents: '" + content + "'", e);
+            Timber.e(e, "Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
         }
     }
@@ -60,7 +60,7 @@ public class GsonMapper {
         try {
             return this.mapper.fromJson(new InputStreamReader(content), type);
         } catch (JsonIOException | JsonSyntaxException e) {
-            Log.e(TAG, "Error mapping json to class '" + type + "' with contents: '" + content + "'", e);
+            Timber.e(e, "Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
         }
     }
@@ -69,7 +69,7 @@ public class GsonMapper {
         try {
             return this.mapper.toJson(content, type);
         } catch (JsonIOException | JsonSyntaxException e) {
-            Log.e(TAG, "Error mapping class '" + type + "' to json with contents: '" + content + "'", e);
+            Timber.e(e, "Error mapping class '" + type + "' to json with contents: '" + content + "'");
             throw e;
         }
     }

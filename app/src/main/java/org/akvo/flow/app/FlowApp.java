@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -57,7 +57,7 @@ public class FlowApp extends Application {
     }
 
     private void startUpdateService() {
-        ApkUpdateService.scheduleRepeat(this);
+        ApkUpdateService.scheduleFirstTask(this);
     }
 
     public static FlowApp getApp() {

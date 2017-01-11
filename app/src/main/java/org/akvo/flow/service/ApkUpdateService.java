@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
 *
 * This file is part of Akvo FLOW.
 *
@@ -55,14 +55,14 @@ public class ApkUpdateService extends GcmTaskService {
     }
 
     private static void schedulePeriodicTask(Context context, int repeatIntervalInSeconds,
-            int flexInSeconds) {
+            int flexIntervalInSeconds) {
         try {
             PeriodicTask periodic = new PeriodicTask.Builder()
                     .setService(ApkUpdateService.class)
                     //repeat every x seconds
                     .setPeriod(repeatIntervalInSeconds)
                     //specify how much earlier the task can be executed (in seconds)
-                    .setFlex(flexInSeconds)
+                    .setFlex(flexIntervalInSeconds)
                     .setTag(TAG)
                     //whether the task persists after device reboot
                     .setPersisted(true)

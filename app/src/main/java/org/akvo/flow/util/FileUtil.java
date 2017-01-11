@@ -22,7 +22,6 @@ import android.media.ExifInterface;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
@@ -45,13 +44,14 @@ import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import timber.log.Timber;
+
 /**
  * utility for manipulating files
  *
  * @author Christopher Fagiani
  */
 public class FileUtil {
-    private static final String TAG = FileUtil.class.getSimpleName();
 
     // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
     private static final String DIR_DATA = "akvoflow/data/files"; // form responses zip files
@@ -255,7 +255,7 @@ public class FileUtil {
 
             return md.digest();
         } catch (NoSuchAlgorithmException | IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         } finally {
             close(in);
         }
@@ -300,11 +300,11 @@ public class FileUtil {
             if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime1)) {
                 equals = datetime1.equals(datetime2);
             } else {
-                Log.d(TAG, "Datetime is null or empty. The MD5 checksum will be compared");
+                Timber.d("Datetime is null or empty. The MD5 checksum will be compared");
                 equals = compareFilesChecksum(image1, image2);
             }
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
         return equals;
@@ -361,9 +361,9 @@ public class FileUtil {
                         });
 
                 if (result == 1) {
-                    Log.i(TAG, "Duplicated file successfully removed: " + lastImagePath);
+                    Timber.i("Duplicated file successfully removed: " + lastImagePath);
                 } else {
-                    Log.e(TAG, "Error removing duplicated image:" + lastImagePath);
+                    Timber.e("Error removing duplicated image:" + lastImagePath);
                 }
             }
         }
@@ -422,7 +422,7 @@ public class FileUtil {
         try {
             closeable.close();
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
     }
 

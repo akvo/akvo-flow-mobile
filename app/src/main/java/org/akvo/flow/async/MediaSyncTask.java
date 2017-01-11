@@ -29,6 +29,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import timber.log.Timber;
+
 /**
  * Download media files (images, videos) from synced forms.
  */
@@ -70,7 +72,7 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
             s3.get(ConstantUtil.S3_IMAGE_DIR + mFile.getName(), mFile);
             return true;
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
             if (mFile.exists()) {
                 mFile.delete();
             }

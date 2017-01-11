@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
@@ -34,7 +33,6 @@ import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
@@ -97,7 +95,6 @@ public class SurveyDownloadService extends IntentService {
             }
         } catch (Exception e) {
             Timber.e(e, e.getMessage());
-            PersistentUncaughtExceptionHandler.recordException(e);
         } finally {
             databaseAdaptor.close();
             sendBroadcastNotification(this);
@@ -119,11 +116,6 @@ public class SurveyDownloadService extends IntentService {
         } else {
             checkAndDownload(new String[] { surveyId });
         }
-    }
-
-    public void onCreate() {
-        super.onCreate();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**
@@ -165,7 +157,7 @@ public class SurveyDownloadService extends IntentService {
                     synced++;
                 } catch (IOException e) {
                     failed++;
-                    Log.e(TAG, "Error downloading survey: " + survey.getId(), e);
+                    Timber.e(e, "Error downloading survey: " + survey.getId());
                     displayErrorNotification(ConstantUtil.NOTIFICATION_FORM_ERROR,
                             getString(R.string.error_form_download));
                 }
@@ -211,7 +203,7 @@ public class SurveyDownloadService extends IntentService {
 
         // Compressed file is not needed any more
         if (!file.delete()) {
-            Log.e(TAG, "Could not delete survey zip file: " + filename);
+            Timber.e("Could not delete survey zip file: " + filename);
         }
 
         survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
@@ -236,8 +228,7 @@ public class SurveyDownloadService extends IntentService {
             }
             hydratedDurvey = SurveyDao.loadSurvey(survey, in);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not parse survey survey file", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, "Could not parse survey survey file");
         } finally {
             FileUtil.close(in);
         }
@@ -281,7 +272,7 @@ public class SurveyDownloadService extends IntentService {
         databaseAdaptor.markSurveyHelpDownloaded(sid, false);
         boolean ok = true;
         for (String resource : resources) {
-            Log.i(TAG, "Downloading resource: " + resource);
+            Timber.i("Downloading resource: " + resource);
             try {
                 // Handle both absolute URL (media help files) and S3 object IDs (survey resources)
                 // Naive check to determine whether or not this is an absolute filename
@@ -296,7 +287,7 @@ public class SurveyDownloadService extends IntentService {
                 // more resource types, this message should be accordingly customized.
                 displayErrorNotification(ConstantUtil.NOTIFICATION_RESOURCE_ERROR,
                         getString(R.string.error_missing_cascade));
-                Log.e(TAG, "Could not download resource " + resource + " for survey " + sid, e);
+                Timber.e(e, "Could not download resource " + resource + " for survey " + sid);
             }
         }
         // Mark help (survey resources) as downloaded if ALL files succeeded.
@@ -315,7 +306,7 @@ public class SurveyDownloadService extends IntentService {
         s3.syncFile(objectKey, file);
         FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
         if (!file.delete()) {
-            Log.e(TAG, "Error deleting resource zip file");
+            Timber.e("Error deleting resource zip file");
         }
     }
 
@@ -340,9 +331,8 @@ public class SurveyDownloadService extends IntentService {
                 surveys.addAll(flowApi.getSurveyHeader(id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
-                    PersistentUncaughtExceptionHandler.recordException(e);
+                    Timber.e(e, e.getMessage());
                 }
-                Log.e(TAG, e.getMessage());
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         getString(R.string.error_form_header, id));
             }
@@ -364,11 +354,10 @@ public class SurveyDownloadService extends IntentService {
             surveys = api.getSurveys();
         } catch (@NonNull IllegalArgumentException | IOException e) {
             if (e instanceof IllegalArgumentException) {
-                PersistentUncaughtExceptionHandler.recordException(e);
+                Timber.e(e, e.getMessage());
             }
             displayErrorNotification(ConstantUtil.NOTIFICATION_ASSIGNMENT_ERROR,
                     getString(R.string.error_assignment_read));
-            Log.e(TAG, e.getMessage());
         }
         return surveys;
     }

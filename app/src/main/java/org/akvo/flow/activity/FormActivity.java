@@ -28,7 +28,6 @@ import android.os.StatFs;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -66,9 +65,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
-    private static final String TAG = FormActivity.class.getSimpleName();
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
@@ -127,7 +127,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         loadLanguages();
 
         if (mSurvey == null) {
-            Log.e(TAG, "mSurvey is null. Finishing the Activity...");
+            Timber.e("mSurvey is null. Finishing the Activity...");
             finish();
         }
 
@@ -146,7 +146,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         spaceLeftOnCard();
-        Log.d(TAG, "form activity");
+        Timber.d("form activity");
     }
 
     /**
@@ -199,7 +199,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             mSurvey = SurveyDao.loadSurvey(surveyMeta, in);
             mSurvey.setId(surveyId);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not load survey xml file");
+            Timber.e(e, "Could not load survey xml file");
         } finally {
             if (in != null) {
                 try {
@@ -455,14 +455,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {
-                    Log.i(TAG, "Image resized to: " +
+                    Timber.i("Image resized to: " +
                             getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize]);
                     if (!tmp.delete()) { // must check return value to know if it failed
-                        Log.e(TAG, "Media file delete failed");
+                        Timber.e("Media file delete failed");
                     }
                 } else if (!tmp.renameTo(imgFile)) {
                     // must check  return  value to  know if it  failed!
-                    Log.e(TAG, "Media file resize failed");
+                    Timber.e("Media file resize failed");
                 }
 
                 Bundle photoData = new Bundle();
@@ -605,7 +605,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             if (event.getSource() != null) {
                 mRequestQuestionId = event.getSource().getQuestion().getId();
             } else {
-                Log.e(TAG, "Question source was null in the event");
+                Timber.e("Question source was null in the event");
             }
 
             startActivityForResult(i, PHOTO_ACTIVITY_REQUEST);
@@ -616,7 +616,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             if (event.getSource() != null) {
                 mRequestQuestionId = event.getSource().getQuestion().getId();
             } else {
-                Log.e(TAG, "Question source was null in the event");
+                Timber.e("Question source was null in the event");
             }
 
             startActivityForResult(i, VIDEO_ACTIVITY_REQUEST);
@@ -627,7 +627,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 if (event.getSource() != null) {
                     mRequestQuestionId = event.getSource().getQuestion().getId();
                 } else {
-                    Log.e(TAG, "Question source was null in the event");
+                    Timber.e("Question source was null in the event");
                 }
             } catch (ActivityNotFoundException ex) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

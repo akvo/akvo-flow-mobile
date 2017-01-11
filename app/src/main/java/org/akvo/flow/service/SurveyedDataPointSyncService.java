@@ -22,7 +22,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
@@ -39,6 +38,8 @@ import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import timber.log.Timber;
 
 public class SurveyedDataPointSyncService extends IntentService {
 
@@ -100,7 +101,7 @@ public class SurveyedDataPointSyncService extends IntentService {
                         ConstantUtil.NOTIFICATION_RECORD_SYNC);
             }
         } catch (HttpException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Timber.e(e, e.getMessage());
             String message = e.getMessage();
             switch (e.getStatus()) {
                 case HttpURLConnection.HTTP_FORBIDDEN:
@@ -114,7 +115,7 @@ public class SurveyedDataPointSyncService extends IntentService {
                             message, false,
                             false, ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Timber.e(e, e.getMessage());
             displayToast(getString(R.string.network_error));
             NotificationHelper
                     .displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
@@ -136,7 +137,7 @@ public class SurveyedDataPointSyncService extends IntentService {
             throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
-        Log.d(TAG, "sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
+        Timber.d("sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         List<SurveyedLocale> locales = api
                 .getSurveyedLocales(surveyGroupId, syncTime);
         boolean correctData = true;

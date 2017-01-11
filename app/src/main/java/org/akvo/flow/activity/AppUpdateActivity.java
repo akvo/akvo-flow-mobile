@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -46,12 +45,13 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import timber.log.Timber;
+
 public class AppUpdateActivity extends Activity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";
 
-    private static final String TAG = AppUpdateActivity.class.getSimpleName();
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS = 100;
 
@@ -178,7 +178,7 @@ public class AppUpdateActivity extends Activity {
             boolean syncOver3GAllowed = prefs
                     .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
             if (!connectivityStateManager.isConnectionAvailable(syncOver3GAllowed)) {
-                Log.e(TAG, "No internet connection available. Can't perform the requested operation");
+                Timber.d("No internet connection available. Can't perform the requested operation");
             } else if (downloadApk(mUrl, filename) && !isCancelled()) {
                 return filename;
             }
@@ -199,7 +199,7 @@ public class AppUpdateActivity extends Activity {
             if (percentComplete > MAX_PROGRESS) {
                 percentComplete = MAX_PROGRESS;
             }
-            Log.d(TAG, "onProgressUpdate() - APK update: " + percentComplete + "%");
+            Timber.d("onProgressUpdate() - APK update: " + percentComplete + "%");
             notifyProgress(percentComplete);
         }
 
@@ -227,7 +227,7 @@ public class AppUpdateActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            Log.d(TAG, "onCancelled() - APK update task cancelled");
+            Timber.d("onCancelled() - APK update task cancelled");
             notifyProgress(0);
             cleanupDownloads(mVersion);
         }
@@ -263,7 +263,7 @@ public class AppUpdateActivity extends Activity {
          * the user to 'click to installAppUpdate'
          */
         private boolean downloadApk(String location, String localPath) {
-            Log.i(TAG, "App Update: Downloading new version " + mVersion + " from " + mUrl);
+            Timber.i("App Update: Downloading new version " + mVersion + " from " + mUrl);
 
             boolean ok = false;
             InputStream in = null;
@@ -280,7 +280,7 @@ public class AppUpdateActivity extends Activity {
                 byte[] b = new byte[IO_BUFFER_SIZE];
 
                 final int fileSize = conn.getContentLength();
-                Log.d(TAG, "APK size: " + fileSize);
+                Timber.d("APK size: " + fileSize);
 
                 int read;
                 while ((read = in.read(b)) != -1) {
@@ -310,11 +310,11 @@ public class AppUpdateActivity extends Activity {
                     // Compare the MD5, if found. Otherwise, rely on the 200 status code
                     ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);
                 } else {
-                    Log.e(TAG, "Wrong status code: " + status);
+                    Timber.e("Wrong status code: " + status);
                     ok = false;
                 }
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                Timber.e(e, e.getMessage());
             } finally {
                 if (conn != null) {
                     conn.disconnect();

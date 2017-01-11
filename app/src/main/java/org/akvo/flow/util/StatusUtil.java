@@ -23,10 +23,11 @@ import android.os.Build;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import timber.log.Timber;
 
 /**
  * utilities for checking system state
@@ -107,7 +108,7 @@ public class StatusUtil {
                 return host.substring(0, host.indexOf("."));
             }
         } catch (MalformedURLException e) {
-            Log.e("getApplicationId() - ", e.getMessage());
+            Timber.e("getApplicationId() - "+ e.getMessage());
         }
         return null;
     }

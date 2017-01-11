@@ -21,7 +21,6 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.dao.SurveyDao;
@@ -29,7 +28,6 @@ import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +38,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import timber.log.Timber;
 
 /**
  * utility class for manipulating the preference settings that allow for
@@ -52,7 +52,7 @@ public class LangsPreferenceUtil {
 
     /**
      * returns an arrayList of language codes that are active.
-     * 
+     *
      * @return
      */
     public static String[] getSelectedLangCodes(Context context, int[] indexes,
@@ -71,7 +71,7 @@ public class LangsPreferenceUtil {
     /**
      * forms a comma-delimited string of array index values used to persist the
      * selected items to the db.
-     * 
+     *
      * @return
      */
     public static String formLangPreferenceString(boolean[] selectedItems,
@@ -153,8 +153,7 @@ public class LangsPreferenceUtil {
 
             appendAllLanguages(survey, availableSurveyLanguages, hydratedSurvey);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not parse survey file", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, "Could not parse survey file");
         }
         return availableSurveyLanguages.toArray(new String[availableSurveyLanguages.size()]);
     }

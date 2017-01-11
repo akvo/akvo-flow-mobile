@@ -23,7 +23,6 @@ import android.util.Log;
 import org.akvo.flow.activity.TimeCheckActivity;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConnectivityStateManager;
 
 import java.io.IOException;
@@ -31,6 +30,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+
+import timber.log.Timber;
 
 import static org.akvo.flow.util.StringUtil.isValid;
 
@@ -49,7 +50,6 @@ public class TimeCheckService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         this.connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
         this.prefs = new Prefs(getApplicationContext());
         checkTime();
@@ -82,7 +82,7 @@ public class TimeCheckService extends IntentService {
                 }
             }
         } catch (IOException | ParseException e) {
-            Log.e(TAG, "Error fetching time: ", e);
+            Timber.e(e, "Error fetching time");
         }
     }
 }

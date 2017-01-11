@@ -30,8 +30,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,7 +49,6 @@ import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
-import org.akvo.flow.service.ExceptionReportingService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
@@ -65,6 +62,8 @@ import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.lang.ref.WeakReference;
+
+import timber.log.Timber;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
@@ -273,7 +272,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 startService(new Intent(this, DataSyncService.class));
             }
             startService(new Intent(this, BootstrapService.class));
-            startService(new Intent(this, ExceptionReportingService.class));
             startService(new Intent(this, TimeCheckService.class));
         }
     }
@@ -303,6 +301,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         long id = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
         setTitle(title);
+
         FlowApp.getApp().setSurveyGroupId(id);
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
@@ -314,6 +313,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
         mDrawer.load();
         mDrawerLayout.closeDrawers();
+
     }
 
     @Override
@@ -324,7 +324,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean showItems = !mDrawerLayout.isDrawerOpen(Gravity.START) && mSurveyGroup != null;
+        boolean showItems =
+                !mDrawerLayout.isDrawerOpen(GravityCompat.START) && mSurveyGroup != null;
         for (int i = 0; i < menu.size(); i++) {
             menu.getItem(i).setVisible(showItems);
         }
@@ -418,7 +419,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
+            Timber.i("Surveys have been synchronised. Refreshing data...");
             SurveyActivity surveyActivity = activityWeakReference.get();
             if (surveyActivity != null) {
                 surveyActivity.reloadDrawer();

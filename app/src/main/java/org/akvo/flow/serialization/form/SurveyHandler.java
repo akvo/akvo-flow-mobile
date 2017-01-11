@@ -16,28 +16,27 @@
 
 package org.akvo.flow.serialization.form;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.SurveyGroup;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
-
 import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Dependency;
+import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.ScoringRule;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.ValidationRule;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Handler for sax-based xml parser for Survey files
@@ -355,7 +354,7 @@ public class SurveyHandler extends DefaultHandler {
                 } catch (NumberFormatException e) {
                     currentQuestion.setUseStrength(false);
                     currentQuestion.setType(ConstantUtil.OPTION_QUESTION_TYPE);
-                    Log.e("XML ERROR", "Could not parse strength values", e);
+                    Timber.e(e, "Could not parse strength values");
                 }
             } else {
                 currentQuestion.setUseStrength(false);
@@ -410,7 +409,7 @@ public class SurveyHandler extends DefaultHandler {
             currentOption = new Option();
             currentOption.setCode(attributes.getValue(CODE));
         } else if (localName.equalsIgnoreCase(LEVELS)) {
-            currentLevels = new ArrayList<Level>();
+            currentLevels = new ArrayList<>();
         } else if (localName.equalsIgnoreCase(LEVEL)) {
             currentLevel = new Level();
         } else if (localName.equalsIgnoreCase(DEPENDENCY)) {

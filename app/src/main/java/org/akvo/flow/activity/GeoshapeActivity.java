@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,8 +34,8 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -59,6 +58,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class GeoshapeActivity extends ActionBarActivity
     implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener,
     OnMapReadyCallback {
@@ -71,7 +72,6 @@ public class GeoshapeActivity extends ActionBarActivity
     private static final String TYPE_FEATURE = "Feature";
     private static final String TYPE_FEATURE_COLLECTION = "FeatureCollection";
 
-    private static final String TAG = GeoshapeActivity.class.getSimpleName();
     private static final float ACCURACY_THRESHOLD = 20f;
     public static final int MAP_ZOOM_LEVEL = 10;
 
@@ -350,7 +350,7 @@ public class GeoshapeActivity extends ActionBarActivity
             }
             jObject.put(JSON_FEATURES, jFeatures);
         } catch (JSONException e) {
-            Log.e(TAG, "geoJSON() - " + e.getMessage());
+            Timber.e("geoJSON() - " + e.getMessage());
             return null;
         }
         return jObject.toString();
@@ -415,8 +415,9 @@ public class GeoshapeActivity extends ActionBarActivity
                 }
             });
         } catch (JSONException e) {
+            //TODO: extract this string, what should the error message even be?
             Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
-            Log.e(TAG, "geoJSON() - " + e.getMessage());
+            Timber.e("geoJSON() - " + e.getMessage());
             // TODO: Remove features?
         }
     }
@@ -472,7 +473,7 @@ public class GeoshapeActivity extends ActionBarActivity
 
     @Override
     public void onMyLocationChange(Location location) {
-        Log.i(TAG, "onMyLocationChange() - " + location);
+        Timber.i("onMyLocationChange() - " + location);
         if (location != null && location.hasAccuracy()) {
             mAccuracy.setText(
                 getString(R.string.accuracy) + ": " + new DecimalFormat("#").format(location.getAccuracy()) + "m");

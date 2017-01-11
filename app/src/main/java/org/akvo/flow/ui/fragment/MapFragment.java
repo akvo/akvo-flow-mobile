@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,11 +58,12 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 //TODO: separate single data point and multiple into different classes for clarity
 public class MapFragment extends SupportMapFragment
         implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener, OnMapReadyCallback {
 
-    private static final String TAG = MapFragment.class.getSimpleName();
     public static final int MAP_ZOOM_LEVEL = 10;
 
     private SurveyGroup mSurveyGroup;
@@ -293,7 +293,7 @@ public class MapFragment extends SupportMapFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
+            Timber.w("onFinished() - Loader returned no data");
             return;
         }
 

@@ -21,10 +21,8 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
@@ -34,6 +32,8 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.logging.LoggingFactory;
+import org.akvo.flow.util.logging.LoggingHelper;
 import org.akvo.flow.data.preference.Prefs;
 
 import java.util.Arrays;
@@ -43,7 +43,6 @@ import java.util.Locale;
 import timber.log.Timber;
 
 public class FlowApp extends Application {
-    private static final String TAG = FlowApp.class.getSimpleName();
     private static FlowApp app;// Singleton
 
     //TODO: use shared pref?
@@ -53,13 +52,13 @@ public class FlowApp extends Application {
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
 
+    private final LoggingFactory loggingFactory = new LoggingFactory();
+
     @Override
     public void onCreate() {
         super.onCreate();
         prefs = new Prefs(getApplicationContext());
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
+        initLogging();
         init();
         startUpdateService();
         app = this;
@@ -67,6 +66,12 @@ public class FlowApp extends Application {
 
     private void startUpdateService() {
         ApkUpdateService.scheduleRepeat(this);
+    }
+
+    private void initLogging() {
+        LoggingHelper helper = loggingFactory.createLoggingHelper(this);
+        helper.initDebugTree();
+        helper.initSentry();
     }
 
     public static FlowApp getApp() {
@@ -216,9 +221,8 @@ public class FlowApp extends Application {
             // We check for the key not present in old devices: 'survey.languagespresent'
             // NOTE: 'survey.language' DID exist
             if (database.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY) == null) {
-                Log.d(TAG, "Recomputing available languages...");
-                Toast.makeText(getApplicationContext(), R.string.configuring_languages,
-                        Toast.LENGTH_SHORT)
+                Timber.d("Recomputing available languages...");
+                Toast.makeText(getApplicationContext(), R.string.configuring_languages, Toast.LENGTH_SHORT)
                         .show();
 
                 // First, we add the default property, to avoid null cases within
@@ -230,7 +234,7 @@ public class FlowApp extends Application {
                 List<Survey> surveyList = database.getSurveyList(SurveyGroup.ID_NONE);
                 for (Survey survey : surveyList) {
                     String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
-                    Log.d(TAG, "Adding languages: " + Arrays.toString(langs));
+                    Timber.d("Adding languages: " + Arrays.toString(langs));
                     database.addLanguages(langs);
                 }
             }

@@ -23,7 +23,6 @@ import android.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -35,8 +34,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 
+import timber.log.Timber;
+
 public class ImageUtil {
-    private static final String TAG = ImageUtil.class.getSimpleName();
 
     public static String encodeBase64(Bitmap bitmap, int reqWidth, int reqHeight) {
         Matrix m = new Matrix();
@@ -88,7 +88,7 @@ public class ImageUtil {
             reqWidth = tmp;
         }
 
-        Log.d(TAG, "Orig Image size: " + options.outWidth + "x" + options.outHeight);
+        Timber.d("Orig Image size: " + options.outWidth + "x" + options.outHeight);
 
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
@@ -99,7 +99,7 @@ public class ImageUtil {
 
         if (bitmap != null && saveImage(bitmap, outFilename)) {
             checkOrientation(origFilename, outFilename);// Ensure the EXIF data is not lost
-            Log.d(TAG, "Resized Image size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+            Timber.d("Resized Image size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
             return true;
         }
         return false;
@@ -114,12 +114,12 @@ public class ImageUtil {
             final String orientation2 = exif2.getAttribute(ExifInterface.TAG_ORIENTATION);
 
             if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
-                Log.d(TAG, "Orientation property in EXIF does not match. Overriding it with original value...");
+                Timber.d("Orientation property in EXIF does not match. Overriding it with original value...");
                 exif2.setAttribute(ExifInterface.TAG_ORIENTATION, orientation1);
                 exif2.saveAttributes();
             }
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
     }
@@ -132,7 +132,7 @@ public class ImageUtil {
                 return output;
             }
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
         return null;
@@ -154,7 +154,7 @@ public class ImageUtil {
             exif.saveAttributes();
             return true;
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
         return false;
@@ -168,7 +168,7 @@ public class ImageUtil {
                 return true;
             }
         } catch (FileNotFoundException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         } finally {
             if (out != null) {
                 try {
@@ -243,7 +243,7 @@ public class ImageUtil {
         Bitmap bitmap = BitmapFactory.decodeFile(filename, options);
 
         if (bitmap != null) {
-            Log.d(TAG, "Displaying image with inSampleSize: " + options.inSampleSize);
+            Timber.d("Displaying image with inSampleSize: " + options.inSampleSize);
             imageView.setImageBitmap(bitmap);
         }
     }
@@ -286,7 +286,7 @@ public class ImageUtil {
                 value = fieldValue;
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
         return value;
     }

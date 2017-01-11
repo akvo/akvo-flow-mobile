@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -93,7 +93,7 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     @Override
     public void onLoadFinished(Loader<Stats> loader, Stats stats) {
         if (stats == null) {
-            Timber.e("onLoadFinished() - Loader returned no data");
+            Timber.w("onFinished() - Loader returned no data");
             return;
         }
         mTotalView.setText(String.valueOf(stats.mTotal));

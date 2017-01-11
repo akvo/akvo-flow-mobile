@@ -35,7 +35,6 @@ import java.util.Set;
 public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
 
     private final DatabaseHelper databaseHelper;
-    private SQLiteDatabase database;
 
     public SurveyLanguagesDbDataSource(Context context) {
         this.databaseHelper = new DatabaseHelper(context, new LanguageTable());
@@ -43,20 +42,22 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
 
     @Override
     public void saveLanguagePreferences(String surveyId, @NonNull Set<String> languageCodes) {
-        database = databaseHelper.getWritableDatabase();
+        SQLiteDatabase database = databaseHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues(2);
+        database.delete(LanguageTable.TABLE_NAME, LanguageTable.COLUMN_SURVEY_ID + " = ?",
+                new String[] { surveyId });
         for (String languageCode : languageCodes) {
             contentValues.put(LanguageTable.COLUMN_SURVEY_ID, surveyId);
             contentValues.put(LanguageTable.COLUMN_LANGUAGE_CODE, languageCode);
             database.insert(LanguageTable.TABLE_NAME, null, contentValues);
         }
-        database.close();
+        databaseHelper.close();
     }
 
     @NonNull
     @Override
     public Set<String> getLanguagePreferences(String surveyId) {
-        database = databaseHelper.getWritableDatabase();
+        SQLiteDatabase database = databaseHelper.getWritableDatabase();
         Set<String> languages = new LinkedHashSet<>();
         //english is added by default at the beginning, should it?
         languages.add(ConstantUtil.ENGLISH_CODE);
@@ -65,17 +66,17 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
                 LanguageTable.COLUMN_SURVEY_ID + " = ?",
                 new String[] { surveyId },
                 null, null, null);
-        if (cursor != null) {
-            int languageCodeColumnIndex = cursor
-                    .getColumnIndexOrThrow(LanguageTable.COLUMN_SURVEY_ID);
-            if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
+                int languageCodeColumnIndex = cursor
+                        .getColumnIndexOrThrow(LanguageTable.COLUMN_LANGUAGE_CODE);
+            if (languageCodeColumnIndex >= 0) {
                 do {
                     languages.add(cursor.getString(languageCodeColumnIndex));
                 } while (cursor.moveToNext());
             }
         }
         cursor.close();
-        database.close();
+        databaseHelper.close();
         return languages;
     }
 }

@@ -30,7 +30,7 @@ public class LanguageTable {
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_SURVEY_ID + " TEXT NOT NULL,"
             + COLUMN_LANGUAGE_CODE + " TEXT NOT NULL, "
-            + "UNIQUE(" + COLUMN_SURVEY_ID + ", " + COLUMN_LANGUAGE_CODE + ")";
+            + "UNIQUE(" + COLUMN_SURVEY_ID + ", " + COLUMN_LANGUAGE_CODE + ") ON CONFLICT REPLACE)";
 
     public LanguageTable() {
     }

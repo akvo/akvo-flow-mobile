@@ -33,6 +33,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.SurveyLanguagesDataSource;
@@ -50,13 +54,13 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
+import org.akvo.flow.ui.model.Language;
+import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.ImageUtil;
-import org.akvo.flow.util.LangsPreferenceData;
-import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -65,7 +69,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,6 +115,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Prefs prefs;
 
     private String[] mLanguages;
+    private LanguageMapper languageMapper;
 
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
     private String surveyId;
@@ -132,6 +139,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(getApplicationContext());
 
         prefs = new Prefs(getApplicationContext());
+        languageMapper = new LanguageMapper(getApplicationContext());
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
@@ -411,73 +419,23 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void displayLanguagesDialog() {
-        // TODO: language management should be simplified
-        LangsPreferenceData langsPrefData = LangsPreferenceUtil.createLangPrefData(this,
-                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_SETTING_KEY),
-                mDatabase.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY));
-
-        final String[] langsSelectedNameArray = langsPrefData.getLangsSelectedNameArray();
-        final boolean[] langsSelectedBooleanArray = langsPrefData.getLangsSelectedBooleanArray();
-        final int[] langsSelectedMasterIndexArray = langsPrefData
-                .getLangsSelectedMasterIndexArray();
-
-//        final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int clicked) {
-//                if (dialog != null) {
-//                    dialog.dismiss();
-//                }
-//
-//                mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
-//                        LangsPreferenceUtil.formLangPreferenceString(
-//                                langsSelectedBooleanArray,
-//                                langsSelectedMasterIndexArray));
-//
-//                //TODO: use loader
-//                loadLanguages();
-//                mAdapter.notifyOptionsChanged();
-//            }
-//        };
+        List<Language> languages = languageMapper
+                .transform(mLanguages, mSurvey.getAvailableLanguageCodes());
+        final LanguageAdapter languageAdapter = new LanguageAdapter(this, languages);
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.surveylanglabel)
-                .setMultiChoiceItems(langsSelectedNameArray, langsSelectedBooleanArray,
-                        new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int which, boolean isChecked) {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        break;
-                                }
-                            }
-                        })
+                .setAdapter(languageAdapter, null)
                 .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        boolean isValid = false;
-                        if (true) {
-                            for (int i = 0; i < langsSelectedBooleanArray.length; i++) {
-                                if (langsSelectedBooleanArray[i]) {
-                                    isValid = true;
-                                    break;
-                                }
-                            }
-                        } else {
-                            isValid = true;
-                        }
-                        if (isValid) {
+                        Set<String> selectedLanguages = languageAdapter.getSelectedLanguages();
+                        if (selectedLanguages != null && selectedLanguages.size() > 0) {
                             if (dialog != null) {
                                 dialog.dismiss();
                             }
-
-//                            mDatabase.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY,
-//                                    LangsPreferenceUtil.formLangPreferenceString(
-//                                            langsSelectedBooleanArray,
-//                                            langsSelectedMasterIndexArray));
-
-                            //TODO: save
-
-                            //TODO: use loader
+                            surveyLanguagesDataSource.saveLanguagePreferences(surveyId,
+                                    selectedLanguages);
                             loadLanguages();
                             mAdapter.notifyOptionsChanged();
                         } else {
@@ -491,23 +449,28 @@ public class FormActivity extends BackActivity implements SurveyListener,
                                             if (dialog != null) {
                                                 dialog.dismiss();
                                             }
-//                                            displayLanguageSelectionDialog(FormActivity.this,
-//                                                    langsSelectedBooleanArray, listener,
-//                                                    R.string.surveylanglabel,
-//                                                    langsSelectedNameArray,
-//                                                    true,
-//                                                    R.string.langmandatorytitle,
-//                                                    R.string.langmandatorytext);
+                                            displayLanguagesDialog();
                                         }
                                     });
                         }
                     }
                 }).create();
+        alertDialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        alertDialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                    long id) {
+                Language language = languageAdapter.getItem(position);
+                language.setSelected(!language.isSelected());
+                languageAdapter.notifyDataSetChanged();
+            }
+        });
         alertDialog.show();
     }
 
     /**
      * displays a dialog box for allowing selection of countries from a list
+     * TODO: remove
      */
     private void displayLanguageSelectionDialog(final Context context,
             final boolean[] selections,
@@ -630,6 +593,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         return mSurvey.getDefaultLanguageCode();
     }
 
+    //TODO: use loader
     private void loadLanguages() {
         Set<String> languagePreferences = surveyLanguagesDataSource
                 .getLanguagePreferences(surveyId);
@@ -662,8 +626,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         saveState();
 
         // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyStatus(mSurveyInstanceId,
-                SurveyInstanceStatus.SUBMITTED);
+        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMITTED);
 
         // Make the current survey immutable
         mReadOnly = true;
@@ -891,6 +854,26 @@ public class FormActivity extends BackActivity implements SurveyListener,
         String filename = image ? TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX
                 : TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
         return new File(FileUtil.getFilesDir(FileType.TMP), filename);
+    }
+
+    private static class LanguageAdapter extends ArrayAdapter<Language> {
+
+        private final List<Language> languages;
+
+        public LanguageAdapter(Context context, List<Language> languages) {
+            super(context, android.R.layout.simple_list_item_1, languages);
+            this.languages = languages == null ? new ArrayList<Language>() : languages;
+        }
+
+        public Set<String> getSelectedLanguages() {
+            Set<String> selectedLanguages = new LinkedHashSet<>(3);
+            for (Language language : languages) {
+                if (language.isSelected()) {
+                    selectedLanguages.add(language.getLanguageCode());
+                }
+            }
+            return selectedLanguages;
+        }
     }
 
 }

@@ -114,7 +114,7 @@ public class HttpUtilTest
         server.setResponse(NanoHTTPD.Method.GET, defaultGet);
 
         String result = HttpUtil.httpGet(URL_STRING);
-        assertEquals(result, VALID_RESPONSE_STRING+'\n');
+        assertEquals(result, VALID_RESPONSE_STRING);
     }
 
     @Test

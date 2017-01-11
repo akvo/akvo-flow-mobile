@@ -26,7 +26,7 @@ android {
             targetSdkVersion 21
             applicationId "org.akvo.flow"
             testApplicationId "org.akvo.flow.tests"
-            testInstrumentationRunner "android.test.InstrumentationTestRunner"
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
             testHandleProfiling true
             testFunctionalTest true
         }

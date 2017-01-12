@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="app_name">खोज जारी है </string>
   <string name="accuracy">सूक्ष्मता</string>
   <string name="searching">खोज जारी है </string>
   <string name="ready">तैयार</string>

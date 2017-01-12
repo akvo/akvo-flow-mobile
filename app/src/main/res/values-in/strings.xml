@@ -32,7 +32,7 @@
   <string name="aboutlabel">Tentang</string>
   <string name="aboutdesc">Informasi tentang versi.</string>
   <string name="abouttitle">Tentang - Aplikasi Akvo Flow</string>
-  <string name="about_text" tools:ignore="PluralsCandidate">Aplikasi Akvo FLOW app\nDikembangkan oleh: Akvo Foundation\nHak Cipta © 2010-%1$s Stichting Akvo\nVersi %2$s</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Aplikasi Akvo Flow app\nDikembangkan oleh: Akvo Foundation\nHak Cipta © 2010-%1$s Stichting Akvo\nVersi %2$s</string>
   <string name="gpsstatuslabel">GPS Status</string>
   <string name="gpsstatusdesc">Nyalakan aplikasi GPS Status jika Anda telah menginstallnya dalam perangkat ini.</string>
   <string name="nogpsstatus">Aplikasi GPS Status belum terpasang dalam perangkat ini. Mohon pasang melalui Google Play Store</string>
@@ -85,7 +85,7 @@
   <string name="bootstrapstart">Memuat data survei dari kartu Memori/SD card</string>
   <string name="bootstrapcomplete">Selesai memuat data dari kartu memori/SD card</string>
   <string name="bootstraperror">Ada kesalahan dalam memproses file zip bootsrap</string>
-  <string name="bootstrap_invalid_app">Kesalahan: Formulir bukan terkait dengan FLOW ini</string>
+  <string name="bootstrap_invalid_app">Kesalahan: Formulir bukan terkait dengan Flow ini</string>
   <string name="transmissionhist">Riwayat Transmisi</string>
   <string name="transstartdate">Dimulai:</string>
   <string name="transenddate">Selesai:</string>
@@ -127,7 +127,7 @@
   <string name="app_language">Bahasa Aplikasi</string>
   <string name="please_restart">Mohon memulai ulang aplikasi</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">Anda belum mempunyai survei yang ditugaskan. Survei ditugaskan melalui dasbor FLOW</string>
+  <string name="no_surveys_text">Anda belum mempunyai survei yang ditugaskan. Survei ditugaskan melalui dasbor Flow</string>
   <string name="no_records_text">Anda belum mempunyai data. Klik simbol \'+\' diatas untuk menambahkan data.</string>
   <string name="no_survey_selected_text">Anda belum memilih Survei. Buka menu samping untuk memilih Survei.</string>
   <!--Activity Labels-->
@@ -202,11 +202,11 @@
   <string name="status_exported">Terekspor</string>
   <!--APK update-->
   <string name="app_update_activity">Pembaruan Akvo Flow</string>
-  <string name="app_update">Versi terbaru aplikasi FLOW telah tersedia. Klik \'Perbarui\' untuk mengunduh dan memasang versi baru.</string>
+  <string name="app_update">Versi terbaru aplikasi Flow telah tersedia. Klik \'Perbarui\' untuk mengunduh dan memasang versi baru.</string>
   <string name="update">Perbarui</string>
   <string name="not_now">Lain waktu</string>
-  <string name="clicktoinstall">Versi FLOW terbaru telah terunduh. Apakah Anda ingin memasangnya sekarang?</string>
-  <string name="apk_upgrade_error">Ada kesalahan dalam mengunduh FLOW terbaru.</string>
+  <string name="clicktoinstall">Versi Flow terbaru telah terunduh. Apakah Anda ingin memasangnya sekarang?</string>
+  <string name="apk_upgrade_error">Ada kesalahan dalam mengunduh Flow terbaru.</string>
   <!--Time check-->
   <string name="time_check_activity">Tanggal dan Waktu</string>
   <string name="time_warning">Pengaturan waktu pada perangkat Anda tidak akurat! Atur ulang waktunya dan coba lagi. Tanggal dan waktu di perangkat Anda adalah:</string>
@@ -214,8 +214,8 @@
   <!--Form sync-->
   <string name="downloading_forms">Mengunduh formulir</string>
   <string name="error_form_sync_title">Ada kesalahan dalam menyingkronisasi formulir</string>
-  <string name="error_assignment_read">Penugasan formulir tidak dapat dibaca dari dasbor FLOW</string>
-  <string name="error_form_header">Formulir %1$s tidak dapat dibaca oleh dasbor FLOW</string>
+  <string name="error_assignment_read">Penugasan formulir tidak dapat dibaca dari dasbor Flow</string>
+  <string name="error_form_header">Formulir %1$s tidak dapat dibaca oleh dasbor Flow</string>
   <string name="error_form_download">Pastikan formulir ini sudah diterbitkan, dan pengaturan waktu Anda sudah benar</string>
   <string name="form_deleted">Formulir tersebut telah dihapus</string>
   <!--File sync-->

@@ -125,7 +125,7 @@
   <string name="app_language">ऐप  की भाषा </string>
   <string name="please_restart">कृपया ऐप को पुनर्प्रारंभ करें </string>
   <!--Empty Views-->
-  <string name="no_surveys_text">आप के पास कोई सर्वे नियुक्त नहीं हैI   फ्लो, FLOW डैशबोर्ड में सर्वे नियुक्त किये जाते हैंI</string>
+  <string name="no_surveys_text">आप के पास कोई सर्वे नियुक्त नहीं हैI   फ्लो, Flow डैशबोर्ड में सर्वे नियुक्त किये जाते हैंI</string>
   <string name="no_records_text">आपके पास कोई डेटा पॉइंट नहीं है ।  नया डेटा पॉइंट बनाने के लिए स्क्रीन के ऊपरी ओर  \'+\' निशान को चुनियें । </string>
   <string name="no_survey_selected_text">आपने कोई सर्वे नहीं चुना है । कृपया साइड मेनू से कोई सर्वे चुने । </string>
   <!--Activity Labels-->
@@ -200,11 +200,11 @@
   <string name="status_exported">निर्यातित </string>
   <!--APK update-->
   <string name="app_update_activity">Akvo Flow अपडेट </string>
-  <string name="app_update">नया FLOW वर्शन उपलब्ध है | \"Update\" को चुनें व इसे डाउनलोड करें </string>
+  <string name="app_update">नया Flow वर्शन उपलब्ध है | \"Update\" को चुनें व इसे डाउनलोड करें </string>
   <string name="update">अपडेट </string>
   <string name="not_now">अभी नहीं </string>
-  <string name="clicktoinstall">नया FLOW संस्करण उपलब्ध है. क्या आप इसे स्तापित करना चाहेंगे ?</string>
-  <string name="apk_upgrade_error">FLOW update  दोव्न्लोडिंग त्रुटिपूर्ण </string>
+  <string name="clicktoinstall">नया Flow संस्करण उपलब्ध है. क्या आप इसे स्तापित करना चाहेंगे ?</string>
+  <string name="apk_upgrade_error">Flow update  दोव्न्लोडिंग त्रुटिपूर्ण </string>
   <!--Time check-->
   <string name="time_check_activity">समय व दिनांक </string>
   <string name="time_warning">आपके फ़ोन पे दिखाया जा रहा समय सही नहीं है। उसे सही करें और पुन:प्रयास करें। आपका दिखाया गया समय व दिनांक यह है </string>
@@ -212,8 +212,8 @@
   <!--Form sync-->
   <string name="downloading_forms">फॉर्म डाउनलोड जारी </string>
   <string name="error_form_sync_title">फॉर्म सिंक करने में त्रुटि </string>
-  <string name="error_assignment_read">फॉर्म असाइनमेंट्स FLOW dashboard पर पढ़े नहीं जा रहे हैं </string>
-  <string name="error_form_header">यह फॉर्म  %1$s FLOW dashboard पर पढ़ा नहीं जा सकता </string>
+  <string name="error_assignment_read">फॉर्म असाइनमेंट्स Flow dashboard पर पढ़े नहीं जा रहे हैं </string>
+  <string name="error_form_header">यह फॉर्म  %1$s Flow dashboard पर पढ़ा नहीं जा सकता </string>
   <string name="error_form_download">सुनिशिचित करें की फॉर्म प्रकाशित हो और आपका स्थानिक समय  व दिनांक सही हो </string>
   <string name="form_deleted">यह फॉर्म हटा दिया गया है</string>
   <!--File sync-->

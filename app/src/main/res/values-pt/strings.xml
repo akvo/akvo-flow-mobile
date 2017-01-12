@@ -34,7 +34,7 @@ Sem espaço para armazenamento
   <string name="aboutlabel">Sobre</string>
   <string name="aboutdesc">Exibir informações sobre a versão.</string>
   <string name="abouttitle">Sobre o aplicativo Akvo Flow</string>
-  <string name="about_text" tools:ignore="PluralsCandidate">Aplicação Akvo Flow\nDesenvolvido por: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo \nVersion %2$s</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Aplicação Akvo Flow\nDesenvolvido por: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersão %2$s</string>
   <string name="gpsstatuslabel">Estado do GPS</string>
   <string name="gpsstatusdesc">Iniciar a aplicação do Estado do GPS se o tiver instalado no dispositivo.</string>
   <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>

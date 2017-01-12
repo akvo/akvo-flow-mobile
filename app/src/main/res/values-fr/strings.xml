@@ -32,7 +32,7 @@
   <string name="aboutlabel">A propos</string>
   <string name="aboutdesc">Information sur les versions.</string>
   <string name="abouttitle">A propos - Application Akvo Flow</string>
-  <string name="about_text" tools:ignore="PluralsCandidate">Application Akvo Flow\n Développée par: Akvo Foundation\nTous Droits réservés © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Application Akvo Flow\nDéveloppée par: Akvo Foundation\nTous Droits réservés © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
   <string name="gpsstatuslabel">Etat du GPS</string>
   <string name="gpsstatusdesc">Démarre l\'application de GPS Status si elle est installée sur cet appareil.</string>
   <string name="nogpsstatus">GPS Status n\'est pas installé sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>

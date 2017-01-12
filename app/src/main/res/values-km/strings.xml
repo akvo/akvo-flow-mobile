@@ -15,6 +15,7 @@
   <string name="lon">រយៈបណ្តោយ </string>
   <string name="elevation">កំពស់</string>
   <string name="submitbutton">ចុចបញ្ជូនចេញ </string>
+  <string name="geodialog">អ្នកត្រូវបើកជីភីអេសដើម្បីធ្វើការងារនេះ។ ចុច OK ដើម្បីទៅកាន់ទំព័រ settings។ ចុចលើ ប្រើផ្កាយរណបជីភីអេស បន្ទាប់មកចុចប៊ូតុង \"back\" ដើម្បីត្រឡប់ក្រោយ។ នៅពេលដែលជីភីអេសបានបើក អ្នកអាចចុចលើ \"ស្វែងរកទីតាំងជីភីអេស\" ម្តងទៀតដើម្បីរកទីតាំងរបស់អ្នក។ </string>
   <string name="resize_large_images">ដាក់រូបភាពទំហំធំឲ្យតូចឡើងវិញ</string>
   <string name="settingslabel">ចុចកំណត់ (settings) </string>
   <string name="nouser">ពុំមានអ្នកប្រើប្រាស់! </string>
@@ -200,7 +201,7 @@
   <string name="status_exported">បាននាំចេញ </string>
   <!--APK update-->
   <string name="app_update_activity">ធ្វើបច្ចុប្បន្នភាព Akvo Flow</string>
-  <string name="app_update">មានច្បាប់កំណែថ្មីរបស់ AKVO App។ ចូរចុច ​\'ធ្វើបច្ចុប្បន្នភាព\' ដើម្បីដោនឡូត និងតម្លើងច្បាប់កំណែថ្មី។</string>
+  <string name="app_update">មានច្បាប់កំណែថ្មីរបស់ Akvo App។ ចូរចុច ​\'ធ្វើបច្ចុប្បន្នភាព\' ដើម្បីដោនឡូត និងតម្លើងច្បាប់កំណែថ្មី។</string>
   <string name="update">ធ្វើបច្ចុប្បន្នភាព</string>
   <string name="not_now">មិនមែនពេលនេះទេ </string>
   <string name="clicktoinstall">ច្បាប់កំណែថ្មីរបស់ Flow បានដោនឡូត។ តើអ្នកចង់តម្លើងវាឥឡូវឬទេ?</string>

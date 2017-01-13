@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.activity;
@@ -20,7 +23,6 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -33,7 +35,6 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
-import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -45,12 +46,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import timber.log.Timber;
+
 public class AppUpdateActivity extends Activity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";
 
-    private static final String TAG = AppUpdateActivity.class.getSimpleName();
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS = 100;
 
@@ -177,7 +179,7 @@ public class AppUpdateActivity extends Activity {
                 percentComplete = MAX_PROGRESS;
             }
 
-            Log.d(TAG, "onProgressUpdate() - APK update: " + percentComplete + "%");
+            Timber.d("onProgressUpdate() - APK update: " + percentComplete + "%");
             mProgress.setProgress(percentComplete);
         }
 
@@ -197,7 +199,7 @@ public class AppUpdateActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            Log.d(TAG, "onCancelled() - APK update task cancelled");
+            Timber.d("onCancelled() - APK update task cancelled");
             mProgress.setProgress(0);
             cleanupDownloads(mVersion);
         }
@@ -233,9 +235,9 @@ public class AppUpdateActivity extends Activity {
          * the user to 'click to installAppUpdate'
          */
         private boolean downloadApk(String location, String localPath) {
-            Log.i(TAG, "App Update: Downloading new version " + mVersion + " from " + mUrl);
+            Timber.i("App Update: Downloading new version " + mVersion + " from " + mUrl);
             if (!StatusUtil.hasDataConnection(AppUpdateActivity.this)) {
-                Log.e(TAG, "No internet connection. Can't perform the requested operation");
+                Timber.w("No internet connection. Can't perform the requested operation");
                 return false;
             }
 
@@ -254,7 +256,7 @@ public class AppUpdateActivity extends Activity {
                 byte[] b = new byte[IO_BUFFER_SIZE];
 
                 final int fileSize = conn.getContentLength();
-                Log.d(TAG, "APK size: " + fileSize);
+                Timber.d("APK size: " + fileSize);
 
                 int read;
                 while ((read = in.read(b)) != -1) {
@@ -269,7 +271,7 @@ public class AppUpdateActivity extends Activity {
 
                 final int status = conn.getResponseCode();
 
-                if (status == HttpStatus.SC_OK) {
+                if (status == HttpURLConnection.HTTP_OK) {
                     final String checksum = FileUtil.hexMd5(new File(localPath));
                     if (TextUtils.isEmpty(checksum)) {
                         throw new IOException("Downloaded file is not available");
@@ -284,11 +286,11 @@ public class AppUpdateActivity extends Activity {
                     // Compare the MD5, if found. Otherwise, rely on the 200 status code
                     ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);
                 } else {
-                    Log.e(TAG, "Wrong status code: " + status);
+                    Timber.e("Wrong status code: " + status);
                     ok = false;
                 }
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                Timber.e(e, e.getMessage());
             } finally {
                 if (conn != null) {
                     conn.disconnect();

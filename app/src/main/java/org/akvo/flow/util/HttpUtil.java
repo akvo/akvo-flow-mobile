@@ -1,16 +1,20 @@
 /*
  * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- * This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -20,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.akvo.flow.exception.HttpException;
-import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -56,7 +59,7 @@ public class HttpUtil {
 
         try {
             int status = getStatusCode(conn);
-            if (status != HttpStatus.SC_OK) {
+            if (status != HttpURLConnection.HTTP_OK) {
                 throw new HttpException(conn.getResponseMessage(), status);
             }
             InputStream in = new BufferedInputStream(conn.getInputStream());
@@ -83,7 +86,7 @@ public class HttpUtil {
             copyStream(in, out);
 
             int status = conn.getResponseCode();
-            if (status != HttpStatus.SC_OK) {
+            if (status != HttpURLConnection.HTTP_OK) {
                 // TODO: Use custom exception?
                 throw new IOException("Status Code: " + status + ". Expected: 200 - OK");
             }
@@ -119,7 +122,7 @@ public class HttpUtil {
             in = new BufferedInputStream(conn.getInputStream());
 
             int status = getStatusCode(conn);
-            if (status != HttpStatus.SC_OK) {
+            if (status != HttpURLConnection.HTTP_OK) {
                 throw new HttpException(conn.getResponseMessage(), status);
             }
             return readStream(in);

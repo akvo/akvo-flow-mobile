@@ -1,15 +1,20 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -23,7 +28,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.FileTransmission;
@@ -45,6 +49,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import timber.log.Timber;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well
@@ -191,7 +197,6 @@ public class SurveyDbAdapter {
         int FORM_DELETED = 4;
     }
 
-    private static final String TAG = "SurveyDbAdapter";
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
@@ -331,7 +336,7 @@ public class SurveyDbAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.d(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
+            Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
 
             int version = oldVersion;
 
@@ -356,7 +361,7 @@ public class SurveyDbAdapter {
             }
 
             if (version != DATABASE_VERSION) {
-                Log.d(TAG, "onUpgrade() - Recreating the Database.");
+                Timber.d("onUpgrade() - Recreating the Database.");
 
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.SYNC_TIME);
@@ -547,7 +552,7 @@ public class SurveyDbAdapter {
                 new String[] { String.valueOf(surveyInstanceId) });
 
         if (rows < 1) {
-            Log.e(TAG, "Could not update status for Survey Instance: " + surveyInstanceId);
+            Timber.e("Could not update status for Survey Instance: " + surveyInstanceId);
         }
     }
 
@@ -810,7 +815,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         surveyId
                 }) < 1) {
-            Log.e(TAG, "Could not update record for Survey " + surveyId);
+            Timber.e("Could not update record for Survey " + surveyId);
         }
     }
 

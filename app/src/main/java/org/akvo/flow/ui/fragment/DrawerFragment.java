@@ -1,30 +1,36 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -105,7 +111,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mDatabase.open();
         }
         if (mAdapter == null) {
-            mAdapter = new DrawerAdapter();
+            mAdapter = new DrawerAdapter(getActivity());
             mListView.setAdapter(mAdapter);
             mListView.expandGroup(GROUP_SURVEYS);
             mListView.setOnGroupClickListener(mAdapter);
@@ -380,13 +386,14 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
         LayoutInflater mInflater;
 
-        int mHighlightColor;
+        @ColorInt
+        private final int mHighlightColor;
 
-        public DrawerAdapter() {
-            mInflater = LayoutInflater.from(getActivity());
+        public DrawerAdapter(Context context) {
+            mInflater = LayoutInflater.from(context);
             mUsers = new ArrayList<>();
             mSurveys = new ArrayList<>();
-            mHighlightColor = PlatformUtil.getResource(getActivity(), R.attr.textColorSecondary);
+            mHighlightColor = ContextCompat.getColor(context, R.color.orange_main);
         }
 
         @Override
@@ -463,7 +470,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 3));
                     tv.setTextSize(ITEM_TEXT_SIZE);
-                    tv.setTextColor(getResources().getColor(R.color.black_disabled));
+                    tv.setTextColor(ContextCompat.getColor(getActivity(), R.color.black_disabled));
                     tv.setText(R.string.surveys);
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
@@ -507,8 +514,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     SurveyGroup sg = mSurveys.get(childPosition);
                     tv.setText(sg.getName());
                     if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
-                        tv.setTextColor(getResources().getColorStateList(mHighlightColor));
-                        v.setBackgroundColor(getResources().getColor(R.color.background_alternate));
+                        tv.setTextColor(mHighlightColor);
+                        v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_alternate));
                     }
                     v.setTag(sg);
                     break;

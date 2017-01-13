@@ -1,24 +1,26 @@
 /*
 * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
 *
-* This file is part of Akvo FLOW.
-*
-* Akvo FLOW is free software: you can redistribute it and modify it under the terms of
-* the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
-* either version 3 of the License or any later version.
-*
-* Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU Affero General Public License included below for more details.
-*
-* The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  This file is part of Akvo Flow.
+ *
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 package org.akvo.flow.service;
 
 import android.content.Context;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
@@ -26,10 +28,14 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
+import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
+import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
+
+import timber.log.Timber;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -40,6 +46,9 @@ import org.akvo.flow.util.StatusUtil;
  */
 public class ApkUpdateService extends GcmTaskService {
 
+    /**
+     * Tag that is unique to this task (can be used to cancel task)
+     */
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
@@ -52,7 +61,6 @@ public class ApkUpdateService extends GcmTaskService {
                     .setPeriod(ConstantUtil.REPEAT_INTERVAL_IN_SECONDS)
                     //specify how much earlier the task can be executed (in seconds)
                     .setFlex(ConstantUtil.FLEX_IN_SECONDS)
-                    //tag that is unique to this task (can be used to cancel task)
                     .setTag(TAG)
                     //whether the task persists after device reboot
                     .setPersisted(true)
@@ -64,7 +72,7 @@ public class ApkUpdateService extends GcmTaskService {
                     .setRequiresCharging(false).build();
             GcmNetworkManager.getInstance(context).schedule(periodic);
         } catch (Exception e) {
-            Log.e(TAG, "scheduleRepeat failed", e);
+            Timber.e(e, "scheduleRepeat failed");
         }
     }
 
@@ -93,7 +101,7 @@ public class ApkUpdateService extends GcmTaskService {
     @Override
     public int onRunTask(TaskParams taskParams) {
         if (!StatusUtil.isConnectionAllowed(this)) {
-            Log.d(TAG, "No available authorised connection. Can't perform the requested operation");
+            Timber.d("No available authorised connection. Can't perform the requested operation");
             return GcmNetworkManager.RESULT_SUCCESS;
         }
 
@@ -101,11 +109,12 @@ public class ApkUpdateService extends GcmTaskService {
             Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate(this);
             if (booleanApkDataPair.first) {
                 //save to shared preferences
-                Prefs.saveApkData(this, booleanApkDataPair.second);
+                ApkUpdateStore store = new ApkUpdateStore(new GsonMapper(), new Prefs(this));
+                store.updateApkData(booleanApkDataPair.second);
             }
             return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {
-            Log.e(TAG, "Error with apk version service", e);
+            Timber.e(e, "Error with apk version service");
             return GcmNetworkManager.RESULT_FAILURE;
         }
     }

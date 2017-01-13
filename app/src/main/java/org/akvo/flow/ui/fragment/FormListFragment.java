@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.fragment;
@@ -51,9 +54,14 @@ import java.util.List;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import timber.log.Timber;
+
 public class FormListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
         OnItemClickListener {
-    private static final String TAG = FormListFragment.class.getSimpleName();
 
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
     private static final String EXTRA_RECORD = "record";
@@ -235,7 +243,7 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
+            Timber.w("onFinished() - Loader returned no data");
             return;
         }
 

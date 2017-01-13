@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.view;
@@ -19,7 +22,6 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.graphics.Paint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +40,6 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.CascadeNode;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
@@ -47,10 +48,11 @@ import org.akvo.flow.util.FileUtil.FileType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import timber.log.Timber;
 
 public class CascadeQuestionView extends QuestionView
         implements AdapterView.OnItemSelectedListener {
-    private static final String TAG = CascadeQuestionView.class.getSimpleName();
+
     private static final int POSITION_NONE = -1;// no spinner position id
 
     private static final long ID_NONE = -1;// no node id
@@ -233,8 +235,7 @@ public class CascadeQuestionView extends QuestionView
         updateSpinners(POSITION_NONE);
         if (mDatabase == null) {
             String error = "Cannot load cascade resource: " + getQuestion().getSrc();
-            Log.e(TAG, error);
-            PersistentUncaughtExceptionHandler.recordException(new IllegalStateException(error));
+            Timber.e(new IllegalStateException(error), error);
             setError(error);
         }
     }
@@ -302,7 +303,7 @@ public class CascadeQuestionView extends QuestionView
                 }
                 text.setPaintFlags(flags);
             } catch (ClassCastException e) {
-                Log.e("CascadeAdapter", "View cannot be casted to TextView!");
+                Timber.e("View cannot be casted to TextView!");
             }
         }
     }

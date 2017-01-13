@@ -1,8 +1,26 @@
+/*
+ *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo Flow.
+ *
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.akvo.flow.api;
 
 import android.content.Context;
 import android.util.Base64;
-import android.util.Log;
 
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
@@ -32,8 +50,9 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import timber.log.Timber;
+
 public class S3Api {
-    private static final String TAG = S3Api.class.getSimpleName();
     private static final String URL = "https://%s.s3.amazonaws.com/%s";
     private static final String PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s";// date, bucket, obj
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
@@ -167,16 +186,16 @@ public class S3Api {
 
             int status = conn.getResponseCode();
             if (status != 200 && status != 201) {
-                Log.e(TAG, "Status Code: " + status + ". Expected: 200 or 201");
+                Timber.e("Status Code: " + status + ". Expected: 200 or 201");
                 return false;
             }
             String etag = getEtag(conn);
             if (!md5Hex.equals(etag)) {
-                Log.e(TAG, "ETag comparison failed. Response ETag: " + etag +
+                Timber.e("ETag comparison failed. Response ETag: " + etag +
                         "Locally computed MD5: " + md5Hex);
                 return false;
             }
-            Log.d(TAG, "File successfully uploaded: " + file.getName());
+            Timber.d("File successfully uploaded: " + file.getName());
             return true;
         } finally {
             if (conn != null) {

@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.app;
@@ -23,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
@@ -32,11 +34,11 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.logging.LoggingFactory;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.Locale;
-
-import timber.log.Timber;
 
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
@@ -48,13 +50,13 @@ public class FlowApp extends Application {
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
 
+    private final LoggingFactory loggingFactory = new LoggingFactory();
+
     @Override
     public void onCreate() {
         super.onCreate();
         prefs = new Prefs(getApplicationContext());
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
+        initLogging();
         init();
         startUpdateService();
         app = this;
@@ -62,6 +64,12 @@ public class FlowApp extends Application {
 
     private void startUpdateService() {
         ApkUpdateService.scheduleRepeat(this);
+    }
+
+    private void initLogging() {
+        LoggingHelper helper = loggingFactory.createLoggingHelper(this);
+        helper.initDebugTree();
+        helper.initSentry();
     }
 
     public static FlowApp getApp() {

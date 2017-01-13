@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.activity;
@@ -29,7 +32,6 @@ import android.os.StatFs;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +60,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * Displays the settings menu and handles the user choices
  *
@@ -65,7 +69,6 @@ import java.util.Map;
  */
 public class SettingsActivity extends BackActivity implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = "SettingsActivity";
     private static final String LABEL = "label";
     private static final String DESC = "desc";
 
@@ -382,7 +385,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                             });
             builder.show();
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e, e.getMessage());
             Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
         }
     }

@@ -1,17 +1,20 @@
 /*
 * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
 *
-* This file is part of Akvo FLOW.
-*
-* Akvo FLOW is free software: you can redistribute it and modify it under the terms of
-* the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
-* either version 3 of the License or any later version.
-*
-* Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU Affero General Public License included below for more details.
-*
-* The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  This file is part of Akvo Flow.
+ *
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 package org.akvo.flow.service;
@@ -23,7 +26,6 @@ import android.util.Log;
 import org.akvo.flow.activity.TimeCheckActivity;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConnectivityStateManager;
 
 import java.io.IOException;
@@ -31,6 +33,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+
+import timber.log.Timber;
 
 import static org.akvo.flow.util.StringUtil.isValid;
 
@@ -49,7 +53,6 @@ public class TimeCheckService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         this.connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
         this.prefs = new Prefs(getApplicationContext());
         checkTime();
@@ -58,7 +61,7 @@ public class TimeCheckService extends IntentService {
     private void checkTime() {
         if (!connectivityStateManager.isConnectionAvailable(
                 prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            Log.d(TAG, "No internet connection available. Can't perform the time check.");
+            Timber.d("No internet connection available. Can't perform the time check.");
             return;
         }
 
@@ -82,7 +85,7 @@ public class TimeCheckService extends IntentService {
                 }
             }
         } catch (IOException | ParseException e) {
-            Log.e(TAG, "Error fetching time: ", e);
+            Timber.e(e, "Error fetching time");
         }
     }
 }

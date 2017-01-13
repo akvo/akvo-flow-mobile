@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.service;
@@ -24,7 +27,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,7 +44,6 @@ import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
@@ -73,6 +74,8 @@ import java.util.zip.ZipOutputStream;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import timber.log.Timber;
+
 /**
  * Handle survey export and sync in a background thread. The export process takes
  * no arguments, and will try to zip all the survey instances with a SUBMITTED status
@@ -89,7 +92,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class DataSyncService extends IntentService {
 
-    private static final String TAG = "SyncService";
+    private static final String TAG = "DataSyncService";
     private static final String DELIMITER = "\t";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
 
@@ -141,8 +144,7 @@ public class DataSyncService extends IntentService {
                 syncFiles();// Sync everything
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, e.getMessage());
         } finally {
             if (mDatabase != null) {
                 mDatabase.close();
@@ -190,7 +192,7 @@ public class DataSyncService extends IntentService {
                     String uuid = cursor
                             .getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID));
                     if (!getSurveyInstanceFile(uuid).exists()) {
-                        Log.d(TAG, "Exported file for survey " + uuid + " not found. It's status " +
+                        Timber.d("Exported file for survey " + uuid + " not found. It's status " +
                                 "will be set to 'submitted', and will be reprocessed");
                         updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
                     }
@@ -240,7 +242,7 @@ public class DataSyncService extends IntentService {
             // Write the data into the zip file
             String fileName = zipFile.getAbsolutePath();// Will normalize filename.
             zipFileData.filename = fileName;
-            Log.i(TAG, "Creating zip file: " + fileName);
+            Timber.i("Creating zip file: " + fileName);
             FileOutputStream fout = new FileOutputStream(zipFile);
             CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
             ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
@@ -262,12 +264,10 @@ public class DataSyncService extends IntentService {
 
             final String checksum = "" + checkedOutStream.getChecksum().getValue();
             zos.close();
-            Log.i(TAG,
-                    "Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
+            Timber.i("Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
             return zipFileData;
         } catch (@NonNull IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
+            Timber.e(e, e.getMessage());
             return null;
         }
     }
@@ -278,12 +278,12 @@ public class DataSyncService extends IntentService {
      */
     private void writeTextToZip(@NonNull ZipOutputStream zos, @NonNull String text, String fileName)
             throws IOException {
-        Log.i(TAG, "Writing zip entry");
+        Timber.i("Writing zip entry");
         zos.putNextEntry(new ZipEntry(fileName));
         byte[] allBytes = text.getBytes(UTF_8_CHARSET);
         zos.write(allBytes, 0, allBytes.length);
         zos.closeEntry();
-        Log.i(TAG, "Entry Complete");
+        Timber.i("Entry Complete");
     }
 
     /**
@@ -534,8 +534,7 @@ public class DataSyncService extends IntentService {
                 ok = sendFile(fileAbsolutePath, dir, contentType, isPublic, --retries);
             }
         } catch (IOException e) {
-            Log.e(TAG, "Could not send file: " + fileAbsolutePath + ". " + e.getMessage(), e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, "Could not send file: " + fileAbsolutePath + ". " + e.getMessage());
         }
 
         return ok;
@@ -581,10 +580,10 @@ public class DataSyncService extends IntentService {
                     }
                 }
             } else {
-                Log.e(TAG, "Could not retrieve missing files");
+                Timber.e("Could not retrieve missing files");
             }
         } catch (Exception e) {
-            Log.e(TAG, "Could not retrieve missing files", e);
+            Timber.e(e, "Could not retrieve missing files");
         }
     }
 
@@ -708,7 +707,7 @@ public class DataSyncService extends IntentService {
         try {
             return Integer.valueOf(id);
         } catch (NumberFormatException e) {
-            Log.e(TAG, id + " is not a valid form id");
+            Timber.e(id + " is not a valid form id");
             return 0;
         }
     }

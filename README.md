@@ -1,8 +1,8 @@
-# Akvo FLOW app
+# Akvo Flow app
 
-The Akvo FLOW app is the mobile application for data collection.
+The Akvo Flow app is the mobile application for data collection.
 
-> Akvo FLOW is a tool built specially for international development teams to monitor and evaluate initiatives while working in diverse locations that are often remote or lacking reliable basic infrastructure. It is designed for people who want to understand what is happening now, so they can make informed decisions that lead to secure, sustainable development aid investments.
+> Akvo Flow is a tool built specially for international development teams to monitor and evaluate initiatives while working in diverse locations that are often remote or lacking reliable basic infrastructure. It is designed for people who want to understand what is happening now, so they can make informed decisions that lead to secure, sustainable development aid investments.
 
 Getting Started
 ---------------
@@ -29,10 +29,10 @@ Building the app
 
 License
 -------
-Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
 
-Akvo FLOW is free software: you can redistribute it and modify it under the terms of the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+Akvo Flow is free software: you can redistribute it and modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
 
-Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License included below for more details.
+Akvo Flow is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License in the file LICENSE.txt.
 
-The license can also be seen at http://www.gnu.org/licenses/agpl.html.
+The license can also be seen at http://www.gnu.org/licenses/gpl.html.

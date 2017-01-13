@@ -267,4 +267,6 @@
     <string name="apk_update_service_error_update">There was an error when updating the app. Please try again.</string>
     <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
 
+    <string name="locale_list_error_unknown_location">Unknown Location</string>
+
 </resources>

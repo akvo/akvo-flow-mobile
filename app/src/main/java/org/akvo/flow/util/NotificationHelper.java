@@ -1,16 +1,20 @@
 /*
  * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- * This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -20,6 +24,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+
 import org.akvo.flow.R;
 
 public class NotificationHelper {
@@ -131,7 +137,7 @@ public class NotificationHelper {
 
     private static NotificationCompat.Builder createNotificationBuilder(String title, String text, Context context) {
         return createDefaultNotification(title, text, context)
-                .setColor(context.getResources().getColor(R.color.orange_main));
+                .setColor(ContextCompat.getColor(context, R.color.orange_main));
     }
 
     private static NotificationCompat.Builder createDefaultNotification(String title, String text, Context context) {
@@ -144,6 +150,6 @@ public class NotificationHelper {
 
     private static NotificationCompat.Builder createErrorNotificationBuilder(String title, String text, Context context) {
         return createDefaultNotification(title, text, context)
-                .setColor(context.getResources().getColor(R.color.red));
+                .setColor(ContextCompat.getColor(context, R.color.red));
     }
 }

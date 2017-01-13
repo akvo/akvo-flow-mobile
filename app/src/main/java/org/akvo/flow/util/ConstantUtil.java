@@ -1,16 +1,20 @@
 /*
  * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- * This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -175,6 +179,7 @@ public class ConstantUtil {
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";
+    public static final String SENTRY_DSN = "sentryDsn";
 
     /**
      * S3 bucket directories (object prefixes)
@@ -248,6 +253,11 @@ public class ConstantUtil {
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
     public static final int FLEX_IN_SECONDS = 1 * 60 * 60; //1 hour
+
+    /**
+     * 7 days
+     */
+    public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
 
     //requests
     public static final int REQUEST_ADD_USER = 0;

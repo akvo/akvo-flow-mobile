@@ -1,22 +1,24 @@
 /*
  *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.activity;
 
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,8 +29,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -65,9 +67,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
-    private static final String TAG = FormActivity.class.getSimpleName();
 
     private static final int PHOTO_ACTIVITY_REQUEST = 1;
     private static final int VIDEO_ACTIVITY_REQUEST = 2;
@@ -124,7 +127,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         loadLanguages();
 
         if (mSurvey == null) {
-            Log.e(TAG, "mSurvey is null. Finishing the Activity...");
+            Timber.e("mSurvey is null. Finishing the Activity...");
             finish();
         }
 
@@ -143,7 +146,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         spaceLeftOnCard();
-        Log.d(TAG, "form activity");
+        Timber.d("form activity");
     }
 
     /**
@@ -196,7 +199,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             mSurvey = SurveyDao.loadSurvey(surveyMeta, in);
             mSurvey.setId(surveyId);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not load survey xml file");
+            Timber.e(e, "Could not load survey xml file");
         } finally {
             if (in != null) {
                 try {
@@ -455,14 +458,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {
-                    Log.i(TAG, "Image resized to: " +
+                    Timber.i("Image resized to: " +
                             getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize]);
                     if (!tmp.delete()) { // must check return value to know if it failed
-                        Log.e(TAG, "Media file delete failed");
+                        Timber.e("Media file delete failed");
                     }
                 } else if (!tmp.renameTo(imgFile)) {
                     // must check  return  value to  know if it  failed!
-                    Log.e(TAG, "Media file resize failed");
+                    Timber.e("Media file resize failed");
                 }
 
                 Bundle photoData = new Bundle();
@@ -605,7 +608,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             if (event.getSource() != null) {
                 mRequestQuestionId = event.getSource().getQuestion().getId();
             } else {
-                Log.e(TAG, "Question source was null in the event");
+                Timber.e("Question source was null in the event");
             }
 
             startActivityForResult(i, PHOTO_ACTIVITY_REQUEST);
@@ -616,7 +619,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             if (event.getSource() != null) {
                 mRequestQuestionId = event.getSource().getQuestion().getId();
             } else {
-                Log.e(TAG, "Question source was null in the event");
+                Timber.e("Question source was null in the event");
             }
 
             startActivityForResult(i, VIDEO_ACTIVITY_REQUEST);
@@ -627,7 +630,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 if (event.getSource() != null) {
                     mRequestQuestionId = event.getSource().getQuestion().getId();
                 } else {
-                    Log.e(TAG, "Question source was null in the event");
+                    Timber.e("Question source was null in the event");
                 }
             } catch (ActivityNotFoundException ex) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

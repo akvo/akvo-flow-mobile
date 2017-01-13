@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.api;
@@ -22,7 +25,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
@@ -38,12 +40,12 @@ import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StatusUtil;
-import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -58,9 +60,9 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public class FlowApi {
+import timber.log.Timber;
 
-    private static final String TAG = FlowApi.class.getSimpleName();
+public class FlowApi {
 
     //These values never change
     private static final String API_KEY;
@@ -96,7 +98,7 @@ public class FlowApi {
                 json = new JSONObject(response);
                 time = json.getString("time");
             } catch (JSONException e1) {
-                Log.e(TAG, "Error fetching time: ", e1);
+                Timber.e(e1, "Error fetching time");
             }
         }
         return time;
@@ -191,12 +193,12 @@ public class FlowApi {
         String url = buildProcessingNotificationUrl(serverBaseUrl, formId, action, fileName);
         try {
             HttpUtil.httpGet(url);
-            return HttpStatus.SC_OK;
+            return HttpURLConnection.HTTP_OK;
         } catch (HttpException e) {
-            Log.e(TAG, e.getStatus() + " response for formId: " + formId);
+            Timber.e(e.getStatus() + " response for formId: " + formId);
             return e.getStatus();
         } catch (Exception e) {
-            Log.e(TAG, "GAE sync notification failed for file: " + fileName);
+            Timber.e("GAE sync notification failed for file: " + fileName);
             return ERROR_UNKNOWN;
         }
     }
@@ -262,7 +264,7 @@ public class FlowApi {
         try {
             return URLEncoder.encode(param, CHARSET_UTF8);
         } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
             return "";
         }
     }
@@ -285,7 +287,7 @@ public class FlowApi {
 
             authorization = Base64.encodeToString(rawHmac, Base64.DEFAULT);
         } catch (@NonNull NoSuchAlgorithmException | InvalidKeyException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
         return authorization;
@@ -298,7 +300,7 @@ public class FlowApi {
         try {
             return URLEncoder.encode(dateFormat.format(new Date()), CHARSET_UTF8);
         } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
             return null;
         }
     }

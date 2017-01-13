@@ -1,16 +1,20 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- * This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.fragment;
@@ -26,7 +30,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,11 +62,12 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 //TODO: separate single data point and multiple into different classes for clarity
 public class MapFragment extends SupportMapFragment
         implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener, OnMapReadyCallback {
 
-    private static final String TAG = MapFragment.class.getSimpleName();
     public static final int MAP_ZOOM_LEVEL = 10;
 
     private SurveyGroup mSurveyGroup;
@@ -293,7 +297,7 @@ public class MapFragment extends SupportMapFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
+            Timber.w("onFinished() - Loader returned no data");
             return;
         }
 

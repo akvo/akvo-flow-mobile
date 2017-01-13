@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -22,6 +25,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.provider.Settings.Secure;
+import android.support.annotation.Nullable;
 import android.util.TypedValue;
 
 import java.io.File;
@@ -33,6 +37,9 @@ import java.util.UUID;
 public class PlatformUtil {
 
     /**
+     * TODO: use versionCode to compare versions as versionName field does not have to be X.Y.Z
+     * format
+     *
      * Check if a given version is newer than the current one.
      * Versions are expected to be formatted in a dot-decimal notation: X.Y.Z,
      * being X, Y, and Z integers, and each number separated by a full stop (dot).
@@ -41,7 +48,11 @@ public class PlatformUtil {
      * @param newVersion
      * @return true if the second version is newer than the first one, false otherwise
      */
-    public static boolean isNewerVersion(String installedVersion, String newVersion) {
+    public static boolean isNewerVersion(@Nullable String installedVersion,
+            @Nullable String newVersion) {
+        if (installedVersion == null || newVersion == null) {
+            return false;
+        }
         // Ensure the Strings are properly formatted
         final String regex = "^\\d+(\\.\\d+)*$";// Check dot-decimal notation
         if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {

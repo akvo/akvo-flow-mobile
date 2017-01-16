@@ -135,7 +135,7 @@ public class SurveyDownloadService extends IntentService {
         }
 
         List<Survey> surveys;
-        if (surveyIds != null) {
+        if (surveyIds != null && surveyIds.length > 0) {
             surveys = getSurveyHeaders(surveyIds);
         } else {
             surveys = checkForSurveys();

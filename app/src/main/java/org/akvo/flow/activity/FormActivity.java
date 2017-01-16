@@ -28,16 +28,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
@@ -78,9 +83,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
-
 import timber.log.Timber;
+
+import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
@@ -463,78 +468,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                     long id) {
-                Language language = languageAdapter.getItem(position);
-                language.setSelected(!language.isSelected());
-                languageAdapter.notifyDataSetChanged();
+              languageAdapter.updateSelected(position);
             }
         });
-        alertDialog.show();
-    }
-
-    /**
-     * displays a dialog box for allowing selection of countries from a list
-     * TODO: remove
-     */
-    private void displayLanguageSelectionDialog(final Context context,
-            final boolean[] selections,
-            final DialogInterface.OnClickListener listener,
-            final int labelResourceId, final CharSequence[] languages,
-            final boolean selectionMandatory,
-            final int mandatoryTitleResourceId,
-            final int mandatoryTextResourceId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(context)
-                .setTitle(labelResourceId)
-                .setMultiChoiceItems(languages, selections,
-                        new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int which, boolean isChecked) {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        break;
-                                }
-                            }
-                        })
-                .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        boolean isValid = false;
-                        if (selectionMandatory) {
-                            for (int i = 0; i < selections.length; i++) {
-                                if (selections[i]) {
-                                    isValid = true;
-                                    break;
-                                }
-                            }
-                        } else {
-                            isValid = true;
-                        }
-                        if (isValid) {
-                            listener.onClick(dialog, which);
-                        } else {
-                            ViewUtil.showConfirmDialog(mandatoryTitleResourceId,
-                                    mandatoryTextResourceId, context, false,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface dialog,
-                                                int which) {
-                                            if (dialog != null) {
-                                                dialog.dismiss();
-                                            }
-                                            displayLanguageSelectionDialog(context,
-                                                    selections, listener,
-                                                    labelResourceId,
-                                                    languages,
-                                                    selectionMandatory,
-                                                    mandatoryTitleResourceId,
-                                                    mandatoryTextResourceId);
-                                        }
-                                    });
-                        }
-                    }
-                }).create();
         alertDialog.show();
     }
 
@@ -859,13 +795,18 @@ public class FormActivity extends BackActivity implements SurveyListener,
         return new File(FileUtil.getFilesDir(FileType.TMP), filename);
     }
 
-    private static class LanguageAdapter extends ArrayAdapter<Language> {
+    public static class LanguageAdapter extends ArrayAdapter<Language> {
+
+        @LayoutRes
+        public static final int LAYOUT_RESOURCE_ID = R.layout.language_list_item;
 
         private final List<Language> languages;
+        private final LayoutInflater inflater;
 
         public LanguageAdapter(Context context, List<Language> languages) {
-            super(context, android.R.layout.simple_list_item_1, languages);
+            super(context, LAYOUT_RESOURCE_ID, languages);
             this.languages = languages == null ? new ArrayList<Language>() : languages;
+            this.inflater = LayoutInflater.from(context);
         }
 
         public Set<String> getSelectedLanguages() {
@@ -876,6 +817,33 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 }
             }
             return selectedLanguages;
+        }
+
+        @Nullable @Override
+        public Language getItem(int position) {
+            return languages.get(position);
+        }
+
+        @NonNull @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            final View view;
+            final CheckBox checkBox;
+            Language language = getItem(position);
+            if (convertView == null) {
+                view = inflater.inflate(LAYOUT_RESOURCE_ID, parent, false);
+            } else {
+                view = convertView;
+            }
+            checkBox = (CheckBox)view.findViewById(R.id.language_checkbox);
+            checkBox.setText(language.getLanguage());
+            checkBox.setChecked(language.isSelected());
+            return view;
+        }
+
+        public void updateSelected(int position) {
+            Language language = getItem(position);
+            language.setSelected(!language.isSelected());
+            notifyDataSetChanged();
         }
     }
 

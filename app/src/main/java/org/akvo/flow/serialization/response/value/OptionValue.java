@@ -1,7 +1,23 @@
+/*
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *
+ * This file is part of Akvo FLOW.
+ *
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ * either version 3 of the License or any later version.
+ *
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
+ *
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
+ */
+
 package org.akvo.flow.serialization.response.value;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.domain.Option;
 import org.json.JSONArray;
@@ -11,8 +27,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class OptionValue {
-    private static final String TAG = OptionValue.class.getSimpleName();
 
     public static String serialize(List<Option> values) {
         try {
@@ -30,7 +47,7 @@ public class OptionValue {
             }
             return jOptions.toString();
         } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
         return "";
     }
@@ -49,7 +66,7 @@ public class OptionValue {
             }
             return options;
         } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
         // Default to old format

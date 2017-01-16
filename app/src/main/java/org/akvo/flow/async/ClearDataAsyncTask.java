@@ -16,12 +16,9 @@
 
 package org.akvo.flow.async;
 
-import java.lang.ref.WeakReference;
-
 import android.content.Context;
 import android.database.SQLException;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -29,8 +26,11 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 
+import java.lang.ref.WeakReference;
+
+import timber.log.Timber;
+
 public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
-    private static final String TAG = ClearDataAsyncTask.class.getSimpleName();
 
     /**
      * Use a WeakReference to avoid Context leaks
@@ -58,7 +58,7 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
             // External storage
             clearExternalStorage(responsesOnly);
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
             ok = false;
         }
 

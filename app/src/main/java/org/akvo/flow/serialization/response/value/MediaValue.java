@@ -16,7 +16,6 @@
 package org.akvo.flow.serialization.response.value;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -26,9 +25,9 @@ import org.akvo.flow.domain.response.value.Media;
 
 import java.io.IOException;
 
+import timber.log.Timber;
 
 public class MediaValue {
-    private static final String TAG = MediaValue.class.getSimpleName();
 
     public static String serialize(Media media) {
         ObjectMapper mapper = new ObjectMapper();
@@ -37,7 +36,7 @@ public class MediaValue {
         try {
             return mapper.writeValueAsString(media);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
         return "";
     }
@@ -50,7 +49,7 @@ public class MediaValue {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(data, Media.class);
         } catch (IOException e) {
-            Log.e(TAG, "Value is not a valid JSON response: " + data);
+            Timber.e("Value is not a valid JSON response: " + data);
         }
 
         // Assume old format - plain image

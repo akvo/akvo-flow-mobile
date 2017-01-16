@@ -16,9 +16,9 @@
 
 package org.akvo.flow.domain;
 
-import android.util.Log;
-
 import org.akvo.flow.util.ConstantUtil;
+
+import timber.log.Timber;
 
 /**
  * rule used to translate a free text response into some other type of value.
@@ -26,7 +26,6 @@ import org.akvo.flow.util.ConstantUtil;
  * @author Christopher Fagiani
  */
 public class ScoringRule {
-    private static final String TAG = "ScoringRule";
 
     private String type;
     private String min;
@@ -100,7 +99,7 @@ public class ScoringRule {
                         }
                     }
                 } catch (NumberFormatException e) {
-                    Log.e(TAG, "Can't perform numeric scoring", e);
+                    Timber.e(e, "Can't perform numeric scoring");
                 }
             } else if (ConstantUtil.TEXT_MATCH_SCORING.equalsIgnoreCase(type)) {
                 if (response.equals(text)) {

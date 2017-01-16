@@ -23,7 +23,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.FileTransmission;
@@ -45,6 +44,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import timber.log.Timber;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well
@@ -191,7 +192,6 @@ public class SurveyDbAdapter {
         int FORM_DELETED = 4;
     }
 
-    private static final String TAG = "SurveyDbAdapter";
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
@@ -331,7 +331,7 @@ public class SurveyDbAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.d(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
+            Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
 
             int version = oldVersion;
 
@@ -356,7 +356,7 @@ public class SurveyDbAdapter {
             }
 
             if (version != DATABASE_VERSION) {
-                Log.d(TAG, "onUpgrade() - Recreating the Database.");
+                Timber.d("onUpgrade() - Recreating the Database.");
 
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
                 db.execSQL("DROP TABLE IF EXISTS " + Tables.SYNC_TIME);
@@ -547,7 +547,7 @@ public class SurveyDbAdapter {
                 new String[] { String.valueOf(surveyInstanceId) });
 
         if (rows < 1) {
-            Log.e(TAG, "Could not update status for Survey Instance: " + surveyInstanceId);
+            Timber.e("Could not update status for Survey Instance: " + surveyInstanceId);
         }
     }
 
@@ -810,7 +810,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         surveyId
                 }) < 1) {
-            Log.e(TAG, "Could not update record for Survey " + surveyId);
+            Timber.e("Could not update record for Survey " + surveyId);
         }
     }
 

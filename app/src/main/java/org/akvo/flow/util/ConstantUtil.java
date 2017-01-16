@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -248,7 +248,11 @@ public class ConstantUtil {
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
-    public static final int FLEX_IN_SECONDS = 1 * 60 * 60; //1 hour
+    public static final int FLEX_INTERVAL_IN_SECONDS = 1 * 60 * 60; //1 hour
+
+    //first runs will be faster
+    public static final int FIRST_REPEAT_INTERVAL_IN_SECONDS = 1 * 60;
+    public static final int FIRST_FLEX_INTERVAL_IN_SECOND = 30;
 
     /**
      * 7 days

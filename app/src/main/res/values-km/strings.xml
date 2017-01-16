@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
-  <string name="app_name">Akvo FLOW</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <string name="accuracy">អាស៊ីស៊ី</string>
   <string name="searching">ស្វែងរក...</string>
   <string name="ready">រួចរាល់</string>
@@ -31,8 +30,8 @@
   <string name="screenoptdesc">បង្ការស្គ្រីនទូរស័ព្ទកុំឲ្យរលត់ពេលកំពុងបញ្ចូលទិន្នន័យអង្កេត។ ត្រូវបិទពន្លត់ស្គ្រីន (ឬចេញពី app) ពេលមិនប្រើ ដើម្បីចៀសវាងការស៊ីថ្មខ្លាំង </string>
   <string name="aboutlabel">អំពី</string>
   <string name="aboutdesc">ពត៌មានអំពីច្បាប់កំណែនៃអេក្រង់</string>
-  <string name="abouttitle">អំពី - AKVO Flow App</string>
-  <string name="abouttext">Akvo FLOW App\បង្កើតដោយ: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion  </string>
+  <string name="abouttitle">អំពី - Akvo Flow App</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow App\nបង្កើតដោយ: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
   <string name="gpsstatuslabel">ស្ថានភាពជីភីអេស </string>
   <string name="gpsstatusdesc">ដំណើរការស្ថានភាពជីភីអេស ប្រសិនបើអ្នកបានតម្លើងវាក្នុងឧបករណ៍នេះ </string>
   <string name="nogpsstatus">ស្ថានភាពជីភីអេសពុំមានតម្លើងក្នុងឧបករណ៍នេះឡើយ។ សូមតម្លើងវាដោយចូលទៅក្នុង Google Play Store </string>
@@ -46,7 +45,6 @@
   <string name="savelastuserlabel">រក្សាទុកអ្នកប្រើប្រាស់ចុងក្រោយឲ្យចូលបានរហូត​រវាងវគ្គនិមួយៗ</string>
   <string name="uploadoptionlabel">ទិន្នន័យដោយប្រើបណ្តាញទូរស័ព្ទ (3G)</string>
   <string name="surveylanglabel">ភាសាប្រើក្នុងការអង្កេត</string>
-  <string name="beaconlabel">បញ្ជូនសញ្ញានាំផ្លូវទីតាំង</string>
   <string name="scanbarcode">ស្គែនសញ្ញានាំផ្លូវ</string>
   <string name="barcodeerror">ឧបករណ៍ស្គែនមិនបានតម្លើងឡើយ។ សូមតម្លើង Appសម្រាប់ស្កែនសញ្ញានាំផ្លូវនៅក្នុងផ្សារអាន់ដ្រូយ </string>
   <string name="toosmallerr">តម្លៃតូចជ្រុល។ តម្លៃអប្បបរមាៈ  </string>
@@ -86,7 +84,7 @@
   <string name="bootstrapstart">កំពុងផ្ទុកទិន្នន័យអង្កេតពី SD card </string>
   <string name="bootstrapcomplete">ការផ្ទុកទិន្នន័យអង្កេតពី SD card បានធ្វើរួចរាល់ </string>
   <string name="bootstraperror">ដំណើរការ bootstrap ឯកសារzip​មានកំហុសឆ្គង </string>
-  <string name="bootstrap_invalid_app">កំហុសឆ្គងៈ ទម្រង់មិនមែនជារបស់​ FLOW instance នេះទេ </string>
+  <string name="bootstrap_invalid_app">កំហុសឆ្គងៈ ទម្រង់មិនមែនជារបស់​ Flow instance នេះទេ </string>
   <string name="transmissionhist">ប្រវតិ្តការបញ្ជូន </string>
   <string name="transstartdate">បានចាប់ផ្តើមៈ </string>
   <string name="transenddate">បានបញ្ចប់ៈ </string>
@@ -118,7 +116,7 @@
   <string name="loading">កំពុងផ្ទុក...</string>
   <string name="prefill_title">បំពេញចម្លើយជាមុន </string>
   <string name="prefill_text">បំពេញទម្រង់ជាមុន ដោយប្រើចម្លើយលើកមុន?</string>
-  <string name="error_assignment_text">ត្រូវការ ការចាត់ចែងកិច្ចការ នៅក្នុងដាសបូតរបស់ AKVO Flow</string>
+  <string name="error_assignment_text">ត្រូវការ ការចាត់ចែងកិច្ចការ នៅក្នុងដាសបូតរបស់ Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_title">ការដាក់ទិន្នន័យឲ្យចេញដំណាលគ្នា </string>
   <string name="data_sync_text">កំពុងផ្ទុកទិន្នន័យចូលក្នុងឧបករណ៍។ សូមរង់ចាំ... </string>
@@ -202,8 +200,8 @@
   <string name="status_submitted">បានបញ្ជូនចេញ </string>
   <string name="status_exported">បាននាំចេញ </string>
   <!--APK update-->
-  <string name="app_update_activity">ធ្វើបច្ចុប្បន្នភាព AKVO Flow</string>
-  <string name="app_update">មានច្បាប់កំណែថ្មីរបស់ AKVO App។ ចូរចុច ​\'ធ្វើបច្ចុប្បន្នភាព\' ដើម្បីដោនឡូត និងតម្លើងច្បាប់កំណែថ្មី។</string>
+  <string name="app_update_activity">ធ្វើបច្ចុប្បន្នភាព Akvo Flow</string>
+  <string name="app_update">មានច្បាប់កំណែថ្មីរបស់ Akvo App។ ចូរចុច ​\'ធ្វើបច្ចុប្បន្នភាព\' ដើម្បីដោនឡូត និងតម្លើងច្បាប់កំណែថ្មី។</string>
   <string name="update">ធ្វើបច្ចុប្បន្នភាព</string>
   <string name="not_now">មិនមែនពេលនេះទេ </string>
   <string name="clicktoinstall">ច្បាប់កំណែថ្មីរបស់ Flow បានដោនឡូត។ តើអ្នកចង់តម្លើងវាឥឡូវឬទេ?</string>
@@ -219,6 +217,7 @@
   <string name="error_form_header">ទម្រង់ %1$s មិនអាចអានចេញពីដាសបូតលំហូឡើយ</string>
   <string name="error_form_download">ត្រូវប្រាកដថា ទម្រង់បានបោះពុម្ភ និងការកំណត់កាលបរិចេ្ឆទ និងពេលវេលាក្នុងស្រុករបស់អ្នក OK  </string>
   <string name="form_deleted">ទម្រង់នេះត្រូវបានលុបចេញ</string>
+  <!--File sync-->
   <!--Plotting-->
   <string name="geoshape_area">តំបន់</string>
   <string name="geoshape_line">ខ្សែ</string>
@@ -252,4 +251,6 @@
   <string name="error_value_required">ចន្លោះនេះមិនអាចចំហចោលឡើយ</string>
   <string name="drawer_open">ថត បើក</string>
   <string name="drawer_close">ថត បិទ </string>
+  <!--settings activity-->
+  <!--app update service-->
 </resources>

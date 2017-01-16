@@ -19,6 +19,9 @@
     <color name="button_grey_light_selected">#808285</color>
     <color name="button_grey_dark">#79736e</color>
     <color name="button_grey_dark_selected">#000000</color>
+    <color name="image_button_grey_disabled">#5094918e</color>
+    <color name="image_button_grey">#94918e</color>
+    <color name="image_button_grey_selected">#85827f</color>
 
     <!-- FLOW branding -->
     <color name="background_main">#fffef2e7</color>

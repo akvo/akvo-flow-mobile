@@ -22,7 +22,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -35,8 +35,8 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -59,9 +59,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeoshapeActivity extends ActionBarActivity
-    implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener,
-    OnMapReadyCallback {
+public class GeoshapeActivity extends AppCompatActivity
+        implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener,
+        OnMyLocationChangeListener, OnMapReadyCallback {
 
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";

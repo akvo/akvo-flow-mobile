@@ -61,4 +61,13 @@
         <item name="colorControlNormal">@color/black_disabled</item>
     </style>
 
+    <style name="ImageButtonStyle">
+        <item name="android:background">@drawable/image_button_background</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
 </resources>

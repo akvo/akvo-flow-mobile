@@ -430,9 +430,21 @@ public class FormActivity extends BackActivity implements SurveyListener,
         List<Language> languages = languageMapper
                 .transform(mLanguages, mSurvey.getAvailableLanguageCodes());
         final LanguageAdapter languageAdapter = new LanguageAdapter(this, languages);
+
+        ListView listView = new ListView(this);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        listView.setAdapter(languageAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                    long id) {
+                languageAdapter.updateSelected(position);
+            }
+        });
+
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.surveylanglabel)
-                .setAdapter(languageAdapter, null)
+                .setView(listView)
                 .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
 
                     @Override
@@ -463,15 +475,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
                         }
                     }
                 }).create();
-        alertDialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        alertDialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                    long id) {
-              languageAdapter.updateSelected(position);
-            }
-        });
         alertDialog.show();
+
     }
 
     @Override

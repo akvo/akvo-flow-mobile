@@ -62,21 +62,20 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
     public Set<String> getLanguagePreferences(String surveyId) {
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         Set<String> languages = new LinkedHashSet<>();
-        //english is added by default at the beginning, should it?
-        languages.add(ConstantUtil.ENGLISH_CODE);
         Cursor cursor = database.query(LanguageTable.TABLE_NAME,
                 new String[] { LanguageTable.COLUMN_LANGUAGE_CODE },
                 LanguageTable.COLUMN_SURVEY_ID + " = ?",
                 new String[] { surveyId },
                 null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
-                int languageCodeColumnIndex = cursor
-                        .getColumnIndexOrThrow(LanguageTable.COLUMN_LANGUAGE_CODE);
-            if (languageCodeColumnIndex >= 0) {
-                do {
-                    languages.add(cursor.getString(languageCodeColumnIndex));
-                } while (cursor.moveToNext());
-            }
+            int languageCodeColumnIndex = cursor
+                    .getColumnIndexOrThrow(LanguageTable.COLUMN_LANGUAGE_CODE);
+            do {
+                languages.add(cursor.getString(languageCodeColumnIndex));
+            } while (cursor.moveToNext());
+        } else {
+            //if nothing there, we add english
+            languages.add(ConstantUtil.ENGLISH_CODE);
         }
         cursor.close();
         databaseHelper.close();

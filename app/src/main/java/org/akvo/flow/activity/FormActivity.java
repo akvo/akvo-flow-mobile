@@ -20,7 +20,6 @@
 package org.akvo.flow.activity;
 
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,9 +27,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -39,10 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
@@ -60,6 +54,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
 import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
@@ -76,9 +71,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -427,21 +420,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void displayLanguagesDialog() {
-        List<Language> languages = languageMapper
-                .transform(mLanguages, mSurvey.getAvailableLanguageCodes());
-        final LanguageAdapter languageAdapter = new LanguageAdapter(this, languages);
-
-        ListView listView = new ListView(this);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        listView.setAdapter(languageAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                    long id) {
-                languageAdapter.updateSelected(position);
-            }
-        });
-
+        final ListView listView = createLanguagesList();
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.surveylanglabel)
                 .setView(listView)
@@ -449,34 +428,65 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Set<String> selectedLanguages = languageAdapter.getSelectedLanguages();
-                        if (selectedLanguages != null && selectedLanguages.size() > 0) {
-                            if (dialog != null) {
-                                dialog.dismiss();
-                            }
-                            surveyLanguagesDataSource.saveLanguagePreferences(surveyId,
-                                    selectedLanguages);
-                            loadLanguages();
-                            mAdapter.notifyOptionsChanged();
-                        } else {
-                            ViewUtil.showConfirmDialog(R.string.langmandatorytitle,
-                                    R.string.langmandatorytext, FormActivity.this, false,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface dialog,
-                                                int which) {
-                                            if (dialog != null) {
-                                                dialog.dismiss();
-                                            }
-                                            displayLanguagesDialog();
-                                        }
-                                    });
+                        if (dialog != null) {
+                            dialog.dismiss();
                         }
+                        useSelectedLanguages((LanguageAdapter) listView.getAdapter());
                     }
                 }).create();
         alertDialog.show();
+    }
 
+    private void useSelectedLanguages(LanguageAdapter languageAdapter) {
+        Set<String> selectedLanguages = languageAdapter.getSelectedLanguages();
+        if (selectedLanguages != null && selectedLanguages.size() > 0) {
+            saveLanguages(selectedLanguages);
+        } else {
+            displayError();
+        }
+    }
+
+    private void displayError() {
+        ViewUtil.showConfirmDialog(R.string.langmandatorytitle,
+                R.string.langmandatorytext, this, false,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(
+                            DialogInterface dialog,
+                            int which) {
+                        if (dialog != null) {
+                            dialog.dismiss();
+                        }
+                        displayLanguagesDialog();
+                    }
+                });
+    }
+
+    private void saveLanguages(Set<String> selectedLanguages) {
+        surveyLanguagesDataSource.saveLanguagePreferences(surveyId,
+                selectedLanguages);
+        loadLanguages();
+        mAdapter.notifyOptionsChanged();
+    }
+
+    @NonNull
+    private ListView createLanguagesList() {
+        List<Language> languages = languageMapper
+                .transform(mLanguages, mSurvey.getAvailableLanguageCodes());
+        languages.add(new Language("French", "fr", false)); //remove testing
+        final LanguageAdapter languageAdapter = new LanguageAdapter(this, languages);
+
+        final ListView listView = (ListView) LayoutInflater.from(this)
+                .inflate(R.layout.languages_list, null);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        listView.setAdapter(languageAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                languageAdapter.updateSelected(position);
+            }
+        });
+        return listView;
     }
 
     @Override
@@ -799,57 +809,4 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 : TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
         return new File(FileUtil.getFilesDir(FileType.TMP), filename);
     }
-
-    public static class LanguageAdapter extends ArrayAdapter<Language> {
-
-        @LayoutRes
-        public static final int LAYOUT_RESOURCE_ID = R.layout.language_list_item;
-
-        private final List<Language> languages;
-        private final LayoutInflater inflater;
-
-        public LanguageAdapter(Context context, List<Language> languages) {
-            super(context, LAYOUT_RESOURCE_ID, languages);
-            this.languages = languages == null ? new ArrayList<Language>() : languages;
-            this.inflater = LayoutInflater.from(context);
-        }
-
-        public Set<String> getSelectedLanguages() {
-            Set<String> selectedLanguages = new LinkedHashSet<>(3);
-            for (Language language : languages) {
-                if (language.isSelected()) {
-                    selectedLanguages.add(language.getLanguageCode());
-                }
-            }
-            return selectedLanguages;
-        }
-
-        @Nullable @Override
-        public Language getItem(int position) {
-            return languages.get(position);
-        }
-
-        @NonNull @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            final View view;
-            final CheckBox checkBox;
-            Language language = getItem(position);
-            if (convertView == null) {
-                view = inflater.inflate(LAYOUT_RESOURCE_ID, parent, false);
-            } else {
-                view = convertView;
-            }
-            checkBox = (CheckBox)view.findViewById(R.id.language_checkbox);
-            checkBox.setText(language.getLanguage());
-            checkBox.setChecked(language.isSelected());
-            return view;
-        }
-
-        public void updateSelected(int position) {
-            Language language = getItem(position);
-            language.setSelected(!language.isSelected());
-            notifyDataSetChanged();
-        }
-    }
-
 }

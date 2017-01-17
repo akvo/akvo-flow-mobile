@@ -20,6 +20,8 @@
 
 package org.akvo.flow.ui.model;
 
+import org.akvo.flow.ui.adapter.LanguageAdapter;
+
 public class Language {
 
     private final String languageCode;
@@ -50,7 +52,7 @@ public class Language {
     }
 
     /**
-     * Used by the {@link org.akvo.flow.activity.FormActivity.LanguageAdapter} to display text to
+     * Used by the {@link LanguageAdapter} to display text to
      * the user
      * @return
      */

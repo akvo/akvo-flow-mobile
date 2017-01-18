@@ -19,7 +19,6 @@
 
 package org.akvo.flow.activity;
 
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -54,6 +53,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
 import org.akvo.flow.ui.model.Language;
@@ -82,14 +82,6 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
-
-    private static final int PHOTO_ACTIVITY_REQUEST = 1;
-    private static final int VIDEO_ACTIVITY_REQUEST = 2;
-    private static final int SCAN_ACTIVITY_REQUEST = 3;
-    private static final int EXTERNAL_SOURCE_REQUEST = 4;
-    private static final int CADDISFLY_REQUEST = 5;
-    private static final int PLOTTING_REQUEST = 6;
-    private static final int SIGNATURE_REQUEST = 7;
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
@@ -120,6 +112,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
     private String surveyId;
+    private Navigator navigator = new Navigator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -396,12 +389,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 displayPrefillDialog();
                 return true;
             case R.id.view_map:
-                startActivity(new Intent(this, MapActivity.class)
-                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecordId));
+                navigator.navigateToMapActivity(this, mRecordId);
                 return true;
             case R.id.transmission:
-                startActivity(new Intent(this, TransmissionHistoryActivity.class)
-                        .putExtra(ConstantUtil.RESPONDENT_ID_KEY, mSurveyInstanceId));
+                navigator.navigateToTransmissionActivity(this, mSurveyInstanceId);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -473,7 +464,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private ListView createLanguagesList() {
         List<Language> languages = languageMapper
                 .transform(mLanguages, mSurvey.getAvailableLanguageCodes());
-        languages.add(new Language("French", "fr", false)); //remove testing
         final LanguageAdapter languageAdapter = new LanguageAdapter(this, languages);
 
         final ListView listView = (ListView) LayoutInflater.from(this)
@@ -497,11 +487,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         switch (requestCode) {
-            case PHOTO_ACTIVITY_REQUEST:
-            case VIDEO_ACTIVITY_REQUEST:
+            case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
+            case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
                 String fileSuffix =
-                        requestCode == PHOTO_ACTIVITY_REQUEST ? IMAGE_SUFFIX : VIDEO_SUFFIX;
-                File tmp = getTmpFile(requestCode == PHOTO_ACTIVITY_REQUEST);
+                        requestCode == ConstantUtil.PHOTO_ACTIVITY_REQUEST ? IMAGE_SUFFIX : VIDEO_SUFFIX;
+                File tmp = getTmpFile(requestCode == ConstantUtil.PHOTO_ACTIVITY_REQUEST);
 
                 // Ensure no image is saved in the DCIM folder
                 FileUtil.cleanDCIM(this, tmp.getAbsolutePath());
@@ -528,11 +518,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
                 mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
                 break;
-            case EXTERNAL_SOURCE_REQUEST:
-            case CADDISFLY_REQUEST:
-            case SCAN_ACTIVITY_REQUEST:
-            case PLOTTING_REQUEST:
-            case SIGNATURE_REQUEST:
+            case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
+            case ConstantUtil.CADDISFLY_REQUEST:
+            case ConstantUtil.SCAN_ACTIVITY_REQUEST:
+            case ConstantUtil.PLOTTING_REQUEST:
+            case ConstantUtil.SIGNATURE_REQUEST:
             default:
                 mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
                 break;
@@ -651,90 +641,88 @@ public class FormActivity extends BackActivity implements SurveyListener,
      */
     public void onQuestionInteraction(QuestionInteractionEvent event) {
         if (QuestionInteractionEvent.TAKE_PHOTO_EVENT.equals(event.getEventType())) {
-            // fire off the intent
-            Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTmpFile(true)));
-            if (event.getSource() != null) {
-                mRequestQuestionId = event.getSource().getQuestion().getId();
-            } else {
-                Timber.e("Question source was null in the event");
-            }
-
-            startActivityForResult(i, PHOTO_ACTIVITY_REQUEST);
+            navigateToTakePhoto(event);
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event.getEventType())) {
-            // fire off the intent
-            Intent i = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTmpFile(false)));
-            if (event.getSource() != null) {
-                mRequestQuestionId = event.getSource().getQuestion().getId();
-            } else {
-                Timber.e("Question source was null in the event");
-            }
-
-            startActivityForResult(i, VIDEO_ACTIVITY_REQUEST);
+            navigateToTakeVideo(event);
         } else if (QuestionInteractionEvent.SCAN_BARCODE_EVENT.equals(event.getEventType())) {
-            Intent intent = new Intent(ConstantUtil.BARCODE_SCAN_INTENT);
-            try {
-                startActivityForResult(intent, SCAN_ACTIVITY_REQUEST);
-                if (event.getSource() != null) {
-                    mRequestQuestionId = event.getSource().getQuestion().getId();
-                } else {
-                    Timber.e("Question source was null in the event");
-                }
-            } catch (ActivityNotFoundException ex) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(R.string.barcodeerror);
-                builder.setPositiveButton(R.string.okbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-                builder.show();
-            }
+            navigateToBarcodeScanner(event);
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event.getEventType())) {
-            String questionId = event.getSource().getQuestion().getId();
-            deleteResponse(questionId);
+            clearQuestion(event);
         } else if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
-            String questionId = event.getSource().getQuestion().getId();
-            QuestionResponse response = event.getSource().getResponse();
-
-            // Store the response if it contains a value. Otherwise, delete it
-            if (response != null && response.hasValue()) {
-                mQuestionResponses.put(questionId, response);
-                response.setRespondentId(mSurveyInstanceId);
-                mDatabase.createOrUpdateSurveyResponse(response);
-            } else {
-                event.getSource().setResponse(null, true);// Invalidate previous response
-                deleteResponse(questionId);
-            }
+            storeAnswer(event);
         } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
-            mRequestQuestionId = event.getSource().getQuestion().getId();
-            Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
-            intent.putExtras(event.getData());
-            intent.setType(ConstantUtil.CADDISFLY_MIME);
-            startActivityForResult(
-                    Intent.createChooser(intent, getString(R.string.use_external_source)),
-                    +EXTERNAL_SOURCE_REQUEST);
+            navigateToExternalSource(event);
         } else if (QuestionInteractionEvent.CADDISFLY.equals(event.getEventType())) {
-            mRequestQuestionId = event.getSource().getQuestion().getId();
-            Intent intent = new Intent(ConstantUtil.CADDISFLY_ACTION);
-            intent.putExtras(event.getData());
-            intent.setType(ConstantUtil.CADDISFLY_MIME);
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.caddisfly_test)),
-                    +CADDISFLY_REQUEST);
+            navigateToCaddisfly(event);
         } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
-            Intent i = new Intent(this, GeoshapeActivity.class);
-            if (event.getData() != null) {
-                i.putExtras(event.getData());
-            }
-            mRequestQuestionId = event.getSource().getQuestion().getId();
-            startActivityForResult(i, PLOTTING_REQUEST);
+            navigateToGeoShapeActivity(event);
         } else if (QuestionInteractionEvent.ADD_SIGNATURE_EVENT.equals(event.getEventType())) {
-            Intent i = new Intent(this, SignatureActivity.class);
-            mRequestQuestionId = event.getSource().getQuestion().getId();
-            startActivityForResult(i, SIGNATURE_REQUEST);
+            navigateToSignatureActivity(event);
         }
+    }
+
+    private void navigateToSignatureActivity(QuestionInteractionEvent event) {
+        mRequestQuestionId = event.getSource().getQuestion().getId();
+        navigator.navigateToSignatureActivity(this);
+    }
+
+    private void navigateToGeoShapeActivity(QuestionInteractionEvent event) {
+        mRequestQuestionId = event.getSource().getQuestion().getId();
+        navigator.navigateToGeoShapeActivity(this, event.getData());
+    }
+
+    private void navigateToCaddisfly(QuestionInteractionEvent event) {
+        mRequestQuestionId = event.getSource().getQuestion().getId();
+        navigator.navigateToCaddisfly(this, event.getData(), getString(R.string.caddisfly_test));
+    }
+
+    private void navigateToExternalSource(QuestionInteractionEvent event) {
+        mRequestQuestionId = event.getSource().getQuestion().getId();
+        navigator.navigateToExternalSource(this, event.getData(),
+                getString(R.string.use_external_source));
+    }
+
+    private void storeAnswer(QuestionInteractionEvent event) {
+        String questionId = event.getSource().getQuestion().getId();
+        QuestionResponse response = event.getSource().getResponse();
+
+        // Store the response if it contains a value. Otherwise, delete it
+        if (response != null && response.hasValue()) {
+            mQuestionResponses.put(questionId, response);
+            response.setRespondentId(mSurveyInstanceId);
+            mDatabase.createOrUpdateSurveyResponse(response);
+        } else {
+            event.getSource().setResponse(null, true);// Invalidate previous response
+            deleteResponse(questionId);
+        }
+    }
+
+    private void clearQuestion(QuestionInteractionEvent event) {
+        String questionId = event.getSource().getQuestion().getId();
+        deleteResponse(questionId);
+    }
+
+    private void navigateToBarcodeScanner(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToBarcodeScanner(this);
+    }
+
+    private void recordSourceId(QuestionInteractionEvent event) {
+        if (event.getSource() != null) {
+            mRequestQuestionId = event.getSource().getQuestion().getId();
+        } else {
+            Timber.e("Question source was null in the event");
+        }
+    }
+
+    private void navigateToTakeVideo(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToTakeVideo(this, Uri.fromFile(getTmpFile(false)));
+    }
+
+    private void navigateToTakePhoto(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToTakePhoto(this, Uri.fromFile(getTmpFile(true)));
     }
 
     /*

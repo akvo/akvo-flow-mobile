@@ -24,8 +24,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -60,10 +58,10 @@ import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.ImageUtil;
-import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
@@ -83,10 +81,10 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
 
-    private static final String TEMP_PHOTO_NAME_PREFIX = "image";
-    private static final String TEMP_VIDEO_NAME_PREFIX = "video";
-    private static final String IMAGE_SUFFIX = ".jpg";
-    private static final String VIDEO_SUFFIX = ".mp4";
+    private final Navigator navigator = new Navigator();
+    private final StorageHelper storageHelper = new StorageHelper();
+
+    private MediaFileHelper mediaFileHelper;
 
     /**
      * When a request is done to perform photo, video, barcode scan, etc we store
@@ -112,7 +110,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
     private String surveyId;
-    private Navigator navigator = new Navigator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +131,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         prefs = new Prefs(getApplicationContext());
         languageMapper = new LanguageMapper(getApplicationContext());
+        mediaFileHelper = new MediaFileHelper(this);
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
@@ -488,35 +486,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
+                String imageAbsolutePath = mediaFileHelper.getImageFilePath(prefs
+                        .getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE));
+                onMediaAcquired(imageAbsolutePath);
+                break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                String fileSuffix =
-                        requestCode == ConstantUtil.PHOTO_ACTIVITY_REQUEST ? IMAGE_SUFFIX : VIDEO_SUFFIX;
-                File tmp = getTmpFile(requestCode == ConstantUtil.PHOTO_ACTIVITY_REQUEST);
-
-                // Ensure no image is saved in the DCIM folder
-                FileUtil.cleanDCIM(this, tmp.getAbsolutePath());
-
-                String filename = PlatformUtil.uuid() + fileSuffix;
-                File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
-
-                int maxImgSize = prefs
-                        .getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
-
-                if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
-                        maxImgSize)) {
-                    Timber.i("Image resized to: " +
-                            getResources().getStringArray(R.array.max_image_size_pref)[maxImgSize]);
-                    if (!tmp.delete()) { // must check return value to know if it failed
-                        Timber.e("Media file delete failed");
-                    }
-                } else if (!tmp.renameTo(imgFile)) {
-                    // must check  return  value to  know if it  failed!
-                    Timber.e("Media file resize failed");
-                }
-
-                Bundle photoData = new Bundle();
-                photoData.putString(ConstantUtil.MEDIA_FILE_KEY, imgFile.getAbsolutePath());
-                mAdapter.onQuestionComplete(mRequestQuestionId, photoData);
+                String videoAbsolutePath = mediaFileHelper.getVideoFilePath();
+                onMediaAcquired(videoAbsolutePath);
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
             case ConstantUtil.CADDISFLY_REQUEST:
@@ -529,6 +505,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         mRequestQuestionId = null;// Reset the tmp reference
+    }
+
+    private void onMediaAcquired(String absolutePath) {
+        Bundle mediaData = new Bundle();
+        mediaData.putString(ConstantUtil.MEDIA_FILE_KEY, absolutePath);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
 
     @NonNull
@@ -717,12 +699,20 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void navigateToTakeVideo(QuestionInteractionEvent event) {
         recordSourceId(event);
-        navigator.navigateToTakeVideo(this, Uri.fromFile(getTmpFile(false)));
+        navigator.navigateToTakeVideo(this, getVideoFileUri());
+    }
+
+    private Uri getVideoFileUri() {
+        return Uri.fromFile(mediaFileHelper.getVideoTmpFile());
     }
 
     private void navigateToTakePhoto(QuestionInteractionEvent event) {
         recordSourceId(event);
-        navigator.navigateToTakePhoto(this, Uri.fromFile(getTmpFile(true)));
+        navigator.navigateToTakePhoto(this, getImageFileUri());
+    }
+
+    private Uri getImageFileUri() {
+        return Uri.fromFile(mediaFileHelper.getImageTmpFile());
     }
 
     /*
@@ -730,17 +720,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
      * home screen if completely full.
      */
     public void spaceLeftOnCard() {
-        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            // TODO: more specific warning if card not mounted?
-        }
-        // compute space left
-        StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
-        double sdAvailSize = (double) stat.getAvailableBlocks()
-                * (double) stat.getBlockSize();
-        // One binary gigabyte equals 1,073,741,824 bytes.
-        // double gigaAvailable = sdAvailSize / 1073741824;
-        // One binary megabyte equals 1 048 576 bytes.
-        long megaAvailable = (long) Math.floor(sdAvailSize / 1048576.0);
+        long megaAvailable = storageHelper.getExternalStorageAvailableSpace();
 
         // keep track of changes
         // assume we had space before
@@ -750,8 +730,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         if (megaAvailable <= 0L) {// All out, OR media not mounted
             // Bounce user
-            showConfirmDialog(R.string.nocardspacetitle,
-                    R.string.nocardspacedialog, this, false,
+            showConfirmDialog(R.string.nocardspacetitle, R.string.nocardspacedialog, this, false,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -770,13 +749,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
             for (long l = megaAvailable; l < lastMegaAvailable; l++) {
                 if (ConstantUtil.SPACE_WARNING_MB_LEVELS.contains(Long.toString(l))) {
                     // display how much space is left
-                    String s = getResources().getString(R.string.lowcardspacedialog);
-                    s = s.replace("%%%", Long.toString(megaAvailable));
-                    showConfirmDialog(
-                            R.string.lowcardspacetitle,
-                            s,
-                            this,
-                            false,
+                    //TODO: replace "%%%" by "%s" and use String formatting
+                    String message = getResources().getString(R.string.lowcardspacedialog);
+                    message = message.replace("%%%", Long.toString(megaAvailable));
+                    showConfirmDialog(R.string.lowcardspacetitle, message, this, false,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -790,11 +766,5 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 }
             }
         }
-    }
-
-    private File getTmpFile(boolean image) {
-        String filename = image ? TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX
-                : TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
-        return new File(FileUtil.getFilesDir(FileType.TMP), filename);
     }
 }

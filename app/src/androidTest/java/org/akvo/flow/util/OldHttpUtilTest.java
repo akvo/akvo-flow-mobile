@@ -140,12 +140,10 @@ public class OldHttpUtilTest
 
         String result = OldHttpUtil.httpPost(URL_STRING, params);
 
-
         byte[] hash = MessageDigest.getInstance("MD5").digest(OldHttpUtil.getQuery(params).getBytes());
         String expected = Arrays.toString(hash);
 
         assertEquals(result.substring(0, result.length()-1), expected);
     }
-
 }
 

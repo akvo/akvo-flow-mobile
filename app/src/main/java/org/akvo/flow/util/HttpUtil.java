@@ -39,11 +39,9 @@ public class HttpUtil {
     private static final int BUFFER_SIZE = 8192;
 
     public static String httpGet(String url) throws IOException {
-        // new
         InternetDataConnection connection = new InternetDataConnection(url);
         InternetDataConnection.InputStreamProvider input = connection.connect().forInput();
-        try
-        {
+        try {
             connection.verifyOk();
             String result = input.toStringValue();
             Timber.d(TAG + ": URL: %s - %i ms", url, connection.getElapsedTime());
@@ -54,11 +52,9 @@ public class HttpUtil {
     }
 
     public static void httpGet(String url, File dst) throws IOException {
-        // new
         InternetDataConnection connection = new InternetDataConnection(url);
         InternetDataConnection.InputStreamProvider input = connection.connect().forInput();
-        try
-        {
+        try {
             connection.verifyOk();
             OutputStream out = new BufferedOutputStream(new FileOutputStream(dst));
             input.toStream(out);
@@ -71,11 +67,10 @@ public class HttpUtil {
      * does an HTTP Post to the url specified using the params passed in
      */
     public static String httpPost(String url, Map<String, String> params) throws IOException {
-        // new
         InternetDataConnection connection = new InternetDataConnection(url);
         InternetDataConnection.BothStreams provider = connection.connect().forInput().andOutput();
-        try
-        {
+        connection.getConnection().setRequestMethod("POST");
+        try {
             Writer writer = new BufferedWriter(new OutputStreamWriter(provider.output.get(), "UTF-8"));
             writer.write(getQuery(params));
             writer.flush();
@@ -110,5 +105,4 @@ public class HttpUtil {
         }
         out.flush();
     }
-
 }

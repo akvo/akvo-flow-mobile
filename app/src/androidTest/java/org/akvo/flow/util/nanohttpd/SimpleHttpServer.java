@@ -29,49 +29,39 @@ public class SimpleHttpServer extends NanoHTTPD
 {
     private Map<Method, HttpServe> methodServes = new HashMap<>();
 
-    public SimpleHttpServer() throws IOException
-    {
+    public SimpleHttpServer() throws IOException {
         super(9090);
     }
 
-    public void setResponse(Method method, HttpServe serve)
-    {
+    public void setResponse(Method method, HttpServe serve) {
         methodServes.put(method, serve);
     }
 
-    public void resetResponse()
-    {
+    public void resetResponse() {
         methodServes.clear();
     }
 
-    private Response statusCode(Response.Status status)
-    {
+    private Response statusCode(Response.Status status) {
         return newFixedLengthResponse(status, null, status.getDescription());
     }
 
     @Override
-    public Response serve(IHTTPSession session)
-    {
+    public Response serve(IHTTPSession session) {
         HttpServe serve = methodServes.get(session.getMethod());
-        if(serve != null)
-        {
-            try
-            {
+        if(serve != null) {
+            try {
                 Response response = serve.serve(session);
-                if(response == null)
-                {
+                if(response == null) {
                     return statusCode(Response.Status.NO_CONTENT);
                 }
                 return response;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 e.printStackTrace();
                 return statusCode(Response.Status.INTERNAL_ERROR);
             }
         }
-        else
-        {
+        else {
             // unsupported type
             return statusCode(Response.Status.METHOD_NOT_ALLOWED);
         }

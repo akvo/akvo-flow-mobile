@@ -88,8 +88,6 @@ public class InternetDataConnection implements Closeable {
         if (connection == null) {
             connection = (HttpURLConnection) url.openConnection();
             startTime = System.currentTimeMillis();
-            connection.setDoInput(false);
-            connection.setDoOutput(false);
         }
         return this;
     }
@@ -282,7 +280,6 @@ public class InternetDataConnection implements Closeable {
          */
         public BufferedOutputStream get() throws IOException {
             connected = true;
-            connection.setRequestMethod("POST");
             return new BufferedOutputStream(connection.getOutputStream());
         }
 

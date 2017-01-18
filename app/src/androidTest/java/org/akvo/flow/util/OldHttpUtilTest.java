@@ -18,8 +18,10 @@ package org.akvo.flow.util;
 import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.akvo.flow.TempTestFileFactory;
 import org.akvo.flow.util.nanohttpd.HttpServe;
 import org.akvo.flow.util.nanohttpd.SimpleHttpServer;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -44,22 +46,20 @@ import static junit.framework.Assert.assertEquals;
  */
 
 @RunWith(AndroidJUnit4.class)
-public class OldHttpUtilTest
-{
+public class OldHttpUtilTest {
     private static SimpleHttpServer server;
     private static final String URL_STRING = "http://localhost:9090/";
     private static final String VALID_RESPONSE_STRING = "Valid_Response";
+    private static final TempTestFileFactory TestFileFactory = new TempTestFileFactory();
 
-    private static NanoHTTPD.Response response(Object content)
-    {
+    private static NanoHTTPD.Response response(Object content) {
         if(content == null)
             return null;
         return NanoHTTPD.newFixedLengthResponse(String.valueOf(content));
     };
 
     //initiate response here so the test case can be easier to read
-    private final HttpServe defaultMd5Post = new HttpServe()
-    {
+    private final HttpServe defaultMd5Post = new HttpServe() {
         @Override
         public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception
         {
@@ -74,8 +74,7 @@ public class OldHttpUtilTest
         }
     };
 
-    private final HttpServe defaultGet = new HttpServe()
-    {
+    private final HttpServe defaultGet = new HttpServe() {
         @Override
         public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception
         {
@@ -84,26 +83,23 @@ public class OldHttpUtilTest
     };
 
     @BeforeClass
-    public static void startServer() throws IOException
-    {
+    public static void startServer() throws IOException {
         server = new SimpleHttpServer();
         server.start();
     }
     @AfterClass
-    public static void stopServer()
-    {
+    public static void stopServer() {
         server.stop();
     }
 
     @Before
-    public void resetServer()
-    {
+    public void resetServer() {
         server.resetResponse();
     }
 
-    private File getTempFile() throws IOException
-    {
-        return File.createTempFile("temp_", ".txt");
+    @After
+    public void afterTest() {
+        TestFileFactory.deleteTempFiles();
     }
 
     @Test
@@ -115,9 +111,8 @@ public class OldHttpUtilTest
     }
 
     @Test
-    public void oldCanHttpGetToFile() throws IOException, InterruptedException
-    {
-        File file = getTempFile();
+    public void oldCanHttpGetToFile() throws IOException, InterruptedException {
+        File file = TestFileFactory.generateTempFile();
 
         server.setResponse(NanoHTTPD.Method.GET, defaultGet);
         String expected = OldHttpUtil.httpGet(URL_STRING);
@@ -128,8 +123,7 @@ public class OldHttpUtilTest
     }
 
     @Test
-    public void oldCanHttpPost() throws IOException, InterruptedException, NoSuchAlgorithmException
-    {
+    public void oldCanHttpPost() throws IOException, InterruptedException, NoSuchAlgorithmException {
         server.setResponse(NanoHTTPD.Method.POST, defaultMd5Post);
 
         Map<String, String> params = new HashMap<>();

@@ -31,10 +31,10 @@ import timber.log.Timber;
 
 public class MediaFileHelper {
 
-    public static final String TEMP_PHOTO_NAME_PREFIX = "image";
-    public static final String TEMP_VIDEO_NAME_PREFIX = "video";
-    public static final String IMAGE_SUFFIX = ".jpg";
-    public static final String VIDEO_SUFFIX = ".mp4";
+    private static final String TEMP_PHOTO_NAME_PREFIX = "image";
+    private static final String TEMP_VIDEO_NAME_PREFIX = "video";
+    private static final String IMAGE_SUFFIX = ".jpg";
+    private static final String VIDEO_SUFFIX = ".mp4";
 
     private final Context context;
 

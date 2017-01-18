@@ -719,7 +719,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
      * Check SD card space. Warn by dialog popup if it is getting low. Return to
      * home screen if completely full.
      */
-    public void spaceLeftOnCard() {
+    private void spaceLeftOnCard() {
         long megaAvailable = storageHelper.getExternalStorageAvailableSpace();
 
         // keep track of changes

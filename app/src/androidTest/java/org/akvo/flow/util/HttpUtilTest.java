@@ -62,11 +62,9 @@ public class HttpUtilTest {
         public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception {
             Map<String, String> files = new HashMap<>();
             session.parseBody(files);
-
             byte[] hash = MessageDigest.getInstance("MD5")
                     .digest(session.getQueryParameterString().getBytes());
             String output = Arrays.toString(hash);
-
             return response(output);
         }
     };
@@ -140,6 +138,4 @@ public class HttpUtilTest {
         //assert that the responded md5 hash is correct with the given md5 hash
         assertEquals(expected, result);
     }
-
 }
-

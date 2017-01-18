@@ -45,69 +45,61 @@ import static junit.framework.Assert.assertTrue;
  */
 
 @RunWith(AndroidJUnit4.class)
-public class HttpUtilTest
-{
+public class HttpUtilTest {
     private static SimpleHttpServer server;
     private static final String URL_STRING = "http://localhost:9090/";
     private static final String VALID_RESPONSE_STRING = "Valid_Response";
-    private static NanoHTTPD.Response response(Object content)
-    {
-        if(content == null)
-            return null;
-        return NanoHTTPD.newFixedLengthResponse(String.valueOf(content));
-    };
 
-    private final HttpServe defaultMd5Post = new HttpServe()
-    {
+    private static NanoHTTPD.Response response(Object content) {
+        if (content == null) {
+            return null;
+        }
+        return NanoHTTPD.newFixedLengthResponse(String.valueOf(content));
+    }
+
+    private final HttpServe defaultMd5Post = new HttpServe() {
         @Override
-        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception
-        {
+        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception {
             Map<String, String> files = new HashMap<>();
             session.parseBody(files);
 
-            byte[] hash = MessageDigest.getInstance("MD5").digest(session.getQueryParameterString().getBytes());
+            byte[] hash = MessageDigest.getInstance("MD5")
+                    .digest(session.getQueryParameterString().getBytes());
             String output = Arrays.toString(hash);
 
             return response(output);
         }
     };
 
-    private final HttpServe defaultGet = new HttpServe()
-    {
+    private final HttpServe defaultGet = new HttpServe() {
         @Override
-        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception
-        {
+        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception {
             return response(VALID_RESPONSE_STRING);
         }
     };
 
-
     @BeforeClass
-    public static void startServer() throws IOException
-    {
+    public static void startServer() throws IOException {
         server = new SimpleHttpServer();
         server.start();
     }
+
     @AfterClass
-    public static void stopServer()
-    {
+    public static void stopServer() {
         server.stop();
     }
 
     @Before
-    public void resetServer()
-    {
+    public void resetServer() {
         server.resetResponse();
     }
 
-    private File getTempFile() throws IOException
-    {
+    private File getTempFile() throws IOException {
         return File.createTempFile("temp_", ".txt");
     }
 
     @Test
-    public void newCanHttpGetToFile() throws IOException, InterruptedException
-    {
+    public void newCanHttpGetToFile() throws IOException, InterruptedException {
         File file = getTempFile();
         //sets a response to be returned by the server, based on the request
         server.setResponse(NanoHTTPD.Method.GET, defaultGet);
@@ -118,13 +110,12 @@ public class HttpUtilTest
         //copy contents from URL to destination 'file'
         HttpUtil.httpGet(URL_STRING, file);
 
-        assertEquals(expected+'\n', OldHttpUtil.readStream(new FileInputStream(file)));
+        assertEquals(expected + '\n', OldHttpUtil.readStream(new FileInputStream(file)));
         assertTrue(file.delete());
     }
 
     @Test
-    public void newCanHttpGet() throws IOException, InterruptedException
-    {
+    public void newCanHttpGet() throws IOException, InterruptedException {
         server.setResponse(NanoHTTPD.Method.GET, defaultGet);
 
         String result = HttpUtil.httpGet(URL_STRING);
@@ -132,8 +123,8 @@ public class HttpUtilTest
     }
 
     @Test
-    public void newCanHttpPost() throws IOException, InterruptedException, NoSuchAlgorithmException
-    {
+    public void newCanHttpPost()
+            throws IOException, InterruptedException, NoSuchAlgorithmException {
         server.setResponse(NanoHTTPD.Method.POST, defaultMd5Post);
 
         Map<String, String> params = new HashMap<>();
@@ -143,15 +134,12 @@ public class HttpUtilTest
         //post the contents of the Map and retrieve the result as String
         String result = HttpUtil.httpPost(URL_STRING, params);
 
-
         byte[] hash = MessageDigest.getInstance("MD5").digest(HttpUtil.getQuery(params).getBytes());
         String expected = Arrays.toString(hash);
 
         //assert that the responded md5 hash is correct with the given md5 hash
         assertEquals(result, expected);
     }
-
-
 
 }
 

@@ -18,8 +18,10 @@ package org.akvo.flow.util;
 import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.akvo.flow.TempTestFileFactory;
 import org.akvo.flow.util.nanohttpd.HttpServe;
 import org.akvo.flow.util.nanohttpd.SimpleHttpServer;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -49,6 +51,7 @@ public class HttpUtilTest {
     private static SimpleHttpServer server;
     private static final String URL_STRING = "http://localhost:9090/";
     private static final String VALID_RESPONSE_STRING = "Valid_Response";
+    private static final TempTestFileFactory TestFileFactory = new TempTestFileFactory();
 
     private static NanoHTTPD.Response response(Object content) {
         if (content == null) {
@@ -77,28 +80,29 @@ public class HttpUtilTest {
     };
 
     @BeforeClass
-    public static void startServer() throws IOException {
+    public static void beforeAllTests() throws IOException {
         server = new SimpleHttpServer();
         server.start();
     }
 
     @AfterClass
-    public static void stopServer() {
+    public static void afterAllTests() {
         server.stop();
     }
 
     @Before
-    public void resetServer() {
+    public void beforeTest() {
         server.resetResponse();
     }
 
-    private File getTempFile() throws IOException {
-        return File.createTempFile("temp_", ".txt");
+    @After
+    public void afterTest() {
+        TestFileFactory.deleteTempFiles();
     }
 
     @Test
     public void newCanHttpGetToFile() throws IOException, InterruptedException {
-        File file = getTempFile();
+        File file = TestFileFactory.generateTempFile();
         //sets a response to be returned by the server, based on the request
         server.setResponse(NanoHTTPD.Method.GET, defaultGet);
 

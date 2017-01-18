@@ -40,7 +40,6 @@ import java.util.Map;
 import fi.iki.elonen.NanoHTTPD;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by MelEnt on 2016-11-22.
@@ -113,7 +112,6 @@ public class HttpUtilTest {
         HttpUtil.httpGet(URL_STRING, file);
 
         assertEquals(expected + '\n', OldHttpUtil.readStream(new FileInputStream(file)));
-        assertTrue(file.delete());
     }
 
     @Test

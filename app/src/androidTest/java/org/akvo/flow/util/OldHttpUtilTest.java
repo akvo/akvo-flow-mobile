@@ -38,7 +38,6 @@ import java.util.Map;
 import fi.iki.elonen.NanoHTTPD;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by MelEnt on 2016-11-22.
@@ -112,7 +111,7 @@ public class OldHttpUtilTest
         server.setResponse(NanoHTTPD.Method.GET, defaultGet);
 
         String result = OldHttpUtil.httpGet(URL_STRING);
-        assertEquals(result, VALID_RESPONSE_STRING+'\n');
+        assertEquals(VALID_RESPONSE_STRING+'\n', result);
     }
 
     @Test
@@ -126,7 +125,6 @@ public class OldHttpUtilTest
         OldHttpUtil.httpGet(URL_STRING, file);
 
         assertEquals(expected, OldHttpUtil.readStream(new FileInputStream(file)));
-        assertTrue(file.delete());
     }
 
     @Test
@@ -143,7 +141,6 @@ public class OldHttpUtilTest
         byte[] hash = MessageDigest.getInstance("MD5").digest(OldHttpUtil.getQuery(params).getBytes());
         String expected = Arrays.toString(hash);
 
-        assertEquals(result.substring(0, result.length()-1), expected);
+        assertEquals(expected, result.substring(0, result.length()-1));
     }
 }
-

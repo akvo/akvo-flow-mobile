@@ -15,8 +15,6 @@
 
 package org.akvo.flow.util;
 
-import android.util.Log;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,6 +26,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import timber.log.Timber;
 
 /**
  * Simple utility to make http calls and read the responses
@@ -46,7 +46,7 @@ public class HttpUtil {
         {
             connection.verifyOk();
             String result = input.toStringValue();
-            Log.d(TAG, url + ": " + connection.getElapsedTime() + " ms");
+            Timber.d(TAG + ": URL: %s - %i ms", url, connection.getElapsedTime());
             return result;
         } finally {
             connection.close();

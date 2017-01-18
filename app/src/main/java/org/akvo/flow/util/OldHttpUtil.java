@@ -38,14 +38,14 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import timber.log.Timber;
+
 /**
  * Simple utility to make http calls and read the responses
  *
  * @author Christopher Fagiani
  */
 public class OldHttpUtil {
-
-    private static final String TAG = OldHttpUtil.class.getSimpleName();
     private static final int BUFFER_SIZE = 8192;
 
     @NonNull
@@ -60,7 +60,7 @@ public class OldHttpUtil {
             }
             InputStream in = new BufferedInputStream(conn.getInputStream());
             String response = readStream(in);
-            Log.d(TAG, url + ": " + (System.currentTimeMillis() - t0) + " ms");
+            Timber.d("%s: %f ms", url, (System.currentTimeMillis() - t0));
             return response;
         } finally {
             if (conn != null) {

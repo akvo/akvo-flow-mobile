@@ -18,16 +18,15 @@
  *
  */
 
-package org.akvo.flow.data;
+package org.akvo.flow.data.migration.languages;
 
-import android.support.annotation.NonNull;
-
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-public interface SurveyLanguagesDataSource {
+public class LanguagesMapper {
 
-    void saveLanguagePreferences(long surveyGroupId, @NonNull Set<String> languagesSet);
+    public Set<String> transform(String languagesString) {
+        Set<String> languages = new LinkedHashSet<>(3);
 
-    @NonNull
-    Set<String> getLanguagePreferences(long surveyGroupId);
+    }
 }

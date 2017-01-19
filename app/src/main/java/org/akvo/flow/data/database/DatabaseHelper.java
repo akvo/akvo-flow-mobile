@@ -23,15 +23,18 @@ package org.akvo.flow.data.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 
-import org.akvo.flow.data.preference.InsertablePreferences;
-import org.akvo.flow.data.preference.MigratablePreferences;
-import org.akvo.flow.data.preference.PreferenceExtractor;
-import org.akvo.flow.data.preference.PreferenceHandler;
-import org.akvo.flow.data.preference.PreferenceMapper;
+import org.akvo.flow.data.migration.preferences.InsertablePreferences;
+import org.akvo.flow.data.migration.languages.LanguagesExtractor;
+import org.akvo.flow.data.migration.preferences.MigratablePreferences;
+import org.akvo.flow.data.migration.preferences.PreferenceExtractor;
+import org.akvo.flow.data.migration.preferences.PreferenceMapper;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.domain.SurveyGroup;
 
 import java.lang.ref.WeakReference;
+import java.util.Set;
 
 import timber.log.Timber;
 
@@ -56,7 +59,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
-    private final PreferenceHandler preferenceHandler = new PreferenceHandler();
     private WeakReference<Context> contextWeakReference;
     private final LanguageTable languageTable;
 
@@ -160,9 +162,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
 
         Context context = contextWeakReference.get();
-        if (oldVersion < DATABASE_VERSION && context != null) {
+        if (oldVersion < VER_PREFERENCES_MIGRATE && context != null) {
             migratePreferences(context, db);
         }
+
         // Apply database updates sequentially. It starts in the current
         // version, hooking into the correspondent case block, and falls
         // through to any future upgrade. If no break statement is found,
@@ -200,6 +203,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else if (oldVersion < VER_LANGUAGES_MIGRATE) {
             //add new languages table
             languageTable.onCreate(db);
+            migrateLanguages(context, db);
+        }
+    }
+
+    private void migrateLanguages(Context context, SQLiteDatabase db) {
+        Prefs prefs = new Prefs(context.getApplicationContext());
+        LanguagesExtractor languagesExtractor = new LanguagesExtractor();
+        long selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        if (selectedSurveyId != SurveyGroup.ID_NONE) {
+            String dataBaseLanguages = languagesExtractor.retrieveLanguages(db);
+            if (!TextUtils.isEmpty(dataBaseLanguages)) {
+                Set<String> insertableLanguages =
+            }
         }
     }
 
@@ -208,7 +224,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Prefs prefs = new Prefs(context.getApplicationContext());
         PreferenceExtractor preferenceExtractor = new PreferenceExtractor();
         MigratablePreferences migratablePreferences = preferenceExtractor
-                .create(preferenceHandler, db);
+                .retrievePreferences(db);
         InsertablePreferences insertablePreferences = mapper.transform(migratablePreferences);
         prefs.insertUserPreferences(insertablePreferences);
     }

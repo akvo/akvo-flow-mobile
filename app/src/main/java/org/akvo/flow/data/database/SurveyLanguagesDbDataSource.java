@@ -44,13 +44,13 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
     }
 
     @Override
-    public void saveLanguagePreferences(String surveyId, @NonNull Set<String> languageCodes) {
+    public void saveLanguagePreferences(long surveyGroupId, @NonNull Set<String> languageCodes) {
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues(2);
         database.delete(LanguageTable.TABLE_NAME, LanguageTable.COLUMN_SURVEY_ID + " = ?",
-                new String[] { surveyId });
+                new String[] { surveyGroupId + ""});
         for (String languageCode : languageCodes) {
-            contentValues.put(LanguageTable.COLUMN_SURVEY_ID, surveyId);
+            contentValues.put(LanguageTable.COLUMN_SURVEY_ID, surveyGroupId);
             contentValues.put(LanguageTable.COLUMN_LANGUAGE_CODE, languageCode);
             database.insert(LanguageTable.TABLE_NAME, null, contentValues);
         }
@@ -59,13 +59,13 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
 
     @NonNull
     @Override
-    public Set<String> getLanguagePreferences(String surveyId) {
+    public Set<String> getLanguagePreferences(long surveyGroupId) {
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         Set<String> languages = new LinkedHashSet<>();
         Cursor cursor = database.query(LanguageTable.TABLE_NAME,
                 new String[] { LanguageTable.COLUMN_LANGUAGE_CODE },
                 LanguageTable.COLUMN_SURVEY_ID + " = ?",
-                new String[] { surveyId },
+                new String[] { surveyGroupId + "" },
                 null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             int languageCodeColumnIndex = cursor

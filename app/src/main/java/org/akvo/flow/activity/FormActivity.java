@@ -452,7 +452,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void saveLanguages(Set<String> selectedLanguages) {
-        surveyLanguagesDataSource.saveLanguagePreferences(surveyId,
+        surveyLanguagesDataSource.saveLanguagePreferences(mSurveyGroup.getId(),
                 selectedLanguages);
         loadLanguages();
         mAdapter.notifyOptionsChanged();
@@ -522,7 +522,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     //TODO: use loader
     private void loadLanguages() {
         Set<String> languagePreferences = surveyLanguagesDataSource
-                .getLanguagePreferences(surveyId);
+                .getLanguagePreferences(mSurveyGroup.getId());
         mLanguages = languagePreferences.toArray(new String[languagePreferences.size()]);
     }
 

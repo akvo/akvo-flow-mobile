@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.migration.preferences.InsertablePreferences;
 import org.akvo.flow.util.ConstantUtil;
 
 /**

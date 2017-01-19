@@ -18,15 +18,15 @@
  *
  */
 
-package org.akvo.flow.data.preference;
+package org.akvo.flow.data.database;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.data.database.PreferencesColumns;
-import org.akvo.flow.data.database.Tables;
-
+/**
+ * Gets user preferences from database
+ */
 public class PreferenceHandler {
 
     public PreferenceHandler() {

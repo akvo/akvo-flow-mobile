@@ -140,7 +140,7 @@ public class ConstantUtil {
     /**
      * settings keys
      */
-    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";
+    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
     public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
     public static final String SCREEN_ON_KEY = "screen.keepon";

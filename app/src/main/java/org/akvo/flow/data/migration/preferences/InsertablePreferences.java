@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.preference;
+package org.akvo.flow.data.migration.preferences;
 
 import android.support.annotation.Nullable;
 

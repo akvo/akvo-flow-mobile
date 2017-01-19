@@ -31,7 +31,7 @@ public class LanguageTable {
 
     public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + COLUMN_SURVEY_ID + " TEXT NOT NULL,"
+            + COLUMN_SURVEY_ID + " INTEGER NOT NULL,"
             + COLUMN_LANGUAGE_CODE + " TEXT NOT NULL, "
             + "UNIQUE(" + COLUMN_SURVEY_ID + ", " + COLUMN_LANGUAGE_CODE + ") ON CONFLICT REPLACE)";
 

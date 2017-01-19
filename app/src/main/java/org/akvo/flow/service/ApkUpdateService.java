@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -53,14 +53,20 @@ public class ApkUpdateService extends GcmTaskService {
 
     private final ApkUpdateHelper apkUpdateHelper = new ApkUpdateHelper();
 
-    public static void scheduleRepeat(Context context) {
+    public static void scheduleFirstTask(Context context) {
+        schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,
+                ConstantUtil.FIRST_FLEX_INTERVAL_IN_SECOND);
+    }
+
+    private static void schedulePeriodicTask(Context context, int repeatIntervalInSeconds,
+            int flexIntervalInSeconds) {
         try {
             PeriodicTask periodic = new PeriodicTask.Builder()
                     .setService(ApkUpdateService.class)
                     //repeat every x seconds
-                    .setPeriod(ConstantUtil.REPEAT_INTERVAL_IN_SECONDS)
+                    .setPeriod(repeatIntervalInSeconds)
                     //specify how much earlier the task can be executed (in seconds)
-                    .setFlex(ConstantUtil.FLEX_IN_SECONDS)
+                    .setFlex(flexIntervalInSeconds)
                     .setTag(TAG)
                     //whether the task persists after device reboot
                     .setPersisted(true)
@@ -90,7 +96,7 @@ public class ApkUpdateService extends GcmTaskService {
     @Override
     public void onInitializeTasks() {
         super.onInitializeTasks();
-        scheduleRepeat(this);
+        scheduleFirstTask(this);
     }
 
     /**
@@ -100,6 +106,9 @@ public class ApkUpdateService extends GcmTaskService {
      */
     @Override
     public int onRunTask(TaskParams taskParams) {
+        //after the first time the task is run we reschedule to a higher interval
+        schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
+                ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
         if (!StatusUtil.isConnectionAllowed(this)) {
             Timber.d("No available authorised connection. Can't perform the requested operation");
             return GcmNetworkManager.RESULT_SUCCESS;

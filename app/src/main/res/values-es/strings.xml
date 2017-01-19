@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
-  <string name="app_name">Akvo FLOW</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <string name="accuracy">Prec</string>
   <string name="searching">Buscando...</string>
   <string name="ready">Listo</string>
@@ -31,11 +30,8 @@
   <string name="screenoptdesc">Evitar que la pantalla se apague durante la introducción de datos. Asegúrese de apagar la pantalla (o cerrar la aplicación) cuando no esté en uso, para reducir el consumo de batería.</string>
   <string name="aboutlabel">Acerca de</string>
   <string name="aboutdesc">Muestra información sobre la versión actual</string>
-  <string name="abouttitle">Acerca de - Akvo FLOW app</string>
-  <string name="abouttext">Akvo FLOW app
-Desarrollada por: Akvo Foundation
-Copyright © 2010-2014 Stichting Akvo
-Version</string>
+  <string name="abouttitle">Acerca de - Akvo Flow app</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow app\nDesarrollada por: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
   <string name="gpsstatuslabel">Estado del GPS</string>
   <string name="gpsstatusdesc">Abrir la aplicación GPS Status si la tiene instalada en este dispositivo.</string>
   <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instale la aplicación a través de Google Play Store.</string>
@@ -49,7 +45,6 @@ Version</string>
   <string name="savelastuserlabel">Mantener entre sesiones el último usuario activo </string>
   <string name="uploadoptionlabel">Enviar datos mediante red móvil</string>
   <string name="surveylanglabel">Idiomas de la encuesta</string>
-  <string name="beaconlabel">Enviar localización</string>
   <string name="scanbarcode">Escanear código de barras</string>
   <string name="barcodeerror">Barcode Scanner no está instalado. Por favor, instale Barcode Scanner a través de Play Store.</string>
   <string name="toosmallerr">El valor es demasiado pequeño. Valor mínimo: </string>
@@ -89,7 +84,7 @@ Version</string>
   <string name="bootstrapstart">Cargando datos de la encuesta desde la tarjeta SD</string>
   <string name="bootstrapcomplete">Datos cargados desde la tarjeta SD</string>
   <string name="bootstraperror">Ha ocurrido un error procesando el archivo zip bootstrap</string>
-  <string name="bootstrap_invalid_app">Error: El formulario no pertenece a esta instancia FLOW</string>
+  <string name="bootstrap_invalid_app">Error: El formulario no pertenece a esta instancia Flow</string>
   <string name="transmissionhist">Historial de transmisión</string>
   <string name="transstartdate">Inicio:</string>
   <string name="transenddate">Fin:</string>
@@ -117,21 +112,24 @@ Version</string>
   <string name="sync_finished">Los Puntos de Datos han sido sincronizados</string>
   <string name="synced_records">%1$d Puntos de Datos sincronizados</string>
   <string name="sync_error">Sincronización de Puntos de Datos fallida</string>
+  <string name="syncing_corrupted_data_points_error">Vuelva a sincronizar.</string>
   <string name="network_error">Error de conexión</string>
   <string name="loading">Cargando...</string>
   <string name="prefill_title">Pre-llenar respuestas</string>
   <string name="prefill_text">Pre-llenar respuestas con previos valores de las mismas preguntas</string>
-  <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control FLOW</string>
+  <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control Flow</string>
   <!--Data sync-->
   <string name="data_sync_title">Sincronización de datos</string>
   <string name="data_sync_text">Sincronizando datos. Por favor, espere...</string>
   <string name="data_sync_all">Formularios sincronizados: %1$d - Fallidos: %2$d</string>
   <string name="data_sync_synced">Formularios sincronizados: %1$d</string>
+  <string name="data_sync_error_form_deleted_title">Formulario borrado</string>
+  <string name="data_sync_error_form_deleted_text">El formulario %1$s ha sido borrado</string>
   <!--Localization-->
   <string name="app_language">Idioma de la aplicación</string>
   <string name="please_restart">Por favor, reinicie la aplicación</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">No tiene encuestas asignadas. Las encuestas han de ser asignadas en el Panel de Control FLOW</string>
+  <string name="no_surveys_text">No tiene encuestas asignadas. Las encuestas han de ser asignadas en el Panel de Control Flow</string>
   <string name="no_records_text">Aún no dispone de puntos de datos. Clique \'+\' en el menú de arriba para añadir un nuevo punto de datos</string>
   <string name="no_survey_selected_text">No ha seleccionado ninguna Encuesta. Abra el menú lateral para seleccionar una.</string>
   <!--Activity Labels-->
@@ -205,12 +203,12 @@ Version</string>
   <string name="status_submitted">Finalizado</string>
   <string name="status_exported">Exportado</string>
   <!--APK update-->
-  <string name="app_update_activity">Actualización Akvo FLOW</string>
-  <string name="app_update">Hay una nueva versión de la aplicación FLOW disponible. Pulse \'Actualizar\' para descargar e instalar la nueva versión.</string>
+  <string name="app_update_activity">Actualización Akvo Flow</string>
+  <string name="app_update">Hay una nueva versión de la aplicación Flow disponible. Pulse \'Actualizar\' para descargar e instalar la nueva versión.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Ahora no</string>
-  <string name="clicktoinstall">La nueva versión de FLOW está descargada. ¿Quiere instalarla ahora?</string>
-  <string name="apk_upgrade_error">Error descargando la actualización de FLOW</string>
+  <string name="clicktoinstall">La nueva versión de Flow está descargada. ¿Quiere instalarla ahora?</string>
+  <string name="apk_upgrade_error">Error descargando la actualización de Flow</string>
   <!--Time check-->
   <string name="time_check_activity">Fecha y hora</string>
   <string name="time_warning">¡La hora de su dispositivo no es correcta! Ajuste la hora y vuelta a intentar. La hora local de su dispositivo es:</string>
@@ -218,7 +216,7 @@ Version</string>
   <!--Form sync-->
   <string name="downloading_forms">Descargando formularios</string>
   <string name="error_form_sync_title">Error sincronizando formularios</string>
-  <string name="error_assignment_read">Las asignaciones de encuesta no se han podido recibir desde el panel de control FLOW</string>
+  <string name="error_assignment_read">Las asignaciones de encuesta no se han podido recibir desde el panel de control Flow</string>
   <string name="error_form_header">El formulario %1$s no se ha podido recibir desde el panel de control.</string>
   <string name="error_form_download">Asegúrese que el formulario está publicado, y que la hora/fecha del dispositivo es correcta.</string>
   <string name="form_deleted">Este formulario ha sido borrado.</string>
@@ -265,4 +263,5 @@ Version</string>
   <string name="apk_update_service_no_update">Ya que tiene la última versión de la aplicación.</string>
   <string name="apk_update_service_error_update">Se ha producido un error al intentar actualizar la aplicación, por favor intente-lo de nuevo.</string>
   <string name="apk_update_service_error_no_internet">Se ha producido un error al intentar actualizar la aplicación, usted no está conectado a Internet.</string>
+  <string name="locale_list_error_unknown_location">Localización desconocida</string>
 </resources>

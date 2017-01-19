@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
-  <string name="app_name">Phần mềm Akvo</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <string name="accuracy">Độ chính xác</string>
   <string name="searching">Đang tìm kiếm</string>
   <string name="ready">Sẵn sàng</string>
@@ -32,7 +31,6 @@
   <string name="aboutlabel">Phiên bản</string>
   <string name="aboutdesc">Hiển thị thông tin của phiên bản</string>
   <string name="abouttitle">Giới thiệu ứng dụng Akvo Flow</string>
-  <string name="abouttext">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion </string>
   <string name="gpsstatuslabel">Trạng thái định vị tọa độ</string>
   <string name="gpsstatusdesc">Khởi động ứng dụng định vị tọa độ nếu bạn đã cài đặt nó trên thiết bị này</string>
   <string name="nogpsstatus">Ứng dụng định vị tọa độ chưa được cài đặt trên thiết bị này. Vui lòng cài đặt nó bằng sử dụng kho dữ liệu của Google Play</string>
@@ -46,7 +44,6 @@
   <string name="savelastuserlabel">Giữ người sử dụng được chọn cuối cùng ở chế độ đăng nhập trong những lần tiếp theo</string>
   <string name="uploadoptionlabel">Đồng bộ hóa dữ liệu qua mạng di động </string>
   <string name="surveylanglabel">Những ngôn ngữ của đợt khảo sát</string>
-  <string name="beaconlabel">Gửi những cột mốc vị trí</string>
   <string name="scanbarcode">Quét mã vạch</string>
   <string name="barcodeerror">Máy quét chưa được cài đặt. Vui lòng cài đặt ứng dụng Quét mã vạch của Anroid Market</string>
   <string name="toosmallerr">Giá trị quá nhỏ. Giá trị nhỏ nhất là: </string>
@@ -118,7 +115,7 @@
   <string name="loading">Đang tải...</string>
   <string name="prefill_title">Những câu trả lời trước đây</string>
   <string name="prefill_text">Biểu mẫu với những câu trả lời trước đây?</string>
-  <string name="error_assignment_text">Nhiệm vụ được yêu cầu trong bảng điều khiển Akvo FLOW</string>
+  <string name="error_assignment_text">Nhiệm vụ được yêu cầu trong bảng điều khiển Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_title">Đồng bộ hóa dữ liệu</string>
   <string name="data_sync_text">Đang tải dữ liệu lên. Vui lòng đợi…</string>
@@ -219,6 +216,7 @@
   <string name="error_form_header">Phần trăm %1$s biểu mẫu không được hiểu từ bảng điều khiển Flow</string>
   <string name="error_form_download">Chắc chắn rằng biểu mẫu này đã được công bố, và ngày tháng/thời gian của khu vực của bạn là ok</string>
   <string name="form_deleted">Biểu mẫu này đã bị xóa</string>
+  <!--File sync-->
   <!--Plotting-->
   <string name="geoshape_area">Vùng</string>
   <string name="geoshape_line">Dòng</string>
@@ -252,4 +250,6 @@
   <string name="error_value_required">Trường dữ liệu này không thể bỏ trống</string>
   <string name="drawer_open">Drawer open</string>
   <string name="drawer_close">Drawer close</string>
+  <!--settings activity-->
+  <!--app update service-->
 </resources>

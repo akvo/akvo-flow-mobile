@@ -2,11 +2,12 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
            xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Light Theme -->
-    <style name="Flow.Theme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <!-- Application Theme -->
+    <style name="Flow.Theme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle" tools:targetApi="11">@style/Flow.ActionBar</item>
         <!-- Support library compatibility -->
         <item name="actionBarStyle">@style/Flow.ActionBar</item>
+        <item name="android:dropDownListViewStyle">@style/Flow.PopupMenuListView</item>
 
         <item name="android:actionBarTabStyle" tools:targetApi="11">@style/Flow.ActionBar.Tabs</item>
         <!-- Support library compatibility -->
@@ -18,14 +19,15 @@
         <item name="android:windowBackground">@color/background_main</item>
         <item name="android:listViewStyle">@style/Flow.ListView</item>
 
-        <!-- Text -->
-        <item name="textColorPrimary">@color/text_color_primary</item>
-        <item name="textColorSecondary">@color/text_color_secondary</item>
-        <item name="textColorTertiary">@color/text_color_tertiary</item>
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorSecondary">@color/text_color_primary</item>
+        <item name="android:textColorTertiary">@color/text_color_primary</item>
+        <item name="colorAccent">@color/blue_main</item>
 
         <!-- Background -->
         <item name="listitem_bg1">@drawable/listitem_row_1</item>
         <item name="listitem_bg2">@drawable/listitem_row_2</item>
+
     </style>
 
     <style name="Flow.Dialog" parent="@android:style/Theme.Dialog">

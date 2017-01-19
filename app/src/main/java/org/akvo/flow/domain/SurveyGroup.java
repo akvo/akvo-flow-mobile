@@ -20,18 +20,18 @@ import java.io.Serializable;
 
 public class SurveyGroup implements Serializable {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5146372662599353969L;
 
     public static final long ID_NONE = -1;
-    
+
     private long mId;
     private String mName;
     private boolean mMonitored;
     private String mRegisterSurveyId;
 
-    public SurveyGroup (long id, String name, String registerSurveyId, boolean monitored) {
+    public SurveyGroup(long id, String name, String registerSurveyId, boolean monitored) {
         mId = id;
         mName = name;
         mRegisterSurveyId = registerSurveyId;
@@ -45,21 +45,22 @@ public class SurveyGroup implements Serializable {
     public String getRegisterSurveyId() {
         return mRegisterSurveyId;
     }
-    
+
     public long getId() {
         return mId;
     }
-    
+
     public String getName() {
         return mName;
     }
-    
+
     public boolean isMonitored() {
         return mMonitored;
     }
-    
+
     @Override
     public String toString() {
         return mName;
     }
+
 }

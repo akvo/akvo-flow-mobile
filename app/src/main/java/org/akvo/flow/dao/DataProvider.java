@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *
+ * This file is part of Akvo FLOW.
+ *
+ * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ * either version 3 of the License or any later version.
+ *
+ * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License included below for more details.
+ *
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
+ */
+
 package org.akvo.flow.dao;
 
 import android.app.SearchManager;
@@ -7,6 +24,8 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter.DatabaseHelper;
@@ -50,8 +69,10 @@ public class DataProvider extends ContentProvider {
                 // Suggestions search
                 // Adjust incoming query to become SQL text match
                 long surveyGroupId = FlowApp.getApp().getSurveyGroupId();
-                
-                final String term = selectionArgs[0] + "%";
+
+                String nameSearchTerm = createNameSearchTerm(selectionArgs);
+                String idSearchTerm = createIdSearchTerm(selectionArgs);
+
                 projection = new String[] {
                         RecordColumns._ID,
                         RecordColumns.RECORD_ID
@@ -64,7 +85,7 @@ public class DataProvider extends ContentProvider {
                     Tables.RECORD,
                     projection,
                     SUGGEST_SELECTION,
-                    new String[]{String.valueOf(surveyGroupId), term, term},
+                    new String[]{String.valueOf(surveyGroupId), idSearchTerm, nameSearchTerm},
                     null, null, sortOrder);
                 break;
         }
@@ -75,6 +96,27 @@ public class DataProvider extends ContentProvider {
         }
         
         return cursor;    
+    }
+
+    @NonNull
+    private String createIdSearchTerm(@Nullable String[] selectionArgs) {
+        StringBuilder recordIdSearchBuilder = new StringBuilder();
+        if (selectionArgs != null && selectionArgs.length > 0) {
+            recordIdSearchBuilder.append(selectionArgs[0]);
+        }
+        recordIdSearchBuilder.append("%");
+        return recordIdSearchBuilder.toString();
+    }
+
+    @NonNull
+    private String createNameSearchTerm(@Nullable String[] selectionArgs) {
+        StringBuilder nameSearchBuilder = new StringBuilder();
+        nameSearchBuilder.append("%");
+        if (selectionArgs != null && selectionArgs.length > 0) {
+            nameSearchBuilder.append(selectionArgs[0]);
+        }
+        nameSearchBuilder.append("%");
+        return nameSearchBuilder.toString();
     }
 
     @Override

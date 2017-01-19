@@ -1,18 +1,18 @@
-    /*
-     *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
-     *
-     *  This file is part of Akvo FLOW.
-     *
-     *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
-     *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
-     *  either version 3 of the License or any later version.
-     *
-     *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-     *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-     *  See the GNU Affero General Public License included below for more details.
-     *
-     *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
-     */
+/*
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo FLOW.
+ *
+ *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
 
 package org.akvo.flow.service;
 
@@ -45,6 +45,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -99,8 +100,7 @@ public class BootstrapService extends IntentService {
             }
 
             String startMessage = getString(R.string.bootstrapstart);
-            ViewUtil.displayNotification(startMessage, startMessage, this,
-                    ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
+            displayNotification(startMessage);
             databaseAdapter = new SurveyDbAdapter(this);
             databaseAdapter.open();
             try {
@@ -116,8 +116,7 @@ public class BootstrapService extends IntentService {
                     }
                 }
                 String endMessage = getString(R.string.bootstrapcomplete);
-                ViewUtil.displayNotification(endMessage, endMessage, this,
-                        ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_info);
+                displayNotification(endMessage);
             } finally {
                 if (databaseAdapter != null) {
                     databaseAdapter.close();
@@ -125,10 +124,20 @@ public class BootstrapService extends IntentService {
             }
         } catch (Exception e) {
             String errorMessage = getString(R.string.bootstraperror);
-            ViewUtil.displayNotification(errorMessage, errorMessage, this,
-                    ConstantUtil.NOTIFICATION_BOOTSTRAP, android.R.drawable.ic_dialog_alert);
+            displayErrorNotification(errorMessage);
+
             Log.e(TAG, "Bootstrap error", e);
         }
+    }
+
+    private void displayErrorNotification(String errorMessage) {
+        //FIXME: why are we repeating the message in title and text?
+        NotificationHelper.displayErrorNotification(errorMessage, errorMessage, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
+    }
+
+    private void displayNotification(String message) {
+        //FIXME: why are we repeating the message in title and text?
+        NotificationHelper.displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
     }
 
     /**

@@ -13,6 +13,7 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+
 package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
@@ -37,8 +38,9 @@ import org.akvo.flow.ui.view.SubmitTab;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener,
-        ActionBar.TabListener {
+public class SurveyTabAdapter extends PagerAdapter
+        implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
+
     private static final String TAG = SurveyTabAdapter.class.getSimpleName();
 
     private Context mContext;
@@ -52,7 +54,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private SubmitTab mSubmitTab;
 
     public SurveyTabAdapter(Context context, ActionBar actionBar, ViewPager pager,
-            SurveyListener surveyListener, QuestionInteractionListener questionListener) {
+            SurveyListener surveyListener,
+            QuestionInteractionListener questionListener) {
         mContext = context;
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
@@ -63,11 +66,11 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     private void init() {
         mQuestionGroups = mSurveyListener.getQuestionGroups();
-        mQuestionGroupTabs = new ArrayList<QuestionGroupTab>();
+        mQuestionGroupTabs = new ArrayList<>();
 
         for (QuestionGroup group : mQuestionGroups) {
-            QuestionGroupTab questionGroupTab = new QuestionGroupTab(mContext, group,
-                    mSurveyListener, mQuestionListener);
+            QuestionGroupTab questionGroupTab =
+                    new QuestionGroupTab(mContext, group, mSurveyListener, mQuestionListener);
             mQuestionGroupTabs.add(questionGroupTab);
         }
 
@@ -79,14 +82,11 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         for (QuestionGroup group : mQuestionGroups) {
-            mActionBar.addTab(mActionBar.newTab()
-                    .setText(group.getHeading())
-                    .setTabListener(this));
+            mActionBar.addTab(mActionBar.newTab().setText(group.getHeading()).setTabListener(this));
         }
 
         if (mSubmitTab != null) {
-            mActionBar.addTab(mActionBar.newTab()
-                    .setText(R.string.submitbutton)
+            mActionBar.addTab(mActionBar.newTab().setText(R.string.submitbutton)
                     .setTabListener(this));
         }
 
@@ -127,7 +127,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
      * Upon success the tab position will be returned, -1 otherwise
      */
     public int displayQuestion(String questionId) {
-        for (int i=0; i<mQuestionGroupTabs.size(); i++) {
+        for (int i = 0; i < mQuestionGroupTabs.size(); i++) {
             QuestionGroupTab questionGroupTab = mQuestionGroupTabs.get(i);
             if (questionGroupTab.displayQuestion(questionId)) {
                 return i;
@@ -268,5 +268,4 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         return invalidQuestions;
     }
-
 }

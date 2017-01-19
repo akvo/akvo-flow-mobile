@@ -13,48 +13,46 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+
 package org.akvo.flow.service;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import java.io.IOException;
+import android.support.v4.util.Pair;
+
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.api.service.ApkApiService;
-import org.akvo.flow.domain.apkupdate.ApkData;
+import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
-import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StringUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 public class ApkUpdateHelper {
 
     private final ApkApiService apkApiService = new ApkApiService();
     private final ApkUpdateMapper apkUpdateMapper = new ApkUpdateMapper();
-    private final Navigator navigator = new Navigator();
 
     public ApkUpdateHelper() {
     }
 
-    boolean shouldUpdate(@NonNull Context context) throws IOException, JSONException {
+    Pair<Boolean, ViewApkData> shouldUpdate(@NonNull Context context) throws IOException, JSONException {
         JSONObject json = apkApiService.getApkDataObject(context);
-        ApkData data = apkUpdateMapper.transform(json);
-        if (shouldAppBeUpdated(data, context)) {
-            // There is a newer version. Fire the 'Download and Install' Activity.
-            navigator.navigateToAppUpdate(context, data);
-            return true;
-        }
-        return false;
+        ViewApkData data = apkUpdateMapper.transform(json);
+        return new Pair<>(shouldAppBeUpdated(data), data);
     }
 
-    private boolean shouldAppBeUpdated(@Nullable ApkData data, @NonNull Context context) {
+    private boolean shouldAppBeUpdated(@Nullable ViewApkData data) {
         if (data == null) {
             return false;
         }
         String version = data.getVersion();
         return StringUtil.isValid(version)
-            && PlatformUtil.isNewerVersion(PlatformUtil.getVersionName(context), version)
-            && StringUtil.isValid(data.getFileUrl());
+                && PlatformUtil.isNewerVersion(BuildConfig.VERSION_NAME, version)
+                && StringUtil.isValid(data.getFileUrl());
     }
 }

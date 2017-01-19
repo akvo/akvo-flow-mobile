@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -24,9 +24,13 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -34,37 +38,43 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
+import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.ExceptionReportingService;
-import org.akvo.flow.service.LocationService;
 import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.DrawerFragment;
+import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public class SurveyActivity extends ActionBarActivity implements RecordListListener,
-        DrawerFragment.DrawerListener {
-    private static final String TAG = SurveyActivity.class.getSimpleName();
+import java.lang.ref.WeakReference;
 
-    private static final int REQUEST_ADD_USER = 0;
+public class SurveyActivity extends ActionBarActivity implements RecordListListener,
+        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
+    private static final String TAG = SurveyActivity.class.getSimpleName();
 
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
 
-    public static final String FRAGMENT_DATAPOINTS = "datapoints_fragment";
+    private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
+    private static final String DRAWER_FRAGMENT_TAG = "f";
 
     private SurveyDbAdapter mDatabase;
     private SurveyGroup mSurveyGroup;
@@ -73,11 +83,23 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
     private CharSequence mDrawerTitle, mTitle;
+    private Navigator navigator = new Navigator();
+
+    private Prefs prefs;
+    private ApkUpdateStore apkUpdateStore;
+
+    /**
+     * BroadcastReceiver to notify of surveys synchronisation. This should be
+     * fired from {@link SurveyDownloadService}.
+     */
+    private final BroadcastReceiver mSurveysSyncReceiver = new SurveySyncBroadcastReceiver(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
+
+        initializeToolBar();
 
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
@@ -87,50 +109,63 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mTitle = mDrawerTitle = getString(R.string.app_name);
 
         // Init navigation drawer
-        mDrawer = (DrawerFragment)getSupportFragmentManager().findFragmentByTag("f");
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+                 R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
                 mDrawer.onDrawerClosed();
                 getSupportActionBar().setTitle(mTitle);
                 supportInvalidateOptionsMenu();
             }
 
-            /** Called when a drawer has settled in a completely open state. */
+            /**
+             * Called when a drawer has settled in a completely open state.
+             */
+            @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
+                //prevent the back icon from showing
+                super.onDrawerSlide(drawerView, 0);
                 getSupportActionBar().setTitle(mDrawerTitle);
                 supportInvalidateOptionsMenu();
             }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                //disable drawer animation
+                super.onDrawerSlide(drawerView, 0);
+            }
         };
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.ic_menu_white_48dp);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         // Automatically select the survey
         SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
         if (sg != null) {
             onSurveySelected(sg);
         } else {
-            mDrawerLayout.openDrawer(Gravity.START);
+            mDrawerLayout.openDrawer(GravityCompat.START);
         }
 
-        if (savedInstanceState == null ||
-                getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS) == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
-                    DatapointsFragment.instantiate(mSurveyGroup), FRAGMENT_DATAPOINTS).commit();
+        if (savedInstanceState == null
+                || supportFragmentManager.findFragmentByTag(DATA_POINTS_FRAGMENT_TAG) == null) {
+            DatapointsFragment datapointsFragment = DatapointsFragment.newInstance(mSurveyGroup);
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, datapointsFragment, DATA_POINTS_FRAGMENT_TAG)
+                    .commit();
         }
 
+        prefs = new Prefs(getApplicationContext());
         // Start the setup Activity if necessary.
         boolean noDevIdYet = false;
-        if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
             noDevIdYet = true;
-            startActivityForResult(new Intent(this, AddUserActivity.class), REQUEST_ADD_USER);
+            navigator.navigateToAddUser(this);
         }
 
         startServices(noDevIdYet);
@@ -139,22 +174,30 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
+        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
+    }
+
+    private void initializeToolBar() {
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case REQUEST_ADD_USER:
+            case ConstantUtil.REQUEST_ADD_USER:
                 if (resultCode == RESULT_OK) {
                     displaySelectedUser();
-                    Prefs.setBoolean(this, Prefs.KEY_SETUP, true);
+                    prefs.setBoolean(Prefs.KEY_SETUP, true);
                     // Trigger the delayed services, so the first
                     // backend connections uses the new Device ID
                     startService(new Intent(this, SurveyDownloadService.class));
                     startService(new Intent(this, DataSyncService.class));
-                } else if (!Prefs.getBoolean(this, Prefs.KEY_SETUP, false)) {
+                } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
                     finish();
                 }
                 break;
@@ -169,8 +212,16 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         mDatabase.deleteEmptyRecords();
         registerReceiver(mSurveysSyncReceiver,
                 new IntentFilter(getString(R.string.action_surveys_sync)));
+
+        ViewApkData apkData = apkUpdateStore.getApkData();
+        boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
+        if (apkData != null && shouldNotifyUpdate && PlatformUtil
+                .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
+            apkUpdateStore.saveAppUpdateNotifiedTime();
+            navigator.navigateToAppUpdate(this, apkData);
+        }
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
@@ -212,10 +263,8 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 startService(new Intent(this, SurveyDownloadService.class));
                 startService(new Intent(this, DataSyncService.class));
             }
-            startService(new Intent(this, LocationService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, ExceptionReportingService.class));
-            startService(new Intent(this, ApkUpdateService.class));
             startService(new Intent(this, TimeCheckService.class));
         }
     }
@@ -247,11 +296,13 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
         setTitle(title);
         FlowApp.getApp().setSurveyGroupId(id);
 
-        DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_DATAPOINTS);
+        DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
+                DATA_POINTS_FRAGMENT_TAG);
         if (f != null) {
             f.refresh(mSurveyGroup);
+        } else {
+            supportInvalidateOptionsMenu();
         }
-        supportInvalidateOptionsMenu();
         mDrawer.load();
         mDrawerLayout.closeDrawers();
     }
@@ -263,14 +314,9 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean showItems = !mDrawerLayout.isDrawerOpen(Gravity.START) && mSurveyGroup != null;
-        for (int i=0; i<menu.size(); i++) {
+        for (int i = 0; i < menu.size(); i++) {
             menu.getItem(i).setVisible(showItems);
         }
         return super.onPrepareOptionsMenu(menu);
@@ -278,10 +324,7 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -314,45 +357,67 @@ public class SurveyActivity extends ActionBarActivity implements RecordListListe
                 int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
                 readOnly = status != SurveyDbAdapter.SurveyInstanceStatus.SAVED;
             } else {
-                formInstanceId = mDatabase.createSurveyRespondent(formId, registrationForm.getVersion(), user, surveyedLocaleId);
+                formInstanceId = mDatabase
+                        .createSurveyRespondent(formId, registrationForm.getVersion(), user,
+                                surveyedLocaleId);
             }
             c.close();
 
-            Intent i = new Intent(this, FormActivity.class);
-            i.putExtra(ConstantUtil.USER_ID_KEY, user.getId());
-            i.putExtra(ConstantUtil.SURVEY_ID_KEY, formId);
-            i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-            i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, surveyedLocaleId);
-            i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, formInstanceId);
-            i.putExtra(ConstantUtil.READONLY_KEY, readOnly);
-            startActivity(i);
+            navigator.navigateToFormActivity(this, surveyedLocaleId, user, formId, formInstanceId, readOnly,
+                    mSurveyGroup);
         } else {
-            // Display form list and history
-            Intent intent = new Intent(this, RecordActivity.class);
-            Bundle extras = new Bundle();
-            extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
-            extras.putString(RecordActivity.EXTRA_RECORD_ID, surveyedLocaleId);
-            intent.putExtras(extras);
-            startActivity(intent);
+            navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
+
         }
     }
+
+
 
     private void displaySelectedUser() {
         User user = FlowApp.getApp().getUser();
         if (user != null) {
-            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
+                    Toast.LENGTH_LONG).show();
         }
     }
 
-    /**
-     * BroadcastReceiver to notify of surveys synchronisation. This should be
-     * fired from SurveyDownloadService.
-     */
-    private BroadcastReceiver mSurveysSyncReceiver = new BroadcastReceiver() {
+    @Override
+    public void refreshMenu() {
+        supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void onSyncRecordsTap(long surveyGroupId) {
+        Toast.makeText(this, R.string.syncing_records, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, SurveyedDataPointSyncService.class);
+        intent.putExtra(SurveyedDataPointSyncService.SURVEY_GROUP, surveyGroupId);
+        startService(intent);
+    }
+
+    @Override
+    public boolean onSearchTap() {
+        return onSearchRequested();
+    }
+
+    private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
+
+        private final WeakReference<SurveyActivity> activityWeakReference;
+
+        private SurveySyncBroadcastReceiver(SurveyActivity activity) {
+            this.activityWeakReference = new WeakReference<>(activity);
+        }
+
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "Surveys have been synchronised. Refreshing data...");
-            mDrawer.load();
+            SurveyActivity surveyActivity = activityWeakReference.get();
+            if (surveyActivity != null) {
+                surveyActivity.reloadDrawer();
+            }
         }
-    };
+    }
+
+    private void reloadDrawer() {
+        mDrawer.load();
+    }
 }

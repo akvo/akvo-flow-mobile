@@ -34,3 +34,7 @@ gradle.properties
 
 # Local debug settings
 app/src/debug/raw/survey.properties
+
+#Builds
+builds/
+tmp/

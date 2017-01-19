@@ -5,6 +5,7 @@
 
     <color name="black_main">#000000</color>
     <color name="black_disabled">#8f8f8f</color>
+    <color name="black_transparent">#20000000</color>
 
     <color name="orange_main">#e17e26</color>
     <color name="orange_disabled">#80e17e26</color>
@@ -18,6 +19,9 @@
     <color name="button_grey_light_selected">#808285</color>
     <color name="button_grey_dark">#79736e</color>
     <color name="button_grey_dark_selected">#000000</color>
+    <color name="image_button_grey_disabled">#5094918e</color>
+    <color name="image_button_grey">#94918e</color>
+    <color name="image_button_grey_selected">#85827f</color>
 
     <!-- FLOW branding -->
     <color name="background_main">#fffef2e7</color>
@@ -26,10 +30,6 @@
     <!-- Text -->
     <color name="text_primary">@color/black_main</color>
     <color name="text_primary_disabled">@color/black_disabled</color>
-    <color name="text_secondary">@color/orange_main</color>
-    <color name="text_secondary_disabled">@color/orange_disabled</color>
-    <color name="text_tertiary">@color/blue_main</color>
-    <color name="text_tertiary_disabled">@color/blue_disabled</color>
 
     <color name="action_bar_text">@color/orange_main</color>
 
@@ -47,6 +47,8 @@
     <color name="button_tertiary">@color/button_grey_dark</color>
     <color name="button_tertiary_selected">@color/button_grey_dark_selected</color>
     <color name="button_tertiary_text">@color/white</color>
+
+    <color name="red">#FF0000</color>
 
     <color name="default_underline_indicator_selected_color">#ff33b5e5</color>
 

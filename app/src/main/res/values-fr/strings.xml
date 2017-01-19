@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
-  <string name="app_name">Akvo FLOW</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <string name="accuracy">Préc</string>
   <string name="searching">Recherche...</string>
   <string name="ready">Prêt</string>
@@ -16,7 +15,7 @@
   <string name="lon">Lon</string>
   <string name="elevation">Altitude</string>
   <string name="submitbutton">Envoyer</string>
-  <string name="geodialog">Votre GPS doit être activer. Cliquez OK pour accéder aux préférences. Sélectionnez Utilisez le GPS et pressez le bouton de retour pour revenir a cet écran. Vous pouvez maintenant obtenir la géolocalisation.</string>
+  <string name="geodialog">Votre GPS doit être activé. Cliquez OK pour accéder aux préférences. Sélectionnez Utilisez le GPS et pressez le bouton de retour pour revenir a cet écran. Vous pouvez maintenant obtenir la géolocalisation.</string>
   <string name="resize_large_images">Réduire les images trop lourdes</string>
   <string name="settingslabel">Paramètres</string>
   <string name="nouser">Il n\'y a pas d\'utilisateurs!</string>
@@ -31,8 +30,8 @@
   <string name="screenoptdesc">Empêcher l\'écran de s\'éteindre pendant que vous remplissez les données. S\'assurer d\'éteindre l\'écran manuellement (ou quitter l\'application) quand ceci n\'est pas utilisé afin d\'économiser la batterie.</string>
   <string name="aboutlabel">A propos</string>
   <string name="aboutdesc">Information sur les versions.</string>
-  <string name="abouttitle">A propos - Application Akvo FLOW</string>
-  <string name="abouttext">Akvo FLOW app\nDeveloped By: Akvo Foundation\nCopyright © 2010-2014 Stichting Akvo\nVersion</string>
+  <string name="abouttitle">A propos - Application Akvo Flow</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Application Akvo Flow\nDéveloppée par: Akvo Foundation\nTous Droits réservés © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
   <string name="gpsstatuslabel">Etat du GPS</string>
   <string name="gpsstatusdesc">Démarre l\'application de GPS Status si elle est installée sur cet appareil.</string>
   <string name="nogpsstatus">GPS Status n\'est pas installé sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
@@ -46,7 +45,6 @@
   <string name="savelastuserlabel">Garde le dernier utilisateur connecté entre les sessions</string>
   <string name="uploadoptionlabel">Envoyer les données avec le réseau mobile</string>
   <string name="surveylanglabel">Langues de l\'enquête</string>
-  <string name="beaconlabel">Envoyer la localisation</string>
   <string name="scanbarcode">Scanner le code barre</string>
   <string name="barcodeerror">Le scanner n\'est pas installé. Veuillez installer l\'application de code barre sur Android Market.</string>
   <string name="toosmallerr">La valeur est trop petite. Valeur minimum: </string>
@@ -114,21 +112,24 @@
   <string name="sync_finished">La synchronisation des enregistrements est terminée</string>
   <string name="synced_records">%1$d des enregistrements synchronisés</string>
   <string name="sync_error">La synchronisation des enregistrements à échouer</string>
+  <string name="syncing_corrupted_data_points_error">Veuillez synchroniser de nouveau.</string>
   <string name="network_error">Erreur de réseau</string>
   <string name="loading">Chargement...</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
-  <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo FLOW</string>
+  <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_title">Synchronisation des données</string>
   <string name="data_sync_text">Transfère en cours. Veuillez patienter</string>
   <string name="data_sync_all">Formulaires synchronisés: %1$d - Echoués: %2$d</string>
   <string name="data_sync_synced">Formulaires synchronisés: %1$d</string>
+  <string name="data_sync_error_form_deleted_title">Ce formulaire a été supprimé.</string>
+  <string name="data_sync_error_form_deleted_text">Le formulaire %1$s a été supprimé</string>
   <!--Localization-->
   <string name="app_language">Langue de l\'application</string>
   <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">Vous n\'avez pas d\'enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord FLOW</string>
+  <string name="no_surveys_text">Vous n\'avez pas d\'enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord Flow</string>
   <string name="no_records_text">Vous n\'avez pas encore de données. Cliquez \"+\" en haut de l\'écran pour en ajouter.</string>
   <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
   <!--Activity Labels-->
@@ -202,12 +203,12 @@
   <string name="status_submitted">Envoyé</string>
   <string name="status_exported">Exporté</string>
   <!--APK update-->
-  <string name="app_update_activity">Mise à jour de Akvo FLOW</string>
-  <string name="app_update">Une mise à jour de FLOW est disponible. Cliquez \"mettre à jour\" pour télécharger et installer la nouvelle version.</string>
+  <string name="app_update_activity">Mise à jour de Akvo Flow</string>
+  <string name="app_update">Une mise à jour de Flow est disponible. Cliquez \"mettre à jour\" pour télécharger et installer la nouvelle version.</string>
   <string name="update">Mise à jour</string>
   <string name="not_now">Pas maintenant</string>
   <string name="clicktoinstall">La mise à jour est téléchargée. Voulez vous l\'installer maintenant?</string>
-  <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de FLOW.</string>
+  <string name="apk_upgrade_error">Erreur lors du téléchargement de la mise à jour de Flow.</string>
   <!--Time check-->
   <string name="time_check_activity">Date et heure</string>
   <string name="time_warning">Votre date de téléphone est inexacte! Réglez votre horloge et essayer à nouveau. Votre date et l\'heure téléphone est le:</string>
@@ -215,8 +216,8 @@
   <!--Form sync-->
   <string name="downloading_forms">Téléchargement des formulaires</string>
   <string name="error_form_sync_title">Error en synchronisant les formulaires</string>
-  <string name="error_assignment_read">Les affectations des formulaires n\'ont pas pas pu être lu du tableau de bord FLOW</string>
-  <string name="error_form_header">Le formulaire %1$s n\'a pas pu être lu depuis le tableau de bord FLOW.</string>
+  <string name="error_assignment_read">Les affectations des formulaires n\'ont pas pas pu être lu du tableau de bord Flow</string>
+  <string name="error_form_header">Le formulaire %1$s n\'a pas pu être lu depuis le tableau de bord Flow.</string>
   <string name="error_form_download">Rassurez vous que le formulaire est publié, et que les paramères d\' heure/date sont ok.</string>
   <string name="form_deleted">Ce formulaire a été supprimer.</string>
   <!--File sync-->
@@ -261,5 +262,6 @@
   <!--app update service-->
   <string name="apk_update_service_no_update">Vous avez déjà la dernière version de l\'application.</string>
   <string name="apk_update_service_error_update">Une erreur est survenue en essayant d\'actualiser l\'application, veuillez réessayer plus tard.</string>
-  <string name="apk_update_service_error_no_internet">Une erreur est survenue en essayant d\'actualiser l\'application, vous n\'etes pas connecté/e à internet.</string>
+  <string name="apk_update_service_error_no_internet">Une erreur est survenue en essayant d\'actualiser l\'application, vous n\'êtes pas connecté/e à internet.</string>
+  <string name="locale_list_error_unknown_location">Localisation inconnue</string>
 </resources>

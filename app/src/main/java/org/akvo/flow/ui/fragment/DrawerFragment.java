@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -13,17 +13,21 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
+
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -87,7 +91,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private List<SurveyGroup> mSurveys = new ArrayList<>();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.navigation_drawer, container, false);
         mListView = (ExpandableListView) v.findViewById(R.id.list);
 
@@ -103,7 +108,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mDatabase.open();
         }
         if (mAdapter == null) {
-            mAdapter = new DrawerAdapter();
+            mAdapter = new DrawerAdapter(getActivity());
             mListView.setAdapter(mAdapter);
             mListView.expandGroup(GROUP_SURVEYS);
             mListView.setOnGroupClickListener(mAdapter);
@@ -145,8 +150,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         if (!isResumed()) {
             return;
         }
-        getLoaderManager().restartLoader(LOADER_SURVEYS, null, this);
-        getLoaderManager().restartLoader(LOADER_USERS, null, this);
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.restartLoader(LOADER_SURVEYS, null, this);
+        loaderManager.restartLoader(LOADER_USERS, null, this);
     }
 
     public void onDrawerClosed() {
@@ -184,8 +190,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mUsers.clear();
                     if (cursor.moveToFirst()) {
                         do {
-                            long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
-                            String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
+                            long id = cursor.getLong(
+                                    cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
+                            String name = cursor.getString(
+                                    cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
                             User user = new User(id, name);
                             // Skip selected user
                             if (!user.equals(FlowApp.getApp().getUser())) {
@@ -226,7 +234,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                         String name = et.getText().toString();// TODO: Validate name
                         if (TextUtils.isEmpty(name)) {
                             // Disallow blank usernames
-                            Toast.makeText(getActivity(), R.string.empty_user_warning, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.empty_user_warning,
+                                    Toast.LENGTH_SHORT).show();
                             return;
                         }
 
@@ -247,7 +256,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private void deleteUser(final User user) {
         final long uid = user.getId();
-        ViewUtil.showConfirmDialog(R.string.delete_user, R.string.delete_user_confirmation, getActivity(),
+        ViewUtil.showConfirmDialog(R.string.delete_user, R.string.delete_user_confirmation,
+                getActivity(),
                 true, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -261,7 +271,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private SurveyGroup getSurveyForContextMenu(int type, int group, int child) {
-        if (group == GROUP_SURVEYS && type == ExpandableListView.PACKED_POSITION_TYPE_CHILD && child < mSurveys.size()) {
+        if (group == GROUP_SURVEYS && type == ExpandableListView.PACKED_POSITION_TYPE_CHILD
+                && child < mSurveys.size()) {
             return mSurveys.get(child);
         }
         return null;
@@ -279,7 +290,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) menuInfo;
         int type = ExpandableListView.getPackedPositionType(info.packedPosition);
@@ -371,13 +383,14 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
         LayoutInflater mInflater;
 
-        int mHighlightColor;
+        @ColorInt
+        private final int mHighlightColor;
 
-        public DrawerAdapter() {
-            mInflater = LayoutInflater.from(getActivity());
+        public DrawerAdapter(Context context) {
+            mInflater = LayoutInflater.from(context);
             mUsers = new ArrayList<>();
             mSurveys = new ArrayList<>();
-            mHighlightColor = PlatformUtil.getResource(getActivity(), R.attr.textColorSecondary);
+            mHighlightColor = ContextCompat.getColor(context, R.color.orange_main);
         }
 
         @Override
@@ -423,7 +436,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         @Override
-        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+        public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
+                ViewGroup parent) {
             View v = convertView;
             if (v == null) {
                 v = mInflater.inflate(R.layout.drawer_item, null);
@@ -432,7 +446,6 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             TextView tv = (TextView) v.findViewById(R.id.item_txt);
             ImageView img = (ImageView) v.findViewById(R.id.item_img);
             ImageView dropdown = (ImageView) v.findViewById(R.id.dropdown);
-
 
             switch (groupPosition) {
                 case GROUP_USERS:
@@ -446,13 +459,15 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
                     img.setImageResource(R.drawable.ic_account_circle_black_48dp);
                     img.setVisibility(View.VISIBLE);
-                    dropdown.setImageResource(isExpanded ? R.drawable.ic_action_collapse : R.drawable.ic_action_expand);
+                    dropdown.setImageResource(isExpanded ?
+                            R.drawable.ic_action_collapse :
+                            R.drawable.ic_action_expand);
                     dropdown.setVisibility(View.VISIBLE);
                     break;
                 case GROUP_SURVEYS:
                     divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 3));
                     tv.setTextSize(ITEM_TEXT_SIZE);
-                    tv.setTextColor(getResources().getColor(R.color.black_disabled));
+                    tv.setTextColor(ContextCompat.getColor(getActivity(), R.color.black_disabled));
                     tv.setText(R.string.surveys);
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
@@ -471,7 +486,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         @Override
-        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
+                View convertView, ViewGroup parent) {
             View v = convertView;
             if (v == null) {
                 v = mInflater.inflate(android.R.layout.simple_list_item_1, null);
@@ -485,7 +501,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
             switch (groupPosition) {
                 case GROUP_USERS:
-                    User user = isLastChild ? new User(-1, getString(R.string.new_user)) : mUsers.get(childPosition);
+                    User user = isLastChild ?
+                            new User(-1, getString(R.string.new_user)) :
+                            mUsers.get(childPosition);
                     tv.setText(user.getName());
                     v.setTag(user);
                     break;
@@ -493,8 +511,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     SurveyGroup sg = mSurveys.get(childPosition);
                     tv.setText(sg.getName());
                     if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
-                        tv.setTextColor(getResources().getColorStateList(mHighlightColor));
-                        v.setBackgroundColor(getResources().getColor(R.color.background_alternate));
+                        tv.setTextColor(mHighlightColor);
+                        v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_alternate));
                     }
                     v.setTag(sg);
                     break;
@@ -522,7 +540,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         @Override
-        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
+                int childPosition, long id) {
             switch (groupPosition) {
                 case GROUP_USERS:
                     User user = (User) v.getTag();

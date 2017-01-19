@@ -16,13 +16,13 @@ Date: 19 January 2017
 * **Change the query type for the data point search** - [#467] (https://github.com/akvo/akvo-flow-mobile/issues/467) You can now easily search for a data point using any of the name fields, not just the first word.
 * **Error notification icon is shown as empty white circle** - [#486] (https://github.com/akvo/akvo-flow-mobile/issues/486) Notification look has been improved with new icon and colors.
 * **When notifications have long text, only one line is shown** - [#519] (https://github.com/akvo/akvo-flow-mobile/issues/519) Notifications can now be expanded on newer devices and the text has been made clearer and shorter.
-* **Error notification too long for unsuccessful syncing of data points** - [#560] (https://github.com/akvo/akvo-flow-mobile/issues/560) Notifications for data point syncing errors now have shorter text (similar to #560).
+* **Error notification too long for unsuccessful syncing of data points** - [#560] (https://github.com/akvo/akvo-flow-mobile/issues/560) Notifications for data point syncing errors now have shorter text (similar to #519).
 * **Syncing imported data points** - [#526] (https://github.com/akvo/akvo-flow-mobile/issues/526) You will be notified if the data points were not synced correctly.
 * **When device is rotated user is shown the download update dialog again** - [#499] (https://github.com/akvo/akvo-flow-mobile/issues/499) You will no longer be constantly shown the update dialog when rotating the device.
 * **How to notify user of available updates**  - [#578] (https://github.com/akvo/akvo-flow-mobile/issues/578) Related to #499, the update frequency and user notification of new updates has been reduced.
 * **Form name does not wrap** - [#521] (https://github.com/akvo/akvo-flow-mobile/issues/521) Long form names are now displayed correctly.
 * **"About Akvo" is outdated** - [#545] (https://github.com/akvo/akvo-flow-mobile/issues/545) The "About Akvo" screen now shows up to date information.
-* **Long cascade options do not wrap** - [#568] (https://github.com/akvo/akvo-flow-mobile/issues/568) Long cascade names are now visible in full
+* **Long cascade options do not wrap** - [#568] (https://github.com/akvo/akvo-flow-mobile/issues/568) Long cascade names are now visible in full.
 
 ---------------
 # ver 2.2.9

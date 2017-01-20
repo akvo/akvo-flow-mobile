@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
-  <string name="app_name">Akvo FLOW</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <string name="accuracy">Precisão</string>
   <string name="searching">Procurando...</string>
   <string name="ready">Pronto</string>
@@ -18,7 +17,7 @@ Sem espaço para armazenamento
   <string name="lon">Long</string>
   <string name="elevation">Altura</string>
   <string name="submitbutton">Submeter</string>
-  <string name="geodialog">O GPS deve estar ligado para o fazer isto. Seleccione OK para ir para\à página de definições. Seleccione Usar satélites do GPS e, em seguida, pressione o botão Voltar para retornar. Uma vez que o GPS esteja activo você pode clicar de novo em Verificar Localização Geográfica para obter a sua posição.</string>
+  <string name="geodialog">O GPS deve estar ligado para fazer isto. Seleccione OK para ir à página de definições. Seleccione Usar satélites do GPS e, em seguida, pressione o botão Voltar para retornar. Uma vez que o GPS esteja activo você pode clicar de novo em Verificar Localização Geográfica para obter a sua posição.</string>
   <string name="resize_large_images">Redimensionar imagens grandes</string>
   <string name="settingslabel">Definições</string>
   <string name="nouser">Sem usuários!</string>
@@ -33,8 +32,8 @@ Sem espaço para armazenamento
   <string name="screenoptdesc">Impedir que a tela se desligue enquanto no modo de preenchimento de dados no inquérito. Certifique-se de desligar manualmente a tela (ou sair do aplicativo) quando não estiver em uso para evitar gastar a bateria.</string>
   <string name="aboutlabel">Sobre</string>
   <string name="aboutdesc">Exibir informações sobre a versão.</string>
-  <string name="abouttitle">Sobre o aplicativo Akvo FLOW</string>
-  <string name="abouttext">Aplicação Akvo FLOW \ Desenvolvido por: Akvo Foundation \ Copyright © 2010-2014 Stichting Akvo \ nVersion</string>
+  <string name="abouttitle">Sobre o aplicativo Akvo Flow</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Aplicação Akvo Flow\nDesenvolvido por: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersão %2$s</string>
   <string name="gpsstatuslabel">Estado do GPS</string>
   <string name="gpsstatusdesc">Iniciar a aplicação do Estado do GPS se o tiver instalado no dispositivo.</string>
   <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>
@@ -48,7 +47,6 @@ Sem espaço para armazenamento
   <string name="savelastuserlabel">Manter o último usuário seleccionado com a sessão iniciada entre as sessões</string>
   <string name="uploadoptionlabel">Sincronizar dados através da rede móvel</string>
   <string name="surveylanglabel"> Idiomas do inquérito</string>
-  <string name="beaconlabel">Enviar sinal de localização</string>
   <string name="scanbarcode">Digitalizar o código de barras</string>
   <string name="barcodeerror">Scanner não instalado. Por favor, instale a aplicação Barcode Scanner do Android Market.</string>
   <string name="toosmallerr">O valor é demasiado pequeno. Valor mínimo:</string>
@@ -88,7 +86,7 @@ Sem espaço para armazenamento
   <string name="bootstrapstart">Carregando dados do inquérito do cartão de memória</string>
   <string name="bootstrapcomplete">Concluído o carregamento de dados do cartão de memória</string>
   <string name="bootstraperror">Erro no processamento do ficheiro de inicialização zip</string>
-  <string name="bootstrap_invalid_app">Erro: O formulário não pertence a esta instância do FLOW</string>
+  <string name="bootstrap_invalid_app">Erro: O formulário não pertence a esta instância do Flow</string>
   <string name="transmissionhist">Histórico de transmissão</string>
   <string name="transstartdate">Iniciado:</string>
   <string name="transenddate">Terminado</string>
@@ -116,21 +114,24 @@ Sem espaço para armazenamento
   <string name="sync_finished">Sincronização de pontos de dados concluída</string>
   <string name="synced_records">Pontos de Dados %1$d sincronizados</string>
   <string name="sync_error"> Falhou a sincronização de Pontos de Dados </string>
+  <string name="syncing_corrupted_data_points_error">Faça a sincronização novamente.</string>
   <string name="network_error">Erro de rede</string>
   <string name="loading">Carregando...</string>
   <string name="prefill_title">Preencher novamente as respostas</string>
   <string name="prefill_text">Preencher antecipadamente o formulário com respostas anteriores?</string>
-  <string name="error_assignment_text">É necessário o emparelhamento no painel do Akvo FLOW</string>
+  <string name="error_assignment_text">É necessário o emparelhamento no painel do Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_title">Sincronização de Dados</string>
   <string name="data_sync_text">Carregando dados. Por favor, aguarde...</string>
   <string name="data_sync_all">Formulários sincronizados: %1$d - Falha:%2$d</string>
   <string name="data_sync_synced">Formulários sincronizados:%1$d</string>
+  <string name="data_sync_error_form_deleted_title">Formulário eliminado</string>
+  <string name="data_sync_error_form_deleted_text">O formulário %1$s foi eliminado.</string>
   <!--Localization-->
   <string name="app_language">Idioma da Aplicação </string>
   <string name="please_restart">Por favor, reinicie o aplicativo</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">Não existem inquéritos emparelhados. Os inquéritos são emparelhados no painel do FLOW</string>
+  <string name="no_surveys_text">Não existem inquéritos emparelhados. Os inquéritos são emparelhados no painel do Flow</string>
   <string name="no_records_text">Você ainda não tem pontos de dados. Clique em \'+\', no topo da tela para adicionar um novo ponto de dados</string>
   <string name="no_survey_selected_text">Nenhum inquérito seleccionado. Abra o menu lateral para seleccionar um inquérito</string>
   <!--Activity Labels-->
@@ -205,12 +206,12 @@ Sem espaço para armazenamento
   <string name="status_submitted">Submetido</string>
   <string name="status_exported">Exportado</string>
   <!--APK update-->
-  <string name="app_update_activity">Actualização do Akvo FLOW</string>
-  <string name="app_update">Está disponível uma nova versão do aplicativo FLOW. Clique em \'Actualizar\' para descarregar e instalar a nova versão.</string>
+  <string name="app_update_activity">Actualização do Akvo Flow</string>
+  <string name="app_update">Está disponível uma nova versão do aplicativo Flow. Clique em \'Actualizar\' para descarregar e instalar a nova versão.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Agora não</string>
-  <string name="clicktoinstall">A nova versão do FLOW foi descarregada. Você deseja instalá-la agora?</string>
-  <string name="apk_upgrade_error">Erro ao descarregar a actualização do FLOW.</string>
+  <string name="clicktoinstall">A nova versão do Flow foi descarregada. Você deseja instalá-la agora?</string>
+  <string name="apk_upgrade_error">Erro ao descarregar a actualização do Flow.</string>
   <!--Time check-->
   <string name="time_check_activity">Data e Hora</string>
   <string name="time_warning">A hora do seu telefone não está correcta! Acerte o seu relógio e tente de novo. A data do e hora do seu telefone são:</string>
@@ -218,8 +219,8 @@ Sem espaço para armazenamento
   <!--Form sync-->
   <string name="downloading_forms">Descarregando formulários</string>
   <string name="error_form_sync_title">Erro de sincronização de formulários</string>
-  <string name="error_assignment_read">O emparelhamento de formulários não pode ser lido a partir do painel do FLOW.</string>
-  <string name="error_form_header">O Formulário %1$s não pode ser lido a partir do painel do FLOW.</string>
+  <string name="error_assignment_read">O emparelhamento de formulários não pode ser lido a partir do painel do Flow.</string>
+  <string name="error_form_header">O Formulário %1$s não pode ser lido a partir do painel do Flow.</string>
   <string name="error_form_download">Certifique-se de que o formulário foi publicado e de que as suas definições de data / hora locais estão correctas</string>
   <string name="form_deleted">Este formulário foi eliminado.</string>
   <!--File sync-->
@@ -265,4 +266,5 @@ Sem espaço para armazenamento
   <string name="apk_update_service_no_update">Você já tem a versão mais recente do aplicativo.</string>
   <string name="apk_update_service_error_update">Houve um erro ao tentar atualizar o aplicativo, por favor, tente novamente.</string>
   <string name="apk_update_service_error_no_internet">Houve um erro ao tentar atualizar o aplicativo, você não está conectado à Internet.</string>
+  <string name="locale_list_error_unknown_location"> Localização desconhecida</string>
 </resources>

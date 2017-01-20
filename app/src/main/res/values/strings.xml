@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Akvo Flow</string>
     <string name="accuracy">Acc</string>
     <string name="searching">Searching...</string>
     <string name="ready">Ready</string>
@@ -85,7 +84,7 @@
     <string name="bootstrapstart">Loading survey data from SD card</string>
     <string name="bootstrapcomplete">Done loading data from SD card</string>
     <string name="bootstraperror">Error processing bootstrap zip file</string>
-    <string name="bootstrap_invalid_app">Error: Form doesn\'t belong to this FLOW instance</string>
+    <string name="bootstrap_invalid_app">Error: Form doesn\'t belong to this Flow instance</string>
     <string name="transmissionhist">Transmission History</string>
     <string name="transstartdate">Started:</string>
     <string name="transenddate">Finished:</string>
@@ -130,7 +129,7 @@
     <string name="app_language">App Language</string>
     <string name="please_restart">Please, restart the app</string>
     <!--Empty Views-->
-    <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the FLOW dashboard</string>
+    <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the Flow dashboard</string>
     <string name="no_records_text">You have no data points yet. Click \'+\' at the top of your screen to add a new data point</string>
     <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
     <!--Activity Labels-->
@@ -205,11 +204,11 @@
     <string name="status_exported">Exported</string>
     <!--APK update-->
     <string name="app_update_activity">Akvo Flow Update</string>
-    <string name="app_update">A new version of the FLOW app is available. Click \'Update\' to download and install the new version.</string>
+    <string name="app_update">A new version of the Flow app is available. Click \'Update\' to download and install the new version.</string>
     <string name="update">Update</string>
     <string name="not_now">Not now</string>
-    <string name="clicktoinstall">New FLOW version is downloaded. Do you want to install it now?</string>
-    <string name="apk_upgrade_error">Error downloading FLOW update.</string>
+    <string name="clicktoinstall">New Flow version is downloaded. Do you want to install it now?</string>
+    <string name="apk_upgrade_error">Error downloading Flow update.</string>
     <!--Time check-->
     <string name="time_check_activity">Date and Time</string>
     <string name="time_warning">Your phone time is inaccurate! Adjust your clock and try again. Your phone date and time is:</string>
@@ -217,8 +216,8 @@
     <!--Form sync-->
     <string name="downloading_forms">Downloading forms</string>
     <string name="error_form_sync_title">Error syncing forms</string>
-    <string name="error_assignment_read">Form assignments could not be read from the FLOW dashboard.</string>
-    <string name="error_form_header">Form %1$s could not be read from FLOW dashboard.</string>
+    <string name="error_assignment_read">Form assignments could not be read from the Flow dashboard.</string>
+    <string name="error_form_header">Form %1$s could not be read from Flow dashboard.</string>
     <string name="error_form_download">Ensure the form is published, and your local date/time settings are OK.</string>
     <string name="form_deleted">This form has been deleted.</string>
     <!--File sync-->

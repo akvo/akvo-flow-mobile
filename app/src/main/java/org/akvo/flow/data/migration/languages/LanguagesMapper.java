@@ -20,13 +20,31 @@
 
 package org.akvo.flow.data.migration.languages;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
+import org.akvo.flow.R;
+
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 public class LanguagesMapper {
 
-    public Set<String> transform(String languagesString) {
-        Set<String> languages = new LinkedHashSet<>(3);
-
+    public Set<String> transform(@NonNull Context context, @NonNull String languagesString) {
+        if (TextUtils.isEmpty(languagesString)) {
+            return Collections.emptySet();
+        }
+        Resources res = context.getResources();
+        String[] stringArray = res.getStringArray(R.array.alllanguagecodes);
+        StringTokenizer strTok = new StringTokenizer(languagesString, ",");
+        Set<String> languages = new LinkedHashSet<>(strTok.countTokens());
+        while (strTok.hasMoreTokens()) {
+            languages.add(stringArray[Integer.parseInt(strTok.nextToken())]);
+        }
+        return languages;
     }
 }

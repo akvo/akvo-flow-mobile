@@ -25,8 +25,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.migration.preferences.InsertablePreferences;
 import org.akvo.flow.data.migration.languages.LanguagesExtractor;
+import org.akvo.flow.data.migration.languages.LanguagesMapper;
+import org.akvo.flow.data.migration.languages.SurveyLanguageMigratingDbDataSource;
+import org.akvo.flow.data.migration.preferences.InsertablePreferences;
 import org.akvo.flow.data.migration.preferences.MigratablePreferences;
 import org.akvo.flow.data.migration.preferences.PreferenceExtractor;
 import org.akvo.flow.data.migration.preferences.PreferenceMapper;
@@ -209,12 +211,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void migrateLanguages(Context context, SQLiteDatabase db) {
         Prefs prefs = new Prefs(context.getApplicationContext());
-        LanguagesExtractor languagesExtractor = new LanguagesExtractor();
         long selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
         if (selectedSurveyId != SurveyGroup.ID_NONE) {
-            String dataBaseLanguages = languagesExtractor.retrieveLanguages(db);
+            String dataBaseLanguages = new LanguagesExtractor().retrieveLanguages(db);
             if (!TextUtils.isEmpty(dataBaseLanguages)) {
-                Set<String> insertableLanguages =
+                Set<String> insertableLanguages = new LanguagesMapper()
+                        .transform(context, dataBaseLanguages);
+                new SurveyLanguageMigratingDbDataSource()
+                        .insertLanguagePreferences(db, selectedSurveyId, insertableLanguages);
             }
         }
     }

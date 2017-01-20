@@ -32,7 +32,6 @@ import timber.log.Timber;
 /**
  * Simple utility to make http calls and read the responses
  *
- * @author Christopher Fagiani
  */
 public class HttpUtil {
     private static final String TAG = HttpUtil.class.getSimpleName();

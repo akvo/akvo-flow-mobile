@@ -1,17 +1,21 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+*
+ *  This file is part of Akvo Flow.
  *
- * This file is part of Akvo FLOW.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
- *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- *
- */
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package org.akvo.flow.util;
 
@@ -53,21 +57,22 @@ public class OldHttpUtilTest {
     private static final TempTestFileFactory TestFileFactory = new TempTestFileFactory();
 
     private static NanoHTTPD.Response response(Object content) {
-        if(content == null)
+        if (content == null) {
             return null;
+        }
         return NanoHTTPD.newFixedLengthResponse(String.valueOf(content));
     };
 
     //initiate response here so the test case can be easier to read
     private final HttpServe defaultMd5Post = new HttpServe() {
         @Override
-        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception
-        {
+        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception {
             Map<String, String> files = new HashMap<>();
             //copy body to destination Map files
             session.parseBody(files);
 
-            byte[] hash = MessageDigest.getInstance("MD5").digest(session.getQueryParameterString().getBytes());
+            byte[] hash = MessageDigest.getInstance("MD5")
+                    .digest(session.getQueryParameterString().getBytes());
             String output = Arrays.toString(hash);
 
             return response(output);
@@ -76,8 +81,7 @@ public class OldHttpUtilTest {
 
     private final HttpServe defaultGet = new HttpServe() {
         @Override
-        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception
-        {
+        public NanoHTTPD.Response serve(@Nullable NanoHTTPD.IHTTPSession session) throws Exception {
             return response(VALID_RESPONSE_STRING);
         }
     };
@@ -87,6 +91,7 @@ public class OldHttpUtilTest {
         server = new SimpleHttpServer();
         server.start();
     }
+
     @AfterClass
     public static void stopServer() {
         server.stop();
@@ -107,7 +112,7 @@ public class OldHttpUtilTest {
         server.setResponse(NanoHTTPD.Method.GET, defaultGet);
 
         String result = OldHttpUtil.httpGet(URL_STRING);
-        assertEquals(VALID_RESPONSE_STRING+'\n', result);
+        assertEquals(VALID_RESPONSE_STRING + '\n', result);
     }
 
     @Test
@@ -123,7 +128,8 @@ public class OldHttpUtilTest {
     }
 
     @Test
-    public void oldCanHttpPost() throws IOException, InterruptedException, NoSuchAlgorithmException {
+    public void oldCanHttpPost()
+            throws IOException, InterruptedException, NoSuchAlgorithmException {
         server.setResponse(NanoHTTPD.Method.POST, defaultMd5Post);
 
         Map<String, String> params = new HashMap<>();
@@ -132,9 +138,10 @@ public class OldHttpUtilTest {
 
         String result = OldHttpUtil.httpPost(URL_STRING, params);
 
-        byte[] hash = MessageDigest.getInstance("MD5").digest(OldHttpUtil.getQuery(params).getBytes());
+        byte[] hash = MessageDigest.getInstance("MD5")
+                .digest(OldHttpUtil.getQuery(params).getBytes());
         String expected = Arrays.toString(hash);
 
-        assertEquals(expected, result.substring(0, result.length()-1));
+        assertEquals(expected, result.substring(0, result.length() - 1));
     }
 }

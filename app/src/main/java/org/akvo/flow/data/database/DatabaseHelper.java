@@ -146,10 +146,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + TransmissionColumns.END_DATE + " INTEGER,"
                 + "UNIQUE (" + TransmissionColumns.FILENAME + ") ON CONFLICT REPLACE)");
 
-        db.execSQL("CREATE TABLE " + Tables.PREFERENCES + " ("
-                + PreferencesColumns.KEY + " TEXT PRIMARY KEY,"
-                + PreferencesColumns.VALUE + " TEXT)");
-
         db.execSQL("CREATE TABLE " + Tables.SYNC_TIME + " ("
                 + SyncTimeColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
@@ -200,12 +196,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
-            languageTable.dropTable(db);
             onCreate(db);
         } else if (oldVersion < VER_LANGUAGES_MIGRATE) {
             //add new languages table
             languageTable.onCreate(db);
             migrateLanguages(context, db);
+            db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
         }
     }
 

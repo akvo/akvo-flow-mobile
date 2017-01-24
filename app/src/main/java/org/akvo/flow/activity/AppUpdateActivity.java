@@ -230,9 +230,9 @@ public class AppUpdateActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-           Timber.d("onCancelled() - APK update task cancelled");
-           notifyProgress(0);
-           cleanupDownloads(mVersion);
+            Timber.d("onCancelled() - APK update task cancelled");
+            notifyProgress(0);
+            cleanupDownloads(mVersion);
         }
 
         private void cleanupDownloads(String version) {

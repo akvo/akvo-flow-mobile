@@ -68,7 +68,7 @@ public class FlowApp extends Application {
     }
 
     private void startUpdateService() {
-        ApkUpdateService.scheduleRepeat(this);
+        ApkUpdateService.scheduleFirstTask(this);
     }
 
     private void initLogging() {

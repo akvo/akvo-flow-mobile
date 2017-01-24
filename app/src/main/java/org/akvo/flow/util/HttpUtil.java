@@ -47,7 +47,7 @@ public class HttpUtil {
         try {
             connection.verifyOk();
             String result = input.toStringValue();
-            Timber.d(TAG + ": URL: %s - %i ms", url, connection.getElapsedTime());
+            Timber.d(TAG + ": URL: %s - %s ms", url, String.valueOf(connection.getElapsedTime()));
             return result;
         } finally {
             connection.close();

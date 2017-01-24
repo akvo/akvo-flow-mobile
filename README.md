@@ -25,6 +25,13 @@ To set up your development environment you'll need:
 * You will need to set up the `gradle.properties` file in the `app` module. Just copy the sample `gradle.properties.template` file without the *.template* extension, and edit the values according to your local environment.
 * To build a **release** version of the app, for example for the **flow** flavour: `./gradlew assembleFlowRelease` (or simply `./gradlew aFR`). The generated APK will be located in the `app/bin` folder.
 
+## Contributing
+
+To ensure a consistent code style throughout the codebase, we stick to the [Android Code Style Guidelines]
+(http://source.android.com/source/code-style.html) as much as possible.
+
+Please import the 'util/ide/android-studio/Akvo Java Source Formatting.xml' settings into your Android Studio. Go to `File` > `Settings` > `Editor` > `Code Style` > `Java`, select `Manage` and then `Import`.
+
 ## License
 
 Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)

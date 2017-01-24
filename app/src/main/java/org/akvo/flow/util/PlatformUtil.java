@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -116,5 +116,4 @@ public class PlatformUtil {
     public static String getAndroidID(Context context) {
         return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
     }
-
 }

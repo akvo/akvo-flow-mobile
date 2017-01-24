@@ -44,7 +44,7 @@ public class SentryHelper extends LoggingHelper {
 
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
-            Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),
+            Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(context),
                     LoggingFactory.SENTRY_PROTOCOL_VERSION);
             Timber.plant(new SentryTree());
         }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -17,7 +17,7 @@
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.async.loader.base;
+package org.akvo.flow.data.loader.base;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;

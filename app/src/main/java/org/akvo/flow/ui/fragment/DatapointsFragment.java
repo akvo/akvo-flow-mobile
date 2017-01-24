@@ -44,7 +44,7 @@ import com.astuetz.PagerSlidingTabStrip;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 

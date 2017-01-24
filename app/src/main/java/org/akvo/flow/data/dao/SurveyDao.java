@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -17,15 +17,15 @@
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.dao;
+package org.akvo.flow.data.dao;
 
 import android.text.TextUtils;
 
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.serialization.form.SaxSurveyParser;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-
-import org.akvo.flow.serialization.form.SaxSurveyParser;
-import org.akvo.flow.domain.Survey;
 
 /**
  * utility to read survey xml files from wherever they may reside

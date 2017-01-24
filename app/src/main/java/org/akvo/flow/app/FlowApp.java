@@ -22,24 +22,25 @@ package org.akvo.flow.app;
 import android.app.Application;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.database.SQLException;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.Prefs;
 import org.akvo.flow.util.logging.LoggingFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.data.preference.Prefs;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import timber.log.Timber;
@@ -47,7 +48,9 @@ import timber.log.Timber;
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
 
+    //TODO: use shared pref?
     private Locale mLocale;
+
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
@@ -99,6 +102,8 @@ public class FlowApp extends Application {
         // Load custom locale into the app. If the locale has not previously been configured
         // check if the device has a compatible language active. Otherwise, fall back to English
         String language = loadLocalePref();
+
+        //TODO: this is not necessary as by default locale is english anyway
         if (TextUtils.isEmpty(language)) {
             language = Locale.getDefault().getLanguage();
             // Is that available in our language list?
@@ -107,6 +112,7 @@ public class FlowApp extends Application {
                 language = ConstantUtil.ENGLISH_CODE;// TODO: Move this constant to @strings
             }
         }
+        //TODO: only set the language if it is diferent than the device locale
         setAppLanguage(language, false);
 
         loadLastUser();
@@ -193,31 +199,13 @@ public class FlowApp extends Application {
         }
     }
 
+    @Nullable
     private String loadLocalePref() {
-        String language = null;
-        SurveyDbAdapter database = new SurveyDbAdapter(this);
-        try {
-            database.open();
-            language = database.getPreference(ConstantUtil.PREF_LOCALE);
-        } catch (SQLException e) {
-            Timber.e(e.getMessage());
-        } finally {
-            database.close();
-        }
-
-        return language;
+        return prefs.getString(Prefs.KEY_LOCALE, null);
     }
 
     private void saveLocalePref(String language) {
-        SurveyDbAdapter database = new SurveyDbAdapter(this);
-        try {
-            database.open();
-            database.savePreference(ConstantUtil.PREF_LOCALE, language);
-        } catch (SQLException e) {
-            Timber.e(e.getMessage());
-        } finally {
-            database.close();
-        }
+        prefs.setString(Prefs.KEY_LOCALE, language);
     }
 
     /**
@@ -246,7 +234,8 @@ public class FlowApp extends Application {
                 database.savePreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY, "");
 
                 // Recompute all the surveys, and store their languages
-                for (Survey survey : database.getSurveyList(SurveyGroup.ID_NONE)) {
+                List<Survey> surveyList = database.getSurveyList(SurveyGroup.ID_NONE);
+                for (Survey survey : surveyList) {
                     String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
                     Timber.d("Adding languages: " + Arrays.toString(langs));
                     database.addLanguages(langs);

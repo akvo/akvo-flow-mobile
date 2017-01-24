@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -16,14 +16,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.akvo.flow.async.loader;
+package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.async.loader.base.DataLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.loader.base.DataLoader;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.util.ConstantUtil;
 
 public class SurveyedLocaleLoader extends DataLoader<Cursor> {

@@ -11,11 +11,9 @@ import urllib2
 import argparse
 
 milestone = '2.2.11'
-label_new = '%22New%20and%20noteworthy%22'
-label_resolved = '%22Resolved%20issues%22'
+labels = ['New and noteworthy', 'Resolved issues']
 repo = 'akvo/akvo-flow-mobile'
-url_new = 'https://api.github.com/search/issues?q=label:%22Ready%20for%20release%22+label:' + label_new + '+milestone:' + milestone + '+repo:' + repo
-url_resolved = 'https://api.github.com/search/issues?q=label:%22Ready%20for%20release%22+label:' + label_resolved + '+milestone:' + milestone + '+repo:' + repo
+api_url = 'https://api.github.com/search/issues?q=milestone:' + milestone + '+repo:' + repo + '+label:'
 output_filename = 'temp.md'
 
 def load_issues(url):
@@ -65,14 +63,10 @@ f = open(output_filename, 'w')
 f.write('# ver ' + milestone + '\n')
 f.write('Date: '+ time.strftime("%d %B %Y"))
 f.write('\n')
-f.write('\n# New and noteworthy\n')
-issues = load_issues(url_new)
-write_issues(f, issues)
 
-f.write('\n')
-f.write('\n# Resolved issues\n')
-issues = load_issues(url_resolved)
-write_issues(f, issues)
+for label in labels:
+    f.write('\n\n# ' + label + '\n')
+    write_issues(f, load_issues(api_url + '"' + label.replace(" ", "+") + '"'))
 
 f.close()
 

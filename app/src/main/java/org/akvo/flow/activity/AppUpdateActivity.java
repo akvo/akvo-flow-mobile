@@ -202,7 +202,6 @@ public class AppUpdateActivity extends Activity {
             if (percentComplete > MAX_PROGRESS) {
                 percentComplete = MAX_PROGRESS;
             }
-
             Timber.d("onProgressUpdate() - APK update: " + percentComplete + "%");
             notifyProgress(percentComplete);
         }
@@ -232,8 +231,8 @@ public class AppUpdateActivity extends Activity {
         @Override
         protected void onCancelled() {
            Timber.d("onCancelled() - APK update task cancelled");
-            notifyProgress(0);
-            cleanupDownloads(mVersion);
+           notifyProgress(0);
+           cleanupDownloads(mVersion);
         }
 
         private void cleanupDownloads(String version) {

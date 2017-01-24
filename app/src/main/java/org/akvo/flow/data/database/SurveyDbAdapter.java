@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -48,8 +48,6 @@ import java.util.Map;
 import timber.log.Timber;
 
 import static org.akvo.flow.data.database.SurveyInstanceStatus.SAVED;
-
-import timber.log.Timber;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well

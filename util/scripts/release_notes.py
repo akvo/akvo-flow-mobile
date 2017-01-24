@@ -69,5 +69,3 @@ for label in labels:
     write_issues(f, load_issues(api_url + '"' + label.replace(" ", "+") + '"'))
 
 f.close()
-
-

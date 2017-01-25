@@ -21,7 +21,6 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
@@ -34,7 +33,6 @@ import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.NotificationHelper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -50,8 +48,6 @@ public class SurveyedDataPointSyncService extends IntentService {
 
     public static final String SURVEY_GROUP = "survey_group";
 
-    private final Handler mHandler = new Handler();
-
     public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
@@ -61,14 +57,9 @@ public class SurveyedDataPointSyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
-        int syncedRecords = 0;
         FlowApi api = new FlowApi(getApplicationContext());
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         boolean correctSync = true;
-        NotificationHelper
-                .displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                        getString(R.string.pleasewait), true, true,
-                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
         try {
             Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
@@ -82,26 +73,12 @@ public class SurveyedDataPointSyncService extends IntentService {
                 if (batch.isEmpty()) {
                     break;
                 }
-                syncedRecords += batch.size();
+
                 sendBroadcastNotification();// Keep the UI fresh!
-                NotificationHelper
-                        .displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                                String.format(getString(R.string.synced_records),
-                                        syncedRecords), true, true,
-                                ConstantUtil.NOTIFICATION_RECORD_SYNC);
                 lastBatch = batch;
             }
-            if (correctSync) {
-                NotificationHelper
-                        .displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                                String.format(getString(R.string.synced_records),
-                                        syncedRecords), false, false,
-                                ConstantUtil.NOTIFICATION_RECORD_SYNC);
-            } else {
-                NotificationHelper.displayErrorNotificationWithProgress(this,
-                        getString(R.string.sync_error),
-                        getString(R.string.syncing_corrupted_data_points_error), false, false,
-                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
+            if (!correctSync) {
+                //TODO: notify error to activity
             }
         } catch (HttpException e) {
             Timber.e(e, e.getMessage());
@@ -112,18 +89,10 @@ public class SurveyedDataPointSyncService extends IntentService {
                     message = getString(R.string.error_assignment_text);
                     break;
             }
-            displayToast(message);
-            NotificationHelper
-                    .displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
-                            message, false,
-                            false, ConstantUtil.NOTIFICATION_RECORD_SYNC);
+            //TODO: notify error to activity
         } catch (IOException e) {
             Timber.e(e, e.getMessage());
-            displayToast(getString(R.string.network_error));
-            NotificationHelper
-                    .displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
-                            getString(R.string.network_error), false, false,
-                            ConstantUtil.NOTIFICATION_RECORD_SYNC);
+            //TODO: notify error to activity
         } finally {
             database.close();
         }
@@ -141,8 +110,7 @@ public class SurveyedDataPointSyncService extends IntentService {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
         Timber.d("sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
-        List<SurveyedLocale> locales = api
-                .getSurveyedLocales(surveyGroupId, syncTime);
+        List<SurveyedLocale> locales = api.getSurveyedLocales(surveyGroupId, syncTime);
         boolean correctData = true;
         if (locales != null) {
             for (SurveyedLocale locale : locales) {
@@ -157,10 +125,6 @@ public class SurveyedDataPointSyncService extends IntentService {
         //Delete empty or corrupted data received from server
         database.deleteEmptyRecords();
         return new Pair<>(records, correctData);
-    }
-
-    private void displayToast(final String text) {
-        mHandler.post(new ServiceToastRunnable(getApplicationContext(), text));
     }
 
     /**

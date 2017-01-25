@@ -218,7 +218,6 @@ public class ConstantUtil {
     public static final int IMAGE_SIZE_640_480 = 1;
     public static final int IMAGE_SIZE_1280_960 = 2;
 
-    public static final int NOTIFICATION_RECORD_SYNC = 100;
     public static final int NOTIFICATION_DATA_SYNC = 101;
 
     public static final int NOTIFICATION_FORMS_SYNCED = 102;

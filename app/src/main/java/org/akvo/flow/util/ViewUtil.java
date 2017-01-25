@@ -241,7 +241,7 @@ public class ViewUtil {
                                 }
                             }
                         })
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -50,9 +50,10 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.async.loader.SurveyGroupLoader;
-import org.akvo.flow.async.loader.UserLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyGroupLoader;
+import org.akvo.flow.data.loader.UserLoader;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
@@ -194,9 +195,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     if (cursor.moveToFirst()) {
                         do {
                             long id = cursor.getLong(
-                                    cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
+                                    cursor.getColumnIndexOrThrow(UserColumns._ID));
                             String name = cursor.getString(
-                                    cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
+                                    cursor.getColumnIndexOrThrow(UserColumns.NAME));
                             User user = new User(id, name);
                             // Skip selected user
                             if (!user.equals(FlowApp.getApp().getUser())) {

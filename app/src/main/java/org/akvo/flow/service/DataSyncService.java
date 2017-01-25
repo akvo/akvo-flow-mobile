@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -33,22 +33,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
+import org.akvo.flow.data.database.ResponseColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyInstanceColumns;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.TransmissionStatus;
+import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.PropertyUtil;
-import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -112,6 +113,8 @@ public class DataSyncService extends IntentService {
     // Reuse notification for data export
     private static final int NOTIFICATION_DATA_EXPORT = 1;
 
+    private static final String UTF_8_CHARSET = "UTF-8";
+
     /**
      * Number of retries to upload a file to S3
      */
@@ -119,7 +122,8 @@ public class DataSyncService extends IntentService {
 
     private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
-    private static final String UTF_8_CHARSET = "UTF-8";
+    private Prefs preferences;
+    private ConnectivityStateManager connectivityStateManager;
 
     public DataSyncService() {
         super(TAG);
@@ -131,10 +135,12 @@ public class DataSyncService extends IntentService {
             mProps = new PropertyUtil(getResources());
             mDatabase = new SurveyDbAdapter(this);
             mDatabase.open();
-
+            preferences = new Prefs(getApplicationContext());
+            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             exportSurveys();// Create zip files, if necessary
 
-            if (StatusUtil.hasDataConnection(this)) {
+            if (connectivityStateManager.isConnectionAvailable(preferences
+                    .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
                 syncFiles();// Sync everything
             }
         } catch (Exception e) {
@@ -292,12 +298,9 @@ public class DataSyncService extends IntentService {
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
         if (data != null && data.moveToFirst()) {
-            String deviceIdentifier = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-            if (deviceIdentifier == null) {
-                deviceIdentifier = "unset";
-            } else {
-                deviceIdentifier = cleanVal(deviceIdentifier);
-            }
+            String deviceIdentifier = preferences
+                    .getString(Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
+            deviceIdentifier = cleanVal(deviceIdentifier);
             // evaluate indices once, outside the loop
             int survey_fk_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);
             int question_fk_col = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
@@ -411,10 +414,9 @@ public class DataSyncService extends IntentService {
      * MD5 checksum. Only if these fields match the transmission will be considered successful.
      */
     private void syncFiles() {
-        final String serverBase = StatusUtil.getServerBase(this);
         // Check notifications for this device. This will update the status of the transmissions
         // if necessary, or mark form as deleted.
-        checkDeviceNotifications(serverBase);
+        checkDeviceNotifications();
 
         List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
 
@@ -431,7 +433,8 @@ public class DataSyncService extends IntentService {
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission.getFileName(), transmission.getFormId(), serverBase)) {
+            if (syncFile(transmission.getFileName(), transmission.getFormId()
+            )) {
                 syncedSurveys.add(surveyInstanceId);
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
@@ -454,8 +457,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(@NonNull String filename, @NonNull String formId,
-            @NonNull String serverBase) {
+    private boolean syncFile(@NonNull String filename, @NonNull String formId) {
         if (TextUtils.isEmpty(filename) || filename.lastIndexOf(".") < 0) {
             return false;
         }
@@ -489,8 +491,8 @@ public class DataSyncService extends IntentService {
         boolean synced = false;
 
         if (sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
-            FlowApi api = new FlowApi();
-            switch (api.sendProcessingNotification(serverBase, formId, action,
+            FlowApi api = new FlowApi(getApplicationContext());
+            switch (api.sendProcessingNotification(formId, action,
                     getDestName(filename))) {
                 case HttpURLConnection.HTTP_OK:
                     status = TransmissionStatus.SYNCED;// Mark everything completed
@@ -547,11 +549,11 @@ public class DataSyncService extends IntentService {
      * 1- Request the list of files to the server
      * 2- Update the status of those files in the local database
      */
-    private void checkDeviceNotifications(@NonNull String serverBase) {
-        FlowApi flowApi = new FlowApi();
+    private void checkDeviceNotifications() {
+        FlowApi flowApi = new FlowApi(getApplicationContext());
         try {
             String[] surveyIds = mDatabase.getSurveyIds();
-            JSONObject jResponse = flowApi.getDeviceNotification(serverBase, surveyIds);
+            JSONObject jResponse = flowApi.getDeviceNotification(surveyIds);
 
             if (jResponse != null) {
                 List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));

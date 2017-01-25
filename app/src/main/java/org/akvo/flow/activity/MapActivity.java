@@ -22,7 +22,7 @@ package org.akvo.flow.activity;
 import android.os.Bundle;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;

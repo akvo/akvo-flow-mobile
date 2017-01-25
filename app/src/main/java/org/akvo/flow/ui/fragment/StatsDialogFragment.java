@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -31,22 +31,23 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.async.loader.StatsLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.loader.models.Stats;
+import org.akvo.flow.data.loader.StatsLoader;
 
 import timber.log.Timber;
 
-public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<StatsLoader.Stats> {
+public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
+
+    public static final String SURVEY_GROUP_ID_EXTRA = "surveyGroupId";
 
     private long mSurveyGroupId;
-    private SurveyDbAdapter mDatabase;
 
     private TextView mTotalView, mWeekView, mDayView;
 
     public static StatsDialogFragment newInstance(long surveyGroupId) {
         StatsDialogFragment f = new StatsDialogFragment();
         Bundle args = new Bundle();
-        args.putLong("surveyGroupId", surveyGroupId);
+        args.putLong(SURVEY_GROUP_ID_EXTRA, surveyGroupId);
         f.setArguments(args);
         return f;
     }
@@ -54,26 +55,13 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getLong("surveyGroupId");
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mDatabase = new SurveyDbAdapter(getActivity());
+        mSurveyGroupId = getArguments().getLong(SURVEY_GROUP_ID_EXTRA);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase.open();
         getLoaderManager().restartLoader(0, null, this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mDatabase.close();
     }
 
     @Override
@@ -101,12 +89,12 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     // ==================================== //
 
     @Override
-    public Loader<StatsLoader.Stats> onCreateLoader(int id, Bundle args) {
-        return new StatsLoader(getActivity(), mDatabase, mSurveyGroupId);
+    public Loader<Stats> onCreateLoader(int id, Bundle args) {
+        return new StatsLoader(getActivity(), mSurveyGroupId);
     }
 
     @Override
-    public void onLoadFinished(Loader<StatsLoader.Stats> loader, StatsLoader.Stats stats) {
+    public void onLoadFinished(Loader<Stats> loader, Stats stats) {
         if (stats == null) {
             Timber.w("onFinished() - Loader returned no data");
             return;
@@ -117,7 +105,8 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     }
 
     @Override
-    public void onLoaderReset(Loader<StatsLoader.Stats> loader) {
+    public void onLoaderReset(Loader<Stats> loader) {
+        // EMPTY
     }
 
 }

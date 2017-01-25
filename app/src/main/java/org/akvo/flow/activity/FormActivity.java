@@ -1,20 +1,21 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.akvo.flow.activity;
@@ -36,10 +37,11 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -101,6 +103,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
     private SurveyDbAdapter mDatabase;
+    private Prefs prefs;
 
     private String[] mLanguages;
 
@@ -121,6 +124,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mQuestionResponses = new HashMap<>();
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
+        prefs = new Prefs(getApplicationContext());
 
         loadSurvey(
                 surveyId);// Load Survey. This task would be better off if executed in a worker thread
@@ -205,6 +209,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 try {
                     in.close();
                 } catch (IOException e) {
+                    //EMPTY
                 }
             }
         }
@@ -324,9 +329,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         super.onResume();
         mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
-        if (Boolean.valueOf(mDatabase.getPreference(ConstantUtil.SCREEN_ON_KEY))) {
-            mPager.setKeepScreenOn(true);
-        }
+        mPager.setKeepScreenOn(
+                prefs.getBoolean(Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
     }
 
     @Override
@@ -450,11 +454,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 String filename = PlatformUtil.uuid() + fileSuffix;
                 File imgFile = new File(FileUtil.getFilesDir(FileType.MEDIA), filename);
 
-                int maxImgSize = ConstantUtil.IMAGE_SIZE_320_240;
-                String maxImgSizePref = mDatabase.getPreference(ConstantUtil.MAX_IMG_SIZE);
-                if (!TextUtils.isEmpty(maxImgSizePref)) {
-                    maxImgSize = Integer.valueOf(maxImgSizePref);
-                }
+                int maxImgSize = prefs
+                        .getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
 
                 if (ImageUtil.resizeImage(tmp.getAbsolutePath(), imgFile.getAbsolutePath(),
                         maxImgSize)) {
@@ -531,7 +532,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         // if we have no missing responses, submit the survey
         mDatabase.updateSurveyStatus(mSurveyInstanceId,
-                SurveyDbAdapter.SurveyInstanceStatus.SUBMITTED);
+                SurveyInstanceStatus.SUBMITTED);
 
         // Make the current survey immutable
         mReadOnly = true;
@@ -705,6 +706,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         // One binary megabyte equals 1 048 576 bytes.
         long megaAvailable = (long) Math.floor(sdAvailSize / 1048576.0);
 
+        //TODO: use class Prefs
         // keep track of changes
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         // assume we had space before
@@ -712,7 +714,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("cardMBAvaliable", megaAvailable);
         // Commit the edits!
-        editor.commit();
+        editor.apply();
 
         if (megaAvailable <= 0L) {// All out, OR media not mounted
             // Bounce user

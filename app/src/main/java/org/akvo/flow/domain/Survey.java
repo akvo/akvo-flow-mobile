@@ -45,7 +45,7 @@ public class Survey {
     private String app;// FLOW instance ID
 
     public Survey() {
-        questionGroups = new ArrayList<QuestionGroup>();
+        questionGroups = new ArrayList<>();
     }
     
     public void setSurveyGroup(SurveyGroup surveyGroup) {
@@ -56,6 +56,10 @@ public class Survey {
         return surveyGroup;
     }
 
+    /**
+     * Default survey language code
+     * @return a string with the language code for example 'en'
+     */
     public String getLanguage() {
         return language;
     }
@@ -172,7 +176,7 @@ public class Survey {
     }
     
     public List<String> getLocaleNameQuestions() {
-        List<String> localeNameQuestions = new ArrayList<String>();
+        List<String> localeNameQuestions = new ArrayList<>();
         if (questionGroups != null) {
             for (QuestionGroup group : questionGroups) {
                 localeNameQuestions.addAll(group.getLocaleNameQuestions());

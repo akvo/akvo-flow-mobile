@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -29,20 +29,21 @@ import android.support.annotation.Nullable;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,35 +64,62 @@ import timber.log.Timber;
  * @author Christopher Fagiani
  */
 public class SurveyDownloadService extends IntentService {
+
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
-    public static final String EXTRA_SURVEYS = "surveys";// Intent parameter to specify which surveys need to be updated
+    /**
+     * Intent parameter to specify which survey needs to be downloaded
+     */
+    public static final String EXTRA_SURVEY_ID = "survey";
+    public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
 
     private static final String DEFAULT_TYPE = "Survey";
+    public static final String TEST_SURVEY_ID = "0";
 
     private SurveyDbAdapter databaseAdaptor;
+    private Prefs prefs;
+    private ConnectivityStateManager connectivityStateManager;
 
     public SurveyDownloadService() {
         super(TAG);
     }
 
     public void onHandleIntent(@Nullable Intent intent) {
-        if (StatusUtil.hasDataConnection(this)) {
-            try {
-                databaseAdaptor = new SurveyDbAdapter(this);
-                databaseAdaptor.open();
-
-                String[] surveyIds =
-                        intent != null ? intent.getStringArrayExtra(EXTRA_SURVEYS) : null;
-                checkAndDownload(surveyIds);
-            } catch (Exception e) {
-                Timber.e(e, e.getMessage());
-            } finally {
-                databaseAdaptor.close();
+        try {
+            databaseAdaptor = new SurveyDbAdapter(this);
+            databaseAdaptor.open();
+            prefs = new Prefs(getApplicationContext());
+            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
+            if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
+                downloadSurvey(intent);
+            } else if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
+                reDownloadAllSurveys(intent);
+            } else {
+                checkAndDownload(null);
             }
+        } catch (Exception e) {
+            Timber.e(e, e.getMessage());
+        } finally {
+            databaseAdaptor.close();
+            sendBroadcastNotification(this);
         }
+    }
 
-        sendBroadcastNotification(this);
+    private void reDownloadAllSurveys(@NonNull Intent intent) {
+        intent.removeExtra(EXTRA_DELETE_SURVEYS);
+        String[] surveyIds = databaseAdaptor.getSurveyIds();
+        databaseAdaptor.deleteAllSurveys();
+        checkAndDownload(surveyIds);
+    }
+
+    private void downloadSurvey(@NonNull Intent intent) {
+        String surveyId = intent.getStringExtra(EXTRA_SURVEY_ID);
+        intent.removeExtra(EXTRA_SURVEY_ID);
+        if (TEST_SURVEY_ID.equals(surveyId)) {
+            databaseAdaptor.reinstallTestSurvey();
+        } else {
+            checkAndDownload(new String[] { surveyId });
+        }
     }
 
     /**
@@ -101,14 +129,17 @@ public class SurveyDownloadService extends IntentService {
      * on the device, the surveys will be replaced with the new ones.
      */
     private void checkAndDownload(@Nullable String[] surveyIds) {
-        // Load preferences
-        final String serverBase = StatusUtil.getServerBase(this);
+        if (!connectivityStateManager.isConnectionAvailable(
+                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
+            //No internet or not allowed to sync
+            return;
+        }
 
         List<Survey> surveys;
         if (surveyIds != null) {
-            surveys = getSurveyHeaders(serverBase, surveyIds);
+            surveys = getSurveyHeaders(surveyIds);
         } else {
-            surveys = checkForSurveys(serverBase);
+            surveys = checkForSurveys();
         }
 
         // Update all survey groups
@@ -296,12 +327,12 @@ public class SurveyDownloadService extends IntentService {
      * invokes a service call to get the header information for multiple surveys
      */
     @NonNull
-    private List<Survey> getSurveyHeaders(@NonNull String serverBase, @NonNull String[] surveyIds) {
+    private List<Survey> getSurveyHeaders(@NonNull String[] surveyIds) {
         List<Survey> surveys = new ArrayList<>();
-        FlowApi flowApi = new FlowApi();
+        FlowApi flowApi = new FlowApi(getApplicationContext());
         for (String id : surveyIds) {
             try {
-                surveys.addAll(flowApi.getSurveyHeader(serverBase, id));
+                surveys.addAll(flowApi.getSurveyHeader(id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
                     Timber.e(e, e.getMessage());
@@ -320,11 +351,11 @@ public class SurveyDownloadService extends IntentService {
      * @return - an arrayList of Survey objects with the id and version populated
      * TODO: Move this feature to FLOWApi
      */
-    private List<Survey> checkForSurveys(@NonNull String serverBase) {
+    private List<Survey> checkForSurveys() {
         List<Survey> surveys = new ArrayList<>();
-        FlowApi api = new FlowApi();
+        FlowApi api = new FlowApi(getApplicationContext());
         try {
-            surveys = api.getSurveys(serverBase);
+            surveys = api.getSurveys();
         } catch (@NonNull IllegalArgumentException | IOException e) {
             if (e instanceof IllegalArgumentException) {
                 Timber.e(e, e.getMessage());
@@ -358,7 +389,7 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    private static void sendBroadcastNotification(@NonNull Context context) {
+    private void sendBroadcastNotification(@NonNull Context context) {
         Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
         context.sendBroadcast(intentBroadcast);
     }

@@ -28,8 +28,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;

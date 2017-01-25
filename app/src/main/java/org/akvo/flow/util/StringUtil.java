@@ -19,6 +19,7 @@
 
 package org.akvo.flow.util;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -41,8 +42,10 @@ public class StringUtil {
         return s == null || s.trim().length() == 0;
     }
 
-    // copy a string transforming all control chars
-    // (like newline and tab) into spaces
+    /**
+     * copy a string transforming all control chars (like newline and tab) into spaces
+     */
+    @NonNull
     public static String controlToSpace(@Nullable String val) {
         String result = "";
         if (val == null) {

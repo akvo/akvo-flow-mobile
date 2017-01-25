@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -26,7 +26,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,9 +64,9 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class GeoshapeActivity extends ActionBarActivity
-    implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener, OnMyLocationChangeListener,
-    OnMapReadyCallback {
+public class GeoshapeActivity extends AppCompatActivity
+        implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener,
+        OnMyLocationChangeListener, OnMapReadyCallback {
 
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";

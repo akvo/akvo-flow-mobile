@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -28,14 +28,13 @@ import android.support.v4.util.Pair;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -63,7 +62,7 @@ public class SurveyedDataPointSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         int syncedRecords = 0;
-        FlowApi api = new FlowApi();
+        FlowApi api = new FlowApi(getApplicationContext());
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         boolean correctSync = true;
         NotificationHelper
@@ -143,7 +142,7 @@ public class SurveyedDataPointSyncService extends IntentService {
         Set<String> records = new HashSet<>();
         Timber.d("sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
         List<SurveyedLocale> locales = api
-                .getSurveyedLocales(StatusUtil.getServerBase(this), surveyGroupId, syncTime);
+                .getSurveyedLocales(surveyGroupId, syncTime);
         boolean correctData = true;
         if (locales != null) {
             for (SurveyedLocale locale : locales) {

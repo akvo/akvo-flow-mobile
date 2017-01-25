@@ -23,11 +23,16 @@ import android.content.Context;
 
 import com.joshdholtz.sentry.PostPermissionVerifier;
 
-import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.ConnectivityStateManager;
 
 public class FlowPostPermissionVerifier extends PostPermissionVerifier {
+    private final ConnectivityStateManager connectivityStateManager;
+    private final Prefs prefs;
 
-    public FlowPostPermissionVerifier() {
+    public FlowPostPermissionVerifier(Context context) {
+        this.connectivityStateManager = new ConnectivityStateManager(context);
+        this.prefs = new Prefs(context);
     }
 
     /**
@@ -37,10 +42,10 @@ public class FlowPostPermissionVerifier extends PostPermissionVerifier {
      * @param context
      */
     public boolean shouldAttemptPost(Context context) {
-        if (!StatusUtil.isConnectionAllowed(context)) {
-            //User did not allow using 3G and wifi is not connected
-            return false;
-        }
-        return super.shouldAttemptPost(context);
+        boolean syncOver3GAllowed = prefs
+                .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
+        //User did not allow using 3G and wifi is not connected
+        return connectivityStateManager.isConnectionAvailable(syncOver3GAllowed) && super
+                .shouldAttemptPost(context);
     }
 }

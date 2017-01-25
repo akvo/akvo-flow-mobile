@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -17,32 +17,35 @@
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.async.loader;
+package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.async.loader.base.DataLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.Tables;
-import org.akvo.flow.dao.SurveyDbAdapter.RecordColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.RecordQuery;
+import org.akvo.flow.data.database.RecordColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter.RecordQuery;
+import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.data.loader.base.AsyncLoader;
+import org.akvo.flow.data.loader.models.Stats;
 
 import java.util.Calendar;
-import java.util.Date;
 
-public class StatsLoader extends DataLoader<StatsLoader.Stats> {
-    private long mSurveyGroupId;
+public class StatsLoader extends AsyncLoader<Stats> {
 
-    private static final long WEEK = 1000 * 60 * 60 * 24 * 7;// Week milliseconds
+    private final long mSurveyGroupId;
 
-    public StatsLoader(Context context, SurveyDbAdapter db, long surveyGroupId) {
-        super(context, db);
-        mSurveyGroupId = surveyGroupId;
+    private static final long WEEK_IN_MS = 1000 * 60 * 60 * 24 * 7;// Week milliseconds
+
+    public StatsLoader(Context context, long surveyGroupId) {
+        super(context);
+        this.mSurveyGroupId = surveyGroupId;
     }
 
     @Override
-    public Stats loadData(SurveyDbAdapter database) {
+    public Stats loadInBackground() {
+        SurveyDbAdapter database = new SurveyDbAdapter(getContext());
+        database.open();
         Stats stats = new Stats();
 
         Cursor c = queryRecords(database, 0);
@@ -51,7 +54,7 @@ public class StatsLoader extends DataLoader<StatsLoader.Stats> {
             c.close();
         }
 
-        c = queryRecords(database, System.currentTimeMillis() - WEEK);
+        c = queryRecords(database, System.currentTimeMillis() - WEEK_IN_MS);
         if (c != null) {
             stats.mThisWeek = c.getCount();
             c.close();
@@ -69,7 +72,7 @@ public class StatsLoader extends DataLoader<StatsLoader.Stats> {
             stats.mToday = c.getCount();
             c.close();
         }
-
+        database.close();
         return stats;
     }
 
@@ -82,11 +85,4 @@ public class StatsLoader extends DataLoader<StatsLoader.Stats> {
                 },
                 null, null, null);
     }
-
-    public static class Stats {
-        public int mTotal;
-        public int mThisWeek;
-        public int mToday;
-    }
-
 }

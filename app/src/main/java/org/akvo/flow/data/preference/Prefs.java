@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -17,10 +17,14 @@
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.util;
+package org.akvo.flow.data.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import org.akvo.flow.util.ConstantUtil;
 
 /**
  * Prefs is a SharedPreferences wrapper, with utility methods to
@@ -31,9 +35,20 @@ public class Prefs {
     public static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
+    public static final String KEY_LOCALE = "pref.locale";
+    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    public static final String KEY_BACKEND_SERVER = "backend.server";
+    public static final String KEY_SCREEN_ON = "screen.keepon";
+    public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
+    public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
 
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
+
+    public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
+    public static final int DEFAULT_VALUE_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
+    public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
 
     private final Context context;
 
@@ -79,6 +94,30 @@ public class Prefs {
 
     public void removePreference(String key) {
         getPrefs().edit().remove(key).apply();
+    }
+
+    public void insertUserPreferences(@Nullable InsertablePreferences insertablePreferences) {
+        if (insertablePreferences == null) {
+            return;
+        }
+
+        String deviceIdentifier = insertablePreferences.getDeviceIdentifier();
+        if (!TextUtils.isEmpty(deviceIdentifier)) {
+            setString(KEY_DEVICE_IDENTIFIER, deviceIdentifier);
+        }
+
+        if (DEFAULT_VALUE_CELL_UPLOAD != insertablePreferences.isCellularDataEnabled()) {
+            setBoolean(KEY_CELL_UPLOAD,
+                    insertablePreferences.isCellularDataEnabled());
+        }
+
+        if (DEFAULT_VALUE_SCREEN_ON != insertablePreferences.isScreenOn()) {
+            setBoolean(KEY_SCREEN_ON, insertablePreferences.isScreenOn());
+        }
+
+        if (DEFAULT_VALUE_IMAGE_SIZE != insertablePreferences.getImageSize()) {
+            setInt(KEY_MAX_IMG_SIZE, insertablePreferences.getImageSize());
+        }
     }
 }
 

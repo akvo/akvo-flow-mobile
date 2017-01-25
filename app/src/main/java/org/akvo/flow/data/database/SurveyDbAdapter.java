@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -16,20 +16,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *
  */
 
-package org.akvo.flow.dao;
+package org.akvo.flow.data.database;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.preference.PreferenceHandler;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -52,6 +53,8 @@ import java.util.StringTokenizer;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.data.database.SurveyInstanceStatus.SAVED;
+
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
@@ -61,407 +64,22 @@ import timber.log.Timber;
  */
 public class SurveyDbAdapter {
 
-    public static final int DOES_NOT_EXIST = -1;
+    private static final String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
+            + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
+            + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
+    private static final String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
+            + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
+            + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
 
-    public interface Tables {
-        String SURVEY = "survey";
-        String SURVEY_INSTANCE = "survey_instance";
-        String RESPONSE = "response";
-        String USER = "user";
-        String PREFERENCES = "preferences";
-        String TRANSMISSION = "transmission";
-        String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
-        String RECORD = "record";// Introduced in Point Updates
-        String SYNC_TIME = "sync_time";// Introduced in Point Updates
+    public static final String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
+            + "survey.survey_id=survey_instance.survey_id";
 
-        String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
-                + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
-                + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
-
-        String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
-                + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
-                + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
-
-        String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
-                + "survey.survey_id=survey_instance.survey_id";
-    }
-
-    public interface SurveyGroupColumns {
-        String _ID = "_id";
-        String SURVEY_GROUP_ID = "survey_group_id";
-        String NAME = "name";
-        String REGISTER_SURVEY_ID = "register_survey_id";
-        String MONITORED = "monitored";
-    }
-
-    public interface RecordColumns {
-        String _ID = "_id";
-        String RECORD_ID = "record_id";
-        String SURVEY_GROUP_ID = "survey_group_id";
-        String NAME = "name";
-        String LATITUDE = "latitude";
-        String LONGITUDE = "longitude";
-        String LAST_MODIFIED = "last_modified";
-    }
-
-    public interface SyncTimeColumns {
-        String _ID = "_id";
-        String SURVEY_GROUP_ID = "survey_group_id";
-        String TIME = "time";
-    }
-
-    /**
-     * Submitter is a denormalized value of the user_id.name in locally created surveys, whereas
-     * on synced surveys, it just represents the name of the submitter (not matching a local user).
-     * This is just a temporary implementation before a more robust login system is integrated.
-     */
-    public interface SurveyInstanceColumns {
-        String _ID = "_id";
-        String UUID = "uuid";
-        String SURVEY_ID = "survey_id";
-        String USER_ID = "user_id";
-        String RECORD_ID = "surveyed_locale_id";
-        String START_DATE = "start_date";
-        String SAVED_DATE = "saved_date";
-        String SUBMITTED_DATE = "submitted_date";
-        String EXPORTED_DATE = "exported_date";
-        String SYNC_DATE = "sync_date";
-        /**
-         * Denormalized value. see {@link SurveyInstanceStatus}
-         **/
-        String STATUS = "status";
-        String DURATION = "duration";
-        String SUBMITTER = "submitter";// Submitter name. Added in DB version 79
-        String VERSION = "version";
-    }
-
-    public interface TransmissionColumns {
-        String _ID = "_id";
-        String SURVEY_INSTANCE_ID = "survey_instance_id";
-        String SURVEY_ID = "survey_id";
-        String FILENAME = "filename";
-        String STATUS = "status";// separate table/constants?
-        String START_DATE = "start_date";// do we really need this column?
-        String END_DATE = "end_date";
-    }
-
-    public interface UserColumns {
-        String _ID = "_id";
-        String NAME = "name";
-        String EMAIL = "email";
-        String DELETED = "deleted";// 0 or 1
-    }
-
-    public interface SurveyColumns {
-        String _ID = "_id";
-        String SURVEY_ID = "survey_id";
-        String SURVEY_GROUP_ID = "survey_group_id";
-        String NAME = "display_name";
-        String VERSION = "version";
-        String TYPE = "type";
-        String LOCATION = "location";
-        String FILENAME = "filename";
-        String LANGUAGE = "language";
-        String HELP_DOWNLOADED = "help_downloaded_flag";
-        String DELETED = "deleted";
-    }
-
-    public interface ResponseColumns {
-        String _ID = "_id";
-        String SURVEY_INSTANCE_ID = "survey_instance_id";
-        String QUESTION_ID = "question_id";
-        String ANSWER = "answer";
-        String TYPE = "type";
-        String INCLUDE = "include";
-        String FILENAME = "filename";
-    }
-
-    public interface PreferencesColumns {
-        String KEY = "key";
-        String VALUE = "value";
-    }
-
-    public interface SurveyInstanceStatus {
-        int SAVED = 0;
-        int SUBMITTED = 1;
-        int EXPORTED = 2;
-        int SYNCED = 3;
-        int DOWNLOADED = 4;
-    }
-
-    public interface TransmissionStatus {
-        int QUEUED = 0;
-        int IN_PROGRESS = 1;
-        int SYNCED = 2;
-        int FAILED = 3;
-        int FORM_DELETED = 4;
-    }
+    private static final int DOES_NOT_EXIST = -1;
 
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
-    /**
-     * TODO: Double check these inserts, and use Constants!
-     */
-    private static final String[] DEFAULT_INSERTS = new String[] {
-            "INSERT INTO preferences VALUES('survey.language','')",
-            "INSERT INTO preferences VALUES('survey.languagespresent','')",
-            "INSERT INTO preferences VALUES('user.storelast','false')",
-            "INSERT INTO preferences VALUES('data.cellular.upload','true')",
-            "INSERT INTO preferences VALUES('user.lastuser.id','')",
-            "INSERT INTO preferences VALUES('backend.server','')",
-            "INSERT INTO preferences VALUES('screen.keepon','true')",
-            "INSERT INTO preferences VALUES('survey.textsize','LARGE')",
-            "INSERT INTO preferences VALUES('" + ConstantUtil.MAX_IMG_SIZE + "',"
-                    + String.valueOf(ConstantUtil.IMAGE_SIZE_320_240) + ")"
-    };
-
-    private static final String DATABASE_NAME = "surveydata";
-
-    private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
-    private static final int VER_FORM_SUBMITTER = 79;
-    private static final int VER_FORM_DEL_CHECK = 80;
-    private static final int VER_FORM_VERSION = 81;
-    private static final int VER_CADDISFLY_QN = 82;
-    private static final int DATABASE_VERSION = VER_CADDISFLY_QN;
-
     private final Context context;
-
-    /**
-     * Helper class for creating the database tables and loading reference data
-     * It is declared with package scope for VM optimizations
-     *
-     * @author Christopher Fagiani
-     */
-    static class DatabaseHelper extends SQLiteOpenHelper {
-        private static SQLiteDatabase database;
-        private static volatile Object LOCK_OBJ = new Object();
-        private volatile static int instanceCount = 0;
-
-        DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + Tables.USER + " ("
-                    + UserColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + UserColumns.NAME + " TEXT NOT NULL,"
-                    + UserColumns.EMAIL + " TEXT,"
-                    + UserColumns.DELETED + " INTEGER NOT NULL DEFAULT 0)");
-
-            db.execSQL("CREATE TABLE " + Tables.SURVEY + " ("
-                    + SurveyColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + SurveyColumns.SURVEY_ID + " TEXT NOT NULL,"
-                    + SurveyColumns.SURVEY_GROUP_ID + " INTEGER,"// REFERENCES ...
-                    + SurveyColumns.NAME + " TEXT NOT NULL,"
-                    + SurveyColumns.VERSION + " REAL,"
-                    + SurveyColumns.TYPE + " TEXT,"
-                    + SurveyColumns.LOCATION + " TEXT,"
-                    + SurveyColumns.FILENAME + " TEXT,"
-                    + SurveyColumns.LANGUAGE + " TEXT,"
-                    + SurveyColumns.HELP_DOWNLOADED + " INTEGER NOT NULL DEFAULT 0,"
-                    + SurveyColumns.DELETED + " INTEGER NOT NULL DEFAULT 0,"
-                    + "UNIQUE (" + SurveyColumns.SURVEY_ID + ") ON CONFLICT REPLACE)");
-
-            db.execSQL("CREATE TABLE " + Tables.SURVEY_GROUP + " ("
-                    + SurveyGroupColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + SurveyGroupColumns.SURVEY_GROUP_ID + " INTEGER,"
-                    + SurveyGroupColumns.NAME + " TEXT,"
-                    + SurveyGroupColumns.REGISTER_SURVEY_ID + " TEXT,"
-                    + SurveyGroupColumns.MONITORED + " INTEGER NOT NULL DEFAULT 0,"
-                    + "UNIQUE (" + SurveyGroupColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
-
-            db.execSQL("CREATE TABLE " + Tables.SURVEY_INSTANCE + " ("
-                    + SurveyInstanceColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + SurveyInstanceColumns.UUID + " TEXT,"
-                    + SurveyInstanceColumns.SURVEY_ID + " TEXT NOT NULL,"// REFERENCES ...
-                    + SurveyInstanceColumns.USER_ID + " INTEGER,"
-                    + SurveyInstanceColumns.START_DATE + " INTEGER,"
-                    + SurveyInstanceColumns.SAVED_DATE + " INTEGER,"
-                    + SurveyInstanceColumns.SUBMITTED_DATE + " INTEGER,"
-                    + SurveyInstanceColumns.RECORD_ID + " TEXT,"
-                    + SurveyInstanceColumns.STATUS + " INTEGER,"
-                    + SurveyInstanceColumns.EXPORTED_DATE + " INTEGER,"
-                    + SurveyInstanceColumns.SYNC_DATE + " INTEGER,"
-                    + SurveyInstanceColumns.DURATION + " INTEGER NOT NULL DEFAULT 0,"
-                    + SurveyInstanceColumns.SUBMITTER + " TEXT,"
-                    + SurveyInstanceColumns.VERSION + " REAL,"
-                    + "UNIQUE (" + SurveyInstanceColumns.UUID + ") ON CONFLICT REPLACE)");
-
-            db.execSQL("CREATE TABLE " + Tables.RESPONSE + " ("
-                    + ResponseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + ResponseColumns.SURVEY_INSTANCE_ID + " INTEGER NOT NULL,"// REFERENCES...
-                    + ResponseColumns.QUESTION_ID + " TEXT NOT NULL,"
-                    + ResponseColumns.ANSWER + " TEXT NOT NULL,"
-                    + ResponseColumns.TYPE + " TEXT NOT NULL,"
-                    + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"
-                    + ResponseColumns.FILENAME + " TEXT)");
-
-            db.execSQL("CREATE TABLE " + Tables.RECORD + " ("
-                    + RecordColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + RecordColumns.RECORD_ID + " TEXT,"
-                    + RecordColumns.SURVEY_GROUP_ID + " INTEGER,"// REFERENCES ...
-                    + RecordColumns.NAME + " TEXT,"// REFERENCES ...
-                    + RecordColumns.LATITUDE + " REAL,"// REFERENCES ...
-                    + RecordColumns.LONGITUDE + " REAL,"// REFERENCES ...
-                    + RecordColumns.LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0,"
-                    + "UNIQUE (" + RecordColumns.RECORD_ID + ") ON CONFLICT REPLACE)");
-
-            db.execSQL("CREATE TABLE " + Tables.TRANSMISSION + " ("
-                    + TransmissionColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + TransmissionColumns.SURVEY_INSTANCE_ID + " INTEGER NOT NULL,"
-                    + TransmissionColumns.SURVEY_ID + " TEXT,"
-                    + TransmissionColumns.FILENAME + " TEXT,"
-                    + TransmissionColumns.STATUS + " INTEGER,"
-                    + TransmissionColumns.START_DATE + " INTEGER,"
-                    + TransmissionColumns.END_DATE + " INTEGER,"
-                    + "UNIQUE (" + TransmissionColumns.FILENAME + ") ON CONFLICT REPLACE)");
-
-            db.execSQL("CREATE TABLE " + Tables.PREFERENCES + " ("
-                    + PreferencesColumns.KEY + " TEXT PRIMARY KEY,"
-                    + PreferencesColumns.VALUE + " TEXT)");
-
-            db.execSQL("CREATE TABLE " + Tables.SYNC_TIME + " ("
-                    + SyncTimeColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
-                    + SyncTimeColumns.TIME + " TEXT,"
-                    + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
-
-            createIndexes(db);
-            for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
-                db.execSQL(DEFAULT_INSERTS[i]);
-            }
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
-
-            int version = oldVersion;
-
-            // Apply database updates sequentially. It starts in the current 
-            // version, hooking into the correspondent case block, and falls 
-            // through to any future upgrade. If no break statement is found,
-            // the upgrade will end up in the current version.
-            switch (version) {
-                case VER_LAUNCH:
-                    db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
-                            + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
-                case VER_FORM_SUBMITTER:
-                    db.execSQL("ALTER TABLE " + Tables.TRANSMISSION
-                            + " ADD COLUMN " + TransmissionColumns.SURVEY_ID + " TEXT");
-                case VER_FORM_DEL_CHECK:
-                    db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
-                            + " ADD COLUMN " + SurveyInstanceColumns.VERSION + " REAL");
-                case VER_FORM_VERSION:
-                    db.execSQL("ALTER TABLE " + Tables.RESPONSE
-                            + " ADD COLUMN " + ResponseColumns.FILENAME + " TEXT");
-                    version = DATABASE_VERSION;
-            }
-
-            if (version != DATABASE_VERSION) {
-                Timber.d("onUpgrade() - Recreating the Database.");
-
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.SYNC_TIME);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.USER);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_GROUP);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
-                db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
-
-                onCreate(db);
-            }
-        }
-
-        @Override
-        public SQLiteDatabase getWritableDatabase() {
-            synchronized (LOCK_OBJ) {
-
-                if (database == null || !database.isOpen()) {
-                    database = super.getWritableDatabase();
-                    instanceCount = 0;
-                }
-                instanceCount++;
-                return database;
-            }
-        }
-
-        @Override
-        public void close() {
-            synchronized (LOCK_OBJ) {
-                instanceCount--;
-                if (instanceCount <= 0) {
-                    // close the database held by the helper (if any)
-                    super.close();
-                    if (database != null && database.isOpen()) {
-                        // we may be holding a different database than the
-                        // helper so
-                        // close that too if it's still open.
-                        database.close();
-                    }
-                    database = null;
-                }
-            }
-        }
-
-        private void createIndexes(SQLiteDatabase db) {
-            // Included in point updates
-            db.execSQL("CREATE INDEX response_idx ON " + Tables.RESPONSE + "("
-                    + ResponseColumns.SURVEY_INSTANCE_ID + ", " + ResponseColumns.QUESTION_ID
-                    + ")");
-            db.execSQL("CREATE INDEX record_name_idx ON " + Tables.RECORD
-                    + "(" + RecordColumns.NAME + ")");
-            db.execSQL("CREATE INDEX response_status_idx ON " + Tables.SURVEY_INSTANCE
-                    + "(" + SurveyInstanceColumns.STATUS + ")");
-            db.execSQL("CREATE INDEX response_modified_idx ON " + Tables.SURVEY_INSTANCE
-                    + "(" + SurveyInstanceColumns.SUBMITTED_DATE + ")");
-        }
-
-        /**
-         * returns the value of a single setting identified by the key passed in
-         */
-        public String findPreference(SQLiteDatabase db, String key) {
-            String value = null;
-            Cursor cursor = db.query(Tables.PREFERENCES,
-                    new String[] {
-                            PreferencesColumns.KEY,
-                            PreferencesColumns.VALUE
-                    }, PreferencesColumns.KEY + " = ?",
-                    new String[] {
-                            key
-                    }, null, null, null);
-            if (cursor != null) {
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    value = cursor
-                            .getString(cursor.getColumnIndexOrThrow(PreferencesColumns.VALUE));
-                }
-                cursor.close();
-            }
-            return value;
-        }
-
-        /**
-         * persists setting to the db
-         */
-        public void savePreference(SQLiteDatabase db, String key, String value) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(PreferencesColumns.VALUE, value);
-            int updated = db.update(Tables.PREFERENCES, updatedValues, PreferencesColumns.KEY
-                            + " = ?",
-                    new String[] {
-                            key
-                    });
-            if (updated <= 0) {
-                updatedValues.put(PreferencesColumns.KEY, key);
-                db.insert(Tables.PREFERENCES, null, updatedValues);
-            }
-        }
-    }
 
     /**
      * Constructor - takes the context to allow the database to be
@@ -500,7 +118,7 @@ public class SurveyDbAdapter {
     }
 
     public Cursor getResponsesData(long surveyInstanceId) {
-        return database.query(Tables.SURVEY_INSTANCE_JOIN_RESPONSE_USER,
+        return database.query(SURVEY_INSTANCE_JOIN_RESPONSE_USER,
                 new String[] {
                         SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.SUBMITTED_DATE,
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
@@ -535,7 +153,7 @@ public class SurveyDbAdapter {
             case SurveyInstanceStatus.SUBMITTED:
                 dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
                 break;
-            case SurveyInstanceStatus.SAVED:
+            case SAVED:
                 dateColumn = SurveyInstanceColumns.SAVED_DATE;
                 break;
             default:
@@ -628,7 +246,7 @@ public class SurveyDbAdapter {
     }
 
     public Map<String, QuestionResponse> getResponses(long surveyInstanceId) {
-        Map<String, QuestionResponse> responses = new HashMap<String, QuestionResponse>();
+        Map<String, QuestionResponse> responses = new HashMap<>();
 
         Cursor cursor = database.query(Tables.RESPONSE,
                 new String[] {
@@ -781,7 +399,7 @@ public class SurveyDbAdapter {
      * @return
      */
     public List<Survey> checkSurveyVersions(List<Survey> surveys) {
-        List<Survey> outOfDateSurveys = new ArrayList<Survey>();
+        List<Survey> outOfDateSurveys = new ArrayList<>();
         for (int i = 0; i < surveys.size(); i++) {
             Cursor cursor = database.query(Tables.SURVEY,
                     new String[] {
@@ -897,9 +515,10 @@ public class SurveyDbAdapter {
 
     /**
      * Lists all settings from the database
+     * TODO: move to {@link PreferenceHandler}
      */
     public HashMap<String, String> getPreferences() {
-        HashMap<String, String> settings = new HashMap<String, String>();
+        HashMap<String, String> settings = new HashMap<>();
         Cursor cursor = database.query(Tables.PREFERENCES, new String[] {
                 PreferencesColumns.KEY, PreferencesColumns.VALUE
         }, null, null, null, null, null);
@@ -1012,8 +631,8 @@ public class SurveyDbAdapter {
                 new String[] { fileName });
     }
 
-    public List<FileTransmission> getFileTransmissions(Cursor cursor) {
-        List<FileTransmission> transmissions = new ArrayList<FileTransmission>();
+    private List<FileTransmission> getFileTransmissions(Cursor cursor) {
+        List<FileTransmission> transmissions = new ArrayList<>();
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -1026,7 +645,7 @@ public class SurveyDbAdapter {
                 final int fileCol = cursor.getColumnIndexOrThrow(TransmissionColumns.FILENAME);
                 final int statusCol = cursor.getColumnIndexOrThrow(TransmissionColumns.STATUS);
 
-                transmissions = new ArrayList<FileTransmission>();
+                transmissions = new ArrayList<>();
                 do {
                     FileTransmission trans = new FileTransmission();
                     trans.setId(cursor.getLong(idCol));
@@ -1103,8 +722,15 @@ public class SurveyDbAdapter {
      * The survey xml must exist in the APK
      */
     public void reinstallTestSurvey() {
-        executeSql(
-                "insert into survey values(999991,'Sample Survey', 1.0,'Survey','res','testsurvey','english','N','N')");
+        ContentValues values = new ContentValues();
+        values.put(SurveyColumns.SURVEY_ID, "999991");
+        values.put(SurveyColumns.NAME, "Sample Survey");
+        values.put(SurveyColumns.VERSION, 1.0);
+        values.put(SurveyColumns.TYPE, "Survey");
+        values.put(SurveyColumns.LOCATION, "res");
+        values.put(SurveyColumns.FILENAME, "999991.xml");
+        values.put(SurveyColumns.LANGUAGE, "en");
+        database.insert(Tables.SURVEY, null, values);
     }
 
     /**
@@ -1119,7 +745,6 @@ public class SurveyDbAdapter {
         executeSql("DELETE FROM " + Tables.SURVEY);
         executeSql("DELETE FROM " + Tables.SURVEY_GROUP);
         executeSql("DELETE FROM " + Tables.USER);
-        executeSql("UPDATE preferences SET value = '' WHERE key = 'user.lastuser.id'");
     }
 
     /**
@@ -1148,8 +773,8 @@ public class SurveyDbAdapter {
                 });
     }
 
-    public HashSet<String> stringToSet(String item) {
-        HashSet<String> set = new HashSet<String>();
+    private HashSet<String> stringToSet(String item) {
+        HashSet<String> set = new HashSet<>();
         StringTokenizer strTok = new StringTokenizer(item, ",");
         while (strTok.hasMoreTokens()) {
             set.add(strTok.nextToken());
@@ -1157,7 +782,7 @@ public class SurveyDbAdapter {
         return set;
     }
 
-    public String setToString(HashSet<String> set) {
+    private String setToString(HashSet<String> set) {
         boolean isFirst = true;
         StringBuilder buffer = new StringBuilder();
         Iterator<String> itr = set.iterator();
@@ -1308,7 +933,7 @@ public class SurveyDbAdapter {
         return locale;
     }
 
-    public static Survey getSurvey(Cursor cursor) {
+    private static Survey getSurvey(Cursor cursor) {
         Survey survey = new Survey();
         survey.setId(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID)));
         survey.setName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.NAME)));
@@ -1359,7 +984,7 @@ public class SurveyDbAdapter {
         return s;
     }
 
-    public Cursor getSurveys(long surveyGroupId) {
+    private Cursor getSurveys(long surveyGroupId) {
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = null;
         if (surveyGroupId > 0) {
@@ -1386,7 +1011,7 @@ public class SurveyDbAdapter {
         // Reuse getSurveys() method
         Cursor cursor = getSurveys(surveyGroupId);
 
-        ArrayList<Survey> surveys = new ArrayList<Survey>();
+        ArrayList<Survey> surveys = new ArrayList<>();
 
         if (cursor != null) {
             if (cursor.getCount() > 0) {
@@ -1422,7 +1047,7 @@ public class SurveyDbAdapter {
     }
 
     public Cursor getFormInstance(long formInstanceId) {
-        return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
+        return database.query(SURVEY_INSTANCE_JOIN_SURVEY,
                 FormInstanceQuery.PROJECTION,
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID + "= ?",
                 new String[] { String.valueOf(formInstanceId) },
@@ -1434,7 +1059,7 @@ public class SurveyDbAdapter {
      * of the list, all other forms will be ordered by submission date (desc).
      */
     public Cursor getFormInstances(String recordId) {
-        return database.query(Tables.SURVEY_INSTANCE_JOIN_SURVEY,
+        return database.query(SURVEY_INSTANCE_JOIN_SURVEY,
                 FormInstanceQuery.PROJECTION,
                 Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
                 new String[] { recordId },
@@ -1451,7 +1076,7 @@ public class SurveyDbAdapter {
         String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.STATUS + "= ?" +
                 " AND " + SurveyInstanceColumns.RECORD_ID + "= ?";
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         args.add(surveyId);
         args.add(String.valueOf(status));
         args.add(recordId);
@@ -1494,13 +1119,16 @@ public class SurveyDbAdapter {
                 null, null,
                 SurveyInstanceColumns.SUBMITTED_DATE + " DESC");
         if (cursor != null && cursor.moveToFirst()) {
-            return cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+            long surveyInstanceId = cursor
+                    .getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+            cursor.close();
+            return surveyInstanceId;
         }
 
         return null;
     }
 
-    public String getSurveyedLocaleId(long surveyInstanceId) {
+    private String getSurveyedLocaleId(long surveyInstanceId) {
         Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
                         SurveyInstanceColumns._ID, SurveyInstanceColumns.RECORD_ID
@@ -1627,7 +1255,7 @@ public class SurveyDbAdapter {
     // =========== SurveyedLocales synchronization =========== //
     // ======================================================= //
 
-    public void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
+    private void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
         for (QuestionResponse response : responses) {
             Cursor cursor = database.query(Tables.RESPONSE,
                     new String[] { ResponseColumns.SURVEY_INSTANCE_ID, ResponseColumns.QUESTION_ID
@@ -1659,7 +1287,8 @@ public class SurveyDbAdapter {
         }
     }
 
-    public void syncSurveyInstances(List<SurveyInstance> surveyInstances, String surveyedLocaleId) {
+    private void syncSurveyInstances(List<SurveyInstance> surveyInstances,
+            String surveyedLocaleId) {
         for (SurveyInstance surveyInstance : surveyInstances) {
             Cursor cursor = database.query(Tables.SURVEY_INSTANCE, new String[] {
                             SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID
@@ -1754,7 +1383,7 @@ public class SurveyDbAdapter {
      * @param surveyGroupId id of the SurveyGroup
      * @param time          String containing the timestamp
      */
-    public void setSyncTime(long surveyGroupId, String time) {
+    private void setSyncTime(long surveyGroupId, String time) {
         ContentValues values = new ContentValues();
         values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
         values.put(SyncTimeColumns.TIME, time);

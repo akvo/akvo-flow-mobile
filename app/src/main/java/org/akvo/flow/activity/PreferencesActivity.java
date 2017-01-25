@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -34,17 +34,18 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ArrayPreferenceUtil;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceData;
 import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.PropertyUtil;
-import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.ViewUtil;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 /**
@@ -65,6 +66,8 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     private TextView localeTextView;
 
     private SurveyDbAdapter database;
+    private Prefs prefs;
+    private ServerManager serverManager;
 
     private LangsPreferenceData langsPrefData;
     private String[] langsSelectedNameArray;
@@ -72,7 +75,6 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     private int[] langsSelectedMasterIndexArray;
 
     private String[] maxImgSizes;
-    private PropertyUtil props;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,9 +87,10 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         identTextView = (TextView) findViewById(R.id.identvalue);
         maxImgSizeTextView = (TextView) findViewById(R.id.max_img_size_txt);
         localeTextView = (TextView) findViewById(R.id.locale_name);
+        prefs = new Prefs(getApplicationContext());
+        serverManager = new ServerManager(getApplicationContext());
 
         Resources res = getResources();
-        props = new PropertyUtil(res);
 
         maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
 
@@ -105,45 +108,36 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
      * loads the preferences from the DB and sets their current value in the UI
      */
     private void populateFields() {
+        populateFromSharedPreferences();
+        populateLanguagePreferences();
+    }
+
+    private void populateLanguagePreferences() {
+        localeTextView.setText(FlowApp.getApp().getAppDisplayLanguage());
+
         HashMap<String, String> settings = database.getPreferences();
-        String val = settings.get(ConstantUtil.SCREEN_ON_KEY);
-        if (val != null && Boolean.parseBoolean(val)) {
-            screenOnCheckbox.setChecked(true);
-        } else {
-            screenOnCheckbox.setChecked(false);
-        }
-
-        val = settings.get(ConstantUtil.CELL_UPLOAD_SETTING_KEY);
-        mobileDataCheckbox.setChecked(val != null && Boolean.parseBoolean(val));
-
-        val = settings.get(ConstantUtil.SURVEY_LANG_SETTING_KEY);
+        String val = settings.get(ConstantUtil.SURVEY_LANG_SETTING_KEY);
         String langsPresentIndexes = settings.get(ConstantUtil.SURVEY_LANG_PRESENT_KEY);
         langsPrefData = LangsPreferenceUtil.createLangPrefData(this, val, langsPresentIndexes);
 
         languageTextView.setText(ArrayPreferenceUtil.formSelectedItemString(
                 langsPrefData.getLangsSelectedNameArray(),
                 langsPrefData.getLangsSelectedBooleanArray()));
+    }
 
-        val = settings.get(ConstantUtil.SERVER_SETTING_KEY);
-        if (val != null && val.trim().length() > 0) {
-            serverTextView.setText(val);
-        } else {
-            serverTextView.setText(props.getProperty(ConstantUtil.SERVER_BASE));
-        }
+    private void populateFromSharedPreferences() {
+        screenOnCheckbox
+                .setChecked(prefs.getBoolean(Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
 
-        val = settings.get(ConstantUtil.MAX_IMG_SIZE);
-        if (val != null && val.trim().length() > 0) {
-            maxImgSizeTextView.setText(maxImgSizes[Integer.parseInt(val)]);
-        } else {
-            maxImgSizeTextView.setText(maxImgSizes[0]);
-        }
+        mobileDataCheckbox.setChecked(prefs.getBoolean(Prefs.KEY_CELL_UPLOAD,
+                Prefs.DEFAULT_VALUE_CELL_UPLOAD));
 
-        val = settings.get(ConstantUtil.DEVICE_IDENT_KEY);
-        if (val != null) {
-            identTextView.setText(val);
-        }
+        serverTextView.setText(serverManager.getServerBase());
 
-        localeTextView.setText(FlowApp.getApp().getAppDisplayLanguage());
+        int maxImgSize = prefs.getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
+        maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
+        identTextView.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER,
+                Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER));
     }
 
     /**
@@ -199,76 +193,54 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                 showLanguageDialog();
                 break;
             case R.id.pref_server:
-                ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
-                            @Override
-                            public void onAuthenticated() {
-                                final EditText inputView = new EditText(PreferencesActivity.this);
-                                // one line only
-                                inputView.setSingleLine();
-                                inputView.setText(StatusUtil.getServerBase(PreferencesActivity.this));
-                                ViewUtil.ShowTextInputDialog(
-                                        PreferencesActivity.this, R.string.serverlabel,
-                                        R.string.serverlabel, inputView,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                String s = StringUtil.controlToSpace(inputView
-                                                        .getText().toString());
-                                                // drop any control chars, especially tabs
-                                                database.savePreference(
-                                                        ConstantUtil.SERVER_SETTING_KEY, s);
-                                                serverTextView.setText(
-                                                        StatusUtil.getServerBase(PreferencesActivity.this));
-                                            }
-                                        }
-                                );
-                            }
+                StringPrefInputDialogListener dialogListener = new StringPrefInputDialogListener(
+                        this) {
+                    @Override
+                    public void usePreference(String userInput) {
+                        PreferencesActivity preferencesActivity = activityWeakReference.get();
+                        if (preferencesActivity != null) {
+                            preferencesActivity.saveBackendUrl(userInput);
                         }
+                    }
+                };
+                //TODO: check duplicated title and subtitle --> remove subtitle
+                ViewUtil.showAdminAuthDialog(this,
+                        new StringPreferencesAuthDialogListener(this, dialogListener,
+                                R.string.serverlabel,
+                                R.string.serverlabel,
+                                serverManager.getServerBase())
                 );
                 break;
             case R.id.pref_deviceid:
-                ViewUtil.showAdminAuthDialog(this,
-                        new ViewUtil.AdminAuthDialogListener() {
-                            @Override
-                            public void onAuthenticated() {
-                                final EditText inputView = new EditText(PreferencesActivity.this);
-                                // one line only
-                                inputView.setSingleLine();
-                                ViewUtil.ShowTextInputDialog(
-                                        PreferencesActivity.this,
-                                        R.string.identlabel,
-                                        R.string.setidentlabel, inputView,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                String s = StringUtil.controlToSpace(inputView
-                                                        .getText().toString());
-                                                // drop any control chars,
-                                                // especially tabs
-                                                identTextView.setText(s);
-                                                database.savePreference(
-                                                        ConstantUtil.DEVICE_IDENT_KEY, s);
-                                                // Trigger the SurveyDownload Service, in order to force
-                                                // a backend connection with the new Device ID
-                                                startService(new Intent(PreferencesActivity.this,
-                                                        SurveyDownloadService.class));
-                                            }
-                                        }
-                                );
-                            }
+                StringPrefInputDialogListener dialogListenerId = new StringPrefInputDialogListener(
+                        this) {
+                    @Override
+                    public void usePreference(String userInput) {
+                        PreferencesActivity preferencesActivity = activityWeakReference.get();
+                        if (preferencesActivity != null) {
+                            preferencesActivity.saveNewDeviceId(userInput);
                         }
+                    }
+                };
+                ViewUtil.showAdminAuthDialog(this,
+                        new StringPreferencesAuthDialogListener(this, dialogListenerId,
+                                R.string.identlabel,
+                                R.string.setidentlabel,
+                                prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER,
+                                        Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER))
                 );
                 break;
             case R.id.pref_resize:
-                String[] keys = new String[maxImgSizes.length];
-                for (int i = 0; i < maxImgSizes.length; i++) {
-                    keys[i] = String.valueOf(i);
-                }
-                showPreferenceDialogBase(R.string.resize_large_images,
-                        ConstantUtil.MAX_IMG_SIZE,
-                        keys, maxImgSizes, maxImgSizeTextView);
+                showPreferenceDialog(R.string.resize_large_images,
+                        Prefs.KEY_MAX_IMG_SIZE,
+                         maxImgSizes, maxImgSizeTextView);
                 break;
         }
+    }
+
+    private void saveBackendUrl(String userInput) {
+        prefs.setString(Prefs.KEY_BACKEND_SERVER, userInput);
+        serverTextView.setText(userInput);
     }
 
     /**
@@ -277,18 +249,17 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
      *
      * @param titleId        - resource id of dialog title
      * @param settingKey     - key of setting to edit
-     * @param keys           - string array containing keys (to be stored in the DB)
      * @param values         - string array containing values (text mapping of the key)
      * @param currentValView - view to update with value selected
      */
-    private void showPreferenceDialogBase(int titleId, final String settingKey,
-            final String[] keys, final String[] values, final TextView currentValView) {
+    private void showPreferenceDialog(int titleId, final String settingKey, final String[] values,
+            final TextView currentValView) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(titleId).setItems(values,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        database.savePreference(settingKey, keys[which]);
+                        prefs.setInt(settingKey, which);
                         currentValView.setText(values[which]);
                         if (dialog != null) {
                             dialog.dismiss();
@@ -305,9 +276,9 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView == screenOnCheckbox) {
-            database.savePreference(ConstantUtil.SCREEN_ON_KEY, "" + isChecked);
+            prefs.setBoolean(Prefs.KEY_SCREEN_ON, isChecked);
         } else if (buttonView == mobileDataCheckbox) {
-            database.savePreference(ConstantUtil.CELL_UPLOAD_SETTING_KEY, "" + isChecked);
+            prefs.setBoolean(Prefs.KEY_CELL_UPLOAD, isChecked);
         }
     }
 
@@ -325,4 +296,65 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         builder.show();
     }
 
+    private void saveNewDeviceId(String deviceId) {
+        identTextView.setText(deviceId);
+        prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
+        // Trigger the SurveyDownload Service, in order to force
+        // a backend connection with the new Device ID
+        startService(new Intent(this,
+                SurveyDownloadService.class));
+    }
+
+    static class StringPreferencesAuthDialogListener implements ViewUtil.AdminAuthDialogListener {
+
+        private final WeakReference<PreferencesActivity> activityWeakReference;
+        private final StringPrefInputDialogListener dialogListener;
+        private final int title;
+        private final int subtitle;
+        private final String originalValue;
+
+        StringPreferencesAuthDialogListener(PreferencesActivity activity,
+                StringPrefInputDialogListener dialogListener, int title,
+                int subtitle, String originalValue) {
+            this.activityWeakReference = new WeakReference<>(activity);
+            this.dialogListener = dialogListener;
+            this.title = title;
+            this.subtitle = subtitle;
+            this.originalValue = originalValue;
+        }
+
+        @Override
+        public void onAuthenticated() {
+            final PreferencesActivity preferencesActivity = activityWeakReference.get();
+            if (preferencesActivity != null) {
+                final EditText inputView = new EditText(preferencesActivity);
+                // one line only
+                inputView.setSingleLine();
+                inputView.setText(originalValue);
+                ViewUtil.ShowTextInputDialog(preferencesActivity, title,
+                        subtitle, inputView, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                /**
+                                 * Drop any control chars, especially tabs
+                                 */
+                                String newDeviceId = StringUtil.controlToSpace(inputView
+                                        .getText().toString());
+                                dialogListener.usePreference(newDeviceId);
+                            }
+                        });
+            }
+        }
+    }
+
+    public abstract class StringPrefInputDialogListener {
+
+        final WeakReference<PreferencesActivity> activityWeakReference;
+
+        protected StringPrefInputDialogListener(PreferencesActivity activity) {
+            this.activityWeakReference = new WeakReference<>(activity);
+        }
+
+        public abstract void usePreference(String userInput);
+    }
 }

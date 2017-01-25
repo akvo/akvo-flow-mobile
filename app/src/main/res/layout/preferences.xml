@@ -99,30 +99,6 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/pref_surveylang"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:background="@drawable/listitem_row_1"
-            android:gravity="center_vertical" >
-
-            <TextView
-                android:id="@+id/surveylanglabel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:text="@string/surveylanglabel"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/surveylangvalue"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/surveylanglabel"
-                android:textSize="14sp" />
-        </RelativeLayout>
-
-        <RelativeLayout
             android:id="@+id/pref_server"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -130,7 +130,7 @@ public class SurveyedDataPointSyncService extends IntentService {
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
      * This notification will be received in {@link org.akvo.flow.ui.fragment.DatapointsFragment}, in order to
-     * refresh its data
+     * loadItem its data
      */
     private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC);

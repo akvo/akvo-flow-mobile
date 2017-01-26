@@ -374,7 +374,7 @@ public class BootstrapService extends IntentService {
     /**
      * Dispatch a Broadcast notification to notify of surveys synchronization.
      * This notification will be received in SurveyHomeActivity, in order to
-     * refresh its data
+     * loadItem its data
      */
     private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));

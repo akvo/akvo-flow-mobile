@@ -65,7 +65,7 @@ public class Navigator {
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
         extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
-        extras.putString(RecordActivity.EXTRA_RECORD_ID, surveyedLocaleId);
+        extras.putString(ConstantUtil.EXTRA_RECORD_ID, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }

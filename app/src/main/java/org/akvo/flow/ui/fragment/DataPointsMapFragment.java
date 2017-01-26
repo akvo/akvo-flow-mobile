@@ -29,7 +29,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,28 +43,21 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyedLocaleLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
 
-//TODO: separate single data point and multiple into different classes for clarity
-public class MapFragment extends SupportMapFragment
+public class DataPointsMapFragment extends SupportMapFragment
         implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener, OnMapReadyCallback {
 
     public static final int MAP_ZOOM_LEVEL = 10;
@@ -73,21 +65,17 @@ public class MapFragment extends SupportMapFragment
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
     private RecordListListener mListener;
-
-    private String mRecordId; // If set, load a single record
     private List<SurveyedLocale> mItems;
-    private boolean mSingleRecord = false;
 
     @Nullable
     private GoogleMap mMap;
 
     private ClusterManager<SurveyedLocale> mClusterManager;
 
-    public static MapFragment newInstance(SurveyGroup surveyGroup, String dataPointId) {
-        MapFragment fragment = new MapFragment();
+    public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
+        DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
-        args.putString(RecordActivity.EXTRA_RECORD_ID, dataPointId);
+        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,11 +84,8 @@ public class MapFragment extends SupportMapFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mItems = new ArrayList<>();
-
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
-        mRecordId = getArguments().getString(RecordActivity.EXTRA_RECORD_ID);
-        mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
+                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
     }
 
     @Override
@@ -252,33 +237,12 @@ public class MapFragment extends SupportMapFragment
      */
     public void refresh() {
         if (isResumed()) {
-            if (mSingleRecord) {
-                // Just get it from the DB
-                updateSingleRecord();
-            } else {
-                getLoaderManager().restartLoader(0, null, this);
-            }
-        }
-    }
-
-    private void updateSingleRecord() {
-        SurveyedLocale record = mDatabase.getSurveyedLocale(mRecordId);
-        if (mMap != null && record != null && record.getLatitude() != null
-                && record.getLongitude() != null) {
-            mMap.clear();
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(record.getLatitude(), record.getLongitude()))
-                    .title(record.getDisplayName(getActivity()))
-                    .snippet(record.getId()));
-            centerMap(record);
+            getLoaderManager().restartLoader(0, null, this);
         }
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if (mSingleRecord) {
-            return; // Do nothing. We are already inside the record Activity
-        }
         final String surveyedLocaleId = marker.getSnippet();
         mListener.onRecordSelected(surveyedLocaleId);
     }
@@ -314,39 +278,6 @@ public class MapFragment extends SupportMapFragment
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    /**
-     * This custom renderer overrides original 'bucketed' names, in order to display the accurate
-     * number of markers within a cluster.
-     */
-    private static class PointRenderer extends DefaultClusterRenderer<SurveyedLocale> {
-
-        private final WeakReference<Context> activityContextWeakRef;
-
-        public PointRenderer(GoogleMap map, Context context,
-                ClusterManager<SurveyedLocale> clusterManager) {
-            super(context, map, clusterManager);
-            this.activityContextWeakRef = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onBeforeClusterItemRendered(SurveyedLocale item,
-                MarkerOptions markerOptions) {
-            Context context = activityContextWeakRef.get();
-            if (context != null) {
-                markerOptions.title(item.getDisplayName(context)).snippet(item.getId());
-            }
-        }
-
-        @Override
-        protected int getBucket(Cluster<SurveyedLocale> cluster) {
-            return cluster.getSize();
-        }
-
-        @Override
-        protected String getClusterText(int bucket) {
-            return String.valueOf(bucket);
-        }
+        //EMPTY
     }
 }

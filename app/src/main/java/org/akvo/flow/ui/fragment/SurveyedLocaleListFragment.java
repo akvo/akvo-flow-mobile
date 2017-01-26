@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -48,12 +48,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.RecordColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyInstanceColumns;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.loader.SurveyedLocaleLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
@@ -84,7 +83,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
         SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -93,7 +92,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }

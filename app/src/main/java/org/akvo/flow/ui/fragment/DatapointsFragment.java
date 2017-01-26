@@ -42,7 +42,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
@@ -81,7 +80,7 @@ public class DatapointsFragment extends Fragment {
     public static DatapointsFragment newInstance(SurveyGroup surveyGroup) {
         DatapointsFragment fragment = new DatapointsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -99,7 +98,7 @@ public class DatapointsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -171,7 +170,7 @@ public class DatapointsFragment extends Fragment {
                 subMenu.removeItem(R.id.sync_records);
             }
 
-            // "Order By" is only available for the ListFragment, not the MapFragment.
+            // "Order By" is only available for the ListFragment, not the DataPointsMapFragment.
             // The navigation components maintain 2 different indexes: Tab index and Pager index.
             // The system seems to always update the tab index first, prior to the onCreateOptionsMenu
             // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
@@ -235,7 +234,7 @@ public class DatapointsFragment extends Fragment {
             this.surveyGroup = newSurveyGroup;
             SurveyedLocaleListFragment listFragment = (SurveyedLocaleListFragment) fragmentsRef
                     .get(POSITION_LIST);
-            MapFragment mapFragment = (MapFragment) fragmentsRef.get(POSITION_MAP);
+            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef.get(POSITION_MAP);
 
             if (listFragment != null) {
                 listFragment.refresh(surveyGroup);
@@ -253,7 +252,7 @@ public class DatapointsFragment extends Fragment {
                 fragmentsRef.put(POSITION_LIST, surveyedLocaleListFragment);
                 return surveyedLocaleListFragment;
             } else {
-                MapFragment mapFragment = (MapFragment) super.instantiateItem(container, position);
+                DataPointsMapFragment mapFragment = (DataPointsMapFragment) super.instantiateItem(container, position);
                 fragmentsRef.put(POSITION_MAP, mapFragment);
                 return mapFragment;
             }
@@ -265,7 +264,7 @@ public class DatapointsFragment extends Fragment {
                 return SurveyedLocaleListFragment.newInstance(surveyGroup);
             }
             // Map mode
-            return MapFragment.newInstance(surveyGroup, null);
+            return DataPointsMapFragment.newInstance(surveyGroup);
         }
 
         @Override

@@ -51,7 +51,6 @@ import org.akvo.flow.util.ConstantUtil;
 public class RecordActivity extends BackActivity implements SurveyListListener, TabListener,
         RecordListListener {
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
-    public static final String EXTRA_RECORD_ID = "record";
 
     private static final int POSITION_SURVEYS = 0;
     private static final int POSITION_RESPONSES = 1;
@@ -113,7 +112,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
 
         mUser = FlowApp.getApp().getUser();
         // Record might have changed while answering a registration survey
-        String recordId = getIntent().getStringExtra(EXTRA_RECORD_ID);
+        String recordId = getIntent().getStringExtra(ConstantUtil.EXTRA_RECORD_ID);
         mRecord = mDatabase.getSurveyedLocale(recordId);
         displayRecord();
     }

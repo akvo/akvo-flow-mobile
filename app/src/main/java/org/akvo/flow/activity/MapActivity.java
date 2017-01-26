@@ -24,8 +24,8 @@ import android.os.Bundle;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.ui.fragment.MapFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.ui.fragment.SingleDataPointMapFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 public class MapActivity extends BackActivity implements RecordListListener {
@@ -47,7 +47,8 @@ public class MapActivity extends BackActivity implements RecordListListener {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.content_frame, MapFragment.newInstance(null, datapointId))
+                .replace(R.id.content_frame, SingleDataPointMapFragment
+                        .newInstance(datapointId))
                 .commit();
     }
 

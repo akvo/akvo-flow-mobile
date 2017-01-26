@@ -115,7 +115,7 @@ public class HttpUtilTest {
         //copy contents from URL to destination 'file'
         HttpUtil.httpGet(URL_STRING, file);
 
-        assertEquals(expected + '\n', OldHttpUtil.readStream(new FileInputStream(file)));
+        assertEquals(expected, FileUtil.readText(new FileInputStream(file)));
     }
 
     @Test

@@ -1,24 +1,34 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.domain;
 
+import android.text.TextUtils;
+
+import org.akvo.flow.util.ConstantUtil;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * domain object for Surveys
@@ -26,7 +36,7 @@ import java.util.List;
  * @author Christopher Fagiani
  */
 public class Survey {
-    private SurveyGroup surveyGroup;// TODO: Use java mMemberName convention
+    private SurveyGroup surveyGroup;
     private String name;
     private String id;
     private Date startDate;
@@ -37,12 +47,16 @@ public class Survey {
     private String location;
     private String fileName;
     private boolean helpDownloaded;
+
+    /**
+     * Main language code
+     */
     private String language;
     private String sourceSurveyId;// "Copied-from" survey Id
     private String app;// FLOW instance ID
 
     public Survey() {
-        questionGroups = new ArrayList<QuestionGroup>();
+        questionGroups = new ArrayList<>();
     }
     
     public void setSurveyGroup(SurveyGroup surveyGroup) {
@@ -53,8 +67,20 @@ public class Survey {
         return surveyGroup;
     }
 
+    /**
+     * Default survey language code
+     * @return a string with the language code for example 'en'
+     */
     public String getLanguage() {
         return language;
+    }
+
+    /**
+     * Default survey language code
+     * @return a string with the language code for example 'en'
+     */
+    public String getDefaultLanguageCode() {
+        return TextUtils.isEmpty(language) ? ConstantUtil.ENGLISH_CODE : language.toLowerCase();
     }
 
     public void setLanguage(String language) {
@@ -169,7 +195,7 @@ public class Survey {
     }
     
     public List<String> getLocaleNameQuestions() {
-        List<String> localeNameQuestions = new ArrayList<String>();
+        List<String> localeNameQuestions = new ArrayList<>();
         if (questionGroups != null) {
             for (QuestionGroup group : questionGroups) {
                 localeNameQuestions.addAll(group.getLocaleNameQuestions());
@@ -190,5 +216,26 @@ public class Survey {
             }
         }
         return null;
+    }
+
+    public Set<String> getAvailableLanguageCodes() {
+        Set<String> languageCodes = new LinkedHashSet<>();
+        languageCodes.add(getDefaultLanguageCode());
+        if (questionGroups != null) {
+            int size = questionGroups.size();
+            for (int i = 0; i < size; i++) {
+                ArrayList<Question> questions = questionGroups.get(i).getQuestions();
+                if (questions != null) {
+                    for (Question question : questions) {
+                        Map<String, AltText> questionAltTextMap = question
+                                .getLanguageTranslationMap();
+                        if (questionAltTextMap != null) {
+                            languageCodes.addAll(questionAltTextMap.keySet());
+                        }
+                    }
+                }
+            }
+        }
+        return languageCodes;
     }
 }

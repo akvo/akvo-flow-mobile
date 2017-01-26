@@ -1,17 +1,20 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -22,20 +25,16 @@ import android.media.ExifInterface;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,13 +44,14 @@ import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import timber.log.Timber;
+
 /**
  * utility for manipulating files
  *
  * @author Christopher Fagiani
  */
 public class FileUtil {
-    private static final String TAG = FileUtil.class.getSimpleName();
 
     // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
     private static final String DIR_DATA = "akvoflow/data/files"; // form responses zip files
@@ -124,37 +124,6 @@ public class FileUtil {
             return FlowApp.getApp().getExternalFilesDir(null).getAbsolutePath();
         }
         return Environment.getExternalStorageDirectory().getAbsolutePath();
-    }
-
-    /**
-     * writes the contents string to the file indicated by filePath
-     */
-    public static void writeStringToFile(String contents,
-            FileOutputStream filePath) throws IOException {
-        if (contents != null) {
-            BufferedOutputStream bw = new BufferedOutputStream(filePath);
-            bw.write(contents.getBytes("UTF-8"));
-            bw.flush();
-            bw.close();
-        }
-    }
-
-    /**
-     * reads the contents of a file into a string.
-     */
-    public static String readFileAsString(File file) throws IOException {
-        StringBuilder contents = new StringBuilder();
-        BufferedReader input = new BufferedReader(new FileReader(file));
-        String line;
-        try {
-            while ((line = input.readLine()) != null) {
-                contents.append(line);
-                contents.append(System.getProperty("line.separator"));
-            }
-        } finally {
-            close(input);
-        }
-        return contents.toString();
     }
 
     /**
@@ -255,7 +224,7 @@ public class FileUtil {
 
             return md.digest();
         } catch (NoSuchAlgorithmException | IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         } finally {
             close(in);
         }
@@ -300,11 +269,11 @@ public class FileUtil {
             if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime1)) {
                 equals = datetime1.equals(datetime2);
             } else {
-                Log.d(TAG, "Datetime is null or empty. The MD5 checksum will be compared");
+                Timber.d("Datetime is null or empty. The MD5 checksum will be compared");
                 equals = compareFilesChecksum(image1, image2);
             }
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
 
         return equals;
@@ -361,9 +330,9 @@ public class FileUtil {
                         });
 
                 if (result == 1) {
-                    Log.i(TAG, "Duplicated file successfully removed: " + lastImagePath);
+                    Timber.i("Duplicated file successfully removed: " + lastImagePath);
                 } else {
-                    Log.e(TAG, "Error removing duplicated image:" + lastImagePath);
+                    Timber.e("Error removing duplicated image:" + lastImagePath);
                 }
             }
         }
@@ -422,7 +391,7 @@ public class FileUtil {
         try {
             closeable.close();
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         }
     }
 

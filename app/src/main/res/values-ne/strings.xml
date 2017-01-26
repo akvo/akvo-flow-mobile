@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
-  <string name="app_name">एक्भो फ्लो</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <string name="accuracy">एक्युरेसी</string>
   <string name="searching">खोजी हुँदैछ...</string>
   <string name="ready">तयार</string>
@@ -31,8 +30,8 @@
   <string name="screenoptdesc">सर्भेको उतर दिँदा उपकरणको स्क्रिनलाई बन्द हुन बाट रोक्दछ। ब्याट्री खपतलाई जोगाउन सर्भे प्रयोगमा नभएको बेला आफैले स्क्रिन बन्द गर्न (वा एप्पबाट बहिर निस्कन) नबिर्सनु होला।</string>
   <string name="aboutlabel">हाम्रो बारेमा</string>
   <string name="aboutdesc">भर्सनको बारेमा देखाउँछ</string>
-  <string name="abouttitle">एक्भो फ्लो एप्पको बारेमा</string>
-  <string name="abouttext">एक्भो फ्लो एप्प विकास गर्नेः एक्भो फाउन्डेशन प्रतिलिपि अधिकारः © 2010-2014 स्टीचिङ्ग एकभो भर्सन</string>
+  <string name="abouttitle">Akvo Flow एप्पको बारेमा</string>
+  <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow एप्प विकास गर्नेः Akvo फाउन्डेशन प्रतिलिपि अधिकारः © 2010-%1$s स्टीचिङ्ग Akvo भर्सन %2$s</string>
   <string name="gpsstatuslabel">जि पि एस् को स्थिति </string>
   <string name="gpsstatusdesc">उपकरणमा GPS Status एप्प राख्नु भएको छ भने चालु गराउँदछ।</string>
   <string name="nogpsstatus">GPS Status राखिएको छैन। कृपया गुगलको Play Store मा गएर डाउन्लोड ग रि राख्नु होला।</string>
@@ -46,7 +45,6 @@
   <string name="savelastuserlabel">सत्रहरुको बिचमा अन्तिमकै प्रयोगकर्तालाई सक्रिय राख्नुहोस्।</string>
   <string name="uploadoptionlabel">मोबाइल नेटवर्क प्रयोग गरेर डाटा सिँक गर्नुहोस्।</string>
   <string name="surveylanglabel">सर्भे भाषाहरु</string>
-  <string name="beaconlabel">स्थानको विवरण पठाउनुहोस्।</string>
   <string name="scanbarcode">बारकोड स्क्यान गर्नुहोस्।</string>
   <string name="barcodeerror">उपकरणमा स्क्यानर राखिएको छैन। कृपया Google Play Store बाट Barcode Scanner एप्प डाउन्लोड गरेर राख्नुहोला।</string>
   <string name="toosmallerr">मान धेरै सानो भयो। न्युनतम मान:</string>
@@ -86,7 +84,7 @@
   <string name="bootstrapstart">एस डि कार्डबाट डाटा लोड हुँदैछ।</string>
   <string name="bootstrapcomplete">एस डि कार्डबाट डाटा लोड भई सक्यो।</string>
   <string name="bootstraperror">बुट स्ट्र्याप zip फाइल प्रसारणमा त्रुटि </string>
-  <string name="bootstrap_invalid_app">त्रुटि: फारम यस फ्लो instance को हैन।</string>
+  <string name="bootstrap_invalid_app">त्रुटि: फारम यस Flow instance को हैन।</string>
   <string name="transmissionhist">डाटा प्रसारण हिस्ट्री</string>
   <string name="transstartdate">शुरु भयो</string>
   <string name="transenddate">सकियो</string>
@@ -118,7 +116,7 @@
   <string name="loading">लोड हुँदैछ...</string>
   <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
   <string name="prefill_text">पहिलेको उतरहरुले फारम भर्न चाहनुहुन्छ?</string>
-  <string name="error_assignment_text">एक्भो फ्लो ड्यास्बोर्डमा assignment हरु चाहियो।</string>
+  <string name="error_assignment_text">Akvo Flow ड्यास्बोर्डमा assignment हरु चाहियो।</string>
   <!--Data sync-->
   <string name="data_sync_title">डाटा सिँक्रोनाइजेसन</string>
   <string name="data_sync_text">डाटा अपलोड हुँदैछ, कृपया पर्खनुहोस्।</string>
@@ -202,12 +200,12 @@
   <string name="status_submitted">बुझाईयो।</string>
   <string name="status_exported">पठाइयो।</string>
   <!--APK update-->
-  <string name="app_update_activity">एक्भो फ्लो अपडेट</string>
-  <string name="app_update">फ्लो एप्पको नयाँ संस्करण उपलब्ध छ। नयाँ संस्करण डाउन्लोड गरेर चलाउनको लागि Update मा थिच्नुहोस्।</string>
+  <string name="app_update_activity">Akvo Flow अपडेट</string>
+  <string name="app_update">Flow एप्पको नयाँ संस्करण उपलब्ध छ। नयाँ संस्करण डाउन्लोड गरेर चलाउनको लागि Update मा थिच्नुहोस्।</string>
   <string name="update">अपडेट गर्नुहोस्</string>
   <string name="not_now">अहिले हैन</string>
-  <string name="clicktoinstall">नयाँ फ्लो भर्सन डाउन्लोड भएको छ। के तपाईं यसलाई ईन्स्टल गर्न चाहनुहुन्छ?</string>
-  <string name="apk_upgrade_error">फ्लो अपडेट डाउन्लोड हुन सकेन</string>
+  <string name="clicktoinstall">नयाँ Flow भर्सन डाउन्लोड भएको छ। के तपाईं यसलाई ईन्स्टल गर्न चाहनुहुन्छ?</string>
+  <string name="apk_upgrade_error">Flow अपडेट डाउन्लोड हुन सकेन</string>
   <!--Time check-->
   <string name="time_check_activity">मिति र गते </string>
   <string name="time_warning">तपाईंको फोनको समय मिलेको छैन! कृपया फोनको घडी मिलाएर पुन: प्रयास गर्नु होला। तपाईंको फोनको मिति र समय </string>
@@ -215,10 +213,11 @@
   <!--Form sync-->
   <string name="downloading_forms">फारम डाउन्लोड हुँदैछ</string>
   <string name="error_form_sync_title">फारम सिन्क हुन सकेन</string>
-  <string name="error_assignment_read">फ्लो ड्यास्बोर्डबाट फारम असाइन्मेन्ट पढ्न सकिएन</string>
-  <string name="error_form_header">फ्लो ड्यास्बोर्डबाट फारम %1$s पढ्न सकिएन</string>
+  <string name="error_assignment_read">Flow ड्यास्बोर्डबाट फारम असाइन्मेन्ट पढ्न सकिएन</string>
+  <string name="error_form_header">Flow ड्यास्बोर्डबाट फारम %1$s पढ्न सकिएन</string>
   <string name="error_form_download">फारम पब्लिश भएको र स्थानिय मिति र समय ठीक भएको पक्का गर्नुहोस् </string>
   <string name="form_deleted">यो फारम हटाइएको छ।</string>
+  <!--File sync-->
   <!--Plotting-->
   <string name="geoshape_area">क्षेत्र</string>
   <string name="geoshape_line">रेखा</string>
@@ -252,4 +251,6 @@
   <string name="error_value_required">यो कोठा खाली हुन सक्दैन।</string>
   <string name="drawer_open">ड्रअर खुला छ</string>
   <string name="drawer_close">ड्रअर बन्द छ</string>
+  <!--settings activity-->
+  <!--app update service-->
 </resources>

@@ -1,17 +1,20 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.activity;
@@ -20,7 +23,6 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -29,10 +31,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.StatusUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -41,15 +44,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import timber.log.Timber;
 
 public class AppUpdateActivity extends Activity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";
 
-    private static final String TAG = AppUpdateActivity.class.getSimpleName();
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS = 100;
 
@@ -91,7 +96,8 @@ public class AppUpdateActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     mInstallBtn.setEnabled(false);
-                    mTask = new UpdateAsyncTask();
+                    mTask = new UpdateAsyncTask(AppUpdateActivity.this, mUrl, mVersion,
+                            mMd5Checksum);
                     mTask.execute();
                 }
             });
@@ -148,14 +154,35 @@ public class AppUpdateActivity extends Activity {
         return mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING;
     }
 
-    class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
+    private static class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
+
+        private final Prefs prefs;
+        private final String mUrl;
+        private final String mVersion;
+        private final WeakReference<AppUpdateActivity> activityWeakReference;
+        private final ConnectivityStateManager connectivityStateManager;
+        private String mMd5Checksum;
+
+        public UpdateAsyncTask(AppUpdateActivity context, String mUrl, String mVersion,
+                String mMd5Checksum) {
+            this.prefs = new Prefs(context);
+            this.mUrl = mUrl;
+            this.mVersion = mVersion;
+            this.activityWeakReference = new WeakReference<>(context);
+            this.connectivityStateManager = new ConnectivityStateManager(context);
+            this.mMd5Checksum = mMd5Checksum;
+        }
 
         @Override
         protected String doInBackground(Void... params) {
             // Create parent directories, and delete files, if necessary
             String filename = createFile(mUrl, mVersion).getAbsolutePath();
 
-            if (downloadApk(mUrl, filename) && !isCancelled()) {
+            boolean syncOver3GAllowed = prefs
+                    .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
+            if (!connectivityStateManager.isConnectionAvailable(syncOver3GAllowed)) {
+                Timber.d("No internet connection available. Can't perform the requested operation");
+            } else if (downloadApk(mUrl, filename) && !isCancelled()) {
                 return filename;
             }
             // Clean up sd-card to ensure no corrupted file is leaked.
@@ -175,29 +202,36 @@ public class AppUpdateActivity extends Activity {
             if (percentComplete > MAX_PROGRESS) {
                 percentComplete = MAX_PROGRESS;
             }
+            Timber.d("onProgressUpdate() - APK update: " + percentComplete + "%");
+            notifyProgress(percentComplete);
+        }
 
-            Log.d(TAG, "onProgressUpdate() - APK update: " + percentComplete + "%");
-            mProgress.setProgress(percentComplete);
+        private void notifyProgress(int percentComplete) {
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
+            if (appUpdateActivity != null) {
+                appUpdateActivity.updateDownloadProgress(percentComplete);
+            }
         }
 
         @Override
         protected void onPostExecute(String filename) {
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
             if (TextUtils.isEmpty(filename)) {
-                Toast.makeText(AppUpdateActivity.this, R.string.apk_upgrade_error,
-                        Toast.LENGTH_SHORT).show();
-                mInstallBtn.setText(R.string.retry);
-                mInstallBtn.setEnabled(true);
+                if (appUpdateActivity != null) {
+                    appUpdateActivity.onDownloadError();
+                }
                 return;
             }
 
-            PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
-            finish();
+            if (appUpdateActivity != null) {
+                appUpdateActivity.onDownloadSuccess(filename);
+            }
         }
 
         @Override
         protected void onCancelled() {
-            Log.d(TAG, "onCancelled() - APK update task cancelled");
-            mProgress.setProgress(0);
+            Timber.d("onCancelled() - APK update task cancelled");
+            notifyProgress(0);
             cleanupDownloads(mVersion);
         }
 
@@ -232,11 +266,7 @@ public class AppUpdateActivity extends Activity {
          * the user to 'click to installAppUpdate'
          */
         private boolean downloadApk(String location, String localPath) {
-            Log.i(TAG, "App Update: Downloading new version " + mVersion + " from " + mUrl);
-            if (!StatusUtil.hasDataConnection(AppUpdateActivity.this)) {
-                Log.e(TAG, "No internet connection. Can't perform the requested operation");
-                return false;
-            }
+            Timber.i("App Update: Downloading new version " + mVersion + " from " + mUrl);
 
             boolean ok = false;
             InputStream in = null;
@@ -253,7 +283,7 @@ public class AppUpdateActivity extends Activity {
                 byte[] b = new byte[IO_BUFFER_SIZE];
 
                 final int fileSize = conn.getContentLength();
-                Log.d(TAG, "APK size: " + fileSize);
+                Timber.d("APK size: " + fileSize);
 
                 int read;
                 while ((read = in.read(b)) != -1) {
@@ -283,11 +313,11 @@ public class AppUpdateActivity extends Activity {
                     // Compare the MD5, if found. Otherwise, rely on the 200 status code
                     ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);
                 } else {
-                    Log.e(TAG, "Wrong status code: " + status);
+                    Timber.e("Wrong status code: " + status);
                     ok = false;
                 }
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                Timber.e(e, e.getMessage());
             } finally {
                 if (conn != null) {
                     conn.disconnect();
@@ -298,5 +328,20 @@ public class AppUpdateActivity extends Activity {
 
             return ok;
         }
+    }
+
+    private void onDownloadSuccess(String filename) {
+        PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
+        finish();
+    }
+
+    private void onDownloadError() {
+        Toast.makeText(this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
+        mInstallBtn.setText(R.string.retry);
+        mInstallBtn.setEnabled(true);
+    }
+
+    private void updateDownloadProgress(int percentComplete) {
+        mProgress.setProgress(percentComplete);
     }
 }

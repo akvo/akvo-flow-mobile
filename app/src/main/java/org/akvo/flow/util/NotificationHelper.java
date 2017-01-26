@@ -1,16 +1,20 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
- * This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -59,28 +63,6 @@ public class NotificationHelper {
     public static void displayNonOnGoingErrorNotification(Context context, int notificationId, String text, String title) {
         NotificationCompat.Builder builder = createErrorNotificationBuilder(title, text, context);
         builder.setOngoing(false);
-
-        notifyWithDummyIntent(context, notificationId, builder);
-    }
-
-    public static void displayProgressNotification(Context context, int synced, int total, String title, String text,
-                                                   int notificationId) {
-        NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
-        builder.setOngoing(true);
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(total, synced, false);
-
-        notifyWithDummyIntent(context, notificationId, builder);
-    }
-
-    public static void displayNonOngoingNotificationWithProgress(Context context, String text, String title,
-                                                                 int notificationId) {
-        NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
-        builder.setOngoing(false);
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, false);
 
         notifyWithDummyIntent(context, notificationId, builder);
     }

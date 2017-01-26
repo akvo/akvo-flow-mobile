@@ -1,17 +1,20 @@
 /*
- *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.activity;
@@ -27,11 +30,12 @@ import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.data.preference.Prefs;
 
 public class AddUserActivity extends Activity implements TextWatcher, TextView.OnEditorActionListener {
 
@@ -63,13 +67,15 @@ public class AddUserActivity extends Activity implements TextWatcher, TextView.O
         });
     }
 
+    //TODO: database operations should be done on separate thread
     private void saveUserData() {
         String username = mName.getText().toString().trim();
         String deviceId = mID.getText().toString().trim();
         SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
         long uid = db.createOrUpdateUser(null, username);
-        db.savePreference(ConstantUtil.DEVICE_IDENT_KEY, deviceId);
         db.close();
+        Prefs prefs = new Prefs(getApplicationContext());
+        prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
 
         // Select the newly created user, and exit the Activity
         FlowApp.getApp().setUser(new User(uid, username));

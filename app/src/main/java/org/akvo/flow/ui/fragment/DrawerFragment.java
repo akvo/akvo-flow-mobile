@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.fragment;
@@ -47,9 +50,10 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.async.loader.SurveyGroupLoader;
-import org.akvo.flow.async.loader.UserLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyGroupLoader;
+import org.akvo.flow.data.loader.UserLoader;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
@@ -191,9 +195,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     if (cursor.moveToFirst()) {
                         do {
                             long id = cursor.getLong(
-                                    cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns._ID));
+                                    cursor.getColumnIndexOrThrow(UserColumns._ID));
                             String name = cursor.getString(
-                                    cursor.getColumnIndexOrThrow(SurveyDbAdapter.UserColumns.NAME));
+                                    cursor.getColumnIndexOrThrow(UserColumns.NAME));
                             User user = new User(id, name);
                             // Skip selected user
                             if (!user.equals(FlowApp.getApp().getUser())) {

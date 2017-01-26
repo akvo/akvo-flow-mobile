@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -19,15 +19,24 @@
 
 package org.akvo.flow;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
-        assertEquals(true, true);
+public class TempTestFileFactory {
+
+    private Queue<File> files = new ArrayDeque<>();
+
+    public File generateTempFile() throws IOException {
+        File tempFile = File.createTempFile("temp_", ".txt");
+        files.add(tempFile);
+        return tempFile;
+    }
+
+    public void deleteTempFiles() {
+        for (File tempFile : files) {
+            tempFile.delete();
+        }
     }
 }

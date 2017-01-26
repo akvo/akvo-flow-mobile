@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -17,17 +17,15 @@
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.akvo.flow;
+package org.akvo.flow.util.nanohttpd;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import fi.iki.elonen.NanoHTTPD;
 
 /**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ * Created by MelEnt on 2017-01-02.
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
-        assertEquals(true, true);
-    }
+
+public interface HttpServe {
+    NanoHTTPD.Response serve(NanoHTTPD.IHTTPSession session) throws Exception;
 }
+

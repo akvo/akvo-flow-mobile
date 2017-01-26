@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -39,8 +40,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.astuetz.PagerSlidingTabStrip;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
@@ -64,8 +63,7 @@ public class DatapointsFragment extends Fragment {
      * BroadcastReceiver to notify of records synchronisation. This should be
      * fired from SurveyedLocalesSyncService.
      */
-    private final BroadcastReceiver mSurveyedLocalesSyncReceiver = new DataPointSyncBroadcastReceiver(
-            this);
+    private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(this);
 
     private SurveyDbAdapter mDatabase;
     private TabsAdapter mTabsAdapter;
@@ -74,6 +72,7 @@ public class DatapointsFragment extends Fragment {
 
     @Nullable
     private DatapointFragmentListener listener;
+
     private String[] tabNames;
 
     public DatapointsFragment() {
@@ -137,7 +136,7 @@ public class DatapointsFragment extends Fragment {
         mDatabase.deleteEmptyRecords();
 
         LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(mSurveyedLocalesSyncReceiver,
+                .registerReceiver(dataPointSyncReceiver,
                         new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
     }
 
@@ -145,7 +144,7 @@ public class DatapointsFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity())
-                .unregisterReceiver(mSurveyedLocalesSyncReceiver);
+                .unregisterReceiver(dataPointSyncReceiver);
     }
 
     @Override
@@ -153,12 +152,12 @@ public class DatapointsFragment extends Fragment {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
         mPager = (ViewPager) v.findViewById(R.id.pager);
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) v.findViewById(R.id.tabs);
+        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
         // Init tabs
         mTabsAdapter = new TabsAdapter(getFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
-        tabs.setViewPager(mPager);
+        tabs.setupWithViewPager(mPager);
 
         return v;
     }

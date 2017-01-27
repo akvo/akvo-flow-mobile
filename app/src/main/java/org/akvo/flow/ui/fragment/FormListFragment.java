@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -42,7 +42,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.data.loader.SurveyInfoLoader;
 import org.akvo.flow.data.loader.models.SurveyInfo;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.model.ViewSurveyInfo;
 import org.akvo.flow.ui.model.ViewSurveyInfoMapper;
 import org.akvo.flow.util.PlatformUtil;
@@ -53,15 +52,14 @@ import java.util.List;
 import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
+import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
+import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 
 public class FormListFragment extends ListFragment
         implements LoaderCallbacks<Pair<List<SurveyInfo>, Boolean>>, OnItemClickListener {
 
-    private static final String EXTRA_SURVEY_GROUP = "survey_group";
-    private static final String EXTRA_RECORD = "record";
-
     private SurveyGroup mSurveyGroup;
-    private SurveyedLocale mRecord;
+    private String recordId;
     private SurveyAdapter mAdapter;
     private SurveyListListener mListener;
     private final ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
@@ -69,11 +67,11 @@ public class FormListFragment extends ListFragment
     public FormListFragment() {
     }
 
-    public static FormListFragment newInstance(SurveyGroup surveyGroup, SurveyedLocale record) {
+    public static FormListFragment newInstance(SurveyGroup surveyGroup, String recordId) {
         FormListFragment fragment = new FormListFragment();
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
-        args.putSerializable(EXTRA_RECORD, record);
+        args.putString(EXTRA_RECORD_ID, recordId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,7 +94,7 @@ public class FormListFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
-        mRecord = (SurveyedLocale) getArguments().getSerializable(EXTRA_RECORD);
+        recordId = getArguments().getString(EXTRA_RECORD_ID);
     }
 
     @Override
@@ -104,7 +102,7 @@ public class FormListFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         if (mAdapter == null) {
-            mAdapter = new SurveyAdapter(getActivity(), mSurveyGroup);
+            mAdapter = new SurveyAdapter(getActivity());
             setListAdapter(mAdapter);
         }
         getListView().setOnItemClickListener(this);
@@ -122,18 +120,16 @@ public class FormListFragment extends ListFragment
         mListener.onSurveyClick(surveyId);
     }
 
-    //TODO: make static to avoid memory leaks
    static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
 
         private static final int LAYOUT_RES = R.layout.survey_item;
-        private final SurveyGroup mSurveyGroup;
+
         private final int[] backgrounds;
         private final int versionTextSize;
         private final int titleTextSize;
 
-        public SurveyAdapter(Context context, SurveyGroup surveyGroup) {
+        public SurveyAdapter(Context context) {
             super(context, LAYOUT_RES, new ArrayList<ViewSurveyInfo>());
-            this.mSurveyGroup = surveyGroup;
             this.backgrounds = new int[2];
             backgrounds[0] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg1);
             backgrounds[1] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg2);
@@ -178,7 +174,7 @@ public class FormListFragment extends ListFragment
 
     @Override
     public Loader<Pair<List<SurveyInfo>, Boolean>> onCreateLoader(int id, Bundle args) {
-        return new SurveyInfoLoader(getActivity(), mRecord.getId(), mSurveyGroup);
+        return new SurveyInfoLoader(getActivity(), recordId, mSurveyGroup);
     }
 
     @Override

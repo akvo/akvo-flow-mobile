@@ -895,22 +895,6 @@ public class SurveyDbAdapter {
         return id;
     }
 
-    public static SurveyedLocale getSurveyedLocale(Cursor cursor) {
-        String id = cursor.getString(RecordQuery.RECORD_ID);
-        long surveyGroupId = cursor.getLong(RecordQuery.SURVEY_GROUP_ID);
-        long lastModified = cursor.getLong(RecordQuery.LAST_MODIFIED);
-        String name = cursor.getString(RecordQuery.NAME);
-
-        // Location. Check for null values first
-        Double latitude = null;
-        Double longitude = null;
-        if (!cursor.isNull(RecordQuery.LATITUDE) && !cursor.isNull(RecordQuery.LONGITUDE)) {
-            latitude = cursor.getDouble(RecordQuery.LATITUDE);
-            longitude = cursor.getDouble(RecordQuery.LONGITUDE);
-        }
-        return new SurveyedLocale(id, name, lastModified, surveyGroupId, latitude, longitude);
-    }
-
     public Cursor getSurveyedLocales(long surveyGroupId) {
         return database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.SURVEY_GROUP_ID + " = ?",
@@ -918,19 +902,12 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
+    public Cursor getSurveyedLocale(String surveyedLocaleId) {
         Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
                 new String[] { String.valueOf(surveyedLocaleId) },
                 null, null, null);
-
-        SurveyedLocale locale = null;
-        if (cursor.moveToFirst()) {
-            locale = getSurveyedLocale(cursor);
-        }
-        cursor.close();
-
-        return locale;
+        return cursor;
     }
 
     private static Survey getSurvey(Cursor cursor) {

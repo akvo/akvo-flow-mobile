@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,6 +25,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,11 +36,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
 
-public class MapActivity extends BackActivity implements OnMapReadyCallback {
+public class MapActivity extends BackActivity implements OnMapReadyCallback,
+        LoaderManager.LoaderCallbacks<SurveyedLocale> {
 
     public static final int MAP_ZOOM_LEVEL = 10;
 
@@ -58,11 +61,7 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback {
     }
 
     private void loadItem() {
-        SurveyDbAdapter db = new SurveyDbAdapter(this).open();
-        datapoint = db.getSurveyedLocale(datapointId);
-        db.close();
-
-        updateTitle();
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     private void updateTitle() {
@@ -76,8 +75,6 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback {
         this.map = googleMap;
         googleMap.setMyLocationEnabled(true);
         loadItem();
-        addDataPointMarker();
-        centerMap();
     }
 
     private void addDataPointMarker() {
@@ -133,5 +130,23 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback {
     private void centerMapOnDataPoint(@NonNull SurveyedLocale record) {
         LatLng position = new LatLng(record.getLatitude(), record.getLongitude());
         positionMap(position);
+    }
+
+    @Override
+    public Loader<SurveyedLocale> onCreateLoader(int id, Bundle args) {
+        return new SurveyedLocaleItemLoader(this, datapointId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<SurveyedLocale> loader, SurveyedLocale data) {
+        this.datapoint  = data;
+        updateTitle();
+        addDataPointMarker();
+        centerMap();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<SurveyedLocale> loader) {
+        // EMPTY
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@ package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -47,7 +46,7 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
+import org.akvo.flow.data.loader.SurveyedLocalesLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
@@ -58,7 +57,7 @@ import java.util.List;
 import timber.log.Timber;
 
 public class DataPointsMapFragment extends SupportMapFragment
-        implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener, OnMapReadyCallback {
+        implements LoaderCallbacks<List<SurveyedLocale>>, OnInfoWindowClickListener, OnMapReadyCallback {
 
     public static final int MAP_ZOOM_LEVEL = 10;
 
@@ -246,32 +245,24 @@ public class DataPointsMapFragment extends SupportMapFragment
     // ==================================== //
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<List<SurveyedLocale>> onCreateLoader(int id, Bundle args) {
         long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId,
-                ConstantUtil.ORDER_BY_NONE);
+        return new SurveyedLocalesLoader(getActivity(), surveyId, ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor == null) {
+    public void onLoadFinished(Loader<List<SurveyedLocale>> loader, List<SurveyedLocale> surveyedLocales) {
+        if (surveyedLocales == null) {
             Timber.w("onFinished() - Loader returned no data");
             return;
         }
-
-        if (cursor.moveToFirst()) {
-            mItems.clear();
-            do {
-                SurveyedLocale item = SurveyDbAdapter.getSurveyedLocale(cursor);
-                mItems.add(item);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
+        mItems.clear();
+        mItems.addAll(surveyedLocales);
         cluster();
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<List<SurveyedLocale>> loader) {
         //EMPTY
     }
 }

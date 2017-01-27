@@ -24,18 +24,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -43,16 +42,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.RecordColumns;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceColumns;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
+import org.akvo.flow.data.loader.SurveyedLocalesLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
@@ -63,11 +61,12 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
+import java.util.List;
 
 import timber.log.Timber;
 
 public class SurveyedLocaleListFragment extends ListFragment implements LocationListener,
-        OnItemClickListener, LoaderCallbacks<Cursor>, OrderByDialogListener {
+        OnItemClickListener, LoaderCallbacks<List<SurveyedLocale>>, OrderByDialogListener {
 
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
@@ -181,7 +180,8 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
         if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
             // Warn user that the location is unknown
-            Toast.makeText(getActivity(), R.string.locale_list_error_unknown_location, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.locale_list_error_unknown_location,
+                    Toast.LENGTH_SHORT).show();
             return;
         }
         getLoaderManager().restartLoader(0, null, this);
@@ -189,11 +189,9 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Cursor cursor = (Cursor) mAdapter.getItem(position);
-        final String localeId = cursor.getString(cursor.getColumnIndexOrThrow(
-                RecordColumns.RECORD_ID));
-
-        mListener.onRecordSelected(localeId);// Notify the host activity
+        SurveyedLocale surveyedLocale = mAdapter.getItem(position);
+        final String localeId = surveyedLocale.getId();
+        mListener.onRecordSelected(localeId);
     }
 
     @Override
@@ -223,25 +221,26 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     // ==================================== //
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<List<SurveyedLocale>> onCreateLoader(int id, Bundle args) {
         long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId, mLatitude, mLongitude,
+        return new SurveyedLocalesLoader(getActivity(), surveyId, mLatitude, mLongitude,
                 mOrderBy);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor == null) {
+    public void onLoadFinished(Loader<List<SurveyedLocale>> loader,
+            List<SurveyedLocale> surveyedLocales) {
+        if (surveyedLocales == null) {
             Timber.w("onFinished() - Loader returned no data");
             return;
         }
 
-        mAdapter.swapCursor(cursor);
+        mAdapter.setLocales(surveyedLocales);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
+    public void onLoaderReset(Loader<List<SurveyedLocale>> loader) {
+        // EMPTY
     }
 
     // ==================================== //
@@ -259,14 +258,17 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     @Override
     public void onProviderDisabled(String provider) {
+        // EMPTY
     }
 
     @Override
     public void onProviderEnabled(String provider) {
+        // EMPTY
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+        // EMPTY
     }
 
     /**
@@ -278,38 +280,39 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     /**
      * List Adapter to bind the Surveyed Locales into the list items
      */
-    private static class SurveyedLocaleListAdapter extends CursorAdapter {
+    private static class SurveyedLocaleListAdapter extends ArrayAdapter<SurveyedLocale> {
 
         private final double mLatitude;
         private final double mLongitude;
         private final SurveyGroup mSurveyGroup;
+        private final LayoutInflater inflater;
 
         public SurveyedLocaleListAdapter(Context context, double mLatitude, double mLongitude,
                 SurveyGroup mSurveyGroup) {
-            super(context, null, false);
+            super(context, R.layout.surveyed_locale_item);
             this.mLatitude = mLatitude;
             this.mLongitude = mLongitude;
             this.mSurveyGroup = mSurveyGroup;
+            this.inflater = LayoutInflater.from(context);
         }
 
-        @Override
-        public View newView(Context context, Cursor c, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return inflater.inflate(R.layout.surveyed_locale_item, parent, false);
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor c) {
+        @NonNull @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view;
+            if (convertView == null) {
+                view = inflater.inflate(R.layout.surveyed_locale_item, parent, false);
+            } else {
+                view = convertView;
+            }
             TextView nameView = (TextView) view.findViewById(R.id.locale_name);
             TextView idView = (TextView) view.findViewById(R.id.locale_id);
             TextView dateView = (TextView) view.findViewById(R.id.last_modified);
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
             TextView statusView = (TextView) view.findViewById(R.id.status);
             ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
-            final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
-
-            // This cursor contains extra info about the Record status
-            int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
+            final SurveyedLocale surveyedLocale = getItem(position);
+            Context context = parent.getContext();
+            int status = surveyedLocale.getStatus();
             nameView.setText(surveyedLocale.getDisplayName(context));
             idView.setText(surveyedLocale.getId());
 
@@ -342,9 +345,10 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             statusView.setText(statusText);
 
             // Alternate background
-            int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+            int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
             final int res = PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
+            return view;
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale, Context context) {
@@ -388,6 +392,13 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             }
         }
 
+        public void setLocales(List<SurveyedLocale> surveyedLocales) {
+            clear();
+            for (SurveyedLocale sl : surveyedLocales) {
+                add(sl);
+            }
+            notifyDataSetChanged();
+        }
     }
 
     private static class DataSyncBroadcastReceiver extends BroadcastReceiver {

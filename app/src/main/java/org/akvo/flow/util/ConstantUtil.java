@@ -263,7 +263,7 @@ public class ConstantUtil {
     //requests
     public static final int REQUEST_ADD_USER = 0;
 
-    public static final String EXTRA_RECORD_ID = "record";
+    public static final String EXTRA_RECORD_ID = "record_id";
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
 
     /**

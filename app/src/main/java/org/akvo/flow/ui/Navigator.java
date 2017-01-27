@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -35,6 +35,7 @@ import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
+import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
@@ -64,7 +65,7 @@ public class Navigator {
         // Display form list and history
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
-        extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
+        extras.putSerializable(EXTRA_SURVEY_GROUP, mSurveyGroup);
         extras.putString(ConstantUtil.EXTRA_RECORD_ID, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);

@@ -198,11 +198,6 @@ public class DatapointsFragment extends Fragment {
                 if (listener != null) {
                     return listener.onSearchTap();
                 }
-            case R.id.sync_records:
-                if (listener != null && mSurveyGroup != null) {
-                    listener.onSyncRecordsTap(mSurveyGroup.getId());
-                }
-                return true;
             case R.id.stats:
                 StatsDialogFragment dialogFragment = StatsDialogFragment
                         .newInstance(mSurveyGroup.getId());
@@ -313,7 +308,5 @@ public class DatapointsFragment extends Fragment {
         void onRecordSelected(String recordId);
 
         boolean onSearchTap();
-
-        void onSyncRecordsTap(long surveyGroupId);
     }
 }

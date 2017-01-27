@@ -224,6 +224,9 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
                 dialogFragment.setTargetFragment(this, 0);
                 dialogFragment.show(getFragmentManager(), "order_by");
                 return true;
+            case R.id.sync_records:
+                requestRemoteDataRefresh();
+                return true;
         }
 
         return false;
@@ -295,7 +298,16 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
 
     @Override
     public void onRefresh() {
-        refreshLocalData();
+        requestRemoteDataRefresh();
+    }
+
+    private void requestRemoteDataRefresh() {
+        if (mListener != null && mSurveyGroup != null) {
+            refreshLayout.setRefreshing(true);
+            mListener.onSyncRecordsSyncRequested(mSurveyGroup.getId());
+        } else {
+            refreshLayout.setRefreshing(false);
+        }
     }
 
     /**

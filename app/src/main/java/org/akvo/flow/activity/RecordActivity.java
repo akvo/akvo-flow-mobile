@@ -47,14 +47,13 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.fragment.FormListFragment;
 import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
-import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 
 public class RecordActivity extends BackActivity implements SurveyListListener, TabListener,
-        RecordListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
+        LoaderManager.LoaderCallbacks<SurveyedLocale> {
 
     private static final int POSITION_SURVEYS = 0;
     private static final int POSITION_RESPONSES = 1;
@@ -227,11 +226,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
         //EMPTY
-    }
-
-    @Override
-    public void onRecordSelected(String recordId) {
-        // EMPTY
     }
 
     @Override

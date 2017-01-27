@@ -19,41 +19,119 @@
 
 package org.akvo.flow.activity;
 
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.ui.fragment.SingleDataPointMapFragment;
 import org.akvo.flow.util.ConstantUtil;
 
-public class MapActivity extends BackActivity implements RecordListListener {
+public class MapActivity extends BackActivity implements OnMapReadyCallback {
+
+    public static final int MAP_ZOOM_LEVEL = 10;
+
+    private SurveyedLocale datapoint;
+    private String datapointId;
+    private GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.map_activity);
+        setContentView(R.layout.activity_map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
+        loadItem();
+    }
 
-        String datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
-
+    private void loadItem() {
         SurveyDbAdapter db = new SurveyDbAdapter(this).open();
-        SurveyedLocale datapoint = db.getSurveyedLocale(datapointId);
+        datapoint = db.getSurveyedLocale(datapointId);
         db.close();
 
+        updateTitle();
+    }
+
+    private void updateTitle() {
         if (datapoint != null) {
             setTitle(datapoint.getDisplayName(this));
         }
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content_frame, SingleDataPointMapFragment
-                        .newInstance(datapointId))
-                .commit();
     }
 
     @Override
-    public void onRecordSelected(String surveyedLocaleId) {
+    public void onMapReady(GoogleMap googleMap) {
+        this.map = googleMap;
+        googleMap.setMyLocationEnabled(true);
+        loadItem();
+        addDataPointMarker();
+        centerMap();
     }
 
+    private void addDataPointMarker() {
+        if (map != null) {
+            map.clear();
+            if (isDataPointLocationAvailable()) {
+                map.addMarker(new MarkerOptions()
+                        .position(new LatLng(datapoint.getLatitude(), datapoint.getLongitude()))
+                        .title(datapoint.getDisplayName(this))
+                        .snippet(datapoint.getId()));
+            }
+        }
+    }
+
+    private boolean isDataPointLocationAvailable() {
+        return datapoint != null && datapoint.getLatitude() != null
+                && datapoint.getLongitude() != null;
+    }
+
+    /**
+     * Center the map in the given record's coordinates. If no record is provided,
+     * the user's location will be used.
+     */
+    private void centerMap() {
+        if (isDataPointLocationAvailable()) {
+            centerMapOnDataPoint(datapoint);
+        } else {
+            centerMapOnUserLocation();
+        }
+    }
+
+    private void centerMapOnUserLocation() {
+        LatLng position = null;
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        String provider = manager.getBestProvider(criteria, true);
+        if (provider != null) {
+            Location location = manager.getLastKnownLocation(provider);
+            if (location != null) {
+                position = new LatLng(location.getLatitude(), location.getLongitude());
+            }
+        }
+        positionMap(position);
+    }
+
+    private void positionMap(LatLng position) {
+        if (position != null) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(position, MAP_ZOOM_LEVEL));
+        }
+    }
+
+    private void centerMapOnDataPoint(@NonNull SurveyedLocale record) {
+        LatLng position = new LatLng(record.getLatitude(), record.getLongitude());
+        positionMap(position);
+    }
 }

@@ -129,7 +129,7 @@ public class DataPointsMapFragment extends SupportMapFragment
                     cluster();
                 }
             });
-            centerMap(null);
+            centerMap();
         }
     }
 
@@ -167,28 +167,22 @@ public class DataPointsMapFragment extends SupportMapFragment
      * Center the map in the given record's coordinates. If no record is provided,
      * the user's location will be used.
      */
-    private void centerMap(@Nullable SurveyedLocale record) {
+    private void centerMap() {
         if (mMap == null) {
             return; // Not ready yet
         }
 
         LatLng position = null;
-
-        if (record != null && record.getLatitude() != null && record.getLongitude() != null) {
-            // Center the map in the data point
-            position = new LatLng(record.getLatitude(), record.getLongitude());
-        } else {
-            // When multiple points are shown, center the map in user's location
-            LocationManager manager = (LocationManager) getActivity()
-                    .getSystemService(Context.LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            String provider = manager.getBestProvider(criteria, true);
-            if (provider != null) {
-                Location location = manager.getLastKnownLocation(provider);
-                if (location != null) {
-                    position = new LatLng(location.getLatitude(), location.getLongitude());
-                }
+        // When multiple points are shown, center the map in user's location
+        LocationManager manager = (LocationManager) getActivity()
+                .getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        String provider = manager.getBestProvider(criteria, true);
+        if (provider != null) {
+            Location location = manager.getLastKnownLocation(provider);
+            if (location != null) {
+                position = new LatLng(location.getLatitude(), location.getLongitude());
             }
         }
 

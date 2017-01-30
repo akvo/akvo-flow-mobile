@@ -20,11 +20,11 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
@@ -103,7 +103,7 @@ public class SurveyDownloadService extends IntentService {
             Timber.e(e, e.getMessage());
         } finally {
             databaseAdaptor.close();
-            sendBroadcastNotification(this);
+            sendBroadcastNotification();
         }
     }
 
@@ -391,9 +391,9 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * loadItem its data
      */
-    private void sendBroadcastNotification(@NonNull Context context) {
+    private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
-        context.sendBroadcast(intentBroadcast);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 
 }

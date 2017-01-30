@@ -28,6 +28,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -72,7 +73,6 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
-    private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     private static final String DRAWER_FRAGMENT_TAG = "f";
@@ -220,7 +220,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         // Delete empty responses, if any
         mDatabase.deleteEmptySurveyInstances();
         mDatabase.deleteEmptyRecords();
-        registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -234,7 +234,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(mSurveysSyncReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSurveysSyncReceiver);
     }
 
     @Override

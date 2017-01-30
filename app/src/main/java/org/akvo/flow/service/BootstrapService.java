@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,6 +25,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
@@ -380,6 +381,6 @@ public class BootstrapService extends IntentService {
      */
     private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
-        sendBroadcast(intentBroadcast);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 }

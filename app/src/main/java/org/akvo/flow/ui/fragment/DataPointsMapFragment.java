@@ -265,7 +265,7 @@ public class DataPointsMapFragment extends SupportMapFragment
             case R.id.sync_records:
                 if (mListener != null && mSurveyGroup != null) {
                     showProgress();
-                    mListener.onSyncRecordsSyncRequested(mSurveyGroup.getId());
+                    mListener.onSyncRecordsRequested(mSurveyGroup.getId());
                 }
                 return true;
         }

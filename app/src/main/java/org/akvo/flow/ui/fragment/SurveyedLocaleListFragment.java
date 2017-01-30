@@ -318,7 +318,7 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
     private void requestRemoteDataRefresh() {
         if (mListener != null && mSurveyGroup != null) {
             refreshLayout.setRefreshing(true);
-            mListener.onSyncRecordsSyncRequested(mSurveyGroup.getId());
+            mListener.onSyncRecordsRequested(mSurveyGroup.getId());
         } else {
             refreshLayout.setRefreshing(false);
         }

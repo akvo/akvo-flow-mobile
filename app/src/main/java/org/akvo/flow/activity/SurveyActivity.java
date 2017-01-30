@@ -96,7 +96,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
      * fired from {@link SurveyDownloadService}.
      */
     private final BroadcastReceiver mSurveysSyncReceiver = new SurveySyncBroadcastReceiver(this);
-    private final BroadcastReceiver dataPointSyncReceiver = new DatapointsSyncResultBroadcastReceiver(this);
+    private final BroadcastReceiver dataPointSyncReceiver = new DatapointsSyncResultBroadcastReceiver(
+            this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,7 +148,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                 R.string.drawer_open, R.string.drawer_close) {
+                R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             @Override
@@ -225,8 +226,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         // Delete empty responses, if any
         mDatabase.deleteEmptySurveyInstances();
         mDatabase.deleteEmptyRecords();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
-        LocalBroadcastManager.getInstance(this).registerReceiver(dataPointSyncReceiver, new IntentFilter(ACTION_LOCALE_SYNC_RESULT));
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
+        LocalBroadcastManager.getInstance(this).registerReceiver(dataPointSyncReceiver,
+                new IntentFilter(ACTION_LOCALE_SYNC_RESULT));
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -379,7 +382,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             }
             c.close();
 
-            navigator.navigateToFormActivity(this, surveyedLocaleId, user, formId, formInstanceId, readOnly,
+            navigator.navigateToFormActivity(this, surveyedLocaleId, user, formId, formInstanceId,
+                    readOnly,
                     mSurveyGroup);
         } else {
             navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);

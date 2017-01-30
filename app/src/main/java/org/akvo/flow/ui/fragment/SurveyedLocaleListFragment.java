@@ -218,8 +218,20 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
             return;
         }
         mAdapter.updateLocation(mLatitude, mLongitude);
-        refreshLayout.setRefreshing(true);
+        showLoading();
         getLoaderManager().restartLoader(0, null, this);
+    }
+
+    private void showLoading() {
+        if (refreshLayout != null) {
+            refreshLayout.setRefreshing(true);
+        }
+    }
+
+    private void hideLoading() {
+        if (refreshLayout != null) {
+            refreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
@@ -280,7 +292,7 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
     @Override
     public void onLoadFinished(Loader<List<SurveyedLocale>> loader,
             List<SurveyedLocale> surveyedLocales) {
-        refreshLayout.setRefreshing(false);
+        hideLoading();
         if (surveyedLocales == null) {
             Timber.w("onFinished() - Loader returned no data");
             return;
@@ -329,10 +341,10 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
 
     private void requestRemoteDataRefresh() {
         if (mListener != null && mSurveyGroup != null) {
-            refreshLayout.setRefreshing(true);
+            showLoading();
             mListener.onSyncRecordsRequested(mSurveyGroup.getId());
         } else {
-            refreshLayout.setRefreshing(false);
+            hideLoading();
         }
     }
 

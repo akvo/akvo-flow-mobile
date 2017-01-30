@@ -38,6 +38,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -213,6 +215,18 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
         SurveyedLocale surveyedLocale = mAdapter.getItem(position);
         final String localeId = surveyedLocale.getId();
         mListener.onRecordSelected(localeId);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (mSurveyGroup != null) {
+            if (mSurveyGroup.isMonitored()) {
+                inflater.inflate(R.menu.datapoints_list_monitored, menu);
+            } else {
+                inflater.inflate(R.menu.datapoints_list, menu);
+            }
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

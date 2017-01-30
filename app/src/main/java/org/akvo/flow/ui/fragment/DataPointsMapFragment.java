@@ -29,6 +29,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -242,6 +244,18 @@ public class DataPointsMapFragment extends SupportMapFragment
             showProgress();
             getLoaderManager().restartLoader(0, null, this);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (mSurveyGroup != null) {
+            if (mSurveyGroup.isMonitored()) {
+                inflater.inflate(R.menu.datapoints_map_monitored, menu);
+            } else {
+                inflater.inflate(R.menu.datapoints_map, menu);
+            }
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

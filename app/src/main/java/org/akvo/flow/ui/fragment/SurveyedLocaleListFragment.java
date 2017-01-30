@@ -70,7 +70,7 @@ import timber.log.Timber;
 
 public class SurveyedLocaleListFragment extends Fragment implements LocationListener,
         OnItemClickListener, LoaderCallbacks<List<SurveyedLocale>>, OrderByDialogListener,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener, DataPointsSyncListener {
 
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
@@ -90,6 +90,13 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
      * fired from DataSyncService.
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
+
+    /**
+     * BroadcastReceiver to notify of records synchronisation. This should be
+     * fired from {@link org.akvo.flow.service.SurveyedDataPointSyncService}.
+     */
+    private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(
+            this);
 
     public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
         SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
@@ -169,6 +176,10 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(dataPointSyncReceiver,
+                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
+
         refreshLocalData();
     }
 
@@ -176,6 +187,7 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataPointSyncReceiver);
         mLocationManager.removeUpdates(this);
     }
 
@@ -322,6 +334,11 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
         } else {
             refreshLayout.setRefreshing(false);
         }
+    }
+
+    @Override
+    public void onNewDataAvailable() {
+        refreshLocalData();
     }
 
     /**

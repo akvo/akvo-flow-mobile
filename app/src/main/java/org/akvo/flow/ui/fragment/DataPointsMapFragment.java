@@ -20,7 +20,9 @@
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -28,6 +30,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,7 +63,8 @@ import java.util.List;
 import timber.log.Timber;
 
 public class DataPointsMapFragment extends SupportMapFragment
-        implements LoaderCallbacks<List<SurveyedLocale>>, OnInfoWindowClickListener, OnMapReadyCallback {
+        implements LoaderCallbacks<List<SurveyedLocale>>, OnInfoWindowClickListener,
+        OnMapReadyCallback, DataPointsSyncListener {
 
     public static final int MAP_ZOOM_LEVEL = 10;
     public static final String MAP_OPTIONS = "MapOptions";
@@ -76,6 +80,13 @@ public class DataPointsMapFragment extends SupportMapFragment
     private GoogleMap mMap;
 
     private ClusterManager<SurveyedLocale> mClusterManager;
+
+    /**
+     * BroadcastReceiver to notify of records synchronisation. This should be
+     * fired from {@link org.akvo.flow.service.SurveyedDataPointSyncService}.
+     */
+    private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(
+            this);
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -218,6 +229,15 @@ public class DataPointsMapFragment extends SupportMapFragment
             // Make sure we only fetch the data and center the map once
             refresh();
         }
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(dataPointSyncReceiver,
+                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataPointSyncReceiver);
     }
 
     public void refresh(SurveyGroup surveyGroup) {
@@ -306,5 +326,10 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void onLoaderReset(Loader<List<SurveyedLocale>> loader) {
         //EMPTY
+    }
+
+    @Override
+    public void onNewDataAvailable() {
+        refresh();
     }
 }

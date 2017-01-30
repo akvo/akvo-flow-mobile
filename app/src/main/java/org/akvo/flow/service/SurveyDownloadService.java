@@ -58,6 +58,8 @@ import java.util.zip.ZipInputStream;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
+
 /**
  * This activity will check for new surveys on the device and install as needed
  *
@@ -390,7 +392,7 @@ public class SurveyDownloadService extends IntentService {
      * loadItem its data
      */
     private void sendBroadcastNotification(@NonNull Context context) {
-        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
+        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
         context.sendBroadcast(intentBroadcast);
     }
 

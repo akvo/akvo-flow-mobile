@@ -20,19 +20,13 @@
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,23 +37,14 @@ import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 public class DatapointsFragment extends Fragment {
 
-    private static final String TAG = DatapointsFragment.class.getSimpleName();
-
     private static final int POSITION_LIST = 0;
     private static final int POSITION_MAP = 1;
     private static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
-
-    /**
-     * BroadcastReceiver to notify of records synchronisation. This should be
-     * fired from SurveyedLocalesSyncService.
-     */
-    private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(this);
 
     private SurveyDbAdapter mDatabase;
     private TabsAdapter mTabsAdapter;
@@ -131,17 +116,11 @@ public class DatapointsFragment extends Fragment {
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
         // TODO: this is very strange, verify what it does and move it to some service
         mDatabase.deleteEmptyRecords();
-
-        LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(dataPointSyncReceiver,
-                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(getActivity())
-                .unregisterReceiver(dataPointSyncReceiver);
     }
 
     @Override
@@ -248,39 +227,12 @@ public class DatapointsFragment extends Fragment {
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
-        refreshView();
-    }
-
-    private void refreshView() {
         if (mTabsAdapter != null) {
             mTabsAdapter.refreshFragments(mSurveyGroup);
-        }
-        if (listener != null) {
-            listener.refreshMenu();
-        }
-    }
-
-    private static class DataPointSyncBroadcastReceiver extends BroadcastReceiver {
-
-        private final WeakReference<DatapointsFragment> fragmentWeakReference;
-
-        private DataPointSyncBroadcastReceiver(DatapointsFragment fragment) {
-            this.fragmentWeakReference = new WeakReference<>(fragment);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "New Records have been synchronised. Refreshing fragments...");
-            DatapointsFragment datapointsFragment = fragmentWeakReference.get();
-            if (datapointsFragment != null) {
-                datapointsFragment.refreshView();
-            }
         }
     }
 
     public interface DatapointFragmentListener {
-
-        void refreshMenu();
 
         void onRecordSelected(String recordId);
 

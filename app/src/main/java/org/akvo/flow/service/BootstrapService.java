@@ -54,6 +54,8 @@ import java.util.zip.ZipInputStream;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
+
 /**
  * Service that will check a well-known location on the device's SD card for a
  * zip file that contains data that should be loaded on the device. The root of
@@ -377,7 +379,7 @@ public class BootstrapService extends IntentService {
      * loadItem its data
      */
     private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
+        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
         sendBroadcast(intentBroadcast);
     }
 }

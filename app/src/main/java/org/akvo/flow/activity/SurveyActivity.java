@@ -68,6 +68,8 @@ import java.lang.ref.WeakReference;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
+
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
@@ -218,8 +220,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         // Delete empty responses, if any
         mDatabase.deleteEmptySurveyInstances();
         mDatabase.deleteEmptyRecords();
-        registerReceiver(mSurveysSyncReceiver,
-                new IntentFilter(getString(R.string.action_surveys_sync)));
+        registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -389,11 +390,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
                     Toast.LENGTH_LONG).show();
         }
-    }
-
-    @Override
-    public void refreshMenu() {
-        supportInvalidateOptionsMenu();
     }
 
     @Override

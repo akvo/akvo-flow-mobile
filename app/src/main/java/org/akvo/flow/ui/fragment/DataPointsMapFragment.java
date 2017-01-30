@@ -49,7 +49,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.loader.SurveyedLocalesLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -67,7 +66,6 @@ public class DataPointsMapFragment extends SupportMapFragment
     public static final String MAP_OPTIONS = "MapOptions";
 
     private SurveyGroup mSurveyGroup;
-    private SurveyDbAdapter mDatabase;
     private RecordListListener mListener;
     private List<SurveyedLocale> mItems;
 
@@ -128,7 +126,6 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mDatabase = new SurveyDbAdapter(getActivity());
         getMapAsync(this);
     }
 
@@ -217,17 +214,10 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase.open();
         if (mItems.isEmpty()) {
             // Make sure we only fetch the data and center the map once
             refresh();
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mDatabase.close();
     }
 
     public void refresh(SurveyGroup surveyGroup) {

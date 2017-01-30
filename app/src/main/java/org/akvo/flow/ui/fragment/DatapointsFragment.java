@@ -129,6 +129,7 @@ public class DatapointsFragment extends Fragment {
         // Delete empty Records, if any
         // TODO: For a more efficient cleanup, attempt to wipe ONLY the latest Record,
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
+        // TODO: this is very strange, verify what it does and move it to some service
         mDatabase.deleteEmptyRecords();
 
         LocalBroadcastManager.getInstance(getActivity())

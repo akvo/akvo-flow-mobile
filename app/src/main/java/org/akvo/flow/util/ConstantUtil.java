@@ -244,7 +244,8 @@ public class ConstantUtil {
     public static final String CADDISFLY_MIME = "text/plain";
 
     //broadcasts
-    public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
+    public static final String ACTION_LOCALE_SYNC_UPDATE = "fieldsurvey.ACTION_LOCALES_SYNC_UPDATE";
+    public static final String ACTION_LOCALE_SYNC_RESULT = "fieldsurvey.ACTION_LOCALES_SYNC_RESULT";
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
     public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
@@ -264,8 +265,17 @@ public class ConstantUtil {
     //requests
     public static final int REQUEST_ADD_USER = 0;
 
+    //extras
     public static final String EXTRA_RECORD_ID = "record_id";
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
+
+    //data point sync result codes
+    public static final int DATA_SYNC_RESULT_SUCCESS = 0;
+    public static final int DATA_SYNC_RESULT_ERROR_UNKNOWN = 1;
+    public static final int DATA_SYNC_RESULT_ERROR_NETWORK = 2;
+    public static final int DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT = 3;
+    public static final String EXTRA_DATAPOINT_SYNC_RESULT = "datapoint_sync_result";
+    public static final String EXTRA_DATAPOINT_NUMBER = "datapoint_number";
 
     /**
      * prevent instantiation

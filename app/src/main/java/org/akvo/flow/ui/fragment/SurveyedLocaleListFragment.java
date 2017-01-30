@@ -178,7 +178,7 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
 
         LocalBroadcastManager.getInstance(getActivity())
                 .registerReceiver(dataPointSyncReceiver,
-                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
+                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE));
 
         refreshLocalData();
     }

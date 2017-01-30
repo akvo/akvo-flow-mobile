@@ -231,7 +231,7 @@ public class DataPointsMapFragment extends SupportMapFragment
         }
         LocalBroadcastManager.getInstance(getActivity())
                 .registerReceiver(dataPointSyncReceiver,
-                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
+                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE));
     }
 
     @Override
@@ -288,6 +288,12 @@ public class DataPointsMapFragment extends SupportMapFragment
         }
     }
 
+    private void hideProgress() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
     @Override
     public void onInfoWindowClick(Marker marker) {
         final String surveyedLocaleId = marker.getSnippet();
@@ -315,12 +321,6 @@ public class DataPointsMapFragment extends SupportMapFragment
         mItems.clear();
         mItems.addAll(surveyedLocales);
         cluster();
-    }
-
-    private void hideProgress() {
-        if (progressBar != null) {
-            progressBar.setVisibility(View.INVISIBLE);
-        }
     }
 
     @Override

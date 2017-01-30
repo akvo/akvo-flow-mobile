@@ -25,7 +25,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
 
-import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
@@ -60,6 +59,8 @@ public class SurveyedDataPointSyncService extends IntentService {
         FlowApi api = new FlowApi(getApplicationContext());
         SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
         boolean correctSync = true;
+        int resultCode = ConstantUtil.DATA_SYNC_RESULT_SUCCESS;
+        int syncedRecords = 0;
         try {
             Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
@@ -73,31 +74,32 @@ public class SurveyedDataPointSyncService extends IntentService {
                 if (batch.isEmpty()) {
                     break;
                 }
-
-                sendBroadcastNotification();// Keep the UI fresh!
+                syncedRecords += batch.size();
+                sendUpdateUiBroadcastNotification();// Keep the UI fresh!
                 lastBatch = batch;
             }
             if (!correctSync) {
-                //TODO: notify error to activity
+                resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_UNKNOWN;
             }
         } catch (HttpException e) {
             Timber.e(e, e.getMessage());
-            String message = e.getMessage();
             switch (e.getStatus()) {
                 case HttpURLConnection.HTTP_FORBIDDEN:
                     // A missing assignment might be the issue. Let's hint the user.
-                    message = getString(R.string.error_assignment_text);
+                    resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT;
+                    break;
+                default:
+                    resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_UNKNOWN;
                     break;
             }
-            //TODO: notify error to activity
         } catch (IOException e) {
             Timber.e(e, e.getMessage());
-            //TODO: notify error to activity
+            resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_NETWORK;
         } finally {
             database.close();
         }
 
-        sendBroadcastNotification();
+        sendResultBroadcastNotification(resultCode, syncedRecords);
     }
 
     /**
@@ -105,8 +107,7 @@ public class SurveyedDataPointSyncService extends IntentService {
      */
     @NonNull
     private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbAdapter database, @NonNull FlowApi api,
-            long surveyGroupId)
-            throws IOException {
+            long surveyGroupId) throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
         Timber.d("sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
@@ -129,11 +130,20 @@ public class SurveyedDataPointSyncService extends IntentService {
 
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
-     * This notification will be received in {@link org.akvo.flow.ui.fragment.DatapointsFragment}, in order to
-     * loadItem its data
+     * This notification will be received in {@link org.akvo.flow.ui.fragment.SurveyedLocaleListFragment}
+     * or {@link org.akvo.flow.ui.fragment.DataPointsMapFragment}, in order to load data from DB
      */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC);
+    private void sendUpdateUiBroadcastNotification() {
+        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
+    }
+
+    private void sendResultBroadcastNotification(int resultCode, int syncedRecords) {
+        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC_RESULT);
+        intentBroadcast.putExtra(ConstantUtil.EXTRA_DATAPOINT_SYNC_RESULT, resultCode);
+        if (resultCode == ConstantUtil.DATA_SYNC_RESULT_SUCCESS && syncedRecords > 0) {
+            intentBroadcast.putExtra(ConstantUtil.EXTRA_DATAPOINT_NUMBER, syncedRecords);
+        }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 }

@@ -309,12 +309,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 DATA_POINTS_FRAGMENT_TAG);
         if (f != null) {
             f.refresh(mSurveyGroup);
-        } else {
-            supportInvalidateOptionsMenu();
         }
+        supportInvalidateOptionsMenu();
         mDrawer.load();
         mDrawerLayout.closeDrawers();
-
     }
 
     @Override
@@ -405,6 +403,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         return onSearchRequested();
     }
 
+    private void reloadDrawer() {
+        mDrawer.load();
+    }
+
     private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
 
         private final WeakReference<SurveyActivity> activityWeakReference;
@@ -421,9 +423,5 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 surveyActivity.reloadDrawer();
             }
         }
-    }
-
-    private void reloadDrawer() {
-        mDrawer.load();
     }
 }

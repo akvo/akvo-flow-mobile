@@ -98,7 +98,6 @@ public class SurveyedDataPointSyncService extends IntentService {
         } finally {
             database.close();
         }
-
         sendResultBroadcastNotification(resultCode, syncedRecords);
     }
 

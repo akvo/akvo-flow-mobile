@@ -29,13 +29,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -60,11 +62,15 @@ public class DataPointsMapFragment extends SupportMapFragment
         implements LoaderCallbacks<List<SurveyedLocale>>, OnInfoWindowClickListener, OnMapReadyCallback {
 
     public static final int MAP_ZOOM_LEVEL = 10;
+    public static final String MAP_OPTIONS = "MapOptions";
 
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
     private RecordListListener mListener;
     private List<SurveyedLocale> mItems;
+
+    @Nullable
+    private ProgressBar progressBar;
 
     @Nullable
     private GoogleMap mMap;
@@ -75,6 +81,9 @@ public class DataPointsMapFragment extends SupportMapFragment
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
+        GoogleMapOptions options = new GoogleMapOptions();
+        options.zOrderOnTop(true);
+        args.putParcelable(MAP_OPTIONS, options);
         fragment.setArguments(args);
         return fragment;
     }
@@ -85,6 +94,7 @@ public class DataPointsMapFragment extends SupportMapFragment
         mItems = new ArrayList<>();
         mSurveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -99,6 +109,18 @@ public class DataPointsMapFragment extends SupportMapFragment
             throw new ClassCastException(
                     activity.toString() + " must implement SurveyedLocalesFragmentListener");
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            View.inflate(getActivity(), R.layout.map_progress_bar, viewGroup);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        }
+        return view;
     }
 
     @Override
@@ -206,19 +228,6 @@ public class DataPointsMapFragment extends SupportMapFragment
         mDatabase.close();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View mapView = super.onCreateView(inflater, container, savedInstanceState);
-
-        View v = inflater.inflate(R.layout.map_fragment, container, false);
-        FrameLayout layout = (FrameLayout) v.findViewById(R.id.map_container);
-
-        layout.addView(mapView, 0);
-
-        return v;
-    }
-
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
         refresh();
@@ -230,7 +239,28 @@ public class DataPointsMapFragment extends SupportMapFragment
      */
     public void refresh() {
         if (isResumed()) {
+            showProgress();
             getLoaderManager().restartLoader(0, null, this);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.sync_records:
+                if (mListener != null && mSurveyGroup != null) {
+                    showProgress();
+                    mListener.onSyncRecordsSyncRequested(mSurveyGroup.getId());
+                }
+                return true;
+        }
+        return false;
+    }
+
+    private void showProgress() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -251,7 +281,9 @@ public class DataPointsMapFragment extends SupportMapFragment
     }
 
     @Override
-    public void onLoadFinished(Loader<List<SurveyedLocale>> loader, List<SurveyedLocale> surveyedLocales) {
+    public void onLoadFinished(Loader<List<SurveyedLocale>> loader,
+            List<SurveyedLocale> surveyedLocales) {
+        hideProgress();
         if (surveyedLocales == null) {
             Timber.w("onFinished() - Loader returned no data");
             return;
@@ -259,6 +291,12 @@ public class DataPointsMapFragment extends SupportMapFragment
         mItems.clear();
         mItems.addAll(surveyedLocales);
         cluster();
+    }
+
+    private void hideProgress() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

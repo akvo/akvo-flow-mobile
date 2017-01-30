@@ -154,7 +154,7 @@ public class DatapointsFragment extends Fragment {
         TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
         // Init tabs
-        mTabsAdapter = new TabsAdapter(getFragmentManager(), tabNames, mSurveyGroup);
+        mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
         tabs.setupWithViewPager(mPager);
 
@@ -208,7 +208,7 @@ public class DatapointsFragment extends Fragment {
         }
     }
 
-    private static class TabsAdapter extends FragmentPagerAdapter {
+    public static class TabsAdapter extends FragmentPagerAdapter {
 
         private final String[] tabs;
         private SurveyGroup surveyGroup;
@@ -229,7 +229,8 @@ public class DatapointsFragment extends Fragment {
             this.surveyGroup = newSurveyGroup;
             SurveyedLocaleListFragment listFragment = (SurveyedLocaleListFragment) fragmentsRef
                     .get(POSITION_LIST);
-            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef.get(POSITION_MAP);
+            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef
+                    .get(POSITION_MAP);
 
             if (listFragment != null) {
                 listFragment.refresh(surveyGroup);
@@ -247,7 +248,8 @@ public class DatapointsFragment extends Fragment {
                 fragmentsRef.put(POSITION_LIST, surveyedLocaleListFragment);
                 return surveyedLocaleListFragment;
             } else {
-                DataPointsMapFragment mapFragment = (DataPointsMapFragment) super.instantiateItem(container, position);
+                DataPointsMapFragment mapFragment = (DataPointsMapFragment) super
+                        .instantiateItem(container, position);
                 fragmentsRef.put(POSITION_MAP, mapFragment);
                 return mapFragment;
             }

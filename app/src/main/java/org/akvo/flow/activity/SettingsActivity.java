@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.activity;
@@ -29,7 +32,6 @@ import android.os.StatFs;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,21 +41,26 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.UserRequestedApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import timber.log.Timber;
 
 /**
  * Displays the settings menu and handles the user choices
@@ -62,9 +69,11 @@ import org.akvo.flow.util.ViewUtil;
  */
 public class SettingsActivity extends BackActivity implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = "SettingsActivity";
     private static final String LABEL = "label";
     private static final String DESC = "desc";
+
+    //TODO: this will be replaced by a year placed in a properties file
+    private static final String CURRENT_YEAR = "2017";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,27 +81,34 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
         Resources resources = getResources();
-        list.add(createMap(resources.getString(R.string.prefoptlabel), resources.getString(R.string.prefoptdesc)));
-        list.add(createMap(resources.getString(R.string.sendoptlabel), resources.getString(R.string.sendoptdesc)));
+        list.add(createMap(resources.getString(R.string.prefoptlabel),
+                resources.getString(R.string.prefoptdesc)));
+        list.add(createMap(resources.getString(R.string.sendoptlabel),
+                resources.getString(R.string.sendoptdesc)));
         list.add(createMap(resources.getString(R.string.reloadsurveyslabel),
-                           resources.getString(R.string.reloadsurveysdesc)));
+                resources.getString(R.string.reloadsurveysdesc)));
         list.add(createMap(resources.getString(R.string.downloadsurveylabel),
-                           resources.getString(R.string.downloadsurveydesc)));
-        list.add(createMap(resources.getString(R.string.poweroptlabel), resources.getString(R.string.poweroptdesc)));
-        list.add(createMap(resources.getString(R.string.gpsstatuslabel), resources.getString(R.string.gpsstatusdesc)));
+                resources.getString(R.string.downloadsurveydesc)));
+        list.add(createMap(resources.getString(R.string.poweroptlabel),
+                resources.getString(R.string.poweroptdesc)));
+        list.add(createMap(resources.getString(R.string.gpsstatuslabel),
+                resources.getString(R.string.gpsstatusdesc)));
         list.add(createMap(resources.getString(R.string.reset_responses),
-                           resources.getString(R.string.reset_responses_desc)));
-        list.add(createMap(resources.getString(R.string.resetall), resources.getString(R.string.resetalldesc)));
-        list.add(createMap(resources.getString(R.string.checksd), resources.getString(R.string.checksddesc)));
+                resources.getString(R.string.reset_responses_desc)));
+        list.add(createMap(resources.getString(R.string.resetall),
+                resources.getString(R.string.resetalldesc)));
+        list.add(createMap(resources.getString(R.string.checksd),
+                resources.getString(R.string.checksddesc)));
         list.add(createMap(resources.getString(R.string.settings_app_update_title),
-                           resources.getString(R.string.settings_app_update_description)));
-        list.add(createMap(resources.getString(R.string.aboutlabel), resources.getString(R.string.aboutdesc)));
+                resources.getString(R.string.settings_app_update_description)));
+        list.add(createMap(resources.getString(R.string.aboutlabel),
+                resources.getString(R.string.aboutdesc)));
 
         String[] fromKeys = {
-            LABEL, DESC
+                LABEL, DESC
         };
         int[] toIds = {
-            R.id.optionLabel, R.id.optionDesc
+                R.id.optionLabel, R.id.optionDesc
         };
 
         ListView lv = (ListView) findViewById(android.R.id.list);
@@ -161,7 +177,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         String state = Environment.getExternalStorageState();
         StringBuilder builder = new StringBuilder();
         if (state == null || !Environment.MEDIA_MOUNTED.equals(state)) {
-            builder.append("<b>").append(resources.getString(R.string.sdmissing)).append("</b><br>");
+            builder.append("<b>").append(resources.getString(R.string.sdmissing))
+                    .append("</b><br>");
         } else {
             builder.append(resources.getString(R.string.sdmounted)).append("<br>");
             File f = Environment.getExternalStorageDirectory();
@@ -177,7 +194,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 long bs = fs.getBlockSize();
                 long space = fb * bs;
                 builder.append(resources.getString(R.string.sdcardspace))
-                       .append(String.format(" %.2f", (double) space / (double) (1024 * 1024)));
+                        .append(String.format(" %.2f", (double) space / (double) (1024 * 1024)));
             }
         }
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -224,23 +241,19 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
                 input.setKeyListener(new DigitsKeyListener(false, false));
                 inputDialog.setView(input);
-                inputDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String value = input.getText().toString().trim();
-                        if ("0".equals(value)) {
-                            SurveyDbAdapter database = new SurveyDbAdapter(SettingsActivity.this);
-                            database.open();
-                            database.reinstallTestSurvey();
-                            database.close();
-                        } else if (!TextUtils.isEmpty(value)) {
-                            Intent i = new Intent(SettingsActivity.this, SurveyDownloadService.class);
-                            i.putExtra(SurveyDownloadService.EXTRA_SURVEYS, new String[] {value});
+                        String surveyId = input.getText().toString().trim();
+                        if (!TextUtils.isEmpty(surveyId)) {
+                            Intent i = new Intent(SettingsActivity.this,
+                                    SurveyDownloadService.class);
+                            i.putExtra(SurveyDownloadService.EXTRA_SURVEY_ID, surveyId);
                             SettingsActivity.this.startService(i);
                         }
                     }
                 });
 
-                inputDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                inputDialog.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Canceled.
                     }
@@ -261,21 +274,17 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Context c = SettingsActivity.this;
-                        SurveyDbAdapter database = new SurveyDbAdapter(c);
-                        database.open();
-                        String[] surveyIds = database.getSurveyIds();
-                        database.deleteAllSurveys();
-                        database.close();
                         Intent i = new Intent(c, SurveyDownloadService.class);
-                        i.putExtra(SurveyDownloadService.EXTRA_SURVEYS, surveyIds);
+                        i.putExtra(SurveyDownloadService.EXTRA_DELETE_SURVEYS, true);
                         c.startService(i);
                     }
                 });
-                builder.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
+                builder.setNegativeButton(R.string.cancelbutton,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
                 builder.show();
             }
         });
@@ -283,7 +292,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     private void onAboutOptionTap(Resources resources) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String txt = resources.getString(R.string.abouttext) + " " + PlatformUtil.getVersionName(this);
+        String txt = resources
+                .getString(R.string.about_text, CURRENT_YEAR, BuildConfig.VERSION_NAME);
         builder.setTitle(R.string.abouttitle);
         builder.setMessage(txt);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
@@ -342,7 +352,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
      * operation.
      *
      * @param responsesOnly Flag to specify a partial deletion (user generated
-     * data).
+     *                      data).
      */
     private void deleteData(final boolean responsesOnly) throws SQLException {
         try {
@@ -357,24 +367,25 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(messageId)
-                   .setCancelable(true)
-                   .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-                       public void onClick(DialogInterface dialog, int id) {
-                           if (!responsesOnly) {
-                               // Delete everything implies logging the current user out (if any)
-                               FlowApp.getApp().setUser(null);
-                           }
-                           new ClearDataAsyncTask(SettingsActivity.this).execute(responsesOnly);
-                       }
-                   })
-                   .setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
-                       public void onClick(DialogInterface dialog, int id) {
-                           dialog.cancel();
-                       }
-                   });
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            if (!responsesOnly) {
+                                // Delete everything implies logging the current user out (if any)
+                                FlowApp.getApp().setUser(null);
+                            }
+                            new ClearDataAsyncTask(SettingsActivity.this).execute(responsesOnly);
+                        }
+                    })
+                    .setNegativeButton(R.string.cancelbutton,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
             builder.show();
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e, e.getMessage());
             Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
         }
     }
@@ -392,8 +403,9 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     private static class SettingsAdapter extends SimpleAdapter {
 
-        public SettingsAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from,
-                               int[] to) {
+        public SettingsAdapter(Context context, List<? extends Map<String, ?>> data, int resource,
+                String[] from,
+                int[] to) {
             super(context, data, resource, from, to);
         }
 

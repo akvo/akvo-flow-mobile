@@ -1,17 +1,20 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.service;
@@ -23,7 +26,18 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
+
+import org.akvo.flow.R;
+import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.NotificationHelper;
+import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.ViewUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,18 +50,8 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.ViewUtil;
+
+import timber.log.Timber;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -126,7 +130,7 @@ public class BootstrapService extends IntentService {
             String errorMessage = getString(R.string.bootstraperror);
             displayErrorNotification(errorMessage);
 
-            Log.e(TAG, "Bootstrap error", e);
+            Timber.e(e,"Bootstrap error");
         }
     }
 
@@ -168,7 +172,7 @@ public class BootstrapService extends IntentService {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            Log.d(TAG, "Processing entry: " + entry.getName());
+            Timber.d("Processing entry: " + entry.getName());
             String parts[] = entry.getName().split("/");
             String filename = parts[parts.length - 1];
             String id = parts.length > 1 ? parts[parts.length - 2] : "";
@@ -233,7 +237,7 @@ public class BootstrapService extends IntentService {
             InputStream in = new FileInputStream(surveyFile);
             loadedSurvey = SurveyDao.loadSurvey(survey, in);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not load survey xml file");
+            Timber.e("Could not load survey xml file");
         }
         if (loadedSurvey == null) {
             // Something went wrong, we cannot continue with this survey
@@ -273,8 +277,6 @@ public class BootstrapService extends IntentService {
     private void updateSurveyStorage(@NonNull Survey survey) {
         databaseAdapter.addSurveyGroup(survey.getSurveyGroup());
         databaseAdapter.saveSurvey(survey);
-        String[] languages = LangsPreferenceUtil.determineLanguages(this, survey);
-        databaseAdapter.addLanguages(languages);
     }
 
     @NonNull
@@ -364,7 +366,6 @@ public class BootstrapService extends IntentService {
     public void onCreate() {
         super.onCreate();
         mHandler = new Handler();
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
     }
 
     /**

@@ -1,43 +1,45 @@
 /*
  *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.serialization.form;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.SurveyGroup;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
-
 import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Dependency;
+import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.ScoringRule;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.ValidationRule;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Handler for sax-based xml parser for Survey files
@@ -355,7 +357,7 @@ public class SurveyHandler extends DefaultHandler {
                 } catch (NumberFormatException e) {
                     currentQuestion.setUseStrength(false);
                     currentQuestion.setType(ConstantUtil.OPTION_QUESTION_TYPE);
-                    Log.e("XML ERROR", "Could not parse strength values", e);
+                    Timber.e(e, "Could not parse strength values");
                 }
             } else {
                 currentQuestion.setUseStrength(false);
@@ -410,7 +412,7 @@ public class SurveyHandler extends DefaultHandler {
             currentOption = new Option();
             currentOption.setCode(attributes.getValue(CODE));
         } else if (localName.equalsIgnoreCase(LEVELS)) {
-            currentLevels = new ArrayList<Level>();
+            currentLevels = new ArrayList<>();
         } else if (localName.equalsIgnoreCase(LEVEL)) {
             currentLevel = new Level();
         } else if (localName.equalsIgnoreCase(DEPENDENCY)) {

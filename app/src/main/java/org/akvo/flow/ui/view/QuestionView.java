@@ -1,25 +1,23 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.view;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -48,6 +46,11 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
     private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
@@ -70,7 +73,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
-        final int padding = (int)PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
+        final int padding = (int) PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
         setPadding(padding, padding, padding, padding);
         if (sColors == null) {
             // must have enough colors for all enabled languages
@@ -84,7 +87,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     /**
      * Inflate the appropriate layout file, and retrieve the references to the common resources.
      * Subclasses' layout files should ALWAYS contain the question_header view.
-     *
      * Inflated layout will be attached to the View's root, thus all the elements within it
      * will be accessible by calling findViewById(int)
      *
@@ -94,8 +96,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(layoutRes, this, true);
 
-        mQuestionText = (TextView)findViewById(R.id.question_tv);
-        mTipImage = (ImageButton)findViewById(R.id.tip_ib);
+        mQuestionText = (TextView) findViewById(R.id.question_tv);
+        mTipImage = (ImageButton) findViewById(R.id.tip_ib);
 
         if (mQuestionText == null || mTipImage == null) {
             throw new RuntimeException(
@@ -169,7 +171,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         boolean isFirst = true;
         StringBuilder text = new StringBuilder();
         if (mQuestion.isMandatory()) {
-            text.append("<i><b>");
+            text.append("<b>");
         }
 
         text.append(mQuestion.getOrder()).append(". ");// Prefix the text with the order
@@ -198,7 +200,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             }
         }
         if (mQuestion.isMandatory()) {
-            text = text.append("*</b></i>");
+            text = text.append("*</b>");
         }
         return Html.fromHtml(text.toString());
     }

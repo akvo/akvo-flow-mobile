@@ -1,17 +1,20 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.fragment;
@@ -23,27 +26,28 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.async.loader.StatsLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.loader.models.Stats;
+import org.akvo.flow.data.loader.StatsLoader;
 
-public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<StatsLoader.Stats> {
-    private static final String TAG = StatsDialogFragment.class.getSimpleName();
+import timber.log.Timber;
+
+public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
+
+    public static final String SURVEY_GROUP_ID_EXTRA = "surveyGroupId";
 
     private long mSurveyGroupId;
-    private SurveyDbAdapter mDatabase;
 
     private TextView mTotalView, mWeekView, mDayView;
 
     public static StatsDialogFragment newInstance(long surveyGroupId) {
         StatsDialogFragment f = new StatsDialogFragment();
         Bundle args = new Bundle();
-        args.putLong("surveyGroupId", surveyGroupId);
+        args.putLong(SURVEY_GROUP_ID_EXTRA, surveyGroupId);
         f.setArguments(args);
         return f;
     }
@@ -51,26 +55,13 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getLong("surveyGroupId");
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mDatabase = new SurveyDbAdapter(getActivity());
+        mSurveyGroupId = getArguments().getLong(SURVEY_GROUP_ID_EXTRA);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase.open();
         getLoaderManager().restartLoader(0, null, this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mDatabase.close();
     }
 
     @Override
@@ -98,14 +89,14 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     // ==================================== //
 
     @Override
-    public Loader<StatsLoader.Stats> onCreateLoader(int id, Bundle args) {
-        return new StatsLoader(getActivity(), mDatabase, mSurveyGroupId);
+    public Loader<Stats> onCreateLoader(int id, Bundle args) {
+        return new StatsLoader(getActivity(), mSurveyGroupId);
     }
 
     @Override
-    public void onLoadFinished(Loader<StatsLoader.Stats> loader, StatsLoader.Stats stats) {
+    public void onLoadFinished(Loader<Stats> loader, Stats stats) {
         if (stats == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
+            Timber.w("onFinished() - Loader returned no data");
             return;
         }
         mTotalView.setText(String.valueOf(stats.mTotal));
@@ -114,7 +105,8 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     }
 
     @Override
-    public void onLoaderReset(Loader<StatsLoader.Stats> loader) {
+    public void onLoaderReset(Loader<Stats> loader) {
+        // EMPTY
     }
 
 }

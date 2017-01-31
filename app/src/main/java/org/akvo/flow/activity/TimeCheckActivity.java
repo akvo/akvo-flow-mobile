@@ -1,18 +1,22 @@
 /*
  *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.akvo.flow.activity;
 
 import android.app.Activity;
@@ -24,7 +28,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
@@ -59,7 +62,6 @@ public class TimeCheckActivity extends Activity {
         // to time changes (the ones interacting with S3)
         startService(new Intent(this, SurveyDownloadService.class));
         startService(new Intent(this, DataSyncService.class));
-        startService(new Intent(this, ApkUpdateService.class));
         startService(new Intent(this, TimeCheckService.class));// Re-check time setting status
         finish();
     }

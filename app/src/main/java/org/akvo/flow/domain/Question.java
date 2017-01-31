@@ -1,27 +1,30 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.domain;
+
+import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.akvo.flow.util.ConstantUtil;
 
 /**
  * data structure for individual survey questions. Questions have a type which
@@ -49,7 +52,13 @@ public class Question {
     private boolean allowOther;
     private boolean allowMultiple;
     private boolean locked;
-    private Map<String, AltText> altTextMap = new HashMap<String, AltText>();
+
+    /**
+     * Stores all available translations for each survey
+     * Key: the language code, ej: en
+     * Value: text of the question in the language represented by the key
+     */
+    private Map<String, AltText> languageTranslationMap = new HashMap<>();
     private List<Dependency> dependencies;
     private List<ScoringRule> scoringRules;
     private boolean useStrength;
@@ -119,16 +128,16 @@ public class Question {
         this.locked = locked;
     }
 
-    public Map<String, AltText> getAltTextMap() {
-        return altTextMap;
+    public Map<String, AltText> getLanguageTranslationMap() {
+        return languageTranslationMap;
     }
 
     public AltText getAltText(String lang) {
-        return altTextMap.get(lang);
+        return languageTranslationMap.get(lang);
     }
 
     public void addAltText(AltText altText) {
-        altTextMap.put(altText.getLanguage(), altText);
+        languageTranslationMap.put(altText.getLanguage(), altText);
     }
 
     public boolean isAllowMultiple() {
@@ -396,7 +405,7 @@ public class Question {
         q.src = question.getSrc();
         q.validationRule = question.getValidationRule();// Shallow copy
         q.questionHelp = question.getQuestionHelp();// Shallow copy
-        q.altTextMap = question.getAltTextMap();// Shallow copy
+        q.languageTranslationMap = question.getLanguageTranslationMap();// Shallow copy
         q.scoringRules = question.getScoringRules();// Shallow copy
         q.levels = question.getLevels();// Shallow copy
         q.caddisflyRes = question.getCaddisflyRes();

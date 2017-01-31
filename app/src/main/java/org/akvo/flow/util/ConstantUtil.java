@@ -1,24 +1,27 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
 
 /**
  * Class to hold all public constants used in the application
- * 
+ *
  * @author Christopher Fagiani
  */
 public class ConstantUtil {
@@ -128,10 +131,7 @@ public class ConstantUtil {
      */
     public static final String USER_ID_KEY = "UID";
     public static final String SURVEY_ID_KEY = "SID";
-    public static final String ID_KEY = "_id";
     public static final String RESPONDENT_ID_KEY = "survey_respondent_id";
-    public static final String IMAGE_URL_LIST_KEY = "imageurls";
-    public static final String IMAGE_CAPTION_LIST_KEY = "imagecaps";
     public static final String READONLY_KEY = "readonly";
     public static final String SINGLE_SURVEY_KEY = "single_survey";
     public static final String SURVEY_GROUP = "survey_group";
@@ -140,16 +140,13 @@ public class ConstantUtil {
     /**
      * settings keys
      */
-    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";
+    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
     public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
-    public static final String LOCATION_BEACON_SETTING_KEY = "location.sendbeacon";
-    public static final String SERVER_SETTING_KEY = "backend.server";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
-    public static final String PREF_LOCALE = "pref.locale";
-
+    
     /**
      * intents
      */
@@ -168,12 +165,6 @@ public class ConstantUtil {
     public static final String ENGLISH_CODE = "en";
 
     /**
-     * html colors
-     */
-    public static final String WHITE_COLOR = "white";
-    public static final String BLACK_COLOR = "black";
-
-    /**
      * "code" to prevent unauthorized use of administrative settings/preferences
      */
     public static final String ADMIN_AUTH_CODE = "12345";
@@ -186,6 +177,7 @@ public class ConstantUtil {
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";
+    public static final String SENTRY_DSN = "sentryDsn";
 
     /**
      * S3 bucket directories (object prefixes)
@@ -199,35 +191,34 @@ public class ConstantUtil {
      */
     public static final String RESOURCE_PACKAGE = "org.akvo.flow";
     public static final String RAW_RESOURCE = "raw";
-    
+
     /**
      * SurveyedLocale meta question IDs. Negative IDs to avoid collisions.
-     * Irrelevant for the server side, they are used to identify a locale meta-data 
+     * Irrelevant for the server side, they are used to identify a locale meta-data
      * response among the rest of the 'real' question answers
      */
     public static final String QUESTION_LOCALE_NAME = "-1";
     public static final String QUESTION_LOCALE_GEO = "-2";
-    
+
     /**
      * Order By
      */
-    public static final int ORDER_BY_NONE     = -1;
-    public static final int ORDER_BY_DATE     = 0;
+    public static final int ORDER_BY_NONE = -1;
+    public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS   = 2;
-    public static final int ORDER_BY_NAME     = 3;
+    public static final int ORDER_BY_STATUS = 2;
+    public static final int ORDER_BY_NAME = 3;
 
     /**
      * Max picture size
      * Values must match the ones set in arrays.
      * TODO: Preferences should be managed with SharedPreferences api, to avoid this error prone references
      */
-    public static final int IMAGE_SIZE_320_240  = 0;
-    public static final int IMAGE_SIZE_640_480  = 1;
+    public static final int IMAGE_SIZE_320_240 = 0;
+    public static final int IMAGE_SIZE_640_480 = 1;
     public static final int IMAGE_SIZE_1280_960 = 2;
 
     public static final int NOTIFICATION_RECORD_SYNC = 100;
-    public static final int NOTIFICATION_DATA_SYNC = 101;
 
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
@@ -251,6 +242,33 @@ public class ConstantUtil {
     public static final String CADDISFLY_RESPONSE = "response";
     public static final String CADDISFLY_IMAGE = "image";
     public static final String CADDISFLY_MIME = "text/plain";
+
+    //broadcasts
+    public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
+    public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
+
+    //apk update
+    public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
+    public static final int FLEX_INTERVAL_IN_SECONDS = 1 * 60 * 60; //1 hour
+
+    //first runs will be faster
+    public static final int FIRST_REPEAT_INTERVAL_IN_SECONDS = 1 * 60;
+    public static final int FIRST_FLEX_INTERVAL_IN_SECOND = 30;
+
+    /**
+     * 7 days
+     */
+    public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
+
+    //requests
+    public static final int REQUEST_ADD_USER = 0;
+    public static final int PHOTO_ACTIVITY_REQUEST = 1;
+    public static final int VIDEO_ACTIVITY_REQUEST = 2;
+    public static final int SCAN_ACTIVITY_REQUEST = 3;
+    public static final int EXTERNAL_SOURCE_REQUEST = 4;
+    public static final int CADDISFLY_REQUEST = 5;
+    public static final int PLOTTING_REQUEST = 6;
+    public static final int SIGNATURE_REQUEST = 7;
 
     /**
      * prevent instantiation

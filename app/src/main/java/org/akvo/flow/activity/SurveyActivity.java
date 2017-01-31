@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -441,29 +442,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void displayDefaultError() {
-        Snackbar
-                .make(rootView, getString(R.string.data_points_sync_error_message_default),
-                        Snackbar.LENGTH_LONG)
-                .setAction(R.string.retry, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onDataPointRetryPressed();
-                    }
-                })
-                .show();
+        displaySnackBarWithRetry(R.string.data_points_sync_error_message_default);
     }
 
     private void displayErrorNetwork() {
-        Snackbar
-                .make(rootView, getString(R.string.data_points_sync_error_message_network),
-                        Snackbar.LENGTH_LONG)
-                .setAction(R.string.retry, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onDataPointRetryPressed();
-                    }
-                })
-                .show();
+        displaySnackBarWithRetry(R.string.data_points_sync_error_message_network);
     }
 
     private void onDataPointRetryPressed() {
@@ -473,16 +456,25 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void displayErrorAssignment() {
-        Snackbar
-                .make(rootView, getString(R.string.data_points_sync_error_message_assignment),
-                        Snackbar.LENGTH_LONG)
-                .show();
+        displaySnackBar(getString(R.string.data_points_sync_error_message_assignment));
     }
 
     private void displaySuccess(int numberSynced) {
-        Snackbar
-                .make(rootView, getString(R.string.data_points_sync_success_message, numberSynced),
-                        Snackbar.LENGTH_LONG)
+        displaySnackBar(getString(R.string.data_points_sync_success_message, numberSynced));
+    }
+
+    private void displaySnackBar(String message) {
+        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void displaySnackBarWithRetry(@StringRes int errorMessage) {
+        Snackbar.make(rootView, getString(errorMessage), Snackbar.LENGTH_LONG)
+                .setAction(R.string.retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onDataPointRetryPressed();
+                    }
+                })
                 .show();
     }
 

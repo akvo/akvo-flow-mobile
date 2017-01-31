@@ -140,7 +140,7 @@ public class ConstantUtil {
     /**
      * settings keys
      */
-    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";
+    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
     public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
     public static final String SCREEN_ON_KEY = "screen.keepon";
@@ -219,7 +219,6 @@ public class ConstantUtil {
     public static final int IMAGE_SIZE_1280_960 = 2;
 
     public static final int NOTIFICATION_RECORD_SYNC = 100;
-    public static final int NOTIFICATION_DATA_SYNC = 101;
 
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
@@ -263,6 +262,13 @@ public class ConstantUtil {
 
     //requests
     public static final int REQUEST_ADD_USER = 0;
+    public static final int PHOTO_ACTIVITY_REQUEST = 1;
+    public static final int VIDEO_ACTIVITY_REQUEST = 2;
+    public static final int SCAN_ACTIVITY_REQUEST = 3;
+    public static final int EXTERNAL_SOURCE_REQUEST = 4;
+    public static final int CADDISFLY_REQUEST = 5;
+    public static final int PLOTTING_REQUEST = 6;
+    public static final int SIGNATURE_REQUEST = 7;
 
     /**
      * prevent instantiation

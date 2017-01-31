@@ -70,7 +70,6 @@ import timber.log.Timber;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
-    private static final String TAG = SurveyActivity.class.getSimpleName();
 
     // Argument to be passed to list/map fragments
     public static final String EXTRA_SURVEY_GROUP = "survey_group";

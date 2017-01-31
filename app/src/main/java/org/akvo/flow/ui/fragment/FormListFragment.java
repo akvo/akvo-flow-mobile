@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -122,7 +122,6 @@ public class FormListFragment extends ListFragment
         mListener.onSurveyClick(surveyId);
     }
 
-    //TODO: make static to avoid memory leaks
    static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
 
         private static final int LAYOUT_RES = R.layout.survey_item;

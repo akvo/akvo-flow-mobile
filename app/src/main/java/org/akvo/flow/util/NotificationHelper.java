@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -63,28 +63,6 @@ public class NotificationHelper {
     public static void displayNonOnGoingErrorNotification(Context context, int notificationId, String text, String title) {
         NotificationCompat.Builder builder = createErrorNotificationBuilder(title, text, context);
         builder.setOngoing(false);
-
-        notifyWithDummyIntent(context, notificationId, builder);
-    }
-
-    public static void displayProgressNotification(Context context, int synced, int total, String title, String text,
-                                                   int notificationId) {
-        NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
-        builder.setOngoing(true);
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(total, synced, false);
-
-        notifyWithDummyIntent(context, notificationId, builder);
-    }
-
-    public static void displayNonOngoingNotificationWithProgress(Context context, String text, String title,
-                                                                 int notificationId) {
-        NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
-        builder.setOngoing(false);
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, false);
 
         notifyWithDummyIntent(context, notificationId, builder);
     }

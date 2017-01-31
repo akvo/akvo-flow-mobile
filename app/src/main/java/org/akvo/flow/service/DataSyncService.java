@@ -110,9 +110,6 @@ public class DataSyncService extends IntentService {
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
 
-    // Reuse notification for data export
-    private static final int NOTIFICATION_DATA_EXPORT = 1;
-
     private static final String UTF_8_CHARSET = "UTF-8";
 
     /**
@@ -164,8 +161,6 @@ public class DataSyncService extends IntentService {
         for (long id : getUnexportedSurveys()) {
             ZipFileData zipFileData = formZip(id);
             if (zipFileData != null) {
-                displayNotification(getString(R.string.exportcomplete), zipFileData.formName);
-
                 // Create new entries in the transmission queue
                 mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
                 updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
@@ -428,7 +423,6 @@ public class DataSyncService extends IntentService {
         Set<Long> unsyncedSurveys = new HashSet<>();// Unsuccessful transmissions
 
         final int totalFiles = transmissions.size();
-        displayProgressNotification(0, totalFiles);
 
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
@@ -439,13 +433,10 @@ public class DataSyncService extends IntentService {
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
             }
-            displayProgressNotification(i, totalFiles);// Progress is the % of files handled so far
         }
 
         // Retain successful survey instances, to mark them as SYNCED
         syncedSurveys.removeAll(unsyncedSurveys);
-
-        displaySyncedNotification(syncedSurveys.size(), unsyncedSurveys.size());
 
         for (long surveyInstanceId : syncedSurveys) {
             updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
@@ -633,45 +624,9 @@ public class DataSyncService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 
-    private void displayNotification(String title, String text) {
-        NotificationHelper.displayNotification(title, text, this,
-                (int) (long) DataSyncService.NOTIFICATION_DATA_EXPORT);
-    }
-
     private void displayErrorNotification(String formId) {
         NotificationHelper.displayErrorNotification(getString(R.string.sync_error_title, formId),
                 getString(R.string.sync_error_message), this, formId(formId));
-    }
-
-    /**
-     * Display a notification showing the up-to-date status of the sync
-     *
-     * @param synced number of handled transmissions so far (either successful or not)
-     * @param total  number of transmissions in the batch
-     */
-    private void displayProgressNotification(int synced, int total) {
-        String title = getString(R.string.data_sync_title);
-        String text = getString(R.string.data_sync_text);
-        NotificationHelper.displayProgressNotification(this, synced, total, title, text,
-                ConstantUtil.NOTIFICATION_DATA_SYNC);
-    }
-
-    /**
-     * Display a notification showing the final status of the sync
-     *
-     * @param syncedForms number of successful transmissions
-     * @param failedForms number of failed transmissions
-     */
-    private void displaySyncedNotification(int syncedForms, int failedForms) {
-        // Do not show failed if there is none
-        String text = failedForms > 0 ?
-                String.format(getString(R.string.data_sync_all), syncedForms, failedForms)
-                :
-                String.format(getString(R.string.data_sync_synced), syncedForms);
-
-        String title = getString(R.string.data_sync_title);
-        NotificationHelper.displayNonOngoingNotificationWithProgress(this, text, title,
-                ConstantUtil.NOTIFICATION_DATA_SYNC);
     }
 
     private void displayFormDeletedNotification(String id, String name) {
@@ -715,18 +670,23 @@ public class DataSyncService extends IntentService {
     /**
      * Helper class to wrap zip file's meta-data
      */
-    class ZipFileData {
+    public static class ZipFileData {
 
         @Nullable
         String uuid = null;
+
         @Nullable
         String formId = null;
+
         @Nullable
         String formName = null;
+
         @Nullable
         String filename = null;
+
         @Nullable
         String data = null;
+
         final List<String> imagePaths = new ArrayList<>();
     }
 }

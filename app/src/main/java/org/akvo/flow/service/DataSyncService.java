@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -71,6 +71,8 @@ import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import timber.log.Timber;
 
 /**
  * Handle survey export and sync in a background thread. The export process takes
@@ -154,17 +156,23 @@ public class DataSyncService extends IntentService {
         checkExportedFiles();
 
         for (long id : getUnexportedSurveys()) {
-            ZipFileData zipFileData = formZip(id);
-            if (zipFileData != null) {
-                displayNotification(getString(R.string.exportcomplete), zipFileData.formName);
+            try {
+                ZipFileData zipFileData = formZip(id);
 
-                // Create new entries in the transmission queue
-                mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
-                updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+                if (zipFileData != null) {
+                    displayNotification(getString(R.string.exportcomplete), zipFileData.formName);
 
-                for (String image : zipFileData.imagePaths) {
-                    mDatabase.createTransmission(id, zipFileData.formId, image);
+                    // Create new entries in the transmission queue
+                    mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
+                    updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+
+                    for (String image : zipFileData.imagePaths) {
+                        mDatabase.createTransmission(id, zipFileData.formId, image);
+                    }
                 }
+             //if the zip creation fails for one survey, let it still attempt to create the others
+            } catch (Exception e) {
+                Timber.e(e, "Error creating zip file for %d", id);
             }
         }
     }
@@ -218,18 +226,28 @@ public class DataSyncService extends IntentService {
             FormInstance formInstance = processFormInstance(surveyInstanceId,
                     zipFileData.imagePaths);
 
-            if (formInstance == null) {
-                return null;
-            }
-
             // Serialize form instance as JSON
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
             zipFileData.uuid = formInstance.getUUID();
-            zipFileData.formId = String.valueOf(formInstance.getFormId());
-            zipFileData.formName = mDatabase.getSurvey(zipFileData.formId).getName();
+            zipFileData.formId = formInstance.getFormId();
+            if (TextUtils.isEmpty(formInstance.getFormId())) {
+                NullPointerException exception = new NullPointerException(" formId is null");
+                Timber.e(exception);
+                PersistentUncaughtExceptionHandler.recordException(exception);
+            }
+            Survey survey = mDatabase.getSurvey(zipFileData.formId);
+            if (survey == null) {
+                NullPointerException exception = new NullPointerException("survey is null");
+                Timber.e(exception);
+                PersistentUncaughtExceptionHandler.recordException(exception);
+                //form name is only used for notification so it is ok if empty
+                zipFileData.formName = "";
+            } else {
+                zipFileData.formName = survey.getName();
+            }
 
-            File zipFile = getSurveyInstanceFile(
-                    zipFileData.uuid);// The filename will match the Survey Instance UUID
+            // The filename will match the Survey Instance UUID
+            File zipFile = getSurveyInstanceFile(zipFileData.uuid);
 
             // Write the data into the zip file
             String fileName = zipFile.getAbsolutePath();// Will normalize filename.
@@ -261,7 +279,7 @@ public class DataSyncService extends IntentService {
             return zipFileData;
         } catch (@NonNull IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
             return null;
         }
     }
@@ -328,10 +346,12 @@ public class DataSyncService extends IntentService {
                 final long submitted_date = data.getLong(submitted_date_col);
                 final long surveyal_time = (data.getLong(duration_col)) / 1000;
 
+                // TODO: this check is useless UUID can only be null here
                 if (formInstance.getUUID() == null) {
                     formInstance.setUUID(data.getString(uuid_col));
-                    formInstance.setFormId(
-                            data.getLong(survey_fk_col));// FormInstance uses a number for this attr
+                    // FormInstance uses a number for this attr
+                    //TODO: survey_is is a string
+                    formInstance.setFormId(data.getString(survey_fk_col));
                     formInstance.setDataPointId(data.getString(localeId_col));
                     formInstance.setDeviceId(deviceIdentifier);
                     formInstance.setSubmissionDate(submitted_date);

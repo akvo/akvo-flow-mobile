@@ -157,22 +157,26 @@ public class DataSyncService extends IntentService {
 
         for (long id : getUnexportedSurveys()) {
             try {
-                ZipFileData zipFileData = formZip(id);
-
-                if (zipFileData != null) {
-                    displayNotification(getString(R.string.exportcomplete), zipFileData.formName);
-
-                    // Create new entries in the transmission queue
-                    mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
-                    updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
-
-                    for (String image : zipFileData.imagePaths) {
-                        mDatabase.createTransmission(id, zipFileData.formId, image);
-                    }
-                }
+                exportSurvey(id);
              //if the zip creation fails for one survey, let it still attempt to create the others
             } catch (Exception e) {
                 Timber.e(e, "Error creating zip file for %d", id);
+            }
+        }
+    }
+
+    private void exportSurvey(long id) {
+        ZipFileData zipFileData = formZip(id);
+
+        if (zipFileData != null) {
+            displayNotification(getString(R.string.exportcomplete), zipFileData.formName);
+
+            // Create new entries in the transmission queue
+            mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
+            updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+
+            for (String image : zipFileData.imagePaths) {
+                mDatabase.createTransmission(id, zipFileData.formId, image);
             }
         }
     }

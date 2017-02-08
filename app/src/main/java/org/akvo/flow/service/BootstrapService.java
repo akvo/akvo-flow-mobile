@@ -37,6 +37,7 @@ import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.SurveyIdGenerator;
 import org.akvo.flow.util.ViewUtil;
 
 import java.io.File;
@@ -46,10 +47,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -76,6 +75,7 @@ public class BootstrapService extends IntentService {
 
     private static final String TAG = "BOOTSTRAP_SERVICE";
     public volatile static boolean isProcessing = false;
+    private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private SurveyDbAdapter databaseAdapter;
     private Handler mHandler;
 
@@ -176,7 +176,7 @@ public class BootstrapService extends IntentService {
             Log.d(TAG, "Processing entry: " + entry.getName());
             String parts[] = entry.getName().split("/");
             String filename = parts[parts.length - 1];
-            String id = getSurveyIdFromFilePath(parts);
+            String id = surveyIdGenerator.getSurveyIdFromFilePath(parts);
 
             // Skip directories and hidden/unwanted files
             if (entry.isDirectory() || filename.startsWith(".") ||
@@ -206,33 +206,6 @@ public class BootstrapService extends IntentService {
 
         // now rename the zip file so we don't process it again
         file.renameTo(new File(file.getAbsolutePath() + ConstantUtil.PROCESSED_OK_SUFFIX));
-    }
-
-    /**
-     * Get the survey id from the survey xml folder
-     * The structure can be either surveyId/survey.xml or surveyId/folder/survey.xml
-     * @param parts
-     * @return
-     */
-    @NonNull
-    private String getSurveyIdFromFilePath(@Nullable String[] parts) {
-        if (parts == null || parts.length <= 1) {
-            //no file at all or missing folder
-            return "";
-        } else {
-            //we remove the last piece which is the actual filename
-            String[] foldersArray = Arrays.copyOfRange(parts, 0, parts.length - 1);
-            List<String> folders = Arrays.asList(foldersArray);
-            Collections.reverse(folders);
-            //remove the xml filename
-            for (String folderName : folders) {
-                if (TextUtils.isDigitsOnly(folderName)) {
-                    return folderName;
-                }
-            }
-            //if not found just return the lowest subfolder name
-            return folders.get(0);
-        }
     }
 
     private void processSurveyFile(@NonNull ZipFile zipFile, @NonNull ZipEntry entry,

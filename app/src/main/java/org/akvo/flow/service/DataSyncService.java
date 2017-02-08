@@ -234,7 +234,7 @@ public class DataSyncService extends IntentService {
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
             zipFileData.uuid = formInstance.getUUID();
             zipFileData.formId = formInstance.getFormId();
-            if (TextUtils.isEmpty(formInstance.getFormId())) {
+            if (TextUtils.isEmpty(zipFileData.formId)) {
                 NullPointerException exception = new NullPointerException(" formId is null");
                 Timber.e(exception);
                 PersistentUncaughtExceptionHandler.recordException(exception);
@@ -350,11 +350,8 @@ public class DataSyncService extends IntentService {
                 final long submitted_date = data.getLong(submitted_date_col);
                 final long surveyal_time = (data.getLong(duration_col)) / 1000;
 
-                // TODO: this check is useless UUID can only be null here
                 if (formInstance.getUUID() == null) {
                     formInstance.setUUID(data.getString(uuid_col));
-                    // FormInstance uses a number for this attr
-                    //TODO: survey_is is a string
                     formInstance.setFormId(data.getString(survey_fk_col));
                     formInstance.setDataPointId(data.getString(localeId_col));
                     formInstance.setDeviceId(deviceIdentifier);

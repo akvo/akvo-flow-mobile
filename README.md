@@ -34,10 +34,5 @@ Please import the 'util/ide/android-studio/Akvo Java Source Formatting.xml' sett
 
 ## License
 
-Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
-
-Akvo Flow is free software: you can redistribute it and modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
-
-Akvo Flow is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License in the file LICENSE.txt.
-
-The license can also be seen at http://www.gnu.org/licenses/gpl.html.
+Licensed under the GNU General Public License (GPL) v3.
+For more information see [LICENSE.txt] (https://github.com/akvo/akvo-flow-mobile/blob/develop/LICENSE.txt).

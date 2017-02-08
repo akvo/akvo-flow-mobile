@@ -30,7 +30,7 @@ import org.akvo.flow.dao.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.serialization.form.SurveyMetaDataParser;
+import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -238,7 +238,7 @@ public class BootstrapService extends IntentService {
         SurveyMetadata surveyMetadata = null;
         try {
             InputStream in = new FileInputStream(surveyFile);
-            SurveyMetaDataParser parser = new SurveyMetaDataParser();
+            SurveyMetadataParser parser = new SurveyMetadataParser();
             surveyMetadata = parser.parse(in);
         } catch (FileNotFoundException e) {
             Log.e(TAG, "Could not load survey xml file");

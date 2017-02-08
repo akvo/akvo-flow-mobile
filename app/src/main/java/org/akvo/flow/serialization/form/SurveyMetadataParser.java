@@ -26,7 +26,7 @@ import org.akvo.flow.domain.SurveyMetadata;
 
 import java.io.InputStream;
 
-public class SurveyMetaDataParser {
+public class SurveyMetadataParser {
 
     public SurveyMetadata parse(InputStream inputStream) {
         try {

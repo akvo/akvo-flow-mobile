@@ -27,10 +27,10 @@ import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.BasicSurveyData;
+import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.serialization.form.BasicSurveyDataParser;
+import org.akvo.flow.serialization.form.SurveyMetaDataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -219,55 +219,55 @@ public class BootstrapService extends IntentService {
         File surveyFile = generateNewSurveyFile(filename, surveyFolderName);
         FileUtil.copy(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
         // now read the survey XML back into memory to see if there is a version
-        BasicSurveyData basicSurveyData = readBasicSurveyData(surveyFile);
-        if (basicSurveyData == null) {
+        SurveyMetadata surveyMetadata = readBasicSurveyData(surveyFile);
+        if (surveyMetadata == null) {
             // Something went wrong, we cannot continue with this survey
             return;
         }
 
-        verifyAppId(basicSurveyData);
+        verifyAppId(surveyMetadata);
 
-        survey = updateSurvey(filename, idFromFolderName, survey, surveyFolderName, basicSurveyData);
+        survey = updateSurvey(filename, idFromFolderName, survey, surveyFolderName, surveyMetadata);
 
         // Save the Survey, SurveyGroup, and languages.
         updateSurveyStorage(survey);
     }
 
     @Nullable
-    private BasicSurveyData readBasicSurveyData(File surveyFile) {
-        BasicSurveyData basicSurveyData = null;
+    private SurveyMetadata readBasicSurveyData(File surveyFile) {
+        SurveyMetadata surveyMetadata = null;
         try {
             InputStream in = new FileInputStream(surveyFile);
-            BasicSurveyDataParser parser = new BasicSurveyDataParser();
-            basicSurveyData = parser.parse(in);
+            SurveyMetaDataParser parser = new SurveyMetaDataParser();
+            surveyMetadata = parser.parse(in);
         } catch (FileNotFoundException e) {
             Log.e(TAG, "Could not load survey xml file");
         }
-        return basicSurveyData;
+        return surveyMetadata;
     }
 
     @NonNull
     private Survey updateSurvey(@NonNull String filename, @NonNull String idFromFolderName,
             @Nullable Survey survey, @NonNull String surveyFolderName,
-            @NonNull BasicSurveyData basicSurveyData) {
+            @NonNull SurveyMetadata surveyMetadata) {
         String surveyName = filename;
         if (surveyName.contains(ConstantUtil.DOT_SEPARATOR)) {
             surveyName = surveyName.substring(0, surveyName.indexOf(ConstantUtil.DOT_SEPARATOR));
         }
         if (survey == null) {
-            survey = createSurvey(idFromFolderName, basicSurveyData, surveyName);
+            survey = createSurvey(idFromFolderName, surveyMetadata, surveyName);
         }
         survey.setLocation(ConstantUtil.FILE_LOCATION);
         String surveyFileName = generateSurveyFileName(filename, surveyFolderName);
         survey.setFileName(surveyFileName);
 
-        if (!TextUtils.isEmpty(basicSurveyData.getName())) {
-            survey.setName(basicSurveyData.getName());
+        if (!TextUtils.isEmpty(surveyMetadata.getName())) {
+            survey.setName(surveyMetadata.getName());
         }
-        survey.setSurveyGroup(basicSurveyData.getSurveyGroup());
+        survey.setSurveyGroup(surveyMetadata.getSurveyGroup());
 
-        if (basicSurveyData.getVersion() > 0) {
-            survey.setVersion(basicSurveyData.getVersion());
+        if (surveyMetadata.getVersion() > 0) {
+            survey.setVersion(surveyMetadata.getVersion());
         } else {
             survey.setVersion(1d);
         }
@@ -275,11 +275,11 @@ public class BootstrapService extends IntentService {
     }
 
     @NonNull
-    private Survey createSurvey(@NonNull String id, @NonNull BasicSurveyData basicSurveyData,
+    private Survey createSurvey(@NonNull String id, @NonNull SurveyMetadata surveyMetadata,
             String surveyName) {
         Survey survey = new Survey();
-        if (!TextUtils.isEmpty(basicSurveyData.getId())) {
-            survey.setId(basicSurveyData.getId());
+        if (!TextUtils.isEmpty(surveyMetadata.getId())) {
+            survey.setId(surveyMetadata.getId());
         } else {
             survey.setId(id);
         }
@@ -296,7 +296,7 @@ public class BootstrapService extends IntentService {
      * Check form app id. Reject the form if it does not belong to the one set up
      * @param loadedSurvey survey to verify
      */
-    private void verifyAppId(@NonNull BasicSurveyData loadedSurvey) {
+    private void verifyAppId(@NonNull SurveyMetadata loadedSurvey) {
         final String app = StatusUtil.getApplicationId(this);
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {

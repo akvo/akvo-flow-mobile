@@ -20,13 +20,13 @@
 
 package org.akvo.flow.serialization.form;
 
-import org.akvo.flow.domain.BasicSurveyData;
+import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.domain.SurveyGroup;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class BasicSurveyDataHandler extends DefaultHandler {
+public class SurveyMetadataHandler extends DefaultHandler {
 
     private static final String SURVEY = "survey";
     private static final String APP = "app";
@@ -37,18 +37,10 @@ public class BasicSurveyDataHandler extends DefaultHandler {
     private static final String SURVEY_GROUP_NAME = "surveyGroupName";
     private static final String REGISTRATION_SURVEY = "registrationSurvey";
 
-    private BasicSurveyData survey;
+    private final SurveyMetadata surveyMetadata = new SurveyMetadata();
 
-    public BasicSurveyData getSurvey() {
-        return survey;
-    }
-
-    /**
-     * construct a new survey object and store as a member
-     */
-    public void startDocument() throws SAXException {
-        super.startDocument();
-        survey = new BasicSurveyData();
+    public SurveyMetadata getSurveyMetadata() {
+        return surveyMetadata;
     }
 
     /**
@@ -60,24 +52,24 @@ public class BasicSurveyDataHandler extends DefaultHandler {
         super.startElement(uri, localName, name, attributes);
         if (localName.equalsIgnoreCase(SURVEY)) {
             if (attributes.getValue(SURVEY_ID) != null) {
-                survey.setId(attributes.getValue(SURVEY_ID));
+                surveyMetadata.setId(attributes.getValue(SURVEY_ID));
             }
             if (attributes.getValue(NAME) != null) {
-                survey.setName(attributes.getValue(NAME));
+                surveyMetadata.setName(attributes.getValue(NAME));
             }
             if (attributes.getValue(VERSION) != null) {
-                survey.setVersion(Double.parseDouble(attributes.getValue(VERSION)));
+                surveyMetadata.setVersion(Double.parseDouble(attributes.getValue(VERSION)));
             }
             if (attributes.getValue(SURVEY_GROUP_ID) != null &&
                     attributes.getValue(SURVEY_GROUP_NAME) != null) {
                 long surveyGroupId = Long.valueOf(attributes.getValue(SURVEY_GROUP_ID));
                 String surveyGroupName = attributes.getValue(SURVEY_GROUP_NAME);
                 String surveyGroupForm = attributes.getValue(REGISTRATION_SURVEY);
-                survey.setSurveyGroup(
+                surveyMetadata.setSurveyGroup(
                         new SurveyGroup(surveyGroupId, surveyGroupName, surveyGroupForm,
                                 surveyGroupForm != null));
             }
-            survey.setApp(attributes.getValue(APP));
+            surveyMetadata.setApp(attributes.getValue(APP));
         }
     }
 

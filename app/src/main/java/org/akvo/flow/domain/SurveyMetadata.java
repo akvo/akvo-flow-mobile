@@ -20,7 +20,7 @@
 
 package org.akvo.flow.domain;
 
-public class BasicSurveyData {
+public class SurveyMetadata {
 
     private String id;
     private String app;
@@ -28,7 +28,7 @@ public class BasicSurveyData {
     private SurveyGroup surveyGroup;
     private double version;
 
-    public BasicSurveyData() {
+    public SurveyMetadata() {
     }
 
     public String getId() {

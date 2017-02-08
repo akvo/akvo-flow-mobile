@@ -20,7 +20,7 @@
 
 package org.akvo.flow.serialization.form;
 
-import org.akvo.flow.domain.BasicSurveyData;
+import org.akvo.flow.domain.SurveyMetadata;
 import org.xml.sax.InputSource;
 
 import java.io.InputStream;
@@ -30,18 +30,18 @@ import java.io.Reader;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-public class BasicSurveyDataParser {
+public class SurveyMetaDataParser {
 
-    public BasicSurveyData parse(InputStream inputStream) {
+    public SurveyMetadata parse(InputStream inputStream) {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
-            BasicSurveyDataHandler handler = new BasicSurveyDataHandler();
+            SurveyMetadataHandler handler = new SurveyMetadataHandler();
             Reader reader = new InputStreamReader(inputStream, "UTF-8");
             InputSource source = new InputSource(reader);
             source.setEncoding("UTF-8");
             parser.parse(source, handler);
-            return handler.getSurvey();
+            return handler.getSurveyMetadata();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -20,14 +20,9 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.joshdholtz.sentry.Sentry;
-
-import org.json.JSONException;
-
-import java.util.Map;
+import com.getsentry.raven.android.Raven;
 
 import timber.log.Timber;
 
@@ -39,36 +34,10 @@ public class SentryHelper extends LoggingHelper {
 
     @Override
     public void initSentry() {
-        addTags();
-        Sentry.setCaptureListener(new FlowSentryCaptureListener(tags));
-
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
-            Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(context),
-                    LoggingFactory.SENTRY_PROTOCOL_VERSION);
+            Raven.init(context, sentryDsn, new FlowAndroidRavenFactory(context));
             Timber.plant(new SentryTree());
-        }
-    }
-
-    private static class FlowSentryCaptureListener implements Sentry.SentryEventCaptureListener {
-
-        private final Map<String, String> tags;
-
-        private FlowSentryCaptureListener(@NonNull Map<String, String> tags) {
-            this.tags = tags;
-        }
-
-        @Override
-        public Sentry.SentryEventBuilder beforeCapture(Sentry.SentryEventBuilder builder) {
-            try {
-                for (String key : tags.keySet()) {
-                    builder.getTags().put(key, tags.get(key));
-                }
-            } catch (JSONException e) {
-                Timber.e("Error setting SentryEventCaptureListener");
-            }
-
-            return builder;
         }
     }
 }

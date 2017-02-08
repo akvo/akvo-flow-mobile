@@ -20,55 +20,21 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.os.Build;
 import android.support.annotation.Nullable;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import timber.log.Timber;
 
 public abstract class LoggingHelper {
 
-    private static final String PLATFORM_TAG_VALUE = "Android";
-    private static final String PLATFORM_TAG_KEY = "Platform";
-    private static final String OS_VERSION_TAG_KEY = "OsVersion";
-    private static final String DEVICE_TAG_KEY = "Device";
-    private static final String VERSION_NAME_TAG_KEY = "VersionName";
-    private static final String VERSION_CODE_TAG_KEY = "VersionCode";
-    private static final String INSTANCE_ID_KEY = "appId";
-    private static final int NUMBER_OF_TAGS = 7;
-
     final Context context;
-    final Map<String, String> tags = new HashMap<>(NUMBER_OF_TAGS);
 
     LoggingHelper(Context context) {
         this.context = context;
-    }
-
-    void addTags() {
-        tags.put(PLATFORM_TAG_KEY, PLATFORM_TAG_VALUE);
-        tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
-        tags.put(DEVICE_TAG_KEY, android.os.Build.MODEL);
-        final PropertyUtil props = new PropertyUtil(context.getResources());
-        tags.put(INSTANCE_ID_KEY, props.getProperty(ConstantUtil.S3_BUCKET));
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            String versionName = packageInfo.versionName;
-            int versionCode = packageInfo.versionCode;
-            tags.put(VERSION_NAME_TAG_KEY, versionName);
-            tags.put(VERSION_CODE_TAG_KEY, versionCode + "");
-        } catch (PackageManager.NameNotFoundException e) {
-            Timber.e("Error getting versionName and versionCode");
-        }
     }
 
     public abstract void initSentry();

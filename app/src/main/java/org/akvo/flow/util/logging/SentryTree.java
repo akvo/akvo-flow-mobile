@@ -22,7 +22,7 @@ package org.akvo.flow.util.logging;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.joshdholtz.sentry.Sentry;
+import com.getsentry.raven.android.Raven;
 
 import timber.log.Timber;
 
@@ -38,7 +38,7 @@ class SentryTree extends Timber.Tree {
 
         if (t != null) {
             //We will only send stacktraces for now
-            Sentry.captureException(t);
+            Raven.capture(t);
         }
     }
 

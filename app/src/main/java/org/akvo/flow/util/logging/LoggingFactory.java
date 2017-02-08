@@ -26,9 +26,6 @@ import android.content.Context;
  */
 public class LoggingFactory {
 
-    //TODO: replace this by 6 or higher once the server is updated
-    public static final String SENTRY_PROTOCOL_VERSION = "4";
-
     public LoggingHelper createLoggingHelper(Context context) {
         return new SentryHelper(context);
     }

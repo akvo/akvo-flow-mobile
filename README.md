@@ -30,7 +30,7 @@ To set up your development environment you'll need:
 To ensure a consistent code style throughout the codebase, we stick to the [Android Code Style Guidelines]
 (http://source.android.com/source/code-style.html) as much as possible.
 
-Please import the 'util/ide/android-studio/Akvo Java Source Formatting.xml' settings into your Android Studio. Go to `File` > `Settings` > `Editor` > `Code Style` > `Java`, select `Manage` and then `Import`.
+Please import the [util/ide/android-studio/Akvo Java Source Formatting.xml](https://github.com/akvo/akvo-flow-mobile/blob/issue/607-update-readme/util/ide/android-studio/Akvo%20Java%20Source%20Formatting.xml) settings into your Android Studio. Go to `File` > `Settings` > `Editor` > `Code Style` > `Java`, select `Manage` and then `Import`.
 
 ## License
 

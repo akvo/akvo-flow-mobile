@@ -20,27 +20,18 @@
 
 package org.akvo.flow.serialization.form;
 
+import android.util.Xml;
+
 import org.akvo.flow.domain.SurveyMetadata;
-import org.xml.sax.InputSource;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 public class SurveyMetaDataParser {
 
     public SurveyMetadata parse(InputStream inputStream) {
-        SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
-            SAXParser parser = factory.newSAXParser();
             SurveyMetadataHandler handler = new SurveyMetadataHandler();
-            Reader reader = new InputStreamReader(inputStream, "UTF-8");
-            InputSource source = new InputSource(reader);
-            source.setEncoding("UTF-8");
-            parser.parse(source, handler);
+            Xml.parse(inputStream, Xml.Encoding.UTF_8, handler);
             return handler.getSurveyMetadata();
         } catch (Exception e) {
             throw new RuntimeException(e);

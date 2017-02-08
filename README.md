@@ -1,8 +1,8 @@
 # Akvo Flow app
 
-The Akvo Flow app is the mobile application for data collection.
+The Akvo Flow app is the mobile application for the [Akvo Flow data collection tool](https://github.com/akvo/akvo-flow).
 
-Akvo Flow is a tool built specially for international development teams to monitor and evaluate initiatives while working in diverse locations that are often remote or lacking reliable basic infrastructure. It is designed for people who want to understand what is happening now, so they can make informed decisions that lead to secure, sustainable development aid investments.
+Akvo Flow was built specially for international development teams to monitor and evaluate initiatives while working in diverse locations that are often remote or lacking reliable basic infrastructure. It is designed for people who want to understand what is happening now, so they can make informed decisions that lead to secure, sustainable development aid investments.
 
 ## Getting Started
 

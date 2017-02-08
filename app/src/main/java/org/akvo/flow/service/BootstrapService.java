@@ -236,9 +236,9 @@ public class BootstrapService extends IntentService {
     }
 
     private void processSurveyFile(@NonNull ZipFile zipFile, @NonNull ZipEntry entry,
-            @NonNull String filename, @NonNull String id) throws IOException {
+            @NonNull String filename, @NonNull String idFromFolderName) throws IOException {
 
-        Survey survey = databaseAdapter.getSurvey(id);
+        Survey survey = databaseAdapter.getSurvey(idFromFolderName);
 
         String surveyFolderName = generateSurveyFolder(entry);
 
@@ -254,7 +254,7 @@ public class BootstrapService extends IntentService {
 
         verifyAppId(basicSurveyData);
 
-        survey = updateSurvey(filename, id, survey, surveyFolderName, basicSurveyData);
+        survey = updateSurvey(filename, idFromFolderName, survey, surveyFolderName, basicSurveyData);
 
         // Save the Survey, SurveyGroup, and languages.
         updateSurveyStorage(survey);
@@ -274,7 +274,7 @@ public class BootstrapService extends IntentService {
     }
 
     @NonNull
-    private Survey updateSurvey(@NonNull String filename, @NonNull String id,
+    private Survey updateSurvey(@NonNull String filename, @NonNull String idFromFolderName,
             @Nullable Survey survey, @NonNull String surveyFolderName,
             @NonNull BasicSurveyData basicSurveyData) {
         String surveyName = filename;
@@ -282,7 +282,7 @@ public class BootstrapService extends IntentService {
             surveyName = surveyName.substring(0, surveyName.indexOf(ConstantUtil.DOT_SEPARATOR));
         }
         if (survey == null) {
-            survey = createSurvey(id, basicSurveyData, surveyName);
+            survey = createSurvey(idFromFolderName, basicSurveyData, surveyName);
         }
         survey.setLocation(ConstantUtil.FILE_LOCATION);
         String surveyFileName = generateSurveyFileName(filename, surveyFolderName);

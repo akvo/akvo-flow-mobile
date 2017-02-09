@@ -181,7 +181,7 @@ public class DatapointsFragment extends Fragment {
 
         public void refreshFragments(SurveyGroup newSurveyGroup) {
             this.surveyGroup = newSurveyGroup;
-            SurveyedLocaleListFragment listFragment = (SurveyedLocaleListFragment) fragmentsRef
+            DataPointsListFragment listFragment = (DataPointsListFragment) fragmentsRef
                     .get(POSITION_LIST);
             DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef
                     .get(POSITION_MAP);
@@ -197,10 +197,10 @@ public class DatapointsFragment extends Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             if (position == POSITION_LIST) {
-                SurveyedLocaleListFragment surveyedLocaleListFragment = (SurveyedLocaleListFragment) super
+                DataPointsListFragment dataPointsListFragment = (DataPointsListFragment) super
                         .instantiateItem(container, position);
-                fragmentsRef.put(POSITION_LIST, surveyedLocaleListFragment);
-                return surveyedLocaleListFragment;
+                fragmentsRef.put(POSITION_LIST, dataPointsListFragment);
+                return dataPointsListFragment;
             } else {
                 DataPointsMapFragment mapFragment = (DataPointsMapFragment) super
                         .instantiateItem(container, position);
@@ -212,7 +212,7 @@ public class DatapointsFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             if (position == POSITION_LIST) {
-                return SurveyedLocaleListFragment.newInstance(surveyGroup);
+                return DataPointsListFragment.newInstance(surveyGroup);
             }
             // Map mode
             return DataPointsMapFragment.newInstance(surveyGroup);

@@ -68,7 +68,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class SurveyedLocaleListFragment extends Fragment implements LocationListener,
+public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, LoaderCallbacks<List<SurveyedLocale>>, OrderByDialogListener,
         SwipeRefreshLayout.OnRefreshListener, DataPointsSyncListener {
 
@@ -98,8 +98,8 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
     private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(
             this);
 
-    public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
-        SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
+    public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
+        DataPointsListFragment fragment = new DataPointsListFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         fragment.setArguments(args);
@@ -484,16 +484,16 @@ public class SurveyedLocaleListFragment extends Fragment implements LocationList
 
     private static class DataSyncBroadcastReceiver extends BroadcastReceiver {
 
-        private final WeakReference<SurveyedLocaleListFragment> fragmentWeakRef;
+        private final WeakReference<DataPointsListFragment> fragmentWeakRef;
 
-        private DataSyncBroadcastReceiver(SurveyedLocaleListFragment fragment) {
+        private DataSyncBroadcastReceiver(DataPointsListFragment fragment) {
             this.fragmentWeakRef = new WeakReference<>(fragment);
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
             Timber.i("Survey Instance status has changed. Refreshing UI...");
-            SurveyedLocaleListFragment fragment = fragmentWeakRef.get();
+            DataPointsListFragment fragment = fragmentWeakRef.get();
             if (fragment != null) {
                 fragment.refreshLocalData();
             }

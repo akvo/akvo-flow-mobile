@@ -31,6 +31,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
+import org.akvo.flow.ui.fragment.DataPointsListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.io.IOException;
@@ -129,7 +130,7 @@ public class SurveyedDataPointSyncService extends IntentService {
 
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
-     * This notification will be received in {@link org.akvo.flow.ui.fragment.SurveyedLocaleListFragment}
+     * This notification will be received in {@link DataPointsListFragment}
      * or {@link org.akvo.flow.ui.fragment.DataPointsMapFragment}, in order to load data from DB
      */
     private void sendUpdateUiBroadcastNotification() {

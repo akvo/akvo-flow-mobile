@@ -110,8 +110,8 @@
     <string name="stats">Stats</string>
     <string name="syncing_records">Syncing Data Points...</string>
     <string name="data_points_sync_success_message">%1$d data points successfully synced</string>
-    <string name="data_points_sync_error_message_network">Sync failed. Check your connection and try again</string>
-    <string name="data_points_sync_error_message_assignment">Sync failed. Flow dashboard assignment required</string>
+    <string name="data_points_sync_error_message_network">Sync failed. No connection.</string>
+    <string name="data_points_sync_error_message_assignment">Sync failed. Assignment missing.</string>
     <string name="data_points_sync_error_message_default">Sync failed</string>
     <string name="prefill_title">Pre-fill Responses</string>
     <string name="prefill_text">Pre-fill form with previous answers?</string>

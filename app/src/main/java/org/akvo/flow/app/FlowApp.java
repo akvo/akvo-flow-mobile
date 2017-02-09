@@ -29,21 +29,16 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
-import org.akvo.flow.domain.Survey;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.logging.LoggingFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
-import org.akvo.flow.data.preference.Prefs;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
-
-import timber.log.Timber;
 
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
@@ -112,15 +107,13 @@ public class FlowApp extends Application {
                 language = ConstantUtil.ENGLISH_CODE;// TODO: Move this constant to @strings
             }
         }
-        //TODO: only set the language if it is diferent than the device locale
+        //TODO: only set the language if it is different than the device locale
         setAppLanguage(language, false);
 
         loadLastUser();
 
         // Load last survey group
         mSurveyGroupId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
-
-        mSurveyChecker.run();// Ensure surveys have put their languages
     }
     
     public void setUser(User user) {
@@ -207,43 +200,5 @@ public class FlowApp extends Application {
     private void saveLocalePref(String language) {
         prefs.setString(Prefs.KEY_LOCALE, language);
     }
-
-    /**
-     * Old versions of the app may not have translations support, thus they will
-     * not store languages preference in the database. This task ensures that
-     * any language stored in the device has properly set its languages in the
-     * database, making them available to the user through the settings menu.
-     */
-    private final Runnable mSurveyChecker = new Runnable() {
-
-        @Override
-        public void run() {
-            SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
-            database.open();
-
-            // We check for the key not present in old devices: 'survey.languagespresent'
-            // NOTE: 'survey.language' DID exist
-            if (database.getPreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY) == null) {
-                Timber.d("Recomputing available languages...");
-                Toast.makeText(getApplicationContext(), R.string.configuring_languages, Toast.LENGTH_SHORT)
-                        .show();
-
-                // First, we add the default property, to avoid null cases within
-                // the process
-                database.savePreference(ConstantUtil.SURVEY_LANG_SETTING_KEY, "");
-                database.savePreference(ConstantUtil.SURVEY_LANG_PRESENT_KEY, "");
-
-                // Recompute all the surveys, and store their languages
-                List<Survey> surveyList = database.getSurveyList(SurveyGroup.ID_NONE);
-                for (Survey survey : surveyList) {
-                    String[] langs = LangsPreferenceUtil.determineLanguages(FlowApp.this, survey);
-                    Timber.d("Adding languages: " + Arrays.toString(langs));
-                    database.addLanguages(langs);
-                }
-            }
-
-            database.close();
-        }
-    };
 
 }

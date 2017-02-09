@@ -98,8 +98,9 @@ public class UserRequestedApkUpdateService extends IntentService {
             }
         } catch (Exception e) {
             Timber.e(e, "Error checking updates");
-            ViewUtil.displayToastFromService(getString(R.string.apk_update_service_error_update), uiHandler,
-                                             getApplicationContext());
+            ViewUtil.displayToastFromService(getString(R.string.apk_update_service_error_update),
+                    uiHandler,
+                    getApplicationContext());
         }
     }
 }

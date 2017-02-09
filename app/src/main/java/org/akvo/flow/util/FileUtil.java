@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -30,14 +30,11 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -127,37 +124,6 @@ public class FileUtil {
             return FlowApp.getApp().getExternalFilesDir(null).getAbsolutePath();
         }
         return Environment.getExternalStorageDirectory().getAbsolutePath();
-    }
-
-    /**
-     * writes the contents string to the file indicated by filePath
-     */
-    public static void writeStringToFile(String contents,
-            FileOutputStream filePath) throws IOException {
-        if (contents != null) {
-            BufferedOutputStream bw = new BufferedOutputStream(filePath);
-            bw.write(contents.getBytes("UTF-8"));
-            bw.flush();
-            bw.close();
-        }
-    }
-
-    /**
-     * reads the contents of a file into a string.
-     */
-    public static String readFileAsString(File file) throws IOException {
-        StringBuilder contents = new StringBuilder();
-        BufferedReader input = new BufferedReader(new FileReader(file));
-        String line;
-        try {
-            while ((line = input.readLine()) != null) {
-                contents.append(line);
-                contents.append(System.getProperty("line.separator"));
-            }
-        } finally {
-            close(input);
-        }
-        return contents.toString();
     }
 
     /**

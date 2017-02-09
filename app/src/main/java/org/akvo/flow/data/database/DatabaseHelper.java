@@ -1,17 +1,20 @@
 /*
  * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- * This file is part of Akvo FLOW.
+ * This file is part of Akvo Flow.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- * either version 3 of the License or any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -20,17 +23,20 @@ package org.akvo.flow.data.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
-import org.akvo.flow.data.preference.InsertablePreferences;
-import org.akvo.flow.data.preference.MigratablePreferences;
-import org.akvo.flow.data.preference.PreferenceExtractor;
-import org.akvo.flow.data.preference.PreferenceHandler;
-import org.akvo.flow.data.preference.PreferenceMapper;
+import org.akvo.flow.data.migration.languages.LanguagesExtractor;
+import org.akvo.flow.data.migration.languages.LanguagesMapper;
+import org.akvo.flow.data.migration.languages.SurveyLanguageMigratingDbDataSource;
+import org.akvo.flow.data.migration.preferences.InsertablePreferences;
+import org.akvo.flow.data.migration.preferences.MigratablePreferences;
+import org.akvo.flow.data.migration.preferences.PreferenceExtractor;
+import org.akvo.flow.data.migration.preferences.PreferenceMapper;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.domain.SurveyGroup;
 
 import java.lang.ref.WeakReference;
+import java.util.Set;
 
 import timber.log.Timber;
 
@@ -49,25 +55,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int VER_FORM_VERSION = 81;
     private static final int VER_CADDISFLY_QN = 82;
     private static final int VER_PREFERENCES_MIGRATE = 83;
-    private static final int DATABASE_VERSION = VER_PREFERENCES_MIGRATE;
-
-    /**
-     * Default values for languages
-     */
-    private static final String[] DEFAULT_INSERTS = new String[] {
-            "INSERT INTO preferences VALUES('"+ ConstantUtil.SURVEY_LANG_SETTING_KEY+"','')",
-            "INSERT INTO preferences VALUES('"+ ConstantUtil.SURVEY_LANG_PRESENT_KEY+"','')",
-    };
+    private static final int VER_LANGUAGES_MIGRATE = 84;
+    private static final int DATABASE_VERSION = VER_LANGUAGES_MIGRATE;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
-    private final PreferenceHandler preferenceHandler = new PreferenceHandler();
     private WeakReference<Context> contextWeakReference;
+    private final LanguageTable languageTable;
 
-    public DatabaseHelper(Context context) {
+    public DatabaseHelper(Context context, LanguageTable languageTable) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.contextWeakReference = new WeakReference<>(context);
+        this.languageTable = languageTable;
     }
 
     @Override
@@ -146,20 +146,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + TransmissionColumns.END_DATE + " INTEGER,"
                 + "UNIQUE (" + TransmissionColumns.FILENAME + ") ON CONFLICT REPLACE)");
 
-        db.execSQL("CREATE TABLE " + Tables.PREFERENCES + " ("
-                + PreferencesColumns.KEY + " TEXT PRIMARY KEY,"
-                + PreferencesColumns.VALUE + " TEXT)");
-
         db.execSQL("CREATE TABLE " + Tables.SYNC_TIME + " ("
                 + SyncTimeColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
                 + SyncTimeColumns.TIME + " TEXT,"
                 + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
-
+        languageTable.onCreate(db);
         createIndexes(db);
-        for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
-            db.execSQL(DEFAULT_INSERTS[i]);
-        }
     }
 
     @Override
@@ -167,9 +160,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
 
         Context context = contextWeakReference.get();
-        if (oldVersion < DATABASE_VERSION && context != null) {
+        if (oldVersion < VER_PREFERENCES_MIGRATE && context != null) {
             migratePreferences(context, db);
         }
+
         // Apply database updates sequentially. It starts in the current
         // version, hooking into the correspondent case block, and falls
         // through to any future upgrade. If no break statement is found,
@@ -202,8 +196,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
-
             onCreate(db);
+        } else if (oldVersion < VER_LANGUAGES_MIGRATE) {
+            //add new languages table
+            languageTable.onCreate(db);
+            migrateLanguages(context, db);
+            db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
+        }
+    }
+
+    private void migrateLanguages(Context context, SQLiteDatabase db) {
+        Prefs prefs = new Prefs(context.getApplicationContext());
+        long selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        if (selectedSurveyId != SurveyGroup.ID_NONE) {
+            String dataBaseLanguages = new LanguagesExtractor().retrieveLanguages(db);
+            if (!TextUtils.isEmpty(dataBaseLanguages)) {
+                Set<String> insertableLanguages = new LanguagesMapper()
+                        .transform(context, dataBaseLanguages);
+                new SurveyLanguageMigratingDbDataSource()
+                        .insertLanguagePreferences(db, selectedSurveyId, insertableLanguages);
+            }
         }
     }
 
@@ -212,7 +224,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Prefs prefs = new Prefs(context.getApplicationContext());
         PreferenceExtractor preferenceExtractor = new PreferenceExtractor();
         MigratablePreferences migratablePreferences = preferenceExtractor
-                .create(preferenceHandler, db);
+                .retrievePreferences(db);
         InsertablePreferences insertablePreferences = mapper.transform(migratablePreferences);
         prefs.insertUserPreferences(insertablePreferences);
     }
@@ -259,20 +271,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "(" + SurveyInstanceColumns.STATUS + ")");
         db.execSQL("CREATE INDEX response_modified_idx ON " + Tables.SURVEY_INSTANCE
                 + "(" + SurveyInstanceColumns.SUBMITTED_DATE + ")");
-    }
-
-    /**
-     * returns the value of a single setting identified by the key passed in
-     */
-    @Nullable
-    public String findPreference(SQLiteDatabase db, String key) {
-        return preferenceHandler.findPreference(db, key);
-    }
-
-    /**
-     * persists setting to the db
-     */
-    public void savePreference(SQLiteDatabase db, String key, String value) {
-        preferenceHandler.savePreference(db, key, value);
     }
 }

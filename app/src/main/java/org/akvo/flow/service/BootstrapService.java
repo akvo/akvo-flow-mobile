@@ -35,7 +35,6 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -281,8 +280,6 @@ public class BootstrapService extends IntentService {
     private void updateSurveyStorage(@NonNull Survey survey) {
         databaseAdapter.addSurveyGroup(survey.getSurveyGroup());
         databaseAdapter.saveSurvey(survey);
-        String[] languages = LangsPreferenceUtil.determineLanguages(this, survey);
-        databaseAdapter.addLanguages(languages);
     }
 
     @NonNull

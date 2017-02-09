@@ -61,7 +61,7 @@ public class TimeCheckService extends IntentService {
     private void checkTime() {
         if (!connectivityStateManager.isConnectionAvailable(
                 prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            Log.d(TAG, "No internet connection available. Can't perform the time check.");
+            Timber.d("No internet connection available. Can't perform the time check.");
             return;
         }
 

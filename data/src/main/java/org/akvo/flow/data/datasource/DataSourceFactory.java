@@ -18,6 +18,7 @@
 package org.akvo.flow.data.datasource;
 
 import org.akvo.flow.data.datasource.apk.NetworkApkDataSource;
+import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -26,13 +27,20 @@ import javax.inject.Singleton;
 public class DataSourceFactory {
 
     private final NetworkApkDataSource networkApkDataSource;
+    private final SharedPreferencesDataSource sharedPreferencesDataSource;
 
     @Inject
-    public DataSourceFactory(NetworkApkDataSource networkApkDataSource) {
+    public DataSourceFactory(NetworkApkDataSource networkApkDataSource,
+            SharedPreferencesDataSource sharedPreferencesDataSource) {
         this.networkApkDataSource = networkApkDataSource;
+        this.sharedPreferencesDataSource = sharedPreferencesDataSource;
     }
 
-    public NetworkApkDataSource createNetworkDataSource() {
+    public NetworkApkDataSource getNetworkDataSource() {
         return networkApkDataSource;
+    }
+
+    public SharedPreferencesDataSource getSharedPreferencesDataSource() {
+        return sharedPreferencesDataSource;
     }
 }

@@ -24,10 +24,12 @@ import com.google.gson.GsonBuilder;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.repository.ApkDataRepository;
+import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.data.util.GsonMapper;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.thread.UIThread;
 
 import javax.inject.Singleton;
@@ -66,6 +68,12 @@ public class ApplicationModule {
     @Singleton
     ApkRepository provideApkRepository(ApkDataRepository apkDataRepository) {
         return apkDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    UserRepository provideUserRepository(UserDataRepository userDataRepository) {
+        return userDataRepository;
     }
 
     @Provides

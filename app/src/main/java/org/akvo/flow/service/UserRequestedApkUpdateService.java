@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -43,9 +43,7 @@ import timber.log.Timber;
  * installAppUpdate it. After clicking the notification, the app will download and installAppUpdate
  * the new APK.
  *
- * @author Christopher Fagiani
  */
-@Deprecated //Will soon be replaced
 public class UserRequestedApkUpdateService extends IntentService {
 
     private static final String TAG = "USER_REQ_APK_UPDATE";

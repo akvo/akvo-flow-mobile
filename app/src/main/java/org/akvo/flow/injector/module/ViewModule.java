@@ -18,6 +18,7 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.GetApkData;
+import org.akvo.flow.domain.interactor.SaveApkData;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -30,7 +31,13 @@ public class ViewModule {
 
     @Provides
     @Named("getApkData")
-    UseCase provideApkDataUseCase(GetApkData getApkData) {
+    UseCase provideGetApkDataUseCase(GetApkData getApkData) {
         return getApkData;
+    }
+
+    @Provides
+    @Named("saveApkData")
+    UseCase provideSaveApkDataUseCase(SaveApkData saveApkData) {
+        return saveApkData;
     }
 }

@@ -20,24 +20,64 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.ApkRepository;
+import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.VersionHelper;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.functions.Func1;
+import rx.functions.Func2;
 
 public class SaveApkData extends UseCase {
 
+    public static final String KEY_APK_DATA = "apk_data";
+    private final ApkRepository apkRepository;
+    private final UserRepository userRepository;
+    private final VersionHelper versionHelper;
+
     @Inject
-    protected SaveApkData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    protected SaveApkData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
+            ApkRepository apkRepository, UserRepository userRepository, VersionHelper versionHelper) {
         super(threadExecutor, postExecutionThread);
+        this.apkRepository = apkRepository;
+        this.userRepository = userRepository;
+        this.versionHelper = versionHelper;
     }
 
     @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return null;
+    protected <T> Observable buildUseCaseObservable(final Map<String, T> parameters) {
+        if (parameters == null || !parameters.containsKey(KEY_APK_DATA)) {
+            throw new IllegalArgumentException("Missing params");
+        }
+
+        final ApkData apkData = (ApkData) parameters.get(KEY_APK_DATA);
+        return apkRepository.getApkDataPreference().concatMap(new Func1<ApkData, Observable<Boolean>>() {
+            @Override
+            public Observable call(ApkData savedApkData) {
+                if (savedApkData == null || versionHelper
+                        .isNewerVersion(savedApkData.getVersion(), apkData.getVersion())) {
+                    return Observable.zip(apkRepository
+                                    .saveApkDataPreference((ApkData) parameters.get(KEY_APK_DATA)),
+                            userRepository.clearAppUpdateNotified(),
+                            new Func2<Boolean, Boolean, Boolean>() {
+                                @Override
+                                public Boolean call(Boolean first, Boolean second) {
+                                    if (first == null || second == null) {
+                                        return false;
+                                    }
+                                    return first && second;
+                                }
+                            });
+                }
+                return Observable.just(false);
+            }
+        });
     }
 }

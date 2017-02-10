@@ -44,16 +44,6 @@ public class SharedPreferencesDataSource {
         this.preferences = prefs;
     }
 
-//    public Observable<Boolean> updateApkData(ApkData apkData) {
-//        ApkData savedApkData = getApkData();
-//        if (savedApkData == null || PlatformUtil
-//                .isNewerVersion(savedApkData.getVersion(), apkData.getVersion())) {
-//            saveApkData(apkData);
-//            clearAppUpdateNotified();
-//        }
-//        return Observable.just(true);
-//    }
-
     public Observable<Boolean> saveApkData(ApkData apkData) {
         preferences.setString(KEY_APK_DATA, gsonMapper.write(apkData, ApkData.class));
         return Observable.just(true);
@@ -73,7 +63,8 @@ public class SharedPreferencesDataSource {
         return Observable.just(gsonMapper.read(apkDataString, ApkData.class));
     }
 
-    public void saveAppUpdateNotifiedTime() {
+    public Observable<Boolean> saveAppUpdateNotifiedTime() {
         preferences.setLong(KEY_APP_UPDATE_LAST_NOTIFIED, System.currentTimeMillis());
+        return Observable.just(true);
     }
 }

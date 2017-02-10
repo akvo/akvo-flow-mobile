@@ -26,4 +26,8 @@ import rx.Observable;
 public interface ApkRepository {
 
     Observable<ApkData> loadApkData(@NonNull String baseUrl);
+
+    Observable<Boolean> saveApkDataPreference(@NonNull ApkData apkData);
+
+    Observable<ApkData> getApkDataPreference();
 }

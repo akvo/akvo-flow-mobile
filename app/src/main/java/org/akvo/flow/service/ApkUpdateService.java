@@ -31,20 +31,18 @@ import com.google.android.gms.gcm.TaskParams;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.GetApkData;
+import org.akvo.flow.domain.interactor.SaveApkData;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.entity.ViewApkMapper;
-import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;
-import org.akvo.flow.util.VersionHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,11 +67,12 @@ public class ApkUpdateService extends GcmTaskService {
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     @Inject
-    Navigator navigator;
-
-    @Inject
     @Named("getApkData")
     UseCase getApkData;
+
+    @Inject
+    @Named("saveApkData")
+    UseCase saveApkData;
 
     @Inject
     VersionHelper versionHelper;
@@ -137,11 +136,12 @@ public class ApkUpdateService extends GcmTaskService {
     public void onDestroy() {
         super.onDestroy();
         getApkData.unSubscribe();
+        saveApkData.unSubscribe();
     }
 
     /**
-     *  Called when app is updated to a new version, reinstalled etc.
-     *  Repeating tasks have to be rescheduled
+     * Called when app is updated to a new version, reinstalled etc.
+     * Repeating tasks have to be rescheduled
      */
     @Override
     public void onInitializeTasks() {
@@ -159,6 +159,7 @@ public class ApkUpdateService extends GcmTaskService {
         //after the first time the task is run we reschedule to a higher interval
         schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
+        //TODO: move those to domain logic
         if (!syncOverMobileNetworksAllowed(prefs) && !connectivityStateManager.isWifiConnected()) {
             Timber.d("No available authorised connection. Can't perform the requested operation");
             return GcmNetworkManager.RESULT_SUCCESS;
@@ -176,16 +177,21 @@ public class ApkUpdateService extends GcmTaskService {
 
             @Override
             public void onNext(ApkData apkData) {
-                ViewApkData viewApkData = mapper.transform(apkData);
+                final ViewApkData viewApkData = mapper.transform(apkData);
                 if (shouldAppBeUpdated(viewApkData)) {
-                    //save to shared preferences //TODO: move to store
-                    ApkUpdateStore store = new ApkUpdateStore(new GsonMapper(), prefs);
-                    store.updateApkData(viewApkData);
-                    navigator.navigateToAppUpdate(ApkUpdateService.this, viewApkData);
+                    Map<String, Object> params = new HashMap<>(1);
+                    params.put(SaveApkData.KEY_APK_DATA, apkData);
+                    saveApkData.execute(new DefaultSubscriber<Boolean>() {
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            Timber.e(e, "Error saving apk data");
+                        }
+                    }, params);
                 }
             }
-
         }, params);
+
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 

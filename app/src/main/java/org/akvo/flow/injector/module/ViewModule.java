@@ -18,7 +18,6 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.GetApkData;
-import org.akvo.flow.domain.interactor.SaveException;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -33,11 +32,5 @@ public class ViewModule {
     @Named("getApkData")
     UseCase provideApkDataUseCase(GetApkData getApkData) {
         return getApkData;
-    }
-
-    @Provides
-    @Named("saveException")
-    UseCase provideSaveExceptionUseCase(SaveException saveException) {
-        return saveException;
     }
 }

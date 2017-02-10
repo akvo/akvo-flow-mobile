@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -25,12 +28,13 @@ import android.support.annotation.NonNull;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
 import org.akvo.flow.R;
 import org.akvo.flow.service.ServiceToastRunnable;
 
 /**
  * Utility class to handle common features for the View tier
- * 
+ *
  * @author Christopher Fagiani
  */
 public class ViewUtil {
@@ -40,7 +44,7 @@ public class ViewUtil {
      * the affirmative button is clicked, the Location Settings panel is
      * launched. If the negative button is clicked, it will just close the
      * dialog
-     * 
+     *
      * @param parentContext
      */
     public static void showGPSDialog(final Context parentContext) {
@@ -67,12 +71,12 @@ public class ViewUtil {
     /**
      * displays a simple dialog box with only a single, positive button using
      * the resource ids of the strings passed in for the title and text.
-     * 
+     *
      * @param titleId
      * @param textId
      * @param parentContext
      */
-    public static void showConfirmDialog(int titleId, int textId,
+    private static void showConfirmDialog(int titleId, int textId,
             Context parentContext) {
         showConfirmDialog(titleId, textId, parentContext, false,
                 new DialogInterface.OnClickListener() {
@@ -88,7 +92,7 @@ public class ViewUtil {
      * displays a simple dialog box with a single positive button and an
      * optional (based on a flag) cancel button using the resource ids of the
      * strings passed in for the title and text.
-     * 
+     *
      * @param titleId
      * @param textId
      * @param parentContext
@@ -112,17 +116,17 @@ public class ViewUtil {
      * optional (based on a flag) cancel button using the resource ids of the
      * strings passed in for the title and text. users can install listeners for
      * both the positive and negative buttons
-     * 
+     *
      * @param titleId
      * @param textId
      * @param parentContext
      * @param includeNegative
      * @param positiveListener - if includeNegative is false, this will also be
-     *            bound to the cancel handler
+     *                         bound to the cancel handler
      * @param negativeListener - only used if includeNegative is true - if the
-     *            negative listener is non-null, it will also be bound to the
-     *            cancel listener so pressing back to dismiss the dialog will
-     *            have the same effect as clicking the negative button.
+     *                         negative listener is non-null, it will also be bound to the
+     *                         cancel listener so pressing back to dismiss the dialog will
+     *                         have the same effect as clicking the negative button.
      */
     public static void showConfirmDialog(int titleId, int textId,
             Context parentContext, boolean includeNegative,
@@ -159,17 +163,17 @@ public class ViewUtil {
      * optional (based on a flag) cancel button using the resource id of the
      * string passed in for the title, and a String parameter for the text.
      * users can install listeners for both the positive and negative buttons
-     * 
+     *
      * @param titleId
      * @param text
      * @param parentContext
      * @param includeNegative
      * @param positiveListener - if includeNegative is false, this will also be
-     *            bound to the cancel handler
+     *                         bound to the cancel handler
      * @param negativeListener - only used if includeNegative is true - if the
-     *            negative listener is non-null, it will also be bound to the
-     *            cancel listener so pressing back to dismiss the dialog will
-     *            have the same effect as clicking the negative button.
+     *                         negative listener is non-null, it will also be bound to the
+     *                         cancel listener so pressing back to dismiss the dialog will
+     *                         have the same effect as clicking the negative button.
      */
     public static void showConfirmDialog(int titleId, String text,
             Context parentContext, boolean includeNegative,
@@ -199,85 +203,6 @@ public class ViewUtil {
         }
 
         builder.show();
-    }
-
-    /**
-     * displays a dialog box for selection of one or more survey languages
-     */
-    public static void displayLanguageSelector(final Context context,
-            final CharSequence[] languages,
-            final boolean[] selections,
-            final DialogInterface.OnClickListener listener) {
-
-        displayLanguageSelectionDialog(context, selections, listener,
-                R.string.surveylanglabel, languages, true,
-                R.string.langmandatorytitle, R.string.langmandatorytext);
-    }
-
-    /**
-     * displays a dialog box for allowing selection of countries from a list
-     */
-    private static void displayLanguageSelectionDialog(final Context context,
-            final boolean[] selections,
-            final DialogInterface.OnClickListener listener,
-            final int labelResourceId, final CharSequence[] languages,
-            final boolean selectionMandatory,
-            final int mandatoryTitleResourceId,
-            final int mandatoryTextResourceId) {
-        AlertDialog dia = new AlertDialog.Builder(context)
-                .setTitle(labelResourceId)
-                .setMultiChoiceItems(languages, selections,
-                        new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int which, boolean isChecked) {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        break;
-                                }
-                            }
-                        })
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        boolean isValid = false;
-                        if (selectionMandatory) {
-                            for (int i = 0; i < selections.length; i++) {
-                                if (selections[i]) {
-                                    isValid = true;
-                                    break;
-                                }
-                            }
-                        } else {
-                            isValid = true;
-                        }
-                        if (isValid) {
-                            listener.onClick(dialog, which);
-                        } else {
-                            showConfirmDialog(mandatoryTitleResourceId,
-                                    mandatoryTextResourceId, context, false,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface dialog,
-                                                int which) {
-                                            if (dialog != null) {
-                                                dialog.dismiss();
-                                            }
-                                            displayLanguageSelectionDialog(context,
-                                                    selections, listener,
-                                                    labelResourceId,
-                                                    languages,
-                                                    selectionMandatory,
-                                                    mandatoryTitleResourceId,
-                                                    mandatoryTextResourceId);
-                                        }
-                                    });
-                        }
-                    }
-                }).create();
-        dia.show();
     }
 
     /**
@@ -318,7 +243,7 @@ public class ViewUtil {
             DialogInterface.OnClickListener clickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
         LinearLayout main = new LinearLayout(parentContext);
-        main.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+        main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
         main.setOrientation(LinearLayout.VERTICAL);
         builder.setTitle(title);
@@ -342,12 +267,14 @@ public class ViewUtil {
 
     /**
      * Display a UI Toast using the Handler's thread (main thread)
-     * @param msg message to display
-     * @param uiThreadHandler the handler to use
+     *
+     * @param msg                message to display
+     * @param uiThreadHandler    the handler to use
      * @param applicationContext the Context to use for the toast
      */
-    public static void displayToastFromService(@NonNull final String msg, @NonNull Handler uiThreadHandler,
-                                               @NonNull final Context applicationContext) {
+    public static void displayToastFromService(@NonNull final String msg,
+            @NonNull Handler uiThreadHandler,
+            @NonNull final Context applicationContext) {
         uiThreadHandler.post(new ServiceToastRunnable(applicationContext, msg));
     }
 
@@ -358,5 +285,5 @@ public class ViewUtil {
     public interface AdminAuthDialogListener {
         void onAuthenticated();
     }
-    
+
 }

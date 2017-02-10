@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.fragment;
@@ -27,6 +30,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -38,8 +42,8 @@ import android.widget.ListView;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
-import org.akvo.flow.async.loader.SurveyInstanceLoader;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyInstanceLoader;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.adapter.ResponseListAdapter;
@@ -49,12 +53,12 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private static final String TAG = ResponseListFragment.class.getSimpleName();
 
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
-    private static final String EXTRA_RECORD       = "record";
+    private static final String EXTRA_RECORD = "record";
 
     // TODO: Move all id constants to ConstantUtil
-    private static int SURVEY_ID_KEY          = R.integer.surveyidkey;
+    private static int SURVEY_ID_KEY = R.integer.surveyidkey;
     private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
-    private static int FINISHED_KEY           = R.integer.finishedkey;
+    private static int FINISHED_KEY = R.integer.finishedkey;
 
     // Context menu items
     private static final int DELETE_ONE = 0;
@@ -86,14 +90,14 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onResume() {
         super.onResume();
         refresh();
-        getActivity().registerReceiver(dataSyncReceiver,
-                new IntentFilter(getString(R.string.action_data_sync)));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
+                new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(dataSyncReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
     }
 
     @Override
@@ -116,7 +120,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
             mDatabase.open();
         }
 
-        if(mAdapter == null) {
+        if (mAdapter == null) {
             mAdapter = new ResponseListAdapter(getActivity());// Cursor Adapter
             setListAdapter(mAdapter);
         }
@@ -131,17 +135,19 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         menu.add(0, VIEW_HISTORY, 0, R.string.transmissionhist);
 
         // Allow deletion only for 'saved' responses
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         View itemView = info.targetView;
-        if (!(Boolean)itemView.getTag(FINISHED_KEY)) {
+        if (!(Boolean) itemView.getTag(FINISHED_KEY)) {
             menu.add(0, DELETE_ONE, 2, R.string.deleteresponse);
         }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        Long surveyInstanceId = mAdapter.getItemId(info.position);// This ID is the _id column in the SQLite db
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        Long surveyInstanceId = mAdapter
+                .getItemId(info.position);// This ID is the _id column in the SQLite db
         switch (item.getItemId()) {
             case DELETE_ONE:
                 deleteSurveyInstance(surveyInstanceId);
@@ -199,7 +205,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
 
         // Read-only vs editable
-        if ((Boolean)view.getTag(FINISHED_KEY)) {
+        if ((Boolean) view.getTag(FINISHED_KEY)) {
             i.putExtra(ConstantUtil.READONLY_KEY, true);
         } else {
             i.putExtra(ConstantUtil.SINGLE_SURVEY_KEY, true);

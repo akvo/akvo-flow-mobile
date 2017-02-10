@@ -1,17 +1,20 @@
 /*
-* Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
 *
-* This file is part of Akvo FLOW.
-*
-* Akvo FLOW is free software: you can redistribute it and modify it under the terms of
-* the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
-* either version 3 of the License or any later version.
-*
-* Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU Affero General Public License included below for more details.
-*
-* The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  This file is part of Akvo Flow.
+ *
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 package org.akvo.flow.service;
@@ -20,17 +23,19 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.util.Pair;
-import android.util.Log;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.presentation.entity.ViewApkData;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ViewUtil;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 /**
  * This background service will check the rest api for a new version of the APK.
@@ -51,6 +56,12 @@ public class UserRequestedApkUpdateService extends IntentService {
     @Inject
     Navigator navigator;
 
+    @Inject
+    ConnectivityStateManager connectivityStateManager;
+
+    @Inject
+    Prefs prefs;
+
     public UserRequestedApkUpdateService() {
         super(TAG);
     }
@@ -67,7 +78,6 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Thread.setDefaultUncaughtExceptionHandler(PersistentUncaughtExceptionHandler.getInstance());
         checkUpdates();
     }
 
@@ -76,26 +86,29 @@ public class UserRequestedApkUpdateService extends IntentService {
      * we display {@link AppUpdateActivity}, requesting the user to download it.
      */
     private void checkUpdates() {
-        if (!StatusUtil.hasDataConnection(this)) {
-            ViewUtil.displayToastFromService(getString(R.string.apk_update_service_error_no_internet), uiHandler,
-                                             getApplicationContext());
+        if (!connectivityStateManager.isConnectionAvailable(
+                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
+            ViewUtil.displayToastFromService(
+                    getString(R.string.apk_update_service_error_no_internet), uiHandler,
+                    getApplicationContext());
             return;
         }
 
         try {
-            Pair<Boolean, ViewApkData> result = apkUpdateHelper.shouldUpdate(StatusUtil.getServerBase(this));
+            Pair<Boolean, ViewApkData> result = apkUpdateHelper.shouldUpdate();
             // There is a newer version. Fire the 'Download and Install' Activity.
             if (result.first) {
                 navigator.navigateToAppUpdate(this, result.second);
             } else {
-                ViewUtil.displayToastFromService(getString(R.string.apk_update_service_no_update), uiHandler,
-                                                 getApplicationContext());
+                ViewUtil.displayToastFromService(getString(R.string.apk_update_service_no_update),
+                        uiHandler,
+                        getApplicationContext());
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error checking updates", e);
-            PersistentUncaughtExceptionHandler.recordException(e);
-            ViewUtil.displayToastFromService(getString(R.string.apk_update_service_error_update), uiHandler,
-                                             getApplicationContext());
+            Timber.e(e, "Error checking updates");
+            ViewUtil.displayToastFromService(getString(R.string.apk_update_service_error_update),
+                    uiHandler,
+                    getApplicationContext());
         }
     }
 }

@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 @Singleton
 public class DataSourceFactory {
 
-    //TODO: make this lazy?
     private final NetworkApkDataSource networkApkDataSource;
 
     @Inject

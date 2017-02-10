@@ -22,6 +22,7 @@ public class Constants {
     public static final String APK_VERSION_SERVICE_PATH =
             "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
 
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
+    public static final int IMAGE_SIZE_320_240 = 0;
+    public static final int IMAGE_SIZE_640_480 = 1;
+    public static final int IMAGE_SIZE_1280_960 = 2;
 }

@@ -1,18 +1,22 @@
 /*
  *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.akvo.flow.ui.view;
 
 import android.animation.LayoutTransition;
@@ -43,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.OnDeleteListener {
+
     private QuestionGroup mQuestionGroup;
     private QuestionInteractionListener mQuestionListener;
     private SurveyListener mSurveyListener;
@@ -82,9 +87,9 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         setFocusableInTouchMode(true);
 
         inflate(getContext(), R.layout.question_group_tab, this);
-        mScroller = (ScrollView)findViewById(R.id.scroller);
-        mContainer = (LinearLayout)findViewById(R.id.question_list);
-        mRepetitionsText = (TextView)findViewById(R.id.repeat_header);
+        mScroller = (ScrollView) findViewById(R.id.scroller);
+        mContainer = (LinearLayout) findViewById(R.id.question_list);
+        mRepetitionsText = (TextView) findViewById(R.id.repeat_header);
 
         // Animate view additions/removals if possible
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -166,11 +171,15 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             // Load existing iterations. If no iteration is available, show one by default.
             mRepetitions.loadIDs();
             int iterCount = Math.max(mRepetitions.size(), 1);
-            for (int i=0; i<iterCount; i++) {
+            for (int i = 0; i < iterCount; i++) {
                 loadGroup(i);
             }
         }
 
+        displayResponses();
+    }
+
+    private void displayResponses() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
         for (QuestionView qv : mQuestionViews.values()) {
             final String questionId = qv.getQuestion().getId();
@@ -223,7 +232,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void updateRepetitionsHeader() {
-        mRepetitionsText.setText(getContext().getString(R.string.repetitions) + mRepetitions.size());
+        mRepetitionsText
+                .setText(getContext().getString(R.string.repetitions) + mRepetitions.size());
     }
 
     private void loadGroup() {
@@ -231,13 +241,18 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void loadGroup(int index) {
-        final int repetitionId = mRepetitions.size() <= index ? mRepetitions.next() : mRepetitions.getRepetitionId(index);
-        final int position = index+1;// Visual indicator.
+        final int repetitionId =
+                mRepetitions.size() <= index ?
+                        mRepetitions.next() :
+                        mRepetitions.getRepetitionId(index);
+        final int position = index + 1;// Visual indicator.
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
-            RepetitionHeader header = new RepetitionHeader(getContext(), mQuestionGroup.getHeading(),
-                    repetitionId, position, mSurveyListener.isReadOnly() ? null : this);
+            RepetitionHeader header =
+                    new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
+                            position,
+                            mSurveyListener.isReadOnly() ? null : this);
             mHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -245,7 +260,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
-                q = Question.copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
+                q = Question
+                        .copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
             }
 
             QuestionView questionView;
@@ -359,6 +375,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     class Repetitions implements Iterable<Integer> {
+
         List<Integer> mIDs = new ArrayList<>();
 
         /**
@@ -409,5 +426,4 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             return mIDs.iterator();
         }
     }
-
 }

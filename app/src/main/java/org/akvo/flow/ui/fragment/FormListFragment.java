@@ -1,33 +1,35 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.fragment;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.util.Log;
+import android.support.v4.util.Pair;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,34 +39,37 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.async.loader.SurveyInfoLoader;
-import org.akvo.flow.async.loader.SurveyInfoLoader.SurveyQuery;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyInfoLoader;
+import org.akvo.flow.data.loader.models.SurveyInfo;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.ui.model.ViewSurveyInfo;
+import org.akvo.flow.ui.model.ViewSurveyInfoMapper;
 import org.akvo.flow.util.PlatformUtil;
-import org.ocpsoft.prettytime.PrettyTime;
 
-public class FormListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
-        OnItemClickListener {
-    private static final String TAG = FormListFragment.class.getSimpleName();
-    
+import java.util.ArrayList;
+import java.util.List;
+
+import timber.log.Timber;
+
+import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
+
+public class FormListFragment extends ListFragment
+        implements LoaderCallbacks<Pair<List<SurveyInfo>, Boolean>>, OnItemClickListener {
+
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
-    private static final String EXTRA_RECORD       = "record";
-    
-    public interface SurveyListListener {
-        void onSurveyClick(String surveyId);
-    }
-    
+    private static final String EXTRA_RECORD = "record";
+
     private SurveyGroup mSurveyGroup;
     private SurveyedLocale mRecord;
-    private boolean mRegistered;
-    
     private SurveyAdapter mAdapter;
-    private SurveyDbAdapter mDatabase;
     private SurveyListListener mListener;
-    
-    public static FormListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
+    private final ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+
+    public FormListFragment() {
+    }
+
+    public static FormListFragment newInstance(SurveyGroup surveyGroup, SurveyedLocale record) {
         FormListFragment fragment = new FormListFragment();
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
@@ -72,21 +77,21 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
         fragment.setArguments(args);
         return fragment;
     }
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        
+
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (SurveyListListener)activity;
+            mListener = (SurveyListListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SurveyListListener");
         }
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +103,8 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
-        if(mAdapter == null) {
-            mAdapter = new SurveyAdapter(getActivity());
+        if (mAdapter == null) {
+            mAdapter = new SurveyAdapter(getActivity(), mSurveyGroup);
             setListAdapter(mAdapter);
         }
         getListView().setOnItemClickListener(this);
@@ -108,34 +113,35 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase = new SurveyDbAdapter(getActivity());
-        mDatabase.open();
         getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mDatabase.close();
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final String surveyId = mAdapter.getItem(position).mId;
+        final String surveyId = mAdapter.getItem(position).getId();
         mListener.onSurveyClick(surveyId);
     }
 
-    private boolean isRegistrationSurvey(String surveyId) {
-        return surveyId.equals(mSurveyGroup.getRegisterSurveyId());
-    }
+   static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
 
-    class SurveyAdapter extends ArrayAdapter<SurveyInfo> {
-        static final int LAYOUT_RES = R.layout.survey_item;
+        private static final int LAYOUT_RES = R.layout.survey_item;
+        private final SurveyGroup mSurveyGroup;
+        private final int[] backgrounds;
+        private final int versionTextSize;
+        private final int titleTextSize;
 
-        public SurveyAdapter(Context context) {
-            super(context, LAYOUT_RES, new ArrayList<SurveyInfo>());
+        public SurveyAdapter(Context context, SurveyGroup surveyGroup) {
+            super(context, LAYOUT_RES, new ArrayList<ViewSurveyInfo>());
+            this.mSurveyGroup = surveyGroup;
+            this.backgrounds = new int[2];
+            backgrounds[0] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg1);
+            backgrounds[1] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg2);
+            this.versionTextSize = context.getResources()
+                    .getDimensionPixelSize(R.dimen.survey_version_text_size);
+            this.titleTextSize = context.getResources()
+                    .getDimensionPixelSize(R.dimen.survey_title_text_size);
         }
-        
+
         @Override
         public boolean areAllItemsEnabled() {
             return false;
@@ -143,122 +149,102 @@ public class FormListFragment extends ListFragment implements LoaderCallbacks<Cu
 
         @Override
         public boolean isEnabled(int position) {
-            SurveyInfo s = getItem(position);
-            return !s.mDeleted && isEnabled(s.mId);
-        }
-        
-        private boolean isEnabled(String surveyId) {
-            if (mSurveyGroup.isMonitored()) {
-                return isRegistrationSurvey(surveyId) ? !mRegistered : mRegistered;
-            }
-            
-            return !mRegistered;// Not monitored. Only one response allowed
+            ViewSurveyInfo surveyInfo = getItem(position);
+            return surveyInfo.isEnabled();
         }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        @NonNull @Override
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
             View listItem = convertView;
+            SurveyInfoViewHolder surveyInfoViewHolder;
             if (listItem == null) {
-                LayoutInflater inflater = LayoutInflater.from(getContext());
-                listItem = inflater.inflate(LAYOUT_RES, null);
+                listItem = LayoutInflater.from(getContext()).inflate(LAYOUT_RES, null);
+                surveyInfoViewHolder = new SurveyInfoViewHolder(listItem);
+                listItem.setTag(surveyInfoViewHolder);
+            } else {
+                surveyInfoViewHolder = (SurveyInfoViewHolder) listItem.getTag();
             }
 
-            final SurveyInfo surveyInfo = getItem(position);
+            final ViewSurveyInfo surveyInfo = getItem(position);
 
-            TextView surveyNameView = (TextView)listItem.findViewById(R.id.text1);
-            TextView surveyVersionView = (TextView)listItem.findViewById(R.id.text2);
-            TextView lastSubmissionTitle = (TextView)listItem.findViewById(R.id.date_label);
-            TextView lastSubmissionView = (TextView)listItem.findViewById(R.id.date);
+            surveyInfoViewHolder.updateViews(surveyInfo, versionTextSize, titleTextSize);
 
-            surveyNameView.setText(surveyInfo.mName);
-            surveyVersionView.setText("v" + surveyInfo.mVersion);
+            // Alternate background
+            listItem.setBackgroundResource(backgrounds[position % 2 == 0 ? 0 : 1]);
+            return listItem;
+        }
+    }
 
-            boolean enabled = isEnabled(surveyInfo.mId);
-            if (surveyInfo.mDeleted) {
-                enabled = false;
-                surveyVersionView.append(" - " + getString(R.string.form_deleted));
-            }
+    @Override
+    public Loader<Pair<List<SurveyInfo>, Boolean>> onCreateLoader(int id, Bundle args) {
+        return new SurveyInfoLoader(getActivity(), mRecord.getId(), mSurveyGroup);
+    }
 
-            listItem.setEnabled(enabled);
-            surveyNameView.setEnabled(enabled);
-            surveyVersionView.setEnabled(enabled);
+    @Override
+    public void onLoadFinished(Loader<Pair<List<SurveyInfo>, Boolean>> loader,
+            Pair<List<SurveyInfo>, Boolean> data) {
+        if (loader == null) {
+            Timber.e("onLoadFinished() - Loader returned no data");
+            return;
+        }
+        mAdapter.clear();
+        boolean registered = data.second;
+        List<ViewSurveyInfo> surveys = mapper
+                .transform(data.first, mSurveyGroup, registered, getString(R.string.form_deleted));
+        for (ViewSurveyInfo s : surveys) {
+            mAdapter.add(s);
+        }
+    }
 
-            if (surveyInfo.mLastSubmission != null && !isRegistrationSurvey(surveyInfo.mId)) {
-                String time = new PrettyTime().format(new Date(surveyInfo.mLastSubmission));
-                lastSubmissionView.setText(time);
+    @Override
+    public void onLoaderReset(Loader<Pair<List<SurveyInfo>, Boolean>> loader) {
+        //EMPTY
+    }
+
+    public interface SurveyListListener {
+
+        void onSurveyClick(String surveyId);
+    }
+
+    public static class SurveyInfoViewHolder {
+
+        private final View view;
+        private final TextView surveyNameView;
+        private final TextView lastSubmissionTitle;
+        private final TextView lastSubmissionView;
+
+        public SurveyInfoViewHolder(View view) {
+            this.view = view;
+            this.surveyNameView = (TextView) view.findViewById(R.id.survey_name_tv);
+            this.lastSubmissionTitle = (TextView) view.findViewById(R.id.date_label);
+            this.lastSubmissionView = (TextView) view.findViewById(R.id.date);
+        }
+
+        public void updateViews(ViewSurveyInfo surveyInfo, int versionTextSize, int titleTextSize) {
+            SpannableString versionSpannable = getSpannableString(versionTextSize,
+                    surveyInfo.getSurveyExtraInfo());
+            SpannableString titleSpannable = getSpannableString(titleTextSize,
+                    surveyInfo.getSurveyName());
+            surveyNameView.setText(TextUtils.concat(titleSpannable, versionSpannable));
+            view.setEnabled(surveyInfo.isEnabled());
+            surveyNameView.setEnabled(surveyInfo.isEnabled());
+
+            if (surveyInfo.getTime() != null) {
+                lastSubmissionView.setText(surveyInfo.getTime());
                 lastSubmissionTitle.setVisibility(View.VISIBLE);
                 lastSubmissionView.setVisibility(View.VISIBLE);
             } else {
                 lastSubmissionTitle.setVisibility(View.GONE);
                 lastSubmissionView.setVisibility(View.GONE);
             }
-
-            // Alternate background
-            int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-            final int res= PlatformUtil.getResource(getContext(), attr);
-            listItem.setBackgroundResource(res);
-
-            return listItem;
-        }
-        
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyInfoLoader(getActivity(), mDatabase, mSurveyGroup.getId(), mRecord.getId());
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor == null) {
-            Log.e(TAG, "onFinished() - Loader returned no data");
-            return;
         }
 
-        mAdapter.clear();
-        List<SurveyInfo> surveys = new ArrayList<SurveyInfo>();// Buffer items before adapter addition
-        mRegistered = false; // Calculate if this record is registered yet
-        if (cursor.moveToFirst()) {
-            do {
-                SurveyInfo s = new SurveyInfo();
-                s.mId = cursor.getString(SurveyQuery.SURVEY_ID);
-                s.mName = cursor.getString(SurveyQuery.NAME);
-                s.mVersion = String.valueOf(cursor.getFloat(SurveyQuery.VERSION));
-                s.mDeleted = cursor.getInt(SurveyQuery.DELETED) == 1;
-                if (!cursor.isNull(SurveyQuery.SUBMITTED)) {
-                    s.mLastSubmission = cursor.getLong(SurveyQuery.SUBMITTED);
-                    mRegistered = true;
-                }
-
-                if (mSurveyGroup.isMonitored() && isRegistrationSurvey(s.mId)) {
-                    surveys.add(0, s);// Make sure registration survey is at the top
-                } else {
-                    surveys.add(s);
-                }
-            } while (cursor.moveToNext());
-        }
-
-        // Dump the temporary list into the adapter. This way mRegistered it's been
-        // properly initialized, having looped through all the items first.
-        for (SurveyInfo s : surveys) {
-            mAdapter.add(s);
+        @NonNull
+        private SpannableString getSpannableString(int textSize, String string) {
+            SpannableString spannable = new SpannableString(string);
+            spannable.setSpan(new AbsoluteSizeSpan(textSize), 0, string.length(),
+                    SPAN_INCLUSIVE_INCLUSIVE);
+            return spannable;
         }
     }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        loader.reset();
-    }
-
-    /**
-     * Wrapper for the data displayed in the list
-     */
-    class SurveyInfo {
-        String mId;
-        String mName;
-        String mVersion;
-        Long mLastSubmission;
-        boolean mDeleted;
-    }
-
 }

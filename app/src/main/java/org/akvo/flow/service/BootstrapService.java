@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -24,6 +24,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+
+import org.akvo.flow.R;
+import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyMetadata;
+import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.serialization.form.SurveyMetadataParser;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.LangsPreferenceUtil;
+import org.akvo.flow.util.NotificationHelper;
+import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.SurveyIdGenerator;
+import org.akvo.flow.util.ViewUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,18 +52,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import org.akvo.flow.R;
-import org.akvo.flow.dao.SurveyDao;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.LangsPreferenceUtil;
-import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.ViewUtil;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -71,6 +75,7 @@ public class BootstrapService extends IntentService {
 
     private static final String TAG = "BOOTSTRAP_SERVICE";
     public volatile static boolean isProcessing = false;
+    private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private SurveyDbAdapter databaseAdapter;
     private Handler mHandler;
 
@@ -168,10 +173,13 @@ public class BootstrapService extends IntentService {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            Log.d(TAG, "Processing entry: " + entry.getName());
-            String parts[] = entry.getName().split("/");
-            String filename = parts[parts.length - 1];
-            String id = parts.length > 1 ? parts[parts.length - 2] : "";
+            String entryName = entry.getName();
+            Log.d(TAG, "Processing entry: " + entryName);
+            int fileSeparatorPosition = entryName.lastIndexOf("/");
+            String filename = entryName.substring(fileSeparatorPosition + 1);
+
+            String id = surveyIdGenerator
+                    .getSurveyIdFromFilePath(entryName.substring(0, fileSeparatorPosition));
 
             // Skip directories and hidden/unwanted files
             if (entry.isDirectory() || filename.startsWith(".") ||
@@ -203,63 +211,95 @@ public class BootstrapService extends IntentService {
         file.renameTo(new File(file.getAbsolutePath() + ConstantUtil.PROCESSED_OK_SUFFIX));
     }
 
-    private void processSurveyFile(@NonNull ZipFile zipFile, @NonNull ZipEntry entry, @NonNull String filename,
-                                   @NonNull String id) throws IOException {
-        String surveyName = filename;
-        // we want to avoid duplicate survey names
+    private void processSurveyFile(@NonNull ZipFile zipFile, @NonNull ZipEntry entry,
+            @NonNull String filename, @NonNull String idFromFolderName) throws IOException {
+
+        Survey survey = databaseAdapter.getSurvey(idFromFolderName);
+
         String surveyFolderName = generateSurveyFolder(entry);
+
+        // in both cases (new survey and existing), we need to update the xml
+        File surveyFile = generateNewSurveyFile(filename, surveyFolderName);
+        FileUtil.copy(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
+        // now read the survey XML back into memory to see if there is a version
+        SurveyMetadata surveyMetadata = readBasicSurveyData(surveyFile);
+        if (surveyMetadata == null) {
+            // Something went wrong, we cannot continue with this survey
+            return;
+        }
+
+        verifyAppId(surveyMetadata);
+
+        survey = updateSurvey(filename, idFromFolderName, survey, surveyFolderName, surveyMetadata);
+
+        // Save the Survey, SurveyGroup, and languages.
+        updateSurveyStorage(survey);
+    }
+
+    @Nullable
+    private SurveyMetadata readBasicSurveyData(File surveyFile) {
+        SurveyMetadata surveyMetadata = null;
+        try {
+            InputStream in = new FileInputStream(surveyFile);
+            SurveyMetadataParser parser = new SurveyMetadataParser();
+            surveyMetadata = parser.parse(in);
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "Could not load survey xml file");
+        }
+        return surveyMetadata;
+    }
+
+    @NonNull
+    private Survey updateSurvey(@NonNull String filename, @NonNull String idFromFolderName,
+            @Nullable Survey survey, @NonNull String surveyFolderName,
+            @NonNull SurveyMetadata surveyMetadata) {
+        String surveyName = filename;
         if (surveyName.contains(ConstantUtil.DOT_SEPARATOR)) {
             surveyName = surveyName.substring(0, surveyName.indexOf(ConstantUtil.DOT_SEPARATOR));
         }
-        Survey survey = databaseAdapter.getSurvey(id);
         if (survey == null) {
-            survey = new Survey();
-            survey.setId(id);
-            survey.setName(surveyName);
-            survey.setHelpDownloaded(true);// Resources are always attached to the zip file
-            survey.setType(ConstantUtil.SURVEY_TYPE);
+            survey = createSurvey(idFromFolderName, surveyMetadata, surveyName);
         }
         survey.setLocation(ConstantUtil.FILE_LOCATION);
         String surveyFileName = generateSurveyFileName(filename, surveyFolderName);
         survey.setFileName(surveyFileName);
 
-        // in both cases (new survey and existing), we need to update the xml
-        File surveyFile = generateNewSurveyFile(filename, surveyFolderName);
-        FileUtil.copy(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
-
-        // now read the survey XML back into memory to see if there is a version
-        Survey loadedSurvey = null;
-        try {
-            InputStream in = new FileInputStream(surveyFile);
-            loadedSurvey = SurveyDao.loadSurvey(survey, in);
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, "Could not load survey xml file");
+        if (!TextUtils.isEmpty(surveyMetadata.getName())) {
+            survey.setName(surveyMetadata.getName());
         }
-        if (loadedSurvey == null) {
-            // Something went wrong, we cannot continue with this survey
-            return;
-        }
+        survey.setSurveyGroup(surveyMetadata.getSurveyGroup());
 
-        verifyAppId(loadedSurvey);
-
-        survey.setName(loadedSurvey.getName());
-        survey.setSurveyGroup(loadedSurvey.getSurveyGroup());
-
-        if (loadedSurvey.getVersion() > 0) {
-            survey.setVersion(loadedSurvey.getVersion());
+        if (surveyMetadata.getVersion() > 0) {
+            survey.setVersion(surveyMetadata.getVersion());
         } else {
             survey.setVersion(1d);
         }
+        return survey;
+    }
 
-        // Save the Survey, SurveyGroup, and languages.
-        updateSurveyStorage(survey);
+    @NonNull
+    private Survey createSurvey(@NonNull String id, @NonNull SurveyMetadata surveyMetadata,
+            String surveyName) {
+        Survey survey = new Survey();
+        if (!TextUtils.isEmpty(surveyMetadata.getId())) {
+            survey.setId(surveyMetadata.getId());
+        } else {
+            survey.setId(id);
+        }
+        survey.setName(surveyName);
+        /**
+         * Resources are always attached to the zip file
+         */
+        survey.setHelpDownloaded(true);
+        survey.setType(ConstantUtil.SURVEY_TYPE);
+        return survey;
     }
 
     /**
      * Check form app id. Reject the form if it does not belong to the one set up
      * @param loadedSurvey survey to verify
      */
-    private void verifyAppId(@NonNull Survey loadedSurvey) {
+    private void verifyAppId(@NonNull SurveyMetadata loadedSurvey) {
         final String app = StatusUtil.getApplicationId(this);
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
@@ -278,7 +318,8 @@ public class BootstrapService extends IntentService {
     }
 
     @NonNull
-    private File generateNewSurveyFile(@NonNull String filename, @Nullable String surveyFolderName) {
+    private File generateNewSurveyFile(@NonNull String filename,
+            @Nullable String surveyFolderName) {
         File filesDir = FileUtil.getFilesDir(FileType.FORMS);
         if (TextUtils.isEmpty(surveyFolderName)) {
             return new File(filesDir, filename);
@@ -292,7 +333,8 @@ public class BootstrapService extends IntentService {
     }
 
     @NonNull
-    private String generateSurveyFileName(@NonNull String filename, @Nullable String surveyFolderName) {
+    private String generateSurveyFileName(@NonNull String filename,
+            @Nullable String surveyFolderName) {
         StringBuilder sb = new StringBuilder(20);
         if (!TextUtils.isEmpty(surveyFolderName)) {
             sb.append(surveyFolderName);

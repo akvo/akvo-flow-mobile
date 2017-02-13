@@ -27,8 +27,8 @@ import android.util.Log;
 
 import org.akvo.flow.R;
 import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
@@ -173,10 +173,13 @@ public class BootstrapService extends IntentService {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            Log.d(TAG, "Processing entry: " + entry.getName());
-            String parts[] = entry.getName().split("/");
-            String filename = parts[parts.length - 1];
-            String id = surveyIdGenerator.getSurveyIdFromFilePath(parts);
+            String entryName = entry.getName();
+            Log.d(TAG, "Processing entry: " + entryName);
+            int fileSeparatorPosition = entryName.lastIndexOf("/");
+            String filename = entryName.substring(fileSeparatorPosition + 1);
+
+            String id = surveyIdGenerator
+                    .getSurveyIdFromFilePath(entryName.substring(0, fileSeparatorPosition));
 
             // Skip directories and hidden/unwanted files
             if (entry.isDirectory() || filename.startsWith(".") ||

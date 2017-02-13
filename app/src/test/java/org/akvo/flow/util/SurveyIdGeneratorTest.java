@@ -67,18 +67,10 @@ public class SurveyIdGeneratorTest {
     }
 
     @Test
-    public void getSurveyIdFromFilePath_shouldReturnEmptyIfEmptyParts() throws Exception {
-        SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
-
-        String surveyId = surveyIdGenerator.getSurveyIdFromFilePath(new String[0]);
-        assertEquals("", surveyId);
-    }
-
-    @Test
     public void getSurveyIdFromFilePath_shouldReturnEmptyIfFolderMissing() throws Exception {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
-        String surveyId = surveyIdGenerator.getSurveyIdFromFilePath(new String[] { "form.xml" });
+        String surveyId = surveyIdGenerator.getSurveyIdFromFilePath("");
         assertEquals("", surveyId);
     }
 
@@ -87,19 +79,19 @@ public class SurveyIdGeneratorTest {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
         String surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath(new String[] { "123", "form.xml" });
+                .getSurveyIdFromFilePath("123");
         assertEquals("123", surveyId);
 
         surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath(new String[] { "folder", "123", "form.xml" });
+                .getSurveyIdFromFilePath("folder/123");
         assertEquals("123", surveyId);
 
         surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath(new String[] { "123", "folder", "form.xml" });
+                .getSurveyIdFromFilePath("123/folder");
         assertEquals("123", surveyId);
 
         surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath(new String[] { "folder1", "123", "folder", "form.xml" });
+                .getSurveyIdFromFilePath("folder1/123/folder");
         assertEquals("123", surveyId);
     }
 
@@ -108,7 +100,7 @@ public class SurveyIdGeneratorTest {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
         String surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath(new String[] { "abc", "folder", "form.xml" });
+                .getSurveyIdFromFilePath("abc/folder");
         assertEquals("folder", surveyId);
     }
 }

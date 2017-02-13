@@ -24,10 +24,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 public class SurveyIdGenerator {
 
     public SurveyIdGenerator() {
@@ -35,29 +31,27 @@ public class SurveyIdGenerator {
 
     /**
      * Get the survey id from the survey xml folder
-     * The structure can be either surveyId/survey.xml or surveyId/folder/survey.xml
+     * The structure can be either surveyId/ or surveyId/folder/
      *
-     * @param parts
+     * @param folderPath all the folder path expluding the actial fileName
      * @return
      */
     @NonNull
-    public String getSurveyIdFromFilePath(@Nullable String[] parts) {
-        if (parts == null || parts.length <= 1) {
-            //no file at all or missing folder
+    public String getSurveyIdFromFilePath(@Nullable String folderPath) {
+        String folders[] = folderPath == null ? null : folderPath.split("/");
+        if (folders == null || folders.length == 0) {
+            //missing folder
             return "";
         } else {
-            //we remove the last piece which is the actual filename
-            String[] foldersArray = Arrays.copyOfRange(parts, 0, parts.length - 1);
-            List<String> folders = Arrays.asList(foldersArray);
-            Collections.reverse(folders);
-            //remove the xml filename
-            for (String folderName : folders) {
+            int lastItemIndex = folders.length - 1;
+            for (int i = lastItemIndex; i >= 0; i--) {
+                String folderName = folders[i];
                 if (TextUtils.isDigitsOnly(folderName)) {
                     return folderName;
                 }
             }
             //if not found just return the lowest subfolder name
-            return folders.get(0);
+            return folders[lastItemIndex];
         }
     }
 }

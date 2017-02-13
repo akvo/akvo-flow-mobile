@@ -53,6 +53,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import timber.log.Timber;
+
 /**
  * Service that will check a well-known location on the device's SD card for a
  * zip file that contains data that should be loaded on the device. The root of
@@ -174,13 +176,18 @@ public class BootstrapService extends IntentService {
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             String entryName = entry.getName();
-            Log.d(TAG, "Processing entry: " + entryName);
+
             int fileSeparatorPosition = entryName.lastIndexOf("/");
-            String filename = entryName.substring(fileSeparatorPosition + 1);
+            String filename = fileSeparatorPosition <= 0 ?
+                    entryName :
+                    entryName.substring(fileSeparatorPosition + 1);
 
+            String folderPath = fileSeparatorPosition <= 0 ?
+                    entryName : entryName.substring(0, fileSeparatorPosition);
             String id = surveyIdGenerator
-                    .getSurveyIdFromFilePath(entryName.substring(0, fileSeparatorPosition));
-
+                    .getSurveyIdFromFilePath(folderPath);
+            Timber.d("Processing entry: %s, fileName: %s, folderPath: %s", entryName, filename,
+                    folderPath);
             // Skip directories and hidden/unwanted files
             if (entry.isDirectory() || filename.startsWith(".") ||
                     ConstantUtil.BOOTSTRAP_ROLLBACK_FILE.equalsIgnoreCase(filename)) {

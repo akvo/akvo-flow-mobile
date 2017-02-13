@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo FLOW.
  *
@@ -23,7 +23,7 @@ public class FormInstance {
     private String deviceId;
     private String username;
     private String email;
-    private long formId;
+    private String formId;
     private long submissionDate;
     private long duration;
     private List<Response> responses;
@@ -44,11 +44,11 @@ public class FormInstance {
         this.username = username;
     }
 
-    public long getFormId() {
+    public String getFormId() {
         return formId;
     }
 
-    public void setFormId(long formId) {
+    public void setFormId(String formId) {
         this.formId = formId;
     }
 

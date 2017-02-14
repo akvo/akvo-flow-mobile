@@ -14,9 +14,9 @@ android {
 
         versionProps.load(new FileInputStream(versionPropsFile))
 
-        def versionMajor = versionProps['VERSION_MAJOR'].toInteger()
-        def versionMinor = versionProps['VERSION_MINOR'].toInteger()
-        def versionPatch = versionProps['VERSION_PATCH'].toInteger()
+        def versionMajor = versionProps['VERSION_MAJOR'].toString()
+        def versionMinor = versionProps['VERSION_MINOR'].toString()
+        def versionPatch = versionProps['VERSION_PATCH'].toString()
         def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
 
         defaultConfig {

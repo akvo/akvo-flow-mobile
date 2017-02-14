@@ -37,6 +37,7 @@ import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.SurveyFileNameGenerator;
 import org.akvo.flow.util.SurveyIdGenerator;
 import org.akvo.flow.util.ViewUtil;
 
@@ -52,8 +53,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-
-import timber.log.Timber;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -78,6 +77,7 @@ public class BootstrapService extends IntentService {
     private static final String TAG = "BOOTSTRAP_SERVICE";
     public volatile static boolean isProcessing = false;
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
+    private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
     private SurveyDbAdapter databaseAdapter;
     private Handler mHandler;
 
@@ -177,33 +177,27 @@ public class BootstrapService extends IntentService {
             ZipEntry entry = entries.nextElement();
             String entryName = entry.getName();
 
-            int fileSeparatorPosition = entryName.lastIndexOf("/");
-            String filename = fileSeparatorPosition <= 0 ?
-                    entryName :
-                    entryName.substring(fileSeparatorPosition + 1);
-
-            String folderPath = fileSeparatorPosition <= 0 ?
-                    entryName : entryName.substring(0, fileSeparatorPosition);
-            String id = surveyIdGenerator
-                    .getSurveyIdFromFilePath(folderPath);
-            Timber.d("Processing entry: %s, fileName: %s, folderPath: %s", entryName, filename,
-                    folderPath);
             // Skip directories and hidden/unwanted files
-            if (entry.isDirectory() || filename.startsWith(".") ||
-                    ConstantUtil.BOOTSTRAP_ROLLBACK_FILE.equalsIgnoreCase(filename)) {
+            if (entry.isDirectory() || entryName.startsWith(".") ||
+                    entryName.endsWith(ConstantUtil.BOOTSTRAP_ROLLBACK_FILE) || TextUtils
+                    .isEmpty(entryName)) {
                 continue;
             }
 
-            if (filename.endsWith(ConstantUtil.BOOTSTRAP_DB_FILE)) {
+            if (entryName.endsWith(ConstantUtil.BOOTSTRAP_DB_FILE)) {
                 // DB instructions
                 processDbInstructions(FileUtil.readText(zipFile.getInputStream(entry)), true);
-            } else if (filename.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
+            } else if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
                 // Cascade resource
                 FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
                         FileUtil.getFilesDir(FileType.RES));
-            } else if (filename.endsWith(ConstantUtil.XML_SUFFIX)) {
+            } else if (entryName.endsWith(ConstantUtil.XML_SUFFIX)) {
+                String filename = surveyFileNameGenerator.generateFileName(entryName);
+                String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
                 processSurveyFile(zipFile, entry, filename, id);
             } else {
+                String filename = surveyFileNameGenerator.generateFileName(entryName);
+                String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
                 // Help media file
                 File helpDir = new File(FileUtil.getFilesDir(FileType.FORMS), id);
                 if (!helpDir.exists()) {

@@ -54,6 +54,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import timber.log.Timber;
+
 /**
  * Service that will check a well-known location on the device's SD card for a
  * zip file that contains data that should be loaded on the device. The root of

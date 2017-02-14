@@ -21,7 +21,6 @@
 package org.akvo.flow.util;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 public class SurveyIdGenerator {
@@ -37,10 +36,10 @@ public class SurveyIdGenerator {
      * @return
      */
     @NonNull
-    public String getSurveyIdFromFilePath(@Nullable String entryName) {
-        int fileSeparatorPosition = entryName == null? -1 : entryName.lastIndexOf("/");
+    public String getSurveyIdFromFilePath(@NonNull String entryName) {
+        int fileSeparatorPosition = entryName.lastIndexOf("/");
         String folderPath = fileSeparatorPosition <= 0 ?
-                entryName : entryName.substring(0, fileSeparatorPosition);
+                "" : entryName.substring(0, fileSeparatorPosition);
         String folders[] = folderPath == null || folderPath.isEmpty()? null : folderPath.split("/");
         if (folders == null || folders.length == 0) {
             //missing folder

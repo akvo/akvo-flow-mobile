@@ -21,7 +21,6 @@
 package org.akvo.flow.util;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 public class SurveyFileNameGenerator {
 
@@ -29,8 +28,8 @@ public class SurveyFileNameGenerator {
     }
 
     @NonNull
-    public String generateFileName(@Nullable String entryName) {
-        if (entryName == null || entryName.isEmpty()) {
+    public String generateFileName(@NonNull String entryName) {
+        if (entryName.isEmpty()) {
             return "";
         }
         int fileSeparatorPosition = entryName.lastIndexOf("/");

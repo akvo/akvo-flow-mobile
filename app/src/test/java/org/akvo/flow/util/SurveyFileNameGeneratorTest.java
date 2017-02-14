@@ -30,24 +30,6 @@ import static junit.framework.Assert.assertEquals;
 public class SurveyFileNameGeneratorTest {
 
     @Test
-    public void generateFileName_shouldReturnEmptyIfNullEntry() throws Exception {
-        SurveyFileNameGenerator fileNameGenerator = new SurveyFileNameGenerator();
-
-        String fileName = fileNameGenerator.generateFileName(null);
-
-        assertEquals("", fileName);
-    }
-
-    @Test
-    public void generateFileName_shouldReturnEmptyIfNullEmpty() throws Exception {
-        SurveyFileNameGenerator fileNameGenerator = new SurveyFileNameGenerator();
-
-        String fileName = fileNameGenerator.generateFileName("");
-
-        assertEquals("", fileName);
-    }
-
-    @Test
     public void generateFileName_shouldReturnEmptyIfOnlySlash() throws Exception {
         SurveyFileNameGenerator fileNameGenerator = new SurveyFileNameGenerator();
 

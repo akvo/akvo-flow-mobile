@@ -59,18 +59,10 @@ public class SurveyIdGeneratorTest {
     }
 
     @Test
-    public void getSurveyIdFromFilePath_shouldReturnEmptyIfNullParts() throws Exception {
-        SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
-
-        String surveyId = surveyIdGenerator.getSurveyIdFromFilePath(null);
-        assertEquals("", surveyId);
-    }
-
-    @Test
     public void getSurveyIdFromFilePath_shouldReturnEmptyIfFolderMissing() throws Exception {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
-        String surveyId = surveyIdGenerator.getSurveyIdFromFilePath("");
+        String surveyId = surveyIdGenerator.getSurveyIdFromFilePath("file.xml");
         assertEquals("", surveyId);
     }
 

@@ -33,12 +33,15 @@ public class SurveyIdGenerator {
      * Get the survey id from the survey xml folder
      * The structure can be either surveyId/ or surveyId/folder/
      *
-     * @param folderPath all the folder path expluding the actial fileName
+     * @param entryName all the folder path expluding the actial fileName
      * @return
      */
     @NonNull
-    public String getSurveyIdFromFilePath(@Nullable String folderPath) {
-        String folders[] = folderPath == null ? null : folderPath.split("/");
+    public String getSurveyIdFromFilePath(@Nullable String entryName) {
+        int fileSeparatorPosition = entryName == null? -1 : entryName.lastIndexOf("/");
+        String folderPath = fileSeparatorPosition <= 0 ?
+                entryName : entryName.substring(0, fileSeparatorPosition);
+        String folders[] = folderPath == null || folderPath.isEmpty()? null : folderPath.split("/");
         if (folders == null || folders.length == 0) {
             //missing folder
             return "";

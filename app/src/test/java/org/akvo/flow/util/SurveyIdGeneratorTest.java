@@ -79,20 +79,24 @@ public class SurveyIdGeneratorTest {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
         String surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath("123");
+                .getSurveyIdFromFilePath("123/file.xml");
         assertEquals("123", surveyId);
 
         surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath("folder/123");
+                .getSurveyIdFromFilePath("folder/123/file.xml");
         assertEquals("123", surveyId);
 
         surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath("123/folder");
+                .getSurveyIdFromFilePath("123/folder/file.xml");
         assertEquals("123", surveyId);
 
         surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath("folder1/123/folder");
+                .getSurveyIdFromFilePath("folder1/123/folder/file.xml");
         assertEquals("123", surveyId);
+
+        surveyId = surveyIdGenerator
+                .getSurveyIdFromFilePath("/");
+        assertEquals("", surveyId);
     }
 
     @Test
@@ -100,7 +104,7 @@ public class SurveyIdGeneratorTest {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
         String surveyId = surveyIdGenerator
-                .getSurveyIdFromFilePath("abc/folder");
+                .getSurveyIdFromFilePath("abc/folder/survey.xml");
         assertEquals("folder", surveyId);
     }
 }

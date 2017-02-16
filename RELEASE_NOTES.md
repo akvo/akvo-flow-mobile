@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.2.10.1
+Date: 15 February 2017
+
+# Resolved issues
+* **Offline survey export: files folder missing** - [#614](https://github.com/akvo/akvo-flow-mobile/issues/614) Fixed the issue where for surveys with a slash in survey name, the collected data zip file was not generated.
+
+---------------
 # ver 2.2.10
 Date: 19 January 2017
 

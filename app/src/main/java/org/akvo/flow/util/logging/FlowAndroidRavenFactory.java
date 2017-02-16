@@ -22,7 +22,10 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 
+import com.getsentry.raven.Raven;
 import com.getsentry.raven.android.AndroidRavenFactory;
+import com.getsentry.raven.buffer.Buffer;
+import com.getsentry.raven.buffer.DiskBuffer;
 import com.getsentry.raven.connection.Connection;
 import com.getsentry.raven.connection.EventSampler;
 import com.getsentry.raven.connection.HttpConnection;
@@ -30,12 +33,19 @@ import com.getsentry.raven.connection.RandomEventSampler;
 import com.getsentry.raven.dsn.Dsn;
 import com.getsentry.raven.marshaller.Marshaller;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
-import java.util.Map;
+
+import timber.log.Timber;
 
 public class FlowAndroidRavenFactory extends AndroidRavenFactory {
+
+    /**
+     * Default Buffer directory name.
+     */
+    private static final String DEFAULT_BUFFER_DIR = "raven-buffered-events";
 
     private final FlowPostPermissionVerifier verifier;
     private final Context context;
@@ -48,9 +58,19 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
 
     @Override
     public com.getsentry.raven.Raven createRavenInstance(Dsn dsn) {
-        com.getsentry.raven.Raven ravenInstance = super.createRavenInstance(dsn);
-        ravenInstance.addBuilderHelper(new FlowAndroidEventBuilderHelper(context));
-        return ravenInstance;
+        Raven raven = new Raven(createConnection(dsn));
+//        try {
+//            // `ServletRequestListener` was added in the Servlet 2.4 API, and
+//            // is used as part of the `HttpEventBuilderHelper`, see:
+//            // https://tomcat.apache.org/tomcat-5.5-doc/servletapi/
+//            Class.forName("javax.servlet.ServletRequestListener", false, this.getClass().getClassLoader());
+//            raven.addBuilderHelper(new HttpEventBuilderHelper());
+//        } catch (ClassNotFoundException e) {
+//            logger.debug("The current environment doesn't provide access to servlets,"
+//                    + "or provides an unsupported version.");
+//        }
+        raven.addBuilderHelper(new FlowAndroidEventBuilderHelper(context));
+        return raven;
     }
 
     /**
@@ -90,5 +110,18 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
         httpConnection.setBypassSecurity(bypassSecurityEnabled);
 
         return httpConnection;
+    }
+
+    @Override
+    protected Buffer getBuffer(Dsn dsn) {
+        File bufferDir;
+        if (dsn.getOptions().get(BUFFER_DIR_OPTION) != null) {
+            bufferDir = new File(dsn.getOptions().get(BUFFER_DIR_OPTION));
+        } else {
+            bufferDir = new File(context.getCacheDir().getAbsolutePath(), DEFAULT_BUFFER_DIR);
+        }
+
+        Timber.d("Using buffer dir: " + bufferDir.getAbsolutePath());
+        return new DiskBuffer(bufferDir, getBufferSize(dsn));
     }
 }

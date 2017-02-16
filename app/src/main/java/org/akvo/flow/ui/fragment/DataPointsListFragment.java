@@ -35,7 +35,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,6 +47,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,7 +70,7 @@ import timber.log.Timber;
 
 public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, LoaderCallbacks<List<SurveyedLocale>>, OrderByDialogListener,
-        SwipeRefreshLayout.OnRefreshListener, DataPointsSyncListener {
+        DataPointsSyncListener {
 
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
@@ -83,7 +83,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     private RecordListListener mListener;
 
     private TextView emptyTextView;
-    private SwipeRefreshLayout refreshLayout;
+    private ProgressBar progressBar;
 
     /**
      * BroadcastReceiver to notify of data synchronisation. This should be
@@ -141,8 +141,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         super.onActivityCreated(savedInstanceState);
         mLocationManager = (LocationManager) getActivity()
                 .getSystemService(Context.LOCATION_SERVICE);
-        ListView listView = (ListView) getView().findViewById(R.id.locales_lv);
-        emptyTextView = (TextView) getView().findViewById(R.id.empty_tv);
+        View view = getView();
+        ListView listView = (ListView) view.findViewById(R.id.locales_lv);
+        emptyTextView = (TextView) view.findViewById(R.id.empty_tv);
         listView.setEmptyView(emptyTextView);
         if (mAdapter == null) {
             mAdapter = new SurveyedLocaleListAdapter(getActivity(), mLatitude, mLongitude,
@@ -150,8 +151,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             listView.setAdapter(mAdapter);
         }
         listView.setOnItemClickListener(this);
-        refreshLayout = (SwipeRefreshLayout)getView().findViewById(R.id.locales_srl);
-        refreshLayout.setOnRefreshListener(this);
+        progressBar = (ProgressBar) view.findViewById(R.id.progress);
     }
 
     @Override
@@ -223,14 +223,14 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     private void showLoading() {
-        if (refreshLayout != null) {
-            refreshLayout.setRefreshing(true);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
         }
     }
 
     private void hideLoading() {
-        if (refreshLayout != null) {
-            refreshLayout.setRefreshing(false);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -332,11 +332,6 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // EMPTY
-    }
-
-    @Override
-    public void onRefresh() {
-        requestRemoteDataRefresh();
     }
 
     private void requestRemoteDataRefresh() {

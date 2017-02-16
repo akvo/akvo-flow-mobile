@@ -1,16 +1,20 @@
 /*
  * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- * This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- * Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- * the GNU Affero General Public License (AGPL) as published by the Free Software Foundation, either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.util;
@@ -136,15 +140,13 @@ public class ConstantUtil {
     /**
      * settings keys
      */
-    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";
+    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
     public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
-    public static final String SERVER_SETTING_KEY = "backend.server";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
-    public static final String PREF_LOCALE = "pref.locale";
-
+    
     /**
      * intents
      */
@@ -175,6 +177,7 @@ public class ConstantUtil {
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";
+    public static final String SENTRY_DSN = "sentryDsn";
 
     /**
      * S3 bucket directories (object prefixes)
@@ -216,7 +219,6 @@ public class ConstantUtil {
     public static final int IMAGE_SIZE_1280_960 = 2;
 
     public static final int NOTIFICATION_RECORD_SYNC = 100;
-    public static final int NOTIFICATION_DATA_SYNC = 101;
 
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
@@ -260,6 +262,13 @@ public class ConstantUtil {
 
     //requests
     public static final int REQUEST_ADD_USER = 0;
+    public static final int PHOTO_ACTIVITY_REQUEST = 1;
+    public static final int VIDEO_ACTIVITY_REQUEST = 2;
+    public static final int SCAN_ACTIVITY_REQUEST = 3;
+    public static final int EXTERNAL_SOURCE_REQUEST = 4;
+    public static final int CADDISFLY_REQUEST = 5;
+    public static final int PLOTTING_REQUEST = 6;
+    public static final int SIGNATURE_REQUEST = 7;
 
     /**
      * prevent instantiation

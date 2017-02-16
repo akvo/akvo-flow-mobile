@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.akvo.flow">
-
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -88,7 +87,6 @@
         <service android:name=".service.DataSyncService"/>
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
-        <service android:name=".service.ExceptionReportingService"/>
         <service android:name=".service.UserRequestedApkUpdateService"/>
         <service android:name=".service.SurveyedDataPointSyncService"/>
         <service android:name=".service.TimeCheckService"/>
@@ -115,7 +113,7 @@
                 android:value="@integer/google_play_services_version"/>
 
         <provider
-                android:name=".dao.DataProvider"
+                android:name=".data.DataProvider"
                 android:authorities="org.akvo.flow"
                 android:label="@string/app_name"
                 android:syncable="true"

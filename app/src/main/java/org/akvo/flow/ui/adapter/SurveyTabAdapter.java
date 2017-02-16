@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.ui.adapter;
@@ -22,7 +25,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -38,44 +40,37 @@ import org.akvo.flow.ui.view.SubmitTab;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+//TODO: refactor to using new toolbar and TabLayout
 public class SurveyTabAdapter extends PagerAdapter
         implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
 
-    private static final String TAG = SurveyTabAdapter.class.getSimpleName();
-
-    private Context mContext;
-    private SurveyListener mSurveyListener;
-    private QuestionInteractionListener mQuestionListener;
-
-    private ActionBar mActionBar;
-    private ViewPager mPager;
+    private final ActionBar mActionBar;
+    private final ViewPager mPager;
     private List<QuestionGroup> mQuestionGroups;
     private List<QuestionGroupTab> mQuestionGroupTabs;
     private SubmitTab mSubmitTab;
 
     public SurveyTabAdapter(Context context, ActionBar actionBar, ViewPager pager,
-            SurveyListener surveyListener,
-            QuestionInteractionListener questionListener) {
-        mContext = context;
-        mSurveyListener = surveyListener;
-        mQuestionListener = questionListener;
+            SurveyListener surveyListener, QuestionInteractionListener questionListener) {
         mActionBar = actionBar;
         mPager = pager;
-        init();
+        init(context, surveyListener, questionListener);
     }
 
-    private void init() {
-        mQuestionGroups = mSurveyListener.getQuestionGroups();
+    private void init(Context context, SurveyListener surveyListener,
+            QuestionInteractionListener questionListener) {
+        mQuestionGroups = surveyListener.getQuestionGroups();
         mQuestionGroupTabs = new ArrayList<>();
 
         for (QuestionGroup group : mQuestionGroups) {
             QuestionGroupTab questionGroupTab =
-                    new QuestionGroupTab(mContext, group, mSurveyListener, mQuestionListener);
+                    new QuestionGroupTab(context, group, surveyListener, questionListener);
             mQuestionGroupTabs.add(questionGroupTab);
         }
 
-        if (!mSurveyListener.isReadOnly()) {
-            mSubmitTab = new SubmitTab(mContext, mSurveyListener);
+        if (!surveyListener.isReadOnly()) {
+            mSubmitTab = new SubmitTab(context, surveyListener);
         }
 
         // Setup the tabs in the action bar
@@ -105,7 +100,7 @@ public class SurveyTabAdapter extends PagerAdapter
     private void loadTab(int position) {
         QuestionGroupTab tab = mQuestionGroupTabs.get(position);
         if (!tab.isLoaded()) {
-            Log.d(TAG, "Loading Tab #" + position);
+            Timber.d("Loading Tab #%d", position);
             tab.load();
             tab.loadState();
             setupDependencies();// Dependencies might occur across tabs
@@ -242,10 +237,12 @@ public class SurveyTabAdapter extends PagerAdapter
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        // EMPTY
     }
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        // EMPTY
     }
 
     @Override
@@ -255,13 +252,14 @@ public class SurveyTabAdapter extends PagerAdapter
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        // EMPTY
     }
 
     /**
      * Checks if all the mandatory questions (on all tabs) have responses
      */
     private List<Question> checkInvalidQuestions() {
-        List<Question> invalidQuestions = new ArrayList<Question>();
+        List<Question> invalidQuestions = new ArrayList<>();
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
             invalidQuestions.addAll(questionGroupTab.checkInvalidQuestions());
         }

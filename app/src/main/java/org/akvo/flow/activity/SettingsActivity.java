@@ -1,17 +1,20 @@
 /*
  *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.activity;
@@ -29,7 +32,6 @@ import android.os.StatFs;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +46,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.dao.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.UserRequestedApkUpdateService;
@@ -58,6 +60,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * Displays the settings menu and handles the user choices
  *
@@ -65,7 +69,6 @@ import java.util.Map;
  */
 public class SettingsActivity extends BackActivity implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = "SettingsActivity";
     private static final String LABEL = "label";
     private static final String DESC = "desc";
 
@@ -238,24 +241,19 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
                 input.setKeyListener(new DigitsKeyListener(false, false));
                 inputDialog.setView(input);
-                inputDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String value = input.getText().toString().trim();
-                        if ("0".equals(value)) {
-                            SurveyDbAdapter database = new SurveyDbAdapter(SettingsActivity.this);
-                            database.open();
-                            database.reinstallTestSurvey();
-                            database.close();
-                        } else if (!TextUtils.isEmpty(value)) {
+                        String surveyId = input.getText().toString().trim();
+                        if (!TextUtils.isEmpty(surveyId)) {
                             Intent i = new Intent(SettingsActivity.this,
                                     SurveyDownloadService.class);
-                            i.putExtra(SurveyDownloadService.EXTRA_SURVEYS, new String[] { value });
+                            i.putExtra(SurveyDownloadService.EXTRA_SURVEY_ID, surveyId);
                             SettingsActivity.this.startService(i);
                         }
                     }
                 });
 
-                inputDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                inputDialog.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Canceled.
                     }
@@ -276,13 +274,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Context c = SettingsActivity.this;
-                        SurveyDbAdapter database = new SurveyDbAdapter(c);
-                        database.open();
-                        String[] surveyIds = database.getSurveyIds();
-                        database.deleteAllSurveys();
-                        database.close();
                         Intent i = new Intent(c, SurveyDownloadService.class);
-                        i.putExtra(SurveyDownloadService.EXTRA_SURVEYS, surveyIds);
+                        i.putExtra(SurveyDownloadService.EXTRA_DELETE_SURVEYS, true);
                         c.startService(i);
                     }
                 });
@@ -392,7 +385,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                             });
             builder.show();
         } catch (SQLException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e, e.getMessage());
             Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
         }
     }

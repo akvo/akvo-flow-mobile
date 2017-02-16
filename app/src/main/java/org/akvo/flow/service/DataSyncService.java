@@ -1,17 +1,20 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo FLOW.
+ *  This file is part of Akvo Flow.
  *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
+ *  Akvo Flow is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  Akvo Flow is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.akvo.flow.service;
@@ -24,30 +27,29 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.dao.SurveyDbAdapter;
-import org.akvo.flow.dao.SurveyDbAdapter.ResponseColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceColumns;
-import org.akvo.flow.dao.SurveyDbAdapter.SurveyInstanceStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.TransmissionStatus;
-import org.akvo.flow.dao.SurveyDbAdapter.UserColumns;
+import org.akvo.flow.data.database.ResponseColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyInstanceColumns;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.TransmissionStatus;
+import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
-import org.akvo.flow.exception.PersistentUncaughtExceptionHandler;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.PropertyUtil;
-import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,6 +74,8 @@ import java.util.zip.ZipOutputStream;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import timber.log.Timber;
+
 /**
  * Handle survey export and sync in a background thread. The export process takes
  * no arguments, and will try to zip all the survey instances with a SUBMITTED status
@@ -88,7 +92,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class DataSyncService extends IntentService {
 
-    private static final String TAG = "SyncService";
+    private static final String TAG = "DataSyncService";
     private static final String DELIMITER = "\t";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
 
@@ -106,8 +110,7 @@ public class DataSyncService extends IntentService {
     private static final String ACTION_SUBMIT = "submit";
     private static final String ACTION_IMAGE = "image";
 
-    // Reuse notification for data export
-    private static final int NOTIFICATION_DATA_EXPORT = 1;
+    private static final String UTF_8_CHARSET = "UTF-8";
 
     /**
      * Number of retries to upload a file to S3
@@ -116,7 +119,8 @@ public class DataSyncService extends IntentService {
 
     private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
-    private static final String UTF_8_CHARSET = "UTF-8";
+    private Prefs preferences;
+    private ConnectivityStateManager connectivityStateManager;
 
     public DataSyncService() {
         super(TAG);
@@ -128,15 +132,16 @@ public class DataSyncService extends IntentService {
             mProps = new PropertyUtil(getResources());
             mDatabase = new SurveyDbAdapter(this);
             mDatabase.open();
-
+            preferences = new Prefs(getApplicationContext());
+            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             exportSurveys();// Create zip files, if necessary
 
-            if (StatusUtil.hasDataConnection(this)) {
+            if (connectivityStateManager.isConnectionAvailable(preferences
+                    .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
                 syncFiles();// Sync everything
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, e.getMessage());
         } finally {
             if (mDatabase != null) {
                 mDatabase.close();
@@ -154,17 +159,25 @@ public class DataSyncService extends IntentService {
         checkExportedFiles();
 
         for (long id : getUnexportedSurveys()) {
-            ZipFileData zipFileData = formZip(id);
-            if (zipFileData != null) {
-                displayNotification(getString(R.string.exportcomplete), zipFileData.formName);
+            try {
+                exportSurvey(id);
+             //if the zip creation fails for one survey, let it still attempt to create the others
+            } catch (Exception e) {
+                Timber.e(e, "Error creating zip file for %d", id);
+            }
+        }
+    }
 
-                // Create new entries in the transmission queue
-                mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
-                updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+    private void exportSurvey(long id) {
+        ZipFileData zipFileData = formZip(id);
 
-                for (String image : zipFileData.imagePaths) {
-                    mDatabase.createTransmission(id, zipFileData.formId, image);
-                }
+        if (zipFileData != null) {
+            // Create new entries in the transmission queue
+            mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
+            updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+
+            for (String image : zipFileData.imagePaths) {
+                mDatabase.createTransmission(id, zipFileData.formId, image);
             }
         }
     }
@@ -184,8 +197,8 @@ public class DataSyncService extends IntentService {
                     String uuid = cursor
                             .getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID));
                     if (!getSurveyInstanceFile(uuid).exists()) {
-                        Log.d(TAG, "Exported file for survey " + uuid + " not found. It's status " +
-                                "will be set to 'submitted', and will be reprocessed");
+                        Timber.d("Exported file for survey %s not found. It's status " +
+                                "will be set to 'submitted', and will be reprocessed", uuid);
                         updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
                     }
                 } while (cursor.moveToNext());
@@ -218,23 +231,31 @@ public class DataSyncService extends IntentService {
             FormInstance formInstance = processFormInstance(surveyInstanceId,
                     zipFileData.imagePaths);
 
-            if (formInstance == null) {
-                return null;
-            }
-
             // Serialize form instance as JSON
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
             zipFileData.uuid = formInstance.getUUID();
-            zipFileData.formId = String.valueOf(formInstance.getFormId());
-            zipFileData.formName = mDatabase.getSurvey(zipFileData.formId).getName();
+            zipFileData.formId = formInstance.getFormId();
+            if (TextUtils.isEmpty(zipFileData.formId)) {
+                NullPointerException exception = new NullPointerException(" formId is null");
+                Timber.e(exception);
+            }
+            Survey survey = mDatabase.getSurvey(zipFileData.formId);
+            if (survey == null) {
+                NullPointerException exception = new NullPointerException("survey is null");
+                Timber.e(exception);
+                //form name is only used for notification so it is ok if empty
+                zipFileData.formName = "";
+            } else {
+                zipFileData.formName = survey.getName();
+            }
 
-            File zipFile = getSurveyInstanceFile(
-                    zipFileData.uuid);// The filename will match the Survey Instance UUID
+            // The filename will match the Survey Instance UUID
+            File zipFile = getSurveyInstanceFile(zipFileData.uuid);
 
             // Write the data into the zip file
             String fileName = zipFile.getAbsolutePath();// Will normalize filename.
             zipFileData.filename = fileName;
-            Log.i(TAG, "Creating zip file: " + fileName);
+            Timber.i("Creating zip file: " + fileName);
             FileOutputStream fout = new FileOutputStream(zipFile);
             CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
             ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
@@ -256,12 +277,10 @@ public class DataSyncService extends IntentService {
 
             final String checksum = "" + checkedOutStream.getChecksum().getValue();
             zos.close();
-            Log.i(TAG,
-                    "Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
+            Timber.i("Closed zip output stream for file: " + fileName + ". Checksum: " + checksum);
             return zipFileData;
         } catch (@NonNull IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            PersistentUncaughtExceptionHandler.recordException(e);
-            Log.e(TAG, e.getMessage());
+            Timber.e(e, e.getMessage());
             return null;
         }
     }
@@ -272,12 +291,12 @@ public class DataSyncService extends IntentService {
      */
     private void writeTextToZip(@NonNull ZipOutputStream zos, @NonNull String text, String fileName)
             throws IOException {
-        Log.i(TAG, "Writing zip entry");
+        Timber.i("Writing zip entry");
         zos.putNextEntry(new ZipEntry(fileName));
         byte[] allBytes = text.getBytes(UTF_8_CHARSET);
         zos.write(allBytes, 0, allBytes.length);
         zos.closeEntry();
-        Log.i(TAG, "Entry Complete");
+        Timber.i("Entry Complete");
     }
 
     /**
@@ -292,12 +311,9 @@ public class DataSyncService extends IntentService {
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
 
         if (data != null && data.moveToFirst()) {
-            String deviceIdentifier = mDatabase.getPreference(ConstantUtil.DEVICE_IDENT_KEY);
-            if (deviceIdentifier == null) {
-                deviceIdentifier = "unset";
-            } else {
-                deviceIdentifier = cleanVal(deviceIdentifier);
-            }
+            String deviceIdentifier = preferences
+                    .getString(Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
+            deviceIdentifier = cleanVal(deviceIdentifier);
             // evaluate indices once, outside the loop
             int survey_fk_col = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);
             int question_fk_col = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
@@ -330,8 +346,7 @@ public class DataSyncService extends IntentService {
 
                 if (formInstance.getUUID() == null) {
                     formInstance.setUUID(data.getString(uuid_col));
-                    formInstance.setFormId(
-                            data.getLong(survey_fk_col));// FormInstance uses a number for this attr
+                    formInstance.setFormId(data.getString(survey_fk_col));
                     formInstance.setDataPointId(data.getString(localeId_col));
                     formInstance.setDeviceId(deviceIdentifier);
                     formInstance.setSubmissionDate(submitted_date);
@@ -411,10 +426,9 @@ public class DataSyncService extends IntentService {
      * MD5 checksum. Only if these fields match the transmission will be considered successful.
      */
     private void syncFiles() {
-        final String serverBase = StatusUtil.getServerBase(this);
         // Check notifications for this device. This will update the status of the transmissions
         // if necessary, or mark form as deleted.
-        checkDeviceNotifications(serverBase);
+        checkDeviceNotifications();
 
         List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
 
@@ -426,23 +440,20 @@ public class DataSyncService extends IntentService {
         Set<Long> unsyncedSurveys = new HashSet<>();// Unsuccessful transmissions
 
         final int totalFiles = transmissions.size();
-        displayProgressNotification(0, totalFiles);
 
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission.getFileName(), transmission.getFormId(), serverBase)) {
+            if (syncFile(transmission.getFileName(), transmission.getFormId()
+            )) {
                 syncedSurveys.add(surveyInstanceId);
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
             }
-            displayProgressNotification(i, totalFiles);// Progress is the % of files handled so far
         }
 
         // Retain successful survey instances, to mark them as SYNCED
         syncedSurveys.removeAll(unsyncedSurveys);
-
-        displaySyncedNotification(syncedSurveys.size(), unsyncedSurveys.size());
 
         for (long surveyInstanceId : syncedSurveys) {
             updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
@@ -454,8 +465,7 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(@NonNull String filename, @NonNull String formId,
-            @NonNull String serverBase) {
+    private boolean syncFile(@NonNull String filename, @NonNull String formId) {
         if (TextUtils.isEmpty(filename) || filename.lastIndexOf(".") < 0) {
             return false;
         }
@@ -489,8 +499,8 @@ public class DataSyncService extends IntentService {
         boolean synced = false;
 
         if (sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
-            FlowApi api = new FlowApi();
-            switch (api.sendProcessingNotification(serverBase, formId, action,
+            FlowApi api = new FlowApi(getApplicationContext());
+            switch (api.sendProcessingNotification(formId, action,
                     getDestName(filename))) {
                 case HttpURLConnection.HTTP_OK:
                     status = TransmissionStatus.SYNCED;// Mark everything completed
@@ -532,8 +542,7 @@ public class DataSyncService extends IntentService {
                 ok = sendFile(fileAbsolutePath, dir, contentType, isPublic, --retries);
             }
         } catch (IOException e) {
-            Log.e(TAG, "Could not send file: " + fileAbsolutePath + ". " + e.getMessage(), e);
-            PersistentUncaughtExceptionHandler.recordException(e);
+            Timber.e(e, "Could not send file: " + fileAbsolutePath + ". " + e.getMessage());
         }
 
         return ok;
@@ -548,11 +557,11 @@ public class DataSyncService extends IntentService {
      * 1- Request the list of files to the server
      * 2- Update the status of those files in the local database
      */
-    private void checkDeviceNotifications(@NonNull String serverBase) {
-        FlowApi flowApi = new FlowApi();
+    private void checkDeviceNotifications() {
+        FlowApi flowApi = new FlowApi(getApplicationContext());
         try {
             String[] surveyIds = mDatabase.getSurveyIds();
-            JSONObject jResponse = flowApi.getDeviceNotification(serverBase, surveyIds);
+            JSONObject jResponse = flowApi.getDeviceNotification(surveyIds);
 
             if (jResponse != null) {
                 List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
@@ -579,10 +588,10 @@ public class DataSyncService extends IntentService {
                     }
                 }
             } else {
-                Log.e(TAG, "Could not retrieve missing files");
+                Timber.e("Could not retrieve missing files");
             }
         } catch (Exception e) {
-            Log.e(TAG, "Could not retrieve missing files", e);
+            Timber.e(e, "Could not retrieve missing files");
         }
     }
 
@@ -632,45 +641,9 @@ public class DataSyncService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 
-    private void displayNotification(String title, String text) {
-        NotificationHelper.displayNotification(title, text, this,
-                (int) (long) DataSyncService.NOTIFICATION_DATA_EXPORT);
-    }
-
     private void displayErrorNotification(String formId) {
         NotificationHelper.displayErrorNotification(getString(R.string.sync_error_title, formId),
                 getString(R.string.sync_error_message), this, formId(formId));
-    }
-
-    /**
-     * Display a notification showing the up-to-date status of the sync
-     *
-     * @param synced number of handled transmissions so far (either successful or not)
-     * @param total  number of transmissions in the batch
-     */
-    private void displayProgressNotification(int synced, int total) {
-        String title = getString(R.string.data_sync_title);
-        String text = getString(R.string.data_sync_text);
-        NotificationHelper.displayProgressNotification(this, synced, total, title, text,
-                ConstantUtil.NOTIFICATION_DATA_SYNC);
-    }
-
-    /**
-     * Display a notification showing the final status of the sync
-     *
-     * @param syncedForms number of successful transmissions
-     * @param failedForms number of failed transmissions
-     */
-    private void displaySyncedNotification(int syncedForms, int failedForms) {
-        // Do not show failed if there is none
-        String text = failedForms > 0 ?
-                String.format(getString(R.string.data_sync_all), syncedForms, failedForms)
-                :
-                String.format(getString(R.string.data_sync_synced), syncedForms);
-
-        String title = getString(R.string.data_sync_title);
-        NotificationHelper.displayNonOngoingNotificationWithProgress(this, text, title,
-                ConstantUtil.NOTIFICATION_DATA_SYNC);
     }
 
     private void displayFormDeletedNotification(String id, String name) {
@@ -706,7 +679,7 @@ public class DataSyncService extends IntentService {
         try {
             return Integer.valueOf(id);
         } catch (NumberFormatException e) {
-            Log.e(TAG, id + " is not a valid form id");
+            Timber.e(id + " is not a valid form id");
             return 0;
         }
     }
@@ -714,18 +687,23 @@ public class DataSyncService extends IntentService {
     /**
      * Helper class to wrap zip file's meta-data
      */
-    class ZipFileData {
+    public static class ZipFileData {
 
         @Nullable
         String uuid = null;
+
         @Nullable
         String formId = null;
+
         @Nullable
         String formName = null;
+
         @Nullable
         String filename = null;
+
         @Nullable
         String data = null;
+
         final List<String> imagePaths = new ArrayList<>();
     }
 }

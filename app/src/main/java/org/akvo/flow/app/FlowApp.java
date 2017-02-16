@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
@@ -39,6 +40,8 @@ import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.Locale;
+
+import timber.log.Timber;
 
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
@@ -55,6 +58,9 @@ public class FlowApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
         prefs = new Prefs(getApplicationContext());
         initLogging();
         init();

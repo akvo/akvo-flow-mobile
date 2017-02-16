@@ -87,7 +87,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     /**
      * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from DataSyncService.
+     * fired from {@link org.akvo.flow.service.DataSyncService}
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
 
@@ -463,7 +463,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             }
         }
 
-        public void setLocales(List<SurveyedLocale> surveyedLocales) {
+        void setLocales(List<SurveyedLocale> surveyedLocales) {
             clear();
             for (SurveyedLocale sl : surveyedLocales) {
                 add(sl);
@@ -471,17 +471,17 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             notifyDataSetChanged();
         }
 
-        public void updateLocation(double latitude, double longitude) {
+        void updateLocation(double latitude, double longitude) {
             this.mLatitude = latitude;
             this.mLongitude = longitude;
         }
     }
 
-    private static class DataSyncBroadcastReceiver extends BroadcastReceiver {
+    public static class DataSyncBroadcastReceiver extends BroadcastReceiver {
 
         private final WeakReference<DataPointsListFragment> fragmentWeakRef;
 
-        private DataSyncBroadcastReceiver(DataPointsListFragment fragment) {
+        public DataSyncBroadcastReceiver(DataPointsListFragment fragment) {
             this.fragmentWeakRef = new WeakReference<>(fragment);
         }
 

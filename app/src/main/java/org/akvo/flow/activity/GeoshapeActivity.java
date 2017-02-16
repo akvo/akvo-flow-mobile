@@ -26,6 +26,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -482,7 +483,7 @@ public class GeoshapeActivity extends AppCompatActivity
             mAccuracy.setText(
                 getString(R.string.accuracy) + ": " + new DecimalFormat("#").format(location.getAccuracy()) + "m");
             if (location.getAccuracy() <= ACCURACY_THRESHOLD) {
-                mAccuracy.setTextColor(getResources().getColor(R.color.button_green));
+                mAccuracy.setTextColor(ContextCompat.getColor(this, R.color.button_green));
             } else {
                 mAccuracy.setTextColor(Color.RED);
             }

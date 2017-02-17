@@ -38,9 +38,9 @@ import timber.log.Timber;
 
 public class TagsFactory {
 
-    private static final String INSTANCE_ID_KEY = "app.id";
-    private static final String DEVICE_ID_KEY = "device.id";
-    private static final String DEVICE_TAG_KEY = "device.model";
+    private static final String INSTANCE_ID_TAG_KEY = "app.id";
+    private static final String DEVICE_ID_TAG_KEY = "device.id";
+    private static final String DEVICE_MODEL_TAG_KEY = "device.model";
     private static final String OS_VERSION_TAG_KEY = "os.version";
     private static final String VERSION_NAME_TAG_KEY = "version.name";
     private static final String VERSION_CODE_TAG_KEY = "version.code";
@@ -58,9 +58,9 @@ public class TagsFactory {
     }
 
     private void initTags(Context context) {
-        tags.put(DEVICE_TAG_KEY, Build.MODEL);
-        tags.put(INSTANCE_ID_KEY, getAppId(context));
-        tags.put(DEVICE_ID_KEY, getDeviceId(context));
+        tags.put(DEVICE_MODEL_TAG_KEY, Build.MODEL);
+        tags.put(INSTANCE_ID_TAG_KEY, getAppId(context));
+        tags.put(DEVICE_ID_TAG_KEY, getDeviceId(context));
         tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
         try {
             PackageInfo packageInfo = context.getPackageManager()

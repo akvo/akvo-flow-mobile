@@ -31,15 +31,17 @@ import timber.log.Timber;
 
 public class SentryHelper extends LoggingHelper {
 
+    private final TagsFactory tagsFactory;
+    private final Context context;
+
     public SentryHelper(Context context) {
-        super(context);
+        this.tagsFactory = new TagsFactory(context);
+        this.context = context;
     }
 
     @Override
     public void initSentry() {
-        addTags();
-        Sentry.setCaptureListener(new FlowSentryCaptureListener(tags));
-
+        Sentry.setCaptureListener(new FlowSentryCaptureListener(tagsFactory.getTags()));
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
             Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),

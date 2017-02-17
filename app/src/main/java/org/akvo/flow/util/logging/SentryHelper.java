@@ -18,7 +18,6 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.joshdholtz.sentry.Sentry;
@@ -31,17 +30,15 @@ import timber.log.Timber;
 
 public class SentryHelper extends LoggingHelper {
 
-    private final TagsFactory tagsFactory;
     private final Context context;
 
     public SentryHelper(Context context) {
-        this.tagsFactory = new TagsFactory(context);
         this.context = context;
     }
 
     @Override
     public void initSentry() {
-        Sentry.setCaptureListener(new FlowSentryCaptureListener(tagsFactory.getTags()));
+        Sentry.setCaptureListener(new FlowSentryCaptureListener(context));
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
             Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),
@@ -52,14 +49,17 @@ public class SentryHelper extends LoggingHelper {
 
     private static class FlowSentryCaptureListener implements Sentry.SentryEventCaptureListener {
 
-        private final Map<String, String> tags;
+        private final Context context;
 
-        private FlowSentryCaptureListener(@NonNull Map<String, String> tags) {
-            this.tags = tags;
+        private FlowSentryCaptureListener(Context context) {
+            this.context = context;
         }
 
         @Override
         public Sentry.SentryEventBuilder beforeCapture(Sentry.SentryEventBuilder builder) {
+            TagsFactory tagsFactory = new TagsFactory(context);
+            //tags value may change over time so we need to recreate them each time
+            Map<String, String> tags = tagsFactory.getTags();
             try {
                 for (String key : tags.keySet()) {
                     builder.getTags().put(key, tags.get(key));
@@ -67,7 +67,6 @@ public class SentryHelper extends LoggingHelper {
             } catch (JSONException e) {
                 Timber.e("Error setting SentryEventCaptureListener");
             }
-
             return builder;
         }
     }

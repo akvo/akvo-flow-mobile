@@ -23,10 +23,10 @@ package org.akvo.flow.data.loader;
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.data.database.RecordColumns;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyDbAdapter.RecordQuery;
-import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.database.RecordColumns;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter.RecordQuery;
+import org.akvo.flow.database.Tables;
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.Stats;
 

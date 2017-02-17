@@ -33,7 +33,7 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.data.preference.Prefs;
 

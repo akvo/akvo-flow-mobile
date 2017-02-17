@@ -19,7 +19,7 @@
 
 package org.akvo.flow.serialization.response;
 
-import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.response.SurveyedLocalesResponse;

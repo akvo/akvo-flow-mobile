@@ -25,7 +25,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 

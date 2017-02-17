@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.view.Window;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
 import org.akvo.flow.util.ConstantUtil;

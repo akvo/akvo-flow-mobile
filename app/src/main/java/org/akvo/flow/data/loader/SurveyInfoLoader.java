@@ -24,10 +24,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.util.Pair;
 
-import org.akvo.flow.data.database.SurveyColumns;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceColumns;
-import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.database.SurveyColumns;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyInstanceColumns;
+import org.akvo.flow.database.Tables;
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.SurveyInfo;
 import org.akvo.flow.domain.SurveyGroup;

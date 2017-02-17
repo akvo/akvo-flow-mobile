@@ -27,8 +27,8 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;

@@ -46,7 +46,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.UserRequestedApkUpdateService;

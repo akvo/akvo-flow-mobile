@@ -42,7 +42,7 @@ import android.widget.ListView;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.data.loader.SurveyInstanceLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.adapter.ResponseListAdapter;

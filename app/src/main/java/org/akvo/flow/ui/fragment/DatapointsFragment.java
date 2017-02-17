@@ -33,7 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -144,7 +144,8 @@ public class DatapointsFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.new_datapoint:
                 if (listener != null) {
-                    String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+                    String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId(),
+                            PlatformUtil.recordUuid());
                     listener.onRecordSelected(newLocaleId);
                 }
                 return true;

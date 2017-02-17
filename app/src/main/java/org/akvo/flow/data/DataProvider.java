@@ -31,10 +31,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.DatabaseHelper;
-import org.akvo.flow.data.database.LanguageTable;
-import org.akvo.flow.data.database.RecordColumns;
-import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.database.RecordColumns;
+import org.akvo.flow.database.Tables;
 
 public class DataProvider extends ContentProvider {
     

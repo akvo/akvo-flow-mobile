@@ -26,7 +26,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -58,7 +58,8 @@ public class SurveyedDataPointSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         FlowApi api = new FlowApi(getApplicationContext());
-        SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
+        SurveyDbDataSource database = new SurveyDbDataSource(getApplicationContext());
+        database.open();
         boolean correctSync = true;
         int resultCode = ConstantUtil.DATA_SYNC_RESULT_SUCCESS;
         int syncedRecords = 0;
@@ -106,7 +107,7 @@ public class SurveyedDataPointSyncService extends IntentService {
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
     @NonNull
-    private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbAdapter database, @NonNull FlowApi api,
+    private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbDataSource database, @NonNull FlowApi api,
             long surveyGroupId) throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();

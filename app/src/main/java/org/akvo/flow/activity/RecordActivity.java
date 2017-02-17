@@ -37,8 +37,8 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;

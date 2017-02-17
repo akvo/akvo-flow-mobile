@@ -25,6 +25,7 @@ import android.content.res.Resources;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
+import org.akvo.flow.database.migration.languages.LanguagesMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

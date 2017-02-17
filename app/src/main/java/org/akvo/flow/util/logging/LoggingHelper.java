@@ -22,11 +22,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
+import org.akvo.flow.util.StatusUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,14 +38,14 @@ import timber.log.Timber;
 
 public abstract class LoggingHelper {
 
-    private static final String PLATFORM_TAG_VALUE = "Android";
-    private static final String PLATFORM_TAG_KEY = "Platform";
-    private static final String OS_VERSION_TAG_KEY = "OsVersion";
-    private static final String DEVICE_TAG_KEY = "Device";
-    private static final String VERSION_NAME_TAG_KEY = "VersionName";
-    private static final String VERSION_CODE_TAG_KEY = "VersionCode";
-    private static final String INSTANCE_ID_KEY = "appId";
-    private static final int NUMBER_OF_TAGS = 7;
+    private static final String INSTANCE_ID_KEY = "app.id";
+    private static final String DEVICE_ID_KEY = "device.id";
+    private static final String DEVICE_TAG_KEY = "device.model";
+    private static final String OS_VERSION_TAG_KEY = "os.version";
+    private static final String VERSION_NAME_TAG_KEY = "version.name";
+    private static final String VERSION_CODE_TAG_KEY = "version.code";
+    private static final String DEFAULT_TAG_VALUE = "NotSet";
+    private static final int NUMBER_OF_TAGS = 6;
 
     final Context context;
     final Map<String, String> tags = new HashMap<>(NUMBER_OF_TAGS);
@@ -52,11 +55,10 @@ public abstract class LoggingHelper {
     }
 
     void addTags() {
-        tags.put(PLATFORM_TAG_KEY, PLATFORM_TAG_VALUE);
-        tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
         tags.put(DEVICE_TAG_KEY, android.os.Build.MODEL);
-        final PropertyUtil props = new PropertyUtil(context.getResources());
-        tags.put(INSTANCE_ID_KEY, props.getProperty(ConstantUtil.S3_BUCKET));
+        tags.put(INSTANCE_ID_KEY, getAppId());
+        tags.put(DEVICE_ID_KEY, getDeviceId());
+        tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
         try {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
@@ -67,6 +69,22 @@ public abstract class LoggingHelper {
         } catch (PackageManager.NameNotFoundException e) {
             Timber.e("Error getting versionName and versionCode");
         }
+    }
+
+    @NonNull
+    private String getDeviceId() {
+        String deviceId = StatusUtil.getDeviceId(context);
+        if (TextUtils.isEmpty(deviceId)) {
+            return DEFAULT_TAG_VALUE;
+        }
+        return deviceId;
+    }
+
+    @NonNull
+    private String getAppId() {
+        final PropertyUtil props = new PropertyUtil(context.getResources());
+        String property = props.getProperty(ConstantUtil.S3_BUCKET);
+        return TextUtils.isEmpty(property) ? DEFAULT_TAG_VALUE : property;
     }
 
     public abstract void initSentry();

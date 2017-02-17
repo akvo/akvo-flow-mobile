@@ -44,6 +44,7 @@ import android.widget.Toast;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.data.preference.Prefs;
@@ -80,7 +81,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     private static final String DRAWER_FRAGMENT_TAG = "f";
 
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
     private SurveyGroup mSurveyGroup;
 
     private DrawerLayout mDrawerLayout;
@@ -107,7 +108,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initializeToolBar();
 
-        mDatabase = new SurveyDbAdapter(this);
+        mDatabase = new SurveyDbDataSource(this);
         mDatabase.open();
 
         mTitle = mDrawerTitle = getString(R.string.app_name);

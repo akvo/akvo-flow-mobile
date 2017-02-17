@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -50,6 +50,7 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyGroupLoader;
 import org.akvo.flow.data.loader.UserLoader;
 import org.akvo.flow.database.SurveyDbAdapter;
@@ -182,7 +183,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mSurveys.clear();
                     if (cursor.moveToFirst()) {
                         do {
-                            mSurveys.add(SurveyDbAdapter.getSurveyGroup(cursor));
+                            mSurveys.add(SurveyDbDataSource.getSurveyGroup(cursor));
                         } while (cursor.moveToNext());
                         cursor.close();
                     }

@@ -38,6 +38,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.database.SurveyDbAdapter;
@@ -102,7 +103,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
 
@@ -125,7 +126,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
 
         mQuestionResponses = new HashMap<>();
-        mDatabase = new SurveyDbAdapter(this);
+        mDatabase = new SurveyDbDataSource(this);
         mDatabase.open();
 
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(getApplicationContext());

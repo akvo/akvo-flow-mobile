@@ -24,6 +24,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.database.RecordColumns;
@@ -273,6 +274,7 @@ public class SurveyDbDataSource {
         return survey;
     }
 
+    @NonNull
     private List<FileTransmission> getFileTransmissions(Cursor cursor) {
         List<FileTransmission> transmissions = new ArrayList<>();
 
@@ -321,6 +323,7 @@ public class SurveyDbDataSource {
     /**
      * Get the list of queued and failed transmissions
      */
+    @NonNull
     public List<FileTransmission> getUnsyncedTransmissions() {
         Cursor cursor = surveyDbAdapter.getUnsyncedTransmissions();
         return getFileTransmissions(cursor);
@@ -333,6 +336,25 @@ public class SurveyDbDataSource {
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
         surveyDbAdapter.addSurveyGroup(values);
+    }
+
+    // Attempt to fetch the registation form. If the form ID is explicitely set on the SurveyGroup,
+    // we simply query by ID. Otherwise, assume is a non-monitored form, and query the first form
+    // we find.
+    public Survey getRegistrationForm(SurveyGroup sg) {
+        String formId = sg.getRegisterSurveyId();
+        if (!TextUtils.isEmpty(formId) && !"null".equalsIgnoreCase(formId)) {
+            return getSurvey(formId);
+        }
+        Survey s = null;
+        Cursor c = surveyDbAdapter.getSurveys(sg.getId());
+        if (c != null) {
+            if (c.moveToFirst()) {
+                s = getSurvey(c);
+            }
+            c.close();
+        }
+        return s;
     }
 
     public static SurveyGroup getSurveyGroup(Cursor cursor) {
@@ -506,5 +528,74 @@ public class SurveyDbDataSource {
 
     public void deleteEmptyRecords() {
         surveyDbAdapter.deleteAllSurveys();
+    }
+
+    public void deleteEmptySurveyInstances() {
+        surveyDbAdapter.deleteEmptySurveyInstances();
+    }
+
+    public Cursor getFormInstances(String surveyedLocaleId) {
+        return surveyDbAdapter.getFormInstances(surveyedLocaleId);
+    }
+
+    public long[] getFormInstances(String recordId, String surveyId, int saved) {
+        return surveyDbAdapter.getFormInstances(recordId, surveyId, saved);
+    }
+
+    public Long getLastSurveyInstance(String mRecordId, String id) {
+        return surveyDbAdapter.getLastSurveyInstance(mRecordId, id);
+    }
+
+    public Cursor getFormInstance(long mSurveyInstanceId) {
+        return surveyDbAdapter.getFormInstance(mSurveyInstanceId);
+    }
+
+    public void updateSurveyStatus(long mSurveyInstanceId, int saved) {
+        surveyDbAdapter.updateSurveyStatus(mSurveyInstanceId, saved);
+    }
+
+    public void updateRecordModifiedDate(String mRecordId, long timestamp) {
+        surveyDbAdapter.updateRecordModifiedDate(mRecordId, timestamp);
+    }
+
+    public void deleteResponses(String surveyId) {
+        surveyDbAdapter.deleteResponses(surveyId);
+    }
+
+    public void addSurveyDuration(long mSurveyInstanceId, long timestamp) {
+        surveyDbAdapter.addSurveyDuration(mSurveyInstanceId, timestamp);
+    }
+
+    public void deleteResponse(long mSurveyInstanceId, String questionId) {
+        surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId);
+    }
+
+    public void createTransmission(long id, String formId, String filename) {
+        surveyDbAdapter.createTransmission(id, formId, filename);
+    }
+
+    public Cursor getResponsesData(long surveyInstanceId) {
+        return surveyDbAdapter.getResponsesData(surveyInstanceId);
+    }
+
+    public Cursor getSurveyInstancesByStatus(int status) {
+        return surveyDbAdapter.getSurveyInstancesByStatus(status);
+    }
+
+    public int updateTransmissionHistory(String filename, int inProgress) {
+        return surveyDbAdapter.updateTransmissionHistory(filename, inProgress);
+    }
+
+    public void deleteSurvey(String id) {
+        surveyDbAdapter.deleteSurvey(id);
+    }
+
+    public void createTransmission(long surveyInstanceId, String formId, String filename,
+            int status) {
+        surveyDbAdapter.createTransmission(surveyInstanceId, formId, filename, status);
+    }
+
+    public String createSurveyedLocale(long id, String recordUuid) {
+        return surveyDbAdapter.createSurveyedLocale(id, recordUuid);
     }
 }

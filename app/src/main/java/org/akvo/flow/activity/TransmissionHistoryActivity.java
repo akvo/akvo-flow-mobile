@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.view.Window;
 
 import org.akvo.flow.R;
-import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
 import org.akvo.flow.util.ConstantUtil;
@@ -38,7 +38,7 @@ import java.util.List;
  * @author Christopher Fagiani
  */
 public class TransmissionHistoryActivity extends ListActivity {
-    private SurveyDbAdapter databaseAdapter;
+    private SurveyDbDataSource databaseAdapter;
     private Long respondentId;
 
     @Override
@@ -54,7 +54,7 @@ public class TransmissionHistoryActivity extends ListActivity {
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
         }
         setContentView(R.layout.transmissionhistory);
-        databaseAdapter = new SurveyDbAdapter(this);
+        databaseAdapter = new SurveyDbDataSource(this);
 
     }
 

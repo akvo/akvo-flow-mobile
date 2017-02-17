@@ -39,7 +39,7 @@ import timber.log.Timber;
 public class TagsFactory {
 
     private static final String INSTANCE_ID_TAG_KEY = "app.id";
-    private static final String DEVICE_ID_TAG_KEY = "device.id";
+    private static final String DEVICE_ID_TAG_KEY = "flow.device.id";
     private static final String DEVICE_MODEL_TAG_KEY = "device.model";
     private static final String OS_VERSION_TAG_KEY = "os.version";
     private static final String VERSION_NAME_TAG_KEY = "version.name";

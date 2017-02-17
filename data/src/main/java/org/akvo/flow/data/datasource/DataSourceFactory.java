@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,34 +18,24 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.datasource;
 
-import android.app.Activity;
+import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 
-import org.akvo.flow.injector.PerActivity;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import dagger.Module;
-import dagger.Provides;
+@Singleton
+public class DataSourceFactory {
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
+    private final SharedPreferencesDataSource sharedPreferencesDataSource;
 
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
+    @Inject
+    public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource) {
+        this.sharedPreferencesDataSource = sharedPreferencesDataSource;
     }
 
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
+    public SharedPreferencesDataSource getSharedPreferencesDataSource() {
+        return sharedPreferencesDataSource;
     }
-
 }

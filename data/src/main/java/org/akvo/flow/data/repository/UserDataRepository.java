@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,34 +18,20 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.repository;
 
-import android.app.Activity;
+import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.domain.repository.UserRepository;
 
-import org.akvo.flow.injector.PerActivity;
+import javax.inject.Inject;
 
-import dagger.Module;
-import dagger.Provides;
+public class UserDataRepository implements UserRepository {
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
+    private final DataSourceFactory dataSourceFactory;
 
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
+    @Inject
+    public UserDataRepository(DataSourceFactory dataSourceFactory) {
+        this.dataSourceFactory = dataSourceFactory;
     }
 
 }

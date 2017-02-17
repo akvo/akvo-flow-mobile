@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,34 +18,14 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.util;
 
-import android.app.Activity;
+public class Constants {
 
-import org.akvo.flow.injector.PerActivity;
+    public static final String APK_VERSION_SERVICE_PATH =
+            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
 
-import dagger.Module;
-import dagger.Provides;
-
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
-
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
-    }
-
+    public static final int IMAGE_SIZE_320_240 = 0;
+    public static final int IMAGE_SIZE_640_480 = 1;
+    public static final int IMAGE_SIZE_1280_960 = 2;
 }

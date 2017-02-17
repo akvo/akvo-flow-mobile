@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,34 +18,25 @@
  *
  */
 
-package org.akvo.flow.injector.module;
-
-import android.app.Activity;
-
-import org.akvo.flow.injector.PerActivity;
-
-import dagger.Module;
-import dagger.Provides;
+package org.akvo.flow.domain.interactor;
 
 /**
- * A module to wrap the Activity state and expose it to the graph.
+ * Default subscriber base class to be used whenever you want default error handling.
  */
-@Module
-public class ActivityModule {
+public class DefaultSubscriber<T> extends rx.Subscriber<T> {
 
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
+    @Override
+    public void onCompleted() {
+        // no-op by default.
     }
 
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
+    @Override
+    public void onError(Throwable e) {
+        // no-op by default.
     }
 
+    @Override
+    public void onNext(T t) {
+        // no-op by default.
+    }
 }

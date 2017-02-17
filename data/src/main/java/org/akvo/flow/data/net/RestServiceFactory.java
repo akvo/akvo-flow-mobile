@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,34 +18,18 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.net;
 
-import android.app.Activity;
+import android.support.annotation.NonNull;
 
-import org.akvo.flow.injector.PerActivity;
+import retrofit.RestAdapter;
 
-import dagger.Module;
-import dagger.Provides;
+public class RestServiceFactory {
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
-
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
+    public static <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
+        RestAdapter.Builder builder = new RestAdapter.Builder()
+                .setEndpoint(baseUrl)
+                .setLogLevel(RestAdapter.LogLevel.FULL);
+        return builder.build().create(clazz);
     }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
-    }
-
 }

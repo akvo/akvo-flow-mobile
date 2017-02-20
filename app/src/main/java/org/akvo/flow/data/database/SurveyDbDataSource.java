@@ -527,7 +527,7 @@ public class SurveyDbDataSource {
     }
 
     public void deleteEmptyRecords() {
-        surveyDbAdapter.deleteAllSurveys();
+        surveyDbAdapter.deleteEmptyRecords();
     }
 
     public void deleteEmptySurveyInstances() {

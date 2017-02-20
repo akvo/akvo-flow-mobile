@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,23 +18,17 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.injector.component;
 
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
-import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.injector.PerActivity;
+import org.akvo.flow.injector.module.ViewModule;
+import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 
-import javax.inject.Named;
+import dagger.Component;
 
-import dagger.Module;
-import dagger.Provides;
+@PerActivity
+@Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
+public interface ViewComponent {
 
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("getSavedDataPoints")
-    UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
-        return getSavedDataPoints;
-    }
-
+    void inject(DataPointsMapFragment dataPointsMapFragment);
 }

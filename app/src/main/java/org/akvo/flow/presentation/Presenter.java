@@ -18,23 +18,9 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.presentation;
 
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
-import org.akvo.flow.domain.interactor.UseCase;
+public interface Presenter {
 
-import javax.inject.Named;
-
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("getSavedDataPoints")
-    UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
-        return getSavedDataPoints;
-    }
-
+    void onViewDestroyed();
 }

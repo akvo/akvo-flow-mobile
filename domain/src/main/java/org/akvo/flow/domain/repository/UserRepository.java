@@ -20,5 +20,14 @@
 
 package org.akvo.flow.domain.repository;
 
+import org.akvo.flow.domain.entity.DataPoint;
+
+import java.util.List;
+
+import rx.Observable;
+
 public interface UserRepository {
+
+    Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
+            Double longitude, Integer orderBy);
 }

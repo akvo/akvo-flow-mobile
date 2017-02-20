@@ -23,19 +23,25 @@ package org.akvo.flow.data.datasource;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
 public class DataSourceFactory {
 
     private final SharedPreferencesDataSource sharedPreferencesDataSource;
 
+    private final DatabaseDataSource dataBaseDataSource;
+
     @Inject
-    public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource) {
+    public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
+            DatabaseDataSource dataBaseDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
+        this.dataBaseDataSource = dataBaseDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
         return sharedPreferencesDataSource;
+    }
+
+    public DatabaseDataSource getDataBaseDataSource() {
+        return dataBaseDataSource;
     }
 }

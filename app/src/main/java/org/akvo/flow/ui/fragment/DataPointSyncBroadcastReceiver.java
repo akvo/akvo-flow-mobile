@@ -28,11 +28,11 @@ import java.lang.ref.WeakReference;
 
 import timber.log.Timber;
 
-class DataPointSyncBroadcastReceiver extends BroadcastReceiver {
+public class DataPointSyncBroadcastReceiver extends BroadcastReceiver {
 
     private final WeakReference<DataPointsSyncListener> fragmentWeakReference;
 
-    DataPointSyncBroadcastReceiver(DataPointsSyncListener fragment) {
+    public DataPointSyncBroadcastReceiver(DataPointsSyncListener fragment) {
         this.fragmentWeakReference = new WeakReference<>(fragment);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,34 +18,33 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.presentation.datapoints.map.entity;
 
-import android.app.Activity;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
-import org.akvo.flow.injector.PerActivity;
+public class MapDataPoint implements ClusterItem {
 
-import dagger.Module;
-import dagger.Provides;
+    private final String id;
+    private final String name;
+    private final LatLng position;
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
-
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
+    public MapDataPoint(String id, String name, LatLng position) {
+        this.id = id;
+        this.name = name;
+        this.position = position;
     }
 
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
+    public String getId() {
+        return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return position;
+    }
 }

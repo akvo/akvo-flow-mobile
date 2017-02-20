@@ -21,10 +21,16 @@
 package org.akvo.flow.injector.module;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.repository.UserDataRepository;
+import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -34,6 +40,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import rx.schedulers.Schedulers;
 
 @Module
 public class ApplicationModule {
@@ -66,5 +73,25 @@ public class ApplicationModule {
     @Singleton
     UserRepository provideUserRepository(UserDataRepository userDataRepository) {
         return userDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    SQLiteOpenHelper provideOpenHelper() {
+        return new DatabaseHelper(application, new LanguageTable());
+    }
+
+    @Provides
+    @Singleton
+    SqlBrite provideSqlBrite() {
+        return new SqlBrite.Builder().build();
+    }
+
+    @Provides
+    @Singleton
+    BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
+        BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
+        db.setLoggingEnabled(true);
+        return db;
     }
 }

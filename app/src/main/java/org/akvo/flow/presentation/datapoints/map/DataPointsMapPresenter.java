@@ -62,7 +62,9 @@ public class DataPointsMapPresenter implements Presenter{
 
     public void onDataReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
-        view.displayMenu(surveyGroup.isMonitored());
+        if (surveyGroup != null) {
+            view.displayMenu(surveyGroup.isMonitored());
+        }
     }
 
     public void onViewReady() {

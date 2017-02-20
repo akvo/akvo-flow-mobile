@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.component;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.executor.PostExecutionThread;
@@ -45,6 +46,8 @@ public interface ApplicationComponent {
     PostExecutionThread postExecutionThread();
 
     UserRepository userRepository();
+
+    SQLiteOpenHelper provideOpenHelper();
 
     Context context();
 

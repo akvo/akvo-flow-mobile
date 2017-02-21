@@ -45,9 +45,8 @@ public class TagsFactory {
     private static final String VERSION_NAME_TAG_KEY = "version.name";
     private static final String VERSION_CODE_TAG_KEY = "version.code";
     private static final String DEFAULT_TAG_VALUE = "NotSet";
-    private static final int NUMBER_OF_TAGS = 6;
 
-    private final Map<String, String> tags = new HashMap<String, String>(NUMBER_OF_TAGS);
+    private final Map<String, String> tags = new HashMap<>();
 
     public TagsFactory(Context context) {
         initTags(context);

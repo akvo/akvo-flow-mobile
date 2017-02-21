@@ -20,14 +20,9 @@
 
 package org.akvo.flow.data.repository;
 
-import android.database.Cursor;
-
 import org.akvo.flow.data.datasource.DataSourceFactory;
-import org.akvo.flow.data.entity.DataPointMapper;
-import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.data.util.ConnectivityStateManager;
 import org.akvo.flow.domain.repository.UserRepository;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -36,26 +31,24 @@ import rx.functions.Func1;
 
 public class UserDataRepository implements UserRepository {
 
+    private final ConnectivityStateManager connectivityStateManager;
     private final DataSourceFactory dataSourceFactory;
-    private final DataPointMapper mapper;
 
     @Inject
-    public UserDataRepository(DataSourceFactory dataSourceFactory, DataPointMapper mapper) {
+    public UserDataRepository(ConnectivityStateManager connectivityStateManager,
+            DataSourceFactory dataSourceFactory) {
+        this.connectivityStateManager = connectivityStateManager;
         this.dataSourceFactory = dataSourceFactory;
-        this.mapper = mapper;
     }
 
     @Override
-    public Observable<List<DataPoint>> getDataPoints(Long surveyGroupId,
-            Double latitude, Double longitude, Integer orderBy) {
-        return dataSourceFactory.getDataBaseDataSource()
-                .getDataPoints(surveyGroupId, latitude, longitude, orderBy).concatMap(
-                        new Func1<Cursor, Observable<List<DataPoint>>>() {
-                            @Override
-                            public Observable<List<DataPoint>> call(Cursor cursor) {
-                                return Observable.just(mapper.getDataPoints(cursor));
-                            }
-                        });
+    public Observable<Boolean> allowedToSync() {
+        return dataSourceFactory.getSharedPreferencesDataSource().mobileSyncEnabled().map(
+                new Func1<Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean enabled) {
+                        return enabled || connectivityStateManager.isWifiConnected();
+                    }
+                });
     }
-
 }

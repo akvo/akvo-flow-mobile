@@ -22,6 +22,8 @@ package org.akvo.flow.data.datasource.preferences;
 
 import javax.inject.Inject;
 
+import rx.Observable;
+
 public class SharedPreferencesDataSource {
 
     public static final String KEY_APK_DATA = "apk_data";
@@ -33,5 +35,10 @@ public class SharedPreferencesDataSource {
     @Inject
     public SharedPreferencesDataSource(Prefs prefs) {
         this.preferences = prefs;
+    }
+
+    public Observable<Boolean> mobileSyncEnabled() {
+        return Observable.just(preferences
+                .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD));
     }
 }

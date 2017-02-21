@@ -20,42 +20,45 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.entity.SyncResult;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.functions.Func1;
 
-public class GetSavedDataPoints extends UseCase {
-
-    public static final String KEY_SURVEY_GROUP_ID = "survey_group_id";
-    public static final String KEY_LATITUDE = "latitude";
-    public static final String KEY_LONGITUDE = "longitude";
-    public static final String KEY_ORDER_BY = "order_by";
+public class SyncDataPoints extends UseCase {
 
     private final SurveyRepository surveyRepository;
+    private final UserRepository userRepository;
 
     @Inject
-    protected GetSavedDataPoints(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, SurveyRepository surveyRepository) {
+    protected SyncDataPoints(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
+            UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(KEY_SURVEY_GROUP_ID)
-                || parameters.get(KEY_SURVEY_GROUP_ID) == null) {
-            return Observable.error(new IllegalArgumentException("Missing survey group id"));
-        }
-        Long surveyGroupId = (Long) parameters.get(KEY_SURVEY_GROUP_ID);
-        Double latitude = (Double) parameters.get(KEY_LATITUDE);
-        Double longitude = (Double) parameters.get(KEY_LONGITUDE);
-        Integer orderBy = (Integer) parameters.get(KEY_ORDER_BY);
-        return surveyRepository.getDataPoints(surveyGroupId, latitude, longitude, orderBy);
+       return userRepository.allowedToSync().concatMap(new Func1<Boolean, Observable>() {
+           @Override
+           public Observable<?> call(Boolean syncAllowed) {
+               if (!syncAllowed) {
+                   return Observable.just(new SyncResult(
+                           SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G));
+               } else {
+                   return surveyRepository.getRemoteDataPoints();
+               }
+           }
+       });
     }
 }

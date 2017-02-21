@@ -47,7 +47,7 @@ public class SurveyedDataPointSyncService extends IntentService {
     private static final String TAG = SurveyedDataPointSyncService.class.getSimpleName();
 
     public static final String SURVEY_GROUP = "survey_group";
-    
+
     public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion

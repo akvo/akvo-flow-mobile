@@ -18,11 +18,19 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.entity;
 
-import rx.Observable;
+public class SyncResult {
 
-public interface UserRepository {
+    private final ResultCode resultCode;
 
-    Observable<Boolean> allowedToSync();
+    public SyncResult(ResultCode resultCode) {
+        this.resultCode = resultCode;
+    }
+
+    public enum ResultCode {
+        SUCCESS,
+        ERROR_SYNC_NOT_ALLOWED_OVER_3G,
+        ERROR_NO_NETWORK,
+    }
 }

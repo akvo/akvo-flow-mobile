@@ -34,8 +34,7 @@ import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LangsPreferenceUtil;
 import org.akvo.flow.util.Prefs;
-import org.akvo.flow.util.logging.LoggingFactory;
-import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.util.logging.SentryHelper;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -49,8 +48,6 @@ public class FlowApp extends Application {
     private User mUser;
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
-
-    private final LoggingFactory loggingFactory = new LoggingFactory();
 
     @Override
     public void onCreate() {
@@ -70,7 +67,7 @@ public class FlowApp extends Application {
     }
 
     private void initLogging() {
-        LoggingHelper helper = loggingFactory.createLoggingHelper(this);
+        SentryHelper helper = new SentryHelper(this);
         helper.initDebugTree();
         helper.initSentry();
     }

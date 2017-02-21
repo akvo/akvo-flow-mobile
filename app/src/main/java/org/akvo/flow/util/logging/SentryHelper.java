@@ -18,33 +18,51 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.joshdholtz.sentry.Sentry;
 
+import org.akvo.flow.BuildConfig;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PropertyUtil;
 import org.json.JSONException;
 
 import java.util.Map;
 
 import timber.log.Timber;
 
-public class SentryHelper extends LoggingHelper {
+public class SentryHelper {
 
+    public static final String SENTRY_PROTOCOL_VERSION = "7";
     private final Context context;
 
     public SentryHelper(Context context) {
         this.context = context;
     }
 
-    @Override
     public void initSentry() {
         Sentry.setCaptureListener(new FlowSentryCaptureListener(context));
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
             Sentry.init(context, sentryDsn, true, new FlowPostPermissionVerifier(),
-                    LoggingFactory.SENTRY_PROTOCOL_VERSION);
+                    SENTRY_PROTOCOL_VERSION);
             Timber.plant(new SentryTree());
         }
+    }
+
+    public void initDebugTree() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
+    }
+
+    @Nullable
+    String getSentryDsn(Resources resources) {
+        final PropertyUtil props = new PropertyUtil(resources);
+        String sentryDsn = props.getProperty(ConstantUtil.SENTRY_DSN);
+        return sentryDsn;
     }
 
     private static class FlowSentryCaptureListener implements Sentry.SentryEventCaptureListener {

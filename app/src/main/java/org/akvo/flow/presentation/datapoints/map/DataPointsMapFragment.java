@@ -27,6 +27,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -326,7 +327,10 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void displayMenu(boolean monitored) {
         displayMonitoredMenu = monitored;
-        getActivity().supportInvalidateOptionsMenu();
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            activity.supportInvalidateOptionsMenu();
+        }
     }
 
     @Override

@@ -31,7 +31,6 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
-import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
@@ -88,7 +87,7 @@ public class SurveyDownloadService extends IntentService {
 
     public void onHandleIntent(@Nullable Intent intent) {
         try {
-            databaseAdaptor = new SurveyDbDataSource(this);
+            databaseAdaptor = new SurveyDbDataSource(this, null);
             databaseAdaptor.open();
             prefs = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());

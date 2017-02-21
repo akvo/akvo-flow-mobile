@@ -47,7 +47,7 @@ public class SurveyedDataPointSyncService extends IntentService {
     private static final String TAG = SurveyedDataPointSyncService.class.getSimpleName();
 
     public static final String SURVEY_GROUP = "survey_group";
-
+    
     public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
@@ -58,7 +58,7 @@ public class SurveyedDataPointSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         FlowApi api = new FlowApi(getApplicationContext());
-        SurveyDbDataSource database = new SurveyDbDataSource(getApplicationContext());
+        SurveyDbDataSource database = new SurveyDbDataSource(getApplicationContext(), null);
         database.open();
         boolean correctSync = true;
         int resultCode = ConstantUtil.DATA_SYNC_RESULT_SUCCESS;
@@ -132,7 +132,8 @@ public class SurveyedDataPointSyncService extends IntentService {
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
      * This notification will be received in {@link DataPointsListFragment}
-     * or {@link org.akvo.flow.ui.fragment.DataPointsMapFragment}, in order to load data from DB
+     * or {@link org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment},
+     * in order to load data from DB
      */
     private void sendUpdateUiBroadcastNotification() {
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE);

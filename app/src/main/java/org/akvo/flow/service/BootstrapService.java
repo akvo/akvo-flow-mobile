@@ -113,7 +113,7 @@ public class BootstrapService extends IntentService {
 
             String startMessage = getString(R.string.bootstrapstart);
             displayNotification(startMessage);
-            databaseAdapter = new SurveyDbDataSource(this);
+            databaseAdapter = new SurveyDbDataSource(this, null);
             databaseAdapter.open();
             try {
                 for (File file : zipFiles) {

@@ -27,6 +27,8 @@ import android.database.SQLException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.squareup.sqlbrite.BriteDatabase;
+
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -36,6 +38,7 @@ import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
+import org.akvo.flow.database.britedb.BriteDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -52,19 +55,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture
  */
 public class SurveyDbDataSource {
 
     private final SurveyDbAdapter surveyDbAdapter;
+    private final BriteDbAdapter briteDbAdapter;
 
-    public SurveyDbDataSource(Context context) {
-        surveyDbAdapter = new SurveyDbAdapter(context);
+    @Inject
+    public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
+        this.briteDbAdapter = new BriteDbAdapter(briteDatabase);
+        this.surveyDbAdapter = new SurveyDbAdapter(context);
     }
 
     /**
-     * Open or create the db
+     * Open or create the briteDbAdapter
      *
      * @throws SQLException if the database could be neither opened or created
      */
@@ -73,7 +81,7 @@ public class SurveyDbDataSource {
     }
 
     /**
-     * close the db
+     * close the briteDbAdapter
      */
     public void close() {
         surveyDbAdapter.close();
@@ -190,7 +198,7 @@ public class SurveyDbDataSource {
 
     /**
      * returns a list of survey objects that are out of date (missing from the
-     * db or with a lower version number). If a survey is present but marked as
+     * briteDbAdapter or with a lower version number). If a survey is present but marked as
      * deleted, it will not be listed as out of date (and thus won't be updated)
      *
      * @param surveys
@@ -213,7 +221,7 @@ public class SurveyDbDataSource {
     }
 
     /**
-     * updates a survey in the db and resets the deleted flag to "N"
+     * updates a survey in the briteDbAdapter and resets the deleted flag to "N"
      *
      * @param survey
      * @return
@@ -243,7 +251,7 @@ public class SurveyDbDataSource {
     }
 
     /**
-     * Gets a single survey from the db using its survey id
+     * Gets a single survey from the briteDbAdapter using its survey id
      */
     public Survey getSurvey(String surveyId) {
         Survey survey = null;
@@ -431,7 +439,8 @@ public class SurveyDbDataSource {
             }
 
             // Update the surveyed locale info
-            surveyDbAdapter.updateSurveyedLocale(surveyedLocaleId, surveyedLocaleValues);
+//            surveyDbAdapter.updateSurveyedLocale(surveyedLocaleId, surveyedLocaleValues);
+            briteDbAdapter.updateSurveyedLocale(surveyedLocaleId, surveyedLocaleValues);
 
             // Store the META_NAME/META_GEO as a response
             createOrUpdateSurveyResponse(metaResponse);
@@ -490,12 +499,10 @@ public class SurveyDbDataSource {
 
             //THIS is not so good but temporary
             surveyDbAdapter.beginTransaction();
-            surveyDbAdapter.insertRecord(values);
 
             syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
 
-            // Update the record last modification date, if necessary
-            surveyDbAdapter.updateRecordModifiedDate(id, surveyedLocale.getLastModified());
+            briteDbAdapter.updateRecord(id, values, surveyedLocale.getLastModified());
 
             String syncTime = String.valueOf(surveyedLocale.getLastModified());
             surveyDbAdapter.setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
@@ -554,8 +561,9 @@ public class SurveyDbDataSource {
         surveyDbAdapter.updateSurveyStatus(mSurveyInstanceId, saved);
     }
 
-    public void updateRecordModifiedDate(String mRecordId, long timestamp) {
-        surveyDbAdapter.updateRecordModifiedDate(mRecordId, timestamp);
+    public void updateRecordModifiedDate(String recordId, long timestamp) {
+        //        surveyDbAdapter.updateRecordModifiedDate(mRecordId, timestamp);
+        briteDbAdapter.updateRecordModifiedDate(recordId, timestamp);
     }
 
     public void deleteResponses(String surveyId) {

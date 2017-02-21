@@ -33,8 +33,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -42,13 +46,17 @@ import org.akvo.flow.util.PlatformUtil;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import javax.inject.Inject;
+
 public class DatapointsFragment extends Fragment {
 
     private static final int POSITION_LIST = 0;
     private static final int POSITION_MAP = 1;
     private static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
 
-    private SurveyDbDataSource mDatabase;
+    @Inject
+    SurveyDbDataSource mDatabase;
+
     private TabsAdapter mTabsAdapter;
     private ViewPager mPager;
     private SurveyGroup mSurveyGroup;
@@ -91,11 +99,24 @@ public class DatapointsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initializeInjector();
+        mDatabase.open();
+    }
 
-        if (mDatabase == null) {
-            mDatabase = new SurveyDbDataSource(getActivity());
-            mDatabase.open();
-        }
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override

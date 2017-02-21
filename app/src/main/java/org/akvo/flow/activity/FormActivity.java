@@ -38,14 +38,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbDataSource;
-import org.akvo.flow.database.SurveyLanguagesDataSource;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.database.SurveyInstanceStatus;
+import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -53,6 +54,9 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -60,9 +64,9 @@ import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
 
@@ -75,6 +79,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -103,7 +109,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
-    private SurveyDbDataSource mDatabase;
+
+    @Inject
+    SurveyDbDataSource mDatabase;
+
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
 
@@ -117,7 +126,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_activity);
-
+        initializeInjector();
         // Read all the params. Note that the survey instance id is now mandatory
         surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
         mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
@@ -126,7 +135,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
 
         mQuestionResponses = new HashMap<>();
-        mDatabase = new SurveyDbDataSource(this);
         mDatabase.open();
 
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(getApplicationContext());
@@ -159,6 +167,21 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
 
         spaceLeftOnCard();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent()).build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     /**

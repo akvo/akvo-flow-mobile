@@ -740,6 +740,7 @@ public class SurveyDbAdapter {
         NAME, GEOLOCATION
     }
 
+    //TODO: remove
     public void updateSurveyedLocale(String surveyedLocaleId, ContentValues surveyedLocaleValues) {
         database.update(Tables.RECORD, surveyedLocaleValues,
                 RecordColumns.RECORD_ID + " = ?",
@@ -749,6 +750,7 @@ public class SurveyDbAdapter {
     /**
      * Update the last modification date, if necessary
      */
+    //TODO: remove
     public void updateRecordModifiedDate(String recordId, long timestamp) {
         ContentValues values = new ContentValues();
         values.put(RecordColumns.LAST_MODIFIED, timestamp);
@@ -760,6 +762,7 @@ public class SurveyDbAdapter {
     /**
      * Filters surveyd locales based on the parameters passed in.
      */
+    //TODO: remove
     public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
             int orderBy) {
         // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
@@ -865,6 +868,7 @@ public class SurveyDbAdapter {
         database.setTransactionSuccessful();
     }
 
+    //TODO: remove
     public void insertRecord(ContentValues values) {
         database.insert(Tables.RECORD, null, values);
     }

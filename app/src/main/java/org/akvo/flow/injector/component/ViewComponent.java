@@ -20,9 +20,11 @@
 
 package org.akvo.flow.injector.component;
 
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.ui.fragment.DatapointsFragment;
 
 import dagger.Component;
 
@@ -30,5 +32,10 @@ import dagger.Component;
 @Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
 public interface ViewComponent {
 
+    void inject(DatapointsFragment datapointsFragment);
+
     void inject(DataPointsMapFragment dataPointsMapFragment);
+
+    void inject(FormActivity formActivity);
+
 }

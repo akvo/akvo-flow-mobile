@@ -87,11 +87,12 @@ public class DataPointsMapPresenter implements Presenter{
 
             @Override
             public void onNext(List<DataPoint> dataPoints) {
+                Timber.d("Found datapoints : %d "+dataPoints.size());
                 List<MapDataPoint> mapDataPoints = mapper.transform(dataPoints);
+                Timber.d("Datapoints with location : %d "+mapDataPoints.size());
                 view.hideProgress();
                 view.displayData(mapDataPoints);
             }
-
         }, params);
     }
 

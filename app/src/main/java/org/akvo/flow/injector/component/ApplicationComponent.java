@@ -23,6 +23,9 @@ package org.akvo.flow.injector.component;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
+
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
@@ -48,6 +51,10 @@ public interface ApplicationComponent {
     UserRepository userRepository();
 
     SQLiteOpenHelper provideOpenHelper();
+
+    SqlBrite provideSqlBrite();
+
+    BriteDatabase provideDatabase();
 
     Context context();
 

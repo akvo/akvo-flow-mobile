@@ -45,8 +45,12 @@ public class TagsFactory {
     private static final String VERSION_NAME_TAG_KEY = "version.name";
     private static final String VERSION_CODE_TAG_KEY = "version.code";
     private static final String DEFAULT_TAG_VALUE = "NotSet";
+    /**
+     *  The initial capacity is set to 9 for 6 tags (it should be increased if there are more tags)
+     */
+    public static final int INITIAL_CAPACITY = 9;
 
-    private final Map<String, String> tags = new HashMap<>();
+    private final Map<String, String> tags = new HashMap<>(INITIAL_CAPACITY);
 
     public TagsFactory(Context context) {
         initTags(context);

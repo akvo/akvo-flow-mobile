@@ -25,8 +25,7 @@ import android.text.TextUtils;
 import com.joshdholtz.sentry.Sentry;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PropertyUtil;
+import org.akvo.flow.R;
 import org.json.JSONException;
 
 import java.util.Map;
@@ -60,9 +59,7 @@ public class SentryHelper {
 
     @Nullable
     String getSentryDsn(Resources resources) {
-        final PropertyUtil props = new PropertyUtil(resources);
-        String sentryDsn = props.getProperty(ConstantUtil.SENTRY_DSN);
-        return sentryDsn;
+        return resources.getString(R.string.sentry_dsn);
     }
 
     private static class FlowSentryCaptureListener implements Sentry.SentryEventCaptureListener {

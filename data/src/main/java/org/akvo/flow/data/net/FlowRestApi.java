@@ -20,7 +20,13 @@
 
 package org.akvo.flow.data.net;
 
+import org.akvo.flow.data.entity.ApiDataPoint;
+
+import java.util.List;
+
 import javax.inject.Inject;
+
+import rx.Observable;
 
 public class FlowRestApi {
 
@@ -28,4 +34,8 @@ public class FlowRestApi {
     public FlowRestApi() {
     }
 
+    public Observable<List<ApiDataPoint>> loadNewDataPoints(String baseUrl) {
+        return RestServiceFactory.createRetrofitService(baseUrl, FlowApiService.class)
+                .loadNewDataPoints();
+    }
 }

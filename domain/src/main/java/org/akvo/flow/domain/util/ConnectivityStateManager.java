@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.domain.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -38,27 +38,17 @@ public class ConnectivityStateManager {
     /**
      * checks whether or not we have a usable data connection
      *
-     * @param syncOver3GAllowed
      * @return
      */
-    public boolean isConnectionAvailable(boolean syncOver3GAllowed) {
+    public boolean isConnectionAvailable() {
         ConnectivityManager connMgr = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connMgr != null) {
             NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
             if (infoArr != null) {
                 for (int i = 0; i < infoArr.length; i++) {
-                    if (syncOver3GAllowed) {
-                        // if we don't care what KIND of connection we have, just that there is one
-                        if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
-                            return true;
-                        }
-                    } else {
-                        // if we only want to use wifi, we need to check the type
-                        if (infoArr[i].getType() == ConnectivityManager.TYPE_WIFI
-                                && NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
-                            return true;
-                        }
+                    if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                        return true;
                     }
                 }
             }

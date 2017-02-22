@@ -24,5 +24,5 @@ import rx.Observable;
 
 public interface UserRepository {
 
-    Observable<Boolean> allowedToSync();
+    Observable<Boolean> mobileSyncAllowed();
 }

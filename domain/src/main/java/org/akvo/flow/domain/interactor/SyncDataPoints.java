@@ -25,6 +25,7 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 
 import java.util.Map;
 
@@ -37,28 +38,35 @@ public class SyncDataPoints extends UseCase {
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
+    private final ConnectivityStateManager connectivityStateManager;
 
     @Inject
     protected SyncDataPoints(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, ConnectivityStateManager connectivityStateManager) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
         this.userRepository = userRepository;
+        this.connectivityStateManager = connectivityStateManager;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-       return userRepository.allowedToSync().concatMap(new Func1<Boolean, Observable>() {
-           @Override
-           public Observable<?> call(Boolean syncAllowed) {
-               if (!syncAllowed) {
-                   return Observable.just(new SyncResult(
-                           SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G));
-               } else {
-                   return surveyRepository.getRemoteDataPoints();
-               }
-           }
-       });
+        if (!connectivityStateManager.isConnectionAvailable()) {
+            return Observable.just(new SyncResult(
+                    SyncResult.ResultCode.ERROR_NO_NETWORK));
+        }
+        return userRepository.mobileSyncAllowed().concatMap(new Func1<Boolean, Observable>() {
+            @Override
+            public Observable<?> call(Boolean syncAllowed) {
+                if (!syncAllowed && !connectivityStateManager.isWifiConnected()) {
+                    return Observable.just(new SyncResult(
+                            SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G));
+                } else {
+                    return surveyRepository.syncRemoteDataPoints();
+                }
+            }
+        });
     }
+
 }

@@ -21,9 +21,11 @@
 package org.akvo.flow.data.datasource.preferences;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import rx.Observable;
 
+@Singleton
 public class SharedPreferencesDataSource {
 
     public static final String KEY_APK_DATA = "apk_data";
@@ -40,5 +42,9 @@ public class SharedPreferencesDataSource {
     public Observable<Boolean> mobileSyncEnabled() {
         return Observable.just(preferences
                 .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD));
+    }
+
+    public Observable<String> getBaseUrl() {
+        return Observable.just(preferences.getString(Prefs.KEY_BACKEND_SERVER, null));
     }
 }

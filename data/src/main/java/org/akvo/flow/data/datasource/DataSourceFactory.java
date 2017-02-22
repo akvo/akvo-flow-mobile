@@ -27,14 +27,15 @@ import javax.inject.Inject;
 public class DataSourceFactory {
 
     private final SharedPreferencesDataSource sharedPreferencesDataSource;
-
     private final DatabaseDataSource dataBaseDataSource;
+    private final PropertiesDataSource propertiesDataSource;
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
-            DatabaseDataSource dataBaseDataSource) {
+            DatabaseDataSource dataBaseDataSource, PropertiesDataSource propertiesDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.dataBaseDataSource = dataBaseDataSource;
+        this.propertiesDataSource = propertiesDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
@@ -44,4 +45,9 @@ public class DataSourceFactory {
     public DatabaseDataSource getDataBaseDataSource() {
         return dataBaseDataSource;
     }
+
+    public PropertiesDataSource getPropertiesDataSource() {
+        return propertiesDataSource;
+    }
+
 }

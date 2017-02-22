@@ -162,13 +162,13 @@ public class DatapointsFragment extends Fragment {
         }
     }
 
-    public static class TabsAdapter extends FragmentPagerAdapter {
+    static class TabsAdapter extends FragmentPagerAdapter {
 
         private final String[] tabs;
         private SurveyGroup surveyGroup;
         private final Map<Integer, Fragment> fragmentsRef = new WeakHashMap<>(2);
 
-        public TabsAdapter(FragmentManager fm, String[] tabs, SurveyGroup surveyGroup) {
+        TabsAdapter(FragmentManager fm, String[] tabs, SurveyGroup surveyGroup) {
             super(fm);
             this.tabs = tabs;
             this.surveyGroup = surveyGroup;
@@ -179,7 +179,7 @@ public class DatapointsFragment extends Fragment {
             return tabs.length;
         }
 
-        public void refreshFragments(SurveyGroup newSurveyGroup) {
+        void refreshFragments(SurveyGroup newSurveyGroup) {
             this.surveyGroup = newSurveyGroup;
             DataPointsListFragment listFragment = (DataPointsListFragment) fragmentsRef
                     .get(POSITION_LIST);

@@ -47,5 +47,4 @@ public class ActivityModule {
     Activity activity() {
         return this.activity;
     }
-
 }

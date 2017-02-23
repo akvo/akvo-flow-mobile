@@ -21,7 +21,8 @@
 package org.akvo.flow.domain.interactor;
 
 /**
- * Default subscriber base class to be used whenever you want default error handling.
+ * Default subscriber base class to be used whenever you want to avoid having to implement all
+ * 3 methods.
  */
 public class DefaultSubscriber<T> extends rx.Subscriber<T> {
 

@@ -367,7 +367,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             this.inflater = LayoutInflater.from(context);
         }
 
-        @NonNull @Override
+        @NonNull
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view;
             if (convertView == null) {
@@ -477,11 +478,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         }
     }
 
-    public static class DataSyncBroadcastReceiver extends BroadcastReceiver {
+    static class DataSyncBroadcastReceiver extends BroadcastReceiver {
 
         private final WeakReference<DataPointsListFragment> fragmentWeakRef;
 
-        public DataSyncBroadcastReceiver(DataPointsListFragment fragment) {
+        DataSyncBroadcastReceiver(DataPointsListFragment fragment) {
             this.fragmentWeakRef = new WeakReference<>(fragment);
         }
 

@@ -27,9 +27,9 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
-import org.akvo.flow.util.StatusUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,24 +46,25 @@ public class TagsFactory {
     private static final String VERSION_CODE_TAG_KEY = "version.code";
     private static final String DEFAULT_TAG_VALUE = "NotSet";
     /**
-     *  The initial capacity is set to 9 for 6 tags (it should be increased if there are more tags)
+     * The initial capacity is set to 9 for 6 tags (it should be increased if there are more tags)
      */
     public static final int INITIAL_CAPACITY = 9;
 
     private final Map<String, String> tags = new HashMap<>(INITIAL_CAPACITY);
 
     public TagsFactory(Context context) {
-        initTags(context);
+        Prefs prefs = new Prefs(context);
+        initTags(context, prefs);
     }
 
     public Map<String, String> getTags() {
         return tags;
     }
 
-    private void initTags(Context context) {
+    private void initTags(Context context, Prefs prefs) {
         tags.put(DEVICE_MODEL_TAG_KEY, Build.MODEL);
         tags.put(GAE_INSTANCE_ID_TAG_KEY, getAppId(context));
-        tags.put(DEVICE_ID_TAG_KEY, getDeviceId(context));
+        tags.put(DEVICE_ID_TAG_KEY, getDeviceId(prefs));
         tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
         try {
             PackageInfo packageInfo = context.getPackageManager()
@@ -78,8 +79,8 @@ public class TagsFactory {
     }
 
     @NonNull
-    private String getDeviceId(Context context) {
-        String deviceId = StatusUtil.getDeviceId(context);
+    private String getDeviceId(Prefs prefs) {
+        String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, DEFAULT_TAG_VALUE);
         if (TextUtils.isEmpty(deviceId)) {
             return DEFAULT_TAG_VALUE;
         }

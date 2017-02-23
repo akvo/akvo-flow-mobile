@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
@@ -35,13 +34,10 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.logging.LoggingFactory;
-import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.util.logging.SentryHelper;
 
 import java.util.Arrays;
 import java.util.Locale;
-
-import timber.log.Timber;
 
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
@@ -53,14 +49,9 @@ public class FlowApp extends Application {
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
 
-    private final LoggingFactory loggingFactory = new LoggingFactory();
-
     @Override
     public void onCreate() {
         super.onCreate();
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
         prefs = new Prefs(getApplicationContext());
         initLogging();
         init();
@@ -73,7 +64,7 @@ public class FlowApp extends Application {
     }
 
     private void initLogging() {
-        LoggingHelper helper = loggingFactory.createLoggingHelper(this);
+        SentryHelper helper = new SentryHelper(this);
         helper.initDebugTree();
         helper.initSentry();
     }

@@ -22,8 +22,6 @@ package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
 
-import retrofit.RestAdapter;
-
 public class RestServiceFactory {
 
     public static <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {

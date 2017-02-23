@@ -21,15 +21,15 @@
 package org.akvo.flow.data.net;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
-import org.akvo.flow.data.util.Constants;
 
 import java.util.List;
 
-import retrofit.http.GET;
+import retrofit2.http.GET;
+import retrofit2.http.Url;
 import rx.Observable;
 
 public interface FlowApiService {
 
-    @GET(Constants.DATAPOINTS_SERVICE_PATH)
-    Observable<List<ApiDataPoint>> loadNewDataPoints();
+    @GET
+    Observable<List<ApiDataPoint>> loadNewDataPoints(@Url String url);
 }

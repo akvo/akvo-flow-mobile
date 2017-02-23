@@ -385,8 +385,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             c.close();
 
             navigator.navigateToFormActivity(this, surveyedLocaleId, user, formId, formInstanceId,
-                    readOnly,
-                    mSurveyGroup);
+                    readOnly, mSurveyGroup);
         } else {
             navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
 

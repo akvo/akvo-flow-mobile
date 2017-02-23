@@ -387,7 +387,7 @@ public class SurveyDownloadService extends IntentService {
     /**
      * Dispatch a Broadcast notification to notify of surveys synchronization.
      * This notification will be received in SurveyHomeActivity, in order to
-     * loadItem its data
+     * refresh its data
      */
     private void sendBroadcastNotification() {
         Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);

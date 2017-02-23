@@ -71,7 +71,6 @@ public class SurveyedLocalesLoader extends AsyncLoader<List<SurveyedLocale>> {
             case ConstantUtil.ORDER_BY_DATE:
             case ConstantUtil.ORDER_BY_STATUS:
             case ConstantUtil.ORDER_BY_NAME:
-                // TODO: Compute filter here in the Loader, instead of the DB
                 cursor = database
                         .getFilteredSurveyedLocales(mSurveyGroupId, mLatitude, mLongitude,
                                 mOrderBy);

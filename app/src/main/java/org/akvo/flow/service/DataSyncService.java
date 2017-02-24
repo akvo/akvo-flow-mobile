@@ -159,15 +159,25 @@ public class DataSyncService extends IntentService {
         checkExportedFiles();
 
         for (long id : getUnexportedSurveys()) {
-            ZipFileData zipFileData = formZip(id);
-            if (zipFileData != null) {
-                // Create new entries in the transmission queue
-                mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
-                updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+            try {
+                exportSurvey(id);
+             //if the zip creation fails for one survey, let it still attempt to create the others
+            } catch (Exception e) {
+                Timber.e(e, "Error creating zip file for %d", id);
+            }
+        }
+    }
 
-                for (String image : zipFileData.imagePaths) {
-                    mDatabase.createTransmission(id, zipFileData.formId, image);
-                }
+    private void exportSurvey(long id) {
+        ZipFileData zipFileData = formZip(id);
+
+        if (zipFileData != null) {
+            // Create new entries in the transmission queue
+            mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
+            updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+
+            for (String image : zipFileData.imagePaths) {
+                mDatabase.createTransmission(id, zipFileData.formId, image);
             }
         }
     }
@@ -187,8 +197,8 @@ public class DataSyncService extends IntentService {
                     String uuid = cursor
                             .getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID));
                     if (!getSurveyInstanceFile(uuid).exists()) {
-                        Timber.d("Exported file for survey " + uuid + " not found. It's status " +
-                                "will be set to 'submitted', and will be reprocessed");
+                        Timber.d("Exported file for survey %s not found. It's status " +
+                                "will be set to 'submitted', and will be reprocessed", uuid);
                         updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
                     }
                 } while (cursor.moveToNext());
@@ -221,18 +231,26 @@ public class DataSyncService extends IntentService {
             FormInstance formInstance = processFormInstance(surveyInstanceId,
                     zipFileData.imagePaths);
 
-            if (formInstance == null) {
-                return null;
-            }
-
             // Serialize form instance as JSON
             zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
             zipFileData.uuid = formInstance.getUUID();
-            zipFileData.formId = String.valueOf(formInstance.getFormId());
-            zipFileData.formName = mDatabase.getSurvey(zipFileData.formId).getName();
+            zipFileData.formId = formInstance.getFormId();
+            if (TextUtils.isEmpty(zipFileData.formId)) {
+                NullPointerException exception = new NullPointerException(" formId is null");
+                Timber.e(exception);
+            }
+            Survey survey = mDatabase.getSurvey(zipFileData.formId);
+            if (survey == null) {
+                NullPointerException exception = new NullPointerException("survey is null");
+                Timber.e(exception);
+                //form name is only used for notification so it is ok if empty
+                zipFileData.formName = "";
+            } else {
+                zipFileData.formName = survey.getName();
+            }
 
-            File zipFile = getSurveyInstanceFile(
-                    zipFileData.uuid);// The filename will match the Survey Instance UUID
+            // The filename will match the Survey Instance UUID
+            File zipFile = getSurveyInstanceFile(zipFileData.uuid);
 
             // Write the data into the zip file
             String fileName = zipFile.getAbsolutePath();// Will normalize filename.
@@ -328,8 +346,7 @@ public class DataSyncService extends IntentService {
 
                 if (formInstance.getUUID() == null) {
                     formInstance.setUUID(data.getString(uuid_col));
-                    formInstance.setFormId(
-                            data.getLong(survey_fk_col));// FormInstance uses a number for this attr
+                    formInstance.setFormId(data.getString(survey_fk_col));
                     formInstance.setDataPointId(data.getString(localeId_col));
                     formInstance.setDeviceId(deviceIdentifier);
                     formInstance.setSubmissionDate(submitted_date);

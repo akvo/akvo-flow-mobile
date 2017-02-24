@@ -1,5 +1,19 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.2.11
+Date: 23 February 2017
+
+# New and noteworthy
+* **Improve crash reporting** - [#551](https://github.com/akvo/akvo-flow-mobile/issues/551) and [#615](https://github.com/akvo/akvo-flow-mobile/issues/615) Crashes are now sent to sentry.io instead of google app engine. This will improve our crashes and error tracking to debug and fix issues faster.
+
+---------------
+# ver 2.2.10.1
+Date: 15 February 2017
+
+# Resolved issues
+* **Offline survey export: files folder missing** - [#614](https://github.com/akvo/akvo-flow-mobile/issues/614) Fixed the issue where for surveys with a slash in survey name, the collected data zip file was not generated.
+
+---------------
 # ver 2.2.10
 Date: 19 January 2017
 

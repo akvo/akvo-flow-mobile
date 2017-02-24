@@ -40,27 +40,35 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import rx.Observable;
 import timber.log.Timber;
 
+@Singleton
 public class FlowRestApi {
 
     private static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
     private static final String CHARSET_UTF8 = "UTF-8";
+    private final String androidId;
+    private final String imei;
+    private final String phoneNumber;
 
     @Inject
-    public FlowRestApi() {
+    public FlowRestApi(DeviceHelper deviceHelper) {
+        this.androidId = deviceHelper.getAndroidID();
+        this.imei = deviceHelper.getImei();
+        this.phoneNumber = deviceHelper.getPhoneNumber();
     }
 
-    public Observable<List<ApiDataPoint>> loadNewDataPoints(@NonNull String baseUrl, long surveyGroup,
-            @NonNull String timestamp) {
+    public Observable<List<ApiDataPoint>> loadNewDataPoints(@NonNull String baseUrl,
+            @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
         return RestServiceFactory.createRetrofitService(baseUrl, FlowApiService.class)
-                .loadNewDataPoints(buildSyncUrl(baseUrl, surveyGroup, timestamp));
+                .loadNewDataPoints(buildSyncUrl(baseUrl, apiKey, surveyGroup, timestamp));
     }
 
     @NonNull
-    private String buildSyncUrl(@NonNull String serverBaseUrl, long surveyGroup,
+    private String buildSyncUrl(@NonNull String serverBaseUrl, String apiKey, long surveyGroup,
             @NonNull String timestamp) {
         // Note: To compute the HMAC auth token, query params must be alphabetically ordered
         StringBuilder queryStringBuilder = new StringBuilder();
@@ -73,7 +81,7 @@ public class FlowRestApi {
         queryStringBuilder.append(Param.TIMESTAMP).append(Param.EQUALS).append(getTimestamp());
         final String query = queryStringBuilder.toString();
         return serverBaseUrl + "/" + Path.SURVEYED_LOCALE + "?" + query +
-                Param.SEPARATOR + Param.HMAC + Param.EQUALS + getAuthorization(query);
+                Param.SEPARATOR + Param.HMAC + Param.EQUALS + getAuthorization(query, apiKey);
     }
 
     private void appendParam(@NonNull StringBuilder queryStringBuilder, @NonNull String paramName,
@@ -107,7 +115,7 @@ public class FlowRestApi {
     }
 
     @Nullable
-    private String getAuthorization(@NonNull String query) {
+    private String getAuthorization(@NonNull String query, String apiKey) {
         String authorization = null;
         try {
             SecretKeySpec signingKey = new SecretKeySpec(apiKey.getBytes(), HMAC_SHA_1_ALGORITHM);

@@ -18,18 +18,23 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.data.entity;
 
-import org.akvo.flow.domain.entity.DataPoint;
+import android.database.Cursor;
 
-import java.util.List;
+import org.akvo.flow.database.SyncTimeColumns;
 
-import rx.Observable;
+public class SyncedTimeMapper {
 
-public interface SurveyRepository {
-
-    Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
-            Double longitude, Integer orderBy);
-
-    Observable<Boolean> syncRemoteDataPoints(long surveyGroupId);
+    public String getTime(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        String time = null;
+        if (cursor.moveToFirst()) {
+            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
+        }
+        cursor.close();
+        return time;
+    }
 }

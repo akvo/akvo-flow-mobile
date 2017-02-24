@@ -28,6 +28,7 @@ import com.squareup.sqlbrite.SqlBrite;
 
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
+import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
 
 import java.util.ArrayList;
@@ -41,11 +42,11 @@ import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
 import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
 import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
-public class BriteDbAdapter {
+public class BriteSurveyDbAdapter {
 
     private final BriteDatabase briteDatabase;
 
-    public BriteDbAdapter(BriteDatabase briteDatabase) {
+    public BriteSurveyDbAdapter(BriteDatabase briteDatabase) {
         this.briteDatabase = briteDatabase;
     }
 
@@ -112,7 +113,7 @@ public class BriteDbAdapter {
     }
 
     public Observable<Cursor> getSurveyedLocales(long surveyGroupId) {
-        String sqlQuery = "SELECT * FROM record WHERE survey_group_id = ?";
+        String sqlQuery = "SELECT * FROM " + Tables.RECORD + " WHERE "+RecordColumns.SURVEY_GROUP_ID+" = ?";
         return briteDatabase.createQuery(Tables.RECORD, sqlQuery,
                 new String[] { String.valueOf(surveyGroupId) }).concatMap(
                 new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
@@ -149,8 +150,27 @@ public class BriteDbAdapter {
             insertRecord(values); //TODO: should it be insert or update??
             // Update the record last modification date, if necessary
             updateRecordModifiedDate(id, lastModified);
+            transaction.markSuccessful();
         } finally {
             transaction.end();
         }
+    }
+
+    /**
+     * Get the synchronization time for a particular survey group.
+     *
+     * @param surveyGroupId id of the SurveyGroup
+     * @return time if exists for this key, null otherwise
+     */
+    public Observable<Cursor> getSyncTime(long surveyGroupId) {
+        String sql =
+                "SELECT * FROM " + Tables.SYNC_TIME + " WHERE " + SyncTimeColumns.SURVEY_GROUP_ID
+                        + " = ?";
+        Cursor cursor = briteDatabase.query(sql, new String[] { String.valueOf(surveyGroupId) });
+        return Observable.just(cursor);
+    }
+
+    public void insertSyncedTime( ContentValues values) {
+        briteDatabase.insert(Tables.SYNC_TIME, values);
     }
 }

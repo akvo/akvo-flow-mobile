@@ -24,6 +24,7 @@ import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
 import javax.inject.Inject;
@@ -44,7 +45,7 @@ public class DeviceHelper {
      *
      * @return
      */
-    public static String getPhoneNumber(Context context) {
+    public String getPhoneNumber() {
         TelephonyManager teleMgr = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
         String number = null;
@@ -78,7 +79,7 @@ public class DeviceHelper {
      *
      * @return
      */
-    public static String getImei(Context context) {
+    public String getImei() {
         TelephonyManager teleMgr = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
         String number = null;
@@ -89,5 +90,9 @@ public class DeviceHelper {
             number = "NO_IMEI";
         }
         return number;
+    }
+
+    public String getAndroidID() {
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

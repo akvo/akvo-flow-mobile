@@ -22,12 +22,24 @@ package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class RestServiceFactory {
 
     public static <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
-        RestAdapter.Builder builder = new RestAdapter.Builder()
-                .setEndpoint(baseUrl)
-                .setLogLevel(RestAdapter.LogLevel.FULL);
-        return builder.build().create(clazz);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        return retrofit.create(clazz);
     }
 }

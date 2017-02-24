@@ -95,4 +95,8 @@ public class PropertiesDataSource {
     public Observable<String> getBaseUrl() {
         return Observable.just(getProperty(SERVER_BASE));
     }
+
+    public Observable<String> getApiKey() {
+        return Observable.just(getProperty(API_KEY));
+    }
 }

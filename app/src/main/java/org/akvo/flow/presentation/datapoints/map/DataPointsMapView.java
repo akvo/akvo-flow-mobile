@@ -32,7 +32,5 @@ public interface DataPointsMapView {
 
     void displayData(List<MapDataPoint> surveyedLocales);
 
-    void syncRecords(long surveyGroupId);
-
     void displayMenu(boolean monitored);
 }

@@ -120,12 +120,12 @@ public class SurveyedDataPointSyncService extends IntentService {
                 if (surveyInstances == null || surveyInstances.isEmpty()) {
                     correctData = false;
                 }
-                database.syncSurveyedLocale(locale);
+                //database.syncSurveyedLocale(locale);
                 records.add(locale.getId());
             }
         }
         //Delete empty or corrupted data received from server
-        database.deleteEmptyRecords();
+        //database.deleteEmptyRecords();
         return new Pair<>(records, correctData);
     }
 

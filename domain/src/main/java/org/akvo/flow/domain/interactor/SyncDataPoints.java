@@ -36,6 +36,8 @@ import rx.functions.Func1;
 
 public class SyncDataPoints extends UseCase {
 
+    public static final String KEY_SURVEY_GROUP_ID = "survey_group_id";
+
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
     private final ConnectivityStateManager connectivityStateManager;
@@ -51,10 +53,12 @@ public class SyncDataPoints extends UseCase {
     }
 
     @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    protected <T> Observable buildUseCaseObservable(final Map<String, T> parameters) {
+        if (parameters == null || !parameters.containsKey(KEY_SURVEY_GROUP_ID)) {
+            return Observable.error(new IllegalArgumentException("missing survey group id"));
+        }
         if (!connectivityStateManager.isConnectionAvailable()) {
-            return Observable.just(new SyncResult(
-                    SyncResult.ResultCode.ERROR_NO_NETWORK));
+            return Observable.just(new SyncResult(SyncResult.ResultCode.ERROR_NO_NETWORK));
         }
         return userRepository.mobileSyncAllowed().concatMap(new Func1<Boolean, Observable>() {
             @Override
@@ -63,10 +67,10 @@ public class SyncDataPoints extends UseCase {
                     return Observable.just(new SyncResult(
                             SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G));
                 } else {
-                    return surveyRepository.syncRemoteDataPoints();
+                    return surveyRepository.syncRemoteDataPoints(
+                            (Long) parameters.get(KEY_SURVEY_GROUP_ID));
                 }
             }
         });
     }
-
 }

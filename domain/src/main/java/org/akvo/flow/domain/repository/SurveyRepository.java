@@ -31,5 +31,5 @@ public interface SurveyRepository {
     Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
             Double longitude, Integer orderBy);
 
-    Observable<Boolean> syncRemoteDataPoints(long surveyGroupId);
+    Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
 }

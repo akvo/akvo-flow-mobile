@@ -318,13 +318,6 @@ public class DataPointsMapFragment extends SupportMapFragment
     }
 
     @Override
-    public void syncRecords(long surveyGroupId) {
-        if (mListener != null) {
-            mListener.onSyncRecordsRequested(surveyGroupId);
-        }
-    }
-
-    @Override
     public void displayMenu(boolean monitored) {
         displayMonitoredMenu = monitored;
         FragmentActivity activity = getActivity();

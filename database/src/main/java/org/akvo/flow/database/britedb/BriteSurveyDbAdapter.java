@@ -27,15 +27,19 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
 import org.akvo.flow.database.RecordColumns;
+import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
+import org.akvo.flow.database.TransmissionColumns;
+import org.akvo.flow.database.TransmissionStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
 import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
@@ -43,6 +47,8 @@ import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
 import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
 public class BriteSurveyDbAdapter {
+
+    private static final int DOES_NOT_EXIST = -1;
 
     private final BriteDatabase briteDatabase;
 
@@ -113,7 +119,9 @@ public class BriteSurveyDbAdapter {
     }
 
     public Observable<Cursor> getSurveyedLocales(long surveyGroupId) {
-        String sqlQuery = "SELECT * FROM " + Tables.RECORD + " WHERE "+RecordColumns.SURVEY_GROUP_ID+" = ?";
+        String sqlQuery =
+                "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
+                        + " = ?";
         return briteDatabase.createQuery(Tables.RECORD, sqlQuery,
                 new String[] { String.valueOf(surveyGroupId) }).concatMap(
                 new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
@@ -170,7 +178,82 @@ public class BriteSurveyDbAdapter {
         return Observable.just(cursor);
     }
 
-    public void insertSyncedTime( ContentValues values) {
+    public void insertSyncedTime(ContentValues values) {
         briteDatabase.insert(Tables.SYNC_TIME, values);
+    }
+
+    //TODO: make sure it works
+    public long syncSurveyInstance(ContentValues values, String surveyInstanceUuid) {
+        String sql =
+                "SELECT " + SurveyInstanceColumns._ID + "," + SurveyInstanceColumns.UUID + " FROM "
+                        + Tables.SURVEY_INSTANCE + " WHERE " + SurveyInstanceColumns.UUID + " = ?";
+        Cursor cursor = briteDatabase.query(sql, new String[] { surveyInstanceUuid });
+
+        long id = DOES_NOT_EXIST;
+        if (cursor.moveToFirst()) {
+            id = cursor.getLong(0);
+        }
+        cursor.close();
+        if (id != DOES_NOT_EXIST) {
+            briteDatabase.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
+                    + " = ?", new String[] { surveyInstanceUuid });
+        } else {
+            values.put(SurveyInstanceColumns.UUID, surveyInstanceUuid);
+            id = briteDatabase.insert(Tables.SURVEY_INSTANCE, values);
+        }
+        return id;
+    }
+
+    public BriteDatabase.Transaction beginTransaction() {
+        return briteDatabase.newTransaction();
+    }
+
+    //TODO: make sure it works
+    public void syncResponse(long surveyInstanceId, ContentValues values, String questionId) {
+        String sql =
+                "SELECT " + ResponseColumns.SURVEY_INSTANCE_ID + "," + ResponseColumns.QUESTION_ID
+                        + " FROM " + Tables.RESPONSE + " WHERE "
+                        + ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                        + ResponseColumns.QUESTION_ID + " = ?";
+        Cursor cursor = briteDatabase
+                .query(sql, new String[] { String.valueOf(surveyInstanceId), questionId });
+
+        boolean exists = cursor.getCount() > 0;
+        Timber.d("Survey instance id %s exists? s%", String.valueOf(surveyInstanceId),
+                String.valueOf(exists));
+        cursor.close();
+        if (exists) {
+            briteDatabase.update(Tables.RESPONSE, values,
+                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                            + ResponseColumns.QUESTION_ID + " = ?",
+                    new String[] { String.valueOf(surveyInstanceId), questionId });
+        } else {
+            briteDatabase.insert(Tables.RESPONSE, values);
+        }
+    }
+
+    public void createTransmission(long surveyInstanceId, String formID, String filename,
+            int status) {
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
+        values.put(TransmissionColumns.SURVEY_ID, formID);
+        values.put(TransmissionColumns.FILENAME, filename);
+        values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            final String date = String.valueOf(System.currentTimeMillis());
+            values.put(TransmissionColumns.START_DATE, date);
+            values.put(TransmissionColumns.END_DATE, date);
+        }
+        briteDatabase.insert(Tables.TRANSMISSION, values);
+    }
+
+    /**
+     * Delete any Record that contains no SurveyInstance
+     */
+    public void deleteEmptyRecords() {
+        briteDatabase.execute("DELETE FROM " + Tables.RECORD
+                + " WHERE " + RecordColumns.RECORD_ID + " NOT IN "
+                + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
+                + " FROM " + Tables.SURVEY_INSTANCE + ")");
     }
 }

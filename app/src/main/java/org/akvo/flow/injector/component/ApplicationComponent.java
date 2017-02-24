@@ -30,6 +30,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
@@ -48,7 +49,9 @@ public interface ApplicationComponent {
 
     PostExecutionThread postExecutionThread();
 
-    SurveyRepository userRepository();
+    SurveyRepository surveyRepository();
+
+    UserRepository userRepository();
 
     SQLiteOpenHelper provideOpenHelper();
 
@@ -61,5 +64,4 @@ public interface ApplicationComponent {
     void inject(FlowApp app);
 
     void inject(BaseActivity baseActivity);
-
 }

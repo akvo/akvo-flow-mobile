@@ -28,13 +28,14 @@ import android.support.annotation.Nullable;
 import com.squareup.sqlbrite.BriteDatabase;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
+import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
-import org.akvo.flow.database.Tables;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 
@@ -74,29 +75,26 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
-    public Observable<Boolean> syncSurveyedLocales(List<ApiDataPoint> apiDataPoints) {
+    public Observable<Integer> syncSurveyedLocales(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
-            return Observable.just(false);
+            return Observable.just(0);
         }
         for (ApiDataPoint apiDataPoint : apiDataPoints) {
             syncSurveyedLocale(apiDataPoint);
         }
-        return null;
+        return Observable.just(apiDataPoints.size());
     }
 
     public void syncSurveyedLocale(ApiDataPoint surveyedLocale) {
         final String id = surveyedLocale.getId();
+        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         try {
-
             ContentValues values = new ContentValues();
             values.put(RecordColumns.RECORD_ID, id);
             values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
             values.put(RecordColumns.NAME, surveyedLocale.getDisplayName());
             values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
             values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
-
-            //THIS is not so good but temporary
-            surveyDbAdapter.beginTransaction();
 
             syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
 
@@ -105,9 +103,9 @@ public class DatabaseDataSource {
             String syncTime = String.valueOf(surveyedLocale.getLastModified());
             setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
 
-            surveyDbAdapter.successfulTransaction();
+            transaction.markSuccessful();
         } finally {
-            surveyDbAdapter.endTransaction();
+            transaction.end();
         }
     }
 
@@ -136,16 +134,36 @@ public class DatabaseDataSource {
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
             values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
 
-            long id = surveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
+            long id = briteSurveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
 
             // Now the responses...
-            syncResponses(surveyInstance.getResponses(), id);
+            syncResponses(surveyInstance.getQasList(), id);
 
             // The filename is a unique column in the transmission table, and as we do not have
             // a file to hold this data, we set the value to the instance UUID
-            surveyDbAdapter
-                    .createTransmission(id, surveyInstance.getSurveyId(), surveyInstance.getUuid(),
+            briteSurveyDbAdapter
+                    .createTransmission(id, String.valueOf(surveyInstance.getSurveyId()),
+                            surveyInstance.getUuid(),
                             TransmissionStatus.SYNCED);
+        }
+        briteSurveyDbAdapter.deleteEmptyRecords();
+    }
+
+    private void syncResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
+        for (ApiQuestionAnswer response : responses) {
+
+            ContentValues values = new ContentValues();
+            values.put(ResponseColumns.ANSWER, response.getAnswer());
+            values.put(ResponseColumns.TYPE, response.getType());
+            values.put(ResponseColumns.QUESTION_ID, response.getQuestionId());
+            /**
+             * true by default when parsing api response
+             * Not sure what this fields is used for ??
+             */
+            values.put(ResponseColumns.INCLUDE, true);
+            values.put(ResponseColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
+
+            briteSurveyDbAdapter.syncResponse(surveyInstanceId, values, response.getQuestionId());
         }
     }
 }

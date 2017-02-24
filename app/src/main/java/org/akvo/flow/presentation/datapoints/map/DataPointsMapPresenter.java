@@ -44,6 +44,7 @@ public class DataPointsMapPresenter implements Presenter{
 
     private final UseCase getSavedDataPoints;
     private final MapDataPointMapper mapper;
+    private final UseCase syncDataPoints;
 
     @Nullable
     private DataPointsMapView view;
@@ -51,9 +52,10 @@ public class DataPointsMapPresenter implements Presenter{
 
     @Inject
     public DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            MapDataPointMapper mapper) {
+            MapDataPointMapper mapper, @Named("syncDataPoints") UseCase syncDataPoints) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
+        this.syncDataPoints = syncDataPoints;
     }
 
     public void setView(DataPointsMapView view) {
@@ -73,7 +75,7 @@ public class DataPointsMapPresenter implements Presenter{
 
     public void refresh() {
         view.showProgress();
-        Map<String, Long> params = new HashMap<>(1);
+        Map<String, Long> params = new HashMap<>(2);
         if (surveyGroup != null) {
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
         }
@@ -99,12 +101,29 @@ public class DataPointsMapPresenter implements Presenter{
     @Override
     public void onViewDestroyed() {
         getSavedDataPoints.unSubscribe();
+        syncDataPoints.unSubscribe();
     }
 
     public void onSyncRecordsPressed() {
         if (surveyGroup != null) {
             view.showProgress();
-            view.syncRecords(surveyGroup.getId());
+            syncRecords(surveyGroup.getId());
         }
+    }
+
+    public void syncRecords(final long surveyGroupId) {
+        Map<String, Long> params = new HashMap<>(2);
+        params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        syncDataPoints.execute(new DefaultSubscriber<Integer>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e, "Error syncing %s", surveyGroupId);
+            }
+
+            @Override
+            public void onNext(Integer integer) {
+                //TODO: show snackbar with number
+            }
+        }, params);
     }
 }

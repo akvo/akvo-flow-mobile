@@ -70,19 +70,19 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Boolean> syncRemoteDataPoints(final long surveyGroupId) {
-        return getServerBaseUrl().concatMap(new Func1<String, Observable<? extends Boolean>>() {
+    public Observable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
+        return getServerBaseUrl().concatMap(new Func1<String, Observable<Integer>>() {
             @Override
-            public Observable<Boolean> call(final String surverBaseUrl) {
+            public Observable<Integer> call(final String surverBaseUrl) {
                 return dataSourceFactory.getPropertiesDataSource().getApiKey().concatMap(
-                        new Func1<String, Observable<Boolean>>() {
+                        new Func1<String, Observable<Integer>>() {
                             @Override
-                            public Observable<Boolean> call(final String apiKey) {
+                            public Observable<Integer> call(final String apiKey) {
                                 return getSyncedTime(surveyGroupId).concatMap(
-                                        new Func1<String, Observable<Boolean>>() {
+                                        new Func1<String, Observable<Integer>>() {
                                             @Override
-                                            public Observable<Boolean> call(String syncedTime) {
-                                                return loadDataPoints(surverBaseUrl, apiKey,
+                                            public Observable<Integer> call(String syncedTime) {
+                                                return syncDataPoints(surverBaseUrl, apiKey,
                                                         surveyGroupId, syncedTime);
                                             }
                                         });
@@ -116,12 +116,12 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<Boolean> loadDataPoints(String baseUrl, String apiKey, long surveyGroup,
+    private Observable<Integer> syncDataPoints(String baseUrl, String apiKey, long surveyGroup,
             @NonNull String timestamp) {
         return restApi.loadNewDataPoints(baseUrl, apiKey, surveyGroup, timestamp).concatMap(
-                new Func1<List<ApiDataPoint>, Observable<Boolean>>() {
+                new Func1<List<ApiDataPoint>, Observable<Integer>>() {
                     @Override
-                    public Observable<Boolean> call(List<ApiDataPoint> apiDataPoints) {
+                    public Observable<Integer> call(List<ApiDataPoint> apiDataPoints) {
                         return dataSourceFactory.getDataBaseDataSource().syncSurveyedLocales(apiDataPoints);
                     }
                 });

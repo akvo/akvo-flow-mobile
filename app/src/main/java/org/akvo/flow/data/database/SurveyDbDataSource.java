@@ -37,14 +37,11 @@ import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionColumns;
-import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.SurveyInstance;
-import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -346,7 +343,7 @@ public class SurveyDbDataSource {
         surveyDbAdapter.addSurveyGroup(values);
     }
 
-    // Attempt to fetch the registation form. If the form ID is explicitely set on the SurveyGroup,
+    // Attempt to fetch the registration form. If the form ID is explicitely set on the SurveyGroup,
     // we simply query by ID. Otherwise, assume is a non-monitored form, and query the first form
     // we find.
     public Survey getRegistrationForm(SurveyGroup sg) {
@@ -439,77 +436,10 @@ public class SurveyDbDataSource {
             }
 
             // Update the surveyed locale info
-//            surveyDbAdapter.updateSurveyedLocale(surveyedLocaleId, surveyedLocaleValues);
             briteSurveyDbAdapter.updateSurveyedLocale(surveyedLocaleId, surveyedLocaleValues);
 
             // Store the META_NAME/META_GEO as a response
             createOrUpdateSurveyResponse(metaResponse);
-        }
-    }
-
-    private void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
-        for (QuestionResponse response : responses) {
-
-            ContentValues values = new ContentValues();
-            values.put(ResponseColumns.ANSWER, response.getValue());
-            values.put(ResponseColumns.TYPE, response.getType());
-            values.put(ResponseColumns.QUESTION_ID, response.getQuestionId());
-            values.put(ResponseColumns.INCLUDE, response.getIncludeFlag());
-            values.put(ResponseColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-
-            surveyDbAdapter.syncResponse(surveyInstanceId, values, response.getQuestionId());
-        }
-    }
-
-    private void syncSurveyInstances(List<SurveyInstance> surveyInstances,
-            String surveyedLocaleId) {
-        for (SurveyInstance surveyInstance : surveyInstances) {
-
-            ContentValues values = new ContentValues();
-            values.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.getSurveyId());
-            values.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getDate());
-            values.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
-            values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
-            values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
-            values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
-
-            long id = surveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
-
-            // Now the responses...
-            syncResponses(surveyInstance.getResponses(), id);
-
-            // The filename is a unique column in the transmission table, and as we do not have
-            // a file to hold this data, we set the value to the instance UUID
-            surveyDbAdapter
-                    .createTransmission(id, surveyInstance.getSurveyId(), surveyInstance.getUuid(),
-                            TransmissionStatus.SYNCED);
-        }
-    }
-
-    public void syncSurveyedLocale(SurveyedLocale surveyedLocale) {
-        final String id = surveyedLocale.getId();
-        try {
-
-            ContentValues values = new ContentValues();
-            values.put(RecordColumns.RECORD_ID, id);
-            values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
-            values.put(RecordColumns.NAME, surveyedLocale.getName());
-            values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
-            values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
-
-            //THIS is not so good but temporary
-            surveyDbAdapter.beginTransaction();
-
-            syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
-
-            briteSurveyDbAdapter.updateRecord(id, values, surveyedLocale.getLastModified());
-
-            String syncTime = String.valueOf(surveyedLocale.getLastModified());
-            surveyDbAdapter.setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
-
-            surveyDbAdapter.successfulTransaction();
-        } finally {
-            surveyDbAdapter.endTransaction();
         }
     }
 
@@ -562,7 +492,6 @@ public class SurveyDbDataSource {
     }
 
     public void updateRecordModifiedDate(String recordId, long timestamp) {
-        //        surveyDbAdapter.updateRecordModifiedDate(mRecordId, timestamp);
         briteSurveyDbAdapter.updateRecordModifiedDate(recordId, timestamp);
     }
 

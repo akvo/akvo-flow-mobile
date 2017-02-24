@@ -94,8 +94,26 @@ public class ApiDataPoint {
         return surveyInstances;
     }
 
-    public void setSurveyInstances(
-            List<ApiSurveyInstance> surveyInstances) {
+    public void setSurveyInstances(List<ApiSurveyInstance> surveyInstances) {
         this.surveyInstances = surveyInstances;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ApiDataPoint that = (ApiDataPoint) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

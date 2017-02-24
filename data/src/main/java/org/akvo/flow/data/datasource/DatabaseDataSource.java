@@ -39,6 +39,7 @@ import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -75,14 +76,14 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
-    public Observable<Integer> syncSurveyedLocales(List<ApiDataPoint> apiDataPoints) {
+    public Observable<List<ApiDataPoint>> syncSurveyedLocales(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
-            return Observable.just(0);
+            return Observable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
         }
         for (ApiDataPoint apiDataPoint : apiDataPoints) {
             syncSurveyedLocale(apiDataPoint);
         }
-        return Observable.just(apiDataPoints.size());
+        return Observable.just(apiDataPoints);
     }
 
     public void syncSurveyedLocale(ApiDataPoint surveyedLocale) {

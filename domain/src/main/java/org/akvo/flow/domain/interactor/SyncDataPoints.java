@@ -58,17 +58,24 @@ public class SyncDataPoints extends UseCase {
             return Observable.error(new IllegalArgumentException("missing survey group id"));
         }
         if (!connectivityStateManager.isConnectionAvailable()) {
-            return Observable.just(new SyncResult(SyncResult.ResultCode.ERROR_NO_NETWORK));
+            return Observable.just(new SyncResult(SyncResult.ResultCode.ERROR_NO_NETWORK, 0));
         }
-        return userRepository.mobileSyncAllowed().concatMap(new Func1<Boolean, Observable>() {
+        return userRepository.mobileSyncAllowed().concatMap(new Func1<Boolean,
+                Observable<SyncResult>>() {
             @Override
-            public Observable<?> call(Boolean syncAllowed) {
+            public Observable<SyncResult> call(Boolean syncAllowed) {
                 if (!syncAllowed && !connectivityStateManager.isWifiConnected()) {
                     return Observable.just(new SyncResult(
-                            SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G));
+                            SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G, 0));
                 } else {
                     return surveyRepository.syncRemoteDataPoints(
-                            (Long) parameters.get(KEY_SURVEY_GROUP_ID));
+                            (Long) parameters.get(KEY_SURVEY_GROUP_ID)).map(
+                            new Func1<Integer, SyncResult>() {
+                                @Override
+                                public SyncResult call(Integer integer) {
+                                    return new SyncResult(SyncResult.ResultCode.SUCCESS, integer);
+                                }
+                            });
                 }
             }
         });

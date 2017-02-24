@@ -24,7 +24,13 @@ import android.database.Cursor;
 
 import org.akvo.flow.database.SyncTimeColumns;
 
+import javax.inject.Inject;
+
 public class SyncedTimeMapper {
+
+    @Inject
+    public SyncedTimeMapper() {
+    }
 
     public String getTime(Cursor cursor) {
         if (cursor == null) {

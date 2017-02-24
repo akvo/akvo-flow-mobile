@@ -57,7 +57,7 @@ public class BriteSurveyDbAdapter {
     }
 
     /**
-     * Filters surveyd locales based on the parameters passed in.
+     * Filters surveyed locales based on the parameters passed in.
      */
     public Observable<Cursor> getFilteredSurveyedLocales(long surveyGroupId, Double latitude,
             Double longitude,
@@ -118,6 +118,7 @@ public class BriteSurveyDbAdapter {
                         });
     }
 
+    //TODO: select only useful columns
     public Observable<Cursor> getSurveyedLocales(long surveyGroupId) {
         String sqlQuery =
                 "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
@@ -153,15 +154,9 @@ public class BriteSurveyDbAdapter {
     }
 
     public void updateRecord(String id, ContentValues values, long lastModified) {
-        BriteDatabase.Transaction transaction = briteDatabase.newTransaction();
-        try {
-            insertRecord(values); //TODO: should it be insert or update??
-            // Update the record last modification date, if necessary
-            updateRecordModifiedDate(id, lastModified);
-            transaction.markSuccessful();
-        } finally {
-            transaction.end();
-        }
+        insertRecord(values); //TODO: should it be insert or update??
+        // Update the record last modification date, if necessary
+        updateRecordModifiedDate(id, lastModified);
     }
 
     /**
@@ -170,6 +165,7 @@ public class BriteSurveyDbAdapter {
      * @param surveyGroupId id of the SurveyGroup
      * @return time if exists for this key, null otherwise
      */
+    //TODO: select useful columns only
     public Observable<Cursor> getSyncTime(long surveyGroupId) {
         String sql =
                 "SELECT * FROM " + Tables.SYNC_TIME + " WHERE " + SyncTimeColumns.SURVEY_GROUP_ID

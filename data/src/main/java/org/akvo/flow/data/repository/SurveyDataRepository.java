@@ -32,6 +32,7 @@ import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -73,7 +74,7 @@ public class SurveyDataRepository implements SurveyRepository {
     public Observable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
         return getServerBaseUrl().concatMap(new Func1<String, Observable<Integer>>() {
             @Override
-            public Observable<Integer> call(final String surverBaseUrl) {
+            public Observable<Integer> call(final String serverBaseUrl) {
                 return dataSourceFactory.getPropertiesDataSource().getApiKey().concatMap(
                         new Func1<String, Observable<Integer>>() {
                             @Override
@@ -82,7 +83,7 @@ public class SurveyDataRepository implements SurveyRepository {
                                         new Func1<String, Observable<Integer>>() {
                                             @Override
                                             public Observable<Integer> call(String syncedTime) {
-                                                return syncDataPoints(surverBaseUrl, apiKey,
+                                                return syncDataPoints(serverBaseUrl, apiKey,
                                                         surveyGroupId, syncedTime);
                                             }
                                         });
@@ -118,13 +119,30 @@ public class SurveyDataRepository implements SurveyRepository {
 
     private Observable<Integer> syncDataPoints(String baseUrl, String apiKey, long surveyGroup,
             @NonNull String timestamp) {
+        final List<ApiDataPoint> lastBatch = new ArrayList<>();
+        final List<ApiDataPoint> allSyncedDataPoints = new ArrayList<>();
         return restApi.loadNewDataPoints(baseUrl, apiKey, surveyGroup, timestamp).concatMap(
-                new Func1<List<ApiDataPoint>, Observable<Integer>>() {
+                new Func1<List<ApiDataPoint>, Observable<List<ApiDataPoint>>>() {
                     @Override
-                    public Observable<Integer> call(List<ApiDataPoint> apiDataPoints) {
-                        return dataSourceFactory.getDataBaseDataSource().syncSurveyedLocales(apiDataPoints);
+                    public Observable<List<ApiDataPoint>> call(List<ApiDataPoint> apiDataPoints) {
+                        return dataSourceFactory.getDataBaseDataSource()
+                                .syncSurveyedLocales(apiDataPoints);
                     }
-                });
+                }).repeat().takeUntil(new Func1<List<ApiDataPoint>, Boolean>() {
+            @Override
+            public Boolean call(List<ApiDataPoint> apiDataPoints) {
+                apiDataPoints.remove(lastBatch);
+                boolean done = apiDataPoints.isEmpty();
+                allSyncedDataPoints.addAll(apiDataPoints);
+                lastBatch.clear();
+                lastBatch.addAll(apiDataPoints);
+                return done;
+            }
+        }).map(new Func1<List<ApiDataPoint>, Integer>() {
+            @Override
+            public Integer call(List<ApiDataPoint> apiDataPoints) {
+                return allSyncedDataPoints.size();
+            }
+        });
     }
-
 }

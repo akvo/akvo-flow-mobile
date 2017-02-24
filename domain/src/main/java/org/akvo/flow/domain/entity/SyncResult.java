@@ -23,9 +23,11 @@ package org.akvo.flow.domain.entity;
 public class SyncResult {
 
     private final ResultCode resultCode;
+    private final int numberOfSyncedItems;
 
-    public SyncResult(ResultCode resultCode) {
+    public SyncResult(ResultCode resultCode, int numberOfSyncedItems) {
         this.resultCode = resultCode;
+        this.numberOfSyncedItems = numberOfSyncedItems;
     }
 
     public enum ResultCode {

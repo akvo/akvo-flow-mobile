@@ -18,29 +18,15 @@
  *
  */
 
-package org.akvo.flow.domain.entity;
+package org.akvo.flow.presentation.datapoints;
 
-public class SyncResult {
+public interface DataPointSyncListener {
 
-    private final ResultCode resultCode;
-    private final int numberOfSyncedItems;
+    void showSyncedResults(int numberOfSyncedItems);
 
-    public SyncResult(ResultCode resultCode, int numberOfSyncedItems) {
-        this.resultCode = resultCode;
-        this.numberOfSyncedItems = numberOfSyncedItems;
-    }
+    void showSyncNotAllowed();
 
-    public ResultCode getResultCode() {
-        return resultCode;
-    }
+    void showNoNetwork();
 
-    public int getNumberOfSyncedItems() {
-        return numberOfSyncedItems;
-    }
-
-    public enum ResultCode {
-        SUCCESS,
-        ERROR_SYNC_NOT_ALLOWED_OVER_3G,
-        ERROR_NO_NETWORK,
-    }
+    void showErrorSync();
 }

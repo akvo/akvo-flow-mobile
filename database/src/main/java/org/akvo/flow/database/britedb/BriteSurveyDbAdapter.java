@@ -22,6 +22,7 @@ package org.akvo.flow.database.britedb;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
@@ -165,23 +166,21 @@ public class BriteSurveyDbAdapter {
      * @param surveyGroupId id of the SurveyGroup
      * @return time if exists for this key, null otherwise
      */
-    //TODO: select useful columns only
-    public Observable<Cursor> getSyncTime(long surveyGroupId) {
+    public Cursor getSyncTime(long surveyGroupId) {
         String sql =
-                "SELECT * FROM " + Tables.SYNC_TIME + " WHERE " + SyncTimeColumns.SURVEY_GROUP_ID
+                "SELECT " + SyncTimeColumns.SURVEY_GROUP_ID + "," + SyncTimeColumns.TIME + " FROM "
+                        + Tables.SYNC_TIME + " WHERE " + SyncTimeColumns.SURVEY_GROUP_ID
                         + " = ?";
-        Cursor cursor = briteDatabase.query(sql, new String[] { String.valueOf(surveyGroupId) });
-        return Observable.just(cursor);
+        return briteDatabase.query(sql, new String[] { String.valueOf(surveyGroupId) });
     }
 
     public void insertSyncedTime(ContentValues values) {
         briteDatabase.insert(Tables.SYNC_TIME, values);
     }
 
-    //TODO: make sure it works
     public long syncSurveyInstance(ContentValues values, String surveyInstanceUuid) {
         String sql =
-                "SELECT " + SurveyInstanceColumns._ID + "," + SurveyInstanceColumns.UUID + " FROM "
+                "SELECT * FROM "
                         + Tables.SURVEY_INSTANCE + " WHERE " + SurveyInstanceColumns.UUID + " = ?";
         Cursor cursor = briteDatabase.query(sql, new String[] { surveyInstanceUuid });
 
@@ -206,6 +205,21 @@ public class BriteSurveyDbAdapter {
 
     //TODO: make sure it works
     public void syncResponse(long surveyInstanceId, ContentValues values, String questionId) {
+        boolean exists = responseExists(surveyInstanceId, questionId);
+        if (exists) {
+            briteDatabase.update(Tables.RESPONSE, values,
+                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                            + ResponseColumns.QUESTION_ID + " = ?",
+                    new String[] { String.valueOf(surveyInstanceId), questionId });
+        } else {
+            briteDatabase.insert(Tables.RESPONSE, values);
+        }
+    }
+
+    private boolean responseExists(long surveyInstanceId, @Nullable String questionId) {
+        if (questionId == null) {
+            return false;
+        }
         String sql =
                 "SELECT " + ResponseColumns.SURVEY_INSTANCE_ID + "," + ResponseColumns.QUESTION_ID
                         + " FROM " + Tables.RESPONSE + " WHERE "
@@ -215,17 +229,10 @@ public class BriteSurveyDbAdapter {
                 .query(sql, new String[] { String.valueOf(surveyInstanceId), questionId });
 
         boolean exists = cursor.getCount() > 0;
-        Timber.d("Survey instance id %s exists? s%", String.valueOf(surveyInstanceId),
+        Timber.d("Survey instance id %s exists? %s", String.valueOf(surveyInstanceId),
                 String.valueOf(exists));
         cursor.close();
-        if (exists) {
-            briteDatabase.update(Tables.RESPONSE, values,
-                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                            + ResponseColumns.QUESTION_ID + " = ?",
-                    new String[] { String.valueOf(surveyInstanceId), questionId });
-        } else {
-            briteDatabase.insert(Tables.RESPONSE, values);
-        }
+        return exists;
     }
 
     public void createTransmission(long surveyInstanceId, String formID, String filename,

@@ -45,15 +45,16 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.datapoints.DataPointSyncListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
@@ -76,7 +77,8 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_LOCALE_SYNC_RESULT;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
+        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener,
+        DataPointSyncListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     private static final String DRAWER_FRAGMENT_TAG = "f";
@@ -436,13 +438,13 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     displayErrorNetwork();
                     break;
                 default:
-                    displayDefaultError();
+                    displayDefaultSyncError();
                     break;
             }
         }
     }
 
-    private void displayDefaultError() {
+    private void displayDefaultSyncError() {
         displaySnackBarWithRetry(R.string.data_points_sync_error_message_default);
     }
 
@@ -477,6 +479,26 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public void showSyncedResults(int numberOfSyncedItems) {
+        displaySuccess(numberOfSyncedItems);
+    }
+
+    @Override
+    public void showSyncNotAllowed() {
+        //TODO: add
+    }
+
+    @Override
+    public void showNoNetwork() {
+        displayErrorNetwork();
+    }
+
+    @Override
+    public void showErrorSync() {
+        displayDefaultSyncError();
     }
 
     static class SurveySyncBroadcastReceiver extends BroadcastReceiver {

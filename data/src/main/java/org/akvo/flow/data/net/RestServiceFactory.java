@@ -22,6 +22,8 @@ package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -33,9 +35,10 @@ public class RestServiceFactory {
     public static <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
+        httpClient.connectTimeout(10, TimeUnit.SECONDS);
+        httpClient.readTimeout(0, TimeUnit.SECONDS);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

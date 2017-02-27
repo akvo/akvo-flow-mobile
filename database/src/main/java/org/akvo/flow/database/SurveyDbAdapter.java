@@ -469,7 +469,7 @@ public class SurveyDbAdapter {
      *
      * @param sql
      */
-    public void executeSql(String sql) {
+    private void executeSql(String sql) {
         database.execSQL(sql);
     }
 
@@ -572,11 +572,10 @@ public class SurveyDbAdapter {
     }
 
     public Cursor getSurveyedLocale(String surveyedLocaleId) {
-        Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
+        return database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
                 new String[] { String.valueOf(surveyedLocaleId) },
                 null, null, null);
-        return cursor;
     }
 
     public String[] getSurveyIds() {
@@ -740,25 +739,6 @@ public class SurveyDbAdapter {
         NAME, GEOLOCATION
     }
 
-    //TODO: remove
-    public void updateSurveyedLocale(String surveyedLocaleId, ContentValues surveyedLocaleValues) {
-        database.update(Tables.RECORD, surveyedLocaleValues,
-                RecordColumns.RECORD_ID + " = ?",
-                new String[] { surveyedLocaleId });
-    }
-
-    /**
-     * Update the last modification date, if necessary
-     */
-    //TODO: remove
-    public void updateRecordModifiedDate(String recordId, long timestamp) {
-        ContentValues values = new ContentValues();
-        values.put(RecordColumns.LAST_MODIFIED, timestamp);
-        database.update(Tables.RECORD, values,
-                RecordColumns.RECORD_ID + " = ? AND " + RecordColumns.LAST_MODIFIED + " < ?",
-                new String[] { recordId, String.valueOf(timestamp) });
-    }
-
     /**
      * Filters surveyd locales based on the parameters passed in.
      */
@@ -809,74 +789,6 @@ public class SurveyDbAdapter {
         return database.rawQuery(queryString + whereClause + groupBy + orderByStr, whereValues);
     }
 
-    // ======================================================= //
-    // =========== SurveyedLocales synchronization =========== //
-    // ======================================================= //
-
-    public void syncResponse(long surveyInstanceId,
-            ContentValues values, String questionId) {
-        Cursor cursor = database.query(Tables.RESPONSE,
-                new String[] { ResponseColumns.SURVEY_INSTANCE_ID, ResponseColumns.QUESTION_ID
-                },
-                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                        + ResponseColumns.QUESTION_ID + " = ?",
-                new String[] { String.valueOf(surveyInstanceId), questionId },
-                null, null, null);
-
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        if (exists) {
-            database.update(Tables.RESPONSE, values,
-                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                            + ResponseColumns.QUESTION_ID + " = ?",
-                    new String[] { String.valueOf(surveyInstanceId), questionId
-                    });
-        } else {
-            database.insert(Tables.RESPONSE, null, values);
-        }
-    }
-
-    public long syncSurveyInstance(ContentValues values,
-            String surveyInstanceUuid) {
-        Cursor cursor = database.query(Tables.SURVEY_INSTANCE, new String[] {
-                        SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID
-                },
-                SurveyInstanceColumns.UUID + " = ?",
-                new String[] { surveyInstanceUuid },
-                null, null, null);
-
-        long id = DOES_NOT_EXIST;
-        if (cursor.moveToFirst()) {
-            id = cursor.getLong(0);
-        }
-        cursor.close();
-        if (id != DOES_NOT_EXIST) {
-            database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
-                    + " = ?", new String[] { surveyInstanceUuid });
-        } else {
-            values.put(SurveyInstanceColumns.UUID, surveyInstanceUuid);
-            id = database.insert(Tables.SURVEY_INSTANCE, null, values);
-        }
-        return id;
-    }
-
-    public void endTransaction() {
-        database.endTransaction();
-    }
-
-    public void successfulTransaction() {
-        database.setTransactionSuccessful();
-    }
-
-    //TODO: remove
-    public void insertRecord(ContentValues values) {
-        database.insert(Tables.RECORD, null, values);
-    }
-
-    public void beginTransaction() {
-        database.beginTransaction();
-    }
-
     /**
      * Get the synchronization time for a particular survey group.
      *
@@ -896,19 +808,6 @@ public class SurveyDbAdapter {
         }
         cursor.close();
         return time;
-    }
-
-    /**
-     * Save the time of synchronization time for a particular SurveyGroup
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @param time          String containing the timestamp
-     */
-    public void setSyncTime(long surveyGroupId, String time) {
-        ContentValues values = new ContentValues();
-        values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
-        values.put(SyncTimeColumns.TIME, time);
-        database.insert(Tables.SYNC_TIME, null, values);
     }
 
     /**

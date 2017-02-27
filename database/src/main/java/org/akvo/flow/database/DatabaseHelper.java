@@ -230,6 +230,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         prefs.insertUserPreferences(insertablePreferences);
     }
 
+    //Using getReadableDatabase() returns
+    // android.database.sqlite.SQLiteDatabaseLockedException: database is locked (code 5):
+    // retrycount exceeded
+    @Override
+    public SQLiteDatabase getReadableDatabase() {
+        return getWritableDatabase();
+    }
+
     @Override
     public SQLiteDatabase getWritableDatabase() {
         synchronized (LOCK_OBJ) {

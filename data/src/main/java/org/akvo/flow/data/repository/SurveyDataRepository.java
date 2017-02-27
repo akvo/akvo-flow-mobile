@@ -21,11 +21,11 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.net.FlowRestApi;
@@ -39,6 +39,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 public class SurveyDataRepository implements SurveyRepository {
 
@@ -76,31 +77,20 @@ public class SurveyDataRepository implements SurveyRepository {
             @Override
             public Observable<Integer> call(final String serverBaseUrl) {
                 return dataSourceFactory.getPropertiesDataSource().getApiKey().concatMap(
-                        new Func1<String, Observable<Integer>>() {
-                            @Override
-                            public Observable<Integer> call(final String apiKey) {
-                                return getSyncedTime(surveyGroupId).concatMap(
                                         new Func1<String, Observable<Integer>>() {
                                             @Override
-                                            public Observable<Integer> call(String syncedTime) {
+                                            public Observable<Integer> call(String apiKey) {
                                                 return syncDataPoints(serverBaseUrl, apiKey,
-                                                        surveyGroupId, syncedTime);
+                                                        surveyGroupId);
                                             }
                                         });
                             }
                         });
-            }
-        });
     }
 
-    private Observable<String> getSyncedTime(long surveyGroupId) {
-        return dataSourceFactory.getDataBaseDataSource().getSyncedTime(surveyGroupId).map(
-                new Func1<Cursor, String>() {
-                    @Override
-                    public String call(Cursor cursor) {
-                        return syncedTimeMapper.getTime(cursor);
-                    }
-                });
+    private String getSyncedTime(long surveyGroupId) {
+        return syncedTimeMapper
+                .getTime(dataSourceFactory.getDataBaseDataSource().getSyncedTime(surveyGroupId));
     }
 
     private Observable<String> getServerBaseUrl() {
@@ -117,32 +107,50 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<Integer> syncDataPoints(String baseUrl, String apiKey, long surveyGroup,
-            @NonNull String timestamp) {
+    private Observable<Integer> syncDataPoints(String baseUrl, String apiKey, long surveyGroupId) {
         final List<ApiDataPoint> lastBatch = new ArrayList<>();
         final List<ApiDataPoint> allSyncedDataPoints = new ArrayList<>();
-        return restApi.loadNewDataPoints(baseUrl, apiKey, surveyGroup, timestamp).concatMap(
-                new Func1<List<ApiDataPoint>, Observable<List<ApiDataPoint>>>() {
+        Timber.d("syncDataPoints");
+        return restApi
+                .loadNewDataPoints(baseUrl, apiKey, surveyGroupId, getSyncedTime(surveyGroupId))
+                .concatMap(new Func1<ApiLocaleResult, Observable<List<ApiDataPoint>>>() {
                     @Override
-                    public Observable<List<ApiDataPoint>> call(List<ApiDataPoint> apiDataPoints) {
+                    public Observable<List<ApiDataPoint>> call(ApiLocaleResult apiLocaleResult) {
+                        List<ApiDataPoint> dataPoints = apiLocaleResult.getDataPoints();
+                        Timber.d("syncDataPoints received %d with count %d", dataPoints.size(),
+                                apiLocaleResult.getResultCount());
+                        dataPoints.removeAll(lastBatch); //remove duplicates
+                        Timber.d("syncDataPoints after removing batch %d", dataPoints.size());
+                        Timber.d("concatMap: will sync with database ");
                         return dataSourceFactory.getDataBaseDataSource()
-                                .syncSurveyedLocales(apiDataPoints);
+                                .syncSurveyedLocales(dataPoints);
                     }
-                }).repeat().takeUntil(new Func1<List<ApiDataPoint>, Boolean>() {
-            @Override
-            public Boolean call(List<ApiDataPoint> apiDataPoints) {
-                apiDataPoints.remove(lastBatch);
-                boolean done = apiDataPoints.isEmpty();
-                allSyncedDataPoints.addAll(apiDataPoints);
-                lastBatch.clear();
-                lastBatch.addAll(apiDataPoints);
-                return done;
-            }
-        }).map(new Func1<List<ApiDataPoint>, Integer>() {
-            @Override
-            public Integer call(List<ApiDataPoint> apiDataPoints) {
-                return allSyncedDataPoints.size();
-            }
-        });
+                })
+                .repeat()
+                .takeWhile(new Func1<List<ApiDataPoint>, Boolean>() {
+                    @Override
+                    public Boolean call(List<ApiDataPoint> apiDataPoints) {
+                        Timber.d("takeWhile: syncDataPoints %d", apiDataPoints.size());
+                        boolean done = !apiDataPoints.isEmpty();
+                        if (done) {
+                            Timber.d("Will load more");
+                        } else {
+                            Timber.d("Done loading");
+                        }
+                        allSyncedDataPoints.addAll(apiDataPoints);
+                        lastBatch.clear();
+                        lastBatch.addAll(apiDataPoints);
+                        return done;
+                    }
+                })
+                .map(new Func1<List<ApiDataPoint>, Integer>() {
+                    @Override
+                    public Integer call(List<ApiDataPoint> apiDataPoints) {
+                        int size = allSyncedDataPoints.size();
+                        Timber.d("Will notify ui about new %d datapoints", size);
+                        return size;
+                    }
+                });
     }
+
 }

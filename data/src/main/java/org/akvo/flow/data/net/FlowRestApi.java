@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiLocaleResult;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -33,7 +33,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -61,8 +60,9 @@ public class FlowRestApi {
         this.phoneNumber = deviceHelper.getPhoneNumber();
     }
 
-    public Observable<List<ApiDataPoint>> loadNewDataPoints(@NonNull String baseUrl,
+    public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
+        Timber.d("loadNewDataPoints");
         return RestServiceFactory.createRetrofitService(baseUrl, FlowApiService.class)
                 .loadNewDataPoints(buildSyncUrl(baseUrl, apiKey, surveyGroup, timestamp));
     }

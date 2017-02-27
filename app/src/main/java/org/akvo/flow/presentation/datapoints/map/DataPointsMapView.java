@@ -33,4 +33,12 @@ public interface DataPointsMapView {
     void displayData(List<MapDataPoint> surveyedLocales);
 
     void displayMenu(boolean monitored);
+
+    void showSyncedResults(int numberOfSyncedItems);
+
+    void showSyncNotAllowed();
+
+    void showNoNetwork();
+
+    void showErrorSync();
 }

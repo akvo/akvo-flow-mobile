@@ -54,6 +54,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.datapoints.DataPointSyncListener;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.ui.fragment.DataPointsSyncListener;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -71,7 +72,12 @@ public class DataPointsMapFragment extends SupportMapFragment
     public static final int MAP_ZOOM_LEVEL = 10;
     public static final String MAP_OPTIONS = "MapOptions";
 
+    @Nullable
     private RecordListListener mListener;
+
+    @Nullable
+    private DataPointSyncListener dataPointsSyncListener;
+
     private List<MapDataPoint> mItems;
 
     private boolean displayMonitoredMenu;
@@ -116,6 +122,10 @@ public class DataPointsMapFragment extends SupportMapFragment
             throw new ClassCastException(
                     activity.toString() + " must implement RecordListListener");
         }
+        if (!(activity instanceof DataPointSyncListener)) {
+            throw new IllegalArgumentException("Activity must implement DataPointsSyncListener");
+        }
+        this.dataPointsSyncListener = (DataPointSyncListener) activity;
     }
 
     @Override
@@ -249,6 +259,13 @@ public class DataPointsMapFragment extends SupportMapFragment
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+        dataPointsSyncListener = null;
+    }
+
+    @Override
     public void onDestroy() {
         presenter.onViewDestroyed();
         super.onDestroy();
@@ -307,7 +324,9 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void onInfoWindowClick(Marker marker) {
         final String surveyedLocaleId = marker.getSnippet();
-        mListener.onRecordSelected(surveyedLocaleId);
+        if (mListener != null) {
+            mListener.onRecordSelected(surveyedLocaleId);
+        }
     }
 
     @Override
@@ -329,5 +348,33 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void onNewDataAvailable() {
         presenter.refresh();
+    }
+
+    @Override
+    public void showSyncedResults(int numberOfSyncedItems) {
+        if (dataPointsSyncListener != null) {
+            dataPointsSyncListener.showSyncedResults(numberOfSyncedItems);
+        }
+    }
+
+    @Override
+    public void showSyncNotAllowed() {
+        if (dataPointsSyncListener != null) {
+            dataPointsSyncListener.showSyncNotAllowed();
+        }
+    }
+
+    @Override
+    public void showNoNetwork() {
+        if (dataPointsSyncListener != null) {
+            dataPointsSyncListener.showNoNetwork();
+        }
+    }
+
+    @Override
+    public void showErrorSync() {
+        if (dataPointsSyncListener != null) {
+            dataPointsSyncListener.showErrorSync();
+        }
     }
 }

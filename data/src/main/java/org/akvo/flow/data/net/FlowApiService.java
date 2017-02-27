@@ -20,16 +20,16 @@
 
 package org.akvo.flow.data.net;
 
-import org.akvo.flow.data.entity.ApiDataPoint;
-
-import java.util.List;
+import org.akvo.flow.data.entity.ApiLocaleResult;
 
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Url;
 import rx.Observable;
 
 public interface FlowApiService {
 
     @GET
-    Observable<List<ApiDataPoint>> loadNewDataPoints(@Url String url);
+    @Headers("Cache-Control: no-cache")
+    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
 }

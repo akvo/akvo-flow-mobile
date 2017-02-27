@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.SyncResult;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -39,6 +40,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import timber.log.Timber;
+
+import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
 
 public class DataPointsMapPresenter implements Presenter{
 
@@ -74,28 +77,25 @@ public class DataPointsMapPresenter implements Presenter{
     }
 
     public void refresh() {
-        view.showProgress();
-        Map<String, Long> params = new HashMap<>(2);
         if (surveyGroup != null) {
+            Map<String, Long> params = new HashMap<>(2);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
-        }
-        getSavedDataPoints.execute(new DefaultSubscriber<List<DataPoint>>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e, "Error loading saved datapoints");
-                //TODO: show error?
-                view.hideProgress();
-            }
+            getSavedDataPoints.execute(new DefaultSubscriber<List<DataPoint>>() {
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e, "Error loading saved datapoints");
+                    //TODO: show error?
+                }
 
-            @Override
-            public void onNext(List<DataPoint> dataPoints) {
-                Timber.d("Found datapoints : %d "+dataPoints.size());
-                List<MapDataPoint> mapDataPoints = mapper.transform(dataPoints);
-                Timber.d("Datapoints with location : %d "+mapDataPoints.size());
-                view.hideProgress();
-                view.displayData(mapDataPoints);
-            }
-        }, params);
+                @Override
+                public void onNext(List<DataPoint> dataPoints) {
+                    Timber.d("Found datapoints : %d "+dataPoints.size());
+                    List<MapDataPoint> mapDataPoints = mapper.transform(dataPoints);
+                    Timber.d("Datapoints with location : %d "+mapDataPoints.size());
+                    view.displayData(mapDataPoints);
+                }
+            }, params);
+        }
     }
 
     @Override
@@ -114,15 +114,43 @@ public class DataPointsMapPresenter implements Presenter{
     public void syncRecords(final long surveyGroupId) {
         Map<String, Long> params = new HashMap<>(2);
         params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        syncDataPoints.execute(new DefaultSubscriber<Integer>() {
+        syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {
+
             @Override
-            public void onError(Throwable e) {
-                Timber.e(e, "Error syncing %s", surveyGroupId);
+            public void onCompleted() {
+                Timber.d("onCompleted");
+                view.hideProgress();
             }
 
             @Override
-            public void onNext(Integer integer) {
-                //TODO: show snackbar with number
+            public void onError(Throwable e) {
+                Timber.e(e, "Error syncing %s", surveyGroupId);
+                view.hideProgress();
+                view.showErrorSync();
+            }
+
+            @Override
+            public void onNext(SyncResult result) {
+                Timber.d("onNext datapoint sync: synced : %d", result.getNumberOfSyncedItems());
+
+                if (result.getResultCode() == SUCCESS) {
+                    if (result.getNumberOfSyncedItems() > 0) {
+                        view.showSyncedResults(result.getNumberOfSyncedItems());
+                    }
+                } else {
+                    switch (result.getResultCode()) {
+                        case ERROR_SYNC_NOT_ALLOWED_OVER_3G:
+                            view.showSyncNotAllowed();
+                            break;
+                        case ERROR_NO_NETWORK:
+                            view.showNoNetwork();
+                            break;
+                        //TODO: add assignment missing
+                        default:
+                            view.showErrorSync();
+                            break;
+                    }
+                }
             }
         }, params);
     }

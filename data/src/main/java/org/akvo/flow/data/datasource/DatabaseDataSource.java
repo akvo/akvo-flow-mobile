@@ -45,6 +45,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import rx.Observable;
+import timber.log.Timber;
 
 public class DatabaseDataSource {
 
@@ -72,38 +73,41 @@ public class DatabaseDataSource {
         }
     }
 
-    public Observable<Cursor> getSyncedTime(long surveyGroupId) {
+    public Cursor getSyncedTime(long surveyGroupId) {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
     public Observable<List<ApiDataPoint>> syncSurveyedLocales(List<ApiDataPoint> apiDataPoints) {
+        Timber.d("Will sync with database : " + apiDataPoints.hashCode());
         if (apiDataPoints == null) {
             return Observable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
         }
-        for (ApiDataPoint apiDataPoint : apiDataPoints) {
-            syncSurveyedLocale(apiDataPoint);
-        }
+        syncSurveyedLocale(apiDataPoints);
         return Observable.just(apiDataPoints);
     }
 
-    public void syncSurveyedLocale(ApiDataPoint surveyedLocale) {
-        final String id = surveyedLocale.getId();
+    public void syncSurveyedLocale(List<ApiDataPoint> apiDataPoints) {
+        if (apiDataPoints == null || apiDataPoints.size() == 0) {
+            return;
+        }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         try {
-            ContentValues values = new ContentValues();
-            values.put(RecordColumns.RECORD_ID, id);
-            values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
-            values.put(RecordColumns.NAME, surveyedLocale.getDisplayName());
-            values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
-            values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
+            for (ApiDataPoint surveyedLocale : apiDataPoints) {
+                final String id = surveyedLocale.getId();
+                ContentValues values = new ContentValues();
+                values.put(RecordColumns.RECORD_ID, id);
+                values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
+                values.put(RecordColumns.NAME, surveyedLocale.getDisplayName());
+                values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
+                values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
 
-            syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
+                syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
 
-            briteSurveyDbAdapter.updateRecord(id, values, surveyedLocale.getLastModified());
+                briteSurveyDbAdapter.updateRecord(id, values, surveyedLocale.getLastModified());
 
-            String syncTime = String.valueOf(surveyedLocale.getLastModified());
-            setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
-
+                String syncTime = String.valueOf(surveyedLocale.getLastModified());
+                setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
+            }
             transaction.markSuccessful();
         } finally {
             transaction.end();

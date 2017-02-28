@@ -59,7 +59,7 @@ public class DataPointsListPresenter implements Presenter {
     private Double longitude;
 
     @Inject
-    public DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+    DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             ListDataPointMapper mapper, @Named("syncDataPoints") UseCase syncDataPoints) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
@@ -70,13 +70,13 @@ public class DataPointsListPresenter implements Presenter {
         this.view = view;
     }
 
-    public void onDataReady(SurveyGroup surveyGroup) {
+    void onDataReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
         boolean monitored = surveyGroup == null? false : surveyGroup.isMonitored();
         view.displayMenu(monitored);
     }
 
-    public void refresh() {
+    void refresh() {
         if (surveyGroup != null) {
             Map<String, Object> params = new HashMap<>(8);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
@@ -105,19 +105,19 @@ public class DataPointsListPresenter implements Presenter {
     }
 
     @Override
-    public void onViewDestroyed() {
+    public void destroy() {
         getSavedDataPoints.unSubscribe();
         syncDataPoints.unSubscribe();
     }
 
-    public void onSyncRecordsPressed() {
+    void onSyncRecordsPressed() {
         if (surveyGroup != null) {
             view.showLoading();
             syncRecords(surveyGroup.getId());
         }
     }
 
-    public void syncRecords(final long surveyGroupId) {
+    private void syncRecords(final long surveyGroupId) {
         Map<String, Long> params = new HashMap<>(2);
         params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
         syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {
@@ -161,7 +161,7 @@ public class DataPointsListPresenter implements Presenter {
         }, params);
     }
 
-    public void onOrderByClick(int order) {
+    void onOrderByClick(int order) {
         if (orderBy != order) {
             if (orderBy == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null || longitude == null)) {
                 // Warn user that the location is unknown
@@ -173,12 +173,12 @@ public class DataPointsListPresenter implements Presenter {
         }
     }
 
-    public void onLocationReady(Double latitude, Double longitude) {
+    void onLocationReady(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public void onOrderByClicked() {
+    void onOrderByClicked() {
         view.showOrderByDialog(orderBy);
     }
 }

@@ -266,7 +266,7 @@ public class DataPointsMapFragment extends SupportMapFragment
 
     @Override
     public void onDestroy() {
-        presenter.onViewDestroyed();
+        presenter.destroy();
         super.onDestroy();
     }
 

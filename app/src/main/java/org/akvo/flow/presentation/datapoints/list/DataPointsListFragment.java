@@ -217,7 +217,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void onDestroy() {
-        presenter.onViewDestroyed();
+        presenter.destroy();
         super.onDestroy();
     }
 

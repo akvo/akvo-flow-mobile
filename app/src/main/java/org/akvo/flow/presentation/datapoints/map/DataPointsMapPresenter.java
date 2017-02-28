@@ -20,6 +20,7 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.akvo.flow.domain.SurveyGroup;
@@ -54,29 +55,29 @@ public class DataPointsMapPresenter implements Presenter{
     private SurveyGroup surveyGroup;
 
     @Inject
-    public DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+    DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             MapDataPointMapper mapper, @Named("syncDataPoints") UseCase syncDataPoints) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.syncDataPoints = syncDataPoints;
     }
 
-    public void setView(DataPointsMapView view) {
+    void setView(@NonNull DataPointsMapView view) {
         this.view = view;
     }
 
-    public void onDataReady(SurveyGroup surveyGroup) {
+    void onDataReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
         if (surveyGroup != null) {
             view.displayMenu(surveyGroup.isMonitored());
         }
     }
 
-    public void onViewReady() {
+    void onViewReady() {
         refresh();
     }
 
-    public void refresh() {
+    void refresh() {
         if (surveyGroup != null) {
             Map<String, Long> params = new HashMap<>(2);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
@@ -84,7 +85,6 @@ public class DataPointsMapPresenter implements Presenter{
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
-                    //TODO: show error?
                 }
 
                 @Override
@@ -99,19 +99,19 @@ public class DataPointsMapPresenter implements Presenter{
     }
 
     @Override
-    public void onViewDestroyed() {
+    public void destroy() {
         getSavedDataPoints.unSubscribe();
         syncDataPoints.unSubscribe();
     }
 
-    public void onSyncRecordsPressed() {
+    void onSyncRecordsPressed() {
         if (surveyGroup != null) {
             view.showProgress();
             syncRecords(surveyGroup.getId());
         }
     }
 
-    public void syncRecords(final long surveyGroupId) {
+    private void syncRecords(final long surveyGroupId) {
         Map<String, Long> params = new HashMap<>(2);
         params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
         syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {

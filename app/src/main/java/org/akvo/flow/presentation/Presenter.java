@@ -22,5 +22,5 @@ package org.akvo.flow.presentation;
 
 public interface Presenter {
 
-    void onViewDestroyed();
+    void destroy();
 }

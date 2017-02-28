@@ -163,7 +163,7 @@ public class DataPointsListPresenter implements Presenter {
 
     void onOrderByClick(int order) {
         if (orderBy != order) {
-            if (orderBy == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null || longitude == null)) {
+            if (order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null || longitude == null)) {
                 // Warn user that the location is unknown
                 view.showErrorMissingLocation();
                 return;

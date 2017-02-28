@@ -18,30 +18,31 @@
  *
  */
 
-package org.akvo.flow.ui.fragment;
+package org.akvo.flow.presentation.datapoints;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
-import java.lang.ref.WeakReference;
+import org.akvo.flow.R;
 
-import timber.log.Timber;
+import javax.inject.Inject;
 
-public class DataPointSyncBroadcastReceiver extends BroadcastReceiver {
+public class DisplayNameMapper {
 
-    private final WeakReference<DataPointsSyncListener> fragmentWeakReference;
+    private final Context context;
 
-    public DataPointSyncBroadcastReceiver(DataPointsSyncListener fragment) {
-        this.fragmentWeakReference = new WeakReference<>(fragment);
+    @Inject
+    public DisplayNameMapper(Context context) {
+        this.context = context;
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Timber.d("New Records have been synchronised. Refreshing fragments...");
-        DataPointsSyncListener datapointsFragment = fragmentWeakReference.get();
-        if (datapointsFragment != null) {
-            datapointsFragment.onNewDataAvailable();
+    @NonNull
+    public String createDisplayName(@Nullable String name) {
+        if (TextUtils.isEmpty(name)) {
+            return context.getString(R.string.unknown);
         }
+        return name;
     }
 }

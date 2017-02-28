@@ -403,8 +403,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
     }
 
-    @Override
-    public void onSyncRecordsRequested(long surveyGroupId) {
+    private void onSyncRecordsRequested(long surveyGroupId) {
         Toast.makeText(this, R.string.syncing_records, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, SurveyedDataPointSyncService.class);
         intent.putExtra(SurveyedDataPointSyncService.SURVEY_GROUP, surveyGroupId);

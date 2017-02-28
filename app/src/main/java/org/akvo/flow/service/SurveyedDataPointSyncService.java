@@ -31,7 +31,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
-import org.akvo.flow.ui.fragment.DataPointsListFragment;
+import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.io.IOException;

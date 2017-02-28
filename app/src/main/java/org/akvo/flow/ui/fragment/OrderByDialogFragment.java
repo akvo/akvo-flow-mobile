@@ -29,6 +29,8 @@ import org.akvo.flow.R;
 
 public class OrderByDialogFragment extends DialogFragment {
 
+    public static final String FRAGMENT_ORDER_BY_TAG = "order_by";
+
     public interface OrderByDialogListener {
         void onOrderByClick(int order);
     }

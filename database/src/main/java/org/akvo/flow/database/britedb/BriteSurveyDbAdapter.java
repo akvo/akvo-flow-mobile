@@ -61,8 +61,7 @@ public class BriteSurveyDbAdapter {
      * Filters surveyed locales based on the parameters passed in.
      */
     public Observable<Cursor> getFilteredSurveyedLocales(long surveyGroupId, Double latitude,
-            Double longitude,
-            int orderBy) {
+            Double longitude, int orderBy) {
         // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
         // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
         // fully compatible. TODO: This should be refactored and replaced with a less complex approach.

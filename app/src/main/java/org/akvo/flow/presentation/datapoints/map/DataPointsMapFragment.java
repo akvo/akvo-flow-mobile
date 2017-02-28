@@ -56,7 +56,6 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncListener;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-import org.akvo.flow.ui.fragment.DataPointsSyncListener;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -66,7 +65,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class DataPointsMapFragment extends SupportMapFragment
-        implements OnInfoWindowClickListener, OnMapReadyCallback, DataPointsSyncListener,
+        implements OnInfoWindowClickListener, OnMapReadyCallback,
         DataPointsMapView {
 
     public static final int MAP_ZOOM_LEVEL = 10;
@@ -343,11 +342,6 @@ public class DataPointsMapFragment extends SupportMapFragment
         if (activity != null) {
             activity.supportInvalidateOptionsMenu();
         }
-    }
-
-    @Override
-    public void onNewDataAvailable() {
-        presenter.refresh();
     }
 
     @Override

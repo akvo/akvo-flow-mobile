@@ -38,8 +38,6 @@ public class ConstantUtil {
     public static final String PROCESSED_OK_SUFFIX = ".processed";
     public static final String PROCESSED_ERROR_SUFFIX = ".error";
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
     public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
     public static final String DOT_SEPARATOR = ".";
 
@@ -137,16 +135,6 @@ public class ConstantUtil {
     public static final String SURVEY_GROUP = "survey_group";
     public static final String SURVEYED_LOCALE_ID = "surveyed_locale_id";
 
-    /**
-     * settings keys
-     */
-    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
-    public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
-    public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
-    public static final String SCREEN_ON_KEY = "screen.keepon";
-    public static final String DEVICE_IDENT_KEY = "device.identifier";
-    public static final String MAX_IMG_SIZE = "media.img.maxsize";
-    
     /**
      * intents
      */

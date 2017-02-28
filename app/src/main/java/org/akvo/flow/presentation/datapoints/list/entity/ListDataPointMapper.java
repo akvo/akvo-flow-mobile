@@ -18,12 +18,10 @@
  *
  */
 
-package org.akvo.flow.presentation.datapoints.map.entity;
+package org.akvo.flow.presentation.datapoints.list.entity;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper;
@@ -34,40 +32,40 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class MapDataPointMapper {
+public class ListDataPointMapper {
 
     private final DisplayNameMapper displayNameMapper;
 
     @Inject
-    public MapDataPointMapper(DisplayNameMapper displayNameMapper) {
+    public ListDataPointMapper(DisplayNameMapper displayNameMapper) {
         this.displayNameMapper = displayNameMapper;
     }
 
     @Nullable
-    public MapDataPoint transform(@Nullable DataPoint dataPoint) {
-        if (dataPoint == null || dataPoint.getLatitude() == null
-                || dataPoint.getLongitude() == null) {
-            //a map datapoint needs to have location data or it will not be displayed
-            // so no need to add it
+    public ListDataPoint transform(@Nullable DataPoint dataPoint) {
+        if (dataPoint == null) {
             return null;
         }
-        LatLng position = new LatLng(dataPoint.getLatitude(), dataPoint.getLongitude());
         String displayName = displayNameMapper.createDisplayName(dataPoint.getName());
-        return new MapDataPoint(dataPoint.getId(), displayName, position);
+        double latitude = dataPoint.getLatitude() == null ? ListDataPoint.INVALID_COORDINATE : dataPoint.getLatitude();
+        double longitude = dataPoint.getLongitude() == null? ListDataPoint.INVALID_COORDINATE: dataPoint.getLongitude();
+        long lastModified = dataPoint.getLastModified();
+        return new ListDataPoint(displayName, dataPoint.getStatus(), dataPoint.getId(),
+                latitude, longitude, lastModified);
     }
 
     @NonNull
-    public List<MapDataPoint> transform(@Nullable List<DataPoint> dataPoints) {
+    public List<ListDataPoint> transform(List<DataPoint> dataPoints) {
         if (dataPoints == null) {
             return Collections.emptyList();
         }
-        List<MapDataPoint> mapDataPoints = new ArrayList<>(dataPoints.size());
+        List<ListDataPoint> listDataPoints = new ArrayList<>(dataPoints.size());
         for (DataPoint dataPoint : dataPoints) {
-            MapDataPoint mapDataPoint = transform(dataPoint);
-            if (mapDataPoint != null) {
-                mapDataPoints.add(mapDataPoint);
+            ListDataPoint listDataPoint = transform(dataPoint);
+            if (listDataPoint != null) {
+                listDataPoints.add(listDataPoint);
             }
         }
-        return mapDataPoints;
+        return listDataPoints;
     }
 }

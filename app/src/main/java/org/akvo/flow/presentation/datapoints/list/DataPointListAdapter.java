@@ -46,14 +46,14 @@ import java.util.List;
 /**
  * List Adapter to bind the Surveyed Locales into the list items
  */
-class SurveyedLocaleListAdapter extends ArrayAdapter<ListDataPoint> {
+class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
 
     private Double mLatitude;
     private Double mLongitude;
     private final SurveyGroup mSurveyGroup;
     private final LayoutInflater inflater;
 
-    SurveyedLocaleListAdapter(Context context, @Nullable Double mLatitude,
+    DataPointListAdapter(Context context, @Nullable Double mLatitude,
             @Nullable Double mLongitude, SurveyGroup mSurveyGroup) {
         super(context, R.layout.surveyed_locale_item);
         this.mLatitude = mLatitude;

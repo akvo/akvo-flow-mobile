@@ -74,7 +74,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     private Double mLatitude = null;
     private Double mLongitude = null;
 
-    private SurveyedLocaleListAdapter mAdapter;
+    private DataPointListAdapter mAdapter;
     private RecordListListener mListener;
 
     private TextView emptyTextView;
@@ -143,7 +143,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
         if (mAdapter == null) {
-            mAdapter = new SurveyedLocaleListAdapter(getActivity(), mLatitude, mLongitude,
+            mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude,
                     surveyGroup);
             listView.setAdapter(mAdapter);
         }

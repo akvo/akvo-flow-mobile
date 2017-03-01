@@ -89,9 +89,7 @@ public class DataPointsMapPresenter implements Presenter{
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    Timber.d("Found datapoints : %d "+dataPoints.size());
                     List<MapDataPoint> mapDataPoints = mapper.transform(dataPoints);
-                    Timber.d("Datapoints with location : %d "+mapDataPoints.size());
                     view.displayData(mapDataPoints);
                 }
             }, params);
@@ -140,12 +138,14 @@ public class DataPointsMapPresenter implements Presenter{
                 } else {
                     switch (result.getResultCode()) {
                         case ERROR_SYNC_NOT_ALLOWED_OVER_3G:
-                            view.showSyncNotAllowed();
+                            view.showErrorSyncNotAllowed();
                             break;
                         case ERROR_NO_NETWORK:
-                            view.showNoNetwork();
+                            view.showErrorNoNetwork();
                             break;
-                        //TODO: add assignment missing
+                        case ERROR_ASSIGNMENT_MISSING:
+                            view.showErrorAssignmentMissing();
+                            break;
                         default:
                             view.showErrorSync();
                             break;

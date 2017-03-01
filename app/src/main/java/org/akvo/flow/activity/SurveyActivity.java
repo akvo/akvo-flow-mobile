@@ -486,18 +486,23 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void showSyncNotAllowed() {
+    public void showErrorSyncNotAllowed() {
         //TODO: add
     }
 
     @Override
-    public void showNoNetwork() {
+    public void showErrorNoNetwork() {
         displayErrorNetwork();
     }
 
     @Override
     public void showErrorSync() {
         displayDefaultSyncError();
+    }
+
+    @Override
+    public void showErrorAssignmentMissing() {
+        displayErrorAssignment();
     }
 
     static class SurveySyncBroadcastReceiver extends BroadcastReceiver {

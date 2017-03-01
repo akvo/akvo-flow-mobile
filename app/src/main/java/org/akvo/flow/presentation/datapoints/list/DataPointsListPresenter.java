@@ -146,12 +146,14 @@ public class DataPointsListPresenter implements Presenter {
                 } else {
                     switch (result.getResultCode()) {
                         case ERROR_SYNC_NOT_ALLOWED_OVER_3G:
-                            view.showSyncNotAllowed();
+                            view.showErrorSyncNotAllowed();
                             break;
                         case ERROR_NO_NETWORK:
-                            view.showNoNetwork();
+                            view.showErrorNoNetwork();
                             break;
-                        //TODO: add assignment missing
+                        case ERROR_ASSIGNMENT_MISSING:
+                            view.showErrorAssignmentMissing();
+                            break;
                         default:
                             view.showErrorSync();
                             break;

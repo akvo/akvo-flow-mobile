@@ -62,7 +62,8 @@ public class FlowRestApi {
 
     public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
-        Timber.d("loadNewDataPoints");
+        Timber.d("loadNewDataPoints with args: surveyGroup: %d, timestamp: %s", surveyGroup,
+                timestamp);
         return RestServiceFactory.createRetrofitService(baseUrl, FlowApiService.class)
                 .loadNewDataPoints(buildSyncUrl(baseUrl, apiKey, surveyGroup, timestamp));
     }

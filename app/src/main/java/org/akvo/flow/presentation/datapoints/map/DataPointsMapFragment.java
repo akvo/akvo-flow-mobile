@@ -352,16 +352,23 @@ public class DataPointsMapFragment extends SupportMapFragment
     }
 
     @Override
-    public void showSyncNotAllowed() {
+    public void showErrorAssignmentMissing() {
         if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showSyncNotAllowed();
+            dataPointsSyncListener.showErrorAssignmentMissing();
         }
     }
 
     @Override
-    public void showNoNetwork() {
+    public void showErrorSyncNotAllowed() {
         if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showNoNetwork();
+            dataPointsSyncListener.showErrorSyncNotAllowed();
+        }
+    }
+
+    @Override
+    public void showErrorNoNetwork() {
+        if (dataPointsSyncListener != null) {
+            dataPointsSyncListener.showErrorNoNetwork();
         }
     }
 

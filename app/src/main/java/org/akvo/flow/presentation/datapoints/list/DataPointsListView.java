@@ -34,9 +34,9 @@ public interface DataPointsListView {
 
     void showSyncedResults(int numberOfSyncedItems);
 
-    void showSyncNotAllowed();
+    void showErrorSyncNotAllowed();
 
-    void showNoNetwork();
+    void showErrorNoNetwork();
 
     void showErrorSync();
 
@@ -49,4 +49,6 @@ public interface DataPointsListView {
     void showNoSurveySelected();
 
     void showOrderByDialog(int orderBy);
+
+    void showErrorAssignmentMissing();
 }

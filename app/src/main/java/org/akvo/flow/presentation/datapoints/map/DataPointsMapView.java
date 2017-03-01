@@ -36,9 +36,11 @@ public interface DataPointsMapView {
 
     void showSyncedResults(int numberOfSyncedItems);
 
-    void showSyncNotAllowed();
+    void showErrorAssignmentMissing();
 
-    void showNoNetwork();
+    void showErrorSyncNotAllowed();
+
+    void showErrorNoNetwork();
 
     void showErrorSync();
 }

@@ -18,17 +18,11 @@
  *
  */
 
-package org.akvo.flow.presentation.datapoints;
+package org.akvo.flow.domain.exception;
 
-public interface DataPointSyncListener {
+public class AssignmentRequiredException extends RuntimeException {
 
-    void showSyncedResults(int numberOfSyncedItems);
-
-    void showErrorSyncNotAllowed();
-
-    void showErrorNoNetwork();
-
-    void showErrorSync();
-
-    void showErrorAssignmentMissing();
+    public AssignmentRequiredException(String message) {
+        super(message);
+    }
 }

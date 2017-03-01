@@ -21,6 +21,7 @@
 package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.entity.SyncResult;
+import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
@@ -68,16 +69,29 @@ public class SyncDataPoints extends UseCase {
                     return Observable.just(new SyncResult(
                             SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G, 0));
                 } else {
-                    return surveyRepository.syncRemoteDataPoints(
-                            (Long) parameters.get(KEY_SURVEY_GROUP_ID)).map(
-                            new Func1<Integer, SyncResult>() {
-                                @Override
-                                public SyncResult call(Integer integer) {
-                                    return new SyncResult(SyncResult.ResultCode.SUCCESS, integer);
-                                }
-                            });
+                    return syncDataPoints(parameters);
                 }
             }
         });
+    }
+
+    private <T> Observable<SyncResult> syncDataPoints(Map<String, T> parameters) {
+        return surveyRepository.syncRemoteDataPoints((Long) parameters.get(KEY_SURVEY_GROUP_ID))
+                .map(new Func1<Integer, SyncResult>() {
+                    @Override
+                    public SyncResult call(Integer integer) {
+                        return new SyncResult(SyncResult.ResultCode.SUCCESS, integer);
+                    }
+                })
+                .onErrorResumeNext(new Func1<Throwable, Observable<SyncResult>>() {
+                    @Override
+                    public Observable<SyncResult> call(Throwable throwable) {
+                        if (throwable instanceof AssignmentRequiredException) {
+                            return Observable.just(new SyncResult(
+                                    SyncResult.ResultCode.ERROR_ASSIGNMENT_MISSING, 0));
+                        }
+                        return Observable.error(throwable);
+                    }
+                });
     }
 }

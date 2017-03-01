@@ -45,7 +45,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import rx.Observable;
-import timber.log.Timber;
 
 public class DatabaseDataSource {
 
@@ -78,7 +77,6 @@ public class DatabaseDataSource {
     }
 
     public Observable<List<ApiDataPoint>> syncSurveyedLocales(List<ApiDataPoint> apiDataPoints) {
-        Timber.d("Will sync with database : " + apiDataPoints.hashCode());
         if (apiDataPoints == null) {
             return Observable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
         }
@@ -104,13 +102,19 @@ public class DatabaseDataSource {
                 syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
 
                 briteSurveyDbAdapter.updateRecord(id, values, surveyedLocale.getLastModified());
-
-                String syncTime = String.valueOf(surveyedLocale.getLastModified());
-                setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
             }
+            updateLastUpdatedDateTime(apiDataPoints);
             transaction.markSuccessful();
         } finally {
             transaction.end();
+        }
+    }
+
+    private void updateLastUpdatedDateTime(List<ApiDataPoint> apiDataPoints) {
+        ApiDataPoint surveyedLocale = apiDataPoints.get(apiDataPoints.size() - 1);
+        if (surveyedLocale != null) {
+            String syncTime = String.valueOf(surveyedLocale.getLastModified());
+            setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
         }
     }
 

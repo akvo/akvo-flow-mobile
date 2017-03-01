@@ -30,13 +30,17 @@ import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import retrofit2.HttpException;
 import rx.Observable;
 import rx.functions.Func1;
 import timber.log.Timber;
@@ -73,24 +77,42 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Observable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
-        return getServerBaseUrl().concatMap(new Func1<String, Observable<Integer>>() {
-            @Override
-            public Observable<Integer> call(final String serverBaseUrl) {
-                return dataSourceFactory.getPropertiesDataSource().getApiKey().concatMap(
-                                        new Func1<String, Observable<Integer>>() {
-                                            @Override
-                                            public Observable<Integer> call(String apiKey) {
-                                                return syncDataPoints(serverBaseUrl, apiKey,
-                                                        surveyGroupId);
-                                            }
-                                        });
-                            }
-                        });
+        return getServerBaseUrl()
+                .concatMap(new Func1<String, Observable<Integer>>() {
+                    @Override
+                    public Observable<Integer> call(final String serverBaseUrl) {
+                        return dataSourceFactory.getPropertiesDataSource().getApiKey()
+                                .concatMap(new Func1<String, Observable<Integer>>() {
+                                    @Override
+                                    public Observable<Integer> call(String apiKey) {
+                                        return syncDataPoints(serverBaseUrl, apiKey,
+                                                surveyGroupId);
+                                    }
+                                });
+                    }
+                })
+                .onErrorResumeNext(new Func1<Throwable, Observable<Integer>>() {
+                    @Override
+                    public Observable<Integer> call(Throwable throwable) {
+                        if (isErrorForbidden(throwable)) {
+                            throw new AssignmentRequiredException("Dashboard Assignment missing");
+                        } else {
+                            return Observable.error(throwable);
+                        }
+                    }
+                });
+    }
+
+    private boolean isErrorForbidden(Throwable throwable) {
+        return throwable instanceof HttpException
+                && ((HttpException) throwable).code() == HttpURLConnection.HTTP_FORBIDDEN;
     }
 
     private String getSyncedTime(long surveyGroupId) {
-        return syncedTimeMapper
-                .getTime(dataSourceFactory.getDataBaseDataSource().getSyncedTime(surveyGroupId));
+        Cursor syncedTime = dataSourceFactory.getDataBaseDataSource().getSyncedTime(surveyGroupId);
+        String time = syncedTimeMapper.getTime(syncedTime);
+        Timber.d("getSyncedTime %s", time);
+        return time;
     }
 
     private Observable<String> getServerBaseUrl() {
@@ -107,50 +129,90 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<Integer> syncDataPoints(String baseUrl, String apiKey, long surveyGroupId) {
+    private Observable<Integer> syncDataPoints(final String baseUrl, final String apiKey,
+            final long surveyGroupId) {
         final List<ApiDataPoint> lastBatch = new ArrayList<>();
-        final List<ApiDataPoint> allSyncedDataPoints = new ArrayList<>();
-        Timber.d("syncDataPoints");
-        return restApi
-                .loadNewDataPoints(baseUrl, apiKey, surveyGroupId, getSyncedTime(surveyGroupId))
-                .concatMap(new Func1<ApiLocaleResult, Observable<List<ApiDataPoint>>>() {
+        final List<ApiDataPoint> allResults = new ArrayList<>();
+        Timber.d("start syncDataPoints");
+        return loadAndSave(baseUrl, apiKey, surveyGroupId, lastBatch, allResults)
+                .repeatWhen(new Func1<Observable<? extends Void>, Observable<?>>() {
                     @Override
-                    public Observable<List<ApiDataPoint>> call(ApiLocaleResult apiLocaleResult) {
-                        List<ApiDataPoint> dataPoints = apiLocaleResult.getDataPoints();
-                        Timber.d("syncDataPoints received %d with count %d", dataPoints.size(),
-                                apiLocaleResult.getResultCount());
-                        dataPoints.removeAll(lastBatch); //remove duplicates
-                        Timber.d("syncDataPoints after removing batch %d", dataPoints.size());
-                        Timber.d("concatMap: will sync with database ");
-                        return dataSourceFactory.getDataBaseDataSource()
-                                .syncSurveyedLocales(dataPoints);
+                    public Observable<?> call(final Observable<? extends Void> observable) {
+                        Timber.d("Calling repeatWhen");
+                        return observable.delay(5, TimeUnit.SECONDS);
                     }
                 })
-                .repeat()
-                .takeWhile(new Func1<List<ApiDataPoint>, Boolean>() {
+                .takeUntil(new Func1<List<ApiDataPoint>, Boolean>() {
                     @Override
                     public Boolean call(List<ApiDataPoint> apiDataPoints) {
-                        Timber.d("takeWhile: syncDataPoints %d", apiDataPoints.size());
-                        boolean done = !apiDataPoints.isEmpty();
+                        boolean done = apiDataPoints.isEmpty();
                         if (done) {
-                            Timber.d("Will load more");
+                            Timber.d("takeUntil : finished");
                         } else {
-                            Timber.d("Done loading");
+                            Timber.d("takeUntil : will query again");
                         }
-                        allSyncedDataPoints.addAll(apiDataPoints);
-                        lastBatch.clear();
-                        lastBatch.addAll(apiDataPoints);
                         return done;
                     }
                 })
-                .map(new Func1<List<ApiDataPoint>, Integer>() {
+                .filter(new Func1<List<ApiDataPoint>, Boolean>() {
+                    @Override
+                    public Boolean call(List<ApiDataPoint> apiDataPoints) {
+                        boolean unfiltered = apiDataPoints.isEmpty();
+                        if (unfiltered) {
+                            Timber.d("filtered");
+                        } else {
+                            Timber.d("not filtered");
+                        }
+                        return unfiltered;
+                    }
+                }).map(new Func1<List<ApiDataPoint>, Integer>() {
                     @Override
                     public Integer call(List<ApiDataPoint> apiDataPoints) {
-                        int size = allSyncedDataPoints.size();
-                        Timber.d("Will notify ui about new %d datapoints", size);
-                        return size;
+                        Timber.d("Finished polling server");
+                        return allResults.size();
                     }
                 });
+    }
+
+    private Observable<List<ApiDataPoint>> loadAndSave(final String baseUrl, final String apiKey,
+            final long surveyGroupId, final List<ApiDataPoint> lastBatch,
+            final List<ApiDataPoint> allResults) {
+        return loadNewDataPoints(baseUrl, apiKey, surveyGroupId)
+                .concatMap(new Func1<ApiLocaleResult, Observable<List<ApiDataPoint>>>() {
+                    @Override
+                    public Observable<List<ApiDataPoint>> call(ApiLocaleResult apiLocaleResult) {
+                        return saveToDataBase(apiLocaleResult, lastBatch, allResults);
+                    }
+                });
+    }
+
+    private Observable<List<ApiDataPoint>> saveToDataBase(ApiLocaleResult apiLocaleResult,
+            List<ApiDataPoint> lastBatch, List<ApiDataPoint> allResults) {
+        List<ApiDataPoint> dataPoints = apiLocaleResult.getDataPoints();
+        Timber.d("syncDataPoints received %d with count %d", dataPoints.size(),
+                apiLocaleResult.getResultCount());
+        dataPoints.removeAll(lastBatch); //remove duplicates
+        lastBatch.clear();
+        lastBatch.addAll(dataPoints);
+        allResults.addAll(dataPoints);
+        Timber.d("syncDataPoints after removing batch %d", dataPoints.size());
+        Timber.d("Will now sync with database");
+        return dataSourceFactory.getDataBaseDataSource()
+                .syncSurveyedLocales(dataPoints);
+    }
+
+    private Observable<ApiLocaleResult> loadNewDataPoints(final String baseUrl, final String apiKey,
+            final long surveyGroupId) {
+        Timber.d("loadNewDataPoints");
+        return Observable.just(true).concatMap(new Func1<Object, Observable<ApiLocaleResult>>() {
+            @Override
+            public Observable<ApiLocaleResult> call(Object o) {
+                Timber.d("loadNewDataPoints call");
+                return restApi
+                        .loadNewDataPoints(baseUrl, apiKey, surveyGroupId,
+                                getSyncedTime(surveyGroupId));
+            }
+        });
     }
 
 }

@@ -30,7 +30,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RestServiceFactory {
+class RestServiceFactory {
 
     public static <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

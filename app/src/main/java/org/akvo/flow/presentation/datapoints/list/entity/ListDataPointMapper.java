@@ -42,7 +42,7 @@ public class ListDataPointMapper {
     }
 
     @Nullable
-    public ListDataPoint transform(@Nullable DataPoint dataPoint) {
+    private ListDataPoint transform(@Nullable DataPoint dataPoint) {
         if (dataPoint == null) {
             return null;
         }

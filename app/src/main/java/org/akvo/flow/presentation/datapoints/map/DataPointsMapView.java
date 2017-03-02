@@ -24,7 +24,7 @@ import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 
 import java.util.List;
 
-public interface DataPointsMapView {
+interface DataPointsMapView {
 
     void showProgress();
 

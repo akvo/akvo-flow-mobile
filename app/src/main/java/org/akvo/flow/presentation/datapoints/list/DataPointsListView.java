@@ -24,7 +24,7 @@ import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 
 import java.util.List;
 
-public interface DataPointsListView {
+interface DataPointsListView {
 
     void showNoDataPoints();
 

@@ -27,7 +27,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.Url;
 import rx.Observable;
 
-public interface FlowApiService {
+interface FlowApiService {
 
     @GET
     @Headers("Cache-Control: no-cache")

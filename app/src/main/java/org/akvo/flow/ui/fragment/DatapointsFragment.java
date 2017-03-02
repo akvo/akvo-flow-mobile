@@ -215,7 +215,7 @@ public class DatapointsFragment extends Fragment {
                 listFragment.refresh(surveyGroup);
             }
             if (mapFragment != null) {
-                mapFragment.refresh(surveyGroup);
+                mapFragment.refreshData(surveyGroup);
             }
         }
 

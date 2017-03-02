@@ -44,7 +44,7 @@ public class MapDataPointMapper {
     }
 
     @Nullable
-    public MapDataPoint transform(@Nullable DataPoint dataPoint) {
+    private MapDataPoint transform(@Nullable DataPoint dataPoint) {
         if (dataPoint == null || dataPoint.getLatitude() == null
                 || dataPoint.getLongitude() == null) {
             //a map datapoint needs to have location data or it will not be displayed

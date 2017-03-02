@@ -40,8 +40,8 @@ public class PropertiesDataSource {
     /**
      * property file keys
      */
-    public static final String SERVER_BASE = "serverBase";
-    public static final String API_KEY = "apiKey";
+    private static final String SERVER_BASE = "serverBase";
+    private static final String API_KEY = "apiKey";
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";

@@ -34,7 +34,7 @@ import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
  * This custom renderer overrides original 'bucketed' names, in order to display the accurate
  * number of markers within a cluster.
  */
-public class PointRenderer extends DefaultClusterRenderer<MapDataPoint> {
+class PointRenderer extends DefaultClusterRenderer<MapDataPoint> {
 
     public PointRenderer(GoogleMap map, Context context,
             ClusterManager<MapDataPoint> clusterManager) {

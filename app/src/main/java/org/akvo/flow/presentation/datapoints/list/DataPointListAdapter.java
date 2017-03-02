@@ -62,8 +62,9 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         this.inflater = LayoutInflater.from(context);
     }
 
-    @NonNull @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @NonNull
+    @Override
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View view;
         if (convertView == null) {
             view = inflater.inflate(R.layout.surveyed_locale_item, parent, false);

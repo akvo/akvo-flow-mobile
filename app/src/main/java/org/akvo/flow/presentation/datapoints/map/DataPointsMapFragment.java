@@ -70,13 +70,13 @@ public class DataPointsMapFragment extends SupportMapFragment
         implements OnInfoWindowClickListener, OnMapReadyCallback,
         DataPointsMapView, DataPointSyncView {
 
-    public static final int MAP_ZOOM_LEVEL = 10;
-    public static final String MAP_OPTIONS = "MapOptions";
+    private static final int MAP_ZOOM_LEVEL = 10;
+    private static final String MAP_OPTIONS = "MapOptions";
 
     @Nullable
     private RecordListListener mListener;
 
-    private DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
+    private final DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
             this);
 
     private List<MapDataPoint> mItems;
@@ -254,7 +254,7 @@ public class DataPointsMapFragment extends SupportMapFragment
         super.onResume();
         if (mItems.isEmpty()) {
             // Make sure we only fetch the data and center the map once
-            refresh();
+            presenter.refresh();
         }
     }
 
@@ -270,19 +270,9 @@ public class DataPointsMapFragment extends SupportMapFragment
         super.onDestroy();
     }
 
-    public void refresh(SurveyGroup surveyGroup) {
+    public void refreshData(SurveyGroup surveyGroup) {
         presenter.onDataReady(surveyGroup);
-        refresh();
-    }
-
-    /**
-     * Ideally, we should build a ContentProvider, so this notifications are handled
-     * automatically, and the loaders restarted without this explicit dependency.
-     */
-    public void refresh() {
-        if (isResumed()) {
-            presenter.refresh();
-        }
+        presenter.refresh();
     }
 
     @Override

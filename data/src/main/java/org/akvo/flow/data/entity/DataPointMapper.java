@@ -38,7 +38,7 @@ public class DataPointMapper {
     public DataPointMapper() {
     }
 
-    public DataPoint getDataPoint(Cursor cursor) {
+    private DataPoint getDataPoint(Cursor cursor) {
         String id = cursor.getString(SurveyDbAdapter.RecordQuery.RECORD_ID);
         long surveyGroupId = cursor.getLong(SurveyDbAdapter.RecordQuery.SURVEY_GROUP_ID);
         long lastModified = cursor.getLong(SurveyDbAdapter.RecordQuery.LAST_MODIFIED);

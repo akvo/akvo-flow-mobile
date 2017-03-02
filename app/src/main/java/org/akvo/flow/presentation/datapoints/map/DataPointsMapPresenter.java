@@ -21,7 +21,6 @@
 package org.akvo.flow.presentation.datapoints.map;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -50,7 +49,6 @@ public class DataPointsMapPresenter implements Presenter{
     private final MapDataPointMapper mapper;
     private final UseCase syncDataPoints;
 
-    @Nullable
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
 

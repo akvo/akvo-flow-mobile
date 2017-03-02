@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.datapoints.list;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -51,7 +51,6 @@ public class DataPointsListPresenter implements Presenter {
     private final ListDataPointMapper mapper;
     private final UseCase syncDataPoints;
 
-    @Nullable
     private DataPointsListView view;
     private SurveyGroup surveyGroup;
     private int orderBy = ConstantUtil.ORDER_BY_DATE;
@@ -66,13 +65,13 @@ public class DataPointsListPresenter implements Presenter {
         this.syncDataPoints = syncDataPoints;
     }
 
-    public void setView(DataPointsListView view) {
+    public void setView(@NonNull DataPointsListView view) {
         this.view = view;
     }
 
     void onDataReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
-        boolean monitored = surveyGroup == null? false : surveyGroup.isMonitored();
+        boolean monitored = surveyGroup != null && surveyGroup.isMonitored();
         view.displayMenu(monitored);
     }
 
@@ -99,6 +98,7 @@ public class DataPointsListPresenter implements Presenter {
                 }
             }, params);
         } else {
+            //noinspection unchecked
             view.displayData(Collections.EMPTY_LIST);
             view.showNoSurveySelected();
         }

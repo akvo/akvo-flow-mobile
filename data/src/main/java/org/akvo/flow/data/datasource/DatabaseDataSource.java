@@ -84,7 +84,7 @@ public class DatabaseDataSource {
         return Observable.just(apiDataPoints);
     }
 
-    public void syncSurveyedLocale(List<ApiDataPoint> apiDataPoints) {
+    private void syncSurveyedLocale(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null || apiDataPoints.size() == 0) {
             return;
         }
@@ -124,7 +124,7 @@ public class DatabaseDataSource {
      * @param surveyGroupId id of the SurveyGroup
      * @param time          String containing the timestamp
      */
-    public void setSyncTime(long surveyGroupId, String time) {
+    private void setSyncTime(long surveyGroupId, String time) {
         ContentValues values = new ContentValues();
         values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
         values.put(SyncTimeColumns.TIME, time);

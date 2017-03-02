@@ -38,8 +38,9 @@ public class DataPointSyncSnackBarManager {
         View rootView = dataPointSyncView.getRootView();
         if (rootView != null) {
             displaySnackBar(
-                    rootView.getContext().getString(R.string.data_points_sync_success_message,
-                            numberOfSyncedItems));
+                    rootView.getResources()
+                            .getQuantityString(R.plurals.data_points_sync_success_message,
+                                    numberOfSyncedItems, numberOfSyncedItems));
         }
     }
 

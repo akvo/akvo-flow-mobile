@@ -126,7 +126,7 @@
     <string name="please_restart">Please, restart the app</string>
     <!--Empty Views-->
     <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the Flow dashboard</string>
-    <string name="no_records_text">You have no data points yet. Click \'+\' at the top of your screen to add a new data point</string>
+    <string name="no_records_text">You have no data points</string>
     <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
     <!--Activity Labels-->
     <string name="survey_groups_activity">Surveys</string>
@@ -265,6 +265,8 @@
     <string name="locale_list_error_unknown_location">Unknown Location</string>
     <string name="data_points_sync_error_mobile_data_sync">Mobile data sync disabled</string>
     <string name="action_settings">Settings</string>
+    <string name="no_records_subtitle_monitored">Use \'+\' to capture data or \'Sync\' to get existing data</string>
+    <string name="no_records_subtitle_non_monitored">Use \'+\' to capture data.</string>
 
     <!--Verify if this works for wetranslateit-->
     <plurals name="data_points_sync_success_message">

@@ -87,6 +87,8 @@ public class DataPointsListPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
+                    view.displayData(Collections.EMPTY_LIST);
+                    view.showNoDataPoints(surveyGroup.isMonitored());
                 }
 
                 @Override
@@ -94,7 +96,7 @@ public class DataPointsListPresenter implements Presenter {
                     List<ListDataPoint> mapDataPoints = mapper.transform(dataPoints);
                     view.displayData(mapDataPoints);
                     if (mapDataPoints.isEmpty()) {
-                        view.showNoDataPoints();
+                        view.showNoDataPoints(surveyGroup.isMonitored());
                     }
                 }
             }, params);

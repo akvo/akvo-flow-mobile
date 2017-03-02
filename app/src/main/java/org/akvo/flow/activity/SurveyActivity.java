@@ -27,8 +27,6 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -54,11 +52,9 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.presentation.datapoints.DataPointSyncListener;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
-import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
@@ -73,12 +69,10 @@ import java.lang.ref.WeakReference;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.util.ConstantUtil.ACTION_LOCALE_SYNC_RESULT;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener,
-        DataPointSyncListener {
+        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     private static final String DRAWER_FRAGMENT_TAG = "f";
@@ -91,7 +85,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private DrawerFragment mDrawer;
     private CharSequence mDrawerTitle, mTitle;
     private Navigator navigator = new Navigator();
-    private View rootView;
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
 
@@ -100,8 +93,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
      * fired from {@link SurveyDownloadService}.
      */
     private final BroadcastReceiver mSurveysSyncReceiver = new SurveySyncBroadcastReceiver(this);
-    private final BroadcastReceiver dataPointSyncReceiver = new DatapointsSyncResultBroadcastReceiver(
-            this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +110,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         initNavigationDrawer();
 
         initDataPointsFragment(savedInstanceState);
-
-        rootView = findViewById(R.id.content_frame);
 
         prefs = new Prefs(getApplicationContext());
         apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
@@ -232,8 +221,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDatabase.deleteEmptyRecords();
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
-        LocalBroadcastManager.getInstance(this).registerReceiver(dataPointSyncReceiver,
-                new IntentFilter(ACTION_LOCALE_SYNC_RESULT));
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -248,7 +235,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mSurveysSyncReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(dataPointSyncReceiver);
     }
 
     @Override
@@ -403,13 +389,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
     }
 
-    private void onSyncRecordsRequested(long surveyGroupId) {
-        Toast.makeText(this, R.string.syncing_records, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, SurveyedDataPointSyncService.class);
-        intent.putExtra(SurveyedDataPointSyncService.SURVEY_GROUP, surveyGroupId);
-        startService(intent);
-    }
-
     @Override
     public boolean onSearchTap() {
         return onSearchRequested();
@@ -417,92 +396,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void reloadDrawer() {
         mDrawer.load();
-    }
-
-    private void displayResult(Intent intent) {
-        if (intent != null) {
-            int resultCode = intent.getIntExtra(ConstantUtil.EXTRA_DATAPOINT_SYNC_RESULT,
-                    ConstantUtil.DATA_SYNC_RESULT_SUCCESS);
-            int numberSynced = intent.getIntExtra(ConstantUtil.EXTRA_DATAPOINT_NUMBER, 0);
-            switch (resultCode) {
-                case ConstantUtil.DATA_SYNC_RESULT_SUCCESS:
-                    if (numberSynced > 0) {
-                        displaySuccess(numberSynced);
-                    }
-                    break;
-                case ConstantUtil.DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT:
-                    displayErrorAssignment();
-                    break;
-                case ConstantUtil.DATA_SYNC_RESULT_ERROR_NETWORK:
-                    displayErrorNetwork();
-                    break;
-                default:
-                    displayDefaultSyncError();
-                    break;
-            }
-        }
-    }
-
-    private void displayDefaultSyncError() {
-        displaySnackBarWithRetry(R.string.data_points_sync_error_message_default);
-    }
-
-    private void displayErrorNetwork() {
-        displaySnackBarWithRetry(R.string.data_points_sync_error_message_network);
-    }
-
-    private void onDataPointRetryPressed() {
-        if (mSurveyGroup != null) {
-            onSyncRecordsRequested(mSurveyGroup.getId());
-        }
-    }
-
-    private void displayErrorAssignment() {
-        displaySnackBar(getString(R.string.data_points_sync_error_message_assignment));
-    }
-
-    private void displaySuccess(int numberSynced) {
-        displaySnackBar(getString(R.string.data_points_sync_success_message, numberSynced));
-    }
-
-    private void displaySnackBar(String message) {
-        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
-    }
-
-    private void displaySnackBarWithRetry(@StringRes int errorMessage) {
-        Snackbar.make(rootView, getString(errorMessage), Snackbar.LENGTH_LONG)
-                .setAction(R.string.retry, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onDataPointRetryPressed();
-                    }
-                })
-                .show();
-    }
-
-    @Override
-    public void showSyncedResults(int numberOfSyncedItems) {
-        displaySuccess(numberOfSyncedItems);
-    }
-
-    @Override
-    public void showErrorSyncNotAllowed() {
-        //TODO: add
-    }
-
-    @Override
-    public void showErrorNoNetwork() {
-        displayErrorNetwork();
-    }
-
-    @Override
-    public void showErrorSync() {
-        displayDefaultSyncError();
-    }
-
-    @Override
-    public void showErrorAssignmentMissing() {
-        displayErrorAssignment();
     }
 
     static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
@@ -519,23 +412,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             SurveyActivity surveyActivity = activityWeakReference.get();
             if (surveyActivity != null) {
                 surveyActivity.reloadDrawer();
-            }
-        }
-    }
-
-    static class DatapointsSyncResultBroadcastReceiver extends BroadcastReceiver {
-
-        private final WeakReference<SurveyActivity> activityWeakReference;
-
-        DatapointsSyncResultBroadcastReceiver(SurveyActivity activity) {
-            this.activityWeakReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            SurveyActivity surveyActivity = activityWeakReference.get();
-            if (surveyActivity != null) {
-                surveyActivity.displayResult(intent);
             }
         }
     }

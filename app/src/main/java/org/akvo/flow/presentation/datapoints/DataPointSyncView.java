@@ -20,15 +20,13 @@
 
 package org.akvo.flow.presentation.datapoints;
 
-public interface DataPointSyncListener {
+import android.view.View;
 
-    void showSyncedResults(int numberOfSyncedItems);
+public interface DataPointSyncView {
 
-    void showErrorSyncNotAllowed();
+    void onRetryRequested();
 
-    void showErrorNoNetwork();
+    View getRootView();
 
-    void showErrorSync();
-
-    void showErrorAssignmentMissing();
+    void onSettingsPressed();
 }

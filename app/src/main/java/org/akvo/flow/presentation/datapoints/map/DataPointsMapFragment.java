@@ -54,8 +54,10 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.datapoints.DataPointSyncListener;
+import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
+import org.akvo.flow.presentation.datapoints.DataPointSyncView;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -66,7 +68,7 @@ import javax.inject.Inject;
 
 public class DataPointsMapFragment extends SupportMapFragment
         implements OnInfoWindowClickListener, OnMapReadyCallback,
-        DataPointsMapView {
+        DataPointsMapView, DataPointSyncView {
 
     public static final int MAP_ZOOM_LEVEL = 10;
     public static final String MAP_OPTIONS = "MapOptions";
@@ -74,8 +76,8 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Nullable
     private RecordListListener mListener;
 
-    @Nullable
-    private DataPointSyncListener dataPointsSyncListener;
+    private DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
+            this);
 
     private List<MapDataPoint> mItems;
 
@@ -89,6 +91,9 @@ public class DataPointsMapFragment extends SupportMapFragment
 
     @Inject
     DataPointsMapPresenter presenter;
+
+    @Inject
+    Navigator navigator;
 
     private ClusterManager<MapDataPoint> mClusterManager;
 
@@ -121,10 +126,6 @@ public class DataPointsMapFragment extends SupportMapFragment
             throw new ClassCastException(
                     activity.toString() + " must implement RecordListListener");
         }
-        if (!(activity instanceof DataPointSyncListener)) {
-            throw new IllegalArgumentException("Activity must implement DataPointsSyncListener");
-        }
-        this.dataPointsSyncListener = (DataPointSyncListener) activity;
     }
 
     @Override
@@ -261,7 +262,6 @@ public class DataPointsMapFragment extends SupportMapFragment
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        dataPointsSyncListener = null;
     }
 
     @Override
@@ -346,36 +346,41 @@ public class DataPointsMapFragment extends SupportMapFragment
 
     @Override
     public void showSyncedResults(int numberOfSyncedItems) {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showSyncedResults(numberOfSyncedItems);
-        }
+        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems);
     }
 
     @Override
     public void showErrorAssignmentMissing() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorAssignmentMissing();
-        }
+        dataPointSyncSnackBarManager.showErrorAssignmentMissing();
     }
 
     @Override
     public void showErrorSyncNotAllowed() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorSyncNotAllowed();
-        }
+        dataPointSyncSnackBarManager.showErrorSyncNotAllowed();
     }
 
     @Override
     public void showErrorNoNetwork() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorNoNetwork();
-        }
+        dataPointSyncSnackBarManager.showErrorNoNetwork();
     }
 
     @Override
     public void showErrorSync() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorSync();
-        }
+       dataPointSyncSnackBarManager.showErrorSync();
+    }
+
+    @Override
+    public void onRetryRequested() {
+        presenter.onSyncRecordsPressed();
+    }
+
+    @Override
+    public View getRootView() {
+        return getView();
+    }
+
+    @Override
+    public void onSettingsPressed() {
+        navigator.navigateToPreferences(getActivity());
     }
 }

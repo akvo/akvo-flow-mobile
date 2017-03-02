@@ -230,8 +230,6 @@ public class ConstantUtil {
     public static final String CADDISFLY_MIME = "text/plain";
 
     //broadcasts
-    public static final String ACTION_LOCALE_SYNC_UPDATE = "fieldsurvey.ACTION_LOCALES_SYNC_UPDATE";
-    public static final String ACTION_LOCALE_SYNC_RESULT = "fieldsurvey.ACTION_LOCALES_SYNC_RESULT";
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
     public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 

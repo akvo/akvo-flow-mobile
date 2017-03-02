@@ -53,8 +53,10 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.datapoints.DataPointSyncListener;
+import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
+import org.akvo.flow.presentation.datapoints.DataPointSyncView;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -68,7 +70,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 public class DataPointsListFragment extends Fragment implements LocationListener,
-        OnItemClickListener, OrderByDialogListener, DataPointsListView {
+        OnItemClickListener, OrderByDialogListener, DataPointsListView, DataPointSyncView {
 
     private LocationManager mLocationManager;
     private Double mLatitude = null;
@@ -85,7 +87,12 @@ public class DataPointsListFragment extends Fragment implements LocationListener
      * fired from {@link org.akvo.flow.service.DataSyncService}
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
-    private DataPointSyncListener dataPointsSyncListener;
+
+    private DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
+            this);
+
+    @Inject
+    Navigator navigator;
 
     @Inject
     DataPointsListPresenter presenter;
@@ -118,12 +125,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             throw new ClassCastException(activity.toString()
                     + " must implement SurveyedLocalesFragmentListener");
         }
-        if (!(activity instanceof DataPointSyncListener)) {
-            throw new IllegalArgumentException("Activity must implement DataPointsSyncListener");
-        }
-        this.dataPointsSyncListener = (DataPointSyncListener) activity;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -170,7 +172,6 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -212,7 +213,6 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        dataPointsSyncListener = null;
     }
 
     @Override
@@ -353,38 +353,42 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showSyncedResults(int numberOfSyncedItems) {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showSyncedResults(numberOfSyncedItems);
-        }
+        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems);
     }
-
 
     @Override
     public void showErrorAssignmentMissing() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorAssignmentMissing();
-        }
+        dataPointSyncSnackBarManager.showErrorAssignmentMissing();
     }
 
     @Override
     public void showErrorSyncNotAllowed() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorSyncNotAllowed();
-        }
+        dataPointSyncSnackBarManager.showErrorSyncNotAllowed();
     }
 
     @Override
     public void showErrorNoNetwork() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorNoNetwork();
-        }
+        dataPointSyncSnackBarManager.showErrorNoNetwork();
     }
 
     @Override
     public void showErrorSync() {
-        if (dataPointsSyncListener != null) {
-            dataPointsSyncListener.showErrorSync();
-        }
+        dataPointSyncSnackBarManager.showErrorSync();
+    }
+
+    @Override
+    public void onRetryRequested() {
+        presenter.onSyncRecordsPressed();
+    }
+
+    @Override
+    public View getRootView() {
+        return getView();
+    }
+
+    @Override
+    public void onSettingsPressed() {
+        navigator.navigateToPreferences(getActivity());
     }
 
     //TODO: once we insert data using brite database this will no longer be necessary either

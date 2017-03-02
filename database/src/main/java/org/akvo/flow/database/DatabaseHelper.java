@@ -62,7 +62,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
-    private WeakReference<Context> contextWeakReference;
+    private final WeakReference<Context> contextWeakReference;
     private final LanguageTable languageTable;
 
     public DatabaseHelper(Context context, LanguageTable languageTable) {
@@ -158,7 +158,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
+        Timber.d("Upgrading database from version %d to %d", oldVersion, newVersion);
 
         Context context = contextWeakReference.get();
         if (oldVersion < VER_PREFERENCES_MIGRATE && context != null) {

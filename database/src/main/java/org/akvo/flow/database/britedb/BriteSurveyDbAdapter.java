@@ -40,7 +40,6 @@ import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
-import timber.log.Timber;
 
 import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
 import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
@@ -118,15 +117,15 @@ public class BriteSurveyDbAdapter {
                         });
     }
 
-    //TODO: select only useful columns
     public Observable<Cursor> getSurveyedLocales(long surveyGroupId) {
         String sqlQuery =
                 "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
                         + " = ?";
         return briteDatabase.createQuery(Tables.RECORD, sqlQuery,
-                new String[] { String.valueOf(surveyGroupId) }).concatMap(
+                String.valueOf(surveyGroupId)).concatMap(
                 new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
-                    @Override public Observable<? extends Cursor> call(SqlBrite.Query query) {
+                    @Override
+                    public Observable<? extends Cursor> call(SqlBrite.Query query) {
                         return Observable.just(query.run());
                     }
                 });
@@ -140,21 +139,16 @@ public class BriteSurveyDbAdapter {
         values.put(RecordColumns.LAST_MODIFIED, timestamp);
         briteDatabase.update(Tables.RECORD, values,
                 RecordColumns.RECORD_ID + " = ? AND " + RecordColumns.LAST_MODIFIED + " < ?",
-                new String[] { recordId, String.valueOf(timestamp) });
+                recordId, String.valueOf(timestamp));
     }
 
     public void updateSurveyedLocale(String surveyedLocaleId, ContentValues surveyedLocaleValues) {
-        briteDatabase.update(Tables.RECORD, surveyedLocaleValues,
-                RecordColumns.RECORD_ID + " = ?",
-                new String[] { surveyedLocaleId });
-    }
-
-    private void insertRecord(ContentValues values) {
-        briteDatabase.insert(Tables.RECORD, values);
+        briteDatabase.update(Tables.RECORD, surveyedLocaleValues, RecordColumns.RECORD_ID + " = ?",
+                surveyedLocaleId);
     }
 
     public void updateRecord(String id, ContentValues values, long lastModified) {
-        insertRecord(values); //TODO: should it be insert or update??
+        briteDatabase.insert(Tables.RECORD, values);
         // Update the record last modification date, if necessary
         updateRecordModifiedDate(id, lastModified);
     }
@@ -170,7 +164,7 @@ public class BriteSurveyDbAdapter {
                 "SELECT " + SyncTimeColumns.SURVEY_GROUP_ID + "," + SyncTimeColumns.TIME + " FROM "
                         + Tables.SYNC_TIME + " WHERE " + SyncTimeColumns.SURVEY_GROUP_ID
                         + " = ?";
-        return briteDatabase.query(sql, new String[] { String.valueOf(surveyGroupId) });
+        return briteDatabase.query(sql, String.valueOf(surveyGroupId));
     }
 
     public void insertSyncedTime(ContentValues values) {
@@ -179,18 +173,20 @@ public class BriteSurveyDbAdapter {
 
     public long syncSurveyInstance(ContentValues values, String surveyInstanceUuid) {
         String sql =
-                "SELECT * FROM "
+                "SELECT " + SurveyInstanceColumns._ID + "," + SurveyInstanceColumns.UUID + " FROM "
                         + Tables.SURVEY_INSTANCE + " WHERE " + SurveyInstanceColumns.UUID + " = ?";
-        Cursor cursor = briteDatabase.query(sql, new String[] { surveyInstanceUuid });
+        Cursor cursor = briteDatabase.query(sql, surveyInstanceUuid);
 
         long id = DOES_NOT_EXIST;
-        if (cursor.moveToFirst()) {
-            id = cursor.getLong(0);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                id = cursor.getLong(0);
+            }
+            cursor.close();
         }
-        cursor.close();
         if (id != DOES_NOT_EXIST) {
             briteDatabase.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
-                    + " = ?", new String[] { surveyInstanceUuid });
+                    + " = ?", surveyInstanceUuid);
         } else {
             values.put(SurveyInstanceColumns.UUID, surveyInstanceUuid);
             id = briteDatabase.insert(Tables.SURVEY_INSTANCE, values);
@@ -202,14 +198,13 @@ public class BriteSurveyDbAdapter {
         return briteDatabase.newTransaction();
     }
 
-    //TODO: make sure it works
     public void syncResponse(long surveyInstanceId, ContentValues values, String questionId) {
         boolean exists = responseExists(surveyInstanceId, questionId);
         if (exists) {
             briteDatabase.update(Tables.RESPONSE, values,
                     ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
                             + ResponseColumns.QUESTION_ID + " = ?",
-                    new String[] { String.valueOf(surveyInstanceId), questionId });
+                    String.valueOf(surveyInstanceId), questionId);
         } else {
             briteDatabase.insert(Tables.RESPONSE, values);
         }
@@ -225,12 +220,13 @@ public class BriteSurveyDbAdapter {
                         + ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
                         + ResponseColumns.QUESTION_ID + " = ?";
         Cursor cursor = briteDatabase
-                .query(sql, new String[] { String.valueOf(surveyInstanceId), questionId });
+                .query(sql, String.valueOf(surveyInstanceId), questionId);
 
-        boolean exists = cursor.getCount() > 0;
-        Timber.d("Survey instance id %s exists? %s", String.valueOf(surveyInstanceId),
-                String.valueOf(exists));
-        cursor.close();
+        boolean exists = false;
+        if (cursor != null) {
+            exists = cursor.getCount() > 0;
+            cursor.close();
+        }
         return exists;
     }
 

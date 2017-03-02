@@ -27,6 +27,7 @@ import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.SyncResult;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
@@ -109,7 +110,7 @@ public class DataPointsMapPresenter implements Presenter{
 
     private void syncRecords(final long surveyGroupId) {
         Map<String, Long> params = new HashMap<>(2);
-        params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
         syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {
 
             @Override

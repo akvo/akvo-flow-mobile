@@ -110,6 +110,11 @@ public class DatabaseDataSource {
         }
     }
 
+    /**
+     * JSON array responses are ordered to have the latest updated datapoint last so
+     * we record it to make the next query using it
+     * @param apiDataPoints
+     */
     private void updateLastUpdatedDateTime(List<ApiDataPoint> apiDataPoints) {
         ApiDataPoint surveyedLocale = apiDataPoints.get(apiDataPoints.size() - 1);
         if (surveyedLocale != null) {
@@ -145,7 +150,6 @@ public class DatabaseDataSource {
 
             long id = briteSurveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
 
-            // Now the responses...
             syncResponses(surveyInstance.getQasList(), id);
 
             // The filename is a unique column in the transmission table, and as we do not have

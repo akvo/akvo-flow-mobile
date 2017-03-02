@@ -28,7 +28,7 @@ import static org.akvo.flow.database.Constants.SURVEY_LANG_SETTING_KEY;
 
 public class LanguagesExtractor {
 
-    final PreferenceHandler preferenceHandler = new PreferenceHandler();
+    private final PreferenceHandler preferenceHandler = new PreferenceHandler();
 
     public LanguagesExtractor() {
     }

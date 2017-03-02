@@ -57,8 +57,6 @@ public class SurveyDbAdapter {
             "survey LEFT OUTER JOIN survey_instance ON "
                     + "survey.survey_id=survey_instance.survey_id";
 
-    private static final int DOES_NOT_EXIST = -1;
-
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
@@ -153,7 +151,7 @@ public class SurveyDbAdapter {
                 new String[] { String.valueOf(surveyInstanceId) });
 
         if (rows < 1) {
-            Timber.e("Could not update status for Survey Instance: " + surveyInstanceId);
+            Timber.e("Could not update status for Survey Instance: %d", surveyInstanceId);
         }
     }
 
@@ -307,7 +305,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         surveyId
                 }) < 1) {
-            Timber.e("Could not update record for Survey " + surveyId);
+            Timber.e("Could not update record for Survey %s", surveyId);
         }
     }
 

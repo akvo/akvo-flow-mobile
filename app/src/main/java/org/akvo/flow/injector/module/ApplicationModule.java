@@ -27,6 +27,7 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
@@ -48,6 +49,9 @@ import rx.schedulers.Schedulers;
 public class ApplicationModule {
 
     private final FlowApp application;
+
+    private static final String PREFS_NAME = "flow_prefs";
+    private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
     public ApplicationModule(FlowApp application) {
         this.application = application;
@@ -101,5 +105,12 @@ public class ApplicationModule {
         BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
         db.setLoggingEnabled(false);
         return db;
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferencesDataSource provideSharedPreferences() {
+        return new SharedPreferencesDataSource(
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
     }
 }

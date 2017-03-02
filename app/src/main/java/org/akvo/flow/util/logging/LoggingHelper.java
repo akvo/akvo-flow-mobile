@@ -82,7 +82,6 @@ public abstract class LoggingHelper {
     @Nullable
     String getSentryDsn(Resources resources) {
         final PropertyUtil props = new PropertyUtil(resources);
-        String sentryDsn = props.getProperty(ConstantUtil.SENTRY_DSN);
-        return sentryDsn;
+        return props.getProperty(ConstantUtil.SENTRY_DSN);
     }
 }

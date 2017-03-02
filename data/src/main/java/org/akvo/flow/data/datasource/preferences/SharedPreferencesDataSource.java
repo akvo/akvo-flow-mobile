@@ -20,6 +20,8 @@
 
 package org.akvo.flow.data.datasource.preferences;
 
+import android.content.SharedPreferences;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -28,23 +30,58 @@ import rx.Observable;
 @Singleton
 public class SharedPreferencesDataSource {
 
-    public static final String KEY_APK_DATA = "apk_data";
-    public static final String KEY_APP_UPDATE_LAST_NOTIFIED = "update_notified_last_time";
-    public static final long NOT_NOTIFIED = -1;
+    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    public static final String KEY_BACKEND_SERVER = "backend.server";
 
-    private final Prefs preferences;
+    private final SharedPreferences preferences;
 
     @Inject
-    public SharedPreferencesDataSource(Prefs prefs) {
+    public SharedPreferencesDataSource(SharedPreferences prefs) {
         this.preferences = prefs;
     }
 
     public Observable<Boolean> mobileSyncEnabled() {
-        return Observable.just(preferences
-                .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD));
+        return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
     }
 
     public Observable<String> getBaseUrl() {
-        return Observable.just(preferences.getString(Prefs.KEY_BACKEND_SERVER, null));
+        return Observable.just(preferences.getString(KEY_BACKEND_SERVER, null));
+    }
+
+    public String getString(String key, String defValue) {
+        return preferences.getString(key, defValue);
+    }
+
+    public void setString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
+    }
+
+    public boolean getBoolean(String key, boolean defValue) {
+        return preferences.getBoolean(key, defValue);
+    }
+
+    public void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
+    }
+
+    public long getLong(String key, long defValue) {
+        return preferences.getLong(key, defValue);
+    }
+
+    public void setLong(String key, long value) {
+        preferences.edit().putLong(key, value).apply();
+    }
+
+    public int getInt(String key, int defValue) {
+        return preferences.getInt(key, defValue);
+    }
+
+    public void setInt(String key, int value) {
+        preferences.edit().putInt(key, value).apply();
+    }
+
+    public void removePreference(String key) {
+        preferences.edit().remove(key).apply();
     }
 }

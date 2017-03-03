@@ -24,7 +24,6 @@ import java.util.List;
 
 public class ApiSurveyInstance {
 
-    //TODO: should be a string??
     private long surveyId;
     private String submitter;
     private long collectionDate;

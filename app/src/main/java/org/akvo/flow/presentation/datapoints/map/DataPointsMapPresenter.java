@@ -44,7 +44,7 @@ import timber.log.Timber;
 
 import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
 
-public class DataPointsMapPresenter implements Presenter{
+public class DataPointsMapPresenter implements Presenter {
 
     private final UseCase getSavedDataPoints;
     private final MapDataPointMapper mapper;

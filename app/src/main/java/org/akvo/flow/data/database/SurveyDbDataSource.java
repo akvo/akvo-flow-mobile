@@ -459,10 +459,6 @@ public class SurveyDbDataSource {
         surveyDbAdapter.reinstallTestSurvey();
     }
 
-    public String getSyncTime(long surveyGroupId) {
-        return surveyDbAdapter.getSyncTime(surveyGroupId);
-    }
-
     public void deleteEmptyRecords() {
         surveyDbAdapter.deleteEmptyRecords();
     }

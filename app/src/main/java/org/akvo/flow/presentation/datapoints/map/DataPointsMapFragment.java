@@ -66,9 +66,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class DataPointsMapFragment extends SupportMapFragment
-        implements OnInfoWindowClickListener, OnMapReadyCallback,
-        DataPointsMapView, DataPointSyncView {
+public class DataPointsMapFragment extends SupportMapFragment implements OnInfoWindowClickListener,
+        OnMapReadyCallback, DataPointsMapView, DataPointSyncView {
 
     private static final int MAP_ZOOM_LEVEL = 10;
     private static final String MAP_OPTIONS = "MapOptions";

@@ -24,10 +24,6 @@ public class Constants {
     public static final int IMAGE_SIZE_320_240 = 0;
     public static final long SURVEY_GROUP_ID_NONE = -1;
 
-    /**
-     * Order By
-     */
-    public static final int ORDER_BY_NONE = -1;
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
     public static final int ORDER_BY_STATUS = 2;
@@ -42,7 +38,6 @@ public class Constants {
      * settings keys
      */
     public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
-    public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";

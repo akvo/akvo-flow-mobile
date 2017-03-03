@@ -38,14 +38,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbDataSource;
-import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.data.dao.SurveyDao;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.database.SurveyInstanceStatus;
+import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
-import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.migration.preferences.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -60,9 +60,9 @@ import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
 

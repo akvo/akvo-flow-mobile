@@ -21,13 +21,10 @@
 package org.akvo.flow.injector.component;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
 
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
@@ -53,12 +50,6 @@ public interface ApplicationComponent {
     SurveyRepository surveyRepository();
 
     UserRepository userRepository();
-
-    SharedPreferencesDataSource provideSharedPreferences();
-
-    SQLiteOpenHelper provideOpenHelper();
-
-    SqlBrite provideSqlBrite();
 
     BriteDatabase provideDatabase();
 

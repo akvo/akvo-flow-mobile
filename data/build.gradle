@@ -28,7 +28,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':domain')
     compile project(path: ':database')
-    testCompile 'junit:junit:4.12'
+
     apt 'com.google.dagger:dagger-compiler:2.4'
     compile 'com.google.dagger:dagger:2.4'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'

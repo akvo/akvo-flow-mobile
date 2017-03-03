@@ -2,4 +2,5 @@
 <resources>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBPyguWZrQi2xcqs49WajwQ6FYeSHpaEFQ</string>
     <string name="app_name">Akvo Flow</string>
+    <string name="sentry_dsn">https://3c2f0307fa7649de95bce7c9b1ccc486:27546384199147b78d15aba2e6b31e6b@sentry.io/141161</string>
 </resources>

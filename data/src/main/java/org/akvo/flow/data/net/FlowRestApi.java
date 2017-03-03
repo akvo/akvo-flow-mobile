@@ -62,8 +62,6 @@ public class FlowRestApi {
 
     public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
-        Timber.d("loadNewDataPoints with args: surveyGroup: %d, timestamp: %s", surveyGroup,
-                timestamp);
         return RestServiceFactory.createRetrofitService(baseUrl, FlowApiService.class)
                 .loadNewDataPoints(buildSyncUrl(baseUrl, apiKey, surveyGroup, timestamp));
     }
@@ -137,11 +135,6 @@ public class FlowRestApi {
     interface Path {
 
         String SURVEYED_LOCALE = "surveyedlocale";
-        String NOTIFICATION = "processor";
-        String SURVEY_LIST_SERVICE = "surveymanager";
-        String SURVEY_HEADER_SERVICE = "surveymanager";
-        String DEVICE_NOTIFICATION = "devicenotification";
-        String TIME_CHECK = "devicetimerest";
     }
 
     interface Param {
@@ -153,17 +146,7 @@ public class FlowRestApi {
         String LAST_UPDATED = "lastUpdateTime";
         String HMAC = "h";
         String VERSION = "ver";
-        String DEVICE_ID = "devId";
         String ANDROID_ID = "androidId";
-
-        String PARAM_ACTION = "action";
-        String FORM_ID = "formID";
-        String SURVEY_ID = "surveyId";
-        String FILENAME = "fileName";
-
-        String VALUE_HEADER = "getSurveyHeader";
-        String VALUE_SURVEY = "getAvailableSurveysDevice";
-
         String SEPARATOR = "&";
         String EQUALS = "=";
     }

@@ -161,11 +161,9 @@ public class ConstantUtil {
      * property file keys
      */
     public static final String SERVER_BASE = "serverBase";
-    public static final String API_KEY = "apiKey";
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";
-    public static final String SENTRY_DSN = "sentryDsn";
 
     /**
      * S3 bucket directories (object prefixes)
@@ -191,11 +189,8 @@ public class ConstantUtil {
     /**
      * Order By
      */
-    public static final int ORDER_BY_NONE = -1;
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
 
     /**
      * Max picture size

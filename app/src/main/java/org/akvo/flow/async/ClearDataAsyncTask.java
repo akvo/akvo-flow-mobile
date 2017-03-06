@@ -25,6 +25,9 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -43,10 +46,13 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private SurveyDbAdapter mDatabase;
 
     public ClearDataAsyncTask(Context context) {
-        mWeakContext = new WeakReference<Context>(context);
+        mWeakContext = new WeakReference<>(context);
         // Use the Application Context to be held by the Database
         // This will allow the current Activity to be GC if it's finished
-        mDatabase = new SurveyDbAdapter(context.getApplicationContext());
+        Context applicationContext = context.getApplicationContext();
+        mDatabase = new SurveyDbAdapter(applicationContext,
+                new FlowMigrationListener(new Prefs(applicationContext),
+                        new MigrationLanguageMapper(applicationContext)));
     }
 
     @Override

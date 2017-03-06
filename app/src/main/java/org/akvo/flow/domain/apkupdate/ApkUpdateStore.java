@@ -21,7 +21,7 @@ package org.akvo.flow.domain.apkupdate;
 
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 

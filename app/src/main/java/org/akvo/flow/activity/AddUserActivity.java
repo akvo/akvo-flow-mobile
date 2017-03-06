@@ -20,6 +20,7 @@
 package org.akvo.flow.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -33,8 +34,10 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.migration.preferences.Prefs;
 import org.akvo.flow.domain.User;
 
 public class AddUserActivity extends Activity implements TextWatcher, TextView.OnEditorActionListener {
@@ -71,10 +74,15 @@ public class AddUserActivity extends Activity implements TextWatcher, TextView.O
     private void saveUserData() {
         String username = mName.getText().toString().trim();
         String deviceId = mID.getText().toString().trim();
-        SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
+        Context context = getApplicationContext();
+        Prefs prefs = new Prefs(context);
+        SurveyDbAdapter db = new SurveyDbAdapter(context,
+                new FlowMigrationListener(prefs,
+                        new MigrationLanguageMapper(context)));
+        db.open();
         long uid = db.createOrUpdateUser(null, username);
         db.close();
-        Prefs prefs = new Prefs(getApplicationContext());
+
         prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
 
         // Select the newly created user, and exit the Activity

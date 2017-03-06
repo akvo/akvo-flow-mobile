@@ -24,7 +24,7 @@ import android.content.Intent;
 
 import org.akvo.flow.activity.TimeCheckActivity;
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConnectivityStateManager;
 
 import java.io.IOException;

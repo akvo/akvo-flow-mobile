@@ -23,7 +23,7 @@ package org.akvo.flow.util;
 import android.content.Context;
 import android.text.TextUtils;
 
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 
 public class ServerManager {
 

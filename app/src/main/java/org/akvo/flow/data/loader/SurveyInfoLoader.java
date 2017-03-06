@@ -24,12 +24,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.util.Pair;
 
+import org.akvo.flow.data.loader.base.AsyncLoader;
+import org.akvo.flow.data.loader.models.SurveyInfo;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.Tables;
-import org.akvo.flow.data.loader.base.AsyncLoader;
-import org.akvo.flow.data.loader.models.SurveyInfo;
 import org.akvo.flow.domain.SurveyGroup;
 
 import java.util.ArrayList;
@@ -60,7 +63,9 @@ public class SurveyInfoLoader extends AsyncLoader<Pair<List<SurveyInfo>, Boolean
             table +=  " AND " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID
                     + "='" + mRecordId + "'";
         }
-        SurveyDbAdapter database = new SurveyDbAdapter(getContext());
+        Context context = getContext();
+        SurveyDbAdapter database = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
         database.open();
         Cursor cursor = database.query(table,
                 SurveyQuery.PROJECTION,

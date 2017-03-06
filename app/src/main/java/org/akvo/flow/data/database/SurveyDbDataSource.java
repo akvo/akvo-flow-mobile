@@ -27,6 +27,9 @@ import android.database.SQLException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -60,7 +63,8 @@ public class SurveyDbDataSource {
     private final SurveyDbAdapter surveyDbAdapter;
 
     public SurveyDbDataSource(Context context) {
-        surveyDbAdapter = new SurveyDbAdapter(context);
+        this.surveyDbAdapter = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
     }
 
     /**

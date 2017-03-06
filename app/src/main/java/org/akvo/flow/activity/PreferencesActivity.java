@@ -34,7 +34,7 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;

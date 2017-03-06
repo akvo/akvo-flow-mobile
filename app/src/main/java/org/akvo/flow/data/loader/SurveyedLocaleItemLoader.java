@@ -22,9 +22,12 @@ package org.akvo.flow.data.loader;
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.SurveyedLocaleMapper;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
 
 public class SurveyedLocaleItemLoader extends AsyncLoader<SurveyedLocale> {
@@ -40,7 +43,10 @@ public class SurveyedLocaleItemLoader extends AsyncLoader<SurveyedLocale> {
 
     @Override
     public SurveyedLocale loadInBackground() {
-        SurveyDbAdapter db = new SurveyDbAdapter(getContext()).open();
+        Context context = getContext();
+        SurveyDbAdapter db = new SurveyDbAdapter(context, new FlowMigrationListener(
+                new Prefs(context), new MigrationLanguageMapper(context)));
+        db.open();
         SurveyedLocale datapoint = null;
         Cursor cursor = db.getSurveyedLocale(datapointId);
         db.close();

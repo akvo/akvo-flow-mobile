@@ -23,7 +23,7 @@ import android.content.Context;
 
 import com.joshdholtz.sentry.PostPermissionVerifier;
 
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConnectivityStateManager;
 
 public class FlowPostPermissionVerifier extends PostPermissionVerifier {

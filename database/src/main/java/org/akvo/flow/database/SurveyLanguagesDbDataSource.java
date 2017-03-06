@@ -38,8 +38,8 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
 
     private final DatabaseHelper databaseHelper;
 
-    public SurveyLanguagesDbDataSource(Context context) {
-        this.databaseHelper = new DatabaseHelper(context, new LanguageTable());
+    public SurveyLanguagesDbDataSource(Context context, MigrationListener migrationListener) {
+        this.databaseHelper = new DatabaseHelper(context, new LanguageTable(), migrationListener);
     }
 
     @Override

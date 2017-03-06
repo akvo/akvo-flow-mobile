@@ -27,7 +27,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.response.SurveyedLocalesResponse;

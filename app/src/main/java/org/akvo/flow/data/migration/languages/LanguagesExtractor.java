@@ -23,8 +23,7 @@ package org.akvo.flow.data.migration.languages;
 import android.database.sqlite.SQLiteDatabase;
 
 import org.akvo.flow.database.PreferenceHandler;
-
-import static org.akvo.flow.database.Constants.SURVEY_LANG_SETTING_KEY;
+import org.akvo.flow.util.ConstantUtil;
 
 public class LanguagesExtractor {
 
@@ -34,6 +33,6 @@ public class LanguagesExtractor {
     }
 
     public String retrieveLanguages(SQLiteDatabase db) {
-        return preferenceHandler.findPreference(db, SURVEY_LANG_SETTING_KEY);
+        return preferenceHandler.findPreference(db, ConstantUtil.SURVEY_LANG_SETTING_KEY);
     }
 }

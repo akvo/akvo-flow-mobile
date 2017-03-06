@@ -20,18 +20,16 @@
 
 package org.akvo.flow.data.datasource.preferences;
 
+import android.content.SharedPreferences;
+
 import javax.inject.Inject;
 
 public class SharedPreferencesDataSource {
 
-    public static final String KEY_APK_DATA = "apk_data";
-    public static final String KEY_APP_UPDATE_LAST_NOTIFIED = "update_notified_last_time";
-    public static final long NOT_NOTIFIED = -1;
-
-    private final Prefs preferences;
+    private final SharedPreferences preferences;
 
     @Inject
-    public SharedPreferencesDataSource(Prefs prefs) {
+    public SharedPreferencesDataSource(SharedPreferences prefs) {
         this.preferences = prefs;
     }
 }

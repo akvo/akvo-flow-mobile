@@ -27,7 +27,7 @@ import android.support.v4.util.Pair;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConnectivityStateManager;

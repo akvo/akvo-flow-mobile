@@ -29,6 +29,9 @@ import android.text.TextUtils;
 
 import com.squareup.sqlbrite.BriteDatabase;
 
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -65,7 +68,9 @@ public class SurveyDbDataSource {
     @Inject
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(briteDatabase);
-        this.surveyDbAdapter = new SurveyDbAdapter(context);
+        this.surveyDbAdapter = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context),
+                        new MigrationLanguageMapper(context)));
     }
 
     /**
@@ -78,7 +83,7 @@ public class SurveyDbDataSource {
     }
 
     /**
-     * close the briteSurveyDbAdapter
+     * close the db
      */
     public void close() {
         surveyDbAdapter.close();
@@ -195,7 +200,7 @@ public class SurveyDbDataSource {
 
     /**
      * returns a list of survey objects that are out of date (missing from the
-     * briteSurveyDbAdapter or with a lower version number). If a survey is present but marked as
+     * db or with a lower version number). If a survey is present but marked as
      * deleted, it will not be listed as out of date (and thus won't be updated)
      *
      * @param surveys
@@ -218,7 +223,7 @@ public class SurveyDbDataSource {
     }
 
     /**
-     * updates a survey in the briteSurveyDbAdapter and resets the deleted flag to "N"
+     * updates a survey in the db and resets the deleted flag to "N"
      *
      * @param survey
      * @return
@@ -248,7 +253,7 @@ public class SurveyDbDataSource {
     }
 
     /**
-     * Gets a single survey from the briteSurveyDbAdapter using its survey id
+     * Gets a single survey from the db using its survey id
      */
     public Survey getSurvey(String surveyId) {
         Survey survey = null;

@@ -18,22 +18,13 @@
  *
  */
 
-package org.akvo.flow.database.migration.languages;
+package org.akvo.flow.database;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import org.akvo.flow.database.PreferenceHandler;
+public interface MigrationListener {
 
-import static org.akvo.flow.database.Constants.SURVEY_LANG_SETTING_KEY;
+    void migrateLanguages(SQLiteDatabase db);
 
-public class LanguagesExtractor {
-
-    private final PreferenceHandler preferenceHandler = new PreferenceHandler();
-
-    public LanguagesExtractor() {
-    }
-
-    public String retrieveLanguages(SQLiteDatabase db) {
-        return preferenceHandler.findPreference(db, SURVEY_LANG_SETTING_KEY);
-    }
+    void migratePreferences(SQLiteDatabase db);
 }

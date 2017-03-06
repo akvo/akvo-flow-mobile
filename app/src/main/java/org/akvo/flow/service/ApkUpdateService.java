@@ -28,7 +28,7 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;

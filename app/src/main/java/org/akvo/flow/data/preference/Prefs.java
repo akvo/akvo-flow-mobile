@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,13 +18,14 @@
  *
  */
 
-package org.akvo.flow.database.migration.preferences;
+package org.akvo.flow.data.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.migration.preferences.InsertablePreferences;
 import org.akvo.flow.database.Constants;
 
 /**

@@ -61,6 +61,7 @@ public class SurveyDbAdapter {
     private SQLiteDatabase database;
 
     private final Context context;
+    private final MigrationListener migrationListener;
 
     /**
      * Constructor - takes the context to allow the database to be
@@ -68,8 +69,9 @@ public class SurveyDbAdapter {
      *
      * @param ctx the Context within which to work
      */
-    public SurveyDbAdapter(Context ctx) {
+    public SurveyDbAdapter(Context ctx, MigrationListener migrationListener) {
         this.context = ctx;
+        this.migrationListener = migrationListener;
     }
 
     /**
@@ -78,7 +80,7 @@ public class SurveyDbAdapter {
      * @throws SQLException if the database could be neither opened or created
      */
     public SurveyDbAdapter open() throws SQLException {
-        databaseHelper = new DatabaseHelper(context, new LanguageTable());
+        databaseHelper = new DatabaseHelper(context, new LanguageTable(), migrationListener);
         database = databaseHelper.getWritableDatabase();
         return this;
     }

@@ -18,10 +18,12 @@
  *
  */
 
-package org.akvo.flow.database.migration.preferences;
+package org.akvo.flow.data.migration.preferences;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
+import org.akvo.flow.data.preference.Prefs;
 
 public class PreferenceMapper {
 

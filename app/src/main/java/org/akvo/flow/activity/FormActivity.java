@@ -20,6 +20,7 @@
 
 package org.akvo.flow.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -41,12 +42,14 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -137,10 +140,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mQuestionResponses = new HashMap<>();
         mDatabase.open();
 
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(getApplicationContext());
+        Context context = getApplicationContext();
+        prefs = new Prefs(context);
+        languageMapper = new LanguageMapper(context);
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context, new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
 
-        prefs = new Prefs(getApplicationContext());
-        languageMapper = new LanguageMapper(getApplicationContext());
         mediaFileHelper = new MediaFileHelper(this);
 
         //TODO: move all loading to worker thread

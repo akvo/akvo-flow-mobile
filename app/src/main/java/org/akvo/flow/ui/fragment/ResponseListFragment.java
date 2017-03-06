@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -42,8 +43,11 @@ import android.widget.ListView;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
-import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.data.loader.SurveyInstanceLoader;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.adapter.ResponseListAdapter;
 import org.akvo.flow.util.ConstantUtil;
@@ -115,7 +119,10 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onActivityCreated(savedInstanceState);
 
         if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
+            Context context = getActivity().getApplicationContext();
+            mDatabase = new SurveyDbAdapter(context,
+                    new FlowMigrationListener(new Prefs(context),
+                            new MigrationLanguageMapper(context)));
             mDatabase.open();
         }
 
@@ -166,10 +173,17 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                     int id) {
-                                SurveyDbAdapter db = new SurveyDbAdapter(getActivity()).open();
-                                db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
-                                db.close();
-                                refresh();
+                                FragmentActivity activity = getActivity();
+                                if (activity != null) {
+                                    Context context = activity.getApplicationContext();
+                                    SurveyDbAdapter db = new SurveyDbAdapter(context,
+                                            new FlowMigrationListener(new Prefs(context),
+                                                    new MigrationLanguageMapper(context)));
+                                    db.open();
+                                    db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
+                                    db.close();
+                                    refresh();
+                                }
                             }
                         })
                 .setNegativeButton(R.string.cancelbutton,

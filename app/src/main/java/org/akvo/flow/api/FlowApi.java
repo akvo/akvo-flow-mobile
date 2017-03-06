@@ -26,7 +26,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.serialization.form.SurveyMetaParser;

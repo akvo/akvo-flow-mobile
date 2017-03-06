@@ -23,23 +23,10 @@ package org.akvo.flow.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.text.TextUtils;
-
-import org.akvo.flow.database.migration.languages.LanguagesExtractor;
-import org.akvo.flow.database.migration.languages.LanguagesMapper;
-import org.akvo.flow.database.migration.languages.SurveyLanguageMigratingDbDataSource;
-import org.akvo.flow.database.migration.preferences.InsertablePreferences;
-import org.akvo.flow.database.migration.preferences.MigratablePreferences;
-import org.akvo.flow.database.migration.preferences.PreferenceExtractor;
-import org.akvo.flow.database.migration.preferences.PreferenceMapper;
-import org.akvo.flow.database.migration.preferences.Prefs;
 
 import java.lang.ref.WeakReference;
-import java.util.Set;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.database.Constants.SURVEY_GROUP_ID_NONE;
 
 /**
  * Helper class for creating the database tables and loading reference data
@@ -62,13 +49,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
+    private final MigrationListener migrationListener;
     private final WeakReference<Context> contextWeakReference;
     private final LanguageTable languageTable;
 
-    public DatabaseHelper(Context context, LanguageTable languageTable) {
+    public DatabaseHelper(Context context, LanguageTable languageTable,
+            MigrationListener migrationListener) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.contextWeakReference = new WeakReference<>(context);
         this.languageTable = languageTable;
+        this.migrationListener = migrationListener;
     }
 
     @Override
@@ -160,11 +150,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Timber.d("Upgrading database from version %d to %d", oldVersion, newVersion);
 
-        Context context = contextWeakReference.get();
-        if (oldVersion < VER_PREFERENCES_MIGRATE && context != null) {
-            migratePreferences(context, db);
-        }
-
         // Apply database updates sequentially. It starts in the current
         // version, hooking into the correspondent case block, and falls
         // through to any future upgrade. If no break statement is found,
@@ -185,6 +170,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = VER_CADDISFLY_QN;
         }
 
+        Context context = contextWeakReference.get();
+        if (oldVersion < VER_PREFERENCES_MIGRATE && context != null) {
+            migrationListener.migratePreferences(db);
+        }
+
         if (oldVersion < VER_CADDISFLY_QN) {
             Timber.d("onUpgrade() - Recreating the Database.");
 
@@ -201,33 +191,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else if (oldVersion < VER_LANGUAGES_MIGRATE) {
             //add new languages table
             languageTable.onCreate(db);
-            migrateLanguages(context, db);
+            migrationListener.migrateLanguages(db);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
         }
-    }
-
-    private void migrateLanguages(Context context, SQLiteDatabase db) {
-        Prefs prefs = new Prefs(context.getApplicationContext());
-        long selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SURVEY_GROUP_ID_NONE);
-        if (selectedSurveyId != SURVEY_GROUP_ID_NONE) {
-            String dataBaseLanguages = new LanguagesExtractor().retrieveLanguages(db);
-            if (!TextUtils.isEmpty(dataBaseLanguages)) {
-                Set<String> insertableLanguages = new LanguagesMapper()
-                        .transform(context, dataBaseLanguages);
-                new SurveyLanguageMigratingDbDataSource()
-                        .insertLanguagePreferences(db, selectedSurveyId, insertableLanguages);
-            }
-        }
-    }
-
-    private void migratePreferences(Context context, SQLiteDatabase db) {
-        PreferenceMapper mapper = new PreferenceMapper();
-        Prefs prefs = new Prefs(context.getApplicationContext());
-        PreferenceExtractor preferenceExtractor = new PreferenceExtractor();
-        MigratablePreferences migratablePreferences = preferenceExtractor
-                .retrievePreferences(db);
-        InsertablePreferences insertablePreferences = mapper.transform(migratablePreferences);
-        prefs.insertUserPreferences(insertablePreferences);
     }
 
     //Using getReadableDatabase() returns

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,43 +18,40 @@
  *
  */
 
-package org.akvo.flow.database.migration.preferences;
-
-import android.support.annotation.Nullable;
+package org.akvo.flow.data.migration.preferences;
 
 /**
- * Preferences ready to be inserted to SharedPreference
+ * Preference as extracted from Database
  */
-public class InsertablePreferences {
+public class MigratablePreferences {
 
-    @Nullable
     private final String deviceIdentifier;
-    private final boolean cellularDataEnabled;
-    private final boolean screenOn;
-    private final int imageSize;
+    private final String cellularDataUpload;
+    private final String screenOn;
+    private final String imageSize;
 
-    public InsertablePreferences(@Nullable String deviceIdentifier, boolean cellularDataEnabled,
-            boolean screenOn, int imageSize) {
+    public MigratablePreferences(String deviceIdentifier, String cellularDataUpload,
+            String screenOn, String imageSize) {
         this.deviceIdentifier = deviceIdentifier;
-        this.cellularDataEnabled = cellularDataEnabled;
+        this.cellularDataUpload = cellularDataUpload;
         this.screenOn = screenOn;
         this.imageSize = imageSize;
     }
 
-    @Nullable
     public String getDeviceIdentifier() {
         return deviceIdentifier;
     }
 
-    public boolean isCellularDataEnabled() {
-        return cellularDataEnabled;
+    public String getCellularDataUpload() {
+        return cellularDataUpload;
     }
 
-    public boolean isScreenOn() {
+    public String getScreenOn() {
         return screenOn;
     }
 
-    public int getImageSize() {
+    public String getImageSize() {
         return imageSize;
     }
+
 }

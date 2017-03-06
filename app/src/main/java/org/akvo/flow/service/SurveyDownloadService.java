@@ -31,7 +31,7 @@ import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;

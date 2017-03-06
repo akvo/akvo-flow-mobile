@@ -24,7 +24,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 

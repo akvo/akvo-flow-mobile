@@ -116,7 +116,6 @@ dependencies {
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
-    androidTestCompile 'com.nanohttpd:nanohttpd:2.2.0'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.1') {

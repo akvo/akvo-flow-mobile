@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.database.migration.languages;
+package org.akvo.flow.data.migration.languages;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;

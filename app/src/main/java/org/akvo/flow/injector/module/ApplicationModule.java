@@ -29,6 +29,9 @@ import com.squareup.sqlbrite.SqlBrite;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.database.DatabaseHelper;
@@ -90,7 +93,9 @@ public class ApplicationModule {
     @Provides
     @Singleton
     SQLiteOpenHelper provideOpenHelper() {
-        return new DatabaseHelper(application, new LanguageTable());
+        return new DatabaseHelper(application, new LanguageTable(),
+                new FlowMigrationListener(new Prefs(application),
+                        new MigrationLanguageMapper(application)));
     }
 
     @Provides

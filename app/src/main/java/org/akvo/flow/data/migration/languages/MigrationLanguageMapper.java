@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.database.migration.languages;
+package org.akvo.flow.data.migration.languages;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -32,9 +32,16 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-public class LanguagesMapper {
+public class MigrationLanguageMapper {
 
-    public Set<String> transform(@NonNull Context context, @NonNull String languagesString) {
+    @NonNull
+    private final Context context;
+
+    public MigrationLanguageMapper(@NonNull Context context) {
+        this.context = context;
+    }
+
+    public Set<String> transform(@NonNull String languagesString) {
         if (TextUtils.isEmpty(languagesString)) {
             return Collections.emptySet();
         }

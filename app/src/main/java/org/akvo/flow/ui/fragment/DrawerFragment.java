@@ -53,6 +53,9 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyGroupLoader;
 import org.akvo.flow.data.loader.UserLoader;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.SurveyGroup;
@@ -109,7 +112,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
 
         if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
+            Context context = getActivity().getApplicationContext();
+            mDatabase = new SurveyDbAdapter(context,
+                    new FlowMigrationListener(new Prefs(context),
+                            new MigrationLanguageMapper(context)));
             mDatabase.open();
         }
         if (mAdapter == null) {

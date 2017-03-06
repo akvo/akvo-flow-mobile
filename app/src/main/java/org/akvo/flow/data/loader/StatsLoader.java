@@ -23,12 +23,15 @@ package org.akvo.flow.data.loader;
 import android.content.Context;
 import android.database.Cursor;
 
+import org.akvo.flow.data.loader.base.AsyncLoader;
+import org.akvo.flow.data.loader.models.Stats;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyDbAdapter.RecordQuery;
 import org.akvo.flow.database.Tables;
-import org.akvo.flow.data.loader.base.AsyncLoader;
-import org.akvo.flow.data.loader.models.Stats;
 
 import java.util.Calendar;
 
@@ -45,7 +48,9 @@ public class StatsLoader extends AsyncLoader<Stats> {
 
     @Override
     public Stats loadInBackground() {
-        SurveyDbAdapter database = new SurveyDbAdapter(getContext());
+        Context context = getContext();
+        SurveyDbAdapter database = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
         database.open();
         Stats stats = new Stats();
 

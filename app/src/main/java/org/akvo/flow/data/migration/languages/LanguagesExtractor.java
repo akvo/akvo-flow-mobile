@@ -18,31 +18,21 @@
  *
  */
 
-package org.akvo.flow.database.migration.preferences;
+package org.akvo.flow.data.migration.languages;
 
 import android.database.sqlite.SQLiteDatabase;
 
 import org.akvo.flow.database.PreferenceHandler;
+import org.akvo.flow.util.ConstantUtil;
 
-import static org.akvo.flow.database.Constants.CELL_UPLOAD_SETTING_KEY;
-import static org.akvo.flow.database.Constants.DEVICE_IDENT_KEY;
-import static org.akvo.flow.database.Constants.MAX_IMG_SIZE;
-import static org.akvo.flow.database.Constants.SCREEN_ON_KEY;
-
-public class PreferenceExtractor {
+public class LanguagesExtractor {
 
     private final PreferenceHandler preferenceHandler = new PreferenceHandler();
 
-    public PreferenceExtractor() {
+    public LanguagesExtractor() {
     }
 
-    public MigratablePreferences retrievePreferences(SQLiteDatabase db) {
-        String deviceIdentifier = preferenceHandler
-                .findPreference(db, DEVICE_IDENT_KEY);
-        String cellularData = preferenceHandler
-                .findPreference(db, CELL_UPLOAD_SETTING_KEY);
-        String screenOn = preferenceHandler.findPreference(db, SCREEN_ON_KEY);
-        String imageSize = preferenceHandler.findPreference(db, MAX_IMG_SIZE);
-        return new MigratablePreferences(deviceIdentifier, cellularData, screenOn, imageSize);
+    public String retrieveLanguages(SQLiteDatabase db) {
+        return preferenceHandler.findPreference(db, ConstantUtil.SURVEY_LANG_SETTING_KEY);
     }
 }

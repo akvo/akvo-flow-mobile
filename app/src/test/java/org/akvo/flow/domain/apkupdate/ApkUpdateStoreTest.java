@@ -22,7 +22,7 @@ package org.akvo.flow.domain.apkupdate;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
-import org.akvo.flow.database.migration.preferences.Prefs;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConstantUtil;
 import org.junit.Before;
 import org.junit.Test;

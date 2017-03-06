@@ -20,6 +20,7 @@
 package org.akvo.flow.util.logging;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.joshdholtz.sentry.Sentry;
@@ -32,7 +33,7 @@ class SentryTree extends Timber.Tree {
     protected void log(int priority, @Nullable String tag, @Nullable String message,
             @Nullable Throwable t) {
 
-        if (!shouldSendLog(priority)) {
+        if (!shouldSendLog(priority) || isThrowableExcluded(t)) {
             return;
         }
 
@@ -40,6 +41,25 @@ class SentryTree extends Timber.Tree {
             //We will only send stacktraces for now
             Sentry.captureException(t);
         }
+    }
+
+    /**
+     * Some exceptions are not useful to be sent to sentry, this method will filter them out
+     * @param t
+     * @return
+     */
+    private boolean isThrowableExcluded(Throwable t) {
+        return t instanceof java.net.ConnectException
+                || t instanceof javax.net.ssl.SSLHandshakeException
+                || t instanceof java.security.cert.CertificateNotYetValidException
+                || t instanceof javax.net.ssl.SSLProtocolException
+                || t instanceof java.net.SocketTimeoutException
+                || containsFilteredMessage(t);
+    }
+
+    private boolean containsFilteredMessage(Throwable t) {
+        return !TextUtils.isEmpty(t.getMessage()) && t.getMessage()
+                .contains("Connection timed out");
     }
 
     /**

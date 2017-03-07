@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -45,7 +46,7 @@ public class SentryTreeTest {
 
         tree.log(Log.ERROR, TEST_TAG, TEST_MESSAGE, null);
 
-        verify(tree, times(0)).captureException(any(Throwable.class));
+        verify(tree, times(0)).captureException(any(Throwable.class), anyString());
     }
 
     @Test
@@ -54,7 +55,7 @@ public class SentryTreeTest {
 
         tree.log(Log.DEBUG, TEST_TAG, TEST_MESSAGE, TEST_EXCEPTION);
 
-        verify(tree, times(0)).captureException(TEST_EXCEPTION);
+        verify(tree, times(0)).captureException(any(Throwable.class), anyString());
     }
 
     @Test
@@ -63,16 +64,16 @@ public class SentryTreeTest {
 
         tree.log(Log.ERROR, TEST_TAG, TEST_MESSAGE, new java.net.ConnectException());
 
-        verify(tree, times(0)).captureException(any(Throwable.class));
+        verify(tree, times(0)).captureException(any(Throwable.class), anyString());
     }
 
     @Test
     public void log_shouldCaptureAcceptedException() throws Exception {
         SentryTree tree = spy(new SentryTree());
-        doNothing().when(tree).captureException(any(Throwable.class));
+        doNothing().when(tree).captureException(any(Throwable.class), anyString());
 
         tree.log(Log.ERROR, TEST_TAG, TEST_MESSAGE, TEST_EXCEPTION);
 
-        verify(tree, times(1)).captureException(any(Throwable.class));
+        verify(tree, times(1)).captureException(any(Throwable.class), anyString());
     }
 }

@@ -19,6 +19,7 @@
 
 package org.akvo.flow.util.logging;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
@@ -49,12 +50,16 @@ class SentryTree extends Timber.Tree {
             return;
         }
 
-        captureException(t);
+        captureException(t, message);
     }
 
     @VisibleForTesting
-    void captureException(@Nullable Throwable t) {
-        Sentry.captureException(t);
+    void captureException(@NonNull Throwable t, @Nullable String message) {
+        if (TextUtils.isEmpty(message)) {
+            Sentry.captureException(t);
+        } else {
+            Sentry.captureException(t, message);
+        }
     }
 
     /**

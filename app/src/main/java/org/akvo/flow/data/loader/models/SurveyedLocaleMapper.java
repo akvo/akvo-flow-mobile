@@ -21,6 +21,7 @@
 package org.akvo.flow.data.loader.models;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceColumns;
@@ -28,7 +29,8 @@ import org.akvo.flow.domain.SurveyedLocale;
 
 public class SurveyedLocaleMapper {
 
-    public SurveyedLocale getSurveyedLocale(Cursor cursor) {
+    @NonNull
+    public SurveyedLocale getSurveyedLocale(@NonNull Cursor cursor) {
         String id = cursor.getString(SurveyDbAdapter.RecordQuery.RECORD_ID);
         long surveyGroupId = cursor.getLong(SurveyDbAdapter.RecordQuery.SURVEY_GROUP_ID);
         long lastModified = cursor.getLong(SurveyDbAdapter.RecordQuery.LAST_MODIFIED);

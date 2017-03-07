@@ -20,27 +20,41 @@
 package org.akvo.flow.util.logging;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.joshdholtz.sentry.Sentry;
 
+import java.util.Arrays;
+import java.util.List;
+
 import timber.log.Timber;
 
 class SentryTree extends Timber.Tree {
+
+    private static final List<Class> IGNORED_EXCEPTIONS = Arrays
+            .asList(new Class[] { java.net.ConnectException.class,
+                    javax.net.ssl.SSLHandshakeException.class,
+                    java.security.cert.CertificateNotYetValidException.class,
+                    javax.net.ssl.SSLProtocolException.class,
+                    java.net.SocketTimeoutException.class
+            });
 
     @Override
     protected void log(int priority, @Nullable String tag, @Nullable String message,
             @Nullable Throwable t) {
 
-        if (!shouldSendLog(priority) || isThrowableExcluded(t)) {
+        if (t == null || priorityTooLow(priority) || isThrowableExcluded(t)) {
             return;
         }
 
-        if (t != null) {
-            //We will only send stacktraces for now
-            Sentry.captureException(t);
-        }
+        captureException(t);
+    }
+
+    @VisibleForTesting
+    void captureException(@Nullable Throwable t) {
+        Sentry.captureException(t);
     }
 
     /**
@@ -49,12 +63,7 @@ class SentryTree extends Timber.Tree {
      * @return
      */
     private boolean isThrowableExcluded(Throwable t) {
-        return t instanceof java.net.ConnectException
-                || t instanceof javax.net.ssl.SSLHandshakeException
-                || t instanceof java.security.cert.CertificateNotYetValidException
-                || t instanceof javax.net.ssl.SSLProtocolException
-                || t instanceof java.net.SocketTimeoutException
-                || containsFilteredMessage(t);
+        return IGNORED_EXCEPTIONS.contains(t.getClass()) || containsFilteredMessage(t);
     }
 
     private boolean containsFilteredMessage(Throwable t) {
@@ -67,7 +76,7 @@ class SentryTree extends Timber.Tree {
      * @param priority
      * @return
      */
-    private boolean shouldSendLog(int priority) {
-        return priority == Log.ERROR || priority == Log.ASSERT;
+    private boolean priorityTooLow(int priority) {
+        return priority < Log.ERROR;
     }
 }

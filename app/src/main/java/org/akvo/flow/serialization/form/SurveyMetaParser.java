@@ -39,7 +39,9 @@ public class SurveyMetaParser {
     public Survey parse(String response) {
         String[] touple = response.split(",");
         if (touple.length < Attr.COUNT) {
-            throw new IllegalArgumentException("Survey list response is in an unrecognized format");
+            throw new IllegalArgumentException(
+                    "Wrong survey list format: " + response + ", expected at least " + Attr.COUNT
+                            + " parts but found " + touple.length);
         }
         Survey survey = new Survey();
         survey.setId(touple[Attr.ID]);

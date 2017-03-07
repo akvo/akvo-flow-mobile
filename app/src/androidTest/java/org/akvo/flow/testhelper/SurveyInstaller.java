@@ -42,8 +42,7 @@ public class SurveyInstaller {
     private SurveyDbAdapter adapter;
     private Context context;
 
-    public SurveyInstaller(Context context)
-    {
+    public SurveyInstaller(Context context) {
         this.context = context;
         adapter = new SurveyDbAdapter(context);
     }
@@ -86,6 +85,11 @@ public class SurveyInstaller {
         return survey;
     }
 
+    /**
+     *  Notifies the UI that a new survey has been implemented
+     *
+     * @param context in which to send the notification
+     */
     private void notifyNewSurvey(Context context) {
         Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
         context.sendBroadcast(intentBroadcast);

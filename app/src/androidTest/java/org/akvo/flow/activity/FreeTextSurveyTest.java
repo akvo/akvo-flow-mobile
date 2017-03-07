@@ -58,8 +58,7 @@ public class FreeTextSurveyTest {
     private SurveyInstaller installer;
 
     @Before
-    public void init()
-    {
+    public void init() {
         runtimeContext = InstrumentationRegistry.getContext();
         installer      = new SurveyInstaller(rule.getActivity().getApplicationContext());
     }
@@ -80,16 +79,10 @@ public class FreeTextSurveyTest {
         Survey survey = getSurvey(surveyResId);
 
         openDrawer();
-        //Check for specified survey name, make sure it matches what's displayed and click it
         onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
-        //Add new data point
         onView(withId(R.id.new_datapoint)).perform(click());
-        //Check if our recent click launched us into the survey questions
-        //(matches with question_tv (textview), which is the parent resource for every question)
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
-        //Fill out the free text question and click next
         onView(withId(R.id.input_et)).perform(typeText(text));
-        //Next
         onView(withId(R.id.next_btn)).perform(click());
 
         return survey;
@@ -100,8 +93,7 @@ public class FreeTextSurveyTest {
         return installer.persistSurvey(FileUtil.readText(input));
     }
 
-    private void openDrawer()
-    {
+    private void openDrawer() {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
     }
 }

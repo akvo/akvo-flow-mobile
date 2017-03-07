@@ -57,10 +57,10 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
-        loadItem();
+        loadDataPoint();
     }
 
-    private void loadItem() {
+    private void loadDataPoint() {
         getSupportLoaderManager().restartLoader(0, null, this);
     }
 
@@ -74,7 +74,7 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
         googleMap.setMyLocationEnabled(true);
-        loadItem();
+        loadDataPoint();
     }
 
     private void addDataPointMarker() {
@@ -110,7 +110,7 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
         LatLng position = null;
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         String provider = manager.getBestProvider(criteria, true);
         if (provider != null) {
             Location location = manager.getLastKnownLocation(provider);

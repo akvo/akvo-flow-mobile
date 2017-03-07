@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,36 +24,36 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.RecordColumns;
-import org.akvo.flow.data.database.SurveyInstanceColumns;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.loader.SurveyedLocalesLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
@@ -64,11 +64,13 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
+import java.util.List;
 
 import timber.log.Timber;
 
-public class SurveyedLocaleListFragment extends ListFragment implements LocationListener,
-        OnItemClickListener, LoaderCallbacks<Cursor>, OrderByDialogListener {
+public class DataPointsListFragment extends Fragment implements LocationListener,
+        OnItemClickListener, LoaderCallbacks<List<SurveyedLocale>>, OrderByDialogListener,
+        DataPointsSyncListener {
 
     private LocationManager mLocationManager;
     private double mLatitude = 0.0d;
@@ -76,15 +78,30 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     private int mOrderBy;
     private SurveyGroup mSurveyGroup;
-    private SurveyDbAdapter mDatabase;
 
     private SurveyedLocaleListAdapter mAdapter;
     private RecordListListener mListener;
 
-    public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
-        SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
+    private TextView emptyTextView;
+    private ProgressBar progressBar;
+
+    /**
+     * BroadcastReceiver to notify of data synchronisation. This should be
+     * fired from {@link org.akvo.flow.service.DataSyncService}
+     */
+    private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
+
+    /**
+     * BroadcastReceiver to notify of records synchronisation. This should be
+     * fired from {@link org.akvo.flow.service.SurveyedDataPointSyncService}.
+     */
+    private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(
+            this);
+
+    public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
+        DataPointsListFragment fragment = new DataPointsListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -93,7 +110,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }
@@ -112,25 +129,34 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         }
     }
 
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.surveyed_locales_list_fragment, container, false);
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mLocationManager = (LocationManager) getActivity()
                 .getSystemService(Context.LOCATION_SERVICE);
-        mDatabase = new SurveyDbAdapter(getActivity());
+        View view = getView();
+        ListView listView = (ListView) view.findViewById(R.id.locales_lv);
+        emptyTextView = (TextView) view.findViewById(R.id.empty_tv);
+        listView.setEmptyView(emptyTextView);
         if (mAdapter == null) {
             mAdapter = new SurveyedLocaleListAdapter(getActivity(), mLatitude, mLongitude,
                     mSurveyGroup);
-            setListAdapter(mAdapter);
+            listView.setAdapter(mAdapter);
         }
-        setEmptyText(getString(R.string.no_records_text));
-        getListView().setOnItemClickListener(this);
+        listView.setOnItemClickListener(this);
+        progressBar = (ProgressBar) view.findViewById(R.id.progress);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase.open();
 
         // try to find out where we are
         Criteria criteria = new Criteria();
@@ -141,6 +167,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             if (loc != null) {
                 mLatitude = loc.getLatitude();
                 mLongitude = loc.getLongitude();
+                mAdapter.updateLocation(mLatitude, mLongitude);
             }
             mLocationManager.requestLocationUpdates(provider, 1000, 0, this);
         }
@@ -149,52 +176,81 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
-        refresh();
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(dataPointSyncReceiver,
+                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE));
+
+        refreshLocalData();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataPointSyncReceiver);
         mLocationManager.removeUpdates(this);
-        mDatabase.close();
     }
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
-        refresh();
+        refreshLocalData();
     }
 
     /**
      * Ideally, we should build a ContentProvider, so this notifications are handled
      * automatically, and the loaders restarted without this explicit dependency.
      */
-    private void refresh() {
+    private void refreshLocalData() {
         if (!isResumed()) {
             return;
         }
 
         if (mSurveyGroup == null) {
-            setEmptyText(getString(R.string.no_survey_selected_text));
+            emptyTextView.setText(R.string.no_survey_selected_text);
         } else {
-            setEmptyText(getString(R.string.no_records_text));
+            emptyTextView.setText(R.string.no_records_text);
         }
 
         if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {
             // Warn user that the location is unknown
-            Toast.makeText(getActivity(), R.string.locale_list_error_unknown_location, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.locale_list_error_unknown_location,
+                    Toast.LENGTH_SHORT).show();
             return;
         }
+        mAdapter.updateLocation(mLatitude, mLongitude);
+        showLoading();
         getLoaderManager().restartLoader(0, null, this);
+    }
+
+    private void showLoading() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideLoading() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Cursor cursor = (Cursor) mAdapter.getItem(position);
-        final String localeId = cursor.getString(cursor.getColumnIndexOrThrow(
-                RecordColumns.RECORD_ID));
+        SurveyedLocale surveyedLocale = mAdapter.getItem(position);
+        final String localeId = surveyedLocale.getId();
+        mListener.onRecordSelected(localeId);
+    }
 
-        mListener.onRecordSelected(localeId);// Notify the host activity
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (mSurveyGroup != null) {
+            if (mSurveyGroup.isMonitored()) {
+                inflater.inflate(R.menu.datapoints_list_monitored, menu);
+            } else {
+                inflater.inflate(R.menu.datapoints_list, menu);
+            }
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -206,6 +262,9 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 dialogFragment.setTargetFragment(this, 0);
                 dialogFragment.show(getFragmentManager(), "order_by");
                 return true;
+            case R.id.sync_records:
+                requestRemoteDataRefresh();
+                return true;
         }
 
         return false;
@@ -215,7 +274,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onOrderByClick(int order) {
         if (mOrderBy != order) {
             mOrderBy = order;
-            refresh();
+            refreshLocalData();
         }
     }
 
@@ -224,25 +283,27 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     // ==================================== //
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<List<SurveyedLocale>> onCreateLoader(int id, Bundle args) {
         long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId, mLatitude, mLongitude,
+        return new SurveyedLocalesLoader(getActivity(), surveyId, mLatitude, mLongitude,
                 mOrderBy);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor == null) {
+    public void onLoadFinished(Loader<List<SurveyedLocale>> loader,
+            List<SurveyedLocale> surveyedLocales) {
+        hideLoading();
+        if (surveyedLocales == null) {
             Timber.w("onFinished() - Loader returned no data");
             return;
         }
 
-        mAdapter.swapCursor(cursor);
+        mAdapter.setLocales(surveyedLocales);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
+    public void onLoaderReset(Loader<List<SurveyedLocale>> loader) {
+        // EMPTY
     }
 
     // ==================================== //
@@ -255,62 +316,75 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mLocationManager.removeUpdates(this);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
-        refresh();
+        refreshLocalData();
     }
 
     @Override
     public void onProviderDisabled(String provider) {
+        // EMPTY
     }
 
     @Override
     public void onProviderEnabled(String provider) {
+        // EMPTY
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+        // EMPTY
     }
 
-    /**
-     * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from DataSyncService.
-     */
-    private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
+    private void requestRemoteDataRefresh() {
+        if (mListener != null && mSurveyGroup != null) {
+            showLoading();
+            mListener.onSyncRecordsRequested(mSurveyGroup.getId());
+        } else {
+            hideLoading();
+        }
+    }
+
+    @Override
+    public void onNewDataAvailable() {
+        refreshLocalData();
+    }
 
     /**
      * List Adapter to bind the Surveyed Locales into the list items
      */
-    private static class SurveyedLocaleListAdapter extends CursorAdapter {
+    public static class SurveyedLocaleListAdapter extends ArrayAdapter<SurveyedLocale> {
 
-        private final double mLatitude;
-        private final double mLongitude;
+        private double mLatitude;
+        private double mLongitude;
         private final SurveyGroup mSurveyGroup;
+        private final LayoutInflater inflater;
 
         public SurveyedLocaleListAdapter(Context context, double mLatitude, double mLongitude,
                 SurveyGroup mSurveyGroup) {
-            super(context, null, false);
+            super(context, R.layout.surveyed_locale_item);
             this.mLatitude = mLatitude;
             this.mLongitude = mLongitude;
             this.mSurveyGroup = mSurveyGroup;
+            this.inflater = LayoutInflater.from(context);
         }
 
+        @NonNull
         @Override
-        public View newView(Context context, Cursor c, ViewGroup parent) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return inflater.inflate(R.layout.surveyed_locale_item, parent, false);
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor c) {
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view;
+            if (convertView == null) {
+                view = inflater.inflate(R.layout.surveyed_locale_item, parent, false);
+            } else {
+                view = convertView;
+            }
             TextView nameView = (TextView) view.findViewById(R.id.locale_name);
             TextView idView = (TextView) view.findViewById(R.id.locale_id);
             TextView dateView = (TextView) view.findViewById(R.id.last_modified);
             TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
             TextView statusView = (TextView) view.findViewById(R.id.status);
             ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
-            final SurveyedLocale surveyedLocale = SurveyDbAdapter.getSurveyedLocale(c);
-
-            // This cursor contains extra info about the Record status
-            int status = c.getInt(c.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS));
+            final SurveyedLocale surveyedLocale = getItem(position);
+            Context context = parent.getContext();
+            int status = surveyedLocale.getStatus();
             nameView.setText(surveyedLocale.getDisplayName(context));
             idView.setText(surveyedLocale.getId());
 
@@ -343,9 +417,10 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             statusView.setText(statusText);
 
             // Alternate background
-            int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+            int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
             final int res = PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
+            return view;
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale, Context context) {
@@ -389,22 +464,34 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             }
         }
 
+        void setLocales(List<SurveyedLocale> surveyedLocales) {
+            clear();
+            for (SurveyedLocale sl : surveyedLocales) {
+                add(sl);
+            }
+            notifyDataSetChanged();
+        }
+
+        void updateLocation(double latitude, double longitude) {
+            this.mLatitude = latitude;
+            this.mLongitude = longitude;
+        }
     }
 
-    private static class DataSyncBroadcastReceiver extends BroadcastReceiver {
+    static class DataSyncBroadcastReceiver extends BroadcastReceiver {
 
-        private final WeakReference<SurveyedLocaleListFragment> fragmentWeakRef;
+        private final WeakReference<DataPointsListFragment> fragmentWeakRef;
 
-        private DataSyncBroadcastReceiver(SurveyedLocaleListFragment fragment) {
+        DataSyncBroadcastReceiver(DataPointsListFragment fragment) {
             this.fragmentWeakRef = new WeakReference<>(fragment);
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
             Timber.i("Survey Instance status has changed. Refreshing UI...");
-            SurveyedLocaleListFragment fragment = fragmentWeakRef.get();
+            DataPointsListFragment fragment = fragmentWeakRef.get();
             if (fragment != null) {
-                fragment.refresh();
+                fragment.refreshLocalData();
             }
         }
     }

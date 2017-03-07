@@ -25,6 +25,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
@@ -55,6 +56,8 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import timber.log.Timber;
+
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -415,7 +418,7 @@ public class BootstrapService extends IntentService {
      * refresh its data
      */
     private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
-        sendBroadcast(intentBroadcast);
+        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 }

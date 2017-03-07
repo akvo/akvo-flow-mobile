@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -42,18 +42,17 @@ import android.widget.ListView;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
-import org.akvo.flow.data.loader.SurveyInstanceLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyInstanceLoader;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.adapter.ResponseListAdapter;
 import org.akvo.flow.util.ConstantUtil;
 
+import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
+import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
+
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
     private static final String TAG = ResponseListFragment.class.getSimpleName();
-
-    private static final String EXTRA_SURVEY_GROUP = "survey_group";
-    private static final String EXTRA_RECORD = "record";
 
     // TODO: Move all id constants to ConstantUtil
     private static int SURVEY_ID_KEY = R.integer.surveyidkey;
@@ -65,16 +64,16 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     private static final int VIEW_HISTORY = 1;
 
     private SurveyGroup mSurveyGroup;
-    private SurveyedLocale mRecord;
+    private String recordId;
     private ResponseListAdapter mAdapter;
 
     private SurveyDbAdapter mDatabase;
 
-    public static ResponseListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
+    public static ResponseListFragment instantiate(SurveyGroup surveyGroup, String recordId) {
         ResponseListFragment fragment = new ResponseListFragment();
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
-        args.putSerializable(EXTRA_RECORD, record);
+        args.putString(EXTRA_RECORD_ID, recordId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -83,7 +82,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
-        mRecord = (SurveyedLocale) getArguments().getSerializable(EXTRA_RECORD);
+        recordId = getArguments().getString(EXTRA_RECORD_ID);
     }
 
     @Override
@@ -202,7 +201,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, (Long) view.getTag(SURVEY_INSTANCE_ID_KEY));
 
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId);
 
         // Read-only vs editable
         if ((Boolean) view.getTag(FINISHED_KEY)) {
@@ -216,7 +215,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyInstanceLoader(getActivity(), mDatabase, mRecord.getId());
+        return new SurveyInstanceLoader(getActivity(), mDatabase, recordId);
     }
 
     @Override

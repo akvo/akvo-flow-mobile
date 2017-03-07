@@ -218,8 +218,6 @@ public class ConstantUtil {
     public static final int IMAGE_SIZE_640_480 = 1;
     public static final int IMAGE_SIZE_1280_960 = 2;
 
-    public static final int NOTIFICATION_RECORD_SYNC = 100;
-
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
     public static final int NOTIFICATION_HEADER_ERROR = 104;
@@ -244,8 +242,10 @@ public class ConstantUtil {
     public static final String CADDISFLY_MIME = "text/plain";
 
     //broadcasts
-    public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
+    public static final String ACTION_LOCALE_SYNC_UPDATE = "fieldsurvey.ACTION_LOCALES_SYNC_UPDATE";
+    public static final String ACTION_LOCALE_SYNC_RESULT = "fieldsurvey.ACTION_LOCALES_SYNC_RESULT";
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
+    public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
@@ -269,6 +269,18 @@ public class ConstantUtil {
     public static final int CADDISFLY_REQUEST = 5;
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
+
+    //extras
+    public static final String EXTRA_RECORD_ID = "record_id";
+    public static final String EXTRA_SURVEY_GROUP = "survey_group";
+    public static final String EXTRA_DATAPOINT_SYNC_RESULT = "datapoint_sync_result";
+    public static final String EXTRA_DATAPOINT_NUMBER = "datapoint_number";
+
+    //data point sync result codes
+    public static final int DATA_SYNC_RESULT_SUCCESS = 0;
+    public static final int DATA_SYNC_RESULT_ERROR_UNKNOWN = 1;
+    public static final int DATA_SYNC_RESULT_ERROR_NETWORK = 2;
+    public static final int DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT = 3;
 
     /**
      * prevent instantiation

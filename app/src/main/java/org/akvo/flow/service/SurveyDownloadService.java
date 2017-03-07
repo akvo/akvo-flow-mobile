@@ -20,11 +20,11 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
@@ -56,6 +56,8 @@ import java.util.Set;
 import java.util.zip.ZipInputStream;
 
 import timber.log.Timber;
+
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 /**
  * This activity will check for new surveys on the device and install as needed
@@ -100,7 +102,7 @@ public class SurveyDownloadService extends IntentService {
             Timber.e(e, e.getMessage());
         } finally {
             databaseAdaptor.close();
-            sendBroadcastNotification(this);
+            sendBroadcastNotification();
         }
     }
 
@@ -386,9 +388,9 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    private void sendBroadcastNotification(@NonNull Context context) {
-        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
-        context.sendBroadcast(intentBroadcast);
+    private void sendBroadcastNotification() {
+        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 
 }

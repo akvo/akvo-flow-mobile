@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,6 +25,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
@@ -37,21 +39,21 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.fragment.FormListFragment;
 import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
-import org.akvo.flow.service.BootstrapService;
+import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
+import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
+
 public class RecordActivity extends BackActivity implements SurveyListListener, TabListener,
-        RecordListListener {
-    public static final String EXTRA_SURVEY_GROUP = "survey_group";
-    public static final String EXTRA_RECORD_ID = "record";
+        LoaderManager.LoaderCallbacks<SurveyedLocale> {
 
     private static final int POSITION_SURVEYS = 0;
     private static final int POSITION_RESPONSES = 1;
@@ -59,13 +61,13 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     private static final int REQUEST_FORM = 0;
 
     private User mUser;
-    private SurveyedLocale mRecord;
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
 
     private ViewPager mPager;
 
     private String[] mTabs;
+    private String recordId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +115,8 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
 
         mUser = FlowApp.getApp().getUser();
         // Record might have changed while answering a registration survey
-        String recordId = getIntent().getStringExtra(EXTRA_RECORD_ID);
-        mRecord = mDatabase.getSurveyedLocale(recordId);
-        displayRecord();
+        recordId = getIntent().getStringExtra(ConstantUtil.EXTRA_RECORD_ID);
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -131,10 +132,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         }
     }
 
-    private void displayRecord() {
-        setTitle(mRecord.getDisplayName(this));
-    }
-
     @Override
     public void onSurveyClick(final String surveyId) {
         if (BootstrapService.isProcessing) {
@@ -148,23 +145,22 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         }
 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getFormInstances(mRecord.getId(), surveyId,
+        long[] instances = mDatabase.getFormInstances(recordId, surveyId,
                 SurveyInstanceStatus.SAVED);
         long instance = instances.length > 0 ?
-                instances[0]
-                :
-                mDatabase.createSurveyRespondent(surveyId, survey.getVersion(), mUser,
-                        mRecord.getId());
+                instances[0] :
+                mDatabase.createSurveyRespondent(surveyId, survey.getVersion(), mUser, recordId);
 
         Intent i = new Intent(this, FormActivity.class);
         i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, instance);
         startActivityForResult(i, REQUEST_FORM);
     }
 
+    //TODO: make static
     class TabsAdapter extends FragmentPagerAdapter {
 
         public TabsAdapter(FragmentManager fm) {
@@ -180,9 +176,9 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         public Fragment getItem(int position) {
             switch (position) {
                 case POSITION_SURVEYS:
-                    return FormListFragment.newInstance(mSurveyGroup, mRecord);
+                    return FormListFragment.newInstance(mSurveyGroup, recordId);
                 case POSITION_RESPONSES:
-                    return ResponseListFragment.instantiate(mSurveyGroup, mRecord);
+                    return ResponseListFragment.instantiate(mSurveyGroup, recordId);
             }
 
             return null;
@@ -210,7 +206,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         switch (item.getItemId()) {
             case R.id.view_map:
                 startActivity(new Intent(this, MapActivity.class)
-                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId()));
+                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -219,6 +215,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
 
     @Override
     public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
+        // EMPTY
     }
 
     @Override
@@ -228,9 +225,21 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
 
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
+        //EMPTY
     }
 
     @Override
-    public void onRecordSelected(String recordId) {
+    public Loader<SurveyedLocale> onCreateLoader(int id, Bundle args) {
+        return new SurveyedLocaleItemLoader(this, recordId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<SurveyedLocale> loader, SurveyedLocale data) {
+        setTitle(data.getDisplayName(this));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<SurveyedLocale> loader) {
+        // EMPTY
     }
 }

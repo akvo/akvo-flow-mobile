@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,8 +20,9 @@
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.database.Cursor;
+import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -29,65 +30,71 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyedLocalesLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
 
-//TODO: separate single data point and multiple into different classes for clarity
-public class MapFragment extends SupportMapFragment
-        implements LoaderCallbacks<Cursor>, OnInfoWindowClickListener, OnMapReadyCallback {
+public class DataPointsMapFragment extends SupportMapFragment
+        implements LoaderCallbacks<List<SurveyedLocale>>, OnInfoWindowClickListener,
+        OnMapReadyCallback, DataPointsSyncListener {
 
     public static final int MAP_ZOOM_LEVEL = 10;
+    public static final String MAP_OPTIONS = "MapOptions";
 
     private SurveyGroup mSurveyGroup;
-    private SurveyDbAdapter mDatabase;
     private RecordListListener mListener;
-
-    private String mRecordId; // If set, load a single record
     private List<SurveyedLocale> mItems;
-    private boolean mSingleRecord = false;
+
+    @Nullable
+    private ProgressBar progressBar;
 
     @Nullable
     private GoogleMap mMap;
 
     private ClusterManager<SurveyedLocale> mClusterManager;
 
-    public static MapFragment newInstance(SurveyGroup surveyGroup, String dataPointId) {
-        MapFragment fragment = new MapFragment();
+    /**
+     * BroadcastReceiver to notify of records synchronisation. This should be
+     * fired from {@link org.akvo.flow.service.SurveyedDataPointSyncService}.
+     */
+    private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(
+            this);
+
+    public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
+        DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
-        args.putString(RecordActivity.EXTRA_RECORD_ID, dataPointId);
+        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
+        GoogleMapOptions options = new GoogleMapOptions();
+        options.zOrderOnTop(true);
+        args.putParcelable(MAP_OPTIONS, options);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,11 +103,9 @@ public class MapFragment extends SupportMapFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mItems = new ArrayList<>();
-
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
-        mRecordId = getArguments().getString(RecordActivity.EXTRA_RECORD_ID);
-        mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
+                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -118,9 +123,20 @@ public class MapFragment extends SupportMapFragment
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            View.inflate(getActivity(), R.layout.map_progress_bar, viewGroup);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        }
+        return view;
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mDatabase = new SurveyDbAdapter(getActivity());
         getMapAsync(this);
     }
 
@@ -144,7 +160,7 @@ public class MapFragment extends SupportMapFragment
                     cluster();
                 }
             });
-            centerMap(null);
+            centerMap();
         }
     }
 
@@ -182,28 +198,22 @@ public class MapFragment extends SupportMapFragment
      * Center the map in the given record's coordinates. If no record is provided,
      * the user's location will be used.
      */
-    private void centerMap(@Nullable SurveyedLocale record) {
+    private void centerMap() {
         if (mMap == null) {
             return; // Not ready yet
         }
 
         LatLng position = null;
-
-        if (record != null && record.getLatitude() != null && record.getLongitude() != null) {
-            // Center the map in the data point
-            position = new LatLng(record.getLatitude(), record.getLongitude());
-        } else {
-            // When multiple points are shown, center the map in user's location
-            LocationManager manager = (LocationManager) getActivity()
-                    .getSystemService(Context.LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            String provider = manager.getBestProvider(criteria, true);
-            if (provider != null) {
-                Location location = manager.getLastKnownLocation(provider);
-                if (location != null) {
-                    position = new LatLng(location.getLatitude(), location.getLongitude());
-                }
+        // When multiple points are shown, center the map in user's location
+        LocationManager manager = (LocationManager) getActivity()
+                .getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        String provider = manager.getBestProvider(criteria, true);
+        if (provider != null) {
+            Location location = manager.getLastKnownLocation(provider);
+            if (location != null) {
+                position = new LatLng(location.getLatitude(), location.getLongitude());
             }
         }
 
@@ -215,30 +225,19 @@ public class MapFragment extends SupportMapFragment
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase.open();
         if (mItems.isEmpty()) {
             // Make sure we only fetch the data and center the map once
             refresh();
         }
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(dataPointSyncReceiver,
+                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mDatabase.close();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View mapView = super.onCreateView(inflater, container, savedInstanceState);
-
-        View v = inflater.inflate(R.layout.map_fragment, container, false);
-        FrameLayout layout = (FrameLayout) v.findViewById(R.id.map_container);
-
-        layout.addView(mapView, 0);
-
-        return v;
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataPointSyncReceiver);
     }
 
     public void refresh(SurveyGroup surveyGroup) {
@@ -252,33 +251,51 @@ public class MapFragment extends SupportMapFragment
      */
     public void refresh() {
         if (isResumed()) {
-            if (mSingleRecord) {
-                // Just get it from the DB
-                updateSingleRecord();
-            } else {
-                getLoaderManager().restartLoader(0, null, this);
-            }
+            showProgress();
+            getLoaderManager().restartLoader(0, null, this);
         }
     }
 
-    private void updateSingleRecord() {
-        SurveyedLocale record = mDatabase.getSurveyedLocale(mRecordId);
-        if (mMap != null && record != null && record.getLatitude() != null
-                && record.getLongitude() != null) {
-            mMap.clear();
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(record.getLatitude(), record.getLongitude()))
-                    .title(record.getDisplayName(getActivity()))
-                    .snippet(record.getId()));
-            centerMap(record);
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (mSurveyGroup != null) {
+            if (mSurveyGroup.isMonitored()) {
+                inflater.inflate(R.menu.datapoints_map_monitored, menu);
+            } else {
+                inflater.inflate(R.menu.datapoints_map, menu);
+            }
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.sync_records:
+                if (mListener != null && mSurveyGroup != null) {
+                    showProgress();
+                    mListener.onSyncRecordsRequested(mSurveyGroup.getId());
+                }
+                return true;
+        }
+        return false;
+    }
+
+    private void showProgress() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideProgress() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if (mSingleRecord) {
-            return; // Do nothing. We are already inside the record Activity
-        }
         final String surveyedLocaleId = marker.getSnippet();
         mListener.onRecordSelected(surveyedLocaleId);
     }
@@ -288,65 +305,31 @@ public class MapFragment extends SupportMapFragment
     // ==================================== //
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<List<SurveyedLocale>> onCreateLoader(int id, Bundle args) {
         long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        return new SurveyedLocaleLoader(getActivity(), mDatabase, surveyId,
-                ConstantUtil.ORDER_BY_NONE);
+        return new SurveyedLocalesLoader(getActivity(), surveyId, ConstantUtil.ORDER_BY_NONE);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor == null) {
+    public void onLoadFinished(Loader<List<SurveyedLocale>> loader,
+            List<SurveyedLocale> surveyedLocales) {
+        hideProgress();
+        if (surveyedLocales == null) {
             Timber.w("onFinished() - Loader returned no data");
             return;
         }
-
-        if (cursor.moveToFirst()) {
-            mItems.clear();
-            do {
-                SurveyedLocale item = SurveyDbAdapter.getSurveyedLocale(cursor);
-                mItems.add(item);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
+        mItems.clear();
+        mItems.addAll(surveyedLocales);
         cluster();
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<List<SurveyedLocale>> loader) {
+        //EMPTY
     }
 
-    /**
-     * This custom renderer overrides original 'bucketed' names, in order to display the accurate
-     * number of markers within a cluster.
-     */
-    private static class PointRenderer extends DefaultClusterRenderer<SurveyedLocale> {
-
-        private final WeakReference<Context> activityContextWeakRef;
-
-        public PointRenderer(GoogleMap map, Context context,
-                ClusterManager<SurveyedLocale> clusterManager) {
-            super(context, map, clusterManager);
-            this.activityContextWeakRef = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onBeforeClusterItemRendered(SurveyedLocale item,
-                MarkerOptions markerOptions) {
-            Context context = activityContextWeakRef.get();
-            if (context != null) {
-                markerOptions.title(item.getDisplayName(context)).snippet(item.getId());
-            }
-        }
-
-        @Override
-        protected int getBucket(Cluster<SurveyedLocale> cluster) {
-            return cluster.getSize();
-        }
-
-        @Override
-        protected String getClusterText(int bucket) {
-            return String.valueOf(bucket);
-        }
+    @Override
+    public void onNewDataAvailable() {
+        refresh();
     }
 }

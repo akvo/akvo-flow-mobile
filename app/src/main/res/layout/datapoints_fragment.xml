@@ -5,14 +5,28 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.astuetz.PagerSlidingTabStrip
-        android:id="@+id/tabs"
-        app:pstsIndicatorColor="@color/orange_main"
-        app:pstsShouldExpand="true"
-        android:layout_width="match_parent"
-        android:layout_height="48dip"
-        android:background="@drawable/ab_stacked_solid_flow"
-        android:textColor="@color/tab_text_color" />
+    <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="48dip"
+            android:background="@drawable/ab_stacked_solid_flow"
+            app:tabBackground="@drawable/ab_stacked_solid_flow"
+            app:tabIndicatorColor="@color/orange_main"
+            app:tabIndicatorHeight="8dp"
+            app:tabTextColor="@color/tab_text_color"
+            app:tabSelectedTextColor="@color/tab_text_color"
+            >
+
+        <android.support.design.widget.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="48dip"
+                />
+
+        <android.support.design.widget.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="48dip"/>
+
+    </android.support.design.widget.TabLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"

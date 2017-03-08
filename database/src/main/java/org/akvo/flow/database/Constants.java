@@ -21,9 +21,9 @@
 package org.akvo.flow.database;
 
 public class Constants {
+
     public static final int IMAGE_SIZE_320_240 = 0;
     public static final long SURVEY_GROUP_ID_NONE = -1;
-
     public static final Integer ORDER_BY_NONE = -1;
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;

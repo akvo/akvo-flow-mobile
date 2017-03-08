@@ -45,6 +45,3 @@ mv ${RES_FOLDER}/${VALUES_FOLDER}-id ${RES_FOLDER}/${VALUES_FOLDER}-in
 # update the changes with app's res folder
 rsync -avhu --progress ${RES_FOLDER} ../../../../app/src/main/
 
-
-
-

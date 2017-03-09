@@ -24,21 +24,33 @@ import android.support.annotation.NonNull;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-class RestServiceFactory {
+@Singleton
+public class RestServiceFactory {
 
-    public static <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
-        httpClient.connectTimeout(10, TimeUnit.SECONDS);
-        httpClient.readTimeout(0, TimeUnit.SECONDS);
+    public static final int CONNECTION_TIMEOUT = 10;
+    /**
+     * Requests to GAE take a long time especially when there are a lot of datapoints
+     */
+    public static final int NO_TIMEOUT = 0;
+
+    private final OkHttpClient.Builder httpClient;
+
+    @Inject
+    public RestServiceFactory(OkHttpClient.Builder httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    public <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
+        httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
+        httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

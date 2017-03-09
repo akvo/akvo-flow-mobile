@@ -49,20 +49,23 @@ public class FlowRestApi {
 
     private static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
     private static final String CHARSET_UTF8 = "UTF-8";
+
     private final String androidId;
     private final String imei;
     private final String phoneNumber;
+    private final RestServiceFactory serviceFactory;
 
     @Inject
-    public FlowRestApi(DeviceHelper deviceHelper) {
+    public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
         this.androidId = deviceHelper.getAndroidID();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
+        this.serviceFactory = serviceFactory;
     }
 
     public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
-        return RestServiceFactory.createRetrofitService(baseUrl, FlowApiService.class)
+        return serviceFactory.createRetrofitService(baseUrl, FlowApiService.class)
                 .loadNewDataPoints(buildSyncUrl(baseUrl, apiKey, surveyGroup, timestamp));
     }
 

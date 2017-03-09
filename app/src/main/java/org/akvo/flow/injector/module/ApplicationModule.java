@@ -26,11 +26,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
@@ -46,7 +48,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 @Module
 public class ApplicationModule {
@@ -117,5 +122,17 @@ public class ApplicationModule {
     SharedPreferencesDataSource provideSharedPreferences() {
         return new SharedPreferencesDataSource(
                 application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
+    }
+
+    @Provides
+    @Singleton
+    RestServiceFactory provideServiceFactory() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        }
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+        return new RestServiceFactory(httpClient);
     }
 }

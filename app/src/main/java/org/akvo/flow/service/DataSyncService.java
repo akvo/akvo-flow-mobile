@@ -591,14 +591,12 @@ public class DataSyncService extends IntentService {
             } else {
                 Timber.e("Could not retrieve missing files");
             }
+        } catch (HttpException e) {
+            Timber.e(e, "Could not retrieve missing or deleted files: message: %s, status code: %s",
+                    e.getMessage(),
+                    e.getStatus());
         } catch (Exception e) {
-            if (e instanceof HttpException) {
-                HttpException exception = (HttpException) e;
-                Timber.e(exception, "Could not retrieve missing or deleted files: message: %s, status code: %s", exception.getMessage(),
-                        exception.getStatus());
-            } else {
-                Timber.e(e, "Could not retrieve missing or deleted files");
-            }
+            Timber.e(e, "Could not retrieve missing or deleted files");
         }
     }
 

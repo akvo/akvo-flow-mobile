@@ -30,23 +30,24 @@ public class UpgraderFactory {
     @Nullable
     public static DatabaseUpgrader createUpgrader(int upgradingFromVersion, DatabaseHelper helper,
             SQLiteDatabase db) {
-        if (upgradingFromVersion < DatabaseHelper.VER_LAUNCH) {
-            return new BeforeLaunchUpgrader(helper, db);
-        }
         UpgraderVisitor databaseUpgrader = new UpgraderVisitor();
-        switch (upgradingFromVersion) {
-            case DatabaseHelper.VER_LAUNCH:
-                databaseUpgrader.addUpgrader(new LaunchUpgrader(helper, db));
-            case DatabaseHelper.VER_FORM_SUBMITTER:
-                databaseUpgrader.addUpgrader(new FormSubmitterUpgrader(helper, db));
-            case DatabaseHelper.VER_FORM_DEL_CHECK:
-                databaseUpgrader.addUpgrader(new FormCheckUpgrader(helper, db));
+        if (upgradingFromVersion < DatabaseHelper.VER_LAUNCH) {
+            databaseUpgrader.addUpgrader(new BeforeLaunchUpgrader(helper, db));
+        } else {
+            switch (upgradingFromVersion) {
+                case DatabaseHelper.VER_LAUNCH:
+                    databaseUpgrader.addUpgrader(new LaunchUpgrader(helper, db));
+                case DatabaseHelper.VER_FORM_SUBMITTER:
+                    databaseUpgrader.addUpgrader(new FormSubmitterUpgrader(helper, db));
+                case DatabaseHelper.VER_FORM_DEL_CHECK:
+                    databaseUpgrader.addUpgrader(new FormCheckUpgrader(helper, db));
                 case DatabaseHelper.VER_FORM_VERSION:
                     databaseUpgrader.addUpgrader(new FormVersionUpgrader(helper, db));
                 case DatabaseHelper.VER_CADDISFLY_QN:
                     databaseUpgrader.addUpgrader(new CaddisflyUpgrader(helper, db));
-                    case DatabaseHelper.VER_PREFERENCES_MIGRATE:
-                        databaseUpgrader.addUpgrader(new PreferencesUpgrader(helper, db));
+                case DatabaseHelper.VER_PREFERENCES_MIGRATE:
+                    databaseUpgrader.addUpgrader(new PreferencesUpgrader(helper, db));
+            }
         }
         return databaseUpgrader;
     }

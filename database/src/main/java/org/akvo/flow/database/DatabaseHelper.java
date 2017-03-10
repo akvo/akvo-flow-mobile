@@ -24,8 +24,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.lang.ref.WeakReference;
-
 import timber.log.Timber;
 
 /**
@@ -50,13 +48,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
     private final MigrationListener migrationListener;
-    private final WeakReference<Context> contextWeakReference;
     private final LanguageTable languageTable;
 
     public DatabaseHelper(Context context, LanguageTable languageTable,
             MigrationListener migrationListener) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.contextWeakReference = new WeakReference<>(context);
         this.languageTable = languageTable;
         this.migrationListener = migrationListener;
     }
@@ -170,8 +166,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = VER_CADDISFLY_QN;
         }
 
-        Context context = contextWeakReference.get();
-        if (oldVersion < VER_PREFERENCES_MIGRATE && context != null) {
+        if (oldVersion < VER_PREFERENCES_MIGRATE) {
             migrationListener.migratePreferences(db);
         }
 

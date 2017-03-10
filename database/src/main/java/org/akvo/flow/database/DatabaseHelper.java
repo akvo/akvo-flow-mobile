@@ -43,8 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_FORM_VERSION = 81;
     public static final int VER_CADDISFLY_QN = 82;
     public static final int VER_PREFERENCES_MIGRATE = 83;
-    public static final int VER_LANGUAGES_MIGRATE = 84;
-    private static final int DATABASE_VERSION = VER_LANGUAGES_MIGRATE;
+    private static final int VER_LANGUAGES_MIGRATE = 84;
+    static final int DATABASE_VERSION = VER_LANGUAGES_MIGRATE;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();

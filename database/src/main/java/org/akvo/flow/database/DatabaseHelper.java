@@ -43,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_FORM_VERSION = 81;
     public static final int VER_CADDISFLY_QN = 82;
     public static final int VER_PREFERENCES_MIGRATE = 83;
-    private static final int VER_LANGUAGES_MIGRATE = 84;
+    public static final int VER_LANGUAGES_MIGRATE = 84;
     static final int DATABASE_VERSION = VER_LANGUAGES_MIGRATE;
 
     private static SQLiteDatabase database;
@@ -147,7 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Timber.d("Upgrading database from version %d to %d", oldVersion, newVersion);
-        UpgraderFactory.createUpgrader(oldVersion, this, db).upgrade();
+        new UpgraderFactory().createUpgrader(oldVersion, this, db).upgrade();
     }
 
     public void upgradeFromPreferences(SQLiteDatabase db) {

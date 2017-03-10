@@ -27,6 +27,10 @@ public class UpgraderVisitor implements DatabaseUpgrader {
 
     private final List<DatabaseUpgrader> upgraders = new ArrayList<>();
 
+    public List<DatabaseUpgrader> getUpgraders() {
+        return upgraders;
+    }
+
     @Override
     public void upgrade() {
         for (DatabaseUpgrader upgrader : upgraders) {

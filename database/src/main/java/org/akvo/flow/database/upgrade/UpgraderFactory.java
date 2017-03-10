@@ -28,7 +28,7 @@ import org.akvo.flow.database.DatabaseHelper;
 public class UpgraderFactory {
 
     @Nullable
-    public static DatabaseUpgrader createUpgrader(int upgradingFromVersion, DatabaseHelper helper,
+    public DatabaseUpgrader createUpgrader(int upgradingFromVersion, DatabaseHelper helper,
             SQLiteDatabase db) {
         UpgraderVisitor databaseUpgrader = new UpgraderVisitor();
         if (upgradingFromVersion < DatabaseHelper.VER_LAUNCH) {

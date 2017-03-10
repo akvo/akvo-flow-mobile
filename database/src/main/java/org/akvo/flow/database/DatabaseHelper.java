@@ -112,6 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ResponseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + ResponseColumns.SURVEY_INSTANCE_ID + " INTEGER NOT NULL,"// REFERENCES...
                 + ResponseColumns.QUESTION_ID + " TEXT NOT NULL,"
+                + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0,"
                 + ResponseColumns.ANSWER + " TEXT NOT NULL,"
                 + ResponseColumns.TYPE + " TEXT NOT NULL,"
                 + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"

@@ -25,11 +25,8 @@ import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.rule.ActivityTestRule;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.testhelper.SurveyInstaller;
 import org.akvo.flow.testhelper.SurveyRequisite;
 import org.akvo.flow.util.FileUtil;
@@ -37,7 +34,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -48,7 +44,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.RootMatchers.isDialog;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;

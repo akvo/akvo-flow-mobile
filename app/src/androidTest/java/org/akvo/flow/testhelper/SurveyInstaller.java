@@ -39,8 +39,6 @@ import java.io.Writer;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-import javax.inject.Inject;
-
 public class SurveyInstaller {
 
     private Context context;

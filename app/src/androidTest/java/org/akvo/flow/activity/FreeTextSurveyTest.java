@@ -25,10 +25,19 @@ import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.rule.ActivityTestRule;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.User;
 import org.akvo.flow.testhelper.SurveyInstaller;
+import org.akvo.flow.testhelper.SurveyRequisite;
 import org.akvo.flow.util.FileUtil;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -39,6 +48,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.RootMatchers.isDialog;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
@@ -53,14 +63,28 @@ public class FreeTextSurveyTest {
 
     @Rule
     public ActivityTestRule<SurveyActivity> rule = new ActivityTestRule<>(SurveyActivity.class);
-
-    private Context runtimeContext;
     private SurveyInstaller installer;
 
     @Before
     public void init() {
-        runtimeContext = InstrumentationRegistry.getContext();
-        installer      = new SurveyInstaller(rule.getActivity().getApplicationContext());
+        //Need context referring to application itself
+        Context context    = rule.getActivity();
+        installer          = new SurveyInstaller(context, new SurveyDbAdapter(context));
+    }
+
+    @BeforeClass
+    public static void setRequisite() {
+        SurveyRequisite.setRequisites(InstrumentationRegistry.getTargetContext());
+    }
+
+    @After
+    public void clearSurveys() {
+        installer.clearSurveys();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        SurveyRequisite.resetRequisites();
     }
 
     @Test
@@ -89,7 +113,7 @@ public class FreeTextSurveyTest {
     }
 
     private Survey getSurvey(int resId) throws IOException {
-        InputStream input = runtimeContext.getResources().openRawResource(resId);
+        InputStream input = InstrumentationRegistry.getContext().getResources().openRawResource(resId);
         return installer.persistSurvey(FileUtil.readText(input));
     }
 

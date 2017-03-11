@@ -36,15 +36,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+import javax.inject.Inject;
 
 public class SurveyInstaller {
 
-    private SurveyDbAdapter adapter;
     private Context context;
+    private SurveyDbAdapter adapter;
+    //Need an array that holds every File so we can delete them in the end
+    private Queue<File> surveyFiles = new ArrayDeque<>();
 
-    public SurveyInstaller(Context context) {
+    public SurveyInstaller(Context context, SurveyDbAdapter adapter) {
         this.context = context;
-        adapter = new SurveyDbAdapter(context);
+        this.adapter = adapter;
     }
 
     /**
@@ -55,6 +61,24 @@ public class SurveyInstaller {
      * @throws IOException
      */
     public Survey persistSurvey(String xml) throws IOException {
+        Survey survey = parseSurvey(xml);
+        File surveyFile = new File(FileUtil.getFilesDir(FileUtil.FileType.FORMS), survey.getId() + ConstantUtil.XML_SUFFIX);
+        Writer writer = new FileWriter(surveyFile);
+        writer.write(xml);
+        writer.close();
+
+        surveyFiles.add(surveyFile);
+
+        survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
+        survey.setType("Survey");
+        survey.setLocation(ConstantUtil.FILE_LOCATION);
+        survey.setHelpDownloaded(true);
+
+        saveSurvey(survey);
+        return survey;
+    }
+
+    private Survey parseSurvey(String xml) {
         SurveyMetadataParser surveyMetaData = new SurveyMetadataParser();
         ByteArrayInputStream metaInputStream = new ByteArrayInputStream(xml.getBytes());
 
@@ -66,23 +90,26 @@ public class SurveyInstaller {
 
         survey.setId(surveyMeta.getId());
 
-        File surveyFile = new File(FileUtil.getFilesDir(FileUtil.FileType.FORMS), survey.getId() + ConstantUtil.XML_SUFFIX);
-        Writer writer = new FileWriter(surveyFile);
-        writer.write(xml);
-        writer.close();
+        return survey;
+    }
 
-        survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
-        survey.setType("Survey");
-        survey.setLocation(ConstantUtil.FILE_LOCATION);
-        survey.setHelpDownloaded(true);
-
+    private void saveSurvey(Survey survey) {
         adapter.open();
         adapter.saveSurvey(survey);
         adapter.addSurveyGroup(survey.getSurveyGroup());
         adapter.close();
-
         notifyNewSurvey(context);
-        return survey;
+    }
+
+    public void clearSurveys()
+    {
+        for (File file : surveyFiles)
+        {
+            file.delete();
+        }
+        adapter.open();
+        adapter.deleteAllSurveys();
+        adapter.close();
     }
 
     /**

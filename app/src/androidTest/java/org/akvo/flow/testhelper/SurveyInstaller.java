@@ -99,8 +99,7 @@ public class SurveyInstaller {
         notifyNewSurvey(context);
     }
 
-    public void clearSurveys()
-    {
+    public void clearSurveys() {
         for (File file : surveyFiles)
         {
             file.delete();

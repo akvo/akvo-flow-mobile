@@ -42,7 +42,8 @@ public class ResponseMigrationHelper {
         Set<Pair<String, String>> surveyInstanceIdQuestionIdSPair = responseMigrationData.keySet();
         for (Pair<String, String> key : surveyInstanceIdQuestionIdSPair) {
             db.update(Tables.RESPONSE, responseMigrationData.get(key),
-                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID,
+                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
+                            + " = ?",
                     new String[] { key.first, key.second });
         }
     }

@@ -23,6 +23,7 @@ package org.akvo.flow.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.akvo.flow.database.migration.MigrationListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

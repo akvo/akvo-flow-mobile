@@ -32,7 +32,7 @@ import org.akvo.flow.data.migration.preferences.PreferenceExtractor;
 import org.akvo.flow.data.migration.preferences.PreferenceMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.Constants;
-import org.akvo.flow.database.MigrationListener;
+import org.akvo.flow.database.migration.MigrationListener;
 
 import java.util.Set;
 

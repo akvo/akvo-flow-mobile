@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.database.migration;
 
 import android.database.sqlite.SQLiteDatabase;
 

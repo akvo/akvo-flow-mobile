@@ -20,11 +20,17 @@
 
 package org.akvo.flow.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Pair;
 
+import org.akvo.flow.database.migration.MigrationListener;
+import org.akvo.flow.database.migration.ResponseMigrationHelper;
 import org.akvo.flow.database.upgrade.UpgraderFactory;
+
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -185,6 +191,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void upgradeFromLanguages(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + Tables.RESPONSE
                 + " ADD COLUMN " + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
+        ResponseMigrationHelper responseMigrationHelper = new ResponseMigrationHelper();
+        Map<Pair<String, String>, ContentValues> responseMigrationData = responseMigrationHelper
+                .obtainResponseMigrationData(db);
+        responseMigrationHelper.migrateResponses(responseMigrationData, db);
     }
 
     //Using getReadableDatabase() returns

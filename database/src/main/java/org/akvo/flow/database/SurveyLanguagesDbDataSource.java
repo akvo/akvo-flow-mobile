@@ -26,6 +26,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
+import org.akvo.flow.database.migration.MigrationListener;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 

@@ -114,8 +114,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ResponseColumns.ANSWER + " TEXT NOT NULL,"
                 + ResponseColumns.TYPE + " TEXT NOT NULL,"
                 + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"
-                + ResponseColumns.FILENAME + " TEXT),"
-                + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
+                + ResponseColumns.FILENAME + " TEXT,"
+                + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0)");
 
         db.execSQL("CREATE TABLE " + Tables.RECORD + " ("
                 + RecordColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"

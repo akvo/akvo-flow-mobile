@@ -34,11 +34,6 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
-
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
@@ -235,7 +230,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
                         ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME
+                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
@@ -254,7 +249,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
                         ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME
+                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                         + " =?",
@@ -262,19 +257,24 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public long updateSurveyResponse(Long responseToSaveId, long id,
-            ContentValues initialValues) {
+    public long updateSurveyResponse(Long responseToSaveId, long id, ContentValues initialValues) {
         if (responseToSaveId == null) {
-            id = database.insert(Tables.RESPONSE, null, initialValues);
+            id = insertResponse(initialValues);
         } else {
-            if (database.update(Tables.RESPONSE, initialValues, ResponseColumns._ID
-                    + "=?", new String[] {
-                    responseToSaveId.toString()
-            }) > 0) {
+            if (updateResponse(responseToSaveId, initialValues) > 0) {
                 id = responseToSaveId;
             }
         }
         return id;
+    }
+
+    private long insertResponse(ContentValues initialValues) {
+        return database.insert(Tables.RESPONSE, null, initialValues);
+    }
+
+    private int updateResponse(Long responseToSaveId, ContentValues initialValues) {
+        return database.update(Tables.RESPONSE, initialValues, ResponseColumns._ID + "=?",
+                new String[] { responseToSaveId.toString() });
     }
 
     /**
@@ -391,6 +391,20 @@ public class SurveyDbAdapter {
                 String.valueOf(surveyInstanceId),
                 questionId
         });
+    }
+
+    public void deleteResponse(long surveyInstanceId, String questionId, String iteration) {
+        int deleted = database.delete(Tables.RESPONSE,
+                ResponseColumns.SURVEY_INSTANCE_ID
+                        + "= ? AND "
+                        + ResponseColumns.QUESTION_ID
+                        + "= ? AND "
+                        + ResponseColumns.ITERATION
+                        + " = ? ",
+                new String[] {
+                        String.valueOf(surveyInstanceId), questionId, iteration
+                });
+        Timber.d("deleted %d response(s)", deleted);
     }
 
     public void createTransmission(long surveyInstanceId, String formID, String filename) {
@@ -566,13 +580,6 @@ public class SurveyDbAdapter {
         return recordUid;
     }
 
-    public Cursor getSurveyedLocales(long surveyGroupId) {
-        return database.query(Tables.RECORD, RecordQuery.PROJECTION,
-                RecordColumns.SURVEY_GROUP_ID + " = ?",
-                new String[] { String.valueOf(surveyGroupId) },
-                null, null, null);
-    }
-
     public Cursor getSurveyedLocale(String surveyedLocaleId) {
         return database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
@@ -739,77 +746,6 @@ public class SurveyDbAdapter {
      */
     public enum SurveyedLocaleMeta {
         NAME, GEOLOCATION
-    }
-
-    /**
-     * Filters surveyd locales based on the parameters passed in.
-     */
-    //TODO: remove
-    public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
-            int orderBy) {
-        // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
-        // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
-        // fully compatible. TODO: This should be refactored and replaced with a less complex approach.
-        String queryString = "SELECT sl.*,"
-                + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
-                + " FROM "
-                + Tables.RECORD + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
-                + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;
-        String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =?";
-        String groupBy = " GROUP BY sl." + RecordColumns.RECORD_ID;
-
-        String orderByStr = "";
-        switch (orderBy) {
-            case ORDER_BY_DATE:
-                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
-                break;
-            case ORDER_BY_DISTANCE:
-                if (latitude != null && longitude != null) {
-                    // this is to correct the distance for the shortening at higher latitudes
-                    Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)), 2);
-
-                    // this uses a simple planar approximation of distance. this should be good enough for our purpose.
-                    String orderByTempl = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE
-                            + " IS NULL THEN 1 ELSE 0 END,"
-                            + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
-                            + RecordColumns.LATITUDE
-                            + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
-                            + RecordColumns.LONGITUDE + ") * %s)";
-                    orderByStr = String
-                            .format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
-                }
-                break;
-            case ORDER_BY_STATUS:
-                orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
-                break;
-            case ORDER_BY_NAME:
-                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
-                break;
-        }
-
-        String[] whereValues = new String[] { String.valueOf(surveyGroupId) };
-        return database.rawQuery(queryString + whereClause + groupBy + orderByStr, whereValues);
-    }
-
-    /**
-     * Get the synchronization time for a particular survey group.
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @return time if exists for this key, null otherwise
-     */
-    public String getSyncTime(long surveyGroupId) {
-        Cursor cursor = database.query(Tables.SYNC_TIME,
-                new String[] { SyncTimeColumns.SURVEY_GROUP_ID, SyncTimeColumns.TIME },
-                SyncTimeColumns.SURVEY_GROUP_ID + "=?",
-                new String[] { String.valueOf(surveyGroupId) },
-                null, null, null);
-
-        String time = null;
-        if (cursor.moveToFirst()) {
-            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
-        }
-        cursor.close();
-        return time;
     }
 
     /**

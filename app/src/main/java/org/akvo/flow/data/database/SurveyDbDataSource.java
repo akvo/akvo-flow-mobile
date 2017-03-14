@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.squareup.sqlbrite.BriteDatabase;
 
@@ -56,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture
@@ -101,7 +104,7 @@ public class SurveyDbDataSource {
             int qidCol = cursor.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
             int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
             int filenameCol = cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME);
-
+            int iterationCol = cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION);
             if (cursor.moveToFirst()) {
                 do {
                     QuestionResponse response = new QuestionResponse();
@@ -112,8 +115,12 @@ public class SurveyDbDataSource {
                     response.setQuestionId(cursor.getString(qidCol));
                     response.setIncludeFlag(cursor.getInt(includeCol) == 1);
                     response.setFilename(cursor.getString(filenameCol));
-
-                    responses.put(response.getQuestionId(), response);
+                    response.setIteration(cursor.getInt(iterationCol));
+                    String responseKey = response.getQuestionId();
+                    if (response.getIteration() > QuestionResponse.NO_ITERATION) {
+                        responseKey = responseKey + "|" + cursor.getInt(iterationCol);
+                    }
+                    responses.put(responseKey, response);
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -138,6 +145,8 @@ public class SurveyDbDataSource {
             boolean include =
                     cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
             resp.setIncludeFlag(include);
+            resp.setIteration(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION)));
         }
 
         if (cursor != null) {
@@ -155,8 +164,8 @@ public class SurveyDbDataSource {
      * @return
      */
     public QuestionResponse createOrUpdateSurveyResponse(QuestionResponse resp) {
-        QuestionResponse responseToSave = getResponse(
-                resp.getRespondentId(), resp.getQuestionId());
+        Timber.d(Log.getStackTraceString(new Exception("")));
+        QuestionResponse responseToSave = getResponse(resp.getRespondentId(), resp.getQuestionId());
         if (responseToSave != null) {
             responseToSave.setValue(resp.getValue());
             responseToSave.setFilename(resp.getFilename());
@@ -174,6 +183,7 @@ public class SurveyDbDataSource {
         initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getRespondentId());
         initialValues.put(ResponseColumns.FILENAME, responseToSave.getFilename());
         initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag() ? 1 : 0);
+        initialValues.put(ResponseColumns.INCLUDE, responseToSave.getIteration());
         id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), id, initialValues);
         responseToSave.setId(id);
         resp.setId(id);
@@ -506,6 +516,10 @@ public class SurveyDbDataSource {
 
     public void deleteResponse(long mSurveyInstanceId, String questionId) {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId);
+    }
+
+    public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {
+        surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId, iteration);
     }
 
     public void createTransmission(long id, String formId, String filename) {

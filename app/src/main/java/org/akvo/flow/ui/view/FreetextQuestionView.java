@@ -137,7 +137,8 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
      */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        ValidationRule rule = getQuestion().getValidationRule();
+        Question question = getQuestion();
+        ValidationRule rule = question.getValidationRule();
         try {
             if (!TextUtils.isEmpty(mEditText.getText().toString())) {
                 // Do not validate void answers
@@ -165,8 +166,12 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
             return;// Die early. Don't store the value.
         }
 
-        setResponse(new QuestionResponse(mEditText.getText().toString(),
-                ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                        .setValue(mEditText.getText().toString())
+                        .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                        .setQuestionId(question.getQuestionId())
+                        .setIteration(question.getIteration())
+                        .createQuestionResponse(),
                 suppressListeners);
 
         checkMandatory();// Mandatory question must be answered
@@ -227,8 +232,13 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
     @Override
     public void questionComplete(Bundle data) {
         if (data != null && data.containsKey(ConstantUtil.CADDISFLY_RESPONSE)) {
-            setResponse(new QuestionResponse(data.getString(ConstantUtil.CADDISFLY_RESPONSE),
-                    ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()));
+            Question question = getQuestion();
+            setResponse(new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(data.getString(ConstantUtil.CADDISFLY_RESPONSE))
+                    .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                    .setQuestionId(question.getQuestionId())
+                    .setIteration(question.getIteration())
+                    .createQuestionResponse());
         }
     }
 

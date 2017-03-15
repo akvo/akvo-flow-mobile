@@ -228,9 +228,15 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
             setResponse(null);
         } else {
-            setResponse(new QuestionResponse(lat + DELIM + lon + DELIM + mElevationField.getText()
-                    + DELIM + mCode,
-                    ConstantUtil.GEO_RESPONSE_TYPE, getQuestion().getId()));
+            String value = lat + DELIM + lon + DELIM + mElevationField.getText()
+                    + DELIM + mCode;
+            Question question = getQuestion();
+            setResponse(new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(value)
+                    .setType(ConstantUtil.GEO_RESPONSE_TYPE)
+                    .setQuestionId(question.getQuestionId())
+                    .setIteration(question.getIteration())
+                    .createQuestionResponse());
         }
     }
 

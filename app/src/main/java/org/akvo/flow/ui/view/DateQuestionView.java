@@ -117,10 +117,14 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
      */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(mSelectedDate != null ? mSelectedDate.getTime() + "" : "",
-                        ConstantUtil.DATE_RESPONSE_TYPE,
-                        getQuestion().getId()),
-                suppressListeners);
+        String value = mSelectedDate != null ? mSelectedDate.getTime() + "" : "";
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                        .setValue(value)
+                        .setType(ConstantUtil.DATE_RESPONSE_TYPE)
+                        .setQuestionId(question.getQuestionId())
+                        .setIteration(question.getIteration())
+                        .createQuestionResponse(), suppressListeners);
     }
 
     @Override

@@ -385,8 +385,13 @@ public class OptionQuestionView extends QuestionView {
         if (!values.isEmpty()) {
             response = OptionValue.serialize(values);
         }
-        setResponse(new QuestionResponse(response, ConstantUtil.OPTION_RESPONSE_TYPE,
-                getQuestion().getId()), suppressListeners);
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                .setValue(response)
+                .setType(ConstantUtil.OPTION_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse(), suppressListeners);
     }
 
 }

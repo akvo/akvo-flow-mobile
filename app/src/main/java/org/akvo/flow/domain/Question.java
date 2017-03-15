@@ -427,4 +427,27 @@ public class Question {
         }
         return q;
     }
+
+    public boolean isRepeatable() {
+        return id != null && id.contains("|");
+    }
+
+    public String getQuestionId() {
+        if (isRepeatable()) {
+            String [] questionIdAndIteration = id.split("\\|");
+            return questionIdAndIteration[0];
+        } else {
+            return id;
+        }
+    }
+
+    public int getIteration() {
+        if (isRepeatable()) {
+            String[] questionIdAndIteration = id.split("\\|");
+            String iteration = questionIdAndIteration[1];
+            return Integer.parseInt(iteration);
+        } else {
+            return QuestionResponse.NO_ITERATION;
+        }
+    }
 }

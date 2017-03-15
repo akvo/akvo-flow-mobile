@@ -257,7 +257,35 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public long updateSurveyResponse(Long responseToSaveId, long id, ContentValues initialValues) {
+    public Cursor getResponse(Long surveyInstanceId, String questionId, int iteration) {
+        return database.query(Tables.RESPONSE,
+                new String[] {
+                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
+                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
+                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
+                },
+                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
+                        + " =? AND " + "CAST(" + ResponseColumns.ITERATION + " as TEXT) = ? ",
+                new String[] { String.valueOf(surveyInstanceId), questionId,
+                        String.valueOf(iteration)
+                },
+                null, null, null);
+//        return database.rawQuery(
+//                "SELECT * FROM " + Tables.RESPONSE + " WHERE " + ResponseColumns.SURVEY_INSTANCE_ID
+//                        + " = ? AND " + ResponseColumns.QUESTION_ID
+//                        + " = ? AND " + ResponseColumns.ITERATION + " = " + iteration,
+//                new String[] { String.valueOf(surveyInstanceId), questionId });
+    }
+
+    /**
+     *
+     * @param responseToSaveId
+     * @param initialValues
+     * @return
+     */
+    public long updateSurveyResponse(Long responseToSaveId, ContentValues initialValues) {
+        Timber.d("updateSurveyResponse "+responseToSaveId);
+        long id = -1;
         if (responseToSaveId == null) {
             id = insertResponse(initialValues);
         } else {
@@ -268,13 +296,18 @@ public class SurveyDbAdapter {
         return id;
     }
 
+    /**
+     * Inserts new response
+     * @param initialValues
+     * @return the id of the inserted row
+     */
     private long insertResponse(ContentValues initialValues) {
         return database.insert(Tables.RESPONSE, null, initialValues);
     }
 
-    private int updateResponse(Long responseToSaveId, ContentValues initialValues) {
+    private int updateResponse(long responseToSaveId, ContentValues initialValues) {
         return database.update(Tables.RESPONSE, initialValues, ResponseColumns._ID + "=?",
-                new String[] { responseToSaveId.toString() });
+                new String[] { String.valueOf(responseToSaveId)});
     }
 
     /**
@@ -393,6 +426,12 @@ public class SurveyDbAdapter {
         });
     }
 
+    /**
+     * Delete response for a repeated question
+     * @param surveyInstanceId
+     * @param questionId
+     * @param iteration
+     */
     public void deleteResponse(long surveyInstanceId, String questionId, String iteration) {
         int deleted = database.delete(Tables.RESPONSE,
                 ResponseColumns.SURVEY_INSTANCE_ID

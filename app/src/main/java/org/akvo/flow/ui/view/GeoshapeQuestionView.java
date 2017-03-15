@@ -109,8 +109,12 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(mValue, ConstantUtil.VALUE_RESPONSE_TYPE,
-                getQuestion().getId()), suppressListeners);
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder().setValue(mValue)
+                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse(), suppressListeners);
     }
 
 }

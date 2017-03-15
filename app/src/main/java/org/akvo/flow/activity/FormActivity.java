@@ -44,12 +44,12 @@ import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -143,7 +143,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         Context context = getApplicationContext();
         prefs = new Prefs(context);
         languageMapper = new LanguageMapper(context);
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context, new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
+                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
 
         mediaFileHelper = new MediaFileHelper(this);
 
@@ -193,7 +194,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
      * for monitored groups, when a new survey instance is created, allowing users
      * to 'clone' responses from the previous response.
      */
-    private void displayPrefillDialog() {
+    private void displayPreFillDialog() {
         final Long lastSurveyInstance = mDatabase.getLastSurveyInstance(mRecordId, mSurvey.getId());
         if (lastSurveyInstance != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -202,7 +203,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    prefillSurvey(lastSurveyInstance);
+                    preFillSurvey(lastSurveyInstance);
                     dialog.dismiss();
                 }
             });
@@ -217,14 +218,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
     }
 
-    private void prefillSurvey(long prefillSurveyInstance) {
-        Map<String, QuestionResponse> responses = mDatabase.getResponses(prefillSurveyInstance);
-        for (QuestionResponse response : responses.values()) {
-            // Adapt(clone) responses for the current survey instance:
-            // Get rid of its Id and update the SurveyInstance Id
-            response.setId(null);
-            response.setRespondentId(mSurveyInstanceId);
-        }
+    private void preFillSurvey(long preFilledSurveyInstance) {
+        Map<String, QuestionResponse> responses = mDatabase
+                .getResponsesForPreFilledSurvey(preFilledSurveyInstance, mSurveyInstanceId);
         displayResponses(responses);
     }
 
@@ -343,7 +339,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             // Make sure the value is not larger than 500 chars
             builder.setLength(Math.min(builder.length(), 500));
-
+            Timber.d("will save name : " + builder.toString());
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
                     SurveyedLocaleMeta.NAME);
         }
@@ -413,7 +409,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 clearSurvey();
                 return true;
             case R.id.prefill:
-                displayPrefillDialog();
+                displayPreFillDialog();
                 return true;
             case R.id.view_map:
                 navigator.navigateToMapActivity(this, mRecordId);
@@ -626,6 +622,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mDatabase.deleteResponse(mSurveyInstanceId, questionId);
     }
 
+    public void deleteResponse(String questionId, String iteration) {
+        mQuestionResponses.remove(questionId);
+        mDatabase.deleteResponse(mSurveyInstanceId, questionId, iteration);
+    }
+
     @Override
     public QuestionView getQuestionView(String questionId) {
         return mAdapter.getQuestionView(questionId);
@@ -694,17 +695,30 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void storeAnswer(QuestionInteractionEvent event) {
-        String questionId = event.getSource().getQuestion().getId();
-        QuestionResponse response = event.getSource().getResponse();
+        String questionIdKey = event.getSource().getQuestion().getId();
+        QuestionResponse eventResponse = event.getSource().getResponse();
 
         // Store the response if it contains a value. Otherwise, delete it
-        if (response != null && response.hasValue()) {
-            mQuestionResponses.put(questionId, response);
-            response.setRespondentId(mSurveyInstanceId);
-            mDatabase.createOrUpdateSurveyResponse(response);
+        if (eventResponse != null && eventResponse.hasValue()) {
+            Long id = mQuestionResponses.containsKey(questionIdKey) ?
+                    mQuestionResponses.get(questionIdKey).getId(): null;
+            QuestionResponse responseToSave = new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(eventResponse.getValue())
+                    .setType(eventResponse.getType())
+                    .setId(id)
+                    .setSurveyInstanceId(mSurveyInstanceId)
+                    .setQuestionId(eventResponse.getQuestionId())
+                    .setFilename(eventResponse.getFilename())
+                    .setIncludeFlag(eventResponse.getIncludeFlag())
+                    .setIteration(eventResponse.getIteration())
+                    .createQuestionResponse();
+            Timber.d("storeAnswer : " + responseToSave.toString());
+            responseToSave = mDatabase.createOrUpdateSurveyResponse(responseToSave);
+            mQuestionResponses.put(questionIdKey, responseToSave);
         } else {
             event.getSource().setResponse(null, true);// Invalidate previous response
-            deleteResponse(questionId);
+            //TODO: this is wrong questionId cannot be used here
+            deleteResponse(questionIdKey);
         }
     }
 

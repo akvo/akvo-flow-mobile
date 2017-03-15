@@ -26,7 +26,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.squareup.sqlbrite.BriteDatabase;
 
@@ -107,20 +106,50 @@ public class SurveyDbDataSource {
             int iterationCol = cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION);
             if (cursor.moveToFirst()) {
                 do {
-                    QuestionResponse response = new QuestionResponse();
-                    response.setId(cursor.getLong(idCol));
-                    response.setRespondentId(surveyInstanceId);// No need to read the cursor
-                    response.setValue(cursor.getString(answerCol));
-                    response.setType(cursor.getString(typeCol));
-                    response.setQuestionId(cursor.getString(qidCol));
-                    response.setIncludeFlag(cursor.getInt(includeCol) == 1);
-                    response.setFilename(cursor.getString(filenameCol));
-                    response.setIteration(cursor.getInt(iterationCol));
-                    String responseKey = response.getQuestionId();
-                    if (response.getIteration() > QuestionResponse.NO_ITERATION) {
-                        responseKey = responseKey + "|" + cursor.getInt(iterationCol);
-                    }
-                    responses.put(responseKey, response);
+                    QuestionResponse response = new QuestionResponse.QuestionResponseBuilder()
+                            .setValue(cursor.getString(answerCol))
+                            .setType(cursor.getString(typeCol)).setId(cursor.getLong(idCol))
+                            .setSurveyInstanceId(surveyInstanceId)
+                            .setQuestionId(cursor.getString(qidCol))
+                            .setFilename(cursor.getString(filenameCol))
+                            .setIncludeFlag(cursor.getInt(includeCol) == 1)
+                            .setIteration(cursor.getInt(iterationCol)).createQuestionResponse();
+                    responses.put(response.getResponseKey(), response);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+
+        return responses;
+    }
+
+    /**
+     *  Adapt(clone) responses for the current survey instance:
+     *  Get rid of its Id and update the SurveyInstance Id
+     */
+    public Map<String, QuestionResponse> getResponsesForPreFilledSurvey(long surveyInstanceId,
+            long newSurveyInstanceId) {
+        Map<String, QuestionResponse> responses = new HashMap<>();
+
+        Cursor cursor = surveyDbAdapter.getResponses(surveyInstanceId);
+
+        if (cursor != null) {
+            int idCol = cursor.getColumnIndexOrThrow(ResponseColumns._ID);
+            int answerCol = cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER);
+            int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
+            int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
+            int filenameCol = cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME);
+            int iterationCol = cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION);
+            if (cursor.moveToFirst()) {
+                do {
+                    QuestionResponse response = new QuestionResponse.QuestionResponseBuilder()
+                            .setValue(cursor.getString(answerCol))
+                            .setType(cursor.getString(typeCol)).setId(cursor.getLong(idCol))
+                            .setSurveyInstanceId(newSurveyInstanceId).setQuestionId(null)
+                            .setFilename(cursor.getString(filenameCol))
+                            .setIncludeFlag(cursor.getInt(includeCol) == 1)
+                            .setIteration(cursor.getInt(iterationCol)).createQuestionResponse();
+                    responses.put(response.getResponseKey(), response);
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -133,20 +162,18 @@ public class SurveyDbDataSource {
         QuestionResponse resp = null;
         Cursor cursor = surveyDbAdapter.getResponse(surveyInstanceId, questionId);
         if (cursor != null && cursor.moveToFirst()) {
-            resp = new QuestionResponse();
-            resp.setQuestionId(questionId);
-            resp.setRespondentId(surveyInstanceId);
-            resp.setType(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE)));
-            resp.setValue(cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER)));
-            resp.setId(cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID)));
-            resp.setFilename(
-                    cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME)));
-
+            String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER));
+            String type = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE));
+            Long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID));
+            String filename = cursor
+                    .getString(cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME));
             boolean include =
                     cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
-            resp.setIncludeFlag(include);
-            resp.setIteration(
-                    cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION)));
+            int iteration = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION));
+            resp = new QuestionResponse.QuestionResponseBuilder().setValue(value).setType(type).setId(id)
+                    .setSurveyInstanceId(surveyInstanceId).setQuestionId(questionId)
+                    .setFilename(filename).setIncludeFlag(include).setIteration(iteration)
+                    .createQuestionResponse();
         }
 
         if (cursor != null) {
@@ -156,38 +183,72 @@ public class SurveyDbDataSource {
         return resp;
     }
 
+    //TODO: also take into account iteration
+    @NonNull
+    private QuestionResponse getResponseToSave(@NonNull QuestionResponse newResponse) {
+        QuestionResponse resp;
+        Long surveyInstanceId = newResponse.getSurveyInstanceId();
+        String questionId = newResponse.getQuestionId();
+
+        //TODO: use another method with less fields
+        Cursor cursor;
+        if (newResponse.isAnswerToRepeatableGroup()) {
+            cursor = surveyDbAdapter
+                    .getResponse(surveyInstanceId, questionId, newResponse.getIteration());
+        } else {
+            cursor = surveyDbAdapter.getResponse(surveyInstanceId, questionId);
+        }
+        if (cursor != null && cursor.moveToFirst()) {
+            String type = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE));
+            if (newResponse.getType() != null) {
+                type = newResponse.getType();
+            }
+            Long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID));
+            int iteration = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION));
+            resp = new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(newResponse.getValue())
+                    .setType(type)
+                    .setId(id)
+                    .setSurveyInstanceId(surveyInstanceId)
+                    .setQuestionId(questionId)
+                    .setFilename(newResponse.getFilename())
+                    .setIncludeFlag(newResponse.getIncludeFlag())
+                    .setIteration(iteration)
+                    .createQuestionResponse();
+        } else {
+            resp = new QuestionResponse.QuestionResponseBuilder()
+                    .createFromQuestionResponse(newResponse);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        return resp;
+    }
+
+
     /**
      * inserts or updates a question response after first looking to see if it
      * already exists in the database.
      *
-     * @param resp
+     * @param newResponse new QuestionResponseData to insert
      * @return
      */
-    public QuestionResponse createOrUpdateSurveyResponse(QuestionResponse resp) {
-        Timber.d(Log.getStackTraceString(new Exception("")));
-        QuestionResponse responseToSave = getResponse(resp.getRespondentId(), resp.getQuestionId());
-        if (responseToSave != null) {
-            responseToSave.setValue(resp.getValue());
-            responseToSave.setFilename(resp.getFilename());
-            if (resp.getType() != null) {
-                responseToSave.setType(resp.getType());
-            }
-        } else {
-            responseToSave = resp;
-        }
-        long id = -1;
+    //TODO: verify this as id may be wrong
+    public QuestionResponse createOrUpdateSurveyResponse(@NonNull QuestionResponse newResponse) {
+        QuestionResponse responseToSave = getResponseToSave(newResponse);
+        Timber.d("will save response : " + responseToSave.toString());
         ContentValues initialValues = new ContentValues();
         initialValues.put(ResponseColumns.ANSWER, responseToSave.getValue());
         initialValues.put(ResponseColumns.TYPE, responseToSave.getType());
         initialValues.put(ResponseColumns.QUESTION_ID, responseToSave.getQuestionId());
-        initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getRespondentId());
+        initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getSurveyInstanceId());
         initialValues.put(ResponseColumns.FILENAME, responseToSave.getFilename());
-        initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag() ? 1 : 0);
-        initialValues.put(ResponseColumns.INCLUDE, responseToSave.getIteration());
-        id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), id, initialValues);
-        responseToSave.setId(id);
-        resp.setId(id);
-        return responseToSave;
+        initialValues.put(ResponseColumns.INCLUDE, responseToSave.getIncludeFlag() ? 1 : 0);
+        initialValues.put(ResponseColumns.ITERATION, responseToSave.getIteration());
+        long id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), initialValues);
+        return new QuestionResponse.QuestionResponseBuilder().createFromQuestionResponse(
+                responseToSave, id);
     }
 
     public long createSurveyRespondent(String surveyId, double version, User user,
@@ -422,21 +483,19 @@ public class SurveyDbDataSource {
     }
 
     public void updateSurveyedLocale(long surveyInstanceId, String response,
-            SurveyDbAdapter.SurveyedLocaleMeta type) {
+            SurveyDbAdapter.SurveyedLocaleMeta surveyedLocaleMeta) {
         if (!TextUtils.isEmpty(response)) {
             String surveyedLocaleId = surveyDbAdapter.getSurveyedLocaleId(surveyInstanceId);
             ContentValues surveyedLocaleValues = new ContentValues();
 
-            QuestionResponse metaResponse = new QuestionResponse();
-            metaResponse.setRespondentId(surveyInstanceId);
-            metaResponse.setValue(response);
-            metaResponse.setIncludeFlag(true);
+            String questionId = null;
+            String type = null;
 
-            switch (type) {
+            switch (surveyedLocaleMeta) {
                 case NAME:
                     surveyedLocaleValues.put(RecordColumns.NAME, response);
-                    metaResponse.setType("META_NAME");
-                    metaResponse.setQuestionId(ConstantUtil.QUESTION_LOCALE_NAME);
+                    type = "META_NAME";
+                    questionId = ConstantUtil.QUESTION_LOCALE_NAME;
                     break;
                 case GEOLOCATION:
                     String[] parts = response.split("\\|");
@@ -445,11 +504,17 @@ public class SurveyDbDataSource {
                     }
                     surveyedLocaleValues.put(RecordColumns.LATITUDE, Double.parseDouble(parts[0]));
                     surveyedLocaleValues.put(RecordColumns.LONGITUDE, Double.parseDouble(parts[1]));
-                    metaResponse.setType("META_GEO");
-                    metaResponse.setQuestionId(ConstantUtil.QUESTION_LOCALE_GEO);
+                    type = "META_GEO";
+                    questionId = ConstantUtil.QUESTION_LOCALE_GEO;
                     break;
             }
-
+            QuestionResponse metaResponse = new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(response)
+                    .setType(type)
+                    .setSurveyInstanceId(surveyInstanceId)
+                    .setQuestionId(questionId)
+                    .setIncludeFlag(true)
+                    .createQuestionResponse();
             // Update the surveyed locale info
             briteSurveyDbAdapter.updateSurveyedLocale(surveyedLocaleId, surveyedLocaleValues);
 

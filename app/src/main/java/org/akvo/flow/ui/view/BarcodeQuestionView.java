@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -266,7 +267,12 @@ public class BarcodeQuestionView extends QuestionView implements OnClickListener
         if (!TextUtils.isEmpty(value)) {
             builder.append(value);
         }
-        setResponse(new QuestionResponse(builder.toString(), ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
-                    suppressListeners);
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                .setValue(builder.toString())
+                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse(), suppressListeners);
     }
 }

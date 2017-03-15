@@ -110,8 +110,13 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
     public void captureResponse(boolean suppressListeners) {
         mSignature.setName(mName.getText().toString());
         String value = SignatureValue.serialize(mSignature);
-        setResponse(new QuestionResponse(value, ConstantUtil.SIGNATURE_RESPONSE_TYPE,
-                getQuestion().getId()));
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(ConstantUtil.SIGNATURE_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse());
     }
 
     private void displayResponse() {

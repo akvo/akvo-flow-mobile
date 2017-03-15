@@ -406,17 +406,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public boolean handleDependencyParentResponse(Dependency dep, QuestionResponse resp) {
         boolean isMatch = false;
-        if (dep.getAnswer() != null
-                && resp != null
-                && dep.isMatch(resp.getValue())
-                && resp.getIncludeFlag()) {
+        if (dep.getAnswer() != null && resp != null && dep.isMatch(resp.getValue()) && resp
+                .getIncludeFlag()) {
             isMatch = true;
-        } else if (dep.getAnswer() != null
-                && resp != null
-                && resp.getIncludeFlag()) {
+        } else if (dep.getAnswer() != null && resp != null && resp.getIncludeFlag()) {
             if (resp.getValue() != null) {
-                StringTokenizer strTok = new StringTokenizer(resp.getValue(),
-                        "|");
+                StringTokenizer strTok = new StringTokenizer(resp.getValue(), "|");
                 while (strTok.hasMoreTokens()) {
                     if (dep.isMatch(strTok.nextToken().trim())) {
                         isMatch = true;
@@ -429,18 +424,16 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         // if we're here, then the question on which we depend
         // has been answered. Check the value to see if it's the
         // one we are looking for
+        boolean includeFlag = true;
         if (isMatch) {
             setVisibility(View.VISIBLE);
-            if (mResponse != null) {
-                mResponse.setIncludeFlag(true);
-            }
             setVisible = true;
         } else {
-            if (mResponse != null) {
-                mResponse.setIncludeFlag(false);
-            }
+            includeFlag = false;
             setVisibility(View.GONE);
         }
+        mResponse = new QuestionResponse.QuestionResponseBuilder()
+                .createFromQuestionResponse(mResponse, includeFlag);
 
         // now notify our own listeners to make sure we correctly toggle
         // nested dependencies (i.e. if A -> B -> C and C changes, A needs to
@@ -505,18 +498,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     public void setResponse(QuestionResponse response, boolean suppressListeners) {
-        if (response != null) {
-            if (this.mResponse == null) {
-                this.mResponse = response;
-            } else {
-                // we need to preserve the ID so we don't get duplicates in the db
-                this.mResponse.setType(response.getType());
-                this.mResponse.setValue(response.getValue());
-                this.mResponse.setFilename(response.getFilename());
-            }
-        } else {
-            this.mResponse = response;
-        }
+        this.mResponse = new QuestionResponse.QuestionResponseBuilder()
+                .createFromQuestionResponse(this.mResponse, response);
         if (!suppressListeners) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
         }
@@ -588,7 +571,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     public boolean isDoubleEntry() {
-        return mQuestion != null ? mQuestion.isDoubleEntry() : false;// Avoid NPE
+        return mQuestion != null && mQuestion.isDoubleEntry();
     }
 
     /**

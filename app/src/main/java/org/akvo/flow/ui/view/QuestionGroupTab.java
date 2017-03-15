@@ -307,15 +307,15 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     @Override
     public void onDeleteRepetition(Integer repetitionID) {
         // Delete question views and corresponding responses
-        for (String qid : mQuestions) {
-            qid += "|" + repetitionID;
+        for (String questionId : mQuestions) {
+            String qid = questionId + "|" + repetitionID;
             QuestionView qv = mQuestionViews.get(qid);
             if (qv != null) {
                 qv.onDestroy();
                 mQuestionViews.remove(qid);
                 mContainer.removeView(qv);
             }
-            mSurveyListener.deleteResponse(qid);
+            mSurveyListener.deleteResponse(questionId, String.valueOf(repetitionID));
         }
 
         // Rearrange header positions (just the visual indicator).

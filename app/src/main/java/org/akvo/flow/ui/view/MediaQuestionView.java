@@ -223,10 +223,18 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     public void captureResponse(boolean suppressListeners) {
         QuestionResponse response = null;
         if (mMedia != null && !TextUtils.isEmpty(mMedia.getFilename())) {
-            response = new QuestionResponse(MediaValue.serialize(mMedia),
-                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                    getQuestion().getId());
-            response.setFilename(mMedia.getFilename());
+            Question question = getQuestion();
+            String value = MediaValue.serialize(mMedia);
+            String type = isImage() ?
+                    ConstantUtil.IMAGE_RESPONSE_TYPE :
+                    ConstantUtil.VIDEO_RESPONSE_TYPE;
+            response = new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(value)
+                    .setType(type)
+                    .setQuestionId(question.getQuestionId())
+                    .setIteration(question.getIteration())
+                    .setFilename(mMedia.getFilename())
+                    .createQuestionResponse();
         }
         setResponse(response);
     }

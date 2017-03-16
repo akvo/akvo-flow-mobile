@@ -91,17 +91,17 @@ public class DatabaseDataSource {
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         try {
             for (ApiDataPoint surveyedLocale : apiDataPoints) {
-                final String id = surveyedLocale.getId();
+                final String surveyedLocaleId = surveyedLocale.getId();
                 ContentValues values = new ContentValues();
-                values.put(RecordColumns.RECORD_ID, id);
+                values.put(RecordColumns.RECORD_ID, surveyedLocaleId);
                 values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
                 values.put(RecordColumns.NAME, surveyedLocale.getDisplayName());
                 values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
                 values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
 
-                syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
+                syncSurveyInstances(surveyedLocale.getSurveyInstances(), surveyedLocaleId);
 
-                briteSurveyDbAdapter.updateRecord(id, values, surveyedLocale.getLastModified());
+                briteSurveyDbAdapter.updateRecord(surveyedLocaleId, values, surveyedLocale.getLastModified());
             }
             updateLastUpdatedDateTime(apiDataPoints);
             transaction.markSuccessful();
@@ -163,6 +163,17 @@ public class DatabaseDataSource {
     }
 
     private void syncResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
+        deleteResponses(responses, surveyInstanceId);
+        insertResponses(responses, surveyInstanceId);
+    }
+
+    private void deleteResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
+        for (ApiQuestionAnswer response : responses) {
+            briteSurveyDbAdapter.deleteResponses(surveyInstanceId, response.getQuestionId());
+        }
+    }
+
+    private void insertResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
         for (ApiQuestionAnswer response : responses) {
 
             ContentValues values = new ContentValues();

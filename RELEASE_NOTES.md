@@ -1,5 +1,20 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.0
+Date: 16 March 2017
+
+# New and noteworthy
+* **Automate release note creation** - [#604](https://github.com/akvo/akvo-flow-mobile/issues/604) Release notes can now be generated faster with a script.
+* **Create 3 modules for the layers of the app** - [#535](https://github.com/akvo/akvo-flow-mobile/issues/535) This is the first step of refactoring the app to 3 layers app/domain/data.
+
+# Resolved issues
+* **Review some exceptions being sent to sentry** - [#633](https://github.com/akvo/akvo-flow-mobile/issues/633) Filtered out exceptions that were not useful to reduce traffic.
+* **Data sync notifications phase 1** - [#584](https://github.com/akvo/akvo-flow-mobile/issues/584) Removed notifications when datapoints are being sent to the server.
+* **Languages: Find a better way to handle languages** - [#576](https://github.com/akvo/akvo-flow-mobile/issues/576) Improved language settings per survey and moved languages to the language table.
+* **Languages: When switching surveys the previous survey languages are displayed** - [#575](https://github.com/akvo/akvo-flow-mobile/issues/575) Fixed issue when survey languages were displayed for all the surveys at the same time.
+* **Database refactor phase 1** - [#544](https://github.com/akvo/akvo-flow-mobile/issues/544) User preferences have been moved out of database into SharedPreferences for faster access.
+
+---------------
 # ver 2.2.11
 Date: 23 February 2017
 

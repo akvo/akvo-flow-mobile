@@ -57,8 +57,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
-
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture
  */
@@ -108,12 +106,14 @@ public class SurveyDbDataSource {
                 do {
                     QuestionResponse response = new QuestionResponse.QuestionResponseBuilder()
                             .setValue(cursor.getString(answerCol))
-                            .setType(cursor.getString(typeCol)).setId(cursor.getLong(idCol))
+                            .setType(cursor.getString(typeCol))
+                            .setId(cursor.getLong(idCol))
                             .setSurveyInstanceId(surveyInstanceId)
                             .setQuestionId(cursor.getString(qidCol))
                             .setFilename(cursor.getString(filenameCol))
                             .setIncludeFlag(cursor.getInt(includeCol) == 1)
-                            .setIteration(cursor.getInt(iterationCol)).createQuestionResponse();
+                            .setIteration(cursor.getInt(iterationCol))
+                            .createQuestionResponse();
                     responses.put(response.getResponseKey(), response);
                 } while (cursor.moveToNext());
             }
@@ -134,7 +134,6 @@ public class SurveyDbDataSource {
         Cursor cursor = surveyDbAdapter.getResponses(surveyInstanceId);
 
         if (cursor != null) {
-            int idCol = cursor.getColumnIndexOrThrow(ResponseColumns._ID);
             int answerCol = cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER);
             int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
             int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
@@ -144,11 +143,12 @@ public class SurveyDbDataSource {
                 do {
                     QuestionResponse response = new QuestionResponse.QuestionResponseBuilder()
                             .setValue(cursor.getString(answerCol))
-                            .setType(cursor.getString(typeCol)).setId(cursor.getLong(idCol))
-                            .setSurveyInstanceId(newSurveyInstanceId).setQuestionId(null)
+                            .setType(cursor.getString(typeCol))
+                            .setSurveyInstanceId(newSurveyInstanceId)
                             .setFilename(cursor.getString(filenameCol))
                             .setIncludeFlag(cursor.getInt(includeCol) == 1)
-                            .setIteration(cursor.getInt(iterationCol)).createQuestionResponse();
+                            .setIteration(cursor.getInt(iterationCol))
+                            .createQuestionResponse();
                     responses.put(response.getResponseKey(), response);
                 } while (cursor.moveToNext());
             }
@@ -170,9 +170,15 @@ public class SurveyDbDataSource {
             boolean include =
                     cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
             int iteration = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION));
-            resp = new QuestionResponse.QuestionResponseBuilder().setValue(value).setType(type).setId(id)
-                    .setSurveyInstanceId(surveyInstanceId).setQuestionId(questionId)
-                    .setFilename(filename).setIncludeFlag(include).setIteration(iteration)
+            resp = new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(value)
+                    .setType(type)
+                    .setId(id)
+                    .setSurveyInstanceId(surveyInstanceId)
+                    .setQuestionId(questionId)
+                    .setFilename(filename)
+                    .setIncludeFlag(include)
+                    .setIteration(iteration)
                     .createQuestionResponse();
         }
 
@@ -183,14 +189,12 @@ public class SurveyDbDataSource {
         return resp;
     }
 
-    //TODO: also take into account iteration
     @NonNull
     private QuestionResponse getResponseToSave(@NonNull QuestionResponse newResponse) {
         QuestionResponse resp;
         Long surveyInstanceId = newResponse.getSurveyInstanceId();
         String questionId = newResponse.getQuestionId();
 
-        //TODO: use another method with less fields
         Cursor cursor;
         if (newResponse.isAnswerToRepeatableGroup()) {
             cursor = surveyDbAdapter
@@ -234,10 +238,8 @@ public class SurveyDbDataSource {
      * @param newResponse new QuestionResponseData to insert
      * @return
      */
-    //TODO: verify this as id may be wrong
     public QuestionResponse createOrUpdateSurveyResponse(@NonNull QuestionResponse newResponse) {
         QuestionResponse responseToSave = getResponseToSave(newResponse);
-        Timber.d("will save response : " + responseToSave.toString());
         ContentValues initialValues = new ContentValues();
         initialValues.put(ResponseColumns.ANSWER, responseToSave.getValue());
         initialValues.put(ResponseColumns.TYPE, responseToSave.getType());

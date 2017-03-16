@@ -176,7 +176,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void initializeInjector() {
         ViewComponent viewComponent =
-                DaggerViewComponent.builder().applicationComponent(getApplicationComponent()).build();
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
         viewComponent.inject(this);
     }
 
@@ -339,7 +340,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             // Make sure the value is not larger than 500 chars
             builder.setLength(Math.min(builder.length(), 500));
-            Timber.d("will save name : " + builder.toString());
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
                     SurveyedLocaleMeta.NAME);
         }
@@ -618,8 +618,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void deleteResponse(String questionId) {
-        mQuestionResponses.remove(questionId);
-        mDatabase.deleteResponse(mSurveyInstanceId, questionId);
+        QuestionResponse questionResponse = mQuestionResponses.remove(questionId);
+        if (questionResponse.isAnswerToRepeatableGroup()) {
+            mDatabase.deleteResponse(mSurveyInstanceId, questionResponse.getQuestionId(),
+                    questionResponse.getIteration()+"");
+        } else {
+            mDatabase.deleteResponse(mSurveyInstanceId, questionId);
+        }
     }
 
     public void deleteResponse(String questionId, String iteration) {
@@ -712,12 +717,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     .setIncludeFlag(eventResponse.getIncludeFlag())
                     .setIteration(eventResponse.getIteration())
                     .createQuestionResponse();
-            Timber.d("storeAnswer : " + responseToSave.toString());
             responseToSave = mDatabase.createOrUpdateSurveyResponse(responseToSave);
             mQuestionResponses.put(questionIdKey, responseToSave);
         } else {
             event.getSource().setResponse(null, true);// Invalidate previous response
-            //TODO: this is wrong questionId cannot be used here
             deleteResponse(questionIdKey);
         }
     }

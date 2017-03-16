@@ -234,7 +234,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void updateRepetitionsHeader() {
-        //TODO: replace string concatenation by
+        //TODO: replace string concatenation by replaceable params inside string and/or plurals
         mRepetitionsText
                 .setText(getContext().getString(R.string.repetitions) + groupIterations.size());
     }
@@ -384,7 +384,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         /**
          * For the given form instance, load the list of repetitions IDs.
          * The populated list will contain the IDs of existing repetitions.
-         * Although IDs are autoIncremented numeric values, there might be
+         * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
          * @param questions
          * @param questionResponses

@@ -270,11 +270,6 @@ public class SurveyDbAdapter {
                         String.valueOf(iteration)
                 },
                 null, null, null);
-//        return database.rawQuery(
-//                "SELECT * FROM " + Tables.RESPONSE + " WHERE " + ResponseColumns.SURVEY_INSTANCE_ID
-//                        + " = ? AND " + ResponseColumns.QUESTION_ID
-//                        + " = ? AND " + ResponseColumns.ITERATION + " = " + iteration,
-//                new String[] { String.valueOf(surveyInstanceId), questionId });
     }
 
     /**
@@ -284,7 +279,6 @@ public class SurveyDbAdapter {
      * @return
      */
     public long updateSurveyResponse(Long responseToSaveId, ContentValues initialValues) {
-        Timber.d("updateSurveyResponse "+responseToSaveId);
         long id = -1;
         if (responseToSaveId == null) {
             id = insertResponse(initialValues);
@@ -433,7 +427,7 @@ public class SurveyDbAdapter {
      * @param iteration
      */
     public void deleteResponse(long surveyInstanceId, String questionId, String iteration) {
-        int deleted = database.delete(Tables.RESPONSE,
+        database.delete(Tables.RESPONSE,
                 ResponseColumns.SURVEY_INSTANCE_ID
                         + "= ? AND "
                         + ResponseColumns.QUESTION_ID
@@ -443,7 +437,6 @@ public class SurveyDbAdapter {
                 new String[] {
                         String.valueOf(surveyInstanceId), questionId, iteration
                 });
-        Timber.d("deleted %d response(s)", deleted);
     }
 
     public void createTransmission(long surveyInstanceId, String formID, String filename) {

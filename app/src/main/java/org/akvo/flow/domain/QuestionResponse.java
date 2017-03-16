@@ -294,19 +294,4 @@ public class QuestionResponse {
             return null;
         }
     }
-
-    //TODO: remove this
-    @Override
-    public String toString() {
-        return "QuestionResponse{" +
-                "value='" + value + '\'' +
-                ", type='" + type + '\'' +
-                ", id=" + id +
-                ", surveyInstanceId=" + surveyInstanceId +
-                ", questionId='" + questionId + '\'' +
-                ", filename='" + filename + '\'' +
-                ", includeFlag=" + includeFlag +
-                ", iteration=" + iteration +
-                '}';
-    }
 }

@@ -38,7 +38,7 @@ public class QuestionResponse {
     private final boolean includeFlag;
     private final int iteration;
 
-    public QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
+    QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
             String questionId, String filename, boolean includeFlag, int iteration) {
         this.value = value;
         this.type = type;
@@ -265,6 +265,8 @@ public class QuestionResponse {
                 return null;
             } else if (oldResponse == null) {
                 return newResponse;
+            } else if (newResponse == null) {
+                return oldResponse;
             } else {
                 return setId(oldResponse.getId())
                         .setValue(newResponse.getValue())

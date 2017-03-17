@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.OnDeleteListener {
+public class QuestionGroupTab extends LinearLayout implements QuestionGroupIterationHeader.OnDeleteListener {
 
     private final QuestionGroup mQuestionGroup;
     private final QuestionInteractionListener mQuestionListener;
@@ -62,7 +62,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
     private TextView mRepetitionsText;
 
-    private final Map<Integer, RepetitionHeader> mHeaders;
+    private final Map<Integer, QuestionGroupIterationHeader> groupIterationHeaders;
     private final RepeatableGroupIterations groupIterations;// Repetition IDs
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
@@ -72,7 +72,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
         mQuestionViews = new HashMap<>();
-        mHeaders = new HashMap<>();
+        groupIterationHeaders = new HashMap<>();
         groupIterations = new RepeatableGroupIterations();
         mLoaded = false;
         mQuestions = new HashSet<>();
@@ -176,9 +176,24 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             for (int i = 0; i < iterCount; i++) {
                 loadGroup(i);
             }
+            updateGroupIterationHeaders();
         }
 
         displayResponses();
+    }
+
+    private void updateGroupIterationHeaders() {
+        if (groupIterationHeaders.size() > 1) {
+            Collection<QuestionGroupIterationHeader> iterationHeaders = groupIterationHeaders
+                    .values();
+            for (QuestionGroupIterationHeader header : iterationHeaders) {
+                header.enableDeleteButton();
+            }
+        } else if (groupIterationHeaders.size() == 1) {
+            QuestionGroupIterationHeader header = groupIterationHeaders.entrySet().iterator().next()
+                    .getValue();
+            header.disableDeleteButton();
+        }
     }
 
     private void displayResponses() {
@@ -241,6 +256,9 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
     private void loadGroup() {
         loadGroup(groupIterations.size());
+        if (mQuestionGroup.isRepeatable()) {
+            updateGroupIterationHeaders();
+        }
     }
 
     private void loadGroup(int index) {
@@ -252,10 +270,10 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
-            RepetitionHeader header =
-                    new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
+            QuestionGroupIterationHeader header =
+                    new QuestionGroupIterationHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
                             position, mSurveyListener.isReadOnly() ? null : this);
-            mHeaders.put(repetitionId, header);
+            groupIterationHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
 
@@ -323,18 +341,19 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         // Rearrange header positions (just the visual indicator).
         for (Integer id : groupIterations) {
             if (id.intValue() == repetitionID.intValue()) {
-                View header = mHeaders.remove(repetitionID);
+                View header = groupIterationHeaders.remove(repetitionID);
                 if (header != null) {
                     mContainer.removeView(header);
                 }
-            } else if (id > repetitionID && mHeaders.containsKey(id)) {
-                mHeaders.get(id).decreasePosition();
+            } else if (id > repetitionID && groupIterationHeaders.containsKey(id)) {
+                groupIterationHeaders.get(id).decreasePosition();
             }
         }
 
         // Remove the ID from the repetitions list.
         groupIterations.remove(repetitionID);
         updateRepetitionsHeader();
+        updateGroupIterationHeaders();
     }
 
     public void setupDependencies() {

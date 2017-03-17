@@ -31,7 +31,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public class RepetitionHeader extends android.support.v7.widget.AppCompatTextView
+public class QuestionGroupIterationHeader extends android.support.v7.widget.AppCompatTextView
         implements View.OnTouchListener {
 
     private String mTitle;
@@ -43,7 +43,7 @@ public class RepetitionHeader extends android.support.v7.widget.AppCompatTextVie
         void onDeleteRepetition(Integer index);
     }
 
-    public RepetitionHeader(Context context, String title, int id, int pos,
+    public QuestionGroupIterationHeader(Context context, String title, int id, int pos,
             OnDeleteListener listener) {
         super(context);
 
@@ -58,13 +58,23 @@ public class RepetitionHeader extends android.support.v7.widget.AppCompatTextVie
         setText(mTitle + " - " + pos);
         setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
         setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
+    }
 
-        // Show 'delete' icon if the OnDeleteListener param is not null
+    /**
+     * Show 'delete' icon
+     */
+    public void enableDeleteButton() {
         if (mListener != null) {
-            Drawable deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_trash);
+            Drawable deleteIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_trash);
             setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
             setOnTouchListener(this);
         }
+    }
+
+
+    public void disableDeleteButton() {
+        setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        setOnTouchListener(null);
     }
 
     public void decreasePosition() {

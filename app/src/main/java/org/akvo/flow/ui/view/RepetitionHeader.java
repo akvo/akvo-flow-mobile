@@ -31,7 +31,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public class RepetitionHeader extends TextView implements View.OnTouchListener {
+public class RepetitionHeader extends android.support.v7.widget.AppCompatTextView implements View.OnTouchListener {
     private String mTitle;
     private int mID, mPosition;
     private OnDeleteListener mListener;

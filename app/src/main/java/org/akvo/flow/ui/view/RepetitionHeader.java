@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -16,6 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
@@ -25,22 +26,25 @@ import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
-public class RepetitionHeader extends android.support.v7.widget.AppCompatTextView implements View.OnTouchListener {
+public class RepetitionHeader extends android.support.v7.widget.AppCompatTextView
+        implements View.OnTouchListener {
+
     private String mTitle;
     private int mID, mPosition;
     private OnDeleteListener mListener;
 
     public interface OnDeleteListener {
+
         void onDeleteRepetition(Integer index);
     }
 
-    public RepetitionHeader(Context context, String title, int id, int pos, OnDeleteListener listener) {
+    public RepetitionHeader(Context context, String title, int id, int pos,
+            OnDeleteListener listener) {
         super(context);
 
         mID = id;
@@ -48,7 +52,7 @@ public class RepetitionHeader extends android.support.v7.widget.AppCompatTextVie
         mTitle = title;
         mListener = listener;
 
-        int padding = (int)PlatformUtil.dp2Pixel(context, 8);
+        int padding = (int) PlatformUtil.dp2Pixel(context, 8);
         setPadding(padding, padding, padding, padding);
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         setText(mTitle + " - " + pos);

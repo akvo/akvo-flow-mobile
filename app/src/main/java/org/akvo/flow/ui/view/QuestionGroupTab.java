@@ -254,8 +254,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             updateRepetitionsHeader();
             RepetitionHeader header =
                     new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
-                            position,
-                            mSurveyListener.isReadOnly() ? null : this);
+                            position, mSurveyListener.isReadOnly() ? null : this);
             mHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -386,6 +385,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
          * The populated list will contain the IDs of existing repetitions.
          * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
+         *
          * @param questions
          * @param questionResponses
          */

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,6 +22,7 @@ package org.akvo.flow.ui.view;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.DatePicker;
@@ -34,10 +35,12 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import timber.log.Timber;
@@ -53,21 +56,19 @@ import timber.log.Timber;
  */
 public class DateQuestionView extends QuestionView implements View.OnClickListener {
 
+    private final DateFormat localeDateFormat;
+    private final DateFormat gmtDateFormat;
+    private final Calendar mLocalCalendar;
+
     private EditText mDateTextEdit;
-    private DateFormat mDateFormat;
     private Date mSelectedDate;
-    private Calendar mLocalCalendar;
-    private Calendar mGMTCalendar;
 
     public DateQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mLocalCalendar = GregorianCalendar.getInstance();
-        mGMTCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-        mGMTCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        mGMTCalendar.set(Calendar.MINUTE, 0);
-        mGMTCalendar.set(Calendar.SECOND, 0);
-        mGMTCalendar.set(Calendar.MILLISECOND, 0);
-        mDateFormat = SimpleDateFormat.getDateInstance();
+        mLocalCalendar = GregorianCalendar.getInstance(Locale.getDefault());
+        localeDateFormat = SimpleDateFormat.getDateInstance();
+        gmtDateFormat = SimpleDateFormat.getDateInstance();
+        gmtDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         init();
     }
 
@@ -89,12 +90,13 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         DatePickerDialog dia = new DatePickerDialog(getContext(), new OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                mGMTCalendar.set(year, monthOfYear, dayOfMonth);
-                mSelectedDate = mGMTCalendar.getTime();
-                mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
+                mLocalCalendar.set(year, monthOfYear, dayOfMonth);
+                mSelectedDate = mLocalCalendar.getTime();
+                mDateTextEdit.setText(localeDateFormat.format(mSelectedDate));
                 captureResponse();
             }
-        }, mLocalCalendar.get(Calendar.YEAR), mLocalCalendar.get(Calendar.MONTH), mLocalCalendar.get(Calendar.DAY_OF_MONTH));
+        }, mLocalCalendar.get(Calendar.YEAR), mLocalCalendar.get(Calendar.MONTH),
+                mLocalCalendar.get(Calendar.DAY_OF_MONTH));
         dia.show();
     }
 
@@ -103,7 +105,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         if (resp != null && mDateTextEdit != null) {
             mSelectedDate = parseDateValue(resp.getValue());
             if (mSelectedDate != null) {
-                mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
+                mDateTextEdit.setText(localeDateFormat.format(mSelectedDate));
             } else {
                 mDateTextEdit.setText("");
             }
@@ -117,10 +119,25 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
      */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(mSelectedDate != null ? mSelectedDate.getTime() + "" : "",
+        String gmtFormattedTimeStampString = getGmtFormattedTimeStampString();
+        setResponse(new QuestionResponse(gmtFormattedTimeStampString,
                         ConstantUtil.DATE_RESPONSE_TYPE,
                         getQuestion().getId()),
                 suppressListeners);
+    }
+
+    @NonNull
+    private String getGmtFormattedTimeStampString() {
+        String gmtTimeStampString = "";
+        if (mSelectedDate != null) {
+            String gmtDate = gmtDateFormat.format(mSelectedDate);
+            try {
+                return gmtDateFormat.parse(gmtDate).getTime() + "";
+            } catch (ParseException e) {
+                Timber.e(e, "Error parsing date %s", gmtDate);
+            }
+        }
+        return gmtTimeStampString;
     }
 
     @Override
@@ -131,7 +148,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         }
         mSelectedDate = parseDateValue(resp.getValue());
         if (mSelectedDate != null) {
-            mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
+            mDateTextEdit.setText(localeDateFormat.format(mSelectedDate));
         } else {
             mDateTextEdit.setText("");
         }
@@ -150,9 +167,8 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
                 return new Date(Long.parseLong(value));
             }
         } catch (NumberFormatException e) {
-            Timber.e("parseDateValue() - Value is not a number: " + value);
+            Timber.e("parseDateValue() - Value is not a number: %s", value);
         }
         return null;
     }
-    
 }

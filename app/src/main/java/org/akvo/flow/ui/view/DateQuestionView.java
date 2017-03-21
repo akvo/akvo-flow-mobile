@@ -23,7 +23,6 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -92,14 +91,13 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
 
     private void useSelectedDate(int year, int monthOfYear, int dayOfMonth) {
         mLocalCalendar.set(year, monthOfYear, dayOfMonth);
-        displaySelectedDate();
+        displayFormattedDate();
         captureResponse();
     }
 
-    private void displaySelectedDate() {
-        String format = userDisplayedDateFormat.format(mLocalCalendar.getTime());
-        Timber.d("Will display date %s", format);
-        mDateTextEdit.setText(format);
+    private void displayFormattedDate() {
+        String formattedTime = userDisplayedDateFormat.format(mLocalCalendar.getTime());
+        mDateTextEdit.setText(formattedTime);
     }
 
     @Override
@@ -109,24 +107,30 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     }
 
     private void displayResponse(@Nullable QuestionResponse resp) {
-        if (mDateTextEdit != null) {
-            String locallyParsedDateString = "";
-            if (resp != null) {
-                String timestamp = resp.getValue();
-                Timber.d("displayResponse: original time stamp %s", timestamp);
-                if (!TextUtils.isEmpty(timestamp)) {
-                    try {
-                        Long utcTimestamp = Long.parseLong(timestamp);
-                        mLocalCalendar.setTimeInMillis(utcTimestamp);
-                        locallyParsedDateString = userDisplayedDateFormat
-                                .format(mLocalCalendar.getTime());
-                    } catch (NumberFormatException e) {
-                        Timber.e(e, "displayResponse - Value is not a number: %s", timestamp);
-                    }
-                }
-            }
-            mDateTextEdit.setText(locallyParsedDateString);
+        Long timeStamp = parseTimeStampFromResponse(resp);
+        if (timeStamp != null) {
+            mLocalCalendar.setTimeInMillis(timeStamp);
         }
+        if (mDateTextEdit != null) {
+            if (timeStamp != null) {
+                displayFormattedDate();
+            } else {
+                mDateTextEdit.setText("");
+            }
+        }
+    }
+
+    @Nullable
+    private Long parseTimeStampFromResponse(@Nullable QuestionResponse resp) {
+        String value = resp.getValue();
+        Long timeStamp = null;
+        try {
+            timeStamp = Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            Timber.e(e, "parseTimeStampFromResponse - Value is not a number: %s", value);
+        }
+
+        return timeStamp;
     }
 
     /**
@@ -136,7 +140,6 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     @Override
     public void captureResponse(boolean suppressListeners) {
         String utcTimeStampString = mLocalCalendar.getTimeInMillis() + "";
-        Timber.d("captureResponse: UTC timestamp as string %s", utcTimeStampString);
         setResponse(new QuestionResponse(utcTimeStampString,
                         ConstantUtil.DATE_RESPONSE_TYPE,
                         getQuestion().getId()),
@@ -154,5 +157,4 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         super.resetQuestion(fireEvent);
         mDateTextEdit.setText("");
     }
-
 }

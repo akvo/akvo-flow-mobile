@@ -122,12 +122,14 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
 
     @Nullable
     private Long parseTimeStampFromResponse(@Nullable QuestionResponse resp) {
-        String value = resp.getValue();
         Long timeStamp = null;
-        try {
-            timeStamp = Long.parseLong(value);
-        } catch (NumberFormatException e) {
-            Timber.e(e, "parseTimeStampFromResponse - Value is not a number: %s", value);
+        if (resp != null) {
+            String value = resp.getValue();
+            try {
+                timeStamp = Long.parseLong(value);
+            } catch (NumberFormatException e) {
+                Timber.e(e, "parseTimeStampFromResponse - Value is not a number: %s", value);
+            }
         }
 
         return timeStamp;

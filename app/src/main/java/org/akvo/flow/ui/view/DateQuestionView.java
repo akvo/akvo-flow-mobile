@@ -22,7 +22,7 @@ package org.akvo.flow.ui.view;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.DatePicker;
@@ -35,7 +35,6 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,8 +55,6 @@ import timber.log.Timber;
  */
 public class DateQuestionView extends QuestionView implements View.OnClickListener {
 
-    private final DateFormat localeDateFormat;
-    private final DateFormat gmtDateFormat;
     private final DateFormat userDisplayedDateFormat;
     private final Calendar mLocalCalendar;
 
@@ -67,12 +64,8 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         super(context, q, surveyListener);
         mLocalCalendar = GregorianCalendar.getInstance(Locale.getDefault());
         mLocalCalendar.setTime(new Date());
-        localeDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
-        localeDateFormat.setTimeZone(TimeZone.getDefault());
         userDisplayedDateFormat = SimpleDateFormat.getDateInstance();
         userDisplayedDateFormat.setTimeZone(TimeZone.getDefault());
-        gmtDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.UK);
-        gmtDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         init();
     }
 
@@ -99,16 +92,14 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     }
 
     private void useSelectedDate(int year, int monthOfYear, int dayOfMonth) {
-        Timber.d("before mLocalCalendar set " + mLocalCalendar.getTime().getTime());
         mLocalCalendar.set(year, monthOfYear, dayOfMonth);
-        Timber.d("after mLocalCalendar set " + mLocalCalendar.getTime().getTime());
         displaySelectedDate();
         captureResponse();
     }
 
     private void displaySelectedDate() {
         String format = userDisplayedDateFormat.format(mLocalCalendar.getTime());
-        Timber.d("Will display date "+format);
+        Timber.d("Will display date %s", format);
         mDateTextEdit.setText(format);
     }
 
@@ -118,22 +109,21 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         super.setResponse(resp);
     }
 
-    private void displayResponse(QuestionResponse resp) {
-        if (resp != null && mDateTextEdit != null) {
+    private void displayResponse(@Nullable QuestionResponse resp) {
+        if (mDateTextEdit != null) {
             String locallyParsedDateString = "";
-            String gmtTimeStamp = resp.getValue();
-            Timber.d("displayResponse: original time stamp %s", gmtTimeStamp);
-            if (!TextUtils.isEmpty(gmtTimeStamp)) {
-                try {
-                    Date gmtDate = parseDateValue(gmtTimeStamp);
-                    Date localDate = localeDateFormat.parse(localeDateFormat.format(gmtDate));
-                    mLocalCalendar.setTime(localDate);
-                    Date time = mLocalCalendar.getTime();
-                    Timber.d("getLocallyFormattedDateString: time to string " + time.toString());
-                    locallyParsedDateString = userDisplayedDateFormat.format(time);
-                    Timber.d("displayResponse: selected dateString %s", locallyParsedDateString);
-                } catch (ParseException e) {
-                    Timber.e(e, "Error parsing dateString %s", gmtTimeStamp);
+            if (resp != null) {
+                String timestamp = resp.getValue();
+                Timber.d("displayResponse: original time stamp %s", timestamp);
+                if (!TextUtils.isEmpty(timestamp)) {
+                    try {
+                        Long utcTimestamp = Long.parseLong(timestamp);
+                        mLocalCalendar.setTimeInMillis(utcTimestamp);
+                        locallyParsedDateString = userDisplayedDateFormat
+                                .format(mLocalCalendar.getTime());
+                    } catch (NumberFormatException e) {
+                        Timber.e(e, "displayResponse - Value is not a number: %s", timestamp);
+                    }
                 }
             }
             mDateTextEdit.setText(locallyParsedDateString);
@@ -146,28 +136,12 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
      */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        String gmtFormattedTimeStampString = getGmtTimeStampString();
-        setResponse(new QuestionResponse(gmtFormattedTimeStampString,
+        String utcTimeStampString = mLocalCalendar.getTimeInMillis() + "";
+        Timber.d("captureResponse: UTC timestamp as string %s", utcTimeStampString);
+        setResponse(new QuestionResponse(utcTimeStampString,
                         ConstantUtil.DATE_RESPONSE_TYPE,
                         getQuestion().getId()),
                 suppressListeners);
-    }
-
-    @NonNull
-    private String getGmtTimeStampString() {
-        String gmtTimeStampString = "";
-        Date userSelectedDate = mLocalCalendar.getTime();
-        if (userSelectedDate != null) {
-            String gmtDate = gmtDateFormat.format(userSelectedDate);
-            try {
-                Date parse = gmtDateFormat.parse(gmtDate);
-                gmtTimeStampString = parse.getTime() + "";
-            } catch (ParseException e) {
-                Timber.e(e, "Error parsing date %s", gmtDate);
-            }
-        }
-        Timber.d("getGmtTimeStampString: gmt timestamp as string " + gmtTimeStampString);
-        return gmtTimeStampString;
     }
 
     @Override
@@ -182,23 +156,4 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         mDateTextEdit.setText("");
     }
 
-    private Date parseDateValue(String value) {
-        try {
-            if (!TextUtils.isEmpty(value)) {
-                Date time = new Date(Long.parseLong(value));
-                return time;
-            }
-        } catch (NumberFormatException e) {
-            Timber.e("parseDateValue() - Value is not a number: %s", value);
-        }
-        return null;
-    }
-
-    private long getTimeDifference() {
-        long currentTime = System.currentTimeMillis();
-        int localOffset = TimeZone.getDefault().getOffset(currentTime);
-        int gmtOffset = TimeZone.getTimeZone("GMT").getOffset(currentTime);
-        int hourDifference = gmtOffset - localOffset;
-        return hourDifference;
-    }
 }

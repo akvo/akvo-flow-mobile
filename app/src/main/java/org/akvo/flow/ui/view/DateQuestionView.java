@@ -37,7 +37,6 @@ import org.akvo.flow.util.ConstantUtil;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -63,7 +62,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     public DateQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
         mLocalCalendar = GregorianCalendar.getInstance(Locale.getDefault());
-        mLocalCalendar.setTime(new Date());
+        mLocalCalendar.setTimeInMillis(System.currentTimeMillis());
         userDisplayedDateFormat = SimpleDateFormat.getDateInstance();
         userDisplayedDateFormat.setTimeZone(TimeZone.getDefault());
         init();

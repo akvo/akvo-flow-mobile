@@ -84,7 +84,7 @@ public class DateFormTest {
 
     @AfterClass
     public static void tearDown() {
-        SurveyRequisite.resetRequisites();
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
     }
 
     @Test

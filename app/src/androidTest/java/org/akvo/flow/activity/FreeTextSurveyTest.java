@@ -63,8 +63,8 @@ public class FreeTextSurveyTest {
     @Before
     public void init() {
         //Need context referring to application itself
-        Context context    = rule.getActivity();
-        installer          = new SurveyInstaller(context, new SurveyDbAdapter(context));
+        Context context = rule.getActivity();
+        installer = new SurveyInstaller(context, new SurveyDbAdapter(context));
     }
 
     @BeforeClass
@@ -79,19 +79,21 @@ public class FreeTextSurveyTest {
 
     @AfterClass
     public static void tearDown() {
-        SurveyRequisite.resetRequisites();
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
     }
 
     @Test
     public void canFillFreeTextQuestion() throws IOException {
         fillFreeTextQuestion(freetextsurvey, "This is an answer to your question");
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches((isEnabled())));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches((isEnabled())));
     }
 
     @Test
     public void ensureCantSubmitEmptyFreeText() throws IOException {
         fillFreeTextQuestion(freetextsurvey, "");
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches(not(isEnabled())));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(not(isEnabled())));
     }
 
     private Survey fillFreeTextQuestion(int surveyResId, String text) throws IOException {
@@ -108,7 +110,8 @@ public class FreeTextSurveyTest {
     }
 
     private Survey getSurvey(int resId) throws IOException {
-        InputStream input = InstrumentationRegistry.getContext().getResources().openRawResource(resId);
+        InputStream input = InstrumentationRegistry.getContext().getResources()
+                .openRawResource(resId);
         return installer.persistSurvey(FileUtil.readText(input));
     }
 

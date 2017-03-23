@@ -76,7 +76,7 @@ public class OptionsSurveyTest {
 
     @AfterClass
     public static void tearDown() {
-        SurveyRequisite.resetRequisites();
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
     }
 
     @Test

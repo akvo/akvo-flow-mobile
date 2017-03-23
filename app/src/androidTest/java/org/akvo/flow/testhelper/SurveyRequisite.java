@@ -35,7 +35,10 @@ public class SurveyRequisite {
     }
 
     //Reset to stage before tests
-    public static void resetRequisites() {
+    public static void resetRequisites(Context context) {
         FlowApp.getApp().setUser(null);
+        Prefs prefs = new Prefs(context);
+        prefs.setBoolean(Prefs.KEY_SETUP, false);
+        prefs.setLong(Prefs.KEY_SPACE_AVAILABLE, Prefs.DEF_VALUE_SPACE_AVAILABLE);
     }
 }

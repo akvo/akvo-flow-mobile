@@ -81,7 +81,7 @@ public class NumberSurveyTest {
 
     @AfterClass
     public static void tearDown() {
-        SurveyRequisite.resetRequisites();
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
     }
 
     @Test

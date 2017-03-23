@@ -55,7 +55,6 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
-
 public class NumberSurveyTest {
 
     @Rule
@@ -63,10 +62,9 @@ public class NumberSurveyTest {
     private SurveyInstaller installer;
 
     @Before
-    public void init()
-    {
+    public void init() {
         Context context = rule.getActivity();
-        installer       = new SurveyInstaller(context, new SurveyDbAdapter(context));
+        installer = new SurveyInstaller(context, new SurveyDbAdapter(context));
     }
 
     @BeforeClass
@@ -88,32 +86,40 @@ public class NumberSurveyTest {
     public void canFillNumberQuestion() throws IOException {
         fillNumberQuestion(numbersurvey, 50, 50);
         onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches((isEnabled())));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches((isEnabled())));
     }
 
     @Test
     public void canNotifyWrongDoubleInputNumberQuestion() throws IOException {
         fillNumberQuestion(numbersurvey, 50, 60);
         //Ensure Popup shows the "Answers do not match" text
-        onView(withText(R.string.error_answer_match)).inRoot(RootMatchers.isPlatformPopup()).check(matches(isDisplayed()));
+        onView(withText(R.string.error_answer_match)).inRoot(RootMatchers.isPlatformPopup())
+                .check(matches(isDisplayed()));
         onView(withId(R.id.next_btn)).perform(click());
         //Ensure the button object with text "Submit" is greyed out and not enabled
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches(not(isEnabled())));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(not(isEnabled())));
     }
 
     @Test
     public void canNotifyWrongMaxInputNumberQuestion() throws IOException {
         Survey survey = fillNumberQuestion(numbersurvey, 0, 2000);
         //Gets the maxValue for the first question
-        int maxValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule().getMaxVal().intValue();
-        String tooLargeError = rule.getActivity().getApplicationContext().getResources().getString(R.string.toolargeerr);
+        int maxValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
+                .getMaxVal().intValue();
+        String tooLargeError = rule.getActivity().getApplicationContext().getResources()
+                .getString(R.string.toolargeerr);
 
-        onView(withText(tooLargeError + maxValue)).inRoot(RootMatchers.isPlatformPopup()).check(matches(isDisplayed()));
+        onView(withText(tooLargeError + maxValue)).inRoot(RootMatchers.isPlatformPopup())
+                .check(matches(isDisplayed()));
         onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches(not(isEnabled())));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(not(isEnabled())));
     }
 
-    private Survey fillNumberQuestion(int surveyResId, int firstValue, int secondValue) throws IOException {
+    private Survey fillNumberQuestion(int surveyResId, int firstValue, int secondValue)
+            throws IOException {
         Survey survey = getSurvey(surveyResId);
 
         openDrawer();
@@ -126,7 +132,8 @@ public class NumberSurveyTest {
     }
 
     private Survey getSurvey(int resId) throws IOException {
-        InputStream input = InstrumentationRegistry.getContext().getResources().openRawResource(resId);
+        InputStream input = InstrumentationRegistry.getContext().getResources()
+                .openRawResource(resId);
         return installer.persistSurvey(FileUtil.readText(input));
     }
 

@@ -149,7 +149,6 @@
     <string name="error_img_preview">Can\'t load image preview</string>
     <string name="use_external_source">Use External Source</string>
     <string name="caddisfly_test">Go to test</string>
-    <string name="caddisfly_response">Test captured successfully</string>
     <string name="error_empty_form">Empty forms cannot be submitted. Please, add the corresponding responses first.</string>
     <string name="select">please select</string>
     <string name="clear_value_msg">Do you want to delete this value?</string>

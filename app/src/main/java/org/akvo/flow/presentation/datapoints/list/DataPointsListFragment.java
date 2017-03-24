@@ -246,10 +246,10 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void showNoDataPoints(boolean monitored) {
         emptyTitleTv.setText(R.string.no_records_text);
-        String subtitle = monitored ?
-                getString(R.string.no_records_subtitle_monitored):
-                getString(R.string.no_records_subtitle_non_monitored);
-        emptySubTitleTv.setText(subtitle);
+        int subtitleResource = monitored ?
+                R.string.no_records_subtitle_monitored :
+                R.string.no_records_subtitle_non_monitored;
+        emptySubTitleTv.setText(subtitleResource);
     }
 
     @Override

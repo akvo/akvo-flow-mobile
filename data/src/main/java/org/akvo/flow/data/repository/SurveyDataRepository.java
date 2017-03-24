@@ -109,8 +109,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     private String getSyncedTime(long surveyGroupId) {
         Cursor syncedTime = dataSourceFactory.getDataBaseDataSource().getSyncedTime(surveyGroupId);
-        String time = syncedTimeMapper.getTime(syncedTime);
-        return time;
+        return syncedTimeMapper.getTime(syncedTime);
     }
 
     private Observable<String> getServerBaseUrl() {

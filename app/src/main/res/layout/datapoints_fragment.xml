@@ -15,16 +15,9 @@
             app:tabIndicatorHeight="8dp"
             app:tabTextColor="@color/tab_text_color"
             app:tabSelectedTextColor="@color/tab_text_color"
-            >
-
-        <android.support.design.widget.TabItem
-                android:layout_width="match_parent"
-                android:layout_height="48dip"
-                />
-
-        <android.support.design.widget.TabItem
-                android:layout_width="match_parent"
-                android:layout_height="48dip"/>
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabMaxWidth="0dp">
 
     </android.support.design.widget.TabLayout>
 

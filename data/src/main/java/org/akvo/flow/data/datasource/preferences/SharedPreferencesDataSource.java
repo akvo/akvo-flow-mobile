@@ -30,9 +30,9 @@ import rx.Observable;
 @Singleton
 public class SharedPreferencesDataSource {
 
-    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
-    public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
-    public static final String KEY_BACKEND_SERVER = "backend.server";
+    private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    private static final String KEY_BACKEND_SERVER = "backend.server";
 
     private final SharedPreferences preferences;
 

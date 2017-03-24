@@ -4,33 +4,13 @@
 
     <include layout="@layout/question_header" />
 
-    <RelativeLayout
-        android:id="@+id/response_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/checkmark"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:adjustViewBounds="true"
-            android:src="@drawable/checkmark" />
-
-        <TextView
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/results_recycler_view"
+            android:scrollbars="none"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="4dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_toEndOf="@id/checkmark"
-            android:layout_toRightOf="@id/checkmark"
-            android:text="@string/caddisfly_response"
-            android:textColor="#8dc63f"
-            android:textSize="18sp" />
-    </RelativeLayout>
+            android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/button"

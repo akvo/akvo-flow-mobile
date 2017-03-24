@@ -35,7 +35,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Singleton
 public class RestServiceFactory {
 
-    public static final int CONNECTION_TIMEOUT = 10;
+    private static final int CONNECTION_TIMEOUT = 10;
     /**
      * Requests to GAE take a long time especially when there are a lot of datapoints
      */

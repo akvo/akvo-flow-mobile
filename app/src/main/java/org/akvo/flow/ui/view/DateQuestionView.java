@@ -22,7 +22,7 @@ package org.akvo.flow.ui.view;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -36,8 +36,8 @@ import org.akvo.flow.util.ConstantUtil;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import timber.log.Timber;
@@ -48,33 +48,29 @@ import timber.log.Timber;
  * (obtained via SimpleDateFormat.getDateInstance()). Though the actual value
  * saved in the response object will be a timestamp (milliseconds since
  * Midnight, Jan 1, 1970 UTC).
- * 
+ *
  * @author Christohper Fagiani
  */
 public class DateQuestionView extends QuestionView implements View.OnClickListener {
 
+    private final DateFormat userDisplayedDateFormat;
+    private final Calendar mLocalCalendar;
+
     private EditText mDateTextEdit;
-    private DateFormat mDateFormat;
-    private Date mSelectedDate;
-    private Calendar mLocalCalendar;
-    private Calendar mGMTCalendar;
 
     public DateQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mLocalCalendar = GregorianCalendar.getInstance();
-        mGMTCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-        mGMTCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        mGMTCalendar.set(Calendar.MINUTE, 0);
-        mGMTCalendar.set(Calendar.SECOND, 0);
-        mGMTCalendar.set(Calendar.MILLISECOND, 0);
-        mDateFormat = SimpleDateFormat.getDateInstance();
+        mLocalCalendar = GregorianCalendar.getInstance(Locale.getDefault());
+        mLocalCalendar.setTimeInMillis(System.currentTimeMillis());
+        userDisplayedDateFormat = SimpleDateFormat.getDateInstance();
+        userDisplayedDateFormat.setTimeZone(TimeZone.getDefault());
         init();
     }
 
     private void init() {
         setQuestionView(R.layout.date_question_view);
 
-        mDateTextEdit = (EditText)findViewById(R.id.date_et);
+        mDateTextEdit = (EditText) findViewById(R.id.date_et);
 
         View pickButton = findViewById(R.id.date_btn);
         pickButton.setOnClickListener(this);
@@ -83,32 +79,60 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if (mSelectedDate != null) {
-            mLocalCalendar.setTime(mSelectedDate);
-        }
         DatePickerDialog dia = new DatePickerDialog(getContext(), new OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                mGMTCalendar.set(year, monthOfYear, dayOfMonth);
-                mSelectedDate = mGMTCalendar.getTime();
-                mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
-                captureResponse();
+                useSelectedDate(year, monthOfYear, dayOfMonth);
             }
-        }, mLocalCalendar.get(Calendar.YEAR), mLocalCalendar.get(Calendar.MONTH), mLocalCalendar.get(Calendar.DAY_OF_MONTH));
+        }, mLocalCalendar.get(Calendar.YEAR), mLocalCalendar.get(Calendar.MONTH),
+                mLocalCalendar.get(Calendar.DAY_OF_MONTH));
         dia.show();
+    }
+
+    private void useSelectedDate(int year, int monthOfYear, int dayOfMonth) {
+        mLocalCalendar.set(year, monthOfYear, dayOfMonth);
+        displayFormattedDate();
+        captureResponse();
+    }
+
+    private void displayFormattedDate() {
+        String formattedTime = userDisplayedDateFormat.format(mLocalCalendar.getTime());
+        mDateTextEdit.setText(formattedTime);
     }
 
     @Override
     public void setResponse(QuestionResponse resp) {
-        if (resp != null && mDateTextEdit != null) {
-            mSelectedDate = parseDateValue(resp.getValue());
-            if (mSelectedDate != null) {
-                mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
+        displayResponse(resp);
+        super.setResponse(resp);
+    }
+
+    private void displayResponse(@Nullable QuestionResponse resp) {
+        Long timeStamp = parseTimeStampFromResponse(resp);
+        if (timeStamp != null) {
+            mLocalCalendar.setTimeInMillis(timeStamp);
+        }
+        if (mDateTextEdit != null) {
+            if (timeStamp != null) {
+                displayFormattedDate();
             } else {
                 mDateTextEdit.setText("");
             }
         }
-        super.setResponse(resp);
+    }
+
+    @Nullable
+    private Long parseTimeStampFromResponse(@Nullable QuestionResponse resp) {
+        Long timeStamp = null;
+        if (resp != null) {
+            String value = resp.getValue();
+            try {
+                timeStamp = Long.parseLong(value);
+            } catch (NumberFormatException e) {
+                Timber.e(e, "parseTimeStampFromResponse - Value is not a number: %s", value);
+            }
+        }
+
+        return timeStamp;
     }
 
     /**
@@ -117,10 +141,10 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
      */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        String value = mSelectedDate != null ? mSelectedDate.getTime() + "" : "";
+        String utcTimeStampString = mLocalCalendar.getTimeInMillis() + "";
         Question question = getQuestion();
         setResponse(new QuestionResponse.QuestionResponseBuilder()
-                        .setValue(value)
+                        .setValue(utcTimeStampString)
                         .setType(ConstantUtil.DATE_RESPONSE_TYPE)
                         .setQuestionId(question.getQuestionId())
                         .setIteration(question.getIteration())
@@ -130,33 +154,12 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-        if (resp == null || mDateTextEdit == null) {
-            return;
-        }
-        mSelectedDate = parseDateValue(resp.getValue());
-        if (mSelectedDate != null) {
-            mDateTextEdit.setText(mDateFormat.format(mSelectedDate));
-        } else {
-            mDateTextEdit.setText("");
-        }
+        displayResponse(resp);
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mDateTextEdit.setText("");
-        mSelectedDate = null;
     }
-
-    private Date parseDateValue(String value) {
-        try {
-            if (!TextUtils.isEmpty(value)) {
-                return new Date(Long.parseLong(value));
-            }
-        } catch (NumberFormatException e) {
-            Timber.e("parseDateValue() - Value is not a number: " + value);
-        }
-        return null;
-    }
-    
 }

@@ -84,13 +84,15 @@ public class SurveyedDataPointSyncService extends IntentService {
                 resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_UNKNOWN;
             }
         } catch (HttpException e) {
-            Timber.e(e, e.getMessage());
+            String message = e.getMessage();
             switch (e.getStatus()) {
                 case HttpURLConnection.HTTP_FORBIDDEN:
                     // A missing assignment might be the issue. Let's hint the user.
+                    Timber.w(e, e.getMessage());
                     resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT;
                     break;
                 default:
+                    Timber.e(e, e.getMessage());
                     resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_UNKNOWN;
                     break;
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -37,21 +37,23 @@ import java.util.StringTokenizer;
 public class SurveyMetaParser {
 
     public Survey parse(String response) {
-        String[] touple = response.split(",");
-        if (touple.length < Attr.COUNT) {
-            throw new IllegalArgumentException("Survey list response is in an unrecognized format");
+        String[] tuple = response.split(",");
+        if (tuple.length < Attr.COUNT) {
+            throw new IllegalArgumentException(
+                    "Wrong survey list format: " + response + ", expected at least " + Attr.COUNT
+                            + " parts but found " + tuple.length);
         }
         Survey survey = new Survey();
-        survey.setId(touple[Attr.ID]);
-        survey.setName(touple[Attr.NAME]);
-        survey.setLanguage(touple[Attr.LANGUAGE]);
-        survey.setVersion(Double.parseDouble(touple[Attr.VERSION]));
+        survey.setId(tuple[Attr.ID]);
+        survey.setName(tuple[Attr.NAME]);
+        survey.setLanguage(tuple[Attr.LANGUAGE]);
+        survey.setVersion(Double.parseDouble(tuple[Attr.VERSION]));
 
         // Parse the SurveyGroup
-        long groupId = Long.parseLong(touple[Attr.GROUP_ID]);
-        String groupName = touple[Attr.GROUP_NAME];
-        boolean monitored = Boolean.valueOf(touple[Attr.GROUP_MONITORED]);
-        String registerSurveyId = touple[Attr.GROUP_REGISTRATION_SURVEY];
+        long groupId = Long.parseLong(tuple[Attr.GROUP_ID]);
+        String groupName = tuple[Attr.GROUP_NAME];
+        boolean monitored = Boolean.valueOf(tuple[Attr.GROUP_MONITORED]);
+        String registerSurveyId = tuple[Attr.GROUP_REGISTRATION_SURVEY];
 
         // Assign registration form id, if missing.
         if (TextUtils.isEmpty(registerSurveyId) || "null".equalsIgnoreCase(registerSurveyId)) {

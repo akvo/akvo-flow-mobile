@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,7 +22,6 @@ package org.akvo.flow.util;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup.LayoutParams;
@@ -38,35 +37,6 @@ import org.akvo.flow.service.ServiceToastRunnable;
  * @author Christopher Fagiani
  */
 public class ViewUtil {
-
-    /**
-     * displays the alert dialog box warning that the GPS receiver is off. If
-     * the affirmative button is clicked, the Location Settings panel is
-     * launched. If the negative button is clicked, it will just close the
-     * dialog
-     *
-     * @param parentContext
-     */
-    public static void showGPSDialog(final Context parentContext) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
-        builder.setMessage(R.string.geodialog)
-                .setCancelable(true)
-                .setPositiveButton(R.string.okbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                parentContext
-                                        .startActivity(new Intent(
-                                                "android.settings.LOCATION_SOURCE_SETTINGS"));
-                            }
-                        })
-                .setNegativeButton(R.string.cancelbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-        builder.show();
-    }
 
     /**
      * displays a simple dialog box with only a single, positive button using

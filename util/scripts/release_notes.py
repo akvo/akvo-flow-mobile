@@ -10,7 +10,7 @@ import time
 import urllib2
 import argparse
 
-milestone = '2.2.11'
+milestone = '2.3.0'
 labels = ['New and noteworthy', 'Resolved issues']
 repo = 'akvo/akvo-flow-mobile'
 api_url = 'https://api.github.com/search/issues?q=milestone:' + milestone + '+repo:' + repo + '+label:'

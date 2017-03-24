@@ -463,15 +463,15 @@ public class SurveyDbDataSource {
             String surveyedLocaleId) {
         for (SurveyInstance surveyInstance : surveyInstances) {
 
-            ContentValues values = new ContentValues();
-            values.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.getSurveyId());
-            values.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getDate());
-            values.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
-            values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
-            values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
-            values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
+            ContentValues surveyInstanceValues = new ContentValues();
+            surveyInstanceValues.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.getSurveyId());
+            surveyInstanceValues.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getDate());
+            surveyInstanceValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
+            surveyInstanceValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
+            surveyInstanceValues.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
+            surveyInstanceValues.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
 
-            long id = surveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
+            long id = surveyDbAdapter.syncSurveyInstance(surveyInstanceValues, surveyInstance.getUuid());
 
             // Now the responses...
             syncResponses(surveyInstance.getResponses(), id);
@@ -486,7 +486,7 @@ public class SurveyDbDataSource {
             final String date = String.valueOf(System.currentTimeMillis());
             transmissionContentValues.put(TransmissionColumns.START_DATE, date);
             transmissionContentValues.put(TransmissionColumns.END_DATE, date);
-            surveyDbAdapter.createTransmission(values);
+            surveyDbAdapter.createTransmission(transmissionContentValues);
         }
     }
 

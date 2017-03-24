@@ -338,7 +338,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         SurveyDbDataSource db = new SurveyDbDataSource(this);
         try {
             db.open();
-            return db.getUnsyncedTransmissions().size() > 0;
+            return db.getUnSyncedTransmissions().size() > 0;
         } finally {
             if (db != null) {
                 db.close();

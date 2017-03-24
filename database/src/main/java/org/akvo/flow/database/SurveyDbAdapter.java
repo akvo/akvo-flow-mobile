@@ -393,22 +393,7 @@ public class SurveyDbAdapter {
         });
     }
 
-    public void createTransmission(long surveyInstanceId, String formID, String filename) {
-        createTransmission(surveyInstanceId, formID, filename, TransmissionStatus.QUEUED);
-    }
-
-    public void createTransmission(long surveyInstanceId, String formID, String filename,
-            int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-        values.put(TransmissionColumns.SURVEY_ID, formID);
-        values.put(TransmissionColumns.FILENAME, filename);
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            final String date = String.valueOf(System.currentTimeMillis());
-            values.put(TransmissionColumns.START_DATE, date);
-            values.put(TransmissionColumns.END_DATE, date);
-        }
+    public void createTransmission(ContentValues values) {
         database.insert(Tables.TRANSMISSION, null, values);
     }
 
@@ -418,20 +403,12 @@ public class SurveyDbAdapter {
      * the status == In Progress, the start date is updated.
      *
      * @param fileName
-     * @param status
+     * @param values
      * @return the number of rows affected
      */
-    public int updateTransmissionHistory(String fileName, int status) {
+    public int updateTransmission(String fileName, ContentValues values) {
         // TODO: Update Survey Instance STATUS as well
-        ContentValues vals = new ContentValues();
-        vals.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            vals.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
-        } else if (TransmissionStatus.IN_PROGRESS == status) {
-            vals.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
-        }
-
-        return database.update(Tables.TRANSMISSION, vals,
+        return database.update(Tables.TRANSMISSION, values,
                 TransmissionColumns.FILENAME + " = ?",
                 new String[] { fileName });
     }
@@ -449,7 +426,7 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public Cursor getUnsyncedTransmissions() {
+    public Cursor getUnSyncedTransmissions(String[] selectionArgs) {
         return database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
@@ -458,11 +435,7 @@ public class SurveyDbAdapter {
                         TransmissionColumns.END_DATE
                 },
                 TransmissionColumns.STATUS + " IN (?, ?, ?)",
-                new String[] {
-                        String.valueOf(TransmissionStatus.FAILED),
-                        String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
-                        String.valueOf(TransmissionStatus.QUEUED)
-                }, null, null, null);
+                selectionArgs, null, null, null);
     }
 
     /**
@@ -471,7 +444,7 @@ public class SurveyDbAdapter {
      *
      * @param sql
      */
-    public void executeSql(String sql) {
+    private void executeSql(String sql) {
         database.execSQL(sql);
     }
 
@@ -574,11 +547,10 @@ public class SurveyDbAdapter {
     }
 
     public Cursor getSurveyedLocale(String surveyedLocaleId) {
-        Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
+        return database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
                 new String[] { String.valueOf(surveyedLocaleId) },
                 null, null, null);
-        return cursor;
     }
 
     public String[] getSurveyIds() {

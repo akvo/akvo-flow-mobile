@@ -20,16 +20,15 @@
 
 package org.akvo.flow.database;
 
-public class Constants {
-    public static final long SURVEY_GROUP_ID_NONE = -1;
+class Constants {
 
-    public static final int ORDER_BY_DATE = 0;
-    public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
+    static final int ORDER_BY_DATE = 0;
+    static final int ORDER_BY_DISTANCE = 1;
+    static final int ORDER_BY_STATUS = 2;
+    static final int ORDER_BY_NAME = 3;
 
     /**
      * language codes
      */
-    public static final String ENGLISH_CODE = "en";
+    static final String ENGLISH_CODE = "en";
 }

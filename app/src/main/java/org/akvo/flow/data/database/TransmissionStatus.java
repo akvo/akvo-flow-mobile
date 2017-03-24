@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.data.database;
 
 public class TransmissionStatus {
     public static final int QUEUED = 0;

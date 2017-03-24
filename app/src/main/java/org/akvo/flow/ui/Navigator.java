@@ -169,4 +169,8 @@ public class Navigator {
         context.startActivity(new Intent(context, TransmissionHistoryActivity.class)
                 .putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId));
     }
+
+    public void navigateToLocationSettings(Context context) {
+         context.startActivity(new Intent("android.settings.LOCATION_SOURCE_SETTINGS"));
+    }
 }

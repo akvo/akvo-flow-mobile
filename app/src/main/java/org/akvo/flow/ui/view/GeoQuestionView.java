@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,6 +22,9 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,8 +38,8 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
+import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.ViewUtil;
 
 import java.text.DecimalFormat;
 
@@ -202,7 +205,13 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     @Override
     public void onGPSDisabled() {
         // we can't turn GPS on directly, the best we can do is launch the settings page
-        ViewUtil.showGPSDialog(getContext());
+        Context context = getContext();
+        if (context instanceof AppCompatActivity) {
+            FragmentManager fragmentManager = ((AppCompatActivity) context)
+                    .getSupportFragmentManager();
+            DialogFragment newFragment = GpsDisabledDialogFragment.newInstance();
+            newFragment.show(fragmentManager, GpsDisabledDialogFragment.GPS_DIALOG_TAG);
+        }
     }
 
     /**

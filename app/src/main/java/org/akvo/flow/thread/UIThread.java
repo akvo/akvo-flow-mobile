@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,36 +18,29 @@
  *
  */
 
-package org.akvo.flow.injector.component;
+package org.akvo.flow.thread;
 
-import android.content.Context;
-
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.injector.module.ApplicationModule;
-import org.akvo.flow.injector.module.ViewModule;
-import org.akvo.flow.presentation.BaseActivity;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import dagger.Component;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
+/**
+ * MainThread (UI Thread) implementation based on a {@link Scheduler}
+ * which will execute actions on the Android UI thread
+ */
 @Singleton
-@Component(modules = {
-        ApplicationModule.class, ViewModule.class
-})
-public interface ApplicationComponent {
+public class UIThread implements PostExecutionThread {
 
-    ThreadExecutor getThreadExecutor();
+    @Inject
+    public UIThread() {
+    }
 
-    PostExecutionThread getPostExecutionThread();
-
-    Context context();
-
-    void inject(FlowApp app);
-
-    void inject(BaseActivity baseActivity);
-
-
+    @Override
+    public Scheduler getScheduler() {
+        return AndroidSchedulers.mainThread();
+    }
 }

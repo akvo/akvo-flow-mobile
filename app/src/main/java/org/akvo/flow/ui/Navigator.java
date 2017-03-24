@@ -174,6 +174,10 @@ public class Navigator {
                 .putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId));
     }
 
+    public void navigateToLocationSettings(Context context) {
+         context.startActivity(new Intent("android.settings.LOCATION_SOURCE_SETTINGS"));
+    }
+
     public void navigateToPreferences(@Nullable Context context) {
         if (context != null) {
             context.startActivity(new Intent(context, PreferencesActivity.class));

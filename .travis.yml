@@ -19,7 +19,7 @@ android:
 before_script:
     - mkdir app/src/main/res/raw
     - mv app/config/survey.properties.template app/src/main/res/raw/survey.properties
-    - mv app/build.properties.template app/build.properties
+    - mv app/gradle.properties.template app/gradle.properties
 
 script:
   - ./gradlew test aFD

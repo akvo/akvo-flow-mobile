@@ -17,7 +17,8 @@ android:
     - extra-android-m2repository
 
 before_script:
-    - mv app/config/survey.properties.template app/res/raw/survey.properties
+    - mkdir app/src/main/res/raw
+    - mv app/config/survey.properties.template app/src/main/res/raw/survey.properties
     - mv app/build.properties.template app/build.properties
 
 script:

@@ -1,0 +1,24 @@
+language: android
+sudo: required
+env:
+  global:
+    - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
+
+jdk:
+  - oraclejdk8
+
+android:
+  components:
+    - tools
+    - build-tools-25.0.1
+    - android-25
+    - extra-android-support
+    - extra-google-m2repository
+    - extra-android-m2repository
+
+before_script:
+    - mv app/config/survey.properties.template app/res/raw/survey.properties
+    - mv app/build.properties.template app/build.properties
+
+script:
+  - ./gradlew test aFD

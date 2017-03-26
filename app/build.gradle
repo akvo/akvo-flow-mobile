@@ -42,6 +42,7 @@ android {
                 keyPassword 'android'
                 storeFile file('debug-key/debug.keystore')
                 storePassword 'android'
+                testCoverageEnabled true
             }
 
             flowRelease {

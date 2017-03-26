@@ -23,3 +23,12 @@ before_script:
 
 script:
   - ./gradlew testFlowDebug aFD
+  
+after_failure:
+  - pandoc builder/build/reports/tests/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'
+  
+after_success:
+  - ./gradlew jacocoFullReport
+  - pip install --user codecov
+  - codecov
+

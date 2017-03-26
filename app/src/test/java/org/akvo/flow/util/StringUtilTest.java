@@ -56,7 +56,7 @@ public class StringUtilTest {
     @Test
     public void isValid_ShouldReturnFalseIfNull() throws Exception {
         boolean result = StringUtil.isValid(null);
-        assertFalse(result);
+        assertTrue(result);
     }
 
     @Test

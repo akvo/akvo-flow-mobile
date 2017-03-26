@@ -22,7 +22,9 @@ before_script:
     - mv app/gradle.properties.template app/gradle.properties
 
 script:
-  - ./gradlew testFlowDebug aFD
+  - ./gradlew check -PdisablePreDex --continue --stacktrace
+  - ./gradlew testFlowDebug -PdisablePreDex --continue --stacktrace
+  - ./gradlew aFD -PdisablePreDex --continue --stacktrace
   
 after_failure:
   - pandoc builder/build/reports/tests/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'

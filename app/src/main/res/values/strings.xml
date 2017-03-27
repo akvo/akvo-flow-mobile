@@ -1,9 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="accuracy">Acc</string>
-    <string name="searching">Searching...</string>
-    <string name="ready">Ready</string>
-    <string name="timeout">Timeout</string>
     <string name="nocardspacetitle">No Storage Space</string>
     <string name="lowcardspacetitle">Low Storage Space</string>
     <string name="nocardspacedialog">The SD card on this device is full and you can no longer collect data. You must clear space on the SD card in order to continue.</string>

@@ -60,7 +60,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     private EditText mLonField;
     private EditText mElevationField;
     private TextView mStatusIndicator;
-    private TextView mSearchingIndicator;
     private String mCode = "";
     private float mLastAccuracy;
     private TimedLocationListener mLocationListener;
@@ -78,11 +77,9 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         mLonField = (EditText)findViewById(R.id.lon_et);
         mElevationField = (EditText)findViewById(R.id.height_et);
         mGeoButton = (Button)findViewById(R.id.geo_btn);
-        mSearchingIndicator = (TextView)findViewById(R.id.searching_tv);
         mStatusIndicator = (TextView)findViewById(R.id.acc_tv);
 
         mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
-        mSearchingIndicator.setText("");
 
         mLatField.setOnFocusChangeListener(this);
         mLonField.setOnFocusChangeListener(this);
@@ -106,7 +103,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
      * When the user clicks the "Populate Geo" button, start listening for location updates
      */
     public void onClick(View v) {
-        mSearchingIndicator.setText(R.string.searching);
         mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
         mStatusIndicator.setTextColor(Color.RED);
 
@@ -148,7 +144,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         mLonField.setText("");
         mElevationField.setText("");
         mCode = "";
-        mSearchingIndicator.setText("");
         mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
     }
 
@@ -190,7 +185,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         if (accuracy <= TimedLocationListener.ACCURACY_DEFAULT) {
             mLocationListener.stop();
             setResponse();
-            mSearchingIndicator.setText(R.string.ready);
             mStatusIndicator.setTextColor(Color.GREEN);
         }
     }
@@ -199,12 +193,10 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     public void onTimeout() {
         // Unknown location
         resetQuestion(true);
-        mSearchingIndicator.setText(R.string.timeout);
     }
 
     @Override
     public void onGPSDisabled() {
-        // we can't turn GPS on directly, the best we can do is launch the settings page
         Context context = getContext();
         if (context instanceof AppCompatActivity) {
             FragmentManager fragmentManager = ((AppCompatActivity) context)

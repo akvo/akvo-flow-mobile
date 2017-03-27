@@ -61,12 +61,6 @@
             android:layout_gravity="center_vertical">
 
             <TextView
-                android:id="@+id/searching_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/searching"/>
-
-            <TextView
                 android:id="@+id/acc_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

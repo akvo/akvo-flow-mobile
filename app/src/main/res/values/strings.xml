@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="accuracy">Acc</string>
+    <string name="geo_location_accuracy_default">Acc:</string>
+    <string name="geo_location_accuracy">Acc: %1$s m</string>
     <string name="nocardspacetitle">No Storage Space</string>
     <string name="lowcardspacetitle">Low Storage Space</string>
     <string name="nocardspacedialog">The SD card on this device is full and you can no longer collect data. You must clear space on the SD card in order to continue.</string>
@@ -263,5 +264,6 @@
     <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
 
     <string name="locale_list_error_unknown_location">Unknown Location</string>
+    <string name="location_timeout">Unable to get location.</string>
 
 </resources>

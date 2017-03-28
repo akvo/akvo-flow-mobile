@@ -49,20 +49,27 @@ import timber.log.Timber;
 /**
  * Question that can handle geographic location input. This question can also
  * listen to location updates from the GPS sensor on the device.
- * 
+ *
  * @author Christopher Fagiani
  */
 public class GeoQuestionView extends QuestionView implements OnClickListener, OnFocusChangeListener,
         TimedLocationListener.Listener {
+
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String DELIMITER = "|";
+    private static final int SNACK_BAR_DURATION_IN_MS = 2000;
+
+    private final TimedLocationListener mLocationListener;
+    private final DecimalFormat accuracyFormat = new DecimalFormat("#");
+    private final DecimalFormat altitudeFormat = new DecimalFormat("#.#");
+
     private EditText mLatField;
     private EditText mLonField;
     private EditText mElevationField;
     private TextView mStatusIndicator;
+
     private String mCode = "";
     private float mLastAccuracy;
-    private final TimedLocationListener mLocationListener;
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -73,11 +80,11 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     private void init() {
         setQuestionView(R.layout.geo_question_view);
 
-        mLatField = (EditText)findViewById(R.id.lat_et);
-        mLonField = (EditText)findViewById(R.id.lon_et);
-        mElevationField = (EditText)findViewById(R.id.height_et);
+        mLatField = (EditText) findViewById(R.id.lat_et);
+        mLonField = (EditText) findViewById(R.id.lon_et);
+        mElevationField = (EditText) findViewById(R.id.height_et);
         Button mGeoButton = (Button) findViewById(R.id.geo_btn);
-        mStatusIndicator = (TextView)findViewById(R.id.acc_tv);
+        mStatusIndicator = (TextView) findViewById(R.id.acc_tv);
 
         mStatusIndicator.setText(R.string.geo_location_accuracy_default);
 
@@ -149,7 +156,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
      * generates a unique code based on the lat/lon passed in. Current algorithm
      * returns the concatenation of the integer portion of 1000 times absolute
      * value of lat and lon in base 36
-     * 
+     *
      * @param lat
      * @param lon
      * @return
@@ -197,7 +204,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     }
 
     @Override
-    public void onLocationReady(double latitude, double longitude, double altitude, float accuracy) {
+    public void onLocationReady(double latitude, double longitude, double altitude,
+            float accuracy) {
         if (accuracy < mLastAccuracy) {
             updateViews(latitude, longitude, altitude, accuracy);
             updateCode(latitude, longitude);
@@ -214,20 +222,18 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     }
 
     private void updateViews(double latitude, double longitude, double altitude, float accuracy) {
-        String formattedAccuracy = new DecimalFormat("#").format(accuracy);
-        mStatusIndicator.setText(
-                getContext().getString(R.string.geo_location_accuracy, formattedAccuracy));
+        mStatusIndicator.setText(getContext()
+                .getString(R.string.geo_location_accuracy, accuracyFormat.format(accuracy)));
         mLatField.setText(latitude + "");
         mLonField.setText(longitude + "");
-        // elevation is in meters, even one decimal is way more than GPS precision
-        mElevationField.setText(new DecimalFormat("#.#").format(altitude));
+        mElevationField.setText(altitudeFormat.format(altitude));
     }
 
     @Override
     public void onTimeout() {
         // Unknown location
         resetQuestion(true);
-        Snackbar.make(this, R.string.location_timeout, Snackbar.LENGTH_LONG)
+        Snackbar.make(this, R.string.location_timeout, SNACK_BAR_DURATION_IN_MS)
                 .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -236,8 +242,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
                         resetResponseValues();
                         startLocation();
                     }
-                })
-                .show();
+                }).show();
     }
 
     @Override

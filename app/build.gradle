@@ -1,8 +1,27 @@
 apply plugin: 'com.android.application'
+apply plugin: 'jacoco'
 
 repositories {
     mavenCentral()
     jcenter()
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testFlowDebugUnitTest', 'createFlowDebugCoverageReport']) {
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "$project.buildDir/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: project.buildDir, includes: [
+            'jacoco/testFlowDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
+    ])
 }
 
 android {
@@ -42,7 +61,6 @@ android {
                 keyPassword 'android'
                 storeFile file('debug-key/debug.keystore')
                 storePassword 'android'
-                testCoverageEnabled true
             }
 
             flowRelease {
@@ -54,6 +72,9 @@ android {
             buildTypes {
                 release {
                     signingConfig signingConfigs.flowRelease
+                }
+                debug {
+                    testCoverageEnabled true
                 }
             }
         }
@@ -73,6 +94,11 @@ android {
 
         testOptions {
             unitTests.returnDefaultValues = true
+            unitTests.all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
 
         lintOptions {

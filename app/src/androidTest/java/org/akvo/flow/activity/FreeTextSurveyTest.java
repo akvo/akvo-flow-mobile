@@ -29,6 +29,7 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.testhelper.SurveyInstaller;
 import org.akvo.flow.util.FileUtil;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -49,6 +50,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
+@Ignore("This tests cannot be run in CI")
 public class FreeTextSurveyTest {
 
     @Rule

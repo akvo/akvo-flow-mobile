@@ -7,4 +7,10 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
     }
+    configurations.all {
+        resolutionStrategy {
+            force 'org.jacoco:org.jacoco.report:0.7.4.201502262128'
+            force 'org.jacoco:org.jacoco.core:0.7.4.201502262128'
+        }
+    }
 }

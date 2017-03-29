@@ -182,7 +182,6 @@ public class Navigator {
 
     /**
      * Fallback as Settings.ACTION_LOCATION_SOURCE_SETTINGS may not be available on some devices
-     * @param context
      */
     private void navigateToSettings(@NonNull Context context) {
         context.startActivity(new Intent(Settings.ACTION_SETTINGS));

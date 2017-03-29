@@ -21,6 +21,7 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -31,6 +32,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -68,6 +70,9 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     private EditText mLonField;
     private EditText mElevationField;
     private TextView mStatusIndicator;
+    private Button mGeoButton;
+    private View geoLoading;
+    private View geoManualInputContainer;
 
     private String mCode = "";
     private float mLastAccuracy;
@@ -84,8 +89,10 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         mLatField = (EditText) findViewById(R.id.lat_et);
         mLonField = (EditText) findViewById(R.id.lon_et);
         mElevationField = (EditText) findViewById(R.id.height_et);
-        Button mGeoButton = (Button) findViewById(R.id.geo_btn);
+        mGeoButton = (Button) findViewById(R.id.geo_btn);
         mStatusIndicator = (TextView) findViewById(R.id.acc_tv);
+        geoLoading = findViewById(R.id.auto_geo_location_progress);
+        geoManualInputContainer = findViewById(R.id.manual_geo_input_container);
 
         mStatusIndicator.setText(R.string.geo_location_accuracy_default);
 
@@ -107,14 +114,44 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         }
     }
 
-    /**
-     * When the user clicks the "Populate Geo" button, start listening for location updates
-     */
     public void onClick(View v) {
-        resetViewsToDefaultValues();
-        setStatusToRed();
-        resetResponseValues();
-        startLocation();
+        //TODO: refactor using states
+        if (mGeoButton.getText().toString()
+                .equals(getResources().getString(R.string.cancelbutton))) {
+            geoLoading.setVisibility(GONE);
+            //TODO: improve
+            setViewAlpha(0.1f, 1f, geoManualInputContainer);
+            stopLocation();
+            updateButtonTextToGetGeo();
+        } else {
+            geoLoading.setVisibility(VISIBLE);
+            setViewAlpha(1f, 0.1f, geoManualInputContainer);
+            resetViewsToDefaultValues();
+            setStatusToRed();
+            resetResponseValues();
+            updateButtonTextToCancel();
+            startLocation();
+        }
+    }
+
+    //TODO: move to ViewTools
+    void setViewAlpha(float from, float to, View view) {
+        if (Build.VERSION.SDK_INT < 11) {
+            final AlphaAnimation animation = new AlphaAnimation(from, to);
+            animation.setDuration(50);
+            animation.setFillAfter(true);
+            view.startAnimation(animation);
+        } else {
+            view.setAlpha(to);
+        }
+    }
+
+    private void updateButtonTextToGetGeo() {
+        mGeoButton.setText(R.string.getgeo);
+    }
+
+    private void updateButtonTextToCancel() {
+        mGeoButton.setText(R.string.cancelbutton);
     }
 
     private void resetResponseValues() {

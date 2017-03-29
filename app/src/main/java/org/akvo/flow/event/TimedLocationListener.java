@@ -30,8 +30,6 @@ import android.os.Handler;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import timber.log.Timber;
-
 /**
  * TimedLocationListener is a reusable helper class to get GPS locations.
  * If geolocation is unknown after the LOCATION_TIMEOUT_IN_MS milliseconds, the caller will receive a
@@ -80,7 +78,6 @@ public class TimedLocationListener implements LocationListener {
                     @Override
                     public void run() {
                         if (mListeningLocation) {
-                            Timber.d("Time out");
                             stop();
                             mListener.onTimeout();
                         }

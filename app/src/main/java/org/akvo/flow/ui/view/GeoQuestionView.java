@@ -22,6 +22,7 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -56,7 +57,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         TimedLocationListener.Listener {
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
-    private static final String DELIMITER = "|";
+    private static final String RESPONSE_DELIMITER = "|";
     private static final int SNACK_BAR_DURATION_IN_MS = 2000;
 
     private final TimedLocationListener mLocationListener;
@@ -156,10 +157,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
      * generates a unique code based on the lat/lon passed in. Current algorithm
      * returns the concatenation of the integer portion of 1000 times absolute
      * value of lat and lon in base 36
-     *
-     * @param lat
-     * @param lon
-     * @return
      */
     private String generateCode(double lat, double lon) {
         try {
@@ -167,7 +164,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
                     + (int) ((Math.abs(lon) * 10000d)));
             return Long.toString(code, 36);
         } catch (NumberFormatException e) {
-            Timber.e(e, "Code cannot be generated: %s", e.getMessage());
+            Timber.e(e, "Location response code cannot be generated: %s", e.getMessage());
             return "";
         }
     }
@@ -201,6 +198,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     @Override
     public void questionComplete(Bundle data) {
+        //EMPTY
     }
 
     @Override
@@ -231,7 +229,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     @Override
     public void onTimeout() {
-        // Unknown location
         resetQuestion(true);
         Snackbar.make(this, R.string.location_timeout, SNACK_BAR_DURATION_IN_MS)
                 .setAction(R.string.retry, new View.OnClickListener() {
@@ -278,14 +275,19 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
             setResponse(null);
         } else {
-            setResponse(new QuestionResponse(
-                    lat + DELIMITER + lon + DELIMITER + mElevationField.getText() + DELIMITER
-                            + mCode, ConstantUtil.GEO_RESPONSE_TYPE, getQuestion().getId()));
+            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
+                    getQuestion().getId()));
         }
+    }
+
+    @NonNull
+    private String getResponse(String lat, String lon) {
+        return lat + RESPONSE_DELIMITER + lon + RESPONSE_DELIMITER + mElevationField.getText()
+                + RESPONSE_DELIMITER + mCode;
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+        //EMPTY
     }
-
 }

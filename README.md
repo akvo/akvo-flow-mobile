@@ -1,4 +1,4 @@
-# Akvo Flow app
+# Akvo Flow app [![Build Status](https://travis-ci.org/akvo/akvo-flow-mobile.svg?branch=develop)](https://travis-ci.org/akvo/akvo-flow-mobile)
 
 The Akvo Flow app is the mobile application for the [Akvo Flow data collection tool](https://github.com/akvo/akvo-flow).
 

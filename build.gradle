@@ -14,3 +14,22 @@ buildscript {
         }
     }
 }
+apply plugin: 'android-reporting'
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://jitpack.io" }
+    }
+
+    apply plugin: 'checkstyle'
+
+    task checkstyle(type: Checkstyle) {
+        configFile file("${project.rootDir}/config/checkstyle.xml")
+        source 'src'
+        include '**/*.java'
+        exclude '**/gen/**'
+        ignoreFailures = true //there are too many checkstyle errors for now to fix them all
+        classpath = files()
+    }
+}

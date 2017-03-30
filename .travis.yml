@@ -30,14 +30,10 @@ before_script:
     - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew check -PdisablePreDex --continue --stacktrace -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms1024m -Xmx1024m" -Dorg.gradle.daemon=false
-  - ./gradlew testFlowDebug -PdisablePreDex --continue --stacktrace -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms1024m -Xmx1024m" -Dorg.gradle.daemon=false
-  
-after_failure:
-  - sudo apt-get install pandoc -y
-  - pandoc app/build/reports/tests/flowDebug/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'
+  - ./gradlew check --continue --stacktrace
+  - ./gradlew connectedFlowDebugAndroidTest --continue --stacktrace
   
 after_success:
-  - ./gradlew createFlowDebugCoverageReport -PdisablePreDex --continue --stacktrace -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms1024m -Xmx1024m" -Dorg.gradle.daemon=false
+  - ./gradlew createFlowDebugCoverageReport --continue --stacktrace
   - bash <(curl -s https://codecov.io/bash)
 

@@ -27,6 +27,7 @@ import android.support.annotation.Nullable;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
+import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
@@ -40,11 +41,6 @@ import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
-
-import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
 public class BriteSurveyDbAdapter {
 
@@ -74,10 +70,10 @@ public class BriteSurveyDbAdapter {
 
         String orderByStr = "";
         switch (orderBy) {
-            case ORDER_BY_DATE:
+            case Constants.ORDER_BY_DATE:
                 orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
                 break;
-            case ORDER_BY_DISTANCE:
+            case Constants.ORDER_BY_DISTANCE:
                 if (latitude != null && longitude != null) {
                     // this is to correct the distance for the shortening at higher latitudes
                     Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)), 2);
@@ -94,10 +90,10 @@ public class BriteSurveyDbAdapter {
                             .format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
                 }
                 break;
-            case ORDER_BY_STATUS:
+            case Constants.ORDER_BY_STATUS:
                 orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
                 break;
-            case ORDER_BY_NAME:
+            case Constants.ORDER_BY_NAME:
                 orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
                 break;
         }

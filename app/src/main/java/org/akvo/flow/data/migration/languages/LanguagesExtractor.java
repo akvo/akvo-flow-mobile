@@ -27,7 +27,7 @@ import org.akvo.flow.util.ConstantUtil;
 
 public class LanguagesExtractor {
 
-    private final PreferenceHandler preferenceHandler = new PreferenceHandler();
+    final PreferenceHandler preferenceHandler = new PreferenceHandler();
 
     public LanguagesExtractor() {
     }

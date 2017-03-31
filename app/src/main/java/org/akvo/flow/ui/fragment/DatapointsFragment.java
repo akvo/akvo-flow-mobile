@@ -57,7 +57,7 @@ public class DatapointsFragment extends Fragment {
     private static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
 
     @Inject
-    private SurveyDbDataSource mDatabase;
+    SurveyDbDataSource mDatabase;
 
     private TabsAdapter mTabsAdapter;
     private ViewPager mPager;

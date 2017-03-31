@@ -32,8 +32,3 @@ before_script:
 script:
   - ./gradlew check --continue --stacktrace
   - ./gradlew connectedFlowDebugAndroidTest --continue --stacktrace
-  
-after_success:
-  - ./gradlew createFlowDebugCoverageReport --continue --stacktrace
-  - bash <(curl -s https://codecov.io/bash)
-

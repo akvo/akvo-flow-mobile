@@ -3,16 +3,10 @@ buildscript {
         mavenCentral()
         jcenter()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    }
-    configurations.all {
-        //bug in jacoco (coverage reporting) so we must use this specific version for now
-        resolutionStrategy {
-            force 'org.jacoco:org.jacoco.report:0.7.4.201502262128'
-            force 'org.jacoco:org.jacoco.core:0.7.4.201502262128'
-        }
     }
 }
 
@@ -43,5 +37,4 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-apply plugin: 'android-reporting'
 apply plugin: 'checkstyle'

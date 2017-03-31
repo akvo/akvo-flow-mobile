@@ -321,7 +321,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     }
 
     private void onPowerManagementOptionTap() {
-        WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         if (!wm.isWifiEnabled()) {
             wm.setWifiEnabled(true);
         } else {
@@ -338,7 +338,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         SurveyDbDataSource db = new SurveyDbDataSource(this, null);
         try {
             db.open();
-            return db.getUnsyncedTransmissions().size() > 0;
+            return db.getUnSyncedTransmissions().size() > 0;
         } finally {
             if (db != null) {
                 db.close();

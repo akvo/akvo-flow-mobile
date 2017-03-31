@@ -26,7 +26,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.migration.preferences.InsertablePreferences;
-import org.akvo.flow.database.Constants;
+import org.akvo.flow.util.ConstantUtil;
 
 /**
  * Prefs is a SharedPreferences wrapper, with utility methods to
@@ -49,7 +49,7 @@ public class Prefs {
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
     public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
-    public static final int DEFAULT_VALUE_IMAGE_SIZE = Constants.IMAGE_SIZE_320_240;
+    public static final int DEFAULT_VALUE_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
     public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
     public static final long DEF_VALUE_SPACE_AVAILABLE = 101L;

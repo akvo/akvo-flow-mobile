@@ -115,7 +115,6 @@ public class DataPointsMapPresenter implements Presenter {
 
             @Override
             public void onCompleted() {
-                Timber.d("onCompleted");
                 view.hideProgress();
             }
 

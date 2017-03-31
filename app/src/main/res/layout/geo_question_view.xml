@@ -43,6 +43,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
                     android:text="@string/elevation" />
                 <EditText
                     android:id="@+id/height_et"
@@ -53,27 +54,21 @@
             </TableRow>
         </TableLayout>
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/searching_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/searching"/>
+            android:gravity="center"
+            android:layout_gravity="center">
 
             <TextView
                 android:id="@+id/acc_tv"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/accuracy"/>
-
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:text="@string/geo_location_accuracy_default"/>
+        </FrameLayout>
 
     </LinearLayout>
 

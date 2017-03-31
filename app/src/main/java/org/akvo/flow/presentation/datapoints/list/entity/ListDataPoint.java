@@ -23,6 +23,7 @@ package org.akvo.flow.presentation.datapoints.list.entity;
 public class ListDataPoint {
 
     public static final double INVALID_COORDINATE = -1;
+
     private final String displayName;
     private final int status;
     private final String id;

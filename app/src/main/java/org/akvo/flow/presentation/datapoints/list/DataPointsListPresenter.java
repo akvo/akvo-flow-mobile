@@ -125,7 +125,6 @@ public class DataPointsListPresenter implements Presenter {
 
             @Override
             public void onCompleted() {
-                Timber.d("onCompleted");
                 view.hideLoading();
             }
 

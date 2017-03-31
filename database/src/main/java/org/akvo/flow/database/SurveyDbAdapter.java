@@ -391,22 +391,7 @@ public class SurveyDbAdapter {
         });
     }
 
-    public void createTransmission(long surveyInstanceId, String formID, String filename) {
-        createTransmission(surveyInstanceId, formID, filename, TransmissionStatus.QUEUED);
-    }
-
-    public void createTransmission(long surveyInstanceId, String formID, String filename,
-            int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-        values.put(TransmissionColumns.SURVEY_ID, formID);
-        values.put(TransmissionColumns.FILENAME, filename);
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            final String date = String.valueOf(System.currentTimeMillis());
-            values.put(TransmissionColumns.START_DATE, date);
-            values.put(TransmissionColumns.END_DATE, date);
-        }
+    public void createTransmission(ContentValues values) {
         database.insert(Tables.TRANSMISSION, null, values);
     }
 
@@ -416,20 +401,12 @@ public class SurveyDbAdapter {
      * the status == In Progress, the start date is updated.
      *
      * @param fileName
-     * @param status
+     * @param values
      * @return the number of rows affected
      */
-    public int updateTransmissionHistory(String fileName, int status) {
+    public int updateTransmission(String fileName, ContentValues values) {
         // TODO: Update Survey Instance STATUS as well
-        ContentValues vals = new ContentValues();
-        vals.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            vals.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
-        } else if (TransmissionStatus.IN_PROGRESS == status) {
-            vals.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
-        }
-
-        return database.update(Tables.TRANSMISSION, vals,
+        return database.update(Tables.TRANSMISSION, values,
                 TransmissionColumns.FILENAME + " = ?",
                 new String[] { fileName });
     }
@@ -447,7 +424,7 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public Cursor getUnsyncedTransmissions() {
+    public Cursor getUnSyncedTransmissions(String[] selectionArgs) {
         return database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
@@ -456,11 +433,7 @@ public class SurveyDbAdapter {
                         TransmissionColumns.END_DATE
                 },
                 TransmissionColumns.STATUS + " IN (?, ?, ?)",
-                new String[] {
-                        String.valueOf(TransmissionStatus.FAILED),
-                        String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
-                        String.valueOf(TransmissionStatus.QUEUED)
-                }, null, null, null);
+                selectionArgs, null, null, null);
     }
 
     /**
@@ -739,6 +712,22 @@ public class SurveyDbAdapter {
         NAME, GEOLOCATION
     }
 
+    public void updateSurveyedLocale(String surveyedLocaleId, ContentValues surveyedLocaleValues) {
+        database.update(Tables.RECORD, surveyedLocaleValues,
+                RecordColumns.RECORD_ID + " = ?",
+                new String[] { surveyedLocaleId });
+    }
+
+    /**
+     * Update the last modification date, if necessary
+     */
+    public void updateRecordModifiedDate(String recordId, long timestamp) {
+        ContentValues values = new ContentValues();
+        values.put(RecordColumns.LAST_MODIFIED, timestamp);
+        database.update(Tables.RECORD, values,
+                RecordColumns.RECORD_ID + " = ? AND " + RecordColumns.LAST_MODIFIED + " < ?",
+                new String[] { recordId, String.valueOf(timestamp) });
+    }
     /**
      * Filters surveyd locales based on the parameters passed in.
      */
@@ -789,6 +778,33 @@ public class SurveyDbAdapter {
         return database.rawQuery(queryString + whereClause + groupBy + orderByStr, whereValues);
     }
 
+    // ======================================================= //
+    // =========== SurveyedLocales synchronization =========== //
+    // ======================================================= //
+
+    public void syncResponse(long surveyInstanceId,
+            ContentValues values, String questionId) {
+        Cursor cursor = database.query(Tables.RESPONSE,
+                new String[] { ResponseColumns.SURVEY_INSTANCE_ID, ResponseColumns.QUESTION_ID
+                },
+                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                        + ResponseColumns.QUESTION_ID + " = ?",
+                new String[] { String.valueOf(surveyInstanceId), questionId },
+                null, null, null);
+
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        if (exists) {
+            database.update(Tables.RESPONSE, values,
+                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                            + ResponseColumns.QUESTION_ID + " = ?",
+                    new String[] { String.valueOf(surveyInstanceId), questionId
+                    });
+        } else {
+            database.insert(Tables.RESPONSE, null, values);
+        }
+    }
+
     /**
      * Get the synchronization time for a particular survey group.
      *
@@ -808,6 +824,19 @@ public class SurveyDbAdapter {
         }
         cursor.close();
         return time;
+    }
+
+    /**
+     * Save the time of synchronization time for a particular SurveyGroup
+     *
+     * @param surveyGroupId id of the SurveyGroup
+     * @param time          String containing the timestamp
+     */
+    public void setSyncTime(long surveyGroupId, String time) {
+        ContentValues values = new ContentValues();
+        values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
+        values.put(SyncTimeColumns.TIME, time);
+        database.insert(Tables.SYNC_TIME, null, values);
     }
 
     /**

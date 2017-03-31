@@ -44,12 +44,11 @@ import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -58,7 +57,6 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
@@ -143,7 +141,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         Context context = getApplicationContext();
         prefs = new Prefs(context);
         languageMapper = new LanguageMapper(context);
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context, new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
+                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
 
         mediaFileHelper = new MediaFileHelper(this);
 
@@ -345,7 +344,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             builder.setLength(Math.min(builder.length(), 500));
 
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
-                    SurveyedLocaleMeta.NAME);
+                    SurveyDbAdapter.SurveyedLocaleMeta.NAME);
         }
 
         // META_GEO
@@ -354,7 +353,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             QuestionResponse response = mDatabase.getResponse(mSurveyInstanceId, localeGeoQuestion);
             if (response != null) {
                 mDatabase.updateSurveyedLocale(mSurveyInstanceId, response.getValue(),
-                        SurveyedLocaleMeta.GEOLOCATION);
+                        SurveyDbAdapter.SurveyedLocaleMeta.GEOLOCATION);
             }
         }
     }

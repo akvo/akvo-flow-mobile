@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
@@ -56,7 +57,7 @@ public class DatapointsFragment extends Fragment {
     private static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
 
     @Inject
-    SurveyDbDataSource mDatabase;
+    private SurveyDbDataSource mDatabase;
 
     private TabsAdapter mTabsAdapter;
     private ViewPager mPager;

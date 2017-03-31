@@ -25,8 +25,8 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testFlowDebugUnitTest', '
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     def versionPropsFile = file('version.properties')
 
     if (versionPropsFile.canRead()) {
@@ -42,8 +42,8 @@ android {
         defaultConfig {
             versionCode versionCodeProperty
             versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-            minSdkVersion 10
-            targetSdkVersion 21
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
             applicationId "org.akvo.flow"
             testApplicationId "org.akvo.flow.tests"
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

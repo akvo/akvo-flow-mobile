@@ -50,7 +50,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
-@Ignore("This tests cannot be run in CI")
+@Ignore("These tests are broken for now")
 public class FreeTextSurveyTest {
 
     @Rule

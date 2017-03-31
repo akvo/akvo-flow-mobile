@@ -54,7 +54,7 @@ public class TransmissionHistoryActivity extends ListActivity {
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
         }
         setContentView(R.layout.transmissionhistory);
-        databaseAdapter = new SurveyDbDataSource(this);
+        databaseAdapter = new SurveyDbDataSource(this, null);
 
     }
 

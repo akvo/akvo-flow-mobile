@@ -337,7 +337,7 @@ public class AppUpdateActivity extends Activity {
 
     private void onDownloadError() {
         Toast.makeText(this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
-        mInstallBtn.setText(R.string.retry);
+        mInstallBtn.setText(R.string.action_retry);
         mInstallBtn.setEnabled(true);
     }
 

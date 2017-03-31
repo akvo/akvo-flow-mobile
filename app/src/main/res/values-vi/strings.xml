@@ -245,7 +245,7 @@
   <string name="clearbutton">Xóa dữ liệu</string>
   <string name="yes">Có</string>
   <string name="no">Không</string>
-  <string name="retry">Làm lại</string>
+  <string name="action_retry">Làm lại</string>
   <string name="delete">Xóa</string>
   <string name="error_value_required">Trường dữ liệu này không thể bỏ trống</string>
   <string name="drawer_open">Drawer open</string>

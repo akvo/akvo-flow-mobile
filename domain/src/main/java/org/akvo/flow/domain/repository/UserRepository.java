@@ -20,5 +20,9 @@
 
 package org.akvo.flow.domain.repository;
 
+import rx.Observable;
+
 public interface UserRepository {
+
+    Observable<Boolean> mobileSyncAllowed();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,8 +20,28 @@
 
 package org.akvo.flow.injector.module;
 
+import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.SyncDataPoints;
+import org.akvo.flow.domain.interactor.UseCase;
+
+import javax.inject.Named;
+
 import dagger.Module;
+import dagger.Provides;
 
 @Module
 public class ViewModule {
+
+    @Provides
+    @Named("getSavedDataPoints")
+    UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
+        return getSavedDataPoints;
+    }
+
+    @Provides
+    @Named("syncDataPoints")
+    UseCase provideSyncDataPointsUseCase(SyncDataPoints syncDataPoints) {
+        return syncDataPoints;
+    }
+
 }

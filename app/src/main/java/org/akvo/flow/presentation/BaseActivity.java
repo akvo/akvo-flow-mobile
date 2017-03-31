@@ -25,7 +25,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.injector.module.ActivityModule;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -43,15 +42,4 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getApplication()).getApplicationComponent();
     }
-
-
-    /**
-     * Get an Activity module for dependency injection.
-     *
-     * @return {@link ActivityModule}
-     */
-    protected ActivityModule getActivityModule() {
-        return new ActivityModule(this);
-    }
-
 }

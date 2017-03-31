@@ -22,8 +22,7 @@ package org.akvo.flow.testhelper;
 import android.content.Context;
 import android.content.Intent;
 
-import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
@@ -39,12 +38,12 @@ import java.io.Writer;
 
 public class SurveyInstaller {
 
-    private SurveyDbAdapter adapter;
+    private SurveyDbDataSource adapter;
     private Context context;
 
     public SurveyInstaller(Context context) {
         this.context = context;
-        adapter = new SurveyDbAdapter(context);
+        adapter = new SurveyDbDataSource(context, null);
     }
 
     /**
@@ -91,7 +90,7 @@ public class SurveyInstaller {
      * @param context in which to send the notification
      */
     private void notifyNewSurvey(Context context) {
-        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
+        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_SURVEY_SYNC);
         context.sendBroadcast(intentBroadcast);
     }
 

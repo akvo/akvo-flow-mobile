@@ -109,7 +109,6 @@
     <string name="sort">Sort</string>
     <string name="stats">Stats</string>
     <string name="syncing_records">Syncing Data Points...</string>
-    <string name="data_points_sync_success_message">%1$d data points successfully synced</string>
     <string name="data_points_sync_error_message_network">Sync failed. No connection.</string>
     <string name="data_points_sync_error_message_assignment">Sync failed. Assignment missing.</string>
     <string name="data_points_sync_error_message_default">Sync failed</string>
@@ -247,7 +246,7 @@
     <string name="clearbutton">Clear</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="retry">Retry</string>
+    <string name="action_retry">Retry</string>
     <string name="delete">Delete</string>
     <string name="error_value_required">This field cannot be blank</string>
     <string name="drawer_open">Drawer open</string>
@@ -263,5 +262,13 @@
     <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
 
     <string name="locale_list_error_unknown_location">Unknown Location</string>
+    <string name="data_points_sync_error_mobile_data_sync">Mobile data sync disabled</string>
+    <string name="action_settings">Settings</string>
+
+    <!--Verify if this works for wetranslateit-->
+    <plurals name="data_points_sync_success_message">
+        <item quantity="one">%1$d data point synced</item>
+        <item quantity="other">%1$d data points synced</item>
+    </plurals>
 
 </resources>

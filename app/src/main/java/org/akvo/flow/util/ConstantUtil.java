@@ -38,8 +38,6 @@ public class ConstantUtil {
     public static final String PROCESSED_OK_SUFFIX = ".processed";
     public static final String PROCESSED_ERROR_SUFFIX = ".error";
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
     public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
     public static final String DOT_SEPARATOR = ".";
 
@@ -146,7 +144,7 @@ public class ConstantUtil {
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
-    
+
     /**
      * intents
      */
@@ -173,11 +171,9 @@ public class ConstantUtil {
      * property file keys
      */
     public static final String SERVER_BASE = "serverBase";
-    public static final String API_KEY = "apiKey";
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";
-    public static final String SENTRY_DSN = "sentryDsn";
 
     /**
      * S3 bucket directories (object prefixes)
@@ -203,11 +199,8 @@ public class ConstantUtil {
     /**
      * Order By
      */
-    public static final int ORDER_BY_NONE = -1;
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
 
     /**
      * Max picture size
@@ -242,8 +235,6 @@ public class ConstantUtil {
     public static final String CADDISFLY_MIME = "text/plain";
 
     //broadcasts
-    public static final String ACTION_LOCALE_SYNC_UPDATE = "fieldsurvey.ACTION_LOCALES_SYNC_UPDATE";
-    public static final String ACTION_LOCALE_SYNC_RESULT = "fieldsurvey.ACTION_LOCALES_SYNC_RESULT";
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
     public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
@@ -273,14 +264,6 @@ public class ConstantUtil {
     //extras
     public static final String EXTRA_RECORD_ID = "record_id";
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
-    public static final String EXTRA_DATAPOINT_SYNC_RESULT = "datapoint_sync_result";
-    public static final String EXTRA_DATAPOINT_NUMBER = "datapoint_number";
-
-    //data point sync result codes
-    public static final int DATA_SYNC_RESULT_SUCCESS = 0;
-    public static final int DATA_SYNC_RESULT_ERROR_UNKNOWN = 1;
-    public static final int DATA_SYNC_RESULT_ERROR_NETWORK = 2;
-    public static final int DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT = 3;
 
     /**
      * prevent instantiation

@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.ui.fragment;
+package org.akvo.flow.presentation.datapoints.map;
 
 import android.content.Context;
 
@@ -28,35 +28,26 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-import org.akvo.flow.domain.SurveyedLocale;
-
-import java.lang.ref.WeakReference;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 
 /**
  * This custom renderer overrides original 'bucketed' names, in order to display the accurate
  * number of markers within a cluster.
  */
-public class PointRenderer extends DefaultClusterRenderer<SurveyedLocale> {
-
-    private final WeakReference<Context> contextWeakReference;
+class PointRenderer extends DefaultClusterRenderer<MapDataPoint> {
 
     public PointRenderer(GoogleMap map, Context context,
-            ClusterManager<SurveyedLocale> clusterManager) {
+            ClusterManager<MapDataPoint> clusterManager) {
         super(context, map, clusterManager);
-        this.contextWeakReference = new WeakReference<>(context);
     }
 
     @Override
-    protected void onBeforeClusterItemRendered(SurveyedLocale item,
-            MarkerOptions markerOptions) {
-        Context context = contextWeakReference.get();
-        if (context != null) {
-            markerOptions.title(item.getDisplayName(context)).snippet(item.getId());
-        }
+    protected void onBeforeClusterItemRendered(MapDataPoint item, MarkerOptions markerOptions) {
+        markerOptions.title(item.getName()).snippet(item.getId());
     }
 
     @Override
-    protected int getBucket(Cluster<SurveyedLocale> cluster) {
+    protected int getBucket(Cluster<MapDataPoint> cluster) {
         return cluster.getSize();
     }
 

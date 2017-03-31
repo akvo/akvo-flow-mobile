@@ -32,11 +32,6 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
-
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
@@ -56,8 +51,6 @@ public class SurveyDbAdapter {
     public static final String SURVEY_JOIN_SURVEY_INSTANCE =
             "survey LEFT OUTER JOIN survey_instance ON "
                     + "survey.survey_id=survey_instance.survey_id";
-
-    private static final int DOES_NOT_EXIST = -1;
 
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
@@ -155,7 +148,7 @@ public class SurveyDbAdapter {
                 new String[] { String.valueOf(surveyInstanceId) });
 
         if (rows < 1) {
-            Timber.e("Could not update status for Survey Instance: " + surveyInstanceId);
+            Timber.e("Could not update status for Survey Instance: %d", surveyInstanceId);
         }
     }
 
@@ -309,7 +302,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         surveyId
                 }) < 1) {
-            Timber.e("Could not update record for Survey " + surveyId);
+            Timber.e("Could not update record for Survey %s", surveyId);
         }
     }
 
@@ -539,13 +532,6 @@ public class SurveyDbAdapter {
         return recordUid;
     }
 
-    public Cursor getSurveyedLocales(long surveyGroupId) {
-        return database.query(Tables.RECORD, RecordQuery.PROJECTION,
-                RecordColumns.SURVEY_GROUP_ID + " = ?",
-                new String[] { String.valueOf(surveyGroupId) },
-                null, null, null);
-    }
-
     public Cursor getSurveyedLocale(String surveyedLocaleId) {
         return database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
@@ -712,173 +698,6 @@ public class SurveyDbAdapter {
      */
     public enum SurveyedLocaleMeta {
         NAME, GEOLOCATION
-    }
-
-    public void updateSurveyedLocale(String surveyedLocaleId, ContentValues surveyedLocaleValues) {
-        database.update(Tables.RECORD, surveyedLocaleValues,
-                RecordColumns.RECORD_ID + " = ?",
-                new String[] { surveyedLocaleId });
-    }
-
-    /**
-     * Update the last modification date, if necessary
-     */
-    public void updateRecordModifiedDate(String recordId, long timestamp) {
-        ContentValues values = new ContentValues();
-        values.put(RecordColumns.LAST_MODIFIED, timestamp);
-        database.update(Tables.RECORD, values,
-                RecordColumns.RECORD_ID + " = ? AND " + RecordColumns.LAST_MODIFIED + " < ?",
-                new String[] { recordId, String.valueOf(timestamp) });
-    }
-
-    /**
-     * Filters surveyd locales based on the parameters passed in.
-     */
-    public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
-            int orderBy) {
-        // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
-        // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
-        // fully compatible. TODO: This should be refactored and replaced with a less complex approach.
-        String queryString = "SELECT sl.*,"
-                + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
-                + " FROM "
-                + Tables.RECORD + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
-                + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;
-        String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =?";
-        String groupBy = " GROUP BY sl." + RecordColumns.RECORD_ID;
-
-        String orderByStr = "";
-        switch (orderBy) {
-            case ORDER_BY_DATE:
-                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
-                break;
-            case ORDER_BY_DISTANCE:
-                if (latitude != null && longitude != null) {
-                    // this is to correct the distance for the shortening at higher latitudes
-                    Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)), 2);
-
-                    // this uses a simple planar approximation of distance. this should be good enough for our purpose.
-                    String orderByTempl = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE
-                            + " IS NULL THEN 1 ELSE 0 END,"
-                            + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
-                            + RecordColumns.LATITUDE
-                            + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
-                            + RecordColumns.LONGITUDE + ") * %s)";
-                    orderByStr = String
-                            .format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
-                }
-                break;
-            case ORDER_BY_STATUS:
-                orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
-                break;
-            case ORDER_BY_NAME:
-                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
-                break;
-        }
-
-        String[] whereValues = new String[] { String.valueOf(surveyGroupId) };
-        return database.rawQuery(queryString + whereClause + groupBy + orderByStr, whereValues);
-    }
-
-    // ======================================================= //
-    // =========== SurveyedLocales synchronization =========== //
-    // ======================================================= //
-
-    public void syncResponse(long surveyInstanceId,
-            ContentValues values, String questionId) {
-        Cursor cursor = database.query(Tables.RESPONSE,
-                new String[] { ResponseColumns.SURVEY_INSTANCE_ID, ResponseColumns.QUESTION_ID
-                },
-                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                        + ResponseColumns.QUESTION_ID + " = ?",
-                new String[] { String.valueOf(surveyInstanceId), questionId },
-                null, null, null);
-
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        if (exists) {
-            database.update(Tables.RESPONSE, values,
-                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                            + ResponseColumns.QUESTION_ID + " = ?",
-                    new String[] { String.valueOf(surveyInstanceId), questionId
-                    });
-        } else {
-            database.insert(Tables.RESPONSE, null, values);
-        }
-    }
-
-    public long syncSurveyInstance(ContentValues values,
-            String surveyInstanceUuid) {
-        Cursor cursor = database.query(Tables.SURVEY_INSTANCE, new String[] {
-                        SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID
-                },
-                SurveyInstanceColumns.UUID + " = ?",
-                new String[] { surveyInstanceUuid },
-                null, null, null);
-
-        long id = DOES_NOT_EXIST;
-        if (cursor.moveToFirst()) {
-            id = cursor.getLong(0);
-        }
-        cursor.close();
-        if (id != DOES_NOT_EXIST) {
-            database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
-                    + " = ?", new String[] { surveyInstanceUuid });
-        } else {
-            values.put(SurveyInstanceColumns.UUID, surveyInstanceUuid);
-            id = database.insert(Tables.SURVEY_INSTANCE, null, values);
-        }
-        return id;
-    }
-
-    public void endTransaction() {
-        database.endTransaction();
-    }
-
-    public void successfulTransaction() {
-        database.setTransactionSuccessful();
-    }
-
-    public void insertRecord(ContentValues values) {
-        database.insert(Tables.RECORD, null, values);
-    }
-
-    public void beginTransaction() {
-        database.beginTransaction();
-    }
-
-    /**
-     * Get the synchronization time for a particular survey group.
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @return time if exists for this key, null otherwise
-     */
-    public String getSyncTime(long surveyGroupId) {
-        Cursor cursor = database.query(Tables.SYNC_TIME,
-                new String[] { SyncTimeColumns.SURVEY_GROUP_ID, SyncTimeColumns.TIME },
-                SyncTimeColumns.SURVEY_GROUP_ID + "=?",
-                new String[] { String.valueOf(surveyGroupId) },
-                null, null, null);
-
-        String time = null;
-        if (cursor.moveToFirst()) {
-            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
-        }
-        cursor.close();
-        return time;
-    }
-
-    /**
-     * Save the time of synchronization time for a particular SurveyGroup
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @param time          String containing the timestamp
-     */
-    public void setSyncTime(long surveyGroupId, String time) {
-        ContentValues values = new ContentValues();
-        values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
-        values.put(SyncTimeColumns.TIME, time);
-        database.insert(Tables.SYNC_TIME, null, values);
     }
 
     /**

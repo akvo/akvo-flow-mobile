@@ -37,9 +37,9 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
@@ -62,7 +62,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
 
     private User mUser;
     private SurveyGroup mSurveyGroup;
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
 
     private ViewPager mPager;
 
@@ -84,7 +84,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
             }
         });
 
-        mDatabase = new SurveyDbAdapter(this);
+        mDatabase = new SurveyDbDataSource(this);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(EXTRA_SURVEY_GROUP);
         setTitle(mSurveyGroup.getName());

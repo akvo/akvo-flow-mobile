@@ -18,18 +18,12 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
-public class SurveyColumns {
-    public static final String _ID = "_id";
-    public static final String SURVEY_ID = "survey_id";
-    public static final String SURVEY_GROUP_ID = "survey_group_id";
-    public static final String NAME = "display_name";
-    public static final String VERSION = "version";
-    public static final String TYPE = "type";
-    public static final String LOCATION = "location";
-    public static final String FILENAME = "filename";
-    public static final String LANGUAGE = "language";
-    public static final String HELP_DOWNLOADED = "help_downloaded_flag";
-    public static final String DELETED = "deleted";
+public class SurveyInstanceStatus {
+    public static final int SAVED = 0;
+    public static final int SUBMITTED = 1;
+    public static final int EXPORTED = 2;
+    public static final int SYNCED = 3;
+    public static final int DOWNLOADED = 4;
 }

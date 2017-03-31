@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,16 +25,23 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import org.akvo.flow.R;
+import org.akvo.flow.database.R;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-public class LanguagesMapper {
+public class MigrationLanguageMapper {
 
-    public Set<String> transform(@NonNull Context context, @NonNull String languagesString) {
+    @NonNull
+    private final Context context;
+
+    public MigrationLanguageMapper(@NonNull Context context) {
+        this.context = context;
+    }
+
+    public Set<String> transform(@NonNull String languagesString) {
         if (TextUtils.isEmpty(languagesString)) {
             return Collections.emptySet();
         }

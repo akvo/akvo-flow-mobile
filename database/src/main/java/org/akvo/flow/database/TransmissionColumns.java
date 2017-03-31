@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,21 +18,14 @@
  *
  */
 
-package org.akvo.flow.data.migration.languages;
+package org.akvo.flow.database;
 
-import android.database.sqlite.SQLiteDatabase;
-
-import org.akvo.flow.database.PreferenceHandler;
-import org.akvo.flow.util.ConstantUtil;
-
-public class LanguagesExtractor {
-
-    final PreferenceHandler preferenceHandler = new PreferenceHandler();
-
-    public LanguagesExtractor() {
-    }
-
-    public String retrieveLanguages(SQLiteDatabase db) {
-        return preferenceHandler.findPreference(db, ConstantUtil.SURVEY_LANG_SETTING_KEY);
-    }
+public class TransmissionColumns {
+    public static final String _ID = "_id";
+    public static final String SURVEY_INSTANCE_ID = "survey_instance_id";
+    public static final String SURVEY_ID = "survey_id";
+    public static final String FILENAME = "filename";
+    public static final String STATUS = "status";// separate table/constants?
+    public static final String START_DATE = "start_date";// do we really need this column?
+    public static final String END_DATE = "end_date";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,16 +18,11 @@
  *
  */
 
-package org.akvo.flow.data;
+package org.akvo.flow.database;
 
-import android.support.annotation.NonNull;
-
-import java.util.Set;
-
-public interface SurveyLanguagesDataSource {
-
-    void saveLanguagePreferences(long surveyGroupId, @NonNull Set<String> languagesSet);
-
-    @NonNull
-    Set<String> getLanguagePreferences(long surveyGroupId);
+public class UserColumns {
+    public static final String _ID = "_id";
+    public static final String NAME = "name";
+    public static final String EMAIL = "email";
+    public static final String DELETED = "deleted";// 0 or 1
 }

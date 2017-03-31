@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -26,11 +26,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import org.akvo.flow.data.SurveyLanguagesDataSource;
-import org.akvo.flow.util.ConstantUtil;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import static org.akvo.flow.database.Constants.ENGLISH_CODE;
 
 /**
  * Retrieves / Saves user language preferences for each survey
@@ -39,8 +38,8 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
 
     private final DatabaseHelper databaseHelper;
 
-    public SurveyLanguagesDbDataSource(Context context) {
-        this.databaseHelper = new DatabaseHelper(context, new LanguageTable());
+    public SurveyLanguagesDbDataSource(Context context, MigrationListener migrationListener) {
+        this.databaseHelper = new DatabaseHelper(context, new LanguageTable(), migrationListener);
     }
 
     @Override
@@ -75,7 +74,7 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
             } while (cursor.moveToNext());
         } else {
             //if nothing there, we add english
-            languages.add(ConstantUtil.ENGLISH_CODE);
+            languages.add(ENGLISH_CODE);
         }
         cursor.close();
         databaseHelper.close();

@@ -18,23 +18,18 @@
  *
  */
 
-package org.akvo.flow.data.loader;
+package org.akvo.flow.database;
 
-import android.content.Context;
-import android.database.Cursor;
-
-import org.akvo.flow.data.loader.base.DataLoader;
-import org.akvo.flow.database.SurveyDbAdapter;
-
-public class SurveyGroupLoader extends DataLoader<Cursor> {
-
-    public SurveyGroupLoader(Context context, SurveyDbAdapter db) {
-        super(context, db);
-    }
-
-    @Override
-    protected Cursor loadData(SurveyDbAdapter database) {
-        return database.getSurveyGroups();
-    }
-
+public class SurveyColumns {
+    public static final String _ID = "_id";
+    public static final String SURVEY_ID = "survey_id";
+    public static final String SURVEY_GROUP_ID = "survey_group_id";
+    public static final String NAME = "display_name";
+    public static final String VERSION = "version";
+    public static final String TYPE = "type";
+    public static final String LOCATION = "location";
+    public static final String FILENAME = "filename";
+    public static final String LANGUAGE = "language";
+    public static final String HELP_DOWNLOADED = "help_downloaded_flag";
+    public static final String DELETED = "deleted";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,12 +18,17 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
-public class SurveyInstanceStatus {
-    public static final int SAVED = 0;
-    public static final int SUBMITTED = 1;
-    public static final int EXPORTED = 2;
-    public static final int SYNCED = 3;
-    public static final int DOWNLOADED = 4;
+class Constants {
+
+    static final int ORDER_BY_DATE = 0;
+    static final int ORDER_BY_DISTANCE = 1;
+    static final int ORDER_BY_STATUS = 2;
+    static final int ORDER_BY_NAME = 3;
+
+    /**
+     * language codes
+     */
+    static final String ENGLISH_CODE = "en";
 }

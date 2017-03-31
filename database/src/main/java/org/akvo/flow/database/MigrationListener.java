@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,10 +18,13 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
-public class PreferencesColumns {
+import android.database.sqlite.SQLiteDatabase;
 
-    public static final String KEY = "key";
-    public static final String VALUE = "value";
+public interface MigrationListener {
+
+    void migrateLanguages(SQLiteDatabase db);
+
+    void migratePreferences(SQLiteDatabase db);
 }

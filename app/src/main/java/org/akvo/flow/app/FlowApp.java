@@ -20,6 +20,7 @@
 package org.akvo.flow.app;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
@@ -27,15 +28,17 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
+import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.logging.SentryHelper;
 
@@ -167,7 +170,9 @@ public class FlowApp extends Application {
      * so, loads the last logged-in user from the DB
      */
     private void loadLastUser() {
-        SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
+        Context context = getApplicationContext();
+        SurveyDbAdapter database = new SurveyDbAdapter(context,
+                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
         database.open();
 
         // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades

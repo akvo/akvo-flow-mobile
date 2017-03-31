@@ -47,7 +47,7 @@ import static org.mockito.Matchers.anyInt;
 @SmallTest
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
-public class LanguagesMapperTest {
+public class MigrationLanguageMapperTest {
 
     @Mock
     private Context mockContext;
@@ -79,14 +79,14 @@ public class LanguagesMapperTest {
 
     @Test
     public void transformShouldReturnEmptyIfEmptyLanguageString() throws Exception {
-        Set<String> result = new LanguagesMapper().transform(mockContext, "");
+        Set<String> result = new MigrationLanguageMapper(mockContext).transform("");
 
         assertEmpty(result);
     }
 
     @Test
     public void transformShouldReturnCorrectValue() throws Exception {
-        Set<String> result = new LanguagesMapper().transform(mockContext, "0,2");
+        Set<String> result = new MigrationLanguageMapper(mockContext).transform("0,2");
 
         assertEquals(2, result.size());
         assertTrue(result.contains("es"));

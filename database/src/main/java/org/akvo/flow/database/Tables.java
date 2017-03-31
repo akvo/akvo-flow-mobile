@@ -18,14 +18,18 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
-public class TransmissionColumns {
-    public static final String _ID = "_id";
-    public static final String SURVEY_INSTANCE_ID = "survey_instance_id";
-    public static final String SURVEY_ID = "survey_id";
-    public static final String FILENAME = "filename";
-    public static final String STATUS = "status";// separate table/constants?
-    public static final String START_DATE = "start_date";// do we really need this column?
-    public static final String END_DATE = "end_date";
+public class Tables {
+
+    public static final String PREFERENCES = "preferences";
+    public static final String SURVEY = "survey";
+    public static final String SURVEY_INSTANCE = "survey_instance";
+    public static final String RESPONSE = "response";
+    public static final String USER = "user";
+    public static final String TRANSMISSION = "transmission";
+    public static final String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
+    public static final String RECORD = "record";// Introduced in Point Updates
+    public static final String SYNC_TIME = "sync_time";// Introduced in Point Updates
+
 }

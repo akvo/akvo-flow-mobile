@@ -18,11 +18,12 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
-public class UserColumns {
+public class SurveyGroupColumns {
     public static final String _ID = "_id";
+    public static final String SURVEY_GROUP_ID = "survey_group_id";
     public static final String NAME = "name";
-    public static final String EMAIL = "email";
-    public static final String DELETED = "deleted";// 0 or 1
+    public static final String REGISTER_SURVEY_ID = "register_survey_id";
+    public static final String MONITORED = "monitored";
 }

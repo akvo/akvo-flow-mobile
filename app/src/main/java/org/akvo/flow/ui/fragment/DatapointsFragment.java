@@ -33,9 +33,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -46,7 +47,7 @@ public class DatapointsFragment extends Fragment {
     private static final int POSITION_MAP = 1;
     private static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
 
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
     private TabsAdapter mTabsAdapter;
     private ViewPager mPager;
     private SurveyGroup mSurveyGroup;
@@ -91,7 +92,7 @@ public class DatapointsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
+            mDatabase = new SurveyDbDataSource(getActivity());
             mDatabase.open();
         }
     }
@@ -144,7 +145,8 @@ public class DatapointsFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.new_datapoint:
                 if (listener != null) {
-                    String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+                    String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId(),
+                            PlatformUtil.recordUuid());
                     listener.onRecordSelected(newLocaleId);
                 }
                 return true;

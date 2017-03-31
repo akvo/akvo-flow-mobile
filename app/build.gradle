@@ -140,4 +140,5 @@ dependencies {
 
     compile project(':domain')
     compile project(':data')
+    compile project(path: ':database')
 }

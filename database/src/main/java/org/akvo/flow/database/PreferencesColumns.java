@@ -18,14 +18,10 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
-public class ResponseColumns {
-    public static final String _ID = "_id";
-    public static final String SURVEY_INSTANCE_ID = "survey_instance_id";
-    public static final String QUESTION_ID = "question_id";
-    public static final String ANSWER = "answer";
-    public static final String TYPE = "type";
-    public static final String INCLUDE = "include";
-    public static final String FILENAME = "filename";
+public class PreferencesColumns {
+
+    public static final String KEY = "key";
+    public static final String VALUE = "value";
 }

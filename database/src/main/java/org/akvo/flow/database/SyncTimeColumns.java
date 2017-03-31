@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
 public class SyncTimeColumns {
     public static final String _ID = "_id";

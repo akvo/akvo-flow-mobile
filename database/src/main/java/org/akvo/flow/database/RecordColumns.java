@@ -18,18 +18,14 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
-public class Tables {
-
-    public static final String PREFERENCES = "preferences";
-    public static final String SURVEY = "survey";
-    public static final String SURVEY_INSTANCE = "survey_instance";
-    public static final String RESPONSE = "response";
-    public static final String USER = "user";
-    public static final String TRANSMISSION = "transmission";
-    public static final String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
-    public static final String RECORD = "record";// Introduced in Point Updates
-    public static final String SYNC_TIME = "sync_time";// Introduced in Point Updates
-
+public class RecordColumns {
+    public static final String _ID = "_id";
+    public static final String RECORD_ID = "record_id";
+    public static final String SURVEY_GROUP_ID = "survey_group_id";
+    public static final String NAME = "name";
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
+    public static final String LAST_MODIFIED = "last_modified";
 }

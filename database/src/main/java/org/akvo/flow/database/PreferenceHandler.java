@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

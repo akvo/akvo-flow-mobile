@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database;
 
 /**
  * Submitter is a denormalized value of the user_id.name in locally created surveys, whereas

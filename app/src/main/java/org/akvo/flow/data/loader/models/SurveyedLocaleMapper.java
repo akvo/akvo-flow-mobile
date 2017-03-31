@@ -23,8 +23,8 @@ package org.akvo.flow.data.loader.models;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceColumns;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.domain.SurveyedLocale;
 
 public class SurveyedLocaleMapper {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -46,7 +46,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.UserRequestedApkUpdateService;
@@ -335,10 +335,10 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     }
 
     private boolean unsentData() throws SQLException {
-        SurveyDbAdapter db = new SurveyDbAdapter(this);
+        SurveyDbDataSource db = new SurveyDbDataSource(this);
         try {
             db.open();
-            return db.getUnsyncedTransmissions().size() > 0;
+            return db.getUnSyncedTransmissions().size() > 0;
         } finally {
             if (db != null) {
                 db.close();

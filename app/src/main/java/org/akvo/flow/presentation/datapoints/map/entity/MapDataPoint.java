@@ -18,18 +18,33 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.presentation.datapoints.map.entity;
 
-public class Constants {
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
-    public static final int ORDER_BY_NONE = -1;
-    public static final int ORDER_BY_DATE = 0;
-    public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
+public class MapDataPoint implements ClusterItem {
 
-    /**
-     * language codes
-     */
-    static final String ENGLISH_CODE = "en";
+    private final String id;
+    private final String name;
+    private final LatLng position;
+
+    public MapDataPoint(String id, String name, LatLng position) {
+        this.id = id;
+        this.name = name;
+        this.position = position;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return position;
+    }
 }

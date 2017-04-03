@@ -22,9 +22,13 @@ package org.akvo.flow.injector.component;
 
 import android.content.Context;
 
+import com.squareup.sqlbrite.BriteDatabase;
+
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
@@ -39,15 +43,19 @@ import dagger.Component;
 })
 public interface ApplicationComponent {
 
-    ThreadExecutor getThreadExecutor();
+    ThreadExecutor threadExecutor();
 
-    PostExecutionThread getPostExecutionThread();
+    PostExecutionThread postExecutionThread();
+
+    SurveyRepository surveyRepository();
+
+    UserRepository userRepository();
+
+    BriteDatabase provideDatabase();
 
     Context context();
 
     void inject(FlowApp app);
 
     void inject(BaseActivity baseActivity);
-
-
 }

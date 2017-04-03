@@ -84,7 +84,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
             }
         });
 
-        mDatabase = new SurveyDbDataSource(this);
+        mDatabase = new SurveyDbDataSource(this, null);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(EXTRA_SURVEY_GROUP);
         setTitle(mSurveyGroup.getName());

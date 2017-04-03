@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,12 +18,31 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.presentation.datapoints;
 
-public class TransmissionStatus {
-    public static final int QUEUED = 0;
-    public static final int IN_PROGRESS = 1;
-    public static final int SYNCED = 2;
-    public static final int FAILED = 3;
-    public static final int FORM_DELETED = 4;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import org.akvo.flow.R;
+
+import javax.inject.Inject;
+
+public class DisplayNameMapper {
+
+    private final Context context;
+
+    @Inject
+    public DisplayNameMapper(Context context) {
+        this.context = context;
+    }
+
+    @NonNull
+    public String createDisplayName(@Nullable String name) {
+        if (TextUtils.isEmpty(name)) {
+            return context.getString(R.string.unknown);
+        }
+        return name;
+    }
 }

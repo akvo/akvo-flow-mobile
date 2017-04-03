@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,19 +18,29 @@
  *
  */
 
-package org.akvo.flow.injector.component;
+package org.akvo.flow.presentation.datapoints.map;
 
-import android.app.Activity;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 
-import org.akvo.flow.injector.PerActivity;
-import org.akvo.flow.injector.module.ActivityModule;
+import java.util.List;
 
-import dagger.Component;
+interface DataPointsMapView {
 
-@PerActivity
-@Component(dependencies = ApplicationComponent.class, modules = ActivityModule.class)
-public interface ActivityComponent {
+    void showProgress();
 
-    //Exposed to sub-graphs.
-    Activity activity();
+    void hideProgress();
+
+    void displayData(List<MapDataPoint> surveyedLocales);
+
+    void displayMenu(boolean monitored);
+
+    void showSyncedResults(int numberOfSyncedItems);
+
+    void showErrorAssignmentMissing();
+
+    void showErrorSyncNotAllowed();
+
+    void showErrorNoNetwork();
+
+    void showErrorSync();
 }

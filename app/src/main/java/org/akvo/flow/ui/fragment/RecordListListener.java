@@ -28,6 +28,4 @@ package org.akvo.flow.ui.fragment;
 public interface RecordListListener {
     
     void onRecordSelected(String surveyedLocaleId);
-
-    void onSyncRecordsRequested(long surveyGroupId);
 }

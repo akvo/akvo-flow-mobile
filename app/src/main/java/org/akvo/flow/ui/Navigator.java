@@ -37,6 +37,7 @@ import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
+import org.akvo.flow.activity.PreferencesActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
@@ -46,6 +47,8 @@ import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
+import javax.inject.Inject;
+
 import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
 import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
@@ -53,6 +56,7 @@ import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 public class Navigator {
 
     //TODO: inject activity
+    @Inject
     public Navigator() {
     }
 
@@ -172,5 +176,11 @@ public class Navigator {
 
     public void navigateToLocationSettings(Context context) {
          context.startActivity(new Intent("android.settings.LOCATION_SOURCE_SETTINGS"));
+    }
+
+    public void navigateToPreferences(@Nullable Context context) {
+        if (context != null) {
+            context.startActivity(new Intent(context, PreferencesActivity.class));
+        }
     }
 }

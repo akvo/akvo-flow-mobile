@@ -18,30 +18,26 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.injector.component;
 
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
-import org.akvo.flow.domain.interactor.SyncDataPoints;
-import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.injector.PerActivity;
+import org.akvo.flow.injector.module.ViewModule;
+import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
+import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.ui.fragment.DatapointsFragment;
 
-import javax.inject.Named;
+import dagger.Component;
 
-import dagger.Module;
-import dagger.Provides;
+@PerActivity
+@Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
+public interface ViewComponent {
 
-@Module
-public class ViewModule {
+    void inject(FormActivity formActivity);
 
-    @Provides
-    @Named("getSavedDataPoints")
-    UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
-        return getSavedDataPoints;
-    }
+    void inject(DatapointsFragment datapointsFragment);
 
-    @Provides
-    @Named("syncDataPoints")
-    UseCase provideSyncDataPointsUseCase(SyncDataPoints syncDataPoints) {
-        return syncDataPoints;
-    }
+    void inject(DataPointsMapFragment dataPointsMapFragment);
 
+    void inject(DataPointsListFragment dataPointsListFragment);
 }

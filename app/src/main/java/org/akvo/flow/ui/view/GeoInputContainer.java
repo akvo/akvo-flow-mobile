@@ -23,6 +23,7 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -53,8 +54,7 @@ public class GeoInputContainer extends LinearLayout {
         this(context, null);
     }
 
-    public GeoInputContainer(Context context,
-            @Nullable AttributeSet attrs) {
+    public GeoInputContainer(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -66,7 +66,6 @@ public class GeoInputContainer extends LinearLayout {
         longitudeInput = (EditText) findViewById(R.id.lon_et);
         elevationInput = (EditText) findViewById(R.id.height_et);
         statusIndicator = (TextView) findViewById(R.id.acc_tv);
-        statusIndicator.setText(R.string.geo_location_accuracy_default);
     }
 
     void setInputsFocusChangeListeners(GeoQuestionView geoQuestionView) {
@@ -102,14 +101,14 @@ public class GeoInputContainer extends LinearLayout {
         elevationInput.setText("");
     }
 
-    void displayCoordinates(String latitude, String longitude, @Nullable Double altitude,
+    void displayCoordinates(@NonNull String latitude, @NonNull String longitude, @Nullable Double altitude,
             float accuracy) {
         statusIndicator.setText(getContext()
                 .getString(R.string.geo_location_accuracy, accuracyFormat.format(accuracy)));
         displayCoordinates(latitude, longitude, altitude);
     }
 
-    void displayCoordinates(String latitude, String longitude, @Nullable Double altitude) {
+    void displayCoordinates(@NonNull String latitude, @NonNull String longitude, @Nullable Double altitude) {
         latitudeInput.setText(latitude);
         longitudeInput.setText(longitude);
         if (altitude != null) {
@@ -137,11 +136,11 @@ public class GeoInputContainer extends LinearLayout {
         statusIndicator.setTextColor(Color.RED);
     }
 
-    String getLatitude() {
+    String getLatitudeText() {
         return latitudeInput.getText().toString();
     }
 
-    String getLongitude() {
+    String getLongitudeText() {
         return longitudeInput.getText().toString();
     }
 

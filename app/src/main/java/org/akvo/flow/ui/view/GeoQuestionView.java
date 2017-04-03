@@ -90,7 +90,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     }
 
     public void onClick(View v) {
-        //TODO: refactor using states
         if (mLocationListener.isListening()) {
             stopLocationListener();
         } else {
@@ -196,24 +195,24 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
             float accuracy) {
         boolean areNewCoordinatesMoreAccurate = accuracy < mLastAccuracy;
         if (areNewCoordinatesMoreAccurate) {
-            onMoreAccurateCoordinatesReady(latitude, longitude, altitude, accuracy);
+            updateWithNewCoordinates(latitude, longitude, altitude, accuracy);
         }
         boolean areNewCoordinatesAccurateEnough =
                 accuracy <= TimedLocationListener.ACCURACY_DEFAULT;
         if (areNewCoordinatesAccurateEnough) {
-            onAccurateCoordinatesReady();
+            useAccurateCoordinates();
         }
     }
 
-    private void onAccurateCoordinatesReady() {
+    private void useAccurateCoordinates() {
         stopLocation();
         setResponse();
         geoInputContainer.showCoordinatesAccurate();
         showLocationListenerStopped();
     }
 
-    private void onMoreAccurateCoordinatesReady(double latitude, double longitude,
-            double altitude, float accuracy) {
+    private void updateWithNewCoordinates(double latitude, double longitude, double altitude,
+            float accuracy) {
         geoInputContainer.displayCoordinates(latitude + "", longitude + "", altitude, accuracy);
         updateCode(latitude, longitude);
     }
@@ -254,8 +253,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (!hasFocus) {
-            final String lat = geoInputContainer.getLatitude();
-            final String lon = geoInputContainer.getLongitude();
+            final String lat = geoInputContainer.getLatitudeText();
+            final String lon = geoInputContainer.getLongitudeText();
             if (!TextUtils.isEmpty(lat) && !TextUtils.isEmpty(lon)) {
                 updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
             }
@@ -264,8 +263,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     }
 
     private void setResponse() {
-        final String lat = geoInputContainer.getLatitude();
-        final String lon = geoInputContainer.getLongitude();
+        final String lat = geoInputContainer.getLatitudeText();
+        final String lon = geoInputContainer.getLongitudeText();
 
         if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
             setResponse(null);

@@ -144,7 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
+        Timber.d("Upgrading database from version %d to %d", oldVersion, newVersion);
 
         // Apply database updates sequentially. It starts in the current
         // version, hooking into the correspondent case block, and falls
@@ -189,6 +189,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             migrationListener.migrateLanguages(db);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
         }
+    }
+
+    //Using getReadableDatabase() returns
+    // android.database.sqlite.SQLiteDatabaseLockedException: database is locked (code 5):
+    // retrycount exceeded
+    @Override
+    public SQLiteDatabase getReadableDatabase() {
+        return getWritableDatabase();
     }
 
     @Override

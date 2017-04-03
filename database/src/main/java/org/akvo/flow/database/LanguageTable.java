@@ -27,9 +27,9 @@ public class LanguageTable {
     public static final String TABLE_NAME = "survey_languages_preferences";
     public static final String COLUMN_SURVEY_ID = "survey_instance_id";
     public static final String COLUMN_LANGUAGE_CODE = "language_code";
-    public static final String _ID = "_id";
+    private static final String _ID = "_id";
 
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
+    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_SURVEY_ID + " INTEGER NOT NULL,"
             + COLUMN_LANGUAGE_CODE + " TEXT NOT NULL, "

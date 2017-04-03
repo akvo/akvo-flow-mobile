@@ -61,6 +61,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
     private static final int SNACK_BAR_DURATION_IN_MS = 2000;
+    public static final int ALPHA_ANIMATION_DURATION = 50;
 
     private final TimedLocationListener mLocationListener;
     private final DecimalFormat accuracyFormat = new DecimalFormat("#");
@@ -116,33 +117,47 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     public void onClick(View v) {
         //TODO: refactor using states
-        if (mGeoButton.getText().toString()
-                .equals(getResources().getString(R.string.cancelbutton))) {
-            geoLoading.setVisibility(GONE);
-            //TODO: improve
-            setViewAlpha(0.1f, 1f, geoManualInputContainer);
-            stopLocation();
-            updateButtonTextToGetGeo();
+        if (mLocationListener.isListening()) {
+            stopListeningToLocation();
         } else {
-            geoLoading.setVisibility(VISIBLE);
-            setViewAlpha(1f, 0.1f, geoManualInputContainer);
-            resetViewsToDefaultValues();
-            setStatusToRed();
-            resetResponseValues();
-            updateButtonTextToCancel();
-            startLocation();
+            startListeningToLocation();
         }
     }
 
+    private void startListeningToLocation() {
+        updateViewsLocationListeningStarted();
+        resetResponseValues();
+        startLocation();
+    }
+
+    private void updateViewsLocationListeningStarted() {
+        geoLoading.setVisibility(VISIBLE);
+        setViewAlpha(1f, 0.1f, geoManualInputContainer);
+        resetViewsToDefaultValues();
+        setAccuracyStatusToRed();
+        updateButtonTextToCancel();
+    }
+
+    private void stopListeningToLocation() {
+        stopLocation();
+        updateViewsLocationListeningStopped();
+    }
+
+    private void updateViewsLocationListeningStopped() {
+        geoLoading.setVisibility(GONE);
+        setViewAlpha(0.1f, 1f, geoManualInputContainer);
+        updateButtonTextToGetGeo();
+    }
+
     //TODO: move to ViewTools
-    void setViewAlpha(float from, float to, View view) {
-        if (Build.VERSION.SDK_INT < 11) {
-            final AlphaAnimation animation = new AlphaAnimation(from, to);
-            animation.setDuration(50);
+    void setViewAlpha(float originalAlpha, float targetAlpha, View view) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            final AlphaAnimation animation = new AlphaAnimation(originalAlpha, targetAlpha);
+            animation.setDuration(ALPHA_ANIMATION_DURATION);
             animation.setFillAfter(true);
             view.startAnimation(animation);
         } else {
-            view.setAlpha(to);
+            view.setAlpha(targetAlpha);
         }
     }
 
@@ -182,11 +197,11 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         mElevationField.setText("");
     }
 
-    private void setStatusToRed() {
+    private void setAccuracyStatusToRed() {
         mStatusIndicator.setTextColor(Color.RED);
     }
 
-    private void setStatusToGreen() {
+    private void setAccuracyStatusToGreen() {
         mStatusIndicator.setTextColor(Color.GREEN);
     }
 
@@ -241,15 +256,28 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     @Override
     public void onLocationReady(double latitude, double longitude, double altitude,
             float accuracy) {
-        if (accuracy < mLastAccuracy) {
-            updateViews(latitude, longitude, altitude, accuracy);
-            updateCode(latitude, longitude);
+        boolean areNewCoordinatesMoreAccurate = accuracy < mLastAccuracy;
+        if (areNewCoordinatesMoreAccurate) {
+            onMoreAccurateCoordinatesReady(latitude, longitude, altitude, accuracy);
         }
-        if (accuracy <= TimedLocationListener.ACCURACY_DEFAULT) {
-            stopLocation();
-            setResponse();
-            setStatusToGreen();
+        boolean areNewCoordinatesAccurateEnough =
+                accuracy <= TimedLocationListener.ACCURACY_DEFAULT;
+        if (areNewCoordinatesAccurateEnough) {
+            onAccurateEnoughCoordinatesReady();
         }
+    }
+
+    private void onAccurateEnoughCoordinatesReady() {
+        stopLocation();
+        setResponse();
+        setAccuracyStatusToGreen();
+        updateViewsLocationListeningStopped();
+    }
+
+    private void onMoreAccurateCoordinatesReady(double latitude, double longitude,
+            double altitude, float accuracy) {
+        updateViews(latitude, longitude, altitude, accuracy);
+        updateCode(latitude, longitude);
     }
 
     private void updateCode(double latitude, double longitude) {
@@ -267,14 +295,14 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     @Override
     public void onTimeout() {
         resetQuestion(true);
+        updateViewsLocationListeningStopped();
         Snackbar.make(this, R.string.location_timeout, SNACK_BAR_DURATION_IN_MS)
                 .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        resetViewsToDefaultValues();
-                        setStatusToRed();
                         resetResponseValues();
                         startLocation();
+                        updateViewsLocationListeningStarted();
                     }
                 }).show();
     }
@@ -282,6 +310,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     @Override
     public void onGPSDisabled() {
         Context context = getContext();
+        updateViewsLocationListeningStopped();
         if (context instanceof AppCompatActivity) {
             FragmentManager fragmentManager = ((AppCompatActivity) context)
                     .getSupportFragmentManager();

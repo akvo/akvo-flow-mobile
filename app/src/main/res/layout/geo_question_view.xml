@@ -13,14 +13,14 @@
                 android:id="@+id/manual_geo_input_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:alpha="0.3"
                 android:orientation="horizontal">
 
             <TableLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:stretchColumns="1">
+                    android:stretchColumns="1"
+                    android:layout_marginBottom="8dp">
 
                 <TableRow>
 
@@ -67,23 +67,18 @@
                             android:imeOptions="actionDone"
                             android:inputType="numberDecimal|numberSigned"/>
                 </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                            android:id="@+id/acc_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:text="@string/geo_location_accuracy_default"/>
+                </TableRow>
             </TableLayout>
-
-            <FrameLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:layout_gravity="center">
-
-                <TextView
-                        android:id="@+id/acc_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:layout_gravity="center"
-                        android:text="@string/geo_location_accuracy_default"/>
-            </FrameLayout>
 
         </LinearLayout>
 
@@ -112,7 +107,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textSize="18sp"
-                  />
+                    />
         </LinearLayout>
 
 
@@ -125,6 +120,5 @@
             android:text="@string/getgeo"
             android:textSize="16sp"
             style="@style/button_primary"/>
-
 
 </merge>

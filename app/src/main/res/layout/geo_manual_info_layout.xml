@@ -4,7 +4,7 @@
              android:layout_height="wrap_content"
              android:layout_weight="2"
              android:stretchColumns="1"
-             android:layout_marginBottom="8dp">
+             >
 
     <TableRow>
 
@@ -60,6 +60,8 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:text="@string/geo_location_accuracy_default"/>
     </TableRow>
 </TableLayout>

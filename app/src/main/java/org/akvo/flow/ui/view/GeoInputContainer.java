@@ -102,7 +102,8 @@ public class GeoInputContainer extends LinearLayout {
         elevationInput.setText("");
     }
 
-    void displayCoordinates(String latitude, String longitude, @Nullable Double altitude, float accuracy) {
+    void displayCoordinates(String latitude, String longitude, @Nullable Double altitude,
+            float accuracy) {
         statusIndicator.setText(getContext()
                 .getString(R.string.geo_location_accuracy, accuracyFormat.format(accuracy)));
         displayCoordinates(latitude, longitude, altitude);

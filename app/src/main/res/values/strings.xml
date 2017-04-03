@@ -266,5 +266,6 @@
 
     <string name="locale_list_error_unknown_location">Unknown Location</string>
     <string name="location_timeout">Unable to get location</string>
+    <string name="auto_geo_location_pending">Waiting for device location...</string>
 
 </resources>

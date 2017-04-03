@@ -1,83 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools">
 
-    <include layout="@layout/question_header" />
+    <include layout="@layout/question_header"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+    <FrameLayout
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TableLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:stretchColumns="1">
+        <org.akvo.flow.ui.view.GeoInputContainer
+                android:id="@+id/manual_geo_input_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+        </org.akvo.flow.ui.view.GeoInputContainer>
 
-            <TableRow>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/lat" />
-                <EditText
-                    android:id="@+id/lat_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal|numberSigned"/>
+        <LinearLayout
+                android:id="@+id/auto_geo_location_progress"
+                android:orientation="horizontal"
+                tools:visibility="visible"
+                android:visibility="gone"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            </TableRow>
-            <TableRow>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/lon" />
-                <EditText
-                    android:id="@+id/lon_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal|numberSigned"/>
-
-            </TableRow>
-            <TableRow>
-                <TextView
+            <ProgressBar
+                    style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dp"
-                    android:text="@string/elevation" />
-                <EditText
-                    android:id="@+id/height_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionDone"
-                    android:inputType="numberDecimal|numberSigned"/>
-            </TableRow>
-        </TableLayout>
-
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_gravity="center">
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:id="@+id/progressBar"/>
 
             <TextView
-                android:id="@+id/acc_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:text="@string/geo_location_accuracy_default"/>
-        </FrameLayout>
+                    android:text="@string/auto_geo_location_pending"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    />
+        </LinearLayout>
 
-    </LinearLayout>
+
+    </FrameLayout>
 
     <Button
-        android:id="@+id/geo_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/getgeo"
-        android:textSize="16sp"
-        style="@style/button_primary"/>
+            android:id="@+id/geo_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/getgeo"
+            android:textSize="16sp"
+            style="@style/button_primary"/>
 
 </merge>

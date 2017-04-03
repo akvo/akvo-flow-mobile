@@ -18,11 +18,29 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.data.entity;
 
-public class Constants {
+import android.database.Cursor;
 
-    public static final int IMAGE_SIZE_320_240 = 0;
-    public static final int IMAGE_SIZE_640_480 = 1;
-    public static final int IMAGE_SIZE_1280_960 = 2;
+import org.akvo.flow.database.SyncTimeColumns;
+
+import javax.inject.Inject;
+
+public class SyncedTimeMapper {
+
+    @Inject
+    public SyncedTimeMapper() {
+    }
+
+    public String getTime(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        String time = null;
+        if (cursor.moveToFirst()) {
+            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
+        }
+        cursor.close();
+        return time;
+    }
 }

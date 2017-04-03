@@ -20,6 +20,16 @@
 
 package org.akvo.flow.data.net;
 
-public interface FlowApiService {
+import org.akvo.flow.data.entity.ApiLocaleResult;
 
+import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.Url;
+import rx.Observable;
+
+interface FlowApiService {
+
+    @GET
+    @Headers("Cache-Control: no-cache")
+    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
 }

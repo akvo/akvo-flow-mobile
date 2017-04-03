@@ -18,26 +18,42 @@
  *
  */
 
-package org.akvo.flow.data.repository;
+package org.akvo.flow.data.entity;
 
-import org.akvo.flow.data.datasource.DataSourceFactory;
-import org.akvo.flow.domain.repository.UserRepository;
+import com.google.gson.annotations.SerializedName;
 
-import javax.inject.Inject;
+public class ApiQuestionAnswer {
 
-import rx.Observable;
+    @SerializedName("q")
+    private String questionId;
 
-public class UserDataRepository implements UserRepository {
+    @SerializedName("a")
+    private String answer;
 
-    private final DataSourceFactory dataSourceFactory;
+    @SerializedName("t")
+    private String type;
 
-    @Inject
-    public UserDataRepository(DataSourceFactory dataSourceFactory) {
-        this.dataSourceFactory = dataSourceFactory;
+    public String getQuestionId() {
+        return questionId;
     }
 
-    @Override
-    public Observable<Boolean> mobileSyncAllowed() {
-        return null; //EMPTY FOR NOW
+    public void setQuestionId(String questionId) {
+        this.questionId = questionId;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

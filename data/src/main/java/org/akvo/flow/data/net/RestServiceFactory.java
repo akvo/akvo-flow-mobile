@@ -22,14 +22,41 @@ package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
 
-import retrofit.RestAdapter;
+import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+@Singleton
 public class RestServiceFactory {
 
-    public static <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
-        RestAdapter.Builder builder = new RestAdapter.Builder()
-                .setEndpoint(baseUrl)
-                .setLogLevel(RestAdapter.LogLevel.FULL);
-        return builder.build().create(clazz);
+    private static final int CONNECTION_TIMEOUT = 10;
+    /**
+     * Requests to GAE take a long time especially when there are a lot of datapoints
+     */
+    public static final int NO_TIMEOUT = 0;
+
+    private final OkHttpClient.Builder httpClient;
+
+    @Inject
+    public RestServiceFactory(OkHttpClient.Builder httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    public <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
+        httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
+        httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        return retrofit.create(clazz);
     }
 }

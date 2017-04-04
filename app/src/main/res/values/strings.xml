@@ -1,9 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="accuracy">Acc</string>
-    <string name="searching">Searching...</string>
-    <string name="ready">Ready</string>
-    <string name="timeout">Timeout</string>
+    <string name="geo_location_accuracy_default">Accuracy: unknown</string>
+    <string name="geo_location_accuracy">Accuracy: %1$s m</string>
     <string name="nocardspacetitle">No Storage Space</string>
     <string name="lowcardspacetitle">Low Storage Space</string>
     <string name="nocardspacedialog">The SD card on this device is full and you can no longer collect data. You must clear space on the SD card in order to continue.</string>
@@ -15,7 +13,8 @@
     <string name="lon">Lon</string>
     <string name="elevation">Height</string>
     <string name="submitbutton">Submit</string>
-    <string name="geodialog">GPS must be enabled to do this. Select OK to go to the settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
+    <string name="geodialog">Please enable location settings</string>
+    <string name="settings">Settings</string>
     <string name="resize_large_images">Resize large images</string>
     <string name="settingslabel">Settings</string>
     <string name="nouser">No Users!</string>
@@ -266,5 +265,7 @@
     <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
 
     <string name="locale_list_error_unknown_location">Unknown Location</string>
+    <string name="location_timeout">Unable to get location</string>
+    <string name="auto_geo_location_pending">Waiting for device location...</string>
 
 </resources>

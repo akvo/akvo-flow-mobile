@@ -42,19 +42,17 @@ import java.io.InputStream;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.tests.R.raw.freetextsurvey;
+import static org.akvo.flow.tests.R.raw.optionsurvey;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.not;
 
-public class FreeTextSurveyTest {
+public class OptionsSurveyTest {
 
     @Rule
     public ActivityTestRule<SurveyActivity> rule = new ActivityTestRule<>(SurveyActivity.class);
@@ -62,9 +60,8 @@ public class FreeTextSurveyTest {
 
     @Before
     public void init() {
-        //Need context referring to application itself
         Context context = rule.getActivity();
-        installer = new SurveyInstaller(context, new SurveyDbAdapter(context));
+        installer       = new SurveyInstaller(context, new SurveyDbAdapter(context));
     }
 
     @BeforeClass
@@ -83,35 +80,27 @@ public class FreeTextSurveyTest {
     }
 
     @Test
-    public void canFillFreeTextQuestion() throws IOException {
-        fillFreeTextQuestion(freetextsurvey, "This is an answer to your question");
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches((isEnabled())));
+    public void canFillOptionsQuestion() throws IOException, InterruptedException {
+        fillOptionsQuestion(optionsurvey, 0);
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches(isEnabled()));
     }
 
-    @Test
-    public void ensureCantSubmitEmptyFreeText() throws IOException {
-        fillFreeTextQuestion(freetextsurvey, "");
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(not(isEnabled())));
-    }
-
-    private Survey fillFreeTextQuestion(int surveyResId, String text) throws IOException {
+    private Survey fillOptionsQuestion(int surveyResId, int option) throws IOException {
         Survey survey = getSurvey(surveyResId);
 
         openDrawer();
         onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
         onView(withId(R.id.new_datapoint)).perform(click());
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
-        onView(withId(R.id.input_et)).perform(typeText(text));
+        //Ensure we get the RadioButton View with the ID (each button/option has an ID starting from 0) and click it
+        onView(allOf(withClassName(endsWith("RadioButton")), withId(option))).check(matches(isDisplayed())).perform(click());
         onView(withId(R.id.next_btn)).perform(click());
 
         return survey;
     }
 
     private Survey getSurvey(int resId) throws IOException {
-        InputStream input = InstrumentationRegistry.getContext().getResources()
-                .openRawResource(resId);
+        InputStream input = InstrumentationRegistry.getContext().getResources().openRawResource(resId);
         return installer.persistSurvey(FileUtil.readText(input));
     }
 

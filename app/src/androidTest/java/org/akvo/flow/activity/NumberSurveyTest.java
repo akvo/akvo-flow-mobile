@@ -22,6 +22,7 @@ package org.akvo.flow.activity;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.DrawerActions;
+import android.support.test.espresso.matcher.RootMatchers;
 import android.support.test.rule.ActivityTestRule;
 
 import org.akvo.flow.R;
@@ -49,12 +50,12 @@ import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.tests.R.raw.freetextsurvey;
+import static org.akvo.flow.tests.R.raw.numbersurvey;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
-public class FreeTextSurveyTest {
+public class NumberSurveyTest {
 
     @Rule
     public ActivityTestRule<SurveyActivity> rule = new ActivityTestRule<>(SurveyActivity.class);
@@ -62,7 +63,6 @@ public class FreeTextSurveyTest {
 
     @Before
     public void init() {
-        //Need context referring to application itself
         Context context = rule.getActivity();
         installer = new SurveyInstaller(context, new SurveyDbAdapter(context));
     }
@@ -83,28 +83,50 @@ public class FreeTextSurveyTest {
     }
 
     @Test
-    public void canFillFreeTextQuestion() throws IOException {
-        fillFreeTextQuestion(freetextsurvey, "This is an answer to your question");
+    public void canFillNumberQuestion() throws IOException {
+        fillNumberQuestion(numbersurvey, 50, 50);
+        onView(withId(R.id.next_btn)).perform(click());
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches((isEnabled())));
     }
 
     @Test
-    public void ensureCantSubmitEmptyFreeText() throws IOException {
-        fillFreeTextQuestion(freetextsurvey, "");
+    public void canNotifyWrongDoubleInputNumberQuestion() throws IOException {
+        fillNumberQuestion(numbersurvey, 50, 60);
+        //Ensure Popup shows the "Answers do not match" text
+        onView(withText(R.string.error_answer_match)).inRoot(RootMatchers.isPlatformPopup())
+                .check(matches(isDisplayed()));
+        onView(withId(R.id.next_btn)).perform(click());
+        //Ensure the button object with text "Submit" is greyed out and not enabled
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches(not(isEnabled())));
     }
 
-    private Survey fillFreeTextQuestion(int surveyResId, String text) throws IOException {
+    @Test
+    public void canNotifyWrongMaxInputNumberQuestion() throws IOException {
+        Survey survey = fillNumberQuestion(numbersurvey, 0, 2000);
+        //Gets the maxValue for the first question
+        int maxValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
+                .getMaxVal().intValue();
+        String tooLargeError = rule.getActivity().getApplicationContext().getResources()
+                .getString(R.string.toolargeerr);
+
+        onView(withText(tooLargeError + maxValue)).inRoot(RootMatchers.isPlatformPopup())
+                .check(matches(isDisplayed()));
+        onView(withId(R.id.next_btn)).perform(click());
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(not(isEnabled())));
+    }
+
+    private Survey fillNumberQuestion(int surveyResId, int firstValue, int secondValue)
+            throws IOException {
         Survey survey = getSurvey(surveyResId);
 
         openDrawer();
         onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
         onView(withId(R.id.new_datapoint)).perform(click());
-        onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
-        onView(withId(R.id.input_et)).perform(typeText(text));
-        onView(withId(R.id.next_btn)).perform(click());
+        onView(withId(R.id.input_et)).perform(typeText(String.valueOf(firstValue)));
+        onView(withId(R.id.double_entry_et)).perform(typeText(String.valueOf(secondValue)));
 
         return survey;
     }

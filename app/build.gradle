@@ -7,8 +7,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     def versionPropsFile = file('version.properties')
 
     if (versionPropsFile.canRead()) {
@@ -24,8 +24,8 @@ android {
         defaultConfig {
             versionCode versionCodeProperty
             versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-            minSdkVersion 10
-            targetSdkVersion 21
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
             applicationId "org.akvo.flow"
             testApplicationId "org.akvo.flow.tests"
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -45,31 +45,30 @@ android {
                 storePassword 'android'
             }
 
-        flowRelease {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-        }
-
-        buildTypes {
-            release {
-                signingConfig signingConfigs.flowRelease
+            flowRelease {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
+            buildTypes {
+                release {
+                    signingConfig signingConfigs.flowRelease
+                }
             }
         }
-    }
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-        exclude '.readme'
-    }
+        packagingOptions {
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/license.txt'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/notice.txt'
+            exclude 'META-INF/ASL2.0'
+            exclude 'META-INF/services/javax.annotation.processing.Processor'
+            exclude '.readme'
+        }
 
         productFlavors {
             flow {
@@ -128,10 +127,21 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
     testCompile 'org.powermock:powermock-api-mockito:1.6.2'
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
+
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile ('com.android.support.test:rules:0.5') {
+        exclude module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2') {
+        exclude module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
     androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.1') {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'

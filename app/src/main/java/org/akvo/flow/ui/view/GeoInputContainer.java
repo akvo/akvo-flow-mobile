@@ -124,12 +124,26 @@ public class GeoInputContainer extends LinearLayout {
 
     void showLocationListenerStopped() {
         setAlpha(ALPHA_TRANSPARENT, ALPHA_OPAQUE);
+        enableManualInput();
+    }
+
+    private void enableManualInput() {
+        latitudeInput.setEnabled(true);
+        longitudeInput.setEnabled(true);
+        elevationInput.setEnabled(true);
     }
 
     void showLocationListenerStarted() {
         setAlpha(ALPHA_OPAQUE, ALPHA_TRANSPARENT);
         resetChildViewsToDefaultValues();
         showCoordinatesInaccurate();
+        disableManualInput();
+    }
+
+    private void disableManualInput() {
+        latitudeInput.setEnabled(false);
+        longitudeInput.setEnabled(false);
+        elevationInput.setEnabled(false);
     }
 
     private void showCoordinatesInaccurate() {

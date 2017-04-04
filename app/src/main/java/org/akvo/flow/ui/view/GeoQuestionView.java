@@ -53,7 +53,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
-    private static final int SNACK_BAR_DURATION_IN_MS = 2000;
+    private static final int SNACK_BAR_DURATION_IN_MS = 4000;
 
     private final TimedLocationListener mLocationListener;
 

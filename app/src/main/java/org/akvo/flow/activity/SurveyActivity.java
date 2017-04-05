@@ -33,6 +33,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -83,6 +84,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
+    private Toolbar toolbar;
     private CharSequence mDrawerTitle, mTitle;
     private Navigator navigator = new Navigator();
 
@@ -131,6 +133,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initializeToolBar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);

@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -39,8 +40,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.astuetz.PagerSlidingTabStrip;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
@@ -153,14 +152,18 @@ public class DatapointsFragment extends Fragment {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
         mPager = (ViewPager) v.findViewById(R.id.pager);
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) v.findViewById(R.id.tabs);
+        return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        TabLayout tabs = (TabLayout) getActivity().findViewById(R.id.tabs);
 
         // Init tabs
         mTabsAdapter = new TabsAdapter(getFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
-        tabs.setViewPager(mPager);
-
-        return v;
+        tabs.setupWithViewPager(mPager);
     }
 
     @Override

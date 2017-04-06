@@ -387,8 +387,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
     }
 
-
-
     private void displaySelectedUser() {
         User user = FlowApp.getApp().getUser();
         if (user != null) {

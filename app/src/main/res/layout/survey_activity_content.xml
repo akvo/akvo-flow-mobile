@@ -6,7 +6,7 @@
         android:layout_height="match_parent"
         tools:context="org.akvo.flow.activity.SurveyActivity">
 
-    <include layout="@layout/survey_app_bar_layout"/>
+    <include layout="@layout/app_bar_layout"/>
 
     <FrameLayout
             android:layout_marginTop="?actionBarSize"

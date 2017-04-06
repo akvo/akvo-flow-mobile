@@ -22,7 +22,7 @@
 
     <style name="FlowAppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/orange_main</item>
-        <item name="colorPrimaryDark">@color/orange_disabled</item>
+        <item name="colorPrimaryDark">@color/orange_dark</item>
         <item name="colorAccent">@color/green</item>
 
         <!-- Makes sure the navigation drawer icon is white on older devices-->

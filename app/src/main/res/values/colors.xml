@@ -8,6 +8,7 @@
     <color name="black_transparent">#20000000</color>
 
     <color name="orange_main">#e17e26</color>
+    <color name="orange_dark">#ba661c</color>
     <color name="orange_disabled">#80e17e26</color>
 
     <color name="blue_main">#2bb5e6</color>

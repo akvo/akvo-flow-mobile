@@ -27,7 +27,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,7 +64,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class GeoshapeActivity extends AppCompatActivity
+public class GeoshapeActivity extends BackActivity
         implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener,
         OnMyLocationChangeListener, OnMapReadyCallback {
 
@@ -101,7 +100,7 @@ public class GeoshapeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.geoshape_activity);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolBar();
 
         mFeatures = new ArrayList<>();
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);

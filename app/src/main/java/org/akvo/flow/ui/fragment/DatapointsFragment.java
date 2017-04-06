@@ -152,18 +152,12 @@ public class DatapointsFragment extends Fragment {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
         mPager = (ViewPager) v.findViewById(R.id.pager);
-        return v;
-    }
+        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        TabLayout tabs = (TabLayout) getActivity().findViewById(R.id.tabs);
-
-        // Init tabs
         mTabsAdapter = new TabsAdapter(getFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
         tabs.setupWithViewPager(mPager);
+        return v;
     }
 
     @Override

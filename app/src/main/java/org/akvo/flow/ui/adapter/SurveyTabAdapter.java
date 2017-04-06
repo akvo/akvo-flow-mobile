@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -47,8 +47,8 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private List<QuestionGroupTab> mQuestionGroupTabs;
     private SubmitTab mSubmitTab;
 
-    public SurveyTabAdapter(Context context, ViewPager pager,
-            SurveyListener surveyListener, QuestionInteractionListener questionListener) {
+    public SurveyTabAdapter(Context context, ViewPager pager, SurveyListener surveyListener,
+            QuestionInteractionListener questionListener) {
         mPager = pager;
         init(context, surveyListener, questionListener);
     }

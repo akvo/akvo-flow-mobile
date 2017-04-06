@@ -162,8 +162,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         spaceLeftOnCard();
     }
 
-
-
     /**
      * Display prefill option dialog, if applies. This feature is only available
      * for monitored groups, when a new survey instance is created, allowing users

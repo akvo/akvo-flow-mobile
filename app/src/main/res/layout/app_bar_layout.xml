@@ -13,6 +13,7 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:titleTextAppearance="@style/FlowAppTheme.Toolbar.Title"
+            app:subtitleTextAppearance="@style/FlowAppTheme.Toolbar.SubTitle"
             app:popupTheme="@style/FlowAppTheme.PopupOverlay"/>
 
 </android.support.design.widget.AppBarLayout>

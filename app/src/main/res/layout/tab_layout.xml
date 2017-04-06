@@ -13,8 +13,7 @@
         app:tabIndicatorHeight="4dp"
         app:tabTextColor="@color/white"
         app:tabTextAppearance="@style/TextAppearance.Tabs"
-        app:tabSelectedTextColor="@color/white"
-        tools:showIn="@layout/datapoints_fragment">
+        app:tabSelectedTextColor="@color/white">
 
     <android.support.design.widget.TabItem
             android:layout_width="match_parent"

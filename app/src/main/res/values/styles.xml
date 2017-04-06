@@ -70,4 +70,9 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="TextAppearance.Tabs" parent="TextAppearance.Design.Tab">
+        <item name="android:textStyle">bold</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
 </resources>

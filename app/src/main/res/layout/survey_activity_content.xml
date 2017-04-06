@@ -8,8 +8,8 @@
 
     <include layout="@layout/survey_app_bar_layout"/>
 
-    <!-- Main content -->
     <FrameLayout
+            android:layout_marginTop="?actionBarSize"
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

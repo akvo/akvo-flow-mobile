@@ -6,27 +6,11 @@
         <item name="android:listViewStyle">@style/Flow.ListView</item>
     </style>
 
-    <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
-
-    <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-    <!--On older devices, for some reason the text appears in black without this style-->
-    <style name="FlowAppTheme.Toolbar.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="FlowAppTheme.Toolbar.SubTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
-        <item name="android:textColor">@color/white</item>
-    </style>
-
-    <style name="FlowAppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="FlowAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/orange_main</item>
         <item name="colorPrimaryDark">@color/orange_dark</item>
         <item name="colorAccent">@color/green</item>
-
-        <!-- Makes sure the navigation drawer icon is white on older devices-->
-        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlNormal">@color/black_main</item>
 
         <item name="android:windowBackground">@color/app_background_main</item>
 

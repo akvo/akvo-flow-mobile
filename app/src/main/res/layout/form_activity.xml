@@ -27,6 +27,9 @@
                 app:tabTextColor="@color/white"
                 app:tabTextAppearance="@style/TextAppearance.Tabs"
                 app:tabSelectedTextColor="@color/white"
+                app:tabMode="scrollable"
+                app:tabMaxWidth="140dp"
+                app:tabMinWidth="140dp"
                 tools:showIn="@layout/form_activity">
 
         </android.support.design.widget.TabLayout>

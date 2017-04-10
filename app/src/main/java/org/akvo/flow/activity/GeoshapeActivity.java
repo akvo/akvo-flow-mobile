@@ -478,10 +478,10 @@ public class GeoshapeActivity extends AppCompatActivity
 
     @Override
     public void onMyLocationChange(Location location) {
-        Timber.i("onMyLocationChange() - " + location);
+        Timber.i("onMyLocationChange() - %s", location);
         if (location != null && location.hasAccuracy()) {
-            mAccuracy.setText(
-                getString(R.string.accuracy) + ": " + new DecimalFormat("#").format(location.getAccuracy()) + "m");
+            String formattedAccuracy = new DecimalFormat("#").format(location.getAccuracy());
+            mAccuracy.setText(getString(R.string.geo_location_accuracy, formattedAccuracy));
             if (location.getAccuracy() <= ACCURACY_THRESHOLD) {
                 mAccuracy.setTextColor(ContextCompat.getColor(this, R.color.button_green));
             } else {

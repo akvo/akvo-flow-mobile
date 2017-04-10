@@ -1,7 +1,7 @@
 Akvo FLOW app release notes
 ===========================
 # ver 2.3.1
-Date: 04 April 2017
+Date: 10 April 2017
 
 # New and noteworthy
 * **Improve UI for when searching for location** - [#673](https://github.com/akvo/akvo-flow-mobile/issues/673) Improved the look of geo question: it is now clearer when you can input the coordinates manually. 

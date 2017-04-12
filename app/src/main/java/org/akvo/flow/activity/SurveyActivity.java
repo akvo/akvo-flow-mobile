@@ -84,7 +84,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
-    private Toolbar toolbar;
     private CharSequence mDrawerTitle, mTitle;
     private Navigator navigator = new Navigator();
 
@@ -133,7 +132,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initializeToolBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {

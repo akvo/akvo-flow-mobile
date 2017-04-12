@@ -7,7 +7,7 @@
     <color name="black_disabled">#8f8f8f</color>
     <color name="black_transparent">#20000000</color>
 
-    <color name="orange_main">#e17e26</color>
+    <color name="orange_main">#DE8929</color>
     <color name="orange_dark">#ba661c</color>
     <color name="orange_disabled">#80e17e26</color>
 
@@ -32,8 +32,6 @@
     <!-- Text -->
     <color name="text_primary">@color/black_main</color>
     <color name="text_primary_disabled">@color/black_disabled</color>
-
-    <color name="action_bar_text">@color/orange_main</color>
 
     <color name="tab_text">@color/white</color>
     <color name="tab_text_selected">@color/orange_main</color>

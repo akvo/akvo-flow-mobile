@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.1.1
+Date: 13 April 2017
+
+# Resolved issues
+* **Crash when loading geoquestion: NumberFormatException: Invalid double** - [#697](https://github.com/akvo/akvo-flow-mobile/issues/697) Fixed crash due to unexpected double formatting in some geolocation questions.
+
+---------------
 # ver 2.3.1
 Date: 04 April 2017
 

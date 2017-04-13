@@ -43,7 +43,6 @@ public class GeoInputContainer extends LinearLayout {
     private static final float ALPHA_TRANSPARENT = 0.1f;
 
     private final DecimalFormat accuracyFormat = new DecimalFormat("#");
-    private final DecimalFormat altitudeFormat = new DecimalFormat("#.#");
 
     private EditText latitudeInput;
     private EditText longitudeInput;
@@ -101,18 +100,20 @@ public class GeoInputContainer extends LinearLayout {
         elevationInput.setText("");
     }
 
-    void displayCoordinates(@NonNull String latitude, @NonNull String longitude, @Nullable Double altitude,
+    void displayCoordinates(@NonNull String latitude, @NonNull String longitude,
+            @Nullable String altitude,
             float accuracy) {
         statusIndicator.setText(getContext()
                 .getString(R.string.geo_location_accuracy, accuracyFormat.format(accuracy)));
         displayCoordinates(latitude, longitude, altitude);
     }
 
-    void displayCoordinates(@NonNull String latitude, @NonNull String longitude, @Nullable Double altitude) {
+    void displayCoordinates(@NonNull String latitude, @NonNull String longitude,
+            @Nullable String altitude) {
         latitudeInput.setText(latitude);
         longitudeInput.setText(longitude);
         if (altitude != null) {
-            elevationInput.setText(altitudeFormat.format(altitude));
+            elevationInput.setText(altitude);
         } else {
             elevationInput.setText("");
         }

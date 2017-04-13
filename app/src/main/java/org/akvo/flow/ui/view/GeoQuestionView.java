@@ -174,9 +174,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
             if (tokens.length > 2) {
                 String latitude = tokens[0];
                 String longitude = tokens[1];
-                Double altitude = TextUtils.isEmpty(tokens[2]) ?
-                        null :
-                        Double.parseDouble(tokens[2]);
+                String altitude = tokens[2];
                 geoInputContainer.displayCoordinates(latitude, longitude, altitude);
                 if (tokens.length > 3) {
                     mCode = tokens[3];
@@ -213,7 +211,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     private void updateWithNewCoordinates(double latitude, double longitude, double altitude,
             float accuracy) {
-        geoInputContainer.displayCoordinates(latitude + "", longitude + "", altitude, accuracy);
+        geoInputContainer.displayCoordinates(latitude + "", longitude + "", altitude +"", accuracy);
         updateCode(latitude, longitude);
     }
 

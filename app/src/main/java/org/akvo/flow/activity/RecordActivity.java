@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,11 +24,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
-import android.support.v7.app.ActionBar.TabListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -41,14 +37,14 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.fragment.FormListFragment;
 import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
-import org.akvo.flow.service.BootstrapService;
+import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
-public class RecordActivity extends BackActivity implements SurveyListListener, TabListener,
+public class RecordActivity extends BackActivity implements SurveyListListener,
         RecordListListener {
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
     public static final String EXTRA_RECORD_ID = "record";
@@ -63,8 +59,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
     private SurveyGroup mSurveyGroup;
     private SurveyDbAdapter mDatabase;
 
-    private ViewPager mPager;
-
     private String[] mTabs;
 
     @Override
@@ -73,37 +67,14 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
         setContentView(R.layout.record_activity);
 
         mTabs = getResources().getStringArray(R.array.record_tabs);
-        mPager = (ViewPager) findViewById(R.id.pager);
+        ViewPager mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                getSupportActionBar().setSelectedNavigationItem(position);
-            }
-        });
-
         mDatabase = new SurveyDbAdapter(this);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(EXTRA_SURVEY_GROUP);
         setTitle(mSurveyGroup.getName());
 
-        setupActionBar();
-    }
-
-    //TODO: replace deprecated Tabs
-    private void setupActionBar() {
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        Tab listTab = actionBar.newTab()
-                .setText(mTabs[POSITION_SURVEYS])
-                .setTabListener(this);
-        Tab responsesTab = actionBar.newTab()
-                .setText(mTabs[POSITION_RESPONSES])
-                .setTabListener(this);
-
-        actionBar.addTab(listTab);
-        actionBar.addTab(responsesTab);
+        setupToolBar();
     }
 
     @Override
@@ -215,19 +186,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener, 
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        mPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
     @Override

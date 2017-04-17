@@ -4,17 +4,14 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="org.akvo.flow.activity.RecordActivity">
+        tools:context="org.akvo.flow.activity.SurveyActivity">
 
     <include layout="@layout/app_bar_layout"/>
 
-    <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
+    <FrameLayout
             android:layout_marginTop="?actionBarSize"
+            android:id="@+id/content_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        <include layout="@layout/tab_layout"/>
-    </android.support.v4.view.ViewPager>
+            android:layout_height="match_parent"/>
 
 </android.support.design.widget.CoordinatorLayout>

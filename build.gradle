@@ -25,6 +25,13 @@ ext {
     targetSdkVersion = 21
 }
 
+ext {
+    compileSdkVersion = 25
+    buildToolsVersion = "25.0.1"
+    minSdkVersion = 10
+    targetSdkVersion = 21
+}
+
 allprojects {
     repositories {
         jcenter()

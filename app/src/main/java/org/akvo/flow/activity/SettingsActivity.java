@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -77,8 +77,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settingsmenu);
-
+        setContentView(R.layout.activity_settings);
+        setupToolBar();
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
         Resources resources = getResources();
         list.add(createMap(resources.getString(R.string.prefoptlabel),

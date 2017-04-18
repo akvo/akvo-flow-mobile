@@ -38,8 +38,6 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 
-import timber.log.Timber;
-
 public class FlowAndroidRavenFactory extends AndroidRavenFactory {
 
     /**
@@ -110,8 +108,6 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
         } else {
             bufferDir = new File(context.getCacheDir().getAbsolutePath(), DEFAULT_BUFFER_DIR);
         }
-
-        Timber.d("Using buffer dir: " + bufferDir.getAbsolutePath());
         return new DiskBuffer(bufferDir, getBufferSize(dsn));
     }
 }

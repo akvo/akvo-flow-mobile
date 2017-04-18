@@ -24,7 +24,10 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PropertyUtil;
 
@@ -35,31 +38,34 @@ import timber.log.Timber;
 
 public class TagsFactory {
 
-    static final String PLATFORM_TAG_VALUE = "Android";
-    static final String PLATFORM_TAG_KEY = "Platform";
-    static final String OS_VERSION_TAG_KEY = "OsVersion";
-    static final String DEVICE_TAG_KEY = "Device";
-    static final String VERSION_NAME_TAG_KEY = "VersionName";
-    static final String VERSION_CODE_TAG_KEY = "VersionCode";
-    static final String INSTANCE_ID_KEY = "appId";
-    static final int NUMBER_OF_TAGS = 6;
+    private static final String GAE_INSTANCE_ID_TAG_KEY = "gae.instance";
+    private static final String DEVICE_ID_TAG_KEY = "flow.device.id";
+    private static final String DEVICE_MODEL_TAG_KEY = "device.model";
+    private static final String OS_VERSION_TAG_KEY = "os.version";
+    private static final String VERSION_NAME_TAG_KEY = "version.name";
+    private static final String VERSION_CODE_TAG_KEY = "version.code";
+    private static final String DEFAULT_TAG_VALUE = "NotSet";
+    /**
+     * The initial capacity is set to 9 for 6 tags (it should be increased if there are more tags)
+     */
+    public static final int INITIAL_CAPACITY = 9;
 
-    private final Map<String, String> tags = new HashMap<>(NUMBER_OF_TAGS);
+    private final Map<String, String> tags = new HashMap<>(INITIAL_CAPACITY);
 
     public TagsFactory(Context context) {
-        addTags(context);
+        Prefs prefs = new Prefs(context);
+        initTags(context, prefs);
     }
 
     public Map<String, String> getTags() {
         return tags;
     }
 
-    private void addTags(Context context) {
-        tags.put(PLATFORM_TAG_KEY, PLATFORM_TAG_VALUE);
+    private void initTags(Context context, Prefs prefs) {
+        tags.put(DEVICE_MODEL_TAG_KEY, Build.MODEL);
+        tags.put(GAE_INSTANCE_ID_TAG_KEY, getAppId(context));
+        tags.put(DEVICE_ID_TAG_KEY, getDeviceId(prefs));
         tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
-        tags.put(DEVICE_TAG_KEY, Build.MODEL);
-        final PropertyUtil props = new PropertyUtil(context.getResources());
-        tags.put(INSTANCE_ID_KEY, props.getProperty(ConstantUtil.S3_BUCKET));
         try {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
@@ -70,5 +76,21 @@ public class TagsFactory {
         } catch (PackageManager.NameNotFoundException e) {
             Timber.e("Error getting versionName and versionCode");
         }
+    }
+
+    @NonNull
+    private String getDeviceId(Prefs prefs) {
+        String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, DEFAULT_TAG_VALUE);
+        if (TextUtils.isEmpty(deviceId)) {
+            return DEFAULT_TAG_VALUE;
+        }
+        return deviceId;
+    }
+
+    @NonNull
+    private String getAppId(Context context) {
+        final PropertyUtil props = new PropertyUtil(context.getResources());
+        String property = props.getProperty(ConstantUtil.S3_BUCKET);
+        return TextUtils.isEmpty(property) ? DEFAULT_TAG_VALUE : property;
     }
 }

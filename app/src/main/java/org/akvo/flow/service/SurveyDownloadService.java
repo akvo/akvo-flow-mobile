@@ -332,7 +332,7 @@ public class SurveyDownloadService extends IntentService {
                 surveys.addAll(flowApi.getSurveyHeader(id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
-                    Timber.e(e, e.getMessage());
+                    Timber.e(e);
                 }
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         getString(R.string.error_form_header, id));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -26,22 +26,30 @@ import android.text.TextUtils;
 
 import com.getsentry.raven.android.Raven;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 
 import timber.log.Timber;
 
-public class SentryHelper extends LoggingHelper {
+public class SentryHelper {
+
+    private final Context context;
 
     public SentryHelper(Context context) {
-        super(context);
+        this.context = context;
     }
 
-    @Override
     public void initSentry() {
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
             Raven.init(context, sentryDsn, new FlowAndroidRavenFactory(context));
             Timber.plant(new SentryTree());
+        }
+    }
+
+    public void initDebugTree() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
         }
     }
 

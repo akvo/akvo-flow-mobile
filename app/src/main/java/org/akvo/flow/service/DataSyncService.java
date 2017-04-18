@@ -44,6 +44,7 @@ import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
+import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
@@ -197,8 +198,8 @@ public class DataSyncService extends IntentService {
                     String uuid = cursor
                             .getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID));
                     if (!getSurveyInstanceFile(uuid).exists()) {
-                        Timber.d("Exported file for survey " + uuid + " not found. It's status " +
-                                "will be set to 'submitted', and will be reprocessed");
+                        Timber.d("Exported file for survey %s not found. It's status " +
+                                "will be set to 'submitted', and will be reprocessed", uuid);
                         updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
                     }
                 } while (cursor.moveToNext());
@@ -590,8 +591,12 @@ public class DataSyncService extends IntentService {
             } else {
                 Timber.e("Could not retrieve missing files");
             }
+        } catch (HttpException e) {
+            Timber.e(e, "Could not retrieve missing or deleted files: message: %s, status code: %s",
+                    e.getMessage(),
+                    e.getStatus());
         } catch (Exception e) {
-            Timber.e(e, "Could not retrieve missing files");
+            Timber.e(e, "Could not retrieve missing or deleted files");
         }
     }
 

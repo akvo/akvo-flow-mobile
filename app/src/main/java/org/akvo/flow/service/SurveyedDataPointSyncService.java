@@ -104,12 +104,15 @@ public class SurveyedDataPointSyncService extends IntentService {
                         ConstantUtil.NOTIFICATION_RECORD_SYNC);
             }
         } catch (HttpException e) {
-            Timber.e(e, e.getMessage());
             String message = e.getMessage();
             switch (e.getStatus()) {
                 case HttpURLConnection.HTTP_FORBIDDEN:
                     // A missing assignment might be the issue. Let's hint the user.
                     message = getString(R.string.error_assignment_text);
+                    Timber.w(e, e.getMessage());
+                    break;
+                default:
+                    Timber.e(e, e.getMessage());
                     break;
             }
             displayToast(message);

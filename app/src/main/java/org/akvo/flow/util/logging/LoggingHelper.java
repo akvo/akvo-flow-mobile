@@ -20,12 +20,8 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.support.annotation.Nullable;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PropertyUtil;
 
 import timber.log.Timber;
 
@@ -43,12 +39,5 @@ public abstract class LoggingHelper {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
-    }
-
-    @Nullable
-    String getSentryDsn(Resources resources) {
-        final PropertyUtil props = new PropertyUtil(resources);
-        String sentryDsn = props.getProperty(ConstantUtil.SENTRY_DSN);
-        return sentryDsn;
     }
 }

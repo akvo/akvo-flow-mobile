@@ -20,9 +20,13 @@
 package org.akvo.flow.util.logging;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.getsentry.raven.android.Raven;
+
+import org.akvo.flow.R;
 
 import timber.log.Timber;
 
@@ -39,5 +43,10 @@ public class SentryHelper extends LoggingHelper {
             Raven.init(context, sentryDsn, new FlowAndroidRavenFactory(context));
             Timber.plant(new SentryTree());
         }
+    }
+
+    @Nullable
+    String getSentryDsn(Resources resources) {
+        return resources.getString(R.string.sentry_dsn);
     }
 }

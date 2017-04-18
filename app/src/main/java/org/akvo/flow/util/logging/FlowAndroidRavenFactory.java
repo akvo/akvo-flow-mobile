@@ -58,17 +58,7 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
 
     @Override
     public com.getsentry.raven.Raven createRavenInstance(Dsn dsn) {
-        Raven raven = new Raven(createConnection(dsn));
-//        try {
-//            // `ServletRequestListener` was added in the Servlet 2.4 API, and
-//            // is used as part of the `HttpEventBuilderHelper`, see:
-//            // https://tomcat.apache.org/tomcat-5.5-doc/servletapi/
-//            Class.forName("javax.servlet.ServletRequestListener", false, this.getClass().getClassLoader());
-//            raven.addBuilderHelper(new HttpEventBuilderHelper());
-//        } catch (ClassNotFoundException e) {
-//            logger.debug("The current environment doesn't provide access to servlets,"
-//                    + "or provides an unsupported version.");
-//        }
+        Raven raven = new Raven(createConnection(dsn), getContextManager(dsn));
         raven.addBuilderHelper(new FlowAndroidEventBuilderHelper(context));
         return raven;
     }

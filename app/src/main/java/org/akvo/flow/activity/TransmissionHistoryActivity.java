@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,9 +19,8 @@
 
 package org.akvo.flow.activity;
 
-import android.app.ListActivity;
 import android.os.Bundle;
-import android.view.Window;
+import android.widget.ListView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
@@ -37,14 +36,18 @@ import java.util.List;
  * 
  * @author Christopher Fagiani
  */
-public class TransmissionHistoryActivity extends ListActivity {
+public class TransmissionHistoryActivity extends BackActivity {
+
     private SurveyDbAdapter databaseAdapter;
     private Long respondentId;
+
+    private ListView transmissionsList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_transmission_history);
+        setupToolBar();
         if (savedInstanceState != null) {
             respondentId = savedInstanceState
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY);
@@ -53,9 +56,9 @@ public class TransmissionHistoryActivity extends ListActivity {
             respondentId = extras != null ? extras
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
         }
-        setContentView(R.layout.transmissionhistory);
-        databaseAdapter = new SurveyDbAdapter(this);
 
+        databaseAdapter = new SurveyDbAdapter(this);
+        transmissionsList = (ListView)findViewById(R.id.transmission_list);
     }
 
     public void onResume() {
@@ -67,10 +70,10 @@ public class TransmissionHistoryActivity extends ListActivity {
     private void getData() {
         List<FileTransmission> transmissionList = databaseAdapter.getFileTransmissions(respondentId);
         FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
-                this, R.layout.transmissionrow,
+                this, R.layout.transmission_history_row,
                 transmissionList != null ? transmissionList
                         : new ArrayList<FileTransmission>());
-        setListAdapter(adapter);
+        transmissionsList.setAdapter(adapter);
     }
 
     @Override

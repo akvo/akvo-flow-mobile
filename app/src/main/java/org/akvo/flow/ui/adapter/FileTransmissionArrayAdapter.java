@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,21 +19,20 @@
 
 package org.akvo.flow.ui.adapter;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.List;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.data.database.TransmissionStatus;
+import org.akvo.flow.domain.FileTransmission;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Adapter that converts FileTransmission objects for display in a list view.
@@ -52,25 +51,25 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
     }
 
     private void bindView(View view, FileTransmission trans) {
-        ImageView imageView = (ImageView) view.findViewById(R.id.statusicon);
         TextView tv = (TextView)view.findViewById(R.id.statustext);
-
         switch (trans.getStatus()) {
             case TransmissionStatus.QUEUED:
                 tv.setText(R.string.status_queued);
-                imageView.setImageResource(R.drawable.queued_icn);
+                tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_queued, 0, 0, 0);
                 break;
             case TransmissionStatus.IN_PROGRESS:
                 tv.setText(R.string.status_in_progress);
-                imageView.setImageResource(R.drawable.blueuparrow);
+                tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_progress, 0, 0, 0);
                 break;
             case TransmissionStatus.SYNCED:
                 tv.setText(R.string.status_synced);
-                imageView.setImageResource(R.drawable.checkmark);
+                tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_synced, 0, 0, 0);
                 break;
             case TransmissionStatus.FAILED:
                 tv.setText(R.string.status_failed);
-                imageView.setImageResource(R.drawable.red_cross);
+                tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_failed, 0, 0, 0);
+                break;
+            default:
                 break;
         }
 

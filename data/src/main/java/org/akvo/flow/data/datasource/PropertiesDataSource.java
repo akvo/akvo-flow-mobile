@@ -37,14 +37,8 @@ import timber.log.Timber;
 @Singleton
 public class PropertiesDataSource {
 
-    /**
-     * property file keys
-     */
     private static final String SERVER_BASE = "serverBase";
     private static final String API_KEY = "apiKey";
-    public static final String S3_BUCKET = "awsBucket";
-    public static final String S3_ACCESSKEY = "awsAccessKeyId";
-    public static final String S3_SECRET = "awsSecretKey";
 
     private final Properties properties;
     private final Resources resources;
@@ -78,17 +72,6 @@ public class PropertiesDataSource {
         } catch (Exception e) {
             Timber.e(e, "Could not load properties");
         }
-    }
-
-    /**
-     * Load a boolean property. Since all the properties are stored as Strings,
-     * the value will be read first as a String, then converted into boolean.
-     *
-     * @param propertyName The key for this property
-     * @return true If the property value is "true", false otherwise
-     */
-    private boolean getBoolean(String propertyName) {
-        return "true".equalsIgnoreCase(getProperty(propertyName));
     }
 
     public Observable<String> getBaseUrl() {

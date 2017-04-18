@@ -167,7 +167,6 @@ public class SurveyDbDataSource {
         } else {
             responseToSave = resp;
         }
-        long id = -1;
         ContentValues initialValues = new ContentValues();
         initialValues.put(ResponseColumns.ANSWER, responseToSave.getValue());
         initialValues.put(ResponseColumns.TYPE, responseToSave.getType());
@@ -175,7 +174,7 @@ public class SurveyDbDataSource {
         initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getRespondentId());
         initialValues.put(ResponseColumns.FILENAME, responseToSave.getFilename());
         initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag() ? 1 : 0);
-        id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), id, initialValues);
+        long id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), initialValues);
         responseToSave.setId(id);
         resp.setId(id);
         return responseToSave;

@@ -255,19 +255,19 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public long updateSurveyResponse(Long responseToSaveId, long id,
-            ContentValues initialValues) {
+    public long updateSurveyResponse(Long responseToSaveId, ContentValues initialValues) {
+        long insertedResponseId = -1;
         if (responseToSaveId == null) {
-            id = database.insert(Tables.RESPONSE, null, initialValues);
+            insertedResponseId = database.insert(Tables.RESPONSE, null, initialValues);
         } else {
             if (database.update(Tables.RESPONSE, initialValues, ResponseColumns._ID
                     + "=?", new String[] {
                     responseToSaveId.toString()
             }) > 0) {
-                id = responseToSaveId;
+                insertedResponseId = responseToSaveId;
             }
         }
-        return id;
+        return insertedResponseId;
     }
 
     /**

@@ -279,7 +279,6 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.order_by:
                 presenter.onOrderByClicked();
@@ -287,8 +286,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             case R.id.sync_records:
                 presenter.onSyncRecordsPressed();
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     @Override

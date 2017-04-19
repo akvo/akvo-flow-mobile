@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -147,13 +148,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
             Timber.e("mSurvey is null. Finishing the Activity...");
             finish();
         }
-
+        setupToolBar();
         // Set the survey name as Activity title
         getSupportActionBar().setTitle(mSurvey.getName());
         getSupportActionBar().setSubtitle("v " + getVersion());
 
         mPager = (ViewPager) findViewById(R.id.pager);
-        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mPager);
+        mAdapter = new SurveyTabAdapter(this, mPager, this, this);
         mPager.setAdapter(mAdapter);
 
         // Initialize new survey or load previous responses
@@ -161,7 +164,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         if (!responses.isEmpty()) {
             displayResponses(responses);
         }
-
         spaceLeftOnCard();
     }
 

@@ -77,8 +77,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settingsmenu);
-
+        setContentView(R.layout.activity_settings);
+        setupToolBar();
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
         Resources resources = getResources();
         list.add(createMap(resources.getString(R.string.prefoptlabel),

@@ -39,6 +39,9 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerApplicationComponent;
+import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.logging.SentryHelper;
 

@@ -48,6 +48,4 @@ public interface ApplicationComponent {
     void inject(FlowApp app);
 
     void inject(BaseActivity baseActivity);
-
-
 }

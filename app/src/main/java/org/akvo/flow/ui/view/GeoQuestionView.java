@@ -20,8 +20,9 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -30,8 +31,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -41,29 +40,29 @@ import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.text.DecimalFormat;
-
 import timber.log.Timber;
 
 /**
  * Question that can handle geographic location input. This question can also
  * listen to location updates from the GPS sensor on the device.
- * 
+ *
  * @author Christopher Fagiani
  */
 public class GeoQuestionView extends QuestionView implements OnClickListener, OnFocusChangeListener,
         TimedLocationListener.Listener {
+
     private static final float UNKNOWN_ACCURACY = 99999999f;
-    private static final String DELIM = "|";
+    private static final String RESPONSE_DELIMITER = "|";
+    private static final int SNACK_BAR_DURATION_IN_MS = 4000;
+
+    private final TimedLocationListener mLocationListener;
+
     private Button mGeoButton;
-    private EditText mLatField;
-    private EditText mLonField;
-    private EditText mElevationField;
-    private TextView mStatusIndicator;
-    private TextView mSearchingIndicator;
+    private View geoLoading;
+    private GeoInputContainer geoInputContainer;
+
     private String mCode = "";
     private float mLastAccuracy;
-    private TimedLocationListener mLocationListener;
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -74,58 +73,87 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     private void init() {
         setQuestionView(R.layout.geo_question_view);
 
-        mLatField = (EditText)findViewById(R.id.lat_et);
-        mLonField = (EditText)findViewById(R.id.lon_et);
-        mElevationField = (EditText)findViewById(R.id.height_et);
-        mGeoButton = (Button)findViewById(R.id.geo_btn);
-        mSearchingIndicator = (TextView)findViewById(R.id.searching_tv);
-        mStatusIndicator = (TextView)findViewById(R.id.acc_tv);
+        mGeoButton = (Button) findViewById(R.id.geo_btn);
+        geoLoading = findViewById(R.id.auto_geo_location_progress);
+        geoInputContainer = (GeoInputContainer) findViewById(R.id.manual_geo_input_container);
 
-        mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
-        mSearchingIndicator.setText("");
-
-        mLatField.setOnFocusChangeListener(this);
-        mLonField.setOnFocusChangeListener(this);
-        mElevationField.setOnFocusChangeListener(this);
+        geoInputContainer.setInputsFocusChangeListeners(this);
         mGeoButton.setOnClickListener(this);
 
         if (isReadOnly()) {
-            mLatField.setFocusable(false);
-            mLonField.setFocusable(false);
-            mElevationField.setFocusable(false);
+            geoInputContainer.disableInputsFocusability();
             mGeoButton.setEnabled(false);
         }
         if (mQuestion.isLocked()) {
-            mLatField.setFocusable(false);
-            mLonField.setFocusable(false);
-            mElevationField.setFocusable(false);
+            geoInputContainer.disableInputsFocusability();
         }
     }
 
-    /**
-     * When the user clicks the "Populate Geo" button, start listening for location updates
-     */
     public void onClick(View v) {
-        mSearchingIndicator.setText(R.string.searching);
-        mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
-        mStatusIndicator.setTextColor(Color.RED);
+        if (mLocationListener.isListening()) {
+            stopLocationListener();
+        } else {
+            startListeningToLocation();
+        }
+    }
 
-        mLatField.setText("");
-        mLonField.setText("");
-        mElevationField.setText("");
-        mCode = "";
+    private void startListeningToLocation() {
+        resetQuestion(true);
+        showLocationListenerStarted();
+        resetResponseValues();
+        startLocation();
+    }
+
+    private void showLocationListenerStarted() {
+        geoLoading.setVisibility(VISIBLE);
+        geoInputContainer.showLocationListenerStarted();
+        updateButtonTextToCancel();
+    }
+
+    private void stopLocationListener() {
+        stopLocation();
+        showLocationListenerStopped();
+    }
+
+    private void showLocationListenerStopped() {
+        geoLoading.setVisibility(GONE);
+        geoInputContainer.showLocationListenerStopped();
+        updateButtonTextToGetGeo();
+    }
+
+    private void updateButtonTextToGetGeo() {
+        mGeoButton.setText(R.string.getgeo);
+    }
+
+    private void updateButtonTextToCancel() {
+        mGeoButton.setText(R.string.cancelbutton);
+    }
+
+    private void resetResponseValues() {
+        resetCode();
+        resetAccuracy();
+    }
+
+    private void resetAccuracy() {
         mLastAccuracy = UNKNOWN_ACCURACY;
+    }
+
+    private void resetCode() {
+        mCode = "";
+    }
+
+    private void startLocation() {
         mLocationListener.start();
+    }
+
+    private void stopLocation() {
+        mLocationListener.stop();
     }
 
     /**
      * generates a unique code based on the lat/lon passed in. Current algorithm
      * returns the concatenation of the integer portion of 1000 times absolute
      * value of lat and lon in base 36
-     * 
-     * @param lat
-     * @param lon
-     * @return
      */
     private String generateCode(double lat, double lon) {
         try {
@@ -133,38 +161,21 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
                     + (int) ((Math.abs(lon) * 10000d)));
             return Long.toString(code, 36);
         } catch (NumberFormatException e) {
-            Timber.e("Code cannot be generated: " + e.getMessage());
+            Timber.e(e, "Location response code cannot be generated: %s", e.getMessage());
             return "";
         }
     }
 
-    /**
-     * clears out the UI fields
-     */
-    @Override
-    public void resetQuestion(boolean fireEvent) {
-        super.resetQuestion(fireEvent);
-        mLatField.setText("");
-        mLonField.setText("");
-        mElevationField.setText("");
-        mCode = "";
-        mSearchingIndicator.setText("");
-        mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": ");
-    }
-
-    /**
-     * restores the file path for the file and turns on the complete icon if the
-     * file exists
-     */
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
         if (resp != null && resp.getValue() != null) {
             String[] tokens = resp.getValue().split("\\|", -1);
             if (tokens.length > 2) {
-                mLatField.setText(tokens[0]);
-                mLonField.setText(tokens[1]);
-                mElevationField.setText(tokens[2]);
+                String latitude = tokens[0];
+                String longitude = tokens[1];
+                String altitude = tokens[2];
+                geoInputContainer.displayCoordinates(latitude, longitude, altitude);
                 if (tokens.length > 3) {
                     mCode = tokens[3];
                 }
@@ -174,38 +185,58 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     @Override
     public void questionComplete(Bundle data) {
+        //EMPTY
     }
 
     @Override
-    public void onLocationReady(double latitude, double longitude, double altitude, float accuracy) {
-        if (accuracy < mLastAccuracy) {
-            mStatusIndicator.setText(getContext().getString(R.string.accuracy) + ": "
-                    + new DecimalFormat("#").format(accuracy) + "m");
-            mLatField.setText(latitude + "");
-            mLonField.setText(longitude + "");
-            // elevation is in meters, even one decimal is way more than GPS precision
-            mElevationField.setText(new DecimalFormat("#.#").format(altitude));
-            mCode = generateCode(latitude, longitude);
+    public void onLocationReady(double latitude, double longitude, double altitude,
+            float accuracy) {
+        boolean areNewCoordinatesMoreAccurate = accuracy < mLastAccuracy;
+        if (areNewCoordinatesMoreAccurate) {
+            updateWithNewCoordinates(latitude, longitude, altitude, accuracy);
         }
-        if (accuracy <= TimedLocationListener.ACCURACY_DEFAULT) {
-            mLocationListener.stop();
-            setResponse();
-            mSearchingIndicator.setText(R.string.ready);
-            mStatusIndicator.setTextColor(Color.GREEN);
+        boolean areNewCoordinatesAccurateEnough =
+                accuracy <= TimedLocationListener.ACCURACY_DEFAULT;
+        if (areNewCoordinatesAccurateEnough) {
+            useAccurateCoordinates();
         }
+    }
+
+    private void useAccurateCoordinates() {
+        stopLocation();
+        setResponse();
+        geoInputContainer.showCoordinatesAccurate();
+        showLocationListenerStopped();
+    }
+
+    private void updateWithNewCoordinates(double latitude, double longitude, double altitude,
+            float accuracy) {
+        geoInputContainer.displayCoordinates(latitude + "", longitude + "", altitude +"", accuracy);
+        updateCode(latitude, longitude);
+    }
+
+    private void updateCode(double latitude, double longitude) {
+        mCode = generateCode(latitude, longitude);
     }
 
     @Override
     public void onTimeout() {
-        // Unknown location
-        resetQuestion(true);
-        mSearchingIndicator.setText(R.string.timeout);
+        showLocationListenerStopped();
+        Snackbar.make(this, R.string.location_timeout, SNACK_BAR_DURATION_IN_MS)
+                .setAction(R.string.retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        resetResponseValues();
+                        startLocation();
+                        showLocationListenerStarted();
+                    }
+                }).show();
     }
 
     @Override
     public void onGPSDisabled() {
-        // we can't turn GPS on directly, the best we can do is launch the settings page
         Context context = getContext();
+        showLocationListenerStopped();
         if (context instanceof AppCompatActivity) {
             FragmentManager fragmentManager = ((AppCompatActivity) context)
                     .getSupportFragmentManager();
@@ -220,31 +251,35 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (!hasFocus) {
-            final String lat = mLatField.getText().toString();
-            final String lon = mLonField.getText().toString();
+            final String lat = geoInputContainer.getLatitudeText();
+            final String lon = geoInputContainer.getLongitudeText();
             if (!TextUtils.isEmpty(lat) && !TextUtils.isEmpty(lon)) {
-                mCode = generateCode(Double.parseDouble(mLatField.getText().toString()),
-                        Double.parseDouble(mLonField.getText().toString()));
+                updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
             }
             setResponse();
         }
     }
 
     private void setResponse() {
-        final String lat = mLatField.getText().toString();
-        final String lon = mLonField.getText().toString();
+        final String lat = geoInputContainer.getLatitudeText();
+        final String lon = geoInputContainer.getLongitudeText();
 
         if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
             setResponse(null);
         } else {
-            setResponse(new QuestionResponse(lat + DELIM + lon + DELIM + mElevationField.getText()
-                    + DELIM + mCode,
-                    ConstantUtil.GEO_RESPONSE_TYPE, getQuestion().getId()));
+            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
+                    getQuestion().getId()));
         }
+    }
+
+    @NonNull
+    private String getResponse(String lat, String lon) {
+        return lat + RESPONSE_DELIMITER + lon + RESPONSE_DELIMITER + geoInputContainer
+                .getElevationText() + RESPONSE_DELIMITER + mCode;
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+        //EMPTY
     }
-
 }

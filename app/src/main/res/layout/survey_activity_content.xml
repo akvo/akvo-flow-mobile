@@ -4,14 +4,14 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="org.akvo.flow.activity.MapActivity">
+        tools:context="org.akvo.flow.activity.SurveyActivity">
 
     <include layout="@layout/app_bar_layout"/>
 
-    <fragment
+    <FrameLayout
+            android:layout_marginTop="?actionBarSize"
+            android:id="@+id/content_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/map"
-            tools:context=".activity.MapActivity"
-            android:name="com.google.android.gms.maps.SupportMapFragment"/>
+            android:layout_height="match_parent"/>
+
 </android.support.design.widget.CoordinatorLayout>

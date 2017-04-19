@@ -131,7 +131,6 @@ public class DatapointsFragment extends Fragment {
         mPager = (ViewPager) v.findViewById(R.id.pager);
         TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
-        // Init tabs
         mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
         tabs.setupWithViewPager(mPager);

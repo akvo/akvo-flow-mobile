@@ -20,6 +20,7 @@
 package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,25 +34,26 @@ import org.akvo.flow.domain.FileTransmission;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Adapter that converts FileTransmission objects for display in a list view.
- * 
+ *
  * @author Christopher Fagiani
  */
 public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission> {
-    private DateFormat dateFormat;
-    private int layoutId;
+    private final DateFormat dateFormat;
+    private final int layoutId;
 
     public FileTransmissionArrayAdapter(Context context, int resourceId,
             List<FileTransmission> objects) {
         super(context, resourceId, objects);
         layoutId = resourceId;
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     }
 
     private void bindView(View view, FileTransmission trans) {
-        TextView tv = (TextView)view.findViewById(R.id.statustext);
+        TextView tv = (TextView) view.findViewById(R.id.statustext);
         switch (trans.getStatus()) {
             case TransmissionStatus.QUEUED:
                 tv.setText(R.string.status_queued);
@@ -88,13 +90,18 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
         ((TextView) view.findViewById(R.id.filename)).setText(trans.getFileName());
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Context ctx = getContext();
-        LayoutInflater inflater = (LayoutInflater) ctx
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(layoutId, null);
+    @NonNull
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        View view;
+        if (convertView == null) {
+            Context ctx = getContext();
+            LayoutInflater inflater = (LayoutInflater) ctx
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(layoutId, null);
+        } else {
+            view = convertView;
+        }
         bindView(view, getItem(position));
         return view;
     }
-
 }

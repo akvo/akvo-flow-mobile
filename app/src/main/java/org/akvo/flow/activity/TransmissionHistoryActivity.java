@@ -33,14 +33,13 @@ import java.util.List;
 
 /**
  * Activity to show the transmission history of all files in a survey submission
- * 
+ *
  * @author Christopher Fagiani
  */
 public class TransmissionHistoryActivity extends BackActivity {
 
     private SurveyDbAdapter databaseAdapter;
-    private Long respondentId;
-
+    private Long surveyInstanceId;
     private ListView transmissionsList;
 
     @Override
@@ -48,27 +47,37 @@ public class TransmissionHistoryActivity extends BackActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transmission_history);
         setupToolBar();
+        transmissionsList = (ListView) findViewById(R.id.transmission_list);
+        surveyInstanceId = getSurveyInstanceId(savedInstanceState);
+        databaseAdapter = new SurveyDbAdapter(this);
+    }
+
+    private Long getSurveyInstanceId(Bundle savedInstanceState) {
+        Long surveyInstanceId;
         if (savedInstanceState != null) {
-            respondentId = savedInstanceState
+            surveyInstanceId = savedInstanceState
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY);
         } else {
             Bundle extras = getIntent().getExtras();
-            respondentId = extras != null ? extras
+            surveyInstanceId = extras != null ? extras
                     .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
         }
-
-        databaseAdapter = new SurveyDbAdapter(this);
-        transmissionsList = (ListView)findViewById(R.id.transmission_list);
+        return surveyInstanceId;
     }
 
     public void onResume() {
         super.onResume();
         databaseAdapter.open();
-        getData();
+        getTransmissionData();
     }
 
-    private void getData() {
-        List<FileTransmission> transmissionList = databaseAdapter.getFileTransmissions(respondentId);
+    private void getTransmissionData() {
+        List<FileTransmission> transmissionList = databaseAdapter
+                .getFileTransmissions(surveyInstanceId);
+        displayTransmissionData(transmissionList);
+    }
+
+    private void displayTransmissionData(List<FileTransmission> transmissionList) {
         FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
                 this, R.layout.transmission_history_row,
                 transmissionList != null ? transmissionList
@@ -80,15 +89,15 @@ public class TransmissionHistoryActivity extends BackActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (outState != null) {
-            outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, respondentId);
+            outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
         }
     }
 
+    @Override
     protected void onPause() {
         if (databaseAdapter != null) {
             databaseAdapter.close();
         }
         super.onPause();
     }
-
 }

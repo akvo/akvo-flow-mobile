@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,30 +18,16 @@
  *
  */
 
-package org.akvo.flow.injector.component;
+package org.akvo.flow.util.logging;
 
-import android.content.Context;
+import timber.log.Timber;
 
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.injector.module.ApplicationModule;
-import org.akvo.flow.presentation.BaseActivity;
-import org.akvo.flow.util.logging.LoggingHelper;
+public class DebugLoggingHelper implements LoggingHelper {
 
-import javax.inject.Singleton;
-
-import dagger.Component;
-
-@Singleton
-@Component(modules = {
-        ApplicationModule.class
-})
-public interface ApplicationComponent {
-
-    void inject(FlowApp app);
-
-    void inject(BaseActivity baseActivity);
-
-    Context context();
-
-    LoggingHelper loggingHelper();
+    @Override
+    public void init() {
+//        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+//        }
+    }
 }

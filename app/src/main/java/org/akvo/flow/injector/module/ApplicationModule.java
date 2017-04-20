@@ -22,7 +22,11 @@ package org.akvo.flow.injector.module;
 
 import android.content.Context;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.util.logging.DebugLoggingHelper;
+import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.util.logging.ReleaseLoggingHelper;
 
 import javax.inject.Singleton;
 
@@ -42,5 +46,15 @@ public class ApplicationModule {
     @Singleton
     Context provideContext() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    LoggingHelper loggingHelper() {
+        if (BuildConfig.DEBUG) {
+            return new DebugLoggingHelper();
+        } else {
+            return new ReleaseLoggingHelper(application);
+        }
     }
 }

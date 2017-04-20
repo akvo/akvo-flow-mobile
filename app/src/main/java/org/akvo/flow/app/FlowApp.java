@@ -32,15 +32,17 @@ import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
+import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.logging.SentryHelper;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
@@ -53,6 +55,9 @@ public class FlowApp extends Application {
     private Prefs prefs;
 
     private ApplicationComponent applicationComponent;
+
+    @Inject
+    LoggingHelper loggingHelper;
 
     @Override
     public void onCreate() {
@@ -71,7 +76,8 @@ public class FlowApp extends Application {
 
     private void initializeInjector() {
         this.applicationComponent =
-                DaggerApplicationComponent.builder().applicationModule(new ApplicationModule(this)).build();
+                DaggerApplicationComponent.builder().applicationModule(new ApplicationModule(this))
+                        .build();
         this.applicationComponent.inject(this);
     }
 
@@ -80,9 +86,7 @@ public class FlowApp extends Application {
     }
 
     private void initLogging() {
-        SentryHelper helper = new SentryHelper(this);
-        helper.initDebugTree();
-        helper.initSentry();
+       loggingHelper.init();
     }
 
     public static FlowApp getApp() {
@@ -90,7 +94,7 @@ public class FlowApp extends Application {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig){
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         // This config will contain system locale. We need a workaround
@@ -105,7 +109,7 @@ public class FlowApp extends Application {
             getBaseContext().getResources().updateConfiguration(newConfig, null);
         }
     }
-    
+
     private void init() {
         // Load custom locale into the app. If the locale has not previously been configured
         // check if the device has a compatible language active. Otherwise, fall back to English
@@ -128,21 +132,21 @@ public class FlowApp extends Application {
         // Load last survey group
         mSurveyGroupId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
     }
-    
+
     public void setUser(User user) {
         mUser = user;
         prefs.setLong(Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
     }
-    
+
     public User getUser() {
         return mUser;
     }
-    
+
     public void setSurveyGroupId(long surveyGroupId) {
         mSurveyGroupId = surveyGroupId;
         prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
     }
-    
+
     public long getSurveyGroupId() {
         return mSurveyGroupId;
     }

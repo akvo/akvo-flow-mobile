@@ -26,35 +26,29 @@ import android.text.TextUtils;
 
 import com.getsentry.raven.android.Raven;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 
 import timber.log.Timber;
 
-public class SentryHelper {
+public class ReleaseLoggingHelper implements LoggingHelper {
 
     private final Context context;
 
-    public SentryHelper(Context context) {
+    public ReleaseLoggingHelper(Context context) {
         this.context = context;
     }
 
-    public void initSentry() {
+    @Nullable
+    private String getSentryDsn(Resources resources) {
+        return resources.getString(R.string.sentry_dsn);
+    }
+
+    @Override
+    public void init() {
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
             Raven.init(context, sentryDsn, new FlowAndroidRavenFactory(context));
             Timber.plant(new SentryTree());
         }
-    }
-
-    public void initDebugTree() {
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
-    }
-
-    @Nullable
-    String getSentryDsn(Resources resources) {
-        return resources.getString(R.string.sentry_dsn);
     }
 }

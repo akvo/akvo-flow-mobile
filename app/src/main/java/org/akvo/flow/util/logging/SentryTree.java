@@ -39,7 +39,10 @@ class SentryTree extends Timber.Tree {
                     javax.net.ssl.SSLHandshakeException.class,
                     java.security.cert.CertificateNotYetValidException.class,
                     javax.net.ssl.SSLProtocolException.class,
-                    java.net.SocketTimeoutException.class
+                    java.net.SocketTimeoutException.class,
+                    java.net.UnknownHostException.class,
+                    java.net.ConnectException.class,
+                    javax.net.ssl.SSLException.class
             });
 
     @Override
@@ -64,8 +67,6 @@ class SentryTree extends Timber.Tree {
 
     /**
      * Some exceptions are not useful to be sent to sentry, this method will filter them out
-     * @param t
-     * @return
      */
     private boolean isThrowableExcluded(Throwable t) {
         return IGNORED_EXCEPTIONS.contains(t.getClass()) || containsFilteredMessage(t);
@@ -78,8 +79,6 @@ class SentryTree extends Timber.Tree {
 
     /**
      * Configure which level should be sent
-     * @param priority
-     * @return
      */
     private boolean priorityTooLow(int priority) {
         return priority < Log.ERROR;

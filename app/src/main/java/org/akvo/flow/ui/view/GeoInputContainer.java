@@ -25,6 +25,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -33,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.util.CoordinatesValidator;
 
 import java.text.DecimalFormat;
 
@@ -43,6 +46,7 @@ public class GeoInputContainer extends LinearLayout {
     private static final float ALPHA_TRANSPARENT = 0.1f;
 
     private final DecimalFormat accuracyFormat = new DecimalFormat("#");
+    private final CoordinatesValidator coordinatesValidator = new CoordinatesValidator();
 
     private EditText latitudeInput;
     private EditText longitudeInput;
@@ -65,6 +69,52 @@ public class GeoInputContainer extends LinearLayout {
         longitudeInput = (EditText) findViewById(R.id.lon_et);
         elevationInput = (EditText) findViewById(R.id.height_et);
         statusIndicator = (TextView) findViewById(R.id.acc_tv);
+        setTextWatchers();
+    }
+
+    private void setTextWatchers() {
+        latitudeInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                    int after) {
+                //EMPTY
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //EMPTY
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!coordinatesValidator.isValidLatitude(latitudeInput.getText().toString())) {
+                    latitudeInput.setError(getContext().getString(R.string.invalid_latitude));
+                }
+                //TODO: is clear error needed?
+            }
+        });
+
+        longitudeInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                    int after) {
+                //EMPTY
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //EMPTY
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!coordinatesValidator.isValidLongitude(longitudeInput.getText().toString())) {
+                    longitudeInput.setError(getContext().getString(R.string.invalid_longitude));
+                }
+                //TODO: is clear error needed?
+            }
+        });
+
     }
 
     void setInputsFocusChangeListeners(GeoQuestionView geoQuestionView) {

@@ -18,11 +18,11 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.exception;
 
-import rx.Observable;
+public class AssignmentRequiredException extends RuntimeException {
 
-public interface UserRepository {
-
-    Observable<Boolean> mobileSyncAllowed();
+    public AssignmentRequiredException(String message) {
+        super(message);
+    }
 }

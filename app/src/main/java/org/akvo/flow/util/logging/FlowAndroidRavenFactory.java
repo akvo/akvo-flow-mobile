@@ -65,7 +65,7 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
      * Creates an HTTP connection to the Sentry server.
      *
      * @param dsn Data Source Name of the Sentry server.
-     * @return an {@link HttpConnection} to the server.
+     * @return an {@link FlowSentryHttpConnection}
      */
     protected Connection createHttpConnection(Dsn dsn) {
         URL sentryApiUrl = HttpConnection.getSentryApiUrl(dsn.getUri(), dsn.getProjectId());
@@ -85,8 +85,8 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
             eventSampler = new RandomEventSampler(sampleRate);
         }
 
-        HttpConnection httpConnection = new FlowHttpConnection(sentryApiUrl, dsn.getPublicKey(),
-                dsn.getSecretKey(), proxy, eventSampler, verifier);
+        HttpConnection httpConnection = new FlowSentryHttpConnection(sentryApiUrl,
+                dsn.getPublicKey(), dsn.getSecretKey(), proxy, eventSampler, verifier);
 
         Marshaller marshaller = createMarshaller(dsn);
         httpConnection.setMarshaller(marshaller);

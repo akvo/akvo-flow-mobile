@@ -26,8 +26,6 @@ public class DebugLoggingHelper implements LoggingHelper {
 
     @Override
     public void init() {
-//        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-//        }
+        Timber.plant(new Timber.DebugTree());
     }
 }

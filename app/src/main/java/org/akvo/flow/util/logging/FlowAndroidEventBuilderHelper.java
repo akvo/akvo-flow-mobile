@@ -28,16 +28,10 @@ import com.getsentry.raven.event.helper.EventBuilderHelper;
 
 import java.util.Map;
 
-/**
- * EventBuilderHelper that makes use of Android Context to populate some Event fields.
- */
 public class FlowAndroidEventBuilderHelper implements EventBuilderHelper {
 
     private final Map<String, String> tags;
 
-    /**
-     * Construct given the provided Android {@link Context}.
-     */
     public FlowAndroidEventBuilderHelper(Context context) {
         TagsFactory tagsFactory = new TagsFactory(context);
         this.tags = tagsFactory.getTags();
@@ -50,5 +44,4 @@ public class FlowAndroidEventBuilderHelper implements EventBuilderHelper {
             eventBuilder.withTag(key, tags.get(key));
         }
     }
-
 }

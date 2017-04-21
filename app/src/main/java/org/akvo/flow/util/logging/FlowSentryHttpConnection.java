@@ -28,11 +28,15 @@ import com.getsentry.raven.event.Event;
 import java.net.Proxy;
 import java.net.URL;
 
-public class FlowHttpConnection extends HttpConnection {
+/**
+ * An {@link HttpConnection} that verifies if the user allowed using mobile networks before
+ * sending an exception to sentry
+ */
+public class FlowSentryHttpConnection extends HttpConnection {
 
     private final FlowPostPermissionVerifier permissionVerifier;
 
-    public FlowHttpConnection(URL sentryUrl, String publicKey, String secretKey,
+    public FlowSentryHttpConnection(URL sentryUrl, String publicKey, String secretKey,
             Proxy proxy, EventSampler eventSampler, FlowPostPermissionVerifier verifier) {
         super(sentryUrl, publicKey, secretKey, proxy, eventSampler);
         this.permissionVerifier = verifier;

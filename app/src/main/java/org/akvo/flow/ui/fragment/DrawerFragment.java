@@ -50,10 +50,10 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.loader.SurveyGroupLoader;
-import org.akvo.flow.data.loader.UserLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.loader.SurveyGroupLoader;
+import org.akvo.flow.data.loader.UserLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
@@ -444,7 +444,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                v = mInflater.inflate(R.layout.drawer_item, null);
+                v = mInflater.inflate(R.layout.drawer_item, parent, false);
             }
             View divider = v.findViewById(R.id.divider);
             TextView tv = (TextView) v.findViewById(R.id.item_txt);
@@ -494,14 +494,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 View convertView, ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                v = mInflater.inflate(android.R.layout.simple_list_item_1, null);
+                v = mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             }
             TextView tv = (TextView) v.findViewById(android.R.id.text1);
             v.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 30), 0, 0, 0);
 
             tv.setTextSize(ITEM_TEXT_SIZE);
             tv.setTextColor(Color.BLACK);
-            v.setBackgroundColor(Color.TRANSPARENT);
 
             switch (groupPosition) {
                 case GROUP_USERS:
@@ -516,9 +515,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     tv.setText(sg.getName());
                     if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
                         tv.setTextColor(mHighlightColor);
-                        v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_alternate));
                     }
                     v.setTag(sg);
+                    break;
+                default:
                     break;
             }
 
@@ -563,5 +563,4 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             return false;
         }
     }
-
 }

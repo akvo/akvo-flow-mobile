@@ -7,8 +7,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     def versionPropsFile = file('version.properties')
 
     if (versionPropsFile.canRead()) {

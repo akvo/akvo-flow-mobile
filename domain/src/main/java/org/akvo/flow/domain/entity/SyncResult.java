@@ -18,11 +18,30 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.entity;
 
-import rx.Observable;
+public class SyncResult {
 
-public interface UserRepository {
+    private final ResultCode resultCode;
+    private final int numberOfSyncedItems;
 
-    Observable<Boolean> mobileSyncAllowed();
+    public SyncResult(ResultCode resultCode, int numberOfSyncedItems) {
+        this.resultCode = resultCode;
+        this.numberOfSyncedItems = numberOfSyncedItems;
+    }
+
+    public ResultCode getResultCode() {
+        return resultCode;
+    }
+
+    public int getNumberOfSyncedItems() {
+        return numberOfSyncedItems;
+    }
+
+    public enum ResultCode {
+        SUCCESS,
+        ERROR_SYNC_NOT_ALLOWED_OVER_3G,
+        ERROR_NO_NETWORK,
+        ERROR_ASSIGNMENT_MISSING
+    }
 }

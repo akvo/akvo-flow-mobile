@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,18 +18,12 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.database;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
-
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
-
-interface FlowApiService {
-
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+public class TransmissionStatus {
+    public static final int QUEUED = 0;
+    public static final int IN_PROGRESS = 1;
+    public static final int SYNCED = 2;
+    public static final int FAILED = 3;
+    public static final int FORM_DELETED = 4;
 }

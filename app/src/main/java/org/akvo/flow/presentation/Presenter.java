@@ -18,11 +18,9 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.presentation;
 
-public class Constants {
+public interface Presenter {
 
-    public static final int IMAGE_SIZE_320_240 = 0;
-    public static final int IMAGE_SIZE_640_480 = 1;
-    public static final int IMAGE_SIZE_1280_960 = 2;
+    void destroy();
 }

@@ -18,18 +18,31 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.presentation.datapoints;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
+import org.akvo.flow.R;
 
-interface FlowApiService {
+import javax.inject.Inject;
 
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+public class DisplayNameMapper {
+
+    private final Context context;
+
+    @Inject
+    public DisplayNameMapper(Context context) {
+        this.context = context;
+    }
+
+    @NonNull
+    public String createDisplayName(@Nullable String name) {
+        if (TextUtils.isEmpty(name)) {
+            return context.getString(R.string.unknown);
+        }
+        return name;
+    }
 }

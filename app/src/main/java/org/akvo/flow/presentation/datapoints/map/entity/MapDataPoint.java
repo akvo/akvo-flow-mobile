@@ -18,18 +18,33 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.presentation.datapoints.map.entity;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
+public class MapDataPoint implements ClusterItem {
 
-interface FlowApiService {
+    private final String id;
+    private final String name;
+    private final LatLng position;
 
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+    public MapDataPoint(String id, String name, LatLng position) {
+        this.id = id;
+        this.name = name;
+        this.position = position;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return position;
+    }
 }

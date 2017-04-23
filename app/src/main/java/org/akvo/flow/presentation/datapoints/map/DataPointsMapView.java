@@ -18,18 +18,29 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.presentation.datapoints.map;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
+import java.util.List;
 
-interface FlowApiService {
+interface DataPointsMapView {
 
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+    void showProgress();
+
+    void hideProgress();
+
+    void displayData(List<MapDataPoint> surveyedLocales);
+
+    void displayMenu(boolean monitored);
+
+    void showSyncedResults(int numberOfSyncedItems);
+
+    void showErrorAssignmentMissing();
+
+    void showErrorSyncNotAllowed();
+
+    void showErrorNoNetwork();
+
+    void showErrorSync();
 }

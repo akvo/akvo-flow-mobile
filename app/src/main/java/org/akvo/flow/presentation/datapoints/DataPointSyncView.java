@@ -18,18 +18,15 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.presentation.datapoints;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import android.view.View;
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
+public interface DataPointSyncView {
 
-interface FlowApiService {
+    void onRetryRequested();
 
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+    View getRootView();
+
+    void onSettingsPressed();
 }

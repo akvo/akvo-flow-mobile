@@ -18,18 +18,29 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.data.entity;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import android.database.Cursor;
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
+import org.akvo.flow.database.SyncTimeColumns;
 
-interface FlowApiService {
+import javax.inject.Inject;
 
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+public class SyncedTimeMapper {
+
+    @Inject
+    public SyncedTimeMapper() {
+    }
+
+    public String getTime(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        String time = null;
+        if (cursor.moveToFirst()) {
+            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
+        }
+        cursor.close();
+        return time;
+    }
 }

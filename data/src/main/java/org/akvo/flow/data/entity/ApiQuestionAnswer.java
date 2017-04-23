@@ -18,18 +18,42 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.data.entity;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import com.google.gson.annotations.SerializedName;
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
+public class ApiQuestionAnswer {
 
-interface FlowApiService {
+    @SerializedName("q")
+    private String questionId;
 
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+    @SerializedName("a")
+    private String answer;
+
+    @SerializedName("t")
+    private String type;
+
+    public String getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(String questionId) {
+        this.questionId = questionId;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

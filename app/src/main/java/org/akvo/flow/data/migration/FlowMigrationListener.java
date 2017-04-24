@@ -31,12 +31,13 @@ import org.akvo.flow.data.migration.preferences.MigratablePreferences;
 import org.akvo.flow.data.migration.preferences.PreferenceExtractor;
 import org.akvo.flow.data.migration.preferences.PreferenceMapper;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.migration.MigrationListener;
 
 import java.util.Set;
 
 public class FlowMigrationListener implements MigrationListener {
+
+    private static final long SURVEY_GROUP_ID_NONE = -1;
 
     private final Prefs prefs;
     private MigrationLanguageMapper languagesMapper;
@@ -49,8 +50,8 @@ public class FlowMigrationListener implements MigrationListener {
     @Override
     public void migrateLanguages(SQLiteDatabase db) {
         long selectedSurveyId = prefs
-                .getLong(Prefs.KEY_SURVEY_GROUP_ID, Constants.SURVEY_GROUP_ID_NONE);
-        if (selectedSurveyId != Constants.SURVEY_GROUP_ID_NONE) {
+                .getLong(Prefs.KEY_SURVEY_GROUP_ID, SURVEY_GROUP_ID_NONE);
+        if (selectedSurveyId != SURVEY_GROUP_ID_NONE) {
             String dataBaseLanguages = new LanguagesExtractor().retrieveLanguages(db);
             if (!TextUtils.isEmpty(dataBaseLanguages)) {
 

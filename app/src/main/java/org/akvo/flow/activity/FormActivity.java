@@ -46,7 +46,6 @@ import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
@@ -341,7 +340,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             // Make sure the value is not larger than 500 chars
             builder.setLength(Math.min(builder.length(), 500));
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
-                    SurveyedLocaleMeta.NAME);
+                    SurveyDbAdapter.SurveyedLocaleMeta.NAME);
         }
 
         // META_GEO
@@ -350,7 +349,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             QuestionResponse response = mDatabase.getResponse(mSurveyInstanceId, localeGeoQuestion);
             if (response != null) {
                 mDatabase.updateSurveyedLocale(mSurveyInstanceId, response.getValue(),
-                        SurveyedLocaleMeta.GEOLOCATION);
+                        SurveyDbAdapter.SurveyedLocaleMeta.GEOLOCATION);
             }
         }
     }

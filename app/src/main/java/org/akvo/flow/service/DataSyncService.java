@@ -34,12 +34,12 @@ import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.FormInstance;
@@ -431,7 +431,7 @@ public class DataSyncService extends IntentService {
         // if necessary, or mark form as deleted.
         checkDeviceNotifications();
 
-        List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
+        List<FileTransmission> transmissions = mDatabase.getUnSyncedTransmissions();
 
         if (transmissions.isEmpty()) {
             return;
@@ -573,7 +573,7 @@ public class DataSyncService extends IntentService {
                 // be handled and retried in the next sync attempt.
                 for (String filename : files) {
                     if (new File(filename).exists()) {
-                        setFileTransmissionFailed(filename);
+                        mDatabase.setFileTransmissionFailed(filename);
                     }
                 }
 
@@ -616,14 +616,6 @@ public class DataSyncService extends IntentService {
             }
         }
         return files;
-    }
-
-    private void setFileTransmissionFailed(String filename) {
-        int rows = mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
-        if (rows == 0) {
-            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            mDatabase.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
-        }
     }
 
     @NonNull

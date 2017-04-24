@@ -40,6 +40,7 @@ import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionColumns;
+import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
@@ -407,8 +408,12 @@ public class SurveyDbDataSource {
      * Get the list of queued and failed transmissions
      */
     @NonNull
-    public List<FileTransmission> getUnsyncedTransmissions() {
-        Cursor cursor = surveyDbAdapter.getUnsyncedTransmissions();
+    public List<FileTransmission> getUnSyncedTransmissions() {
+        Cursor cursor = surveyDbAdapter.getUnSyncedTransmissions(new String[] {
+                String.valueOf(TransmissionStatus.FAILED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
+                String.valueOf(TransmissionStatus.QUEUED)
+        });
         return getFileTransmissions(cursor);
     }
 
@@ -585,6 +590,40 @@ public class SurveyDbDataSource {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId);
     }
 
+    private void createTransmission(long surveyInstanceId, String formId, String filename,
+            int status) {
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
+        values.put(TransmissionColumns.SURVEY_ID, formId);
+        values.put(TransmissionColumns.FILENAME, filename);
+        values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            final String date = String.valueOf(System.currentTimeMillis());
+            values.put(TransmissionColumns.START_DATE, date);
+            values.put(TransmissionColumns.END_DATE, date);
+        }
+        surveyDbAdapter.createTransmission(values);
+    }
+
+    public void setFileTransmissionFailed(String filename) {
+        int rows = updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+        if (rows == 0) {
+            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
+            createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+        }
+    }
+
+    public int updateTransmissionHistory(String filename, int status) {
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            values.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
+        } else if (TransmissionStatus.IN_PROGRESS == status) {
+            values.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
+        }
+        return surveyDbAdapter.updateTransmission(filename, values);
+    }
+
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId, iteration);
     }
@@ -601,17 +640,8 @@ public class SurveyDbDataSource {
         return surveyDbAdapter.getSurveyInstancesByStatus(status);
     }
 
-    public int updateTransmissionHistory(String filename, int inProgress) {
-        return surveyDbAdapter.updateTransmissionHistory(filename, inProgress);
-    }
-
     public void deleteSurvey(String id) {
         surveyDbAdapter.deleteSurvey(id);
-    }
-
-    public void createTransmission(long surveyInstanceId, String formId, String filename,
-            int status) {
-        surveyDbAdapter.createTransmission(surveyInstanceId, formId, filename, status);
     }
 
     public String createSurveyedLocale(long id, String recordUuid) {

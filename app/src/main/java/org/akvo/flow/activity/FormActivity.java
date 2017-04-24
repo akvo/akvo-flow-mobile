@@ -60,9 +60,9 @@ import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
 

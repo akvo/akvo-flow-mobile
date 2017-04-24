@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -73,48 +74,33 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     private void setTextWatchers() {
-        latitudeInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-                //EMPTY
-            }
+        latitudeInput.addTextChangedListener(new GeoInputTextWatcher(
+                new CoordinatesTextWatcherListener() {
+                    @Override
+                    public void validateCoordinate() {
+                        String latitude = latitudeInput.getText().toString();
+                        if (!coordinatesValidator.isValidLatitude(latitude)) {
+                            setTextInputError(latitudeInput, R.string.invalid_latitude);
+                        }
+                    }
+                }));
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //EMPTY
-            }
+        longitudeInput.addTextChangedListener(new GeoInputTextWatcher(
+                new CoordinatesTextWatcherListener() {
+                    @Override
+                    public void validateCoordinate() {
+                        String longitude = longitudeInput.getText().toString();
+                        if (!coordinatesValidator.isValidLongitude(longitude)) {
+                            setTextInputError(longitudeInput, R.string.invalid_longitude);
+                        }
+                    }
+                }));
+    }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!coordinatesValidator.isValidLatitude(latitudeInput.getText().toString())) {
-                    latitudeInput.setError(getContext().getString(R.string.invalid_latitude));
-                }
-                //TODO: is clear error needed?
-            }
-        });
-
-        longitudeInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-                //EMPTY
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //EMPTY
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!coordinatesValidator.isValidLongitude(longitudeInput.getText().toString())) {
-                    longitudeInput.setError(getContext().getString(R.string.invalid_longitude));
-                }
-                //TODO: is clear error needed?
-            }
-        });
-
+    private void setTextInputError(EditText editText, @StringRes int resId) {
+        if (editText != null) {
+            editText.setError(getContext().getString(resId));
+        }
     }
 
     void setInputsFocusChangeListeners(GeoQuestionView geoQuestionView) {
@@ -211,5 +197,34 @@ public class GeoInputContainer extends LinearLayout {
 
     String getElevationText() {
         return elevationInput.getText().toString();
+    }
+
+    private static class GeoInputTextWatcher implements TextWatcher {
+
+        private final CoordinatesTextWatcherListener coordinatesTextWatcherListener;
+
+        private GeoInputTextWatcher(CoordinatesTextWatcherListener coordinatesTextWatcherListener) {
+            this.coordinatesTextWatcherListener = coordinatesTextWatcherListener;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count,
+                int after) {
+            //EMPTY
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            //EMPTY
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            coordinatesTextWatcherListener.validateCoordinate();
+        }
+    }
+
+    public interface CoordinatesTextWatcherListener {
+        void validateCoordinate();
     }
 }

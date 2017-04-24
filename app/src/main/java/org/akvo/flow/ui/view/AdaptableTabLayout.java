@@ -47,7 +47,9 @@ public class AdaptableTabLayout extends TabLayout {
     private static final String REQUESTED_TAB_MAX_WIDTH = "mRequestedTabMaxWidth";
     private static final int DIVIDER_MINIMUM = 1;
     private static final int DIVIDER_MAXIMUM = 3;
+    public static final int UNSET = -1;
     private AdapterChangeListener mAdapterChangeListener;
+    private int numberOfTabs = UNSET;
 
     public AdaptableTabLayout(Context context) {
         super(context);
@@ -85,11 +87,14 @@ public class AdaptableTabLayout extends TabLayout {
     }
 
     private void setTabWidth(int numberOfTabs) {
-        int width = ViewUtil.getScreenWidth(getContext());
-        int divider = Math.min(Math.max(numberOfTabs, DIVIDER_MINIMUM), DIVIDER_MAXIMUM);
-        int tabMinWidth = width / divider;
-        setMinimumTabWidth(tabMinWidth);
-        setMaximumTabWidth(tabMinWidth);
+        if (this.numberOfTabs != numberOfTabs) {
+            this.numberOfTabs = numberOfTabs;
+            int width = ViewUtil.getScreenWidth(getContext());
+            int divider = Math.min(Math.max(numberOfTabs, DIVIDER_MINIMUM), DIVIDER_MAXIMUM);
+            int tabMinWidth = width / divider;
+            setMinimumTabWidth(tabMinWidth);
+            setMaximumTabWidth(tabMinWidth);
+        }
     }
 
     private void setMinimumTabWidth(int tabMinWidth) {

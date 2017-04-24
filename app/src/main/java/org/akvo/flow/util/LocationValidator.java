@@ -27,16 +27,19 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-public class CoordinatesValidator {
+public class LocationValidator {
 
     private static final double INVALID_COORDINATE = -999D;
     private static final double MINIMUM_LATITUDE = -90.0D;
     private static final double MAXIMUM_LATITUDE = 90.0D;
     private static final double MINIMUM_LONGITUDE = -180.0D;
     private static final double MAXIMUM_LONGITUDE = 180.0D;
+    private static final double REASONABLE_MINIMUM_ELEVATION_IN_METERS = -15000;
+    private static final double REASONABLE_MAXIMUM_ELEVATION_IN_METERS = 15000;
+    private static final double INVALID_ELEVATION_IN_METERS = 16000;
 
     @Inject
-    public CoordinatesValidator() {
+    public LocationValidator() {
     }
 
     public boolean validCoordinates(@Nullable String lat, @Nullable String lon) {
@@ -62,5 +65,22 @@ public class CoordinatesValidator {
             }
         }
         return INVALID_COORDINATE;
+    }
+
+    public boolean isValidElevation(String elevationString) {
+        double elevation = parseElevation(elevationString);
+        return REASONABLE_MINIMUM_ELEVATION_IN_METERS < elevation
+                && elevation < REASONABLE_MAXIMUM_ELEVATION_IN_METERS;
+    }
+
+    private double parseElevation(@Nullable String elevation) {
+        if (!TextUtils.isEmpty(elevation)) {
+            try {
+                return Double.parseDouble(elevation);
+            } catch (NumberFormatException e) {
+                Timber.w(e);
+            }
+        }
+        return INVALID_ELEVATION_IN_METERS;
     }
 }

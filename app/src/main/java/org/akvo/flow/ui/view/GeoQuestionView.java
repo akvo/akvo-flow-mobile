@@ -39,7 +39,7 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.CoordinatesValidator;
+import org.akvo.flow.util.LocationValidator;
 
 import timber.log.Timber;
 
@@ -57,7 +57,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
     private static final int SNACK_BAR_DURATION_IN_MS = 4000;
 
     private final TimedLocationListener mLocationListener;
-    private final CoordinatesValidator coordinatesValidator = new CoordinatesValidator();
+    private final LocationValidator locationValidator = new LocationValidator();
 
     private Button mGeoButton;
     private View geoLoading;
@@ -255,7 +255,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         if (!hasFocus) {
             final String lat = geoInputContainer.getLatitudeText();
             final String lon = geoInputContainer.getLongitudeText();
-            if (coordinatesValidator.validCoordinates(lat, lon)) {
+            if (locationValidator.validCoordinates(lat, lon)) {
                 updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
                 setResponse(
                         new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,

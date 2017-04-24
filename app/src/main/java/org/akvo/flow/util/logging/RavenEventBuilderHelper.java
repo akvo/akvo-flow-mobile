@@ -20,21 +20,18 @@
 
 package org.akvo.flow.util.logging;
 
-import android.content.Context;
-
 import com.getsentry.raven.environment.RavenEnvironment;
 import com.getsentry.raven.event.EventBuilder;
 import com.getsentry.raven.event.helper.EventBuilderHelper;
 
 import java.util.Map;
 
-public class FlowAndroidEventBuilderHelper implements EventBuilderHelper {
+public class RavenEventBuilderHelper implements EventBuilderHelper {
 
     private final Map<String, String> tags;
 
-    public FlowAndroidEventBuilderHelper(Context context) {
-        TagsFactory tagsFactory = new TagsFactory(context);
-        this.tags = tagsFactory.getTags();
+    public RavenEventBuilderHelper(Map<String, String> tags) {
+        this.tags = tags;
     }
 
     @Override

@@ -24,9 +24,15 @@ import android.content.Context;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
+import org.akvo.flow.util.logging.FlowAndroidRavenFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
+import org.akvo.flow.util.logging.RavenEventBuilderHelper;
 import org.akvo.flow.util.logging.ReleaseLoggingHelper;
+import org.akvo.flow.util.logging.TagsFactory;
 
 import javax.inject.Singleton;
 
@@ -54,7 +60,14 @@ public class ApplicationModule {
         if (BuildConfig.DEBUG) {
             return new DebugLoggingHelper();
         } else {
-            return new ReleaseLoggingHelper(application);
+            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
+                    new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
+                            new Prefs(application));
+            RavenEventBuilderHelper loggingEventBuilderHelper
+                    = new RavenEventBuilderHelper(new TagsFactory(application).getTags());
+            FlowAndroidRavenFactory flowAndroidRavenFactory = new FlowAndroidRavenFactory(
+                    application, loggingSendPermissionVerifier, loggingEventBuilderHelper);
+            return new ReleaseLoggingHelper(application, flowAndroidRavenFactory);
         }
     }
 }

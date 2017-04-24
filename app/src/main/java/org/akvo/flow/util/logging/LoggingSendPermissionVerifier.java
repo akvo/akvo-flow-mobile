@@ -19,25 +19,23 @@
 
 package org.akvo.flow.util.logging;
 
-import android.content.Context;
-
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConnectivityStateManager;
 
-public class FlowPostPermissionVerifier {
+public class LoggingSendPermissionVerifier {
 
     private final ConnectivityStateManager connectivityStateManager;
     private final Prefs prefs;
 
-    public FlowPostPermissionVerifier(Context context) {
-        this.connectivityStateManager = new ConnectivityStateManager(context);
-        this.prefs = new Prefs(context);
+    public LoggingSendPermissionVerifier(ConnectivityStateManager connectivityStateManager,
+            Prefs prefs) {
+        this.connectivityStateManager = connectivityStateManager;
+        this.prefs = prefs;
     }
 
     /**
      * Decides if the stacktrace should be sent to the server
      *
-     * @return
      */
     public boolean shouldAttemptPost() {
         boolean syncOver3GAllowed = prefs

@@ -24,8 +24,6 @@ import android.content.Context;
 
 import com.getsentry.raven.Raven;
 import com.getsentry.raven.android.AndroidRavenFactory;
-import com.getsentry.raven.buffer.Buffer;
-import com.getsentry.raven.buffer.DiskBuffer;
 import com.getsentry.raven.connection.Connection;
 import com.getsentry.raven.connection.EventSampler;
 import com.getsentry.raven.connection.HttpConnection;
@@ -33,31 +31,27 @@ import com.getsentry.raven.connection.RandomEventSampler;
 import com.getsentry.raven.dsn.Dsn;
 import com.getsentry.raven.marshaller.Marshaller;
 
-import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 
 public class FlowAndroidRavenFactory extends AndroidRavenFactory {
 
-    /**
-     * Default Buffer directory name.
-     */
-    private static final String DEFAULT_BUFFER_DIR = "raven-buffered-events";
+    private final LoggingSendPermissionVerifier verifier;
+    private RavenEventBuilderHelper ravenEventBuilderHelper;
 
-    private final FlowPostPermissionVerifier verifier;
-    private final Context context;
-
-    public FlowAndroidRavenFactory(Context context) {
+    public FlowAndroidRavenFactory(Context context,
+            LoggingSendPermissionVerifier loggingSendPermissionVerifier,
+            RavenEventBuilderHelper ravenEventBuilderHelper) {
         super(context);
-        this.context = context;
-        this.verifier = new FlowPostPermissionVerifier(context);
+        this.verifier = loggingSendPermissionVerifier;
+        this.ravenEventBuilderHelper = ravenEventBuilderHelper;
     }
 
     @Override
     public com.getsentry.raven.Raven createRavenInstance(Dsn dsn) {
         Raven raven = new Raven(createConnection(dsn), getContextManager(dsn));
-        raven.addBuilderHelper(new FlowAndroidEventBuilderHelper(context));
+        raven.addBuilderHelper(ravenEventBuilderHelper);
         return raven;
     }
 
@@ -65,7 +59,7 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
      * Creates an HTTP connection to the Sentry server.
      *
      * @param dsn Data Source Name of the Sentry server.
-     * @return an {@link FlowSentryHttpConnection}
+     * @return an {@link FlowRavenHttpConnection}
      */
     protected Connection createHttpConnection(Dsn dsn) {
         URL sentryApiUrl = HttpConnection.getSentryApiUrl(dsn.getUri(), dsn.getProjectId());
@@ -85,8 +79,8 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
             eventSampler = new RandomEventSampler(sampleRate);
         }
 
-        HttpConnection httpConnection = new FlowSentryHttpConnection(sentryApiUrl,
-                dsn.getPublicKey(), dsn.getSecretKey(), proxy, eventSampler, verifier);
+        HttpConnection httpConnection = new FlowRavenHttpConnection(sentryApiUrl,
+                dsn, proxy, eventSampler, verifier);
 
         Marshaller marshaller = createMarshaller(dsn);
         httpConnection.setMarshaller(marshaller);
@@ -98,16 +92,5 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
         httpConnection.setBypassSecurity(bypassSecurityEnabled);
 
         return httpConnection;
-    }
-
-    @Override
-    protected Buffer getBuffer(Dsn dsn) {
-        File bufferDir;
-        if (dsn.getOptions().get(BUFFER_DIR_OPTION) != null) {
-            bufferDir = new File(dsn.getOptions().get(BUFFER_DIR_OPTION));
-        } else {
-            bufferDir = new File(context.getCacheDir().getAbsolutePath(), DEFAULT_BUFFER_DIR);
-        }
-        return new DiskBuffer(bufferDir, getBufferSize(dsn));
     }
 }

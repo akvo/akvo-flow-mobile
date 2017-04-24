@@ -33,22 +33,24 @@ import timber.log.Timber;
 public class ReleaseLoggingHelper implements LoggingHelper {
 
     private final Context context;
+    private final FlowAndroidRavenFactory ravenFactory;
 
-    public ReleaseLoggingHelper(Context context) {
+    public ReleaseLoggingHelper(Context context, FlowAndroidRavenFactory flowAndroidRavenFactory) {
         this.context = context;
-    }
-
-    @Nullable
-    private String getSentryDsn(Resources resources) {
-        return resources.getString(R.string.sentry_dsn);
+        this.ravenFactory = flowAndroidRavenFactory;
     }
 
     @Override
     public void init() {
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
-            Raven.init(context, sentryDsn, new FlowAndroidRavenFactory(context));
+            Raven.init(context, sentryDsn, ravenFactory);
             Timber.plant(new SentryTree());
         }
+    }
+
+    @Nullable
+    private String getSentryDsn(Resources resources) {
+        return resources.getString(R.string.sentry_dsn);
     }
 }

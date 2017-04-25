@@ -514,6 +514,8 @@ public class SurveyDbDataSource {
                     type = "META_GEO";
                     questionId = ConstantUtil.QUESTION_LOCALE_GEO;
                     break;
+                default:
+                    break;
             }
             QuestionResponse metaResponse = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(response)

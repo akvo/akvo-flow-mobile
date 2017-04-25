@@ -51,7 +51,6 @@ import dagger.Provides;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.schedulers.Schedulers;
-import timber.log.Timber;
 
 @Module
 public class ApplicationModule {

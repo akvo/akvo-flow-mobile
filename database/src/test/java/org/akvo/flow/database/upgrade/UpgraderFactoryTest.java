@@ -35,7 +35,7 @@ import static junit.framework.Assert.assertTrue;
 public class UpgraderFactoryTest {
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenBeforeLaunch() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenBeforeLaunch() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory.createUpgrader(77, null, null);
 
@@ -44,7 +44,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenLaunch() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenLaunch() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_LAUNCH, null, null);
@@ -60,7 +60,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenFormSubmitter() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenFormSubmitter() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_FORM_SUBMITTER, null, null);
@@ -76,7 +76,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenFormCheck() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenFormCheck() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_FORM_DEL_CHECK, null, null);
@@ -92,7 +92,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenFormVersion() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenFormVersion() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_FORM_VERSION, null, null);
@@ -108,7 +108,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenCaddisfly() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenCaddisfly() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_CADDISFLY_QN, null, null);
@@ -124,7 +124,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenPreferences() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenPreferences() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_PREFERENCES_MIGRATE, null, null);
@@ -140,7 +140,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateNoUpgraderWhenLanguages() {
+    public void createUpgraderShouldCreateNoUpgraderWhenLanguages() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_LANGUAGES_MIGRATE, null, null);
@@ -156,7 +156,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateNoUpgraderWhenResponseIteration() {
+    public void createUpgraderShouldCreateNoUpgraderWhenResponseIteration() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_RESPONSE_ITERATION, null, null);

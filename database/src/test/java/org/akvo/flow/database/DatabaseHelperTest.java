@@ -53,7 +53,7 @@ public class DatabaseHelperTest {
     private SQLiteDatabase mockDb;
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionBeforeLaunch() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionBeforeLaunch() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         doNothing().when(helper).onCreate(any(SQLiteDatabase.class));
@@ -66,7 +66,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionLaunch() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionLaunch() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -93,7 +93,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionSubmitter() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionSubmitter() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -110,7 +110,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionCheck() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionCheck() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);

@@ -35,9 +35,6 @@ public class LanguageTable {
             + COLUMN_LANGUAGE_CODE + " TEXT NOT NULL, "
             + "UNIQUE(" + COLUMN_SURVEY_ID + ", " + COLUMN_LANGUAGE_CODE + ") ON CONFLICT REPLACE)";
 
-    public LanguageTable() {
-    }
-
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE);
     }

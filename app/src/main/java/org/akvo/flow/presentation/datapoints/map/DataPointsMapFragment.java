@@ -196,7 +196,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         }
 
         final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        LatLng ne = bounds.northeast, sw = bounds.southwest;
+        LatLng ne = bounds.northeast;
+        LatLng sw = bounds.southwest;
         double latDst = Math.abs(ne.latitude - sw.latitude);
         double lonDst = Math.abs(ne.longitude - sw.longitude);
 
@@ -286,13 +287,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.sync_records:
                 presenter.onSyncRecordsPressed();
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     @Override

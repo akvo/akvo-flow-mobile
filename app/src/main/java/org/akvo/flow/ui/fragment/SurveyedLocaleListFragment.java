@@ -119,8 +119,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 .getSystemService(Context.LOCATION_SERVICE);
         mDatabase = new SurveyDbAdapter(getActivity());
         if (mAdapter == null) {
-            mAdapter = new SurveyedLocaleListAdapter(getActivity(), mLatitude, mLongitude,
-                    mSurveyGroup);
+            mAdapter = new SurveyedLocaleListAdapter(getActivity(), mSurveyGroup);
             setListAdapter(mAdapter);
         }
         setEmptyText(getString(R.string.no_records_text));
@@ -141,6 +140,10 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             if (loc != null) {
                 mLatitude = loc.getLatitude();
                 mLongitude = loc.getLongitude();
+                if (mAdapter != null)
+                {
+                    mAdapter.setCurrentLocation(loc);
+                }
             }
             mLocationManager.requestLocationUpdates(provider, 1000, 0, this);
         }
@@ -255,6 +258,10 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mLocationManager.removeUpdates(this);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
+        if (mAdapter != null)
+        {
+            mAdapter.setCurrentLocation(location);
+        }
         refresh();
     }
 
@@ -281,16 +288,15 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
      */
     private static class SurveyedLocaleListAdapter extends CursorAdapter {
 
-        private final double mLatitude;
-        private final double mLongitude;
+        private double mLatitude;
+        private double mLongitude;
         private final SurveyGroup mSurveyGroup;
 
-        public SurveyedLocaleListAdapter(Context context, double mLatitude, double mLongitude,
-                SurveyGroup mSurveyGroup) {
+        public SurveyedLocaleListAdapter(Context context, SurveyGroup surveyGroup) {
             super(context, null, false);
-            this.mLatitude = mLatitude;
-            this.mLongitude = mLongitude;
-            this.mSurveyGroup = mSurveyGroup;
+            mLatitude = 0.0d;
+            mLongitude = 0.0d;
+            mSurveyGroup = surveyGroup;
         }
 
         @Override
@@ -346,6 +352,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
             final int res = PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
+        }
+
+        public void setCurrentLocation(Location location) {
+            mLatitude = location.getLatitude();
+            mLongitude = location.getLongitude();
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale, Context context) {

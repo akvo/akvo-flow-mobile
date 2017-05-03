@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">អាស៊ីស៊ី</string>
-  <string name="searching">ស្វែងរក...</string>
-  <string name="ready">រួចរាល់</string>
-  <string name="timeout"> ផុតពេលកំណត់</string>
   <string name="nocardspacetitle">ពុំមានចន្លោះសម្រាប់ស្តុកទុក</string>
   <string name="lowcardspacetitle">មានលំហស្តុកទុកតិច</string>
   <string name="nocardspacedialog">SD card ក្នុងឧបករណ៍នេះបានពេញ ដូចនេះអ្នកមិនអាចប្រមូលទិន្នន័យបានទៀតឡើយ។ អ្នកត្រូវតែសំអាតចន្លោះក្នុងSD card ដើម្បីអាចបន្តការប្រមូលពត៌មានតទៀត។</string>
@@ -146,7 +142,6 @@
   <string name="error_img_preview">មិនអាចផ្ទុករូបភាពមើលជាមុន </string>
   <string name="use_external_source">ចូរប្រើប្រភពខាងក្រៅ </string>
   <string name="caddisfly_test">ចូលទៅកាន់ការសាកល្បង</string>
-  <string name="caddisfly_response">ការសាកល្បងធ្វើបានជោគជ័យ</string>
   <string name="error_empty_form">ទម្រង់ទទេមិនអាចបញ្ជូនចេញបានទេ។ សូមបន្ថែមចម្លើយដែលត្រូវគ្នា ជាមុន </string>
   <string name="select">សូមជ្រើសរើស </string>
   <string name="clear_value_msg">តើអ្នកចង់លុបតម្លៃនេះឬទេ?</string>

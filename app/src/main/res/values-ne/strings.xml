@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">एक्युरेसी</string>
-  <string name="searching">खोजी हुँदैछ...</string>
-  <string name="ready">तयार</string>
-  <string name="timeout">समय सकियो</string>
   <string name="nocardspacetitle">डाटाको ठाउँ छैन</string>
   <string name="lowcardspacetitle">डाटाको ठाउँ कम छ</string>
   <string name="nocardspacedialog">एस डि कार्ड भरिएको हुनाले डाटा सकंलन गर्न मिल्दैन। डाटा सकंलन गर्न कार्डबाट केही हटाएर खाली ठाउँ बनाउनु होला।  </string>
@@ -146,7 +142,6 @@
   <string name="error_img_preview">फोटोको प्री-भ्यु लोड गर्न सकिएन।</string>
   <string name="use_external_source">बाहिरी श्रोतको प्रयोग गर्नुहोस्</string>
   <string name="caddisfly_test">टेस्टमा जानुहोस्</string>
-  <string name="caddisfly_response">टेस्ट सफलतापुर्वक कब्जा भयो</string>
   <string name="error_empty_form">खाली फारमहरु सब्मिट हुन सक्तैनन्। कृपया पहिले चाहिने उत्तरहरु थप्निहोस्।</string>
   <string name="select">कृपया छान्नुहोस्</string>
   <string name="clear_value_msg">के तपाईं यो मान हटाउन चाहनुहुन्छ?</string>

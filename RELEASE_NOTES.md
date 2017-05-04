@@ -4,11 +4,12 @@ Akvo FLOW app release notes
 Date: 27 April 2017
 
 # New and noteworthy
-* **Transmission History screen is ugly** - [#695](https://github.com/akvo/akvo-flow-mobile/issues/695) The transmission screen has been redesigned.
+* **Transmission History improved** - [#695](https://github.com/akvo/akvo-flow-mobile/issues/695) The transmission screen has been redesigned.
 * **App ToolBar color change** - [#668](https://github.com/akvo/akvo-flow-mobile/issues/668) The toolbar of the whole app has been redesigned respecting google material design and Akvo colors.
 
 # Resolved issues
-* **Selected survey background is grey** - [#704](https://github.com/akvo/akvo-flow-mobile/issues/7047) Removed grey background when a survey is selected.
+* **Data point distances are back** - [#710](https://github.com/akvo/akvo-flow-mobile/issues/710) Restored display of distances to the datapoint list.
+* **Selected survey background no longer grey** - [#704](https://github.com/akvo/akvo-flow-mobile/issues/704) Removed grey background when a survey is selected.
 
 ---------------
 # ver 2.3.1.1

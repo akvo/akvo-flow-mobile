@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -140,8 +140,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             if (loc != null) {
                 mLatitude = loc.getLatitude();
                 mLongitude = loc.getLongitude();
-                if (mAdapter != null)
-                {
+                if (mAdapter != null) {
                     mAdapter.setCurrentLocation(loc);
                 }
             }
@@ -258,8 +257,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mLocationManager.removeUpdates(this);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
-        if (mAdapter != null)
-        {
+        if (mAdapter != null) {
             mAdapter.setCurrentLocation(location);
         }
         refresh();

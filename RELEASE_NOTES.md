@@ -1,5 +1,16 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.2
+Date: 27 April 2017
+
+# New and noteworthy
+* **Transmission History screen is ugly** - [#695](https://github.com/akvo/akvo-flow-mobile/issues/695) The transmission screen has been redesigned.
+* **App ToolBar color change** - [#668](https://github.com/akvo/akvo-flow-mobile/issues/668) The toolbar of the whole app has been redesigned respecting google material design and Akvo colors.
+
+# Resolved issues
+* **Selected survey background is grey** - [#704](https://github.com/akvo/akvo-flow-mobile/issues/7047) Removed grey background when a survey is selected.
+
+---------------
 # ver 2.3.1.1
 Date: 13 April 2017
 
@@ -8,7 +19,7 @@ Date: 13 April 2017
 
 ---------------
 # ver 2.3.1
-Date: 04 April 2017
+Date: 10 April 2017
 
 # New and noteworthy
 * **Improve UI for when searching for location** - [#673](https://github.com/akvo/akvo-flow-mobile/issues/673) Improved the look of geo question: it is now clearer when you can input the coordinates manually. 

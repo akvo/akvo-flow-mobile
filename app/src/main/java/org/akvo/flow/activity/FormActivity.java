@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -59,9 +60,9 @@ import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
 
@@ -142,13 +143,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
             Timber.e("mSurvey is null. Finishing the Activity...");
             finish();
         }
-
+        setupToolBar();
         // Set the survey name as Activity title
         getSupportActionBar().setTitle(mSurvey.getName());
         getSupportActionBar().setSubtitle("v " + getVersion());
 
         mPager = (ViewPager) findViewById(R.id.pager);
-        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mPager);
+        mAdapter = new SurveyTabAdapter(this, mPager, this, this);
         mPager.setAdapter(mAdapter);
 
         // Initialize new survey or load previous responses
@@ -156,7 +159,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         if (!responses.isEmpty()) {
             displayResponses(responses);
         }
-
         spaceLeftOnCard();
     }
 

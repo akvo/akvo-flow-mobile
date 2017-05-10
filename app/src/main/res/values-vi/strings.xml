@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">Độ chính xác</string>
-  <string name="searching">Đang tìm kiếm</string>
-  <string name="ready">Sẵn sàng</string>
-  <string name="timeout">Thời gian chờ</string>
   <string name="nocardspacetitle">Bộ nhớ trong đầy dữ liệu</string>
   <string name="lowcardspacetitle">Bộ nhớ trong sắp đầy dữ liệu</string>
   <string name="nocardspacedialog">Thẻ nhớ của thiết bị này đã đầy dữ liệu và bạn không thể thu thập thêm dữ liệu. Bạn phải xóa bớt dữ liệu trên thẻ nhớ để có thể tiếp tục lưu trữ dữ liệu khác</string>
@@ -145,7 +141,6 @@
   <string name="error_img_preview">Không thể xem trước hình ảnh</string>
   <string name="use_external_source">Sử dụng nguồn bên ngoài</string>
   <string name="caddisfly_test">Đi đến thử nghiệm</string>
-  <string name="caddisfly_response">Thử nghiệm đã lưu trữ thành công</string>
   <string name="error_empty_form">Những biểu mẫu trống dữ liệu không thể đệ trình. Trước tiên, vui lòng, điền thêm những câu trả lời tương ứng.</string>
   <string name="select">Vui lòng chọn</string>
   <string name="clear_value_msg">Bạn có muốn xóa dữ liệu này?</string>

@@ -23,8 +23,6 @@ package org.akvo.flow.util;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import javax.inject.Inject;
-
 import timber.log.Timber;
 
 public class LocationValidator {
@@ -37,10 +35,6 @@ public class LocationValidator {
     private static final double REASONABLE_MINIMUM_ELEVATION_IN_METERS = -15000;
     private static final double REASONABLE_MAXIMUM_ELEVATION_IN_METERS = 15000;
     private static final double INVALID_ELEVATION_IN_METERS = 16000;
-
-    @Inject
-    public LocationValidator() {
-    }
 
     public boolean validCoordinates(@Nullable String lat, @Nullable String lon) {
         return isValidLatitude(lat) && isValidLongitude(lon);

@@ -49,7 +49,7 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
     }
 
     @Override
-    public com.getsentry.raven.Raven createRavenInstance(Dsn dsn) {
+    public Raven createRavenInstance(Dsn dsn) {
         Raven raven = new Raven(createConnection(dsn), getContextManager(dsn));
         raven.addBuilderHelper(ravenEventBuilderHelper);
         return raven;

@@ -321,7 +321,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     }
 
     private void onPowerManagementOptionTap() {
-        WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         if (!wm.isWifiEnabled()) {
             wm.setWifiEnabled(true);
         } else {

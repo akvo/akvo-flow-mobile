@@ -37,6 +37,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.SurveyLanguagesDataSource;
@@ -138,28 +139,30 @@ public class FormActivity extends BackActivity implements SurveyListener,
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
         loadLanguages();
-
         if (mSurvey == null) {
             Timber.e("mSurvey is null. Finishing the Activity...");
+            Toast.makeText(getApplicationContext(), R.string.error_missing_form, Toast.LENGTH_LONG)
+                    .show();
             finish();
-        }
-        setupToolBar();
-        // Set the survey name as Activity title
-        getSupportActionBar().setTitle(mSurvey.getName());
-        getSupportActionBar().setSubtitle("v " + getVersion());
+        } else {
+            setupToolBar();
+            // Set the survey name as Activity title
+            getSupportActionBar().setTitle(mSurvey.getName());
+            getSupportActionBar().setSubtitle("v " + getVersion());
 
-        mPager = (ViewPager) findViewById(R.id.pager);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mPager);
-        mAdapter = new SurveyTabAdapter(this, mPager, this, this);
-        mPager.setAdapter(mAdapter);
+            mPager = (ViewPager) findViewById(R.id.pager);
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+            tabLayout.setupWithViewPager(mPager);
+            mAdapter = new SurveyTabAdapter(this, mPager, this, this);
+            mPager.setAdapter(mAdapter);
 
-        // Initialize new survey or load previous responses
-        Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
-        if (!responses.isEmpty()) {
-            displayResponses(responses);
+            // Initialize new survey or load previous responses
+            Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
+            if (!responses.isEmpty()) {
+                displayResponses(responses);
+            }
+            spaceLeftOnCard();
         }
-        spaceLeftOnCard();
     }
 
     /**
@@ -354,8 +357,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mAdapter.onDestroy();
-        mDatabase.close();
+        if (mAdapter != null) {
+            mAdapter.onDestroy();
+        }
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
     }
 
     @Override

@@ -72,9 +72,6 @@ import timber.log.Timber;
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
 
-    // Argument to be passed to list/map fragments
-    public static final String EXTRA_SURVEY_GROUP = "survey_group";
-
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     private static final String DRAWER_FRAGMENT_TAG = "f";
 
@@ -352,38 +349,45 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             return;
         }
 
-        // Non-monitored surveys display the form directly
-        if (!mSurveyGroup.isMonitored()) {
-            Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
-            if (registrationForm == null) {
-                Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
-                return;
-            } else if (!registrationForm.isHelpDownloaded()) {
-                Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            final String formId = registrationForm.getId();
-            long formInstanceId;
-            boolean readOnly = false;
-            Cursor c = mDatabase.getFormInstances(surveyedLocaleId);
-            if (c.moveToFirst()) {
-                formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
-                int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
-                readOnly = status != SurveyInstanceStatus.SAVED;
-            } else {
-                formInstanceId = mDatabase
-                        .createSurveyRespondent(formId, registrationForm.getVersion(), user,
-                                surveyedLocaleId);
-            }
-            c.close();
-
-            navigator.navigateToFormActivity(this, surveyedLocaleId, user, formId, formInstanceId, readOnly,
-                    mSurveyGroup);
+        if (mSurveyGroup.isMonitored()) {
+            displayRecord(surveyedLocaleId);
         } else {
-            navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
-
+            displayForm(surveyedLocaleId, user);
         }
+    }
+
+    private void displayRecord(String surveyedLocaleId) {
+        navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
+    }
+
+    private void displayForm(String surveyedLocaleId, User user) {
+        Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
+        if (registrationForm == null) {
+            Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
+            return;
+        } else if (!registrationForm.isHelpDownloaded()) {
+            Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        final String registrationFormId = registrationForm.getId();
+        long formInstanceId;
+        boolean readOnly;
+        Cursor c = mDatabase.getFormInstances(surveyedLocaleId);
+        if (c.moveToFirst()) {
+            formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
+            int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
+            readOnly = status != SurveyInstanceStatus.SAVED;
+        } else {
+            formInstanceId = mDatabase
+                    .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
+                            user, surveyedLocaleId);
+            readOnly = false;
+        }
+        c.close();
+
+        navigator.navigateToFormActivity(this, surveyedLocaleId, registrationFormId,
+                formInstanceId, readOnly, mSurveyGroup);
     }
 
     private void displaySelectedUser() {

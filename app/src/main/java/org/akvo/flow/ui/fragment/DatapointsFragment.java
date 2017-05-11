@@ -42,7 +42,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
@@ -81,7 +80,7 @@ public class DatapointsFragment extends Fragment {
     public static DatapointsFragment newInstance(SurveyGroup surveyGroup) {
         DatapointsFragment fragment = new DatapointsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -99,7 +98,7 @@ public class DatapointsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
         setRetainInstance(true);

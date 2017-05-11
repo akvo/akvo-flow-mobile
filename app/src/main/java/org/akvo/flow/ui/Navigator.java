@@ -43,16 +43,18 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+
+import javax.inject.Inject;
 
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
 
     //TODO: inject activity
+    @Inject
     public Navigator() {
     }
 
@@ -78,17 +80,16 @@ public class Navigator {
         // Display form list and history
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
-        extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
-        extras.putString(RecordActivity.EXTRA_RECORD_ID, surveyedLocaleId);
+        extras.putSerializable(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
+        extras.putString(ConstantUtil.RECORD_ID, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }
 
-    public void navigateToFormActivity(Context context, String surveyedLocaleId, User user,
-            String formId,
+    //TODO: too many params, use object
+    public void navigateToFormActivity(Context context, String surveyedLocaleId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
         Intent i = new Intent(context, FormActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, user.getId());
         i.putExtra(ConstantUtil.SURVEY_ID_KEY, formId);
         i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
         i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, surveyedLocaleId);

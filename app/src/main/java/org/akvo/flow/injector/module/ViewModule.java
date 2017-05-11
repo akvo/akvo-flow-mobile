@@ -18,19 +18,10 @@
  *
  */
 
-package org.akvo.flow.injector.component;
+package org.akvo.flow.injector.module;
 
-import android.app.Activity;
+import dagger.Module;
 
-import org.akvo.flow.injector.PerActivity;
-import org.akvo.flow.injector.module.ActivityModule;
-
-import dagger.Component;
-
-@PerActivity
-@Component(dependencies = ApplicationComponent.class, modules = ActivityModule.class)
-public interface ActivityComponent {
-
-    //Exposed to sub-graphs.
-    Activity activity();
+@Module
+public class ViewModule {
 }

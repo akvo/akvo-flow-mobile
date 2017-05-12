@@ -35,7 +35,7 @@ public class MapActivity extends BackActivity implements RecordListListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         setupToolBar();
-        String datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
+        String datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
 
         SurveyDbAdapter db = new SurveyDbAdapter(this).open();
         SurveyedLocale datapoint = db.getSurveyedLocale(datapointId);

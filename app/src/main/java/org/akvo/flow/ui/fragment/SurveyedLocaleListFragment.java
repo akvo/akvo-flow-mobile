@@ -83,7 +83,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
         SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -92,7 +92,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }

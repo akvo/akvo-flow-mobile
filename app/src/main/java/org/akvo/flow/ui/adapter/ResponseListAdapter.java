@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -32,15 +32,12 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
 import org.akvo.flow.data.database.SurveyDbAdapter.FormInstanceQuery;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
 import java.util.Date;
 
 public class ResponseListAdapter extends CursorAdapter {
-    public static final int SURVEY_ID_KEY = R.integer.surveyidkey;
-    public static final int RESP_ID_KEY = R.integer.respidkey;
-    public static final int FINISHED_KEY = R.integer.finishedkey;
-    public static final int RECORD_KEY = R.integer.recordkey;
 
     public ResponseListAdapter(Context context) {
         super(context, null, false);
@@ -89,10 +86,9 @@ public class ResponseListAdapter extends CursorAdapter {
                 + DateFormat.getTimeFormat(context).format(date));
         TextView headingView = (TextView) view.findViewById(R.id.form_name);
         headingView.setText(cursor.getString(FormInstanceQuery.NAME));
-        view.setTag(SURVEY_ID_KEY, cursor.getLong(FormInstanceQuery.SURVEY_ID));
-        view.setTag(RESP_ID_KEY, cursor.getLong(FormInstanceQuery._ID));
-        view.setTag(RECORD_KEY, cursor.getString(FormInstanceQuery.RECORD_ID));
-        view.setTag(FINISHED_KEY, status != SurveyInstanceStatus.SAVED);
+        view.setTag(ConstantUtil.SURVEY_ID_TAG_KEY, cursor.getLong(FormInstanceQuery.SURVEY_ID));
+        view.setTag(ConstantUtil.RESPONDENT_ID_TAG_KEY, cursor.getLong(FormInstanceQuery._ID));
+        view.setTag(ConstantUtil.READ_ONLY_TAG_KEY, status != SurveyInstanceStatus.SAVED);
         ImageView stsIcon = (ImageView) view.findViewById(R.id.status_img);
         stsIcon.setImageResource(icon);
 

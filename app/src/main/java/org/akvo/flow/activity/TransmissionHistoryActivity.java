@@ -56,11 +56,11 @@ public class TransmissionHistoryActivity extends BackActivity {
         Long surveyInstanceId;
         if (savedInstanceState != null) {
             surveyInstanceId = savedInstanceState
-                    .getLong(ConstantUtil.RESPONDENT_ID_KEY);
+                    .getLong(ConstantUtil.RESPONDENT_ID_EXTRA);
         } else {
             Bundle extras = getIntent().getExtras();
             surveyInstanceId = extras != null ? extras
-                    .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
+                    .getLong(ConstantUtil.RESPONDENT_ID_EXTRA) : null;
         }
         return surveyInstanceId;
     }
@@ -89,7 +89,7 @@ public class TransmissionHistoryActivity extends BackActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (outState != null) {
-            outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
+            outState.putLong(ConstantUtil.RESPONDENT_ID_EXTRA, surveyInstanceId);
         }
     }
 

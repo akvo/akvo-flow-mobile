@@ -69,7 +69,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener {
         mDatabase = new SurveyDbAdapter(this);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(
-                ConstantUtil.SURVEY_GROUP);
+                ConstantUtil.SURVEY_GROUP_EXTRA);
         setTitle(mSurveyGroup.getName());
 
         setupToolBar();
@@ -93,7 +93,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener {
 
         mUser = FlowApp.getApp().getUser();
         // Record might have changed while answering a registration survey
-        String recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID);
+        String recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID_EXTRA);
         mRecord = mDatabase.getSurveyedLocale(recordId);
         displayRecord();
     }
@@ -162,7 +162,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener {
             case R.id.view_map:
                 String recordId = getRecordId();
                 startActivity(new Intent(this, MapActivity.class)
-                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId));
+                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

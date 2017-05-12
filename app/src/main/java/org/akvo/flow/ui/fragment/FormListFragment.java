@@ -54,7 +54,7 @@ import java.util.List;
 import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
-import static org.akvo.flow.util.ConstantUtil.RECORD_ID;
+import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 
 public class FormListFragment extends ListFragment
         implements LoaderCallbacks<Pair<List<SurveyInfo>, Boolean>>, OnItemClickListener {
@@ -91,8 +91,8 @@ public class FormListFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
-        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP);
-        recordId = intent.getStringExtra(RECORD_ID);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        recordId = intent.getStringExtra(RECORD_ID_EXTRA);
         setHasOptionsMenu(true);
         if (mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity());

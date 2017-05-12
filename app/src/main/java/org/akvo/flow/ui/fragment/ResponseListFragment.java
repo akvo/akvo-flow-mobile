@@ -53,17 +53,15 @@ import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
-import static org.akvo.flow.util.ConstantUtil.RECORD_ID;
+import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
+import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
+import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
     private static final String TAG = ResponseListFragment.class.getSimpleName();
 
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
-
-    // TODO: Move all id constants to ConstantUtil
-    private static int SURVEY_ID_KEY = R.integer.surveyidkey;
-    private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
-    private static int FINISHED_KEY = R.integer.finishedkey;
 
     // Context menu items
     private static final int DELETE_ONE = 0;
@@ -88,7 +86,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(EXTRA_SURVEY_GROUP);
-        recordId = intent.getStringExtra(RECORD_ID);
+        recordId = intent.getStringExtra(RECORD_ID_EXTRA);
         if (mDatabase == null) {
             mDatabase = new SurveyDbAdapter(getActivity());
             mDatabase.open();
@@ -154,7 +152,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         // Allow deletion only for 'saved' responses
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         View itemView = info.targetView;
-        if (!(Boolean) itemView.getTag(FINISHED_KEY)) {
+        if (!(Boolean) itemView.getTag(READ_ONLY_TAG_KEY)) {
             menu.add(0, DELETE_ONE, 2, R.string.deleteresponse);
         }
     }
@@ -206,9 +204,9 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     @Override
     public void onListItemClick(ListView list, View view, int position, long id) {
-        String formId = view.getTag(SURVEY_ID_KEY).toString();
-        Long formInstanceId = (Long) view.getTag(SURVEY_INSTANCE_ID_KEY);
-        Boolean readOnly = (Boolean) view.getTag(FINISHED_KEY);
+        String formId = view.getTag(SURVEY_ID_TAG_KEY).toString();
+        Long formInstanceId = (Long) view.getTag(RESPONDENT_ID_TAG_KEY);
+        Boolean readOnly = (Boolean) view.getTag(READ_ONLY_TAG_KEY);
         navigator.navigateToFormActivity(getActivity(), recordId, formId,
                 formInstanceId, readOnly, mSurveyGroup);
     }

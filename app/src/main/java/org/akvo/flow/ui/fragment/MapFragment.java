@@ -84,8 +84,8 @@ public class MapFragment extends SupportMapFragment
     public static MapFragment newInstance(SurveyGroup surveyGroup, String dataPointId) {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.SURVEY_GROUP, surveyGroup);
-        args.putString(ConstantUtil.RECORD_ID, dataPointId);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        args.putString(ConstantUtil.RECORD_ID_EXTRA, dataPointId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,8 +96,8 @@ public class MapFragment extends SupportMapFragment
         mItems = new ArrayList<>();
 
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.SURVEY_GROUP);
-        mRecordId = getArguments().getString(ConstantUtil.RECORD_ID);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mRecordId = getArguments().getString(ConstantUtil.RECORD_ID_EXTRA);
         mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
     }
 

@@ -270,5 +270,8 @@
     <string name="invalid_latitude">Invalid latitude</string>
     <string name="invalid_longitude">Invalid longitude</string>
     <string name="invalid_elevation">Invalid height</string>
+    <string name="about_activity_title">About</string>
+    <string name="about_view_title">Akvo Flow app</string>
+    <string name="app_icon_description">App icon</string>
 
 </resources>

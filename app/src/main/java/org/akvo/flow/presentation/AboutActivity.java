@@ -20,17 +20,28 @@
 
 package org.akvo.flow.presentation;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.service.UserRequestedApkUpdateService;
 
 public class AboutActivity extends BackActivity {
+
+    //TODO: this will be replaced by a year placed in a properties file
+    private static final String CURRENT_YEAR = "2017";
+
+    //BuildConfig.VERSION_NAME
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         setupToolBar();
+    }
+
+    private void onUpdateAppOptionTap() {
+        startService(new Intent(this, UserRequestedApkUpdateService.class));
     }
 }

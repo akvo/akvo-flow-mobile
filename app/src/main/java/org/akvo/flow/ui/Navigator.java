@@ -45,6 +45,7 @@ import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
@@ -185,5 +186,9 @@ public class Navigator {
      */
     private void navigateToSettings(@NonNull Context context) {
         context.startActivity(new Intent(Settings.ACTION_SETTINGS));
+    }
+
+    public void navigateToAbout(@NonNull Context context) {
+        context.startActivity(new Intent(context, AboutActivity.class));
     }
 }

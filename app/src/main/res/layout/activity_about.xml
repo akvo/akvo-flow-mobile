@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -8,11 +7,13 @@
         tools:context="org.akvo.flow.presentation.AboutActivity">
 
     <include layout="@layout/app_bar_layout"/>
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?actionBarSize"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center">
+
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -25,48 +26,78 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/waterQualitySystem"
+                android:layout_marginTop="8dp"
+                android:text="@string/about_view_subtitle"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
         <TextView
-                android:id="@+id/textVersion"
+                android:id="@+id/text_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:padding="10dp"
+                android:layout_marginTop="8dp"
+                android:padding="8dp"
                 android:textSize="14sp"
-                tools:text="Version 1.0" />
+                tools:text="Version 2.3.2"/>
 
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|top"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:contentDescription="@string/app_icon_description"
                 android:minHeight="80dp"
                 android:minWidth="80dp"
-                android:src="@drawable/app_icon" />
+                android:src="@mipmap/ic_launcher"/>
 
         <TextView
+                android:id="@+id/text_copyright"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:fontFamily="sans-serif-light"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:text="@string/copyrightMessage"
-                android:textSize="15sp"
-                android:textStyle="normal" />
+                android:text="@string/about_view_copyright"
+                android:textSize="15sp"/>
 
         <TextView
-                android:id="@+id/textLinkSoftwareNotices"
-                android:layout_width="wrap_content"
+                android:id="@+id/text_check_updates"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
-                android:text="@string/legalInformation"
-                android:textColor="@color/cyan"
-                android:textSize="15sp" />
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/about_view_update"
+                android:textColor="@color/blue_main"
+                android:textSize="15sp"/>
+
+        <TextView
+                android:id="@+id/text_release_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/about_view_release_notes"
+                android:textColor="@color/blue_main"
+                android:textSize="15sp"/>
+
+        <TextView
+                android:id="@+id/text_legal_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/about_view_legal"
+                android:textColor="@color/blue_main"
+                android:textSize="15sp"/>
+
+        <TextView
+                android:id="@+id/text_terms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/about_view_terms"
+                android:textColor="@color/blue_main"
+                android:textSize="15sp"/>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

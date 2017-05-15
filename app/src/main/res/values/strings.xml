@@ -29,8 +29,6 @@
     <string name="screenoptdesc">Prevents the screen from turning off while in survey entry mode. Be sure to manually shut the screen off (or exit the app) when not in use to avoid draining the battery.</string>
     <string name="aboutlabel">About</string>
     <string name="aboutdesc">Displays version information.</string>
-    <string name="abouttitle">About - Akvo Flow app</string>
-    <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
     <string name="gpsstatuslabel">GPS Status</string>
     <string name="gpsstatusdesc">Launches the GPS Status application if you have it installed on this device.</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>
@@ -256,7 +254,7 @@
     <string name="drawer_close">Drawer close</string>
 
     <!--settings activity-->
-    <string name="settings_app_update_title">Check for updates</string>
+    <string name="about_view_update">Check for updates</string>
     <string name="settings_app_update_description">Check if there is a newer version for the Flow app.</string>
 
     <!--app update service -->
@@ -271,7 +269,12 @@
     <string name="invalid_longitude">Invalid longitude</string>
     <string name="invalid_elevation">Invalid height</string>
     <string name="about_activity_title">About</string>
-    <string name="about_view_title">Akvo Flow app</string>
+    <string name="about_view_title">Akvo Flow App</string>
     <string name="app_icon_description">App icon</string>
+    <string name="about_view_subtitle">Capture better quality data, faster</string>
+    <string name="about_view_copyright">Copyright © 2010-%1$s Stichting Akvo</string>
+    <string name="about_view_legal">Legal information</string>
+    <string name="about_view_release_notes">Release Notes</string>
+    <string name="about_view_terms">Terms of use</string>
 
 </resources>

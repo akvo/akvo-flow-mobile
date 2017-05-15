@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,33 +18,13 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.presentation.legal.views.apache;
 
-import android.app.Activity;
+import org.akvo.flow.presentation.legal.views.LicenseDetail;
 
-import org.akvo.flow.injector.PerActivity;
+public class AndroidOSPItem extends LicenseDetail {
 
-import dagger.Module;
-import dagger.Provides;
-
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
-
-    private final Activity activity;
-
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
+    public AndroidOSPItem() {
+        super("Android Open Source Project", "https://source.android.com/source/licenses");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,19 +18,13 @@
  *
  */
 
-package org.akvo.flow.injector.component;
+package org.akvo.flow.presentation.legal.views.apache;
 
-import android.app.Activity;
+import org.akvo.flow.presentation.legal.views.LicenseDetail;
 
-import org.akvo.flow.injector.PerActivity;
-import org.akvo.flow.injector.module.ActivityModule;
+public class SqlBriteItem extends LicenseDetail {
 
-import dagger.Component;
-
-@PerActivity
-@Component(dependencies = ApplicationComponent.class, modules = ActivityModule.class)
-public interface ActivityComponent {
-
-    //Exposed to sub-graphs.
-    Activity activity();
+    public SqlBriteItem() {
+        super("sqlbrite", "https://github.com/square/sqlbrite");
+    }
 }

@@ -122,8 +122,12 @@
                 android:writePermission="org.akvo.flow.permission.WRITE_SCHEDULE"/>
 
         <activity
-                android:label="@string/about_activity_title"
-                android:name=".presentation.AboutActivity">
+                android:name=".presentation.AboutActivity"
+                android:label="@string/about_activity_title">
+        </activity>
+        <activity
+                android:name=".presentation.legal.LegalNoticesActivity"
+                android:label="@string/licences_title">
         </activity>
     </application>
 

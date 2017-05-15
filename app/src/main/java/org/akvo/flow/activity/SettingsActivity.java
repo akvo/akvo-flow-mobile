@@ -46,6 +46,8 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
 import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
@@ -117,7 +119,9 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     }
 
     private void initializeInjector() {
-        
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent()).build();
+        viewComponent.inject(this);
     }
 
     /**

@@ -18,28 +18,23 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.injector.component;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import org.akvo.flow.activity.SettingsActivity;
+import org.akvo.flow.injector.PerActivity;
+import org.akvo.flow.injector.module.ViewModule;
+import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.injector.component.ApplicationComponent;
+import dagger.Component;
 
-public abstract class BaseActivity extends AppCompatActivity {
+@PerActivity
+@Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
+public interface ViewComponent {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.getApplicationComponent().inject(this);
-    }
+    void inject(SettingsActivity settingsActivity);
 
-    /**
-     * Get the Main Application component for dependency injection.
-     *
-     * @return {@link ApplicationComponent}
-     */
-    protected ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getApplication()).getApplicationComponent();
-    }
+    void inject(AboutActivity aboutActivity);
+
+    void inject(LegalNoticesActivity legalNoticesActivity);
 }

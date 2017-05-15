@@ -46,14 +46,21 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+
+import javax.inject.Inject;
 
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
 
+    private static final String TERMS_URL = "http://akvo.org/help/akvo-policies-and-terms-2/akvo-flow-terms-of-use/";
+    private static final String RELEASE_NOTES_URL = "https://github.com/akvo/akvo-flow-mobile/releases";
+
     //TODO: inject activity
+    @Inject
     public Navigator() {
     }
 
@@ -190,5 +197,22 @@ public class Navigator {
 
     public void navigateToAbout(@NonNull Context context) {
         context.startActivity(new Intent(context, AboutActivity.class));
+    }
+
+    public void navigateToTerms(@NonNull Context context) {
+        openUrl(context, TERMS_URL);
+    }
+
+    public void openUrl(@NonNull Context context, String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        context.startActivity(browserIntent);
+    }
+
+    public void navigateToReleaseNotes(@NonNull Context context) {
+        openUrl(context, RELEASE_NOTES_URL);
+    }
+
+    public void navigateToLegalInfo(@NonNull Context context) {
+        context.startActivity(new Intent(context, LegalNoticesActivity.class));
     }
 }

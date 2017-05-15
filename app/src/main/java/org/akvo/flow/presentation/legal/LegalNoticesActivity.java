@@ -18,53 +18,39 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.presentation.legal;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.service.UserRequestedApkUpdateService;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class AboutActivity extends BackActivity {
+public class LegalNoticesActivity extends BackActivity {
 
-    //TODO: this will be replaced by a year placed in a properties file
-    private static final String CURRENT_YEAR = "2017";
+    @BindView(R.id.licenses_list)
+    RecyclerView recyclerView;
 
     @Inject
     Navigator navigator;
 
-    @BindView(R.id.text_version)
-    TextView version;
-
-    @BindView(R.id.text_copyright)
-    TextView copyright;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
+        setContentView(R.layout.activity_legal_notices);
         ButterKnife.bind(this);
         initializeInjector();
         setupToolBar();
-        initializeViews();
-    }
-
-    private void initializeViews() {
-        version.setText(getString(R.string.about_view_version, BuildConfig.VERSION_NAME));
-        copyright.setText(getString(R.string.about_view_copyright, CURRENT_YEAR));
+        setUpViews();
     }
 
     private void initializeInjector() {
@@ -73,23 +59,9 @@ public class AboutActivity extends BackActivity {
         viewComponent.inject(this);
     }
 
-    @OnClick(R.id.text_check_updates)
-    void onCheckUpdatesTap() {
-        startService(new Intent(this, UserRequestedApkUpdateService.class));
-    }
-
-    @OnClick(R.id.text_release_notes)
-    void onViewReleaseNotesTap() {
-        navigator.navigateToReleaseNotes(this);
-    }
-
-    @OnClick(R.id.text_legal_info)
-    void onViewLegalInfoTap() {
-        navigator.navigateToLegalInfo(this);
-    }
-
-    @OnClick(R.id.text_terms)
-    void onViewTermsTap() {
-        navigator.navigateToTerms(this);
+    private void setUpViews() {
+        LicencesAdapter adapter = new LicencesAdapter(this, navigator);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setAdapter(adapter);
     }
 }

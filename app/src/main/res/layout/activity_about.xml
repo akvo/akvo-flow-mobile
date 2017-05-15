@@ -31,21 +31,11 @@
                 android:textSize="14sp"
                 android:textStyle="bold"/>
 
-        <TextView
-                android:id="@+id/text_version"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="8dp"
-                android:padding="8dp"
-                android:textSize="14sp"
-                tools:text="Version 2.3.2"/>
-
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|top"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:contentDescription="@string/app_icon_description"
                 android:minHeight="80dp"
                 android:minWidth="80dp"
@@ -57,8 +47,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:text="@string/about_view_copyright"
+                tools:text="Copyright"
                 android:textSize="15sp"/>
+
+        <TextView
+                android:id="@+id/text_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textSize="14sp"
+                tools:text="Version 2.3.2"/>
 
         <TextView
                 android:id="@+id/text_check_updates"

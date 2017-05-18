@@ -40,3 +40,5 @@ builds/
 tmp/
 
 util/scripts/temp.md
+util/scripts/.tx/
+util/scripts/translations/

@@ -18,33 +18,20 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.injector.component;
 
-import android.app.Activity;
-
+import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.injector.PerActivity;
+import org.akvo.flow.injector.module.ViewModule;
+import org.akvo.flow.ui.fragment.ResponseListFragment;
 
-import dagger.Module;
-import dagger.Provides;
+import dagger.Component;
 
-/**
- * A module to wrap the Activity state and expose it to the graph.
- */
-@Module
-public class ActivityModule {
+@PerActivity
+@Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
+public interface ViewComponent {
 
-    private final Activity activity;
+    void inject(RecordActivity recordActivity);
 
-    public ActivityModule(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * Expose the activity to dependents in the graph.
-     */
-    @Provides
-    @PerActivity
-    Activity activity() {
-        return this.activity;
-    }
+    void inject(ResponseListFragment responseListFragment);
 }

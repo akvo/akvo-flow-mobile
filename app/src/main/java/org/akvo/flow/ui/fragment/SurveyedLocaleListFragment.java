@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -48,12 +48,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.RecordColumns;
+import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyInstanceColumns;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.loader.SurveyedLocaleLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
@@ -84,7 +83,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public static SurveyedLocaleListFragment newInstance(SurveyGroup surveyGroup) {
         SurveyedLocaleListFragment fragment = new SurveyedLocaleListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -93,7 +92,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }
@@ -119,8 +118,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
                 .getSystemService(Context.LOCATION_SERVICE);
         mDatabase = new SurveyDbAdapter(getActivity());
         if (mAdapter == null) {
-            mAdapter = new SurveyedLocaleListAdapter(getActivity(), mLatitude, mLongitude,
-                    mSurveyGroup);
+            mAdapter = new SurveyedLocaleListAdapter(getActivity(), mSurveyGroup);
             setListAdapter(mAdapter);
         }
         setEmptyText(getString(R.string.no_records_text));
@@ -141,6 +139,9 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             if (loc != null) {
                 mLatitude = loc.getLatitude();
                 mLongitude = loc.getLongitude();
+                if (mAdapter != null) {
+                    mAdapter.setCurrentLocation(loc);
+                }
             }
             mLocationManager.requestLocationUpdates(provider, 1000, 0, this);
         }
@@ -255,6 +256,9 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         mLocationManager.removeUpdates(this);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
+        if (mAdapter != null) {
+            mAdapter.setCurrentLocation(location);
+        }
         refresh();
     }
 
@@ -281,16 +285,15 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
      */
     private static class SurveyedLocaleListAdapter extends CursorAdapter {
 
-        private final double mLatitude;
-        private final double mLongitude;
+        private double mLatitude;
+        private double mLongitude;
         private final SurveyGroup mSurveyGroup;
 
-        public SurveyedLocaleListAdapter(Context context, double mLatitude, double mLongitude,
-                SurveyGroup mSurveyGroup) {
+        public SurveyedLocaleListAdapter(Context context, SurveyGroup surveyGroup) {
             super(context, null, false);
-            this.mLatitude = mLatitude;
-            this.mLongitude = mLongitude;
-            this.mSurveyGroup = mSurveyGroup;
+            mLatitude = 0.0d;
+            mLongitude = 0.0d;
+            mSurveyGroup = surveyGroup;
         }
 
         @Override
@@ -346,6 +349,11 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             int attr = c.getPosition() % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
             final int res = PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
+        }
+
+        public void setCurrentLocation(Location location) {
+            mLatitude = location.getLatitude();
+            mLongitude = location.getLongitude();
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale, Context context) {

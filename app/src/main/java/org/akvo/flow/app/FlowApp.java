@@ -33,6 +33,9 @@ import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerApplicationComponent;
+import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.logging.SentryHelper;
 
@@ -49,9 +52,12 @@ public class FlowApp extends Application {
     private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
 
+    private ApplicationComponent applicationComponent;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        initializeInjector();
         prefs = new Prefs(getApplicationContext());
         initLogging();
         init();
@@ -61,6 +67,16 @@ public class FlowApp extends Application {
 
     private void startUpdateService() {
         ApkUpdateService.scheduleFirstTask(this);
+    }
+
+    private void initializeInjector() {
+        this.applicationComponent =
+                DaggerApplicationComponent.builder().applicationModule(new ApplicationModule(this)).build();
+        this.applicationComponent.inject(this);
+    }
+
+    public ApplicationComponent getApplicationComponent() {
+        return this.applicationComponent;
     }
 
     private void initLogging() {

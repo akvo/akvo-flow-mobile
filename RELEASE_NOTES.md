@@ -1,5 +1,40 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.2
+Date: 27 April 2017
+
+# New and noteworthy
+* **Transmission History improved** - [#695](https://github.com/akvo/akvo-flow-mobile/issues/695) The transmission screen has been redesigned.
+* **App ToolBar color change** - [#668](https://github.com/akvo/akvo-flow-mobile/issues/668) The toolbar of the whole app has been redesigned respecting google material design and Akvo colors.
+
+# Resolved issues
+* **Data point distances are back** - [#710](https://github.com/akvo/akvo-flow-mobile/issues/710) Restored display of distances to the datapoint list.
+* **Selected survey background no longer grey** - [#704](https://github.com/akvo/akvo-flow-mobile/issues/704) Removed grey background when a survey is selected.
+
+---------------
+# ver 2.3.1.1
+Date: 13 April 2017
+
+# Resolved issues
+* **Crash when loading geoquestion: NumberFormatException: Invalid double** - [#697](https://github.com/akvo/akvo-flow-mobile/issues/697) Fixed crash due to unexpected double formatting in some geolocation questions.
+
+---------------
+# ver 2.3.1
+Date: 10 April 2017
+
+# New and noteworthy
+* **Improve UI for when searching for location** - [#673](https://github.com/akvo/akvo-flow-mobile/issues/673) Improved the look of geo question: it is now clearer when you can input the coordinates manually. 
+* **Add dependency injection with dagger 2** - [#534](https://github.com/akvo/akvo-flow-mobile/issues/534) First step to introduce dependency injection.
+* **Show Caddisfly result in more meaningful way** - [#470](https://github.com/akvo/akvo-flow-mobile/issues/470) Caddisfly test results are now displayed with the actual test values.
+
+# Resolved issues
+* **GeoQuestion Location Timeout** - [#675](https://github.com/akvo/akvo-flow-mobile/issues/675) If the location fails to be retrieved, you will now see a SnackBar which will allow you to retry.
+* **Remove "searching" textView** - [#674](https://github.com/akvo/akvo-flow-mobile/issues/674) The "searching" text was confusing and has been removed.
+* **Simplify dialogue for failed GPS search** - [#672](https://github.com/akvo/akvo-flow-mobile/issues/672) The dialog prompting for enabling the GPS setting now has a clearer message.
+* **Date Picker using GMT formatting by default** - [#662](https://github.com/akvo/akvo-flow-mobile/issues/662) Fixed the issue where a wrong day was displayed for some timezones.
+* **Crash when attempting to display the gps dialog** - [#656](https://github.com/akvo/akvo-flow-mobile/issues/656) Fixed the crash when the device was rotated while the GPS prompt dialog was displayed.
+
+---------------
 # ver 2.3.0
 Date: 16 March 2017
 

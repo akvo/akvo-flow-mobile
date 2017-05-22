@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -36,6 +37,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.SurveyLanguagesDataSource;
@@ -59,9 +61,9 @@ import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
 
@@ -118,11 +120,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
         setContentView(R.layout.form_activity);
 
         // Read all the params. Note that the survey instance id is now mandatory
-        surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
-        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
-        mSurveyInstanceId = getIntent().getLongExtra(ConstantUtil.RESPONDENT_ID_KEY, 0);
-        mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
-        mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
+        Intent intent = getIntent();
+        surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
+        mReadOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
+        mSurveyInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mRecordId = intent.getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
 
         mQuestionResponses = new HashMap<>();
         mDatabase = new SurveyDbAdapter(this);
@@ -137,27 +140,30 @@ public class FormActivity extends BackActivity implements SurveyListener,
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
         loadLanguages();
-
         if (mSurvey == null) {
             Timber.e("mSurvey is null. Finishing the Activity...");
+            Toast.makeText(getApplicationContext(), R.string.error_missing_form, Toast.LENGTH_LONG)
+                    .show();
             finish();
+        } else {
+            setupToolBar();
+            // Set the survey name as Activity title
+            getSupportActionBar().setTitle(mSurvey.getName());
+            getSupportActionBar().setSubtitle("v " + getVersion());
+
+            mPager = (ViewPager) findViewById(R.id.pager);
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+            tabLayout.setupWithViewPager(mPager);
+            mAdapter = new SurveyTabAdapter(this, mPager, this, this);
+            mPager.setAdapter(mAdapter);
+
+            // Initialize new survey or load previous responses
+            Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
+            if (!responses.isEmpty()) {
+                displayResponses(responses);
+            }
+            spaceLeftOnCard();
         }
-
-        // Set the survey name as Activity title
-        getSupportActionBar().setTitle(mSurvey.getName());
-        getSupportActionBar().setSubtitle("v " + getVersion());
-
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mAdapter = new SurveyTabAdapter(this, getSupportActionBar(), mPager, this, this);
-        mPager.setAdapter(mAdapter);
-
-        // Initialize new survey or load previous responses
-        Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
-        if (!responses.isEmpty()) {
-            displayResponses(responses);
-        }
-
-        spaceLeftOnCard();
     }
 
     /**
@@ -352,8 +358,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mAdapter.onDestroy();
-        mDatabase.close();
+        if (mAdapter != null) {
+            mAdapter.onDestroy();
+        }
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
     }
 
     @Override

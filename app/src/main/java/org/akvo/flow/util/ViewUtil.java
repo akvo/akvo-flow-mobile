@@ -22,9 +22,13 @@ package org.akvo.flow.util;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.view.Display;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -248,6 +252,19 @@ public class ViewUtil {
         uiThreadHandler.post(new ServiceToastRunnable(applicationContext, msg));
     }
 
+    public static int getScreenWidth(Context context) {
+        WindowManager windowManager = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        Point size = new Point();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            display.getSize(size);
+            return size.x;
+        } else {
+            return display.getWidth();
+        }
+    }
+
     /**
      * interface that should be implemented by uses of the AdminAuthDialog to be
      * notified when authorization is successful
@@ -255,5 +272,4 @@ public class ViewUtil {
     public interface AdminAuthDialogListener {
         void onAuthenticated();
     }
-
 }

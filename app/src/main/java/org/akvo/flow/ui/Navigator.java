@@ -24,8 +24,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -41,16 +43,18 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+
+import javax.inject.Inject;
 
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
 
     //TODO: inject activity
+    @Inject
     public Navigator() {
     }
 
@@ -76,22 +80,21 @@ public class Navigator {
         // Display form list and history
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
-        extras.putSerializable(RecordActivity.EXTRA_SURVEY_GROUP, mSurveyGroup);
-        extras.putString(RecordActivity.EXTRA_RECORD_ID, surveyedLocaleId);
+        extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        extras.putString(ConstantUtil.RECORD_ID_EXTRA, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }
 
-    public void navigateToFormActivity(Context context, String surveyedLocaleId, User user,
-            String formId,
+    //TODO: confusing, too many params, use object
+    public void navigateToFormActivity(Context context, String surveyedLocaleId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
         Intent i = new Intent(context, FormActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, user.getId());
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, formId);
-        i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, surveyedLocaleId);
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, formInstanceId);
-        i.putExtra(ConstantUtil.READONLY_KEY, readOnly);
+        i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
+        i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, surveyedLocaleId);
+        i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
+        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         context.startActivity(i);
     }
 
@@ -160,15 +163,28 @@ public class Navigator {
 
     public void navigateToMapActivity(@NonNull Context context, String recordId) {
         context.startActivity(new Intent(context, MapActivity.class)
-                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId));
+                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
     }
 
     public void navigateToTransmissionActivity(Context context, long surveyInstanceId) {
         context.startActivity(new Intent(context, TransmissionHistoryActivity.class)
-                .putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId));
+                .putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, surveyInstanceId));
     }
 
-    public void navigateToLocationSettings(Context context) {
-         context.startActivity(new Intent("android.settings.LOCATION_SOURCE_SETTINGS"));
+    public void navigateToLocationSettings(@NonNull Context context) {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        PackageManager packageManager = context.getPackageManager();
+        if (intent.resolveActivity(packageManager) != null) {
+            context.startActivity(intent);
+        } else {
+            navigateToSettings(context);
+        }
+    }
+
+    /**
+     * Fallback as Settings.ACTION_LOCATION_SOURCE_SETTINGS may not be available on some devices
+     */
+    private void navigateToSettings(@NonNull Context context) {
+        context.startActivity(new Intent(Settings.ACTION_SETTINGS));
     }
 }

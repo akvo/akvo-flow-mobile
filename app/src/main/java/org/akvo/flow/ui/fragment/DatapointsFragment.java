@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -40,10 +41,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.astuetz.PagerSlidingTabStrip;
-
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
@@ -82,7 +80,7 @@ public class DatapointsFragment extends Fragment {
     public static DatapointsFragment newInstance(SurveyGroup surveyGroup) {
         DatapointsFragment fragment = new DatapointsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -100,7 +98,7 @@ public class DatapointsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -153,13 +151,11 @@ public class DatapointsFragment extends Fragment {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
         mPager = (ViewPager) v.findViewById(R.id.pager);
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) v.findViewById(R.id.tabs);
+        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
-        // Init tabs
         mTabsAdapter = new TabsAdapter(getFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
-        tabs.setViewPager(mPager);
-
+        tabs.setupWithViewPager(mPager);
         return v;
     }
 

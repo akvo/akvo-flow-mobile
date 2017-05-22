@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.akvo.flow">
+
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -20,9 +21,9 @@
     <application
             android:name=".app.FlowApp"
             android:hasCode="true"
-            android:icon="@drawable/app_icon"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:theme="@style/Flow.Theme">
+            android:theme="@style/FlowAppTheme">
         <activity
                 android:name=".activity.AddUserActivity"
                 android:label="@string/add_user"
@@ -33,7 +34,6 @@
                 android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
@@ -61,7 +61,8 @@
                 android:label="@string/prefoptlabel"/>
         <activity
                 android:name=".activity.TransmissionHistoryActivity"
-                android:configChanges="locale|layoutDirection"/>
+                android:configChanges="locale|layoutDirection"
+                android:label="@string/transmissionhist"/>
         <activity
                 android:name=".activity.GeoshapeActivity"
                 android:configChanges="locale|layoutDirection|orientation|screenSize"/>
@@ -90,9 +91,10 @@
         <service android:name=".service.UserRequestedApkUpdateService"/>
         <service android:name=".service.SurveyedDataPointSyncService"/>
         <service android:name=".service.TimeCheckService"/>
-        <service android:name=".service.ApkUpdateService"
-                 android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
-                 android:exported="true">
+        <service
+                android:name=".service.ApkUpdateService"
+                android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+                android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
             </intent-filter>

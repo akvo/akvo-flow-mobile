@@ -20,6 +20,7 @@
 package org.akvo.flow.testhelper;
 
 import android.content.Context;
+
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.User;

@@ -27,10 +27,8 @@ import android.support.test.rule.ActivityTestRule;
 import android.widget.DatePicker;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.testhelper.SurveyInstaller;
 import org.akvo.flow.testhelper.SurveyRequisite;
 import org.akvo.flow.util.FileUtil;
@@ -69,7 +67,7 @@ public class DateFormTest {
     @Before
     public void init() {
         Context context = rule.getActivity();
-        installer       = new SurveyInstaller(context, new SurveyDbAdapter(context));
+        installer = new SurveyInstaller(context, new SurveyDbAdapter(context));
     }
 
     @BeforeClass
@@ -96,20 +94,24 @@ public class DateFormTest {
 
         String dateString = getShortDate(cal);
 
-        fillDateQuestion(datesurvey, year, month+1, day); // +1 on month due to January starting at 0
+        fillDateQuestion(datesurvey, year, month + 1,
+                day); // +1 on month due to January starting at 0
         onView(withId(R.id.date_et)).check(matches(withText(dateString)));
         onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches(isEnabled()));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(isEnabled()));
     }
 
     @Test
     public void canNotSubmitEmptyDateQuestion() throws IOException {
         fillDateQuestion(datesurvey, 0, 0, 0);
         onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches(not(isEnabled())));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(not(isEnabled())));
     }
 
-    private Survey fillDateQuestion(int surveyResId, int year, int month, int day) throws IOException {
+    private Survey fillDateQuestion(int surveyResId, int year, int month, int day)
+            throws IOException {
         Survey survey = getSurvey(surveyResId);
 
         openDrawer();
@@ -120,17 +122,16 @@ public class DateFormTest {
         //just go next
         if (year == 0 | month == 0 | day == 0) {
             return survey;
-        }
-        else {
+        } else {
             pickDate(year, month, day);
         }
 
         return survey;
     }
 
-
     private Survey getSurvey(int resId) throws IOException {
-        InputStream input = InstrumentationRegistry.getContext().getResources().openRawResource(resId);
+        InputStream input = InstrumentationRegistry.getContext().getResources()
+                .openRawResource(resId);
         return installer.persistSurvey(FileUtil.readText(input));
     }
 
@@ -155,7 +156,8 @@ public class DateFormTest {
 
     private void pickDate(int year, int month, int day) {
         onView(withText(R.string.pickdate)).perform(click());
-        onView(withClassName(endsWith(DatePicker.class.getName()))).perform(PickerActions.setDate(year, month, day));
+        onView(withClassName(endsWith(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(year, month, day));
         onView(withText(R.string.okbutton)).perform(click());
     }
 }

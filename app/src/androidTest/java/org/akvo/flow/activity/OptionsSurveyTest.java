@@ -61,7 +61,7 @@ public class OptionsSurveyTest {
     @Before
     public void init() {
         Context context = rule.getActivity();
-        installer       = new SurveyInstaller(context, new SurveyDbAdapter(context));
+        installer = new SurveyInstaller(context, new SurveyDbAdapter(context));
     }
 
     @BeforeClass
@@ -82,7 +82,8 @@ public class OptionsSurveyTest {
     @Test
     public void canFillOptionsQuestion() throws IOException, InterruptedException {
         fillOptionsQuestion(optionsurvey, 0);
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton))).check(matches(isEnabled()));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(isEnabled()));
     }
 
     private Survey fillOptionsQuestion(int surveyResId, int option) throws IOException {
@@ -93,14 +94,16 @@ public class OptionsSurveyTest {
         onView(withId(R.id.new_datapoint)).perform(click());
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
         //Ensure we get the RadioButton View with the ID (each button/option has an ID starting from 0) and click it
-        onView(allOf(withClassName(endsWith("RadioButton")), withId(option))).check(matches(isDisplayed())).perform(click());
+        onView(allOf(withClassName(endsWith("RadioButton")), withId(option)))
+                .check(matches(isDisplayed())).perform(click());
         onView(withId(R.id.next_btn)).perform(click());
 
         return survey;
     }
 
     private Survey getSurvey(int resId) throws IOException {
-        InputStream input = InstrumentationRegistry.getContext().getResources().openRawResource(resId);
+        InputStream input = InstrumentationRegistry.getContext().getResources()
+                .openRawResource(resId);
         return installer.persistSurvey(FileUtil.readText(input));
     }
 

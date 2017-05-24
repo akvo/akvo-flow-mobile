@@ -67,7 +67,7 @@ public class DateFormTest {
     public ActivityTestRule<SurveyActivity> rule = new ActivityTestRule<>(SurveyActivity.class);
 
     @BeforeClass
-    public static void setRequisite() {
+    public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext, new SurveyDbAdapter(targetContext));
@@ -85,7 +85,7 @@ public class DateFormTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void afterClass() {
         SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
         installer.clearSurveys();
 

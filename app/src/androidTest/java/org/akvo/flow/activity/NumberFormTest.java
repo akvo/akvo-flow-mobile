@@ -20,9 +20,12 @@
 package org.akvo.flow.activity;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.DrawerActions;
+import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -45,6 +48,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
@@ -55,6 +59,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
+@MediumTest
 @RunWith(AndroidJUnit4.class)
 public class NumberFormTest {
 
@@ -109,7 +114,11 @@ public class NumberFormTest {
     @Test
     public void canFillNumberQuestion() throws IOException {
         fillNumberQuestion(50, 50);
-        dismissKeyboard();
+
+        verifySubmitButtonEnabled();
+    }
+
+    private void verifySubmitButtonEnabled() {
         onView(withId(R.id.next_btn)).perform(click());
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches((isEnabled())));
@@ -118,43 +127,47 @@ public class NumberFormTest {
     @Test
     public void canNotifyWrongDoubleInputNumberQuestion() throws IOException {
         fillNumberQuestion(50, 60);
-        //Ensure Popup shows the "Answers do not match" text
-//        onView(withText(R.string.error_answer_match)).inRoot(RootMatchers.isPlatformPopup())
-//                .check(matches(isDisplayed()));
-        dismissKeyboard();
-        onView(withId(R.id.next_btn)).perform(click());
-        //Ensure the button object with text "Submit" is greyed out and not enabled
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(not(isEnabled())));
+
+        verifyAnswersDoNotMatchErrorShown();
+        verifySubmitButtonDisabled();
+    }
+
+    private void verifyAnswersDoNotMatchErrorShown() {
+        onView(withId(R.id.double_entry_et)).check(matches(hasErrorText(
+                getString(R.string.error_answer_match))));
+    }
+
+    @NonNull
+    private String getString(@StringRes int stringResId) {
+        return rule.getActivity().getApplicationContext().getResources()
+                .getString(stringResId);
     }
 
     @Test
     public void canNotifyWrongMaxInputNumberQuestion() throws IOException {
         fillNumberQuestion(0, 2000);
-        //Gets the maxValue for the first question
-        int maxValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
-                .getMaxVal().intValue();
-        String tooLargeError = rule.getActivity().getApplicationContext().getResources()
-                .getString(R.string.toolargeerr);
 
-//        onView(withText(tooLargeError + maxValue)).inRoot(RootMatchers.isPlatformPopup())
-//                .check(matches(isDisplayed()));
-        dismissKeyboard();
+        verifyNumberTooLargeErrorShown();
+        verifySubmitButtonDisabled();
+    }
+
+    private void verifySubmitButtonDisabled() {
         onView(withId(R.id.next_btn)).perform(click());
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches(not(isEnabled())));
     }
 
-    /**
-     * Keyboard is usually covering the "next" button
-     */
-    private void dismissKeyboard() {
-        Espresso.pressBack();
+    private void verifyNumberTooLargeErrorShown() {
+        int maxValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
+                .getMaxVal().intValue();
+        String tooLargeError = getString(R.string.toolargeerr);
+        onView(withId(R.id.double_entry_et)).check(matches(hasErrorText(tooLargeError + maxValue)));
     }
 
     private void fillNumberQuestion(int firstValue, int secondValue)
             throws IOException {
         onView(withId(R.id.input_et)).perform(typeText(String.valueOf(firstValue)));
         onView(withId(R.id.double_entry_et)).perform(typeText(String.valueOf(secondValue)));
+        Espresso.closeSoftKeyboard();
     }
 }

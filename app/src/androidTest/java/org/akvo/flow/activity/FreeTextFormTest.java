@@ -23,6 +23,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.DrawerActions;
+import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -55,6 +56,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
+@MediumTest
 @RunWith(AndroidJUnit4.class)
 public class FreeTextFormTest {
 
@@ -123,6 +125,7 @@ public class FreeTextFormTest {
     private void fillFreeTextQuestion(String text) throws IOException {
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
         onView(withId(R.id.input_et)).perform(typeText(text));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.next_btn)).perform(click());
     }
 }

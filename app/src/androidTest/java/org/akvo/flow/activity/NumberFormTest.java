@@ -34,7 +34,6 @@ import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.testhelper.SurveyInstaller;
 import org.akvo.flow.testhelper.SurveyRequisite;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -73,7 +72,7 @@ public class NumberFormTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext, new SurveyDbAdapter(targetContext));
+        installer = new SurveyInstaller(new SurveyDbAdapter(targetContext));
         survey = installer.installSurvey(numbersurvey, InstrumentationRegistry.getContext());
     }
 
@@ -98,11 +97,6 @@ public class NumberFormTest {
 
     private void openDrawer() {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
-    }
-
-    @After
-    public void afterEachTest() {
-        Espresso.pressBack();
     }
 
     @AfterClass

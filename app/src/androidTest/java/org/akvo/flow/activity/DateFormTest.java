@@ -74,7 +74,7 @@ public class DateFormTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext, new SurveyDbAdapter(targetContext));
+        installer = new SurveyInstaller(new SurveyDbAdapter(targetContext));
         survey = installer.installSurvey(datesurvey, InstrumentationRegistry.getContext());
     }
 

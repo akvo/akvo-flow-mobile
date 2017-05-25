@@ -20,10 +20,8 @@
 package org.akvo.flow.testhelper;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
-import org.akvo.flow.R;
 import org.akvo.flow.activity.DateFormTest;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
@@ -44,14 +42,11 @@ import java.util.Queue;
 
 public class SurveyInstaller {
 
-    //TODO: remove this context
-    private Context context;
     private SurveyDbAdapter adapter;
     //Need an array that holds every File so we can delete them in the end
     private Queue<File> surveyFiles = new ArrayDeque<>();
 
-    public SurveyInstaller(Context context, SurveyDbAdapter adapter) {
-        this.context = context;
+    public SurveyInstaller(SurveyDbAdapter adapter) {
         this.adapter = adapter;
     }
 
@@ -118,7 +113,6 @@ public class SurveyInstaller {
         adapter.saveSurvey(survey);
         adapter.addSurveyGroup(survey.getSurveyGroup());
         adapter.close();
-        notifyNewSurvey(context);
     }
 
     public void clearSurveys() {
@@ -130,15 +124,4 @@ public class SurveyInstaller {
         adapter.clearCollectedData();
         adapter.close();
     }
-
-    /**
-     * Notifies the UI that a new survey has been implemented
-     *
-     * @param context in which to send the notification
-     */
-    private void notifyNewSurvey(Context context) {
-        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
-        context.sendBroadcast(intentBroadcast);
-    }
-
 }

@@ -385,16 +385,24 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     class DrawerAdapter extends BaseExpandableListAdapter implements
             ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
-        LayoutInflater mInflater;
+
+        private static final int PADDING_LEFT_IN_DPS = 30;
+        private static final int PADDING_RIGHT_IN_DPS = 16;
+
+        private final LayoutInflater mInflater;
 
         @ColorInt
         private final int mHighlightColor;
+        private final int leftPadding;
+        private final int rightPadding;
 
         public DrawerAdapter(Context context) {
             mInflater = LayoutInflater.from(context);
             mUsers = new ArrayList<>();
             mSurveys = new ArrayList<>();
             mHighlightColor = ContextCompat.getColor(context, R.color.orange_main);
+            leftPadding = (int) PlatformUtil.dp2Pixel(getActivity(), PADDING_LEFT_IN_DPS);
+            rightPadding = (int) PlatformUtil.dp2Pixel(getActivity(), PADDING_RIGHT_IN_DPS);
         }
 
         @Override
@@ -497,7 +505,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 v = mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             }
             TextView tv = (TextView) v.findViewById(android.R.id.text1);
-            v.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 30), 0, 0, 0);
+            v.setPadding(leftPadding, 0, rightPadding, 0);
 
             tv.setTextSize(ITEM_TEXT_SIZE);
             tv.setTextColor(Color.BLACK);

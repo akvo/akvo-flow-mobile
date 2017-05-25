@@ -27,6 +27,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
@@ -79,6 +80,10 @@ public class GeoInputContainer extends LinearLayout {
                     @Override
                     public void validateCoordinate() {
                         String latitude = latitudeInput.getText().toString();
+                        boolean skipCheckIfEmpty = TextUtils.isEmpty(latitude);
+                        if (skipCheckIfEmpty) {
+                            return;
+                        }
                         if (!locationValidator.isValidLatitude(latitude)) {
                             setTextInputError(latitudeInput, R.string.invalid_latitude);
                         }
@@ -90,6 +95,10 @@ public class GeoInputContainer extends LinearLayout {
                     @Override
                     public void validateCoordinate() {
                         String longitude = longitudeInput.getText().toString();
+                        boolean skipCheckIfEmpty = TextUtils.isEmpty(longitude);
+                        if (skipCheckIfEmpty) {
+                            return;
+                        }
                         if (!locationValidator.isValidLongitude(longitude)) {
                             setTextInputError(longitudeInput, R.string.invalid_longitude);
                         }
@@ -100,6 +109,10 @@ public class GeoInputContainer extends LinearLayout {
                     @Override
                     public void validateCoordinate() {
                         String elevation = elevationInput.getText().toString();
+                        boolean skipCheckIfEmpty = TextUtils.isEmpty(elevation);
+                        if (skipCheckIfEmpty) {
+                            return;
+                        }
                         if (!locationValidator.isValidElevation(elevation)) {
                             setTextInputError(elevationInput, R.string.invalid_elevation);
                         }

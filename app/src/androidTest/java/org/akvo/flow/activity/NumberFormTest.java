@@ -30,10 +30,11 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.domain.Survey;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -97,6 +98,11 @@ public class NumberFormTest {
 
     private void openDrawer() {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+    }
+
+    @After
+    public void afterEachTest() {
+        Espresso.pressBack();
     }
 
     @AfterClass

@@ -21,16 +21,18 @@ package org.akvo.flow.activity;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.domain.Survey;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -90,6 +92,11 @@ public class OptionsSurveyTest {
 
     private void openDrawer() {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+    }
+
+    @After
+    public void afterEachTest() {
+        Espresso.pressBack();
     }
 
     @AfterClass

@@ -20,12 +20,12 @@
 package org.akvo.flow.activity;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.espresso.contrib.PickerActions;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 import android.widget.DatePicker;
 
 import org.akvo.flow.R;
@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -58,6 +59,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 
+@RunWith(AndroidJUnit4.class)
 public class DateFormTest {
 
     private static Survey survey;
@@ -77,6 +79,24 @@ public class DateFormTest {
     @Before
     public void beforeEachTest() {
         newDataPoint();
+    }
+
+    private void newDataPoint() {
+        openDrawer();
+        selectSurvey();
+        clickAddDataPoint();
+    }
+
+    private void clickAddDataPoint() {
+        onView(withId(R.id.new_datapoint)).perform(click());
+    }
+
+    private void selectSurvey() {
+        onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
+    }
+
+    private void openDrawer() {
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
     }
 
     @After
@@ -112,17 +132,6 @@ public class DateFormTest {
         onView(withId(R.id.next_btn)).perform(click());
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches(not(isEnabled())));
-    }
-
-    @NonNull
-    private void newDataPoint() {
-        openDrawer();
-        onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
-        onView(withId(R.id.new_datapoint)).perform(click());
-    }
-
-    private void openDrawer() {
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
     }
 
     /**

@@ -26,6 +26,7 @@ import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.User;
 
 public class SurveyRequisite {
+
     public static void setRequisites(Context context) {
         FlowApp.getApp().setUser(new User(1L, "User"));
         Prefs prefs = new Prefs(context);

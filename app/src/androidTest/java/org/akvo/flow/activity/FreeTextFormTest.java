@@ -21,24 +21,25 @@ package org.akvo.flow.activity;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.testhelper.SurveyInstaller;
 import org.akvo.flow.testhelper.SurveyRequisite;
-import org.akvo.flow.util.FileUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -54,68 +55,73 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
-public class FreeTextSurveyTest {
+@RunWith(AndroidJUnit4.class)
+public class FreeTextFormTest {
+
+    private static Survey survey;
+    private static SurveyInstaller installer;
 
     @Rule
     public ActivityTestRule<SurveyActivity> rule = new ActivityTestRule<>(SurveyActivity.class);
-    private SurveyInstaller installer;
-
-    @Before
-    public void init() {
-        //Need context referring to application itself
-        Context context = rule.getActivity();
-        installer = new SurveyInstaller(context, new SurveyDbAdapter(context));
-    }
 
     @BeforeClass
-    public static void setRequisite() {
-        SurveyRequisite.setRequisites(InstrumentationRegistry.getTargetContext());
+    public static void beforeClass() {
+        Context targetContext = InstrumentationRegistry.getTargetContext();
+        SurveyRequisite.setRequisites(targetContext);
+        installer = new SurveyInstaller(targetContext, new SurveyDbAdapter(targetContext));
+        survey = installer.installSurvey(freetextsurvey, InstrumentationRegistry.getContext());
+    }
+
+    @Before
+    public void beforeEachTest() {
+        newDataPoint();
+    }
+
+    private void newDataPoint() {
+        openDrawer();
+        selectSurvey();
+        clickAddDataPoint();
+    }
+
+    private void clickAddDataPoint() {
+        onView(withId(R.id.new_datapoint)).perform(click());
+    }
+
+    private void selectSurvey() {
+        onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
+    }
+
+    private void openDrawer() {
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
     }
 
     @After
-    public void clearSurveys() {
-        installer.clearSurveys();
+    public void afterEachTest() {
+        Espresso.pressBack();
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void afterClass() {
         SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
-    }
+        installer.clearSurveys();    }
 
     @Test
     public void canFillFreeTextQuestion() throws IOException {
-        fillFreeTextQuestion(freetextsurvey, "This is an answer to your question");
+        fillFreeTextQuestion("This is an answer to your question");
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches((isEnabled())));
     }
 
     @Test
     public void ensureCantSubmitEmptyFreeText() throws IOException {
-        fillFreeTextQuestion(freetextsurvey, "");
+        fillFreeTextQuestion("");
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches(not(isEnabled())));
     }
 
-    private Survey fillFreeTextQuestion(int surveyResId, String text) throws IOException {
-        Survey survey = getSurvey(surveyResId);
-
-        openDrawer();
-        onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
-        onView(withId(R.id.new_datapoint)).perform(click());
+    private void fillFreeTextQuestion(String text) throws IOException {
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
         onView(withId(R.id.input_et)).perform(typeText(text));
         onView(withId(R.id.next_btn)).perform(click());
-
-        return survey;
-    }
-
-    private Survey getSurvey(int resId) throws IOException {
-        InputStream input = InstrumentationRegistry.getContext().getResources()
-                .openRawResource(resId);
-        return installer.persistSurvey(FileUtil.readText(input));
-    }
-
-    private void openDrawer() {
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
     }
 }

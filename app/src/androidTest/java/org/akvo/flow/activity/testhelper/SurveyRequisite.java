@@ -17,7 +17,7 @@
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.testhelper;
+package org.akvo.flow.activity.testhelper;
 
 import android.content.Context;
 

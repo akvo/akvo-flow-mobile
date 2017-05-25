@@ -103,7 +103,8 @@ public class FreeTextFormTest {
     @AfterClass
     public static void afterClass() {
         SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
-        installer.clearSurveys();    }
+        installer.clearSurveys();
+    }
 
     @Test
     public void canFillFreeTextQuestion() throws IOException {

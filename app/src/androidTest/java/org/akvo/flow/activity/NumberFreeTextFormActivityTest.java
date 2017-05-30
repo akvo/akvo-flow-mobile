@@ -1,30 +1,31 @@
 /*
- *  Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.akvo.flow.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
-import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -34,11 +35,12 @@ import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.util.ConstantUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,26 +52,39 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.tests.R.raw.numbersurvey;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.StringEndsWith.endsWith;
 
-@Ignore
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class NumberFormTest {
+public class NumberFreeTextFormActivityTest {
 
-    private static Survey survey;
     private static SurveyInstaller installer;
+    private static Survey survey;
 
     @Rule
-    public ActivityTestRule<SurveyActivity> rule = new ActivityTestRule<>(SurveyActivity.class);
+    public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
+            FormActivity.class) {
+        @Override
+        protected Intent getActivityIntent() {
+            Context targetContext = InstrumentationRegistry.getInstrumentation()
+                    .getTargetContext();
+            Intent result = new Intent(targetContext, FormActivity.class);
+            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "49783002");
+            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0L);
+            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
+                    new SurveyGroup(47323002L, "NumberForm", null, false));
+            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, TEST_FORM_SURVEY_INSTANCE_ID);
+            return result;
+        }
+    };
 
     @BeforeClass
     public static void beforeClass() {
@@ -81,30 +96,11 @@ public class NumberFormTest {
 
     @Before
     public void beforeEachTest() {
-        newDataPoint();
-    }
-
-    private void newDataPoint() {
-        openDrawer();
-        selectSurvey();
-        clickAddDataPoint();
-    }
-
-    private void clickAddDataPoint() {
-        onView(withId(R.id.new_datapoint)).perform(click());
-    }
-
-    private void selectSurvey() {
-        onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
-    }
-
-    private void openDrawer() {
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
     }
 
     @After
     public void afterEachTest() {
-        Espresso.pressBack();
+        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
     }
 
     @AfterClass

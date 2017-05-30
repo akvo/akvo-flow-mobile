@@ -124,4 +124,11 @@ public class SurveyInstaller {
         adapter.clearCollectedData();
         adapter.close();
     }
+
+    public void deleteResponses(String surveyInstanceId) {
+        adapter.open();
+        adapter.deleteResponses(surveyInstanceId);
+        adapter.close();
+    }
+
 }

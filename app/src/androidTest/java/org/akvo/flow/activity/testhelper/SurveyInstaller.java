@@ -22,7 +22,6 @@ package org.akvo.flow.activity.testhelper;
 import android.content.Context;
 import android.util.Log;
 
-import org.akvo.flow.activity.DateFormTest;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyMetadata;
@@ -42,6 +41,7 @@ import java.util.Queue;
 
 public class SurveyInstaller {
 
+    private static final String TAG = "SurveyInstaller";
     private SurveyDbAdapter adapter;
     //Need an array that holds every File so we can delete them in the end
     private Queue<File> surveyFiles = new ArrayDeque<>();
@@ -57,7 +57,7 @@ public class SurveyInstaller {
         try {
             survey = persistSurvey(FileUtil.readText(input));
         } catch (IOException e) {
-            Log.e(DateFormTest.class.getSimpleName(), "Error installing survey");
+            Log.e(TAG, "Error installing survey");
         }
         return survey;
     }

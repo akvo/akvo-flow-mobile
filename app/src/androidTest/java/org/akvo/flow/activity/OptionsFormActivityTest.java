@@ -111,9 +111,9 @@ public class OptionsFormActivityTest {
     private void fillOptionsQuestion(int option) {
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
         //Ensure we get the RadioButton View with the ID (each button/option has an ID starting from 0) and click it
-        onView(allOf(withClassName(endsWith("RadioButton")), withId(option)))
+        onView(withId(option))
                 .check(matches(isDisplayed())).perform(click());
-        onView(allOf(withClassName(endsWith("RadioButton")), withId(option)))
+        onView(withId(option))
                 .check(matches(isDisplayed())).check(matches(isChecked()));
         onView(withId(R.id.next_btn)).perform(click());
     }

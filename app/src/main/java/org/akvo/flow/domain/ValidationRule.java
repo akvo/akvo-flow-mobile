@@ -168,12 +168,10 @@ public class ValidationRule {
      * validation rules, a ValidationException is thrown
      */
     public String performValidation(String val) throws ValidationException {
-        String result = val;
-        if (val != null) {
-            if (ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(validationType)) {
+        if (val != null && ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(validationType)) {
                 Double numVal;
                 try {
-                    numVal = new Double(val.trim());
+                    numVal = Double.valueOf(val.trim());
                     if (minVal != null && minVal > numVal) {
                         throw new ValidationException("Value too small",
                                 ValidationException.TOO_SMALL, null);
@@ -186,8 +184,7 @@ public class ValidationRule {
                     throw new ValidationException("Value must be numeric",
                             ValidationException.INVALID_DATATYPE, e);
                 }
-            }
         }
-        return result;
+        return val;
     }
 }

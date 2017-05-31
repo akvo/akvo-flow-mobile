@@ -20,9 +20,8 @@
 package org.akvo.flow.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -32,11 +31,12 @@ import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.util.ConstantUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,21 +49,35 @@ import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.tests.R.raw.optionsurvey;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
-@Ignore
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class OptionsSurveyTest {
+public class OptionsFormActivityTest {
 
     private static Survey survey;
     private static SurveyInstaller installer;
 
     @Rule
-    public ActivityTestRule<SurveyActivity> rule = new ActivityTestRule<>(SurveyActivity.class);
+    public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
+            FormActivity.class) {
+        @Override
+        protected Intent getActivityIntent() {
+            Context targetContext = InstrumentationRegistry.getInstrumentation()
+                    .getTargetContext();
+            Intent result = new Intent(targetContext, FormActivity.class);
+            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "43623002");
+            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0L);
+            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
+                    new SurveyGroup(42573002L, "OptionsQuestionForm", null, false));
+            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, TEST_FORM_SURVEY_INSTANCE_ID);
+            return result;
+        }
+    };
 
     @BeforeClass
     public static void beforeClass() {
@@ -75,30 +89,11 @@ public class OptionsSurveyTest {
 
     @Before
     public void beforeEachTest() {
-        newDataPoint();
-    }
-
-    private void newDataPoint() {
-        openDrawer();
-        selectSurvey();
-        clickAddDataPoint();
-    }
-
-    private void clickAddDataPoint() {
-        onView(withId(R.id.new_datapoint)).perform(click());
-    }
-
-    private void selectSurvey() {
-        onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
-    }
-
-    private void openDrawer() {
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
     }
 
     @After
     public void afterEachTest() {
-        Espresso.pressBack();
+        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
     }
 
     @AfterClass

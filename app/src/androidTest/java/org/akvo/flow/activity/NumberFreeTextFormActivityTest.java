@@ -111,7 +111,7 @@ public class NumberFreeTextFormActivityTest {
 
     @Test
     public void canFillNumberQuestion() throws IOException {
-        fillNumberQuestion(50, 50);
+        fillNumberQuestion(50);
 
         verifySubmitButtonEnabled();
     }
@@ -122,19 +122,6 @@ public class NumberFreeTextFormActivityTest {
                 .check(matches((isEnabled())));
     }
 
-    @Test
-    public void canNotifyWrongDoubleInputNumberQuestion() throws IOException {
-        fillNumberQuestion(50, 60);
-
-        verifyAnswersDoNotMatchErrorShown();
-        verifySubmitButtonDisabled();
-    }
-
-    private void verifyAnswersDoNotMatchErrorShown() {
-        onView(withId(R.id.double_entry_et)).check(matches(hasErrorText(
-                getString(R.string.error_answer_match))));
-    }
-
     @NonNull
     private String getString(@StringRes int stringResId) {
         return rule.getActivity().getApplicationContext().getResources()
@@ -143,9 +130,17 @@ public class NumberFreeTextFormActivityTest {
 
     @Test
     public void canNotifyWrongMaxInputNumberQuestion() throws IOException {
-        fillNumberQuestion(0, 2000);
+        fillNumberQuestion(2000);
 
         verifyNumberTooLargeErrorShown();
+        verifySubmitButtonDisabled();
+    }
+
+    @Test
+    public void canNotifyWrongMinInputNumberQuestion() throws IOException {
+        fillNumberQuestion(0);
+
+        verifyNumberTooSmallErrorShown();
         verifySubmitButtonDisabled();
     }
 
@@ -159,13 +154,20 @@ public class NumberFreeTextFormActivityTest {
         int maxValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
                 .getMaxVal().intValue();
         String tooLargeError = getString(R.string.toolargeerr);
-        onView(withId(R.id.double_entry_et)).check(matches(hasErrorText(tooLargeError + maxValue)));
+        onView(withId(R.id.input_et)).check(matches(hasErrorText(tooLargeError + maxValue)));
     }
 
-    private void fillNumberQuestion(int firstValue, int secondValue)
+    private void verifyNumberTooSmallErrorShown() {
+        int minValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
+                .getMinVal().intValue();
+        String tooSmallError = getString(R.string.toosmallerr);
+        onView(withId(R.id.input_et)).check(matches(hasErrorText(tooSmallError + minValue)));
+    }
+
+
+    private void fillNumberQuestion(int firstValue)
             throws IOException {
         onView(withId(R.id.input_et)).perform(typeText(String.valueOf(firstValue)));
-        onView(withId(R.id.double_entry_et)).perform(typeText(String.valueOf(secondValue)));
         Espresso.closeSoftKeyboard();
     }
 }

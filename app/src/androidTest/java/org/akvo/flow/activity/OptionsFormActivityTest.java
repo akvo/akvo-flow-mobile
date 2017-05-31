@@ -30,12 +30,10 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +57,6 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 public class OptionsFormActivityTest {
 
-    private static Survey survey;
     private static SurveyInstaller installer;
 
     @Rule
@@ -84,11 +81,7 @@ public class OptionsFormActivityTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(new SurveyDbAdapter(targetContext));
-        survey = installer.installSurvey(optionsurvey, InstrumentationRegistry.getContext());
-    }
-
-    @Before
-    public void beforeEachTest() {
+        installer.installSurvey(optionsurvey, InstrumentationRegistry.getContext());
     }
 
     @After

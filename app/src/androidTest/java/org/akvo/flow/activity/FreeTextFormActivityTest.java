@@ -36,7 +36,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -87,10 +86,6 @@ public class FreeTextFormActivityTest {
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(new SurveyDbAdapter(targetContext));
         installer.installSurvey(freetextsurvey, InstrumentationRegistry.getContext());
-    }
-
-    @Before
-    public void beforeEachTest() {
     }
 
     @After

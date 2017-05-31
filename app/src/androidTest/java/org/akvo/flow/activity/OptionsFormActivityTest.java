@@ -42,6 +42,7 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
@@ -112,6 +113,8 @@ public class OptionsFormActivityTest {
         //Ensure we get the RadioButton View with the ID (each button/option has an ID starting from 0) and click it
         onView(allOf(withClassName(endsWith("RadioButton")), withId(option)))
                 .check(matches(isDisplayed())).perform(click());
+        onView(allOf(withClassName(endsWith("RadioButton")), withId(option)))
+                .check(matches(isDisplayed())).check(matches(isChecked()));
         onView(withId(R.id.next_btn)).perform(click());
     }
 

@@ -13,12 +13,6 @@
 				<option value="Option2" code="1">
 					<text>Option2</text>
 				</option>
-				<option value="Option3" code="3">
-					<text>Option3</text>
-				</option>
-				<option value="Option4" code="4">
-					<text>Option4</text>
-				</option>
 			</options>
 			<text>OptionsQuestion</text>
 		</question>

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -55,6 +55,7 @@ import java.util.List;
  * @author Christopher Fagiani
  */
 public class OptionQuestionView extends QuestionView {
+    
     private static final String OTHER_CODE = "OTHER";
     private final String OTHER_TEXT;
     private RadioGroup mOptionGroup;
@@ -109,7 +110,7 @@ public class OptionQuestionView extends QuestionView {
             View view;
             if (mQuestion.isAllowMultiple()) {
                 view = newCheckbox(option);
-                mCheckBoxes.add((CheckBox)view);
+                mCheckBoxes.add((CheckBox) view);
                 addView(view);
             } else {
                 view = newRadioButton(option);
@@ -121,7 +122,8 @@ public class OptionQuestionView extends QuestionView {
 
         if (mQuestion.isAllowOther()) {
             mOtherText = new TextView(getContext());
-            mOtherText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            mOtherText.setLayoutParams(
+                    new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
             addView(mOtherText);
         }
 
@@ -175,14 +177,16 @@ public class OptionQuestionView extends QuestionView {
             for (int i = 0; i < mCheckBoxes.size(); i++) {
                 // make sure we have a corresponding option (i.e. not the OTHER option)
                 if (!mOptions.get(i).isOther()) {
-                    mCheckBoxes.get(i).setText(formOptionText(mOptions.get(i)), BufferType.SPANNABLE);
+                    mCheckBoxes.get(i)
+                            .setText(formOptionText(mOptions.get(i)), BufferType.SPANNABLE);
                 }
             }
         } else {
             for (int i = 0; i < mOptionGroup.getChildCount(); i++) {
                 // make sure we have a corresponding option (i.e. not the OTHER option)
                 if (!mOptions.get(i).isOther()) {
-                    ((RadioButton) (mOptionGroup.getChildAt(i))).setText(formOptionText(mOptions.get(i)));
+                    ((RadioButton) (mOptionGroup.getChildAt(i)))
+                            .setText(formOptionText(mOptions.get(i)));
                 }
             }
         }
@@ -246,7 +250,7 @@ public class OptionQuestionView extends QuestionView {
     private List<Option> getSelection() {
         List<Option> options = new ArrayList<>();
         if (mQuestion.isAllowMultiple()) {
-            for (CheckBox cb: mCheckBoxes) {
+            for (CheckBox cb : mCheckBoxes) {
                 if (cb.isChecked()) {
                     Option option = mOptions.get(cb.getId());
                     options.add(option);
@@ -268,7 +272,8 @@ public class OptionQuestionView extends QuestionView {
      */
     private void displayOtherDialog(final int otherId) {
         LinearLayout main = new LinearLayout(getContext());
-        main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        main.setLayoutParams(
+                new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         main.setOrientation(LinearLayout.VERTICAL);
         final EditText inputView = new EditText(getContext());
         inputView.setSingleLine();
@@ -321,7 +326,7 @@ public class OptionQuestionView extends QuestionView {
 
         mSuppressListeners = true;
         for (Option selectedOption : selectedOptions) {
-            for (int i=0; i<mOptions.size(); i++) {
+            for (int i = 0; i < mOptions.size(); i++) {
                 Option option = mOptions.get(i);
                 boolean match = selectedOption.equals(option);
                 if (!match && option.isOther()) {

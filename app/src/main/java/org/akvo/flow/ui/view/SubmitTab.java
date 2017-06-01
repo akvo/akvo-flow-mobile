@@ -62,6 +62,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         mSubmitButton.setBackgroundResource(R.drawable.button_primary);
         mSubmitButton.setText(context.getString(R.string.submitbutton));
         mSubmitButton.setOnClickListener(this);
+        mSubmitButton.setId(R.id.submit_button_id);
 
         addHeaderView(mHeaderView);
         addFooterView(mSubmitButton);

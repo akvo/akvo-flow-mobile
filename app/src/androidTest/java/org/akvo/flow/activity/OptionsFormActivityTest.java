@@ -45,13 +45,9 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.tests.R.raw.optionsurvey;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
 @MediumTest
@@ -104,8 +100,9 @@ public class OptionsFormActivityTest {
     }
 
     private void verifySubmitButtonEnabled() {
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(isEnabled()));
+//        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+//                .check(matches(isEnabled()));
+        onView(withId(R.id.submit_button_id)).check(matches(isEnabled()));
     }
 
     private void fillOptionsQuestion(int option) {
@@ -125,7 +122,6 @@ public class OptionsFormActivityTest {
     }
 
     private void verifySubmitButtonDisabled() {
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(not(isEnabled())));
+        onView(withId(R.id.submit_button_id)).check(matches(not(isEnabled())));
     }
 }

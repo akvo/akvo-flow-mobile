@@ -244,7 +244,7 @@ public abstract class OptionQuestionView extends QuestionView {
                     }
                     if (match) {
                         checkMatchingItem(i);
-                        break;// TODO: Break outer loop in single-choice responses?
+                        break; // TODO: Break outer loop in single-choice responses?
                     }
                 }
             }

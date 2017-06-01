@@ -54,7 +54,7 @@ public class OptionQuestionViewMultiple extends OptionQuestionView {
                 mCheckBoxes.add((CheckBox) view);
                 addView(view);
                 view.setEnabled(!isReadOnly());
-                view.setId(i);// View ID will match option position within the array
+                view.setId(i); // View ID will match option position within the array
             }
         }
     }
@@ -123,7 +123,7 @@ public class OptionQuestionViewMultiple extends OptionQuestionView {
         if (mCheckBoxes != null && mOptions != null) {
             for (CheckBox cb : mCheckBoxes) {
                 if (cb.isChecked()) {
-                    Option option = mOptions.get(cb.getId());
+                    Option option = mOptions.   get(cb.getId());
                     options.add(option);
                 }
             }

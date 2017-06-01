@@ -62,7 +62,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private TextView mRepetitionsText;
 
     private final Map<Integer, RepetitionHeader> mHeaders;
-    private final Repetitions mRepetitions;// Repetition IDs
+    private final Repetitions mRepetitionsIds;
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -72,7 +72,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         mQuestionListener = questionListener;
         mQuestionViews = new HashMap<>();
         mHeaders = new HashMap<>();
-        mRepetitions = new Repetitions();
+        mRepetitionsIds = new Repetitions();
         mLoaded = false;
         mQuestions = new HashSet<>();
         for (Question q : mQuestionGroup.getQuestions()) {
@@ -170,8 +170,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             mQuestionViews.clear();
 
             // Load existing iterations. If no iteration is available, show one by default.
-            mRepetitions.loadIDs();
-            int iterCount = Math.max(mRepetitions.size(), 1);
+            mRepetitionsIds.loadIDs();
+            int iterCount = Math.max(mRepetitionsIds.size(), 1);
             for (int i = 0; i < iterCount; i++) {
                 loadGroup(i);
             }
@@ -234,18 +234,18 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
     private void updateRepetitionsHeader() {
         mRepetitionsText
-                .setText(getContext().getString(R.string.repetitions) + mRepetitions.size());
+                .setText(getContext().getString(R.string.repetitions) + mRepetitionsIds.size());
     }
 
     private void loadGroup() {
-        loadGroup(mRepetitions.size());
+        loadGroup(mRepetitionsIds.size());
     }
 
     private void loadGroup(int index) {
         final int repetitionId =
-                mRepetitions.size() <= index ?
-                        mRepetitions.next() :
-                        mRepetitions.getRepetitionId(index);
+                mRepetitionsIds.size() <= index ?
+                        mRepetitionsIds.next() :
+                        mRepetitionsIds.getRepetitionId(index);
         final int position = index + 1;// Visual indicator.
 
         if (mQuestionGroup.isRepeatable()) {
@@ -320,7 +320,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         }
 
         // Rearrange header positions (just the visual indicator).
-        for (Integer id : mRepetitions) {
+        for (Integer id : mRepetitionsIds) {
             if (id.intValue() == repetitionID.intValue()) {
                 View header = mHeaders.remove(repetitionID);
                 if (header != null) {
@@ -332,7 +332,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         }
 
         // Remove the ID from the repetitions list.
-        mRepetitions.remove(repetitionID);
+        mRepetitionsIds.remove(repetitionID);
         updateRepetitionsHeader();
     }
 

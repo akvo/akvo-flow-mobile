@@ -35,6 +35,7 @@ import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.view.option.OptionQuestionFactory;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -48,11 +49,11 @@ import java.util.Set;
 
 public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.OnDeleteListener {
 
-    private QuestionGroup mQuestionGroup;
-    private QuestionInteractionListener mQuestionListener;
-    private SurveyListener mSurveyListener;
+    private final QuestionGroup mQuestionGroup;
+    private final QuestionInteractionListener mQuestionListener;
+    private final SurveyListener mSurveyListener;
 
-    private Map<String, QuestionView> mQuestionViews;
+    private final Map<String, QuestionView> mQuestionViews;
     private final Set<String> mQuestions;// Map group's questions for a quick look-up
     private LinearLayout mContainer;
     private ScrollView mScroller;
@@ -60,8 +61,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
     private TextView mRepetitionsText;
 
-    private Map<Integer, RepetitionHeader> mHeaders;
-    private Repetitions mRepetitions;// Repetition IDs
+    private final Map<Integer, RepetitionHeader> mHeaders;
+    private final Repetitions mRepetitions;// Repetition IDs
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -266,7 +267,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new OptionQuestionView(context, q, mSurveyListener);
+                questionView = OptionQuestionFactory.createOptionQuestion(context, q, mSurveyListener);
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
@@ -381,7 +382,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         /**
          * For the given form instance, load the list of repetitions IDs.
          * The populated list will contain the IDs of existing repetitions.
-         * Although IDs are autoincremented numeric values, there might be
+         * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
          */
         void loadIDs() {

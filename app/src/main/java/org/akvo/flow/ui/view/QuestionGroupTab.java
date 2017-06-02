@@ -246,13 +246,13 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
                 mRepetitionsIds.size() <= index ?
                         mRepetitionsIds.next() :
                         mRepetitionsIds.getRepetitionId(index);
-        final int position = index + 1;// Visual indicator.
+        final int visualIndicator = index + 1;
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
             RepetitionHeader header =
                     new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
-                            position,
+                            visualIndicator,
                             mSurveyListener.isReadOnly() ? null : this);
             mHeaders.put(repetitionId, header);
             mContainer.addView(header);

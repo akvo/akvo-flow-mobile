@@ -41,7 +41,7 @@ import android.widget.ListView;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.loader.SurveyInstanceLoader;
+import org.akvo.flow.data.loader.SurveyInstanceResponseLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -199,7 +199,7 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyInstanceLoader(getActivity(), recordId);
+        return new SurveyInstanceResponseLoader(getActivity(), recordId);
     }
 
     @Override
@@ -213,6 +213,8 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
     }
 
     /**
+     * TODO: make a static inner class to avoid memory leaks
+     *
      * BroadcastReceiver to notify of data synchronisation. This should be
      * fired from DataSyncService.
      */
@@ -223,5 +225,4 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
             refresh();
         }
     };
-
 }

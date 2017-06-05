@@ -26,11 +26,11 @@ import android.database.Cursor;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.loader.base.AsyncLoader;
 
-public class SurveyInstanceLoader extends AsyncLoader<Cursor> {
+public class SurveyInstanceResponseLoader extends AsyncLoader<Cursor> {
 
     private final String surveyedLocaleId;
 
-    public SurveyInstanceLoader(Context context, String surveyedLocaleId) {
+    public SurveyInstanceResponseLoader(Context context, String surveyedLocaleId) {
         super(context);
         this.surveyedLocaleId = surveyedLocaleId;
     }
@@ -39,7 +39,7 @@ public class SurveyInstanceLoader extends AsyncLoader<Cursor> {
     public Cursor loadInBackground() {
         SurveyDbAdapter database = new SurveyDbAdapter(getContext().getApplicationContext());
         database.open();
-        Cursor formInstances = database.getFormInstances(surveyedLocaleId);
+        Cursor formInstances = database.getFormInstancesWithResponses(surveyedLocaleId);
         database.close();
         return formInstances;
     }

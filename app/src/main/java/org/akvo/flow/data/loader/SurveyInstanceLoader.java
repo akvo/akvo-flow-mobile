@@ -23,20 +23,24 @@ package org.akvo.flow.data.loader;
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.data.loader.base.DataLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.loader.base.AsyncLoader;
 
-public class SurveyInstanceLoader extends DataLoader<Cursor> {
-    private String mSurveyedLocaleId;
+public class SurveyInstanceLoader extends AsyncLoader<Cursor> {
 
-    public SurveyInstanceLoader(Context context, SurveyDbAdapter db,  String surveyedLocaleId) {
-        super(context, db);
-        mSurveyedLocaleId = surveyedLocaleId;
+    private final String surveyedLocaleId;
+
+    public SurveyInstanceLoader(Context context, String surveyedLocaleId) {
+        super(context);
+        this.surveyedLocaleId = surveyedLocaleId;
     }
 
     @Override
-    public Cursor loadData(SurveyDbAdapter database) {
-        return database.getFormInstances(mSurveyedLocaleId);
+    public Cursor loadInBackground() {
+        SurveyDbAdapter database = new SurveyDbAdapter(getContext().getApplicationContext());
+        database.open();
+        Cursor formInstances = database.getFormInstances(surveyedLocaleId);
+        database.close();
+        return formInstances;
     }
-
 }

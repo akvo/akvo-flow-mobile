@@ -31,7 +31,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -53,13 +52,14 @@ import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
 
-public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
-    private static final String TAG = ResponseListFragment.class.getSimpleName();
+public class  ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
 
@@ -69,16 +69,13 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     private SurveyGroup mSurveyGroup;
     private ResponseListAdapter mAdapter;
-
-    private SurveyDbAdapter mDatabase;
     private String recordId;
 
     @Inject
     Navigator navigator;
 
     public static ResponseListFragment newInstance() {
-        ResponseListFragment fragment = new ResponseListFragment();
-        return fragment;
+        return new ResponseListFragment();
     }
 
     @Override
@@ -87,16 +84,12 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(EXTRA_SURVEY_GROUP);
         recordId = intent.getStringExtra(RECORD_ID_EXTRA);
-        if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
-            mDatabase.open();
-        }
 
         if (mAdapter == null) {
-            mAdapter = new ResponseListAdapter(getActivity());// Cursor Adapter
+            mAdapter = new ResponseListAdapter(getActivity());
             setListAdapter(mAdapter);
         }
-        registerForContextMenu(getListView());// Same implementation as before
+        registerForContextMenu(getListView());
         setHasOptionsMenu(true);
         initializeInjector();
     }
@@ -117,7 +110,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -130,13 +122,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDatabase.close();
-        mDatabase = null;
     }
 
     private void refresh() {
@@ -161,8 +146,9 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
-        Long surveyInstanceId = mAdapter
-                .getItemId(info.position);// This ID is the _id column in the SQLite db
+
+        // This ID is the _id column in the SQLite db
+        Long surveyInstanceId = mAdapter.getItemId(info.position);
         switch (item.getItemId()) {
             case DELETE_ONE:
                 deleteSurveyInstance(surveyInstanceId);
@@ -182,7 +168,8 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                     int id) {
-                                SurveyDbAdapter db = new SurveyDbAdapter(getActivity()).open();
+                                SurveyDbAdapter db = new SurveyDbAdapter(
+                                        getActivity().getApplicationContext()).open();
                                 db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
                                 db.close();
                                 refresh();
@@ -190,8 +177,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                         })
                 .setNegativeButton(R.string.cancelbutton,
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int id) {
+                            public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                             }
                         });
@@ -213,7 +199,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyInstanceLoader(getActivity(), mDatabase, recordId);
+        return new SurveyInstanceLoader(getActivity(), recordId);
     }
 
     @Override
@@ -230,10 +216,10 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
      * BroadcastReceiver to notify of data synchronisation. This should be
      * fired from DataSyncService.
      */
-    private BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "Survey Instance status has changed. Refreshing UI...");
+            Timber.i("Survey Instance status has changed. Refreshing UI...");
             refresh();
         }
     };

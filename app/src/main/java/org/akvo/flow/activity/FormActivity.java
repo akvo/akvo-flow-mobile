@@ -297,7 +297,22 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void saveRecordMetaData() {
-        // META_NAME
+        saveRecordName();
+        saveRecordLocation();
+    }
+
+    private void saveRecordLocation() {
+        String localeGeoQuestion = mSurvey.getLocaleGeoQuestion();
+        if (localeGeoQuestion != null) {
+            QuestionResponse response = mDatabase.getResponse(mSurveyInstanceId, localeGeoQuestion);
+            if (response != null) {
+                mDatabase.updateSurveyedLocale(mSurveyInstanceId, response.getValue(),
+                        SurveyedLocaleMeta.GEOLOCATION);
+            }
+        }
+    }
+
+    private void saveRecordName() {
         StringBuilder builder = new StringBuilder();
         List<String> localeNameQuestions = mSurvey.getLocaleNameQuestions();
 
@@ -325,16 +340,18 @@ public class FormActivity extends BackActivity implements SurveyListener,
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
                     SurveyedLocaleMeta.NAME);
         }
+    }
 
-        // META_GEO
-        String localeGeoQuestion = mSurvey.getLocaleGeoQuestion();
-        if (localeGeoQuestion != null) {
-            QuestionResponse response = mDatabase.getResponse(mSurveyInstanceId, localeGeoQuestion);
-            if (response != null) {
-                mDatabase.updateSurveyedLocale(mSurveyInstanceId, response.getValue(),
-                        SurveyedLocaleMeta.GEOLOCATION);
-            }
+    private void resetRecordName() {
+        if (!mSurveyGroup.isMonitored() || isRegistrationForm()) {
+            mDatabase.clearSurveyedLocaleName(mSurveyInstanceId);
         }
+    }
+
+    private boolean isRegistrationForm() {
+        Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
+        return registrationForm != null && registrationForm.getId() != null && registrationForm
+                .getId().equals(surveyId);
     }
 
     @Override
@@ -413,6 +430,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
+                        resetRecordName();
                         loadResponses();
                         spaceLeftOnCard();
                     }

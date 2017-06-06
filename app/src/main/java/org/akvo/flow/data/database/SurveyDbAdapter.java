@@ -820,7 +820,7 @@ public class SurveyDbAdapter {
     public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
         Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
-                new String[] { String.valueOf(surveyedLocaleId) },
+                new String[] { surveyedLocaleId },
                 null, null, null);
 
         SurveyedLocale locale = null;
@@ -1057,6 +1057,15 @@ public class SurveyDbAdapter {
         }
         cursor.close();
         return id;
+    }
+
+    public void clearSurveyedLocaleName(long surveyInstanceId) {
+        String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
+        ContentValues surveyedLocaleValues = new ContentValues();
+        surveyedLocaleValues.put(RecordColumns.NAME, "");
+        database.update(Tables.RECORD, surveyedLocaleValues,
+                RecordColumns.RECORD_ID + " = ?",
+                new String[] { surveyedLocaleId });
     }
 
     /**

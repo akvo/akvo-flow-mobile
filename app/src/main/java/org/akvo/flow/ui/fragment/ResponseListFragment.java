@@ -27,6 +27,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -71,11 +73,25 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
     private ResponseListAdapter mAdapter;
     private String recordId;
 
+    @Nullable
+    private ResponseListListener responseListListener;
+
     @Inject
     Navigator navigator;
 
     public static ResponseListFragment newInstance() {
         return new ResponseListFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof ResponseListListener) {
+            responseListListener = (ResponseListListener) activity;
+        } else {
+            throw new IllegalArgumentException("activity must implement ResponseListListener");
+        }
     }
 
     @Override
@@ -124,6 +140,12 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.responseListListener = null;
+    }
+
     private void refresh() {
         getLoaderManager().restartLoader(0, null, ResponseListFragment.this);
     }
@@ -151,7 +173,9 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
         Long surveyInstanceId = mAdapter.getItemId(info.position);
         switch (item.getItemId()) {
             case DELETE_ONE:
-                deleteSurveyInstance(surveyInstanceId);
+                View itemView = info.targetView;
+                showConfirmationDialog(surveyInstanceId,
+                        itemView.getTag(ConstantUtil.SURVEY_ID_TAG_KEY) + "");
                 break;
             case VIEW_HISTORY:
                 viewSurveyInstanceHistory(surveyInstanceId);
@@ -160,19 +184,14 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
         return true;
     }
 
-    private void deleteSurveyInstance(final long surveyInstanceId) {
+    private void showConfirmationDialog(final long surveyInstanceId, final String surveyId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.deleteonewarning)
                 .setCancelable(true)
                 .setPositiveButton(R.string.okbutton,
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int id) {
-                                SurveyDbAdapter db = new SurveyDbAdapter(
-                                        getActivity().getApplicationContext()).open();
-                                db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
-                                db.close();
-                                refresh();
+                            public void onClick(DialogInterface dialog, int id) {
+                                deleteSurveyInstance(surveyId, surveyInstanceId);
                             }
                         })
                 .setNegativeButton(R.string.cancelbutton,
@@ -182,6 +201,21 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
                             }
                         });
         builder.show();
+    }
+
+    private void deleteSurveyInstance(String surveyId, long surveyInstanceId) {
+        SurveyDbAdapter db = new SurveyDbAdapter(getActivity().getApplicationContext()).open();
+        boolean nameResetNeeded = surveyId != null && surveyId
+                .equals(mSurveyGroup.getRegisterSurveyId());
+        if (nameResetNeeded) {
+            db.clearSurveyedLocaleName(surveyInstanceId);
+        }
+        db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
+        db.close();
+        if (nameResetNeeded && responseListListener != null) {
+            responseListListener.onNamedRecordDeleted();
+        }
+        refresh();
     }
 
     private void viewSurveyInstanceHistory(long surveyInstanceId) {
@@ -225,4 +259,8 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
             refresh();
         }
     };
+
+    public interface ResponseListListener {
+        void onNamedRecordDeleted();
+    }
 }

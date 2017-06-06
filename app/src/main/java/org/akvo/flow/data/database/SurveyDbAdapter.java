@@ -820,7 +820,7 @@ public class SurveyDbAdapter {
     public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
         Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
-                new String[] { surveyedLocaleId },
+                new String[] {surveyedLocaleId},
                 null, null, null);
 
         SurveyedLocale locale = null;

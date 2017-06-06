@@ -174,8 +174,7 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
         switch (item.getItemId()) {
             case DELETE_ONE:
                 View itemView = info.targetView;
-                showConfirmationDialog(surveyInstanceId,
-                        itemView.getTag(ConstantUtil.SURVEY_ID_TAG_KEY) + "");
+                showConfirmationDialog(surveyInstanceId, itemView.getTag(SURVEY_ID_TAG_KEY) + "");
                 break;
             case VIEW_HISTORY:
                 viewSurveyInstanceHistory(surveyInstanceId);

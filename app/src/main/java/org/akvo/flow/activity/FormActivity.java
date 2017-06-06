@@ -289,8 +289,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
             mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 
             // Record meta-data, if applies
-            if (!mSurveyGroup.isMonitored() ||
-                    mSurvey.getId().equals(mSurveyGroup.getRegisterSurveyId())) {
+            if (!mSurveyGroup.isMonitored() || mSurvey.getId()
+                    .equals(mSurveyGroup.getRegisterSurveyId())) {
                 saveRecordMetaData();
             }
         }

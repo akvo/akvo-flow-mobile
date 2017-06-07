@@ -19,12 +19,14 @@
 
 package org.akvo.flow.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.app.Activity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 
 import org.akvo.flow.R;
 import org.akvo.flow.ui.view.SignatureView;
@@ -37,6 +39,7 @@ public class SignatureActivity extends Activity {
     private static final int SIGNATURE_HEIGHT = 240;
 
     private SignatureView mSignatureView;
+    private EditText nameEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class SignatureActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_signature);
         mSignatureView = (SignatureView)findViewById(R.id.signature);
+        nameEditText = (EditText) findViewById(R.id.name_edit_text);
         findViewById(R.id.clear).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +64,8 @@ public class SignatureActivity extends Activity {
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mSignatureView.isEmpty()) {
+                if (!mSignatureView.isEmpty() && !TextUtils
+                        .isEmpty(nameEditText.getText().toString())) {
                     save();
                 }
             }
@@ -76,6 +81,7 @@ public class SignatureActivity extends Activity {
         String data = ImageUtil.encodeBase64(bitmap, SIGNATURE_WIDTH, SIGNATURE_HEIGHT);
         Intent intent = new Intent();
         intent.putExtra(ConstantUtil.SIGNATURE_IMAGE, data);
+        intent.putExtra(ConstantUtil.SIGNATURE_NAME, nameEditText.getText().toString());
         setResult(RESULT_OK, intent);
         finish();
     }

@@ -1253,7 +1253,7 @@ public class SurveyDbAdapter {
         contentValues.put(TransmissionColumns.START_DATE, date);
         contentValues.put(TransmissionColumns.END_DATE, date);
         database.update(Tables.TRANSMISSION, contentValues, TransmissionColumns._ID + " = ?",
-                new String[] { transmissionID + "" });
+                new String[] {transmissionID + ""});
     }
 
     public void syncSurveyedLocale(SurveyedLocale surveyedLocale) {

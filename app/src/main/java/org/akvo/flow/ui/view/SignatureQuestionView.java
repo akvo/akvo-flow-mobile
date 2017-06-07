@@ -117,8 +117,8 @@ public class SignatureQuestionView extends QuestionView {
     private void displayResponse() {
         mName.setText(mSignature.getName());
         String imageAsString = mSignature.getImage();
-        boolean isEmptyImage = !TextUtils.isEmpty(imageAsString);
-        if (isEmptyImage) {
+        boolean isEmptyImage = TextUtils.isEmpty(imageAsString);
+        if (!isEmptyImage) {
             // TODO: Resize image?
             mImage.setImageBitmap(ImageUtil.decodeBase64(imageAsString));
             mImage.setVisibility(VISIBLE);

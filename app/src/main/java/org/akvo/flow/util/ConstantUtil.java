@@ -115,6 +115,7 @@ public class ConstantUtil {
      * Signature result data
      */
     public static final String SIGNATURE_IMAGE = "signature_image";
+    public static final String SIGNATURE_NAME = "signature_name";
 
     /**
      * Plot measurement result data

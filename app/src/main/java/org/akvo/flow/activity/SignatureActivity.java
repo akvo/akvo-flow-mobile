@@ -32,6 +32,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
 
 public class SignatureActivity extends Activity {
+
     private static final int SIGNATURE_WIDTH = 320;
     private static final int SIGNATURE_HEIGHT = 240;
 

@@ -270,5 +270,6 @@
     <string name="invalid_latitude">Invalid latitude</string>
     <string name="invalid_longitude">Invalid longitude</string>
     <string name="invalid_elevation">Invalid height</string>
+    <string name="signature_name_hint">Please, type your name</string>
 
 </resources>

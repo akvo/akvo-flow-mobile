@@ -32,7 +32,6 @@
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:inputType="text"
-                android:text="Valeria Rogatchevskikh"
                 android:singleLine="true"/>
         <Button
             android:id="@+id/sign_btn"

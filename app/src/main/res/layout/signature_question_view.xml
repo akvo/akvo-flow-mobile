@@ -20,6 +20,20 @@
             android:maxHeight="150dp"
             android:scaleType="centerInside" />
 
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/signed_by" />
+
+        <EditText
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:inputType="text"
+                android:text="Valeria Rogatchevskikh"
+                android:singleLine="true"/>
         <Button
             android:id="@+id/sign_btn"
             android:layout_width="match_parent"
@@ -27,18 +41,7 @@
             android:text="@string/add_signature"
             style="@style/button_primary" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/signed_by" />
 
-        <EditText
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:singleLine="true"/>
 
     </LinearLayout>
 

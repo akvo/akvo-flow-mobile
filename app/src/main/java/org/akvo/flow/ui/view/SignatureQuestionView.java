@@ -67,7 +67,7 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
                     notifyQuestionListeners(QuestionInteractionEvent.ADD_SIGNATURE_EVENT);
                 }
             });
-            mName.setOnFocusChangeListener(this);
+//            mName.setOnFocusChangeListener(this);
         }
     }
 
@@ -115,7 +115,7 @@ public class SignatureQuestionView extends QuestionView implements View.OnFocusC
     }
 
     private void displayResponse() {
-        mName.setText(mSignature.getName());
+//        mName.setText(mSignature.getName());
         if (!TextUtils.isEmpty(mSignature.getImage())) {
             // TODO: Resize image?
             mImage.setImageBitmap(ImageUtil.decodeBase64(mSignature.getImage()));

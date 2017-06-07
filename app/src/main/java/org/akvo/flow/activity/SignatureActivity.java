@@ -23,7 +23,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -33,20 +35,21 @@ import org.akvo.flow.ui.view.SignatureView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
 
-public class SignatureActivity extends Activity {
+public class SignatureActivity extends Activity implements SignatureView.SignatureViewListener {
 
     private static final int SIGNATURE_WIDTH = 320;
     private static final int SIGNATURE_HEIGHT = 240;
 
     private SignatureView mSignatureView;
     private EditText nameEditText;
+    private View sendButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_signature);
-        mSignatureView = (SignatureView)findViewById(R.id.signature);
+        mSignatureView = (SignatureView) findViewById(R.id.signature);
         nameEditText = (EditText) findViewById(R.id.name_edit_text);
         findViewById(R.id.clear).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +64,8 @@ public class SignatureActivity extends Activity {
                 finish();
             }
         });
-        findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
+        sendButton = findViewById(R.id.save);
+        sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!mSignatureView.isEmpty() && !TextUtils
@@ -70,10 +74,35 @@ public class SignatureActivity extends Activity {
                 }
             }
         });
+        nameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                    int after) {
+                //EMPTY
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //EMPTY
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateSendButton();
+            }
+        });
+        mSignatureView.setListener(this);
+    }
+
+    private void updateSendButton() {
+        boolean isNameEmpty = TextUtils.isEmpty(nameEditText.getText().toString());
+        boolean signatureEmpty = mSignatureView.isEmpty();
+        sendButton.setEnabled(!isNameEmpty && !signatureEmpty);
     }
 
     private void clear() {
         mSignatureView.clear();
+        updateSendButton();
     }
 
     private void save() {
@@ -84,5 +113,10 @@ public class SignatureActivity extends Activity {
         intent.putExtra(ConstantUtil.SIGNATURE_NAME, nameEditText.getText().toString());
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    @Override
+    public void onSignatureDrawn() {
+        updateSendButton();
     }
 }

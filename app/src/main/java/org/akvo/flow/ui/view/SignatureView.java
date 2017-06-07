@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,11 +25,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class SignatureView extends View {
+
     private static final int BACKGROUND_COLOR = Color.WHITE;
     private static final int STROKE_COLOR = Color.BLACK;
     private static final float STROKE_WIDTH = 6f;
@@ -43,6 +45,9 @@ public class SignatureView extends View {
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private boolean mIsEmpty;
+
+    @Nullable
+    private SignatureViewListener listener;
 
     public SignatureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -58,6 +63,10 @@ public class SignatureView extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+    }
+
+    public void setListener(@Nullable SignatureViewListener listener) {
+        this.listener = listener;
     }
 
     public void resetBitmap() {
@@ -134,10 +143,17 @@ public class SignatureView extends View {
             default:
                 return false;
         }
-
+        boolean wasEmpty = mIsEmpty;
         mIsEmpty = false;
+        if (wasEmpty && listener != null) {
+            listener.onSignatureDrawn();
+        }
         invalidate();
         return true;
     }
 
+    public interface SignatureViewListener {
+
+        void onSignatureDrawn();
+    }
 }

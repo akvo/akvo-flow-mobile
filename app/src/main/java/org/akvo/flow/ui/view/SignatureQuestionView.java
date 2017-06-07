@@ -41,6 +41,7 @@ public class SignatureQuestionView extends QuestionView {
 
     private EditText mName;
     private ImageView mImage;
+    private Button signButton;
 
     private Signature mSignature;
 
@@ -56,7 +57,7 @@ public class SignatureQuestionView extends QuestionView {
 
         mName = (EditText)findViewById(R.id.name);
         mImage = (ImageView)findViewById(R.id.image);
-        Button signButton = (Button)findViewById(R.id.sign_btn);
+        signButton = (Button)findViewById(R.id.sign_btn);
 
         if (isReadOnly()) {
             signButton.setEnabled(false);
@@ -115,13 +116,20 @@ public class SignatureQuestionView extends QuestionView {
 
     private void displayResponse() {
         mName.setText(mSignature.getName());
-        if (!TextUtils.isEmpty(mSignature.getImage())) {
+        String imageAsString = mSignature.getImage();
+        boolean isEmptyImage = !TextUtils.isEmpty(imageAsString);
+        if (isEmptyImage) {
             // TODO: Resize image?
-            mImage.setImageBitmap(ImageUtil.decodeBase64(mSignature.getImage()));
+            mImage.setImageBitmap(ImageUtil.decodeBase64(imageAsString));
             mImage.setVisibility(VISIBLE);
         } else {
             mImage.setImageDrawable(null);
             mImage.setVisibility(GONE);
+        }
+        if (!TextUtils.isEmpty(mName.getText().toString()) && !isEmptyImage) {
+            signButton.setText(R.string.modify_signature);
+        } else {
+            signButton.setText(R.string.add_signature);
         }
     }
 

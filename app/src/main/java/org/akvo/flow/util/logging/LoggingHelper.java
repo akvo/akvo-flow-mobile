@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,19 +18,9 @@
  *
  */
 
-package org.akvo.flow.injector.component;
+package org.akvo.flow.util.logging;
 
-import android.app.Activity;
+public interface LoggingHelper {
 
-import org.akvo.flow.injector.PerActivity;
-import org.akvo.flow.injector.module.ActivityModule;
-
-import dagger.Component;
-
-@PerActivity
-@Component(dependencies = ApplicationComponent.class, modules = ActivityModule.class)
-public interface ActivityComponent {
-
-    //Exposed to sub-graphs.
-    Activity activity();
+    void init();
 }

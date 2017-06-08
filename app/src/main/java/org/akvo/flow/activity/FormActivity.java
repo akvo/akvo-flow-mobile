@@ -120,11 +120,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
         setContentView(R.layout.form_activity);
 
         // Read all the params. Note that the survey instance id is now mandatory
-        surveyId = getIntent().getStringExtra(ConstantUtil.SURVEY_ID_KEY);
-        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
-        mSurveyInstanceId = getIntent().getLongExtra(ConstantUtil.RESPONDENT_ID_KEY, 0);
-        mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(ConstantUtil.SURVEY_GROUP);
-        mRecordId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
+        Intent intent = getIntent();
+        surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
+        mReadOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
+        mSurveyInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mRecordId = intent.getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
 
         mQuestionResponses = new HashMap<>();
         mDatabase = new SurveyDbAdapter(this);

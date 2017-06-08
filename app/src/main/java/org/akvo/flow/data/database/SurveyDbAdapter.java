@@ -27,6 +27,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.domain.FileTransmission;
@@ -810,6 +811,7 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
+    @Nullable
     public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
         Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",

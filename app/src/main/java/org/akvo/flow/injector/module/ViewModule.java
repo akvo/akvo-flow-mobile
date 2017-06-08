@@ -18,28 +18,10 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.injector.module;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import dagger.Module;
 
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.injector.component.ApplicationComponent;
-
-public abstract class BaseActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.getApplicationComponent().inject(this);
-    }
-
-    /**
-     * Get the Main Application component for dependency injection.
-     *
-     * @return {@link ApplicationComponent}
-     */
-    protected ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getApplication()).getApplicationComponent();
-    }
+@Module
+public class ViewModule {
 }

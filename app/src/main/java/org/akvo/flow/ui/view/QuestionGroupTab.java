@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -279,7 +279,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new GeoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new BarcodeQuestionView(context, q, mSurveyListener);
+                questionView = BarcodeQuestionViewFactory
+                        .createBarcodeQuestion(context, q, mSurveyListener);
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new DateQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.CASCADE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {

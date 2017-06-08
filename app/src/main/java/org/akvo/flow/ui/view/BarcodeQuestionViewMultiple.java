@@ -1,20 +1,21 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.akvo.flow.ui.view;
@@ -28,7 +29,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -49,14 +49,13 @@ import org.akvo.flow.util.ViewUtil;
  *
  * @author Christopher Fagiani
  */
-public abstract class BarcodeQuestionView extends QuestionView
-        implements OnClickListener, OnFocusChangeListener {
+public class BarcodeQuestionViewMultiple extends QuestionView implements OnClickListener {
 
     private EditText mInputText;
     private LinearLayout mInputContainer;
     private boolean mMultiple;
 
-    public BarcodeQuestionView(Context context, Question q, SurveyListener surveyListener) {
+    public BarcodeQuestionViewMultiple(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
         init();
     }
@@ -126,7 +125,6 @@ public abstract class BarcodeQuestionView extends QuestionView
         }
         mInputText.setEnabled(!mQuestion.isLocked());
         mInputText.setFocusable(!isReadOnly);
-        mInputText.setOnFocusChangeListener(this);
     }
 
     private void addValue(final String text) {
@@ -233,18 +231,6 @@ public abstract class BarcodeQuestionView extends QuestionView
         super.resetQuestion(fireEvent);
         mInputContainer.removeAllViews();
         mInputText.setText("");
-    }
-
-    /**
-     * captures the response and runs validation on loss of focus
-     */
-    @Override
-    public void onFocusChange(View view, boolean hasFocus) {
-        // we need to listen to loss of focus
-        // and make sure input is valid
-        if (!hasFocus) {
-            captureResponse(false);
-        }
     }
 
     /**

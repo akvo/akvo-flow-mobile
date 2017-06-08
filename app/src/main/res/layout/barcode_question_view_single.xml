@@ -16,8 +16,6 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/type_code"
                 android:singleLine="true"
-                android:visibility="gone"
-                tools:visibility="visible"
                 android:imeOptions="actionDone"
                 />
 

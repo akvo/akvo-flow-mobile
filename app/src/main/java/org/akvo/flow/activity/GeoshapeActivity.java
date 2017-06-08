@@ -117,7 +117,7 @@ public class GeoshapeActivity extends BackActivity
         mAllowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
         mAllowPolygon = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POLYGON, true);
         mManualInput = getIntent().getBooleanExtra(ConstantUtil.EXTRA_MANUAL_INPUT, true);
-        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
+        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
 
         if (!mReadOnly) {
             mClearPointBtn.setOnClickListener(mFeatureMenuListener);

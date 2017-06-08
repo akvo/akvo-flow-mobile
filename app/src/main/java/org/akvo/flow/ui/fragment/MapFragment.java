@@ -50,10 +50,8 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SurveyActivity;
-import org.akvo.flow.data.loader.SurveyedLocaleLoader;
 import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyedLocaleLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
@@ -86,8 +84,8 @@ public class MapFragment extends SupportMapFragment
     public static MapFragment newInstance(SurveyGroup surveyGroup, String dataPointId) {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putSerializable(SurveyActivity.EXTRA_SURVEY_GROUP, surveyGroup);
-        args.putString(RecordActivity.EXTRA_RECORD_ID, dataPointId);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        args.putString(ConstantUtil.RECORD_ID_EXTRA, dataPointId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -98,8 +96,8 @@ public class MapFragment extends SupportMapFragment
         mItems = new ArrayList<>();
 
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(SurveyActivity.EXTRA_SURVEY_GROUP);
-        mRecordId = getArguments().getString(RecordActivity.EXTRA_RECORD_ID);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mRecordId = getArguments().getString(ConstantUtil.RECORD_ID_EXTRA);
         mSingleRecord = !TextUtils.isEmpty(mRecordId);// Single datapoint mode?
     }
 

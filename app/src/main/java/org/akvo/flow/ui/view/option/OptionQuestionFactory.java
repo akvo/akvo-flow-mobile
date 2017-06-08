@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,25 +18,23 @@
  *
  */
 
-package org.akvo.flow.data.loader;
+package org.akvo.flow.ui.view.option;
 
 import android.content.Context;
-import android.database.Cursor;
 
-import org.akvo.flow.data.loader.base.DataLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.domain.Question;
+import org.akvo.flow.event.SurveyListener;
 
-public class SurveyInstanceLoader extends DataLoader<Cursor> {
-    private String mSurveyedLocaleId;
+public class OptionQuestionFactory {
 
-    public SurveyInstanceLoader(Context context, SurveyDbAdapter db,  String surveyedLocaleId) {
-        super(context, db);
-        mSurveyedLocaleId = surveyedLocaleId;
+    public static OptionQuestionView createOptionQuestion(Context context, Question question,
+            SurveyListener surveyListener) {
+        if (question.getOptions() == null) {
+            return new OptionQuestionViewNull(context, question, surveyListener);
+        } else if (question.isAllowMultiple()) {
+            return new OptionQuestionViewMultiple(context, question, surveyListener);
+        } else {
+            return new OptionQuestionViewSingle(context, question, surveyListener);
+        }
     }
-
-    @Override
-    public Cursor loadData(SurveyDbAdapter database) {
-        return database.getFormInstances(mSurveyedLocaleId);
-    }
-
 }

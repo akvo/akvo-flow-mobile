@@ -1,5 +1,16 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.3
+Date: 25 May 2017
+
+# Resolved issues
+* **Long form names do not look nice on some devices** - [#727](https://github.com/akvo/akvo-flow-mobile/issues/727) Long form names in the navigation drawer now have a small right margin. 
+* **Pressing back with the navigation drawer shown closes app** - [#711](https://github.com/akvo/akvo-flow-mobile/issues/711) Fixed the issue with pressing the back button when the navigation drawer was being displayed.
+* **NumberFormatException: Invalid long: "21474836472147483647"** - [#701](https://github.com/akvo/akvo-flow-mobile/issues/701) Fixed issue with excessively long numbers which no longer wil be accepted.
+* **GeoQuestion Location Invalid Input** - [#679](https://github.com/akvo/akvo-flow-mobile/issues/679) Manually input coordinates are now verified before submission.
+* **Crash: NullPointerException when trying to open FormActivity** - [#637](https://github.com/akvo/akvo-flow-mobile/issues/637) Fixed a crash when trying to view a deleted datapoint.
+
+---------------
 # ver 2.3.2
 Date: 27 April 2017
 

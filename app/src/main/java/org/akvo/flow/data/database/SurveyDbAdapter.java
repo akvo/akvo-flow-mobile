@@ -27,6 +27,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.domain.FileTransmission;
@@ -64,8 +65,13 @@ public class SurveyDbAdapter {
     private static final String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
             + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
             + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
+    private static final String SURVEY_INSTANCE_JOIN_SURVEY_AND_RESPONSE = "survey_instance "
+            + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
+            + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id "
+            + "JOIN response ON survey_instance._id=response.survey_instance_id";
 
-    public static final String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
+    public static final String SURVEY_JOIN_SURVEY_INSTANCE =
+            "survey LEFT OUTER JOIN survey_instance ON "
             + "survey.survey_id=survey_instance.survey_id";
 
     private static final int DOES_NOT_EXIST = -1;
@@ -810,10 +816,11 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
+    @Nullable
     public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
         Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
-                new String[] { String.valueOf(surveyedLocaleId) },
+                new String[] {surveyedLocaleId},
                 null, null, null);
 
         SurveyedLocale locale = null;
@@ -961,6 +968,21 @@ public class SurveyDbAdapter {
     }
 
     /**
+     * Get all the SurveyInstances for a particular data point which actually have non empty
+     * responses. Registration form will be at the top of the list, all other forms will be ordered
+     * by submission date (desc).
+     */
+    public Cursor getFormInstancesWithResponses(String recordId) {
+        return database.query(SURVEY_INSTANCE_JOIN_SURVEY_AND_RESPONSE,
+                FormInstanceQuery.PROJECTION,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
+                new String[] { recordId },
+                ResponseColumns.SURVEY_INSTANCE_ID, null,
+                "CASE WHEN survey.survey_id = survey_group.register_survey_id THEN 0 ELSE 1 END, "
+                        + SurveyInstanceColumns.START_DATE + " DESC");
+    }
+
+    /**
      * Get SurveyInstances with a particular status.
      * If the recordId is not null, results will be filtered by Record.
      */
@@ -1035,6 +1057,15 @@ public class SurveyDbAdapter {
         }
         cursor.close();
         return id;
+    }
+
+    public void clearSurveyedLocaleName(long surveyInstanceId) {
+        String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
+        ContentValues surveyedLocaleValues = new ContentValues();
+        surveyedLocaleValues.put(RecordColumns.NAME, "");
+        database.update(Tables.RECORD, surveyedLocaleValues,
+                RecordColumns.RECORD_ID + " = ?",
+                new String[] { surveyedLocaleId });
     }
 
     /**

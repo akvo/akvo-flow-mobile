@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -32,26 +32,27 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
 import org.akvo.flow.data.database.SurveyDbAdapter.FormInstanceQuery;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
 import java.util.Date;
 
 public class ResponseListAdapter extends CursorAdapter {
-    public static final int SURVEY_ID_KEY = R.integer.surveyidkey;
-    public static final int RESP_ID_KEY = R.integer.respidkey;
-    public static final int FINISHED_KEY = R.integer.finishedkey;
-    public static final int RECORD_KEY = R.integer.recordkey;
 
-    public ResponseListAdapter(Context context) {
-        super(context, null, false);
+    private final int[] backgrounds = new int[2];
+
+    public ResponseListAdapter(Context activityContext) {
+        super(activityContext.getApplicationContext(), null, false);
+        backgrounds[0] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg1);
+        backgrounds[1] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg2);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final int status = cursor.getInt(FormInstanceQuery.STATUS);
 
-        // Default to 'Submitted' status values
         int icon = 0;
+        // Default to 'Submitted' status values
         String statusText = context.getString(R.string.status_submitted) + ": ";
         long displayDate = cursor.getLong(FormInstanceQuery.SUBMITTED_DATE);
 
@@ -89,25 +90,22 @@ public class ResponseListAdapter extends CursorAdapter {
                 + DateFormat.getTimeFormat(context).format(date));
         TextView headingView = (TextView) view.findViewById(R.id.form_name);
         headingView.setText(cursor.getString(FormInstanceQuery.NAME));
-        view.setTag(SURVEY_ID_KEY, cursor.getLong(FormInstanceQuery.SURVEY_ID));
-        view.setTag(RESP_ID_KEY, cursor.getLong(FormInstanceQuery._ID));
-        view.setTag(RECORD_KEY, cursor.getString(FormInstanceQuery.RECORD_ID));
-        view.setTag(FINISHED_KEY, status != SurveyInstanceStatus.SAVED);
+        view.setTag(ConstantUtil.SURVEY_ID_TAG_KEY, cursor.getLong(FormInstanceQuery.SURVEY_ID));
+        view.setTag(ConstantUtil.RESPONDENT_ID_TAG_KEY, cursor.getLong(FormInstanceQuery._ID));
+        view.setTag(ConstantUtil.READ_ONLY_TAG_KEY, status != SurveyInstanceStatus.SAVED);
         ImageView stsIcon = (ImageView) view.findViewById(R.id.status_img);
         stsIcon.setImageResource(icon);
 
         // Alternate background
-        int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1
-                : R.attr.listitem_bg2;
-        final int res= PlatformUtil.getResource(context, attr);
-        view.setBackgroundResource(res);
+        int backgroundIndex = cursor.getPosition() % 2 == 0 ? 0 : 1;
+        view.setBackgroundResource(backgrounds[backgroundIndex]);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
+        Context activityContext = parent.getContext();
+        LayoutInflater inflater = (LayoutInflater) activityContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         return inflater.inflate(R.layout.submittedrow, parent, false);
     }
-
 }

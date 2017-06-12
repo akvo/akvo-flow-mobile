@@ -37,7 +37,7 @@ import org.akvo.flow.util.ConstantUtil;
 import java.util.ArrayList;
 
 public class BarcodeQuestionViewMultiple extends QuestionView implements
-        BarcodeQuestionAdapter.MultiQuestionListener {
+        BarcodeQuestionAdapter.MultiQuestionListener, ScanButton.ScanButtonListener {
 
     private RecyclerView responses;
     private BarcodeQuestionAdapter barcodeQuestionAdapter;

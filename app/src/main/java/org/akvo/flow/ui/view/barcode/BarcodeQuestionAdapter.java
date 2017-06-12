@@ -29,7 +29,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -44,16 +43,21 @@ public class BarcodeQuestionAdapter
         extends RecyclerView.Adapter<BarcodeQuestionAdapter.ViewHolder> {
 
     private static final int VIEW_TYPE_LAST_ITEM = 0;
-    private static final int VIEW_TYPE_OTHER = 1;
+    private static final int VIEW_TYPE_OTHER = 2;
 
     @NonNull
     private final List<String> barCodes;
 
     @Nullable
-    private final MultiQuestionListener listener;
+    private final MultiQuestionListener multiQuestionListener;
 
-    BarcodeQuestionAdapter(List<String> barCodes, MultiQuestionListener listener) {
-        this.listener = listener;
+    @Nullable
+    private final ScanButton.ScanButtonListener scanButtonListener;
+
+    BarcodeQuestionAdapter(List<String> barCodes,
+            BarcodeQuestionViewMultiple barcodeQuestionViewMultiple) {
+        this.multiQuestionListener = barcodeQuestionViewMultiple;
+        this.scanButtonListener = barcodeQuestionViewMultiple;
         this.barCodes = new ArrayList<>();
         this.barCodes.addAll(barCodes);
         this.barCodes.add(""); //the last item
@@ -80,17 +84,21 @@ public class BarcodeQuestionAdapter
         if (viewType == VIEW_TYPE_LAST_ITEM) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.barcode_item_last, parent, false);
-            return new LastViewHolder(view, listener);
+            return new LastViewHolder(view, scanButtonListener, multiQuestionListener);
         } else {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.barcode_item, parent, false);
-            return new OtherViewHolder(view, listener);
+            return new OtherViewHolder(view, multiQuestionListener);
         }
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.setUpViews(barCodes.get(position), position);
+        if (holder instanceof LastViewHolder) {
+            ((LastViewHolder) holder).setUpViews(barCodes.get(position));
+        } else if (holder instanceof OtherViewHolder) {
+            ((OtherViewHolder) holder).setUpViews(barCodes.get(position), position);
+        }
     }
 
     @Override
@@ -131,40 +139,29 @@ public class BarcodeQuestionAdapter
 
     static abstract class ViewHolder extends RecyclerView.ViewHolder {
 
-        final EditText barcodeEdit;
-        final MultiQuestionListener listener;
-
-        ViewHolder(View itemView, MultiQuestionListener listener) {
+        ViewHolder(View itemView) {
             super(itemView);
-            this.barcodeEdit = (EditText) itemView.findViewById(R.id.input);
-            this.listener = listener;
-        }
-
-        abstract void setUpViews(String text, int position);
-
-        boolean isBarcodeEmpty() {
-            return TextUtils.isEmpty(getBarcodeText());
-        }
-
-        @NonNull
-        String getBarcodeText() {
-            return barcodeEdit.getText().toString();
         }
     }
 
     static class LastViewHolder extends ViewHolder {
 
+        private final EditText barcodeEdit;
         private final ImageButton addButton;
-        private final Button scanButton;
+        private final ScanButton scanButton;
+        private final MultiQuestionListener listener;
 
-        LastViewHolder(View itemView, MultiQuestionListener listener) {
-            super(itemView, listener);
+        LastViewHolder(View itemView, ScanButton.ScanButtonListener scanButtonListener,
+                MultiQuestionListener multiQuestionListener) {
+            super(itemView);
+            this.barcodeEdit = (EditText) itemView.findViewById(R.id.input);
             this.addButton = (ImageButton) itemView.findViewById(R.id.add_btn);
-            this.scanButton = (Button) itemView.findViewById(R.id.scan_btn);
+            this.scanButton = (ScanButton) itemView.findViewById(R.id.scan_btn);
+            this.listener = multiQuestionListener;
+            scanButton.setListener(scanButtonListener);
         }
 
-        @Override
-        void setUpViews(String text, int position) {
+        void setUpViews(String text) {
             barcodeEdit.setText(text);
             barcodeEdit.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -189,15 +186,7 @@ public class BarcodeQuestionAdapter
                 @Override
                 public void onClick(View v) {
                     if (listener != null) {
-                        listener.onQuestionAddTap(getBarcodeText());
-                    }
-                }
-            });
-            scanButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        listener.onScanBarcodeTap();
+                        listener.onQuestionAddTap(barcodeEdit.getText().toString());
                     }
                 }
             });
@@ -206,20 +195,27 @@ public class BarcodeQuestionAdapter
         private void updateAddButton() {
             addButton.setEnabled(!isBarcodeEmpty());
         }
+
+        private boolean isBarcodeEmpty() {
+            return TextUtils.isEmpty(barcodeEdit.getText().toString());
+        }
     }
 
     static class OtherViewHolder extends ViewHolder {
 
+        final EditText barcodeEdit;
         private final TextView positionTextView;
         private final ImageButton deleteButton;
+        private final MultiQuestionListener listener;
 
         OtherViewHolder(View itemView, MultiQuestionListener listener) {
-            super(itemView, listener);
-            positionTextView = (TextView) itemView.findViewById(R.id.order);
-            deleteButton = (ImageButton) itemView.findViewById(R.id.delete);
+            super(itemView);
+            this.barcodeEdit = (EditText) itemView.findViewById(R.id.input);
+            this.positionTextView = (TextView) itemView.findViewById(R.id.order);
+            this.deleteButton = (ImageButton) itemView.findViewById(R.id.delete);
+            this.listener = listener;
         }
 
-        @Override
         void setUpViews(String text, final int position) {
             barcodeEdit.setText(text);
             positionTextView.setText(position + "");
@@ -239,7 +235,5 @@ public class BarcodeQuestionAdapter
         void onQuestionAddTap(String text);
 
         void onQuestionRemoveTap(int position);
-
-        void onScanBarcodeTap();
     }
 }

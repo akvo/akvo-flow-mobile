@@ -20,22 +20,12 @@
 
 package org.akvo.flow.ui.view.barcode;
 
-import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.ui.view.QuestionView;
+abstract class ViewHolder extends RecyclerView.ViewHolder {
 
-public class BarcodeQuestionViewFactory {
-
-    public static QuestionView createBarcodeQuestion(Context context, Question q,
-            SurveyListener surveyListener) {
-        if (surveyListener.isReadOnly()) {
-            return new BarcodeQuestionViewReadOnly(context, q, surveyListener);
-        } else if (q.isAllowMultiple()) {
-            return new BarcodeQuestionViewMultiple(context, q, surveyListener);
-        } else {
-            return new BarcodeQuestionViewSingle(context, q, surveyListener);
-        }
+    ViewHolder(View itemView) {
+        super(itemView);
     }
 }

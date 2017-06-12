@@ -24,7 +24,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
@@ -35,7 +34,8 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
-public class BarcodeQuestionViewSingle extends QuestionView {
+public class BarcodeQuestionViewSingle extends QuestionView implements
+        ScanButton.ScanButtonListener {
 
     private EditText mInputText;
 
@@ -49,8 +49,9 @@ public class BarcodeQuestionViewSingle extends QuestionView {
 
         mInputText = (EditText) findViewById(R.id.input_text);
 
-        Button mScanBtn = (Button) findViewById(R.id.scan_btn);
+        ScanButton mScanBtn = (ScanButton) findViewById(R.id.scan_btn);
         mScanBtn.setEnabled(!isReadOnly());
+        mScanBtn.setListener(this);
 
         boolean isQuestionLocked = mQuestion.isLocked();
 
@@ -62,12 +63,6 @@ public class BarcodeQuestionViewSingle extends QuestionView {
         }
         boolean enableTextInput = !isQuestionLocked && !isReadOnly();
         mInputText.setEnabled(enableTextInput);
-        mScanBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                notifyQuestionListeners(QuestionInteractionEvent.SCAN_BARCODE_EVENT);
-            }
-        });
     }
 
     private void setUpTextWatcher() {
@@ -123,5 +118,10 @@ public class BarcodeQuestionViewSingle extends QuestionView {
         setResponse(new QuestionResponse(builder.toString(), ConstantUtil.VALUE_RESPONSE_TYPE,
                         getQuestion().getId()),
                 suppressListeners);
+    }
+
+    @Override
+    public void onScanBarcodeTap() {
+        notifyQuestionListeners(QuestionInteractionEvent.SCAN_BARCODE_EVENT);
     }
 }

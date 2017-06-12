@@ -20,22 +20,9 @@
 
 package org.akvo.flow.ui.view.barcode;
 
-import android.content.Context;
+interface MultiQuestionListener {
 
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.ui.view.QuestionView;
+    void onQuestionAddTap(String text);
 
-public class BarcodeQuestionViewFactory {
-
-    public static QuestionView createBarcodeQuestion(Context context, Question q,
-            SurveyListener surveyListener) {
-        if (surveyListener.isReadOnly()) {
-            return new BarcodeQuestionViewReadOnly(context, q, surveyListener);
-        } else if (q.isAllowMultiple()) {
-            return new BarcodeQuestionViewMultiple(context, q, surveyListener);
-        } else {
-            return new BarcodeQuestionViewSingle(context, q, surveyListener);
-        }
-    }
+    void onQuestionRemoveTap(int position);
 }

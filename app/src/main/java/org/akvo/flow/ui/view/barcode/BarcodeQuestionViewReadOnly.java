@@ -21,7 +21,6 @@
 package org.akvo.flow.ui.view.barcode;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -29,20 +28,15 @@ import android.text.TextUtils;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionView;
-import org.akvo.flow.util.ConstantUtil;
 
-import java.util.ArrayList;
-
-public class BarcodeQuestionViewMultiple extends QuestionView implements
-        MultiQuestionListener, ScanButton.ScanButtonListener {
+public class BarcodeQuestionViewReadOnly extends QuestionView {
 
     private RecyclerView responses;
-    private EditableBarcodeQuestionAdapter barcodeQuestionAdapter;
+    private ReadOnlyBarcodeQuestionAdapter barcodeQuestionAdapter;
 
-    public BarcodeQuestionViewMultiple(Context context, Question q, SurveyListener surveyListener) {
+    public BarcodeQuestionViewReadOnly(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
         init();
     }
@@ -51,24 +45,10 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
         setQuestionView(R.layout.barcode_question_view_multiple);
         responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
         responses.setLayoutManager(new LinearLayoutManager(getContext()));
-        barcodeQuestionAdapter = new EditableBarcodeQuestionAdapter(new ArrayList<String>(), this,
-                mQuestion.isLocked());
+        barcodeQuestionAdapter = new ReadOnlyBarcodeQuestionAdapter();
         responses.setAdapter(barcodeQuestionAdapter);
     }
 
-    @Override
-    public void questionComplete(Bundle barcodeData) {
-        if (barcodeData != null) {
-            String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
-            barcodeQuestionAdapter.addBarCode(value);
-            captureResponse();
-        }
-    }
-
-    /**
-     * restores the data and turns on the complete icon if the content is
-     * non-null
-     */
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
@@ -79,39 +59,8 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
         }
     }
 
-    /**
-     * clears the file path and the complete icon
-     */
     @Override
-    public void resetQuestion(boolean fireEvent) {
-        super.resetQuestion(fireEvent);
-    }
-
-    /**
-     * pulls the data out of the fields and saves it as a response object,
-     * possibly suppressing listeners
-     */
     public void captureResponse(boolean suppressListeners) {
-        String value = barcodeQuestionAdapter.getBarCodes();
-        setResponse(new QuestionResponse(value, ConstantUtil.VALUE_RESPONSE_TYPE,
-                        getQuestion().getId()),
-                suppressListeners);
-    }
-
-    @Override
-    public void onQuestionAddTap(String text) {
-        barcodeQuestionAdapter.addBarCode(text);
-        captureResponse();
-    }
-
-    @Override
-    public void onQuestionRemoveTap(int position) {
-        barcodeQuestionAdapter.removeBarcode(position);
-        captureResponse();
-    }
-
-    @Override
-    public void onScanBarcodeTap() {
-        notifyQuestionListeners(QuestionInteractionEvent.SCAN_BARCODE_EVENT);
+        //EMPTY
     }
 }

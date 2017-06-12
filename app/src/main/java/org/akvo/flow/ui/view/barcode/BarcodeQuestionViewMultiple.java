@@ -18,22 +18,27 @@
  *
  */
 
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.view.barcode;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
+
+import java.util.ArrayList;
 
 public class BarcodeQuestionViewMultiple extends QuestionView {
 
-    private boolean mMultiple;
     private RecyclerView responses;
+    private BarcodeQuestionAdapter barcodeQuestionAdapter;
 
     public BarcodeQuestionViewMultiple(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -42,23 +47,21 @@ public class BarcodeQuestionViewMultiple extends QuestionView {
 
     private void init() {
         setQuestionView(R.layout.barcode_question_view_multiple);
-
-        mMultiple = getQuestion().isAllowMultiple();
-
-        responses = (RecyclerView)findViewById(R.id.responses_recycler_view);
-
+        responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
+        responses.setLayoutManager(new LinearLayoutManager(getContext()));
+        barcodeQuestionAdapter = new BarcodeQuestionAdapter(new ArrayList<String>(), this);
+        responses.setAdapter(barcodeQuestionAdapter);
     }
-
 
     @Override
     public void questionComplete(Bundle barcodeData) {
         if (barcodeData != null) {
             String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
-//            if (mMultiple) {
-//                addValue(value);
-//            } else {
-//                mInputText.setText(value);
-//            }
+            //            if (mMultiple) {
+            //                addValue(value);
+            //            } else {
+            //                mInputText.setText(value);
+            //            }
             captureResponse();
         }
     }
@@ -70,6 +73,11 @@ public class BarcodeQuestionViewMultiple extends QuestionView {
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
+        String answer = resp != null ? resp.getValue() : null;
+        if (!TextUtils.isEmpty(answer)) {
+            String[] values = answer.split("\\|", -1);
+            barcodeQuestionAdapter.addBarCodes(values);
+        }
     }
 
     /**
@@ -85,25 +93,10 @@ public class BarcodeQuestionViewMultiple extends QuestionView {
      * possibly suppressing listeners
      */
     public void captureResponse(boolean suppressListeners) {
-        StringBuilder builder = new StringBuilder();
-//        if (mMultiple) {
-//            for (int i = 0; i < mInputContainer.getChildCount(); i++) {
-//                View v = mInputContainer.getChildAt(i);
-//                String value = ((EditText) v.findViewById(R.id.input)).getText().toString();
-//                if (!TextUtils.isEmpty(value)) {
-//                    builder.append(value);
-//                    if (i < mInputContainer.getChildCount() - 1) {
-//                        builder.append("|");
-//                    }
-//                }
-//            }
-//        }
-//        String value = mInputText.getText().toString();
-//        if (!TextUtils.isEmpty(value)) {
-//            builder.append(value);
-//        }
-        setResponse(new QuestionResponse(builder.toString(), ConstantUtil.VALUE_RESPONSE_TYPE,
+        String value = barcodeQuestionAdapter.getBarCodes();
+        setResponse(new QuestionResponse(value, ConstantUtil.VALUE_RESPONSE_TYPE,
                         getQuestion().getId()),
                 suppressListeners);
     }
+
 }

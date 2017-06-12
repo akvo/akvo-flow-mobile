@@ -18,13 +18,11 @@
  *
  */
 
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.view.barcode;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +32,7 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.lang.ref.WeakReference;
@@ -76,7 +75,7 @@ public class BarcodeQuestionViewSingle extends QuestionView {
     private void setUpTextWatcher() {
         boolean isReadOnly = isReadOnly();
         if (!isReadOnly) {
-            mInputText.addTextChangedListener(new ResponseInputWatcher(this));
+            mInputText.addTextChangedListener(new ResponseInputWatcher(new WeakReference<>(this)));
         }
     }
 
@@ -126,38 +125,5 @@ public class BarcodeQuestionViewSingle extends QuestionView {
         setResponse(new QuestionResponse(builder.toString(), ConstantUtil.VALUE_RESPONSE_TYPE,
                         getQuestion().getId()),
                 suppressListeners);
-    }
-
-    private static class ResponseInputWatcher implements TextWatcher {
-
-        private final WeakReference<QuestionView> questionViewWeakReference;
-
-        private boolean ignoreEmptyInput = false;
-
-        private ResponseInputWatcher(QuestionView questionView) {
-            this.questionViewWeakReference = new WeakReference<>(questionView);
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // EMPTY
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (before == 0 && count == 0) {
-                ignoreEmptyInput = true;
-            } else {
-                ignoreEmptyInput = false;
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            QuestionView questionView = questionViewWeakReference.get();
-            if (!ignoreEmptyInput && questionView != null) {
-                questionView.captureResponse();
-            }
-        }
     }
 }

@@ -16,8 +16,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:enabled="false"
-                android:focusable="false"
                 android:singleLine="true"
                 />
 
@@ -30,7 +28,6 @@
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_add"/>
-
 
     </LinearLayout>
 

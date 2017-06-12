@@ -18,12 +18,13 @@
  *
  */
 
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.view.barcode;
 
 import android.content.Context;
 
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.view.QuestionView;
 
 public class BarcodeQuestionViewFactory {
 

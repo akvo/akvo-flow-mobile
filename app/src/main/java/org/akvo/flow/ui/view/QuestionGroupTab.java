@@ -35,6 +35,7 @@ import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewFactory;
 import org.akvo.flow.ui.view.option.OptionQuestionFactory;
 import org.akvo.flow.util.ConstantUtil;
 

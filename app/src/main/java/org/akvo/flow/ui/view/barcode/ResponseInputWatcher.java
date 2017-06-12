@@ -33,8 +33,8 @@ public class ResponseInputWatcher implements TextWatcher {
 
     private boolean ignoreEmptyInput = false;
 
-    public ResponseInputWatcher(WeakReference<QuestionView> questionViewWeakReference) {
-        this.questionViewWeakReference = questionViewWeakReference;
+    public ResponseInputWatcher(QuestionView questionViewWeakReference) {
+        this.questionViewWeakReference = new WeakReference<>(questionViewWeakReference);
     }
 
     @Override

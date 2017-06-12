@@ -29,13 +29,15 @@ import android.text.TextUtils;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 
-public class BarcodeQuestionViewMultiple extends QuestionView {
+public class BarcodeQuestionViewMultiple extends QuestionView implements
+        BarcodeQuestionAdapter.MultiQuestionListener {
 
     private RecyclerView responses;
     private BarcodeQuestionAdapter barcodeQuestionAdapter;
@@ -57,11 +59,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView {
     public void questionComplete(Bundle barcodeData) {
         if (barcodeData != null) {
             String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
-            //            if (mMultiple) {
-            //                addValue(value);
-            //            } else {
-            //                mInputText.setText(value);
-            //            }
+            barcodeQuestionAdapter.addBarCode(value);
             captureResponse();
         }
     }
@@ -99,4 +97,20 @@ public class BarcodeQuestionViewMultiple extends QuestionView {
                 suppressListeners);
     }
 
+    @Override
+    public void onQuestionAddTap(String text) {
+        barcodeQuestionAdapter.addBarCode(text);
+        captureResponse();
+    }
+
+    @Override
+    public void onQuestionRemoveTap(int position) {
+        barcodeQuestionAdapter.removeBarcode(position);
+        captureResponse();
+    }
+
+    @Override
+    public void onScanBarcodeTap() {
+        notifyQuestionListeners(QuestionInteractionEvent.SCAN_BARCODE_EVENT);
+    }
 }

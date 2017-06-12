@@ -35,8 +35,6 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.lang.ref.WeakReference;
-
 public class BarcodeQuestionViewSingle extends QuestionView {
 
     private EditText mInputText;
@@ -75,7 +73,7 @@ public class BarcodeQuestionViewSingle extends QuestionView {
     private void setUpTextWatcher() {
         boolean isReadOnly = isReadOnly();
         if (!isReadOnly) {
-            mInputText.addTextChangedListener(new ResponseInputWatcher(new WeakReference<>(this)));
+            mInputText.addTextChangedListener(new ResponseInputWatcher(this));
         }
     }
 

@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.4.1
+Date: 13 June 2017
+
+# Resolved issues
+* **Cookstoves and Biogas app icon is wrong** - [#757](https://github.com/akvo/akvo-flow-mobile/issues/757) Restored both app icons to the correct one.
+
+---------------
 # ver 2.3.4
 Date: 08 June 2017
 

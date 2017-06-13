@@ -42,8 +42,8 @@ public class BarcodeQuestionAdapterEditable extends
         RecyclerView.Adapter<ViewHolder> {
 
     private static final int VIEW_TYPE_LAST_ITEM = 0;
-    private static final int VIEW_TYPE_LAST_ITEM_LOCKED = 1;
-    private static final int VIEW_TYPE_OTHER = 2;
+//    private static final int VIEW_TYPE_LAST_ITEM_LOCKED = 1;
+//    private static final int VIEW_TYPE_OTHER = 2;
 
     @NonNull
     private final List<String> barCodes = new ArrayList<>();
@@ -62,7 +62,7 @@ public class BarcodeQuestionAdapterEditable extends
         this.scanButtonListener = barcodeQuestionViewMultiple;
         this.isLocked = isLocked;
         this.barCodes.addAll(barCodes);
-        this.barCodes.add("");
+//        this.barCodes.add("");
     }
 
     void addBarCode(String barcode) {
@@ -75,26 +75,30 @@ public class BarcodeQuestionAdapterEditable extends
     public ViewHolder onCreateViewHolder(ViewGroup parent,
             int viewType) {
         View view;
-        if (viewType == VIEW_TYPE_LAST_ITEM) {
-            view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.barcode_item_last, parent, false);
-            return new LastViewHolder(view, scanButtonListener, multiQuestionListener);
-        } else if (viewType == VIEW_TYPE_LAST_ITEM_LOCKED) {
-            view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.barcode_item_last_locked, parent, false);
-            return new LastViewHolderLocked(view, scanButtonListener);
-        } else {
-            view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.barcode_item, parent, false);
-            return new OtherViewHolder(view, multiQuestionListener);
-        }
+//        if (viewType == VIEW_TYPE_LAST_ITEM) {
+//            view = LayoutInflater.from(parent.getContext())
+//                    .inflate(R.layout.barcode_question_input, parent, false);
+//            return new LastViewHolder(view, scanButtonListener, multiQuestionListener);
+//        } else if (viewType == VIEW_TYPE_LAST_ITEM_LOCKED) {
+//            view = LayoutInflater.from(parent.getContext())
+//                    .inflate(R.layout.barcode_item_last_locked, parent, false);
+//            return new LastViewHolderLocked(view, scanButtonListener);
+//        } else {
+//            view = LayoutInflater.from(parent.getContext())
+//                    .inflate(R.layout.barcode_item, parent, false);
+//            return new OtherViewHolder(view, multiQuestionListener);
+//        }
+        view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.barcode_item, parent, false);
+                    return new OtherViewHolder(view, multiQuestionListener);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (holder instanceof LastViewHolder) {
-            ((LastViewHolder) holder).setUpViews(barCodes.get(position));
-        } else if (holder instanceof OtherViewHolder) {
+//        if (holder instanceof LastViewHolder) {
+//            ((LastViewHolder) holder).setUpViews(barCodes.get(position));
+//        } else
+            if (holder instanceof OtherViewHolder) {
             ((OtherViewHolder) holder).setUpViews(barCodes.get(position), position);
         }
     }
@@ -104,14 +108,14 @@ public class BarcodeQuestionAdapterEditable extends
         return barCodes.size();
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        boolean isLastItem = position == getItemCount() - 1;
-        if (isLastItem) {
-            return isLocked ? VIEW_TYPE_LAST_ITEM_LOCKED : VIEW_TYPE_LAST_ITEM;
-        }
-        return VIEW_TYPE_OTHER;
-    }
+//    @Override
+//    public int getItemViewType(int position) {
+//        boolean isLastItem = position == getItemCount() - 1;
+//        if (isLastItem) {
+//            return isLocked ? VIEW_TYPE_LAST_ITEM_LOCKED : VIEW_TYPE_LAST_ITEM;
+//        }
+//        return VIEW_TYPE_OTHER;
+//    }
 
     String getBarCodes() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -130,9 +134,9 @@ public class BarcodeQuestionAdapterEditable extends
         if (position < barCodes.size()) {
             barCodes.remove(position);
         }
-        if (barCodes.size() == 0) {
-            barCodes.add("");
-        }
+//        if (barCodes.size() == 0) {
+//            barCodes.add("");
+//        }
         notifyDataSetChanged();
     }
 
@@ -146,7 +150,7 @@ public class BarcodeQuestionAdapterEditable extends
 
     void clearAll() {
         barCodes.clear();
-        barCodes.add("");
+//        barCodes.add("");
         notifyDataSetChanged();
     }
 

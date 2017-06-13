@@ -18,12 +18,10 @@
  *
  */
 
-package org.akvo.flow.ui.view.barcode;
+package org.akvo.flow.ui.view;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-
-import org.akvo.flow.ui.view.QuestionView;
 
 import java.lang.ref.WeakReference;
 
@@ -44,11 +42,7 @@ public class ResponseInputWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (before == 0 && count == 0) {
-            ignoreEmptyInput = true;
-        } else {
-            ignoreEmptyInput = false;
-        }
+        ignoreEmptyInput = before == 0 && count == 0;
     }
 
     @Override

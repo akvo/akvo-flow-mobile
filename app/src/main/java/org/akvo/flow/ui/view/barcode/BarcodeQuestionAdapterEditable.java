@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EditableBarcodeQuestionAdapter extends
+public class BarcodeQuestionAdapterEditable extends
         RecyclerView.Adapter<ViewHolder> {
 
     private static final int VIEW_TYPE_LAST_ITEM = 0;
@@ -56,13 +56,13 @@ public class EditableBarcodeQuestionAdapter extends
 
     private final boolean isLocked;
 
-    EditableBarcodeQuestionAdapter(List<String> barCodes,
+    BarcodeQuestionAdapterEditable(List<String> barCodes,
             BarcodeQuestionViewMultiple barcodeQuestionViewMultiple, boolean isLocked) {
         this.multiQuestionListener = barcodeQuestionViewMultiple;
         this.scanButtonListener = barcodeQuestionViewMultiple;
         this.isLocked = isLocked;
         this.barCodes.addAll(barCodes);
-        this.barCodes.add(""); //the last item
+        this.barCodes.add("");
     }
 
     void addBarCode(String barcode) {
@@ -79,7 +79,7 @@ public class EditableBarcodeQuestionAdapter extends
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.barcode_item_last, parent, false);
             return new LastViewHolder(view, scanButtonListener, multiQuestionListener);
-        } else if (viewType == VIEW_TYPE_LAST_ITEM) {
+        } else if (viewType == VIEW_TYPE_LAST_ITEM_LOCKED) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.barcode_item_last_locked, parent, false);
             return new LastViewHolderLocked(view, scanButtonListener);
@@ -142,6 +142,12 @@ public class EditableBarcodeQuestionAdapter extends
         }
         this.barCodes.addAll(0, Arrays.asList(barCodes));
         this.notifyDataSetChanged();
+    }
+
+    void clearAll() {
+        barCodes.clear();
+        barCodes.add("");
+        notifyDataSetChanged();
     }
 
     static class LastViewHolder extends ViewHolder {

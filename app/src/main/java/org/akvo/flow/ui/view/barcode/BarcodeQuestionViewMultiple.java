@@ -21,6 +21,7 @@
 package org.akvo.flow.ui.view.barcode;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +34,7 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
 
@@ -40,7 +42,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
         MultiQuestionListener, ScanButton.ScanButtonListener {
 
     private RecyclerView responses;
-    private EditableBarcodeQuestionAdapter barcodeQuestionAdapter;
+    private BarcodeQuestionAdapterEditable barcodeQuestionAdapter;
 
     public BarcodeQuestionViewMultiple(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -51,7 +53,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
         setQuestionView(R.layout.barcode_question_view_multiple);
         responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
         responses.setLayoutManager(new LinearLayoutManager(getContext()));
-        barcodeQuestionAdapter = new EditableBarcodeQuestionAdapter(new ArrayList<String>(), this,
+        barcodeQuestionAdapter = new BarcodeQuestionAdapterEditable(new ArrayList<String>(), this,
                 mQuestion.isLocked());
         responses.setAdapter(barcodeQuestionAdapter);
     }
@@ -65,10 +67,6 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
         }
     }
 
-    /**
-     * restores the data and turns on the complete icon if the content is
-     * non-null
-     */
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
@@ -79,12 +77,10 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
         }
     }
 
-    /**
-     * clears the file path and the complete icon
-     */
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
+        barcodeQuestionAdapter.clearAll();
     }
 
     /**
@@ -105,9 +101,17 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     }
 
     @Override
-    public void onQuestionRemoveTap(int position) {
-        barcodeQuestionAdapter.removeBarcode(position);
-        captureResponse();
+    public void onQuestionRemoveTap(final int position) {
+        ViewUtil.showConfirmDialog(R.string.deleteresponse, R.string.clear_value_msg,
+                getContext(), true,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        barcodeQuestionAdapter.removeBarcode(position);
+                        captureResponse();
+                    }
+                });
+
     }
 
     @Override

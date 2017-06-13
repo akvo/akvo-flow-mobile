@@ -29,7 +29,7 @@ import org.akvo.flow.R;
 
 class OtherViewHolder extends ViewHolder {
 
-    final EditText barcodeEdit;
+    private final EditText barcodeEdit;
     private final TextView positionTextView;
     private final ImageButton deleteButton;
     private final MultiQuestionListener listener;

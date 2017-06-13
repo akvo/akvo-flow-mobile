@@ -34,7 +34,7 @@ import org.akvo.flow.ui.view.QuestionView;
 public class BarcodeQuestionViewReadOnly extends QuestionView {
 
     private RecyclerView responses;
-    private ReadOnlyBarcodeQuestionAdapter barcodeQuestionAdapter;
+    private BarcodeQuestionAdapterReadOnly barcodeQuestionAdapter;
 
     public BarcodeQuestionViewReadOnly(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -45,7 +45,7 @@ public class BarcodeQuestionViewReadOnly extends QuestionView {
         setQuestionView(R.layout.barcode_question_view_multiple);
         responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
         responses.setLayoutManager(new LinearLayoutManager(getContext()));
-        barcodeQuestionAdapter = new ReadOnlyBarcodeQuestionAdapter();
+        barcodeQuestionAdapter = new BarcodeQuestionAdapterReadOnly();
         responses.setAdapter(barcodeQuestionAdapter);
     }
 

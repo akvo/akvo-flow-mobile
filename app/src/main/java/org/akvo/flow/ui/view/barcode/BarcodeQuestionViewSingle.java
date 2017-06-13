@@ -32,6 +32,7 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.ResponseInputWatcher;
 import org.akvo.flow.util.ConstantUtil;
 
 public class BarcodeQuestionViewSingle extends QuestionView implements

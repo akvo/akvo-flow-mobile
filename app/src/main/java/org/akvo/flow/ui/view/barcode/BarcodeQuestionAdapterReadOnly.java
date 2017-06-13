@@ -35,11 +35,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ReadOnlyBarcodeQuestionAdapter
-        extends RecyclerView.Adapter<ReadOnlyBarcodeQuestionAdapter.ReadOnlyViewHolder> {
+public class BarcodeQuestionAdapterReadOnly
+        extends RecyclerView.Adapter<BarcodeQuestionAdapterReadOnly.ReadOnlyViewHolder> {
 
     @NonNull
-    final List<String> barCodes = new ArrayList<>();
+    private final List<String> barCodes = new ArrayList<>();
 
     void addBarCodes(@Nullable String[] barCodes) {
         if (barCodes == null || barCodes.length == 0) {

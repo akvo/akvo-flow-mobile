@@ -55,6 +55,7 @@ public class GeoInputContainer extends LinearLayout {
     private EditText longitudeInput;
     private EditText elevationInput;
     private TextView statusIndicator;
+    private boolean disableWatchers;
 
     public GeoInputContainer(Context context) {
         this(context, null);
@@ -128,7 +129,15 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     void setTextWatchers(GeoQuestionView geoQuestionView) {
-        ResponseInputWatcher responseInputWatcher = new ResponseInputWatcher(geoQuestionView);
+        ResponseInputWatcher responseInputWatcher = new ResponseInputWatcher(geoQuestionView) {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (disableWatchers) {
+                    return;
+                }
+                super.afterTextChanged(s);
+            }
+        };
         latitudeInput.addTextChangedListener(responseInputWatcher);
         longitudeInput.addTextChangedListener(responseInputWatcher);
         elevationInput.addTextChangedListener(responseInputWatcher);
@@ -174,6 +183,7 @@ public class GeoInputContainer extends LinearLayout {
 
     void displayCoordinates(@NonNull String latitude, @NonNull String longitude,
             @Nullable String altitude) {
+        disableWatchers = true;
         latitudeInput.setText(latitude);
         longitudeInput.setText(longitude);
         if (altitude != null) {
@@ -181,6 +191,7 @@ public class GeoInputContainer extends LinearLayout {
         } else {
             elevationInput.setText("");
         }
+        disableWatchers = false;
     }
 
     void showCoordinatesAccurate() {
@@ -252,7 +263,8 @@ public class GeoInputContainer extends LinearLayout {
         }
     }
 
-    public interface GeoInputTextWatcherListener {
+    interface GeoInputTextWatcherListener {
+
         void validateCoordinate();
     }
 }

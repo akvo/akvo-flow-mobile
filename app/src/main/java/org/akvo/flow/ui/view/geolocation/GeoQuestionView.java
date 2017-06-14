@@ -224,6 +224,16 @@ public class GeoQuestionView extends QuestionView
         //EMPTY
     }
 
+    /**
+     * clears the file path and the complete icon
+     */
+    @Override
+    public void resetQuestion(boolean fireEvent) {
+        super.resetQuestion(fireEvent);
+        resetResponseValues();
+        geoInputContainer.displayCoordinates("", "", "");
+    }
+
     @Override
     public void onLocationReady(double latitude, double longitude, double altitude,
             float accuracy) {

@@ -39,8 +39,7 @@ import org.akvo.flow.util.ViewUtil;
 import java.util.ArrayList;
 
 public class BarcodeQuestionViewMultiple extends QuestionView implements
-        RemoveButtonListener, ScanButtonListener,
-        BarcodeQuestionInput.AddButtonListener {
+        RemoveButtonListener, ScanButtonListener, BarcodeQuestionInput.AddButtonListener {
 
     private RecyclerView responses;
     private BarcodeQuestionAdapter barcodeQuestionAdapter;
@@ -73,7 +72,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     public void questionComplete(Bundle barcodeData) {
         if (barcodeData != null) {
             String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
-            barcodeQuestionAdapter.addBarCode(value);
+            barcodeQuestionAdapter.addBarcode(value);
             captureResponse();
         }
     }
@@ -84,14 +83,14 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
         String answer = resp != null ? resp.getValue() : null;
         if (!TextUtils.isEmpty(answer)) {
             String[] values = answer.split("\\|", -1);
-            barcodeQuestionAdapter.addBarCodes(values);
+            barcodeQuestionAdapter.addBarcodes(values);
         }
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        barcodeQuestionAdapter.clearAll();
+        barcodeQuestionAdapter.removeBarcodes();
         questionInput.setBarcodeText("");
     }
 
@@ -100,7 +99,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
      * possibly suppressing listeners
      */
     public void captureResponse(boolean suppressListeners) {
-        String value = barcodeQuestionAdapter.getBarCodes();
+        String value = barcodeQuestionAdapter.getBarcodes();
         setResponse(new QuestionResponse(value, ConstantUtil.VALUE_RESPONSE_TYPE,
                         getQuestion().getId()),
                 suppressListeners);
@@ -108,7 +107,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
 
     @Override
     public void onQuestionAddTap(String text) {
-        barcodeQuestionAdapter.addBarCode(text);
+        barcodeQuestionAdapter.addBarcode(text);
         questionInput.setBarcodeText("");
         captureResponse();
     }

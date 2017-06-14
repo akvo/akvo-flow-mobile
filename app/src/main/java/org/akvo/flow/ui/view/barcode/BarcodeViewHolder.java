@@ -33,26 +33,26 @@ class BarcodeViewHolder extends RecyclerView.ViewHolder {
     private final EditText barcodeEdit;
     private final TextView positionTextView;
     private final ImageButton deleteButton;
-    private final RemoveButtonListener listener;
+    private final RemoveButtonListener removeButtonListener;
 
-    BarcodeViewHolder(View itemView, RemoveButtonListener listener) {
+    BarcodeViewHolder(View itemView, RemoveButtonListener removeButtonListener) {
         super(itemView);
         this.barcodeEdit = (EditText) itemView.findViewById(R.id.input);
         this.positionTextView = (TextView) itemView.findViewById(R.id.order);
         this.deleteButton = (ImageButton) itemView.findViewById(R.id.delete);
-        this.listener = listener;
+        this.removeButtonListener = removeButtonListener;
     }
 
     void setUpViews(String text, final int position) {
         barcodeEdit.setText(text);
         positionTextView.setText(position + 1 + "");
-        if (listener != null) {
+        if (removeButtonListener != null) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (listener != null) {
-                        listener.onQuestionRemoveTap(position);
+                    if (removeButtonListener != null) {
+                        removeButtonListener.onQuestionRemoveTap(position);
                     }
                 }
             });

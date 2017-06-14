@@ -34,45 +34,52 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BarcodeQuestionAdapter extends RecyclerView.Adapter<BarcodeViewHolder> {
+class BarcodeQuestionAdapter extends RecyclerView.Adapter<BarcodeViewHolder> {
 
     @NonNull
-    private final List<String> barCodes = new ArrayList<>();
+    private final List<String> barcodes = new ArrayList<>();
 
     @Nullable
-    private final RemoveButtonListener multiQuestionListener;
+    private final RemoveButtonListener removeButtonListener;
 
-    BarcodeQuestionAdapter(List<String> barCodes, RemoveButtonListener removeButtonListener) {
-        this.multiQuestionListener = removeButtonListener;
-        this.barCodes.addAll(barCodes);
-    }
-
-    void addBarCode(String barcode) {
-        this.barCodes.add(barcode);
-        this.notifyDataSetChanged();
+    BarcodeQuestionAdapter(List<String> barcodes, RemoveButtonListener removeButtonListener) {
+        this.removeButtonListener = removeButtonListener;
+        this.barcodes.addAll(barcodes);
     }
 
     @Override
-    public BarcodeViewHolder onCreateViewHolder(ViewGroup parent,
-            int viewType) {
+    public BarcodeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.barcode_item, parent, false);
-        return new BarcodeViewHolder(view, multiQuestionListener);
+        return new BarcodeViewHolder(view, removeButtonListener);
     }
 
     @Override
     public void onBindViewHolder(BarcodeViewHolder holder, int position) {
-        holder.setUpViews(barCodes.get(position), position);
+        holder.setUpViews(barcodes.get(position), position);
     }
 
     @Override
     public int getItemCount() {
-        return barCodes.size();
+        return barcodes.size();
     }
 
-    String getBarCodes() {
+    void addBarcode(String barcode) {
+        this.barcodes.add(barcode);
+        this.notifyDataSetChanged();
+    }
+
+    void addBarcodes(@Nullable String[] barcodes) {
+        if (barcodes == null || barcodes.length == 0) {
+            return;
+        }
+        this.barcodes.addAll(Arrays.asList(barcodes));
+        this.notifyDataSetChanged();
+    }
+
+    String getBarcodes() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (String barcode : barCodes) {
+        for (String barcode : barcodes) {
             if (!TextUtils.isEmpty(barcode)) {
                 if (stringBuilder.length() > 0) {
                     stringBuilder.append("|");
@@ -84,22 +91,14 @@ public class BarcodeQuestionAdapter extends RecyclerView.Adapter<BarcodeViewHold
     }
 
     void removeBarcode(int position) {
-        if (position < barCodes.size()) {
-            barCodes.remove(position);
+        if (position < barcodes.size()) {
+            barcodes.remove(position);
         }
         notifyDataSetChanged();
     }
 
-    void addBarCodes(@Nullable String[] barCodes) {
-        if (barCodes == null || barCodes.length == 0) {
-            return;
-        }
-        this.barCodes.addAll(0, Arrays.asList(barCodes));
-        this.notifyDataSetChanged();
-    }
-
-    void clearAll() {
-        barCodes.clear();
+    void removeBarcodes() {
+        barcodes.clear();
         notifyDataSetChanged();
     }
 }

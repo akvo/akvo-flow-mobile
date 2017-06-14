@@ -57,7 +57,7 @@ public class BarcodeQuestionViewReadOnly extends QuestionView {
         String answer = resp != null ? resp.getValue() : null;
         if (!TextUtils.isEmpty(answer)) {
             String[] values = answer.split("\\|", -1);
-            barcodeQuestionAdapter.addBarCodes(values);
+            barcodeQuestionAdapter.addBarcodes(values);
         }
     }
 

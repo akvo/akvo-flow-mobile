@@ -255,7 +255,7 @@ Sem espaço para armazenamento
   <string name="drawer_open">Desenhador aberto</string>
   <string name="drawer_close">Desenhador fechado</string>
   <!--settings activity-->
-  <string name="settings_app_update_title">Verificar actualizações</string>
+  <string name="about_view_update">Verificar actualizações</string>
   <string name="settings_app_update_description">Verifique se existe uma versão mais recente do Akvo Flow.</string>
   <!--app update service-->
   <string name="apk_update_service_no_update">Você já tem a versão mais recente do aplicativo.</string>

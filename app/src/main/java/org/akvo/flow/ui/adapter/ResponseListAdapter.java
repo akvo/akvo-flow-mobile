@@ -39,16 +39,20 @@ import java.util.Date;
 
 public class ResponseListAdapter extends CursorAdapter {
 
-    public ResponseListAdapter(Context context) {
-        super(context, null, false);
+    private final int[] backgrounds = new int[2];
+
+    public ResponseListAdapter(Context activityContext) {
+        super(activityContext.getApplicationContext(), null, false);
+        backgrounds[0] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg1);
+        backgrounds[1] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg2);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final int status = cursor.getInt(FormInstanceQuery.STATUS);
 
-        // Default to 'Submitted' status values
         int icon = 0;
+        // Default to 'Submitted' status values
         String statusText = context.getString(R.string.status_submitted) + ": ";
         long displayDate = cursor.getLong(FormInstanceQuery.SUBMITTED_DATE);
 
@@ -93,17 +97,15 @@ public class ResponseListAdapter extends CursorAdapter {
         stsIcon.setImageResource(icon);
 
         // Alternate background
-        int attr = cursor.getPosition() % 2 == 0 ? R.attr.listitem_bg1
-                : R.attr.listitem_bg2;
-        final int res= PlatformUtil.getResource(context, attr);
-        view.setBackgroundResource(res);
+        int backgroundIndex = cursor.getPosition() % 2 == 0 ? 0 : 1;
+        view.setBackgroundResource(backgrounds[backgroundIndex]);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
+        Context activityContext = parent.getContext();
+        LayoutInflater inflater = (LayoutInflater) activityContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         return inflater.inflate(R.layout.submittedrow, parent, false);
     }
-
 }

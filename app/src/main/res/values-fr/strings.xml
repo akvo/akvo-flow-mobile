@@ -252,7 +252,7 @@
   <string name="drawer_open">Menu ouvert</string>
   <string name="drawer_close">Menu fermé</string>
   <!--settings activity-->
-  <string name="settings_app_update_title">Vérifier les mises à jour</string>
+  <string name="about_view_update">Vérifier les mises à jour</string>
   <string name="settings_app_update_description">Vérifier s\'il existe une version plus récente de Akvo Flow.</string>
   <!--app update service-->
   <string name="apk_update_service_no_update">Vous avez déjà la dernière version de l\'application.</string>

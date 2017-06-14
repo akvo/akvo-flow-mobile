@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,25 +18,13 @@
  *
  */
 
-package org.akvo.flow.data.loader;
+package org.akvo.flow.presentation.legal.views.apache;
 
-import android.content.Context;
-import android.database.Cursor;
+import org.akvo.flow.presentation.legal.views.LicenseDetail;
 
-import org.akvo.flow.data.loader.base.DataLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+public class AndroidOSPItem extends LicenseDetail {
 
-public class SurveyInstanceLoader extends DataLoader<Cursor> {
-    private String mSurveyedLocaleId;
-
-    public SurveyInstanceLoader(Context context, SurveyDbAdapter db,  String surveyedLocaleId) {
-        super(context, db);
-        mSurveyedLocaleId = surveyedLocaleId;
+    public AndroidOSPItem() {
+        super("Android Open Source Project", "https://source.android.com/source/licenses");
     }
-
-    @Override
-    public Cursor loadData(SurveyDbAdapter database) {
-        return database.getFormInstances(mSurveyedLocaleId);
-    }
-
 }

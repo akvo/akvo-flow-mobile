@@ -41,11 +41,13 @@ import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.RecordTabsAdapter;
 import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
+import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
-public class RecordActivity extends BackActivity implements SurveyListListener {
+public class RecordActivity extends BackActivity implements SurveyListListener,
+        ResponseListFragment.ResponseListListener {
 
     private static final int REQUEST_FORM = 0;
 
@@ -70,8 +72,6 @@ public class RecordActivity extends BackActivity implements SurveyListListener {
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(
                 ConstantUtil.SURVEY_GROUP_EXTRA);
-        setTitle(mSurveyGroup.getName());
-
         setupToolBar();
     }
 
@@ -92,15 +92,18 @@ public class RecordActivity extends BackActivity implements SurveyListListener {
         mDatabase.open();
 
         mUser = FlowApp.getApp().getUser();
+
+        updateRecordTitle();
+    }
+
+    private void updateRecordTitle() {
         // Record might have changed while answering a registration survey
         String recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID_EXTRA);
         mRecord = mDatabase.getSurveyedLocale(recordId);
-        displayRecord();
-    }
-
-    private void displayRecord() {
         if (mRecord != null) {
             setTitle(mRecord.getDisplayName(this));
+        } else {
+            setTitle(getString(R.string.unknown));
         }
     }
 
@@ -144,6 +147,11 @@ public class RecordActivity extends BackActivity implements SurveyListListener {
 
     private String getRecordId() {
         return mRecord == null ? "" : mRecord.getId();
+    }
+
+    @Override
+    public void onNamedRecordDeleted() {
+        updateRecordTitle();
     }
 
     // ==================================== //

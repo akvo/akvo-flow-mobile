@@ -20,9 +20,31 @@
 
 package org.akvo.flow.ui.view.barcode;
 
-interface MultiQuestionListener {
+import android.content.Context;
+import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 
-    void onQuestionAddTap(String text);
+public class SingleLockedBarcodeQuestionInput extends LockedBarcodeQuestionInput {
 
-    void onQuestionRemoveTap(int position);
+    public SingleLockedBarcodeQuestionInput(Context context) {
+        this(context, null);
+    }
+
+    public SingleLockedBarcodeQuestionInput(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    @Override
+    void initViews() {
+        super.initViews();
+        barcodeEdit.setVisibility(VISIBLE);
+        barcodeEdit.setEnabled(false);
+        barcodeEdit.setFocusable(false);
+        barcodeEdit.setHint("");
+    }
+
+    @Override
+    void setBarcodeText(String value) {
+        barcodeEdit.setText(value);
+    }
 }

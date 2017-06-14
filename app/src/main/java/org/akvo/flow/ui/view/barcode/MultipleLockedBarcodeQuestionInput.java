@@ -20,12 +20,28 @@
 
 package org.akvo.flow.ui.view.barcode;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
+import android.content.Context;
+import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 
-abstract class ViewHolder extends RecyclerView.ViewHolder {
+public class MultipleLockedBarcodeQuestionInput extends LockedBarcodeQuestionInput {
 
-    ViewHolder(View itemView) {
-        super(itemView);
+    public MultipleLockedBarcodeQuestionInput(Context context) {
+        this(context, null);
+    }
+
+    public MultipleLockedBarcodeQuestionInput(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    @Override
+    void initViews() {
+        super.initViews();
+        barcodeEdit.setVisibility(GONE);
+    }
+
+    @Override
+    void setBarcodeText(String value) {
+       // EMPTY
     }
 }

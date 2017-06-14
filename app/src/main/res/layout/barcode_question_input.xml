@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
@@ -18,6 +19,8 @@
                 android:layout_weight="1"
                 android:hint="@string/type_code"
                 android:singleLine="true"
+                android:visibility="gone"
+                tools:visibility="visible"
                 />
 
         <ImageButton
@@ -29,6 +32,8 @@
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
                 android:enabled="false"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:src="@drawable/ic_add_box"/>
 
     </LinearLayout>
@@ -41,6 +46,8 @@
             android:text="@string/or"
             android:textColor="@color/black_disabled"
             android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible"
             />
 
     <org.akvo.flow.ui.view.barcode.ScanButton

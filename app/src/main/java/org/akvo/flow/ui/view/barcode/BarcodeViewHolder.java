@@ -20,6 +20,7 @@
 
 package org.akvo.flow.ui.view.barcode;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -27,14 +28,14 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 
-class OtherViewHolder extends ViewHolder {
+class BarcodeViewHolder extends RecyclerView.ViewHolder {
 
     private final EditText barcodeEdit;
     private final TextView positionTextView;
     private final ImageButton deleteButton;
-    private final MultiQuestionListener listener;
+    private final RemoveButtonListener listener;
 
-    OtherViewHolder(View itemView, MultiQuestionListener listener) {
+    BarcodeViewHolder(View itemView, RemoveButtonListener listener) {
         super(itemView);
         this.barcodeEdit = (EditText) itemView.findViewById(R.id.input);
         this.positionTextView = (TextView) itemView.findViewById(R.id.order);
@@ -45,13 +46,18 @@ class OtherViewHolder extends ViewHolder {
     void setUpViews(String text, final int position) {
         barcodeEdit.setText(text);
         positionTextView.setText(position + 1 + "");
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.onQuestionRemoveTap(position);
+        if (listener != null) {
+            deleteButton.setVisibility(View.VISIBLE);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.onQuestionRemoveTap(position);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            deleteButton.setVisibility(View.GONE);
+        }
     }
 }

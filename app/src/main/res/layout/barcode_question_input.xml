@@ -50,7 +50,7 @@
             tools:visibility="visible"
             />
 
-    <org.akvo.flow.ui.view.barcode.ScanButton
+    <Button
             android:id="@+id/scan_btn"
             style="@style/button_primary"
             android:layout_width="match_parent"

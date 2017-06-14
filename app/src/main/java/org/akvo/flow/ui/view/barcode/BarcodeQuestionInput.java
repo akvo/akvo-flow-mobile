@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -37,14 +38,11 @@ public abstract class BarcodeQuestionInput extends LinearLayout {
 
     EditText barcodeEdit;
     ImageButton addButton;
-    ScanButton scanButton;
+    Button scanButton;
     View manualInputSeparator;
 
     @Nullable
     BarcodeEditListener barcodeEditListener;
-
-    @Nullable
-    private ScanButton.ScanButtonListener scanButtonListener;
 
     @Nullable
     AddButtonListener addButtonListener;
@@ -53,8 +51,7 @@ public abstract class BarcodeQuestionInput extends LinearLayout {
         this(context, null);
     }
 
-    public BarcodeQuestionInput(Context context,
-            @Nullable AttributeSet attrs) {
+    public BarcodeQuestionInput(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -63,83 +60,38 @@ public abstract class BarcodeQuestionInput extends LinearLayout {
         inflate(getContext(), R.layout.barcode_question_input, this);
         this.barcodeEdit = (EditText) findViewById(R.id.input);
         this.addButton = (ImageButton) findViewById(R.id.add_btn);
-        this.scanButton = (ScanButton) findViewById(R.id.scan_btn);
+        this.scanButton = (Button) findViewById(R.id.scan_btn);
         this.manualInputSeparator = findViewById(R.id.manual_input_separator);
     }
 
-    public void setBarcodeEditListener(BarcodeEditListener barcodeEditListener) {
+    void setBarcodeEditListener(BarcodeEditListener barcodeEditListener) {
         this.barcodeEditListener = barcodeEditListener;
     }
 
-    abstract void initViews();
-
-    public void setScanButtonListener(@Nullable ScanButton.ScanButtonListener scanButtonListener) {
-        this.scanButtonListener = scanButtonListener;
+    void setScanButtonListener(@Nullable final ScanButtonListener scanButtonListener) {
         if (scanButton != null) {
-            scanButton.setListener(scanButtonListener);
-        }
-    }
-
-    public void setAddButtonListener(@Nullable AddButtonListener addButtonListener) {
-        this.addButtonListener = addButtonListener;
-    }
-
-    void setUpViews(String text, boolean isReadOnly, boolean isMultiEntry, boolean isLocked) {
-        if (isReadOnly) {
-            setUpReadOnlyViews(text);
-            return;
-        } else if (isLocked) {
-            setUpLockedViews();
-            return;
-        } else {
-            updateViewsNormal(text, isMultiEntry);
-        }
-    }
-
-    private void updateViewsNormal(String text, boolean isMultiEntry) {
-        barcodeEdit.setVisibility(VISIBLE);
-        manualInputSeparator.setVisibility(VISIBLE);
-//        barcodeEdit.addTextChangedListener(new BarcodeEditWatcher());
-        if (isMultiEntry) {
-            addButton.setVisibility(VISIBLE);
-            addButton.setOnClickListener(new OnClickListener() {
+            scanButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (addButtonListener != null) {
-                        addButtonListener.onQuestionAddTap(getBarcode());
+                    if (scanButtonListener != null) {
+                        scanButtonListener.onScanBarcodeTap();
                     }
                 }
             });
-        } else {
-            addButton.setVisibility(GONE);
-            barcodeEdit.setText(text);
         }
     }
 
-    private void setUpLockedViews() {
-        barcodeEdit.setVisibility(GONE);
-        manualInputSeparator.setVisibility(GONE);
-        addButton.setVisibility(GONE);
-        scanButton.setVisibility(VISIBLE);
+    void setAddButtonListener(@Nullable AddButtonListener addButtonListener) {
+        this.addButtonListener = addButtonListener;
     }
 
-    private void setUpReadOnlyViews(String text) {
-        barcodeEdit.setText(text);
-        barcodeEdit.setVisibility(VISIBLE);
-        barcodeEdit.setEnabled(false);
-        barcodeEdit.setFocusable(false);
-        addButton.setVisibility(GONE);
-        scanButton.setVisibility(GONE);
-        manualInputSeparator.setVisibility(GONE);
-    }
-
-    public void updateAddButton() {
+    void updateAddButton() {
         if (addButton != null) {
             addButton.setEnabled(!isBarcodeEmpty());
         }
     }
 
-    private boolean isBarcodeEmpty() {
+    boolean isBarcodeEmpty() {
         return TextUtils.isEmpty(getBarcode());
     }
 
@@ -150,27 +102,27 @@ public abstract class BarcodeQuestionInput extends LinearLayout {
 
     abstract void setBarcodeText(String value);
 
-    public interface AddButtonListener {
+    abstract void initViews();
+
+    interface AddButtonListener {
 
         void onQuestionAddTap(String text);
     }
 
-    public interface BarcodeEditListener {
+    interface BarcodeEditListener {
 
         void onTextEdited(String text);
     }
 
-    public static abstract class BarcodeEditWatcher implements TextWatcher {
+    static abstract class BarcodeEditWatcher implements TextWatcher {
 
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count,
-                int after) {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             //EMPTY
         }
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before,
-                int count) {
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
             //EMPTY
         }
     }

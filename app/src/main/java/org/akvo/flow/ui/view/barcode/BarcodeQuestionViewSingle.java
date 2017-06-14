@@ -32,7 +32,7 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 public class BarcodeQuestionViewSingle extends QuestionView implements
-        ScanButton.ScanButtonListener, BarcodeQuestionInput.BarcodeEditListener {
+        ScanButtonListener, BarcodeQuestionInput.BarcodeEditListener {
 
     private BarcodeQuestionInput questionInput;
 

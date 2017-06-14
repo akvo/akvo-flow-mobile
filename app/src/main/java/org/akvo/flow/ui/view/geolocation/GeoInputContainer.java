@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.view.geolocation;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -37,6 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.ui.view.ResponseInputWatcher;
 import org.akvo.flow.util.LocationValidator;
 
 import java.text.DecimalFormat;
@@ -126,16 +127,20 @@ public class GeoInputContainer extends LinearLayout {
         }
     }
 
-    void setInputsFocusChangeListeners(GeoQuestionView geoQuestionView) {
-        latitudeInput.setOnFocusChangeListener(geoQuestionView);
-        longitudeInput.setOnFocusChangeListener(geoQuestionView);
-        elevationInput.setOnFocusChangeListener(geoQuestionView);
+    void setTextWatchers(GeoQuestionView geoQuestionView) {
+        ResponseInputWatcher responseInputWatcher = new ResponseInputWatcher(geoQuestionView);
+        latitudeInput.addTextChangedListener(responseInputWatcher);
+        longitudeInput.addTextChangedListener(responseInputWatcher);
+        elevationInput.addTextChangedListener(responseInputWatcher);
     }
 
     void disableInputsFocusability() {
         latitudeInput.setFocusable(false);
+        latitudeInput.setEnabled(false);
         longitudeInput.setFocusable(false);
+        longitudeInput.setEnabled(false);
         elevationInput.setFocusable(false);
+        elevationInput.setEnabled(false);
     }
 
     /**

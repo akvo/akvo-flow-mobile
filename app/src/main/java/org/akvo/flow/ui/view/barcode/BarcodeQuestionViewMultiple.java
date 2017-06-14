@@ -41,7 +41,6 @@ import java.util.ArrayList;
 public class BarcodeQuestionViewMultiple extends QuestionView implements
         RemoveButtonListener, ScanButtonListener, BarcodeQuestionInput.AddButtonListener {
 
-    private RecyclerView responses;
     private BarcodeQuestionAdapter barcodeQuestionAdapter;
     private BarcodeQuestionInput questionInput;
 
@@ -52,7 +51,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
 
     private void init() {
         setQuestionView(R.layout.barcode_question_view_multiple);
-        responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
+        RecyclerView responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
         responses.setLayoutManager(new LinearLayoutManager(getContext()));
         barcodeQuestionAdapter = new BarcodeQuestionAdapter(new ArrayList<String>(), this);
         responses.setAdapter(barcodeQuestionAdapter);

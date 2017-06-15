@@ -43,7 +43,6 @@
     <string name="uploadoptionlabel">Sync data over mobile network</string>
     <string name="surveylanglabel">Survey Languages</string>
     <string name="scanbarcode">Scan Barcode</string>
-    <string name="barcodeerror">Scanner not installed. Please install the Barcode Scanner app from the Android Market.</string>
     <string name="toosmallerr">Value is too small. Minimum value: </string>
     <string name="toolargeerr">Value is too large. Maximum value: </string>
     <string name="baddatatypeerr">Answer must be numeric</string>
@@ -280,6 +279,8 @@
     <string name="apache_licence_title">Apache License 2.0</string>
     <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
     <string name="mit_licence_title">MIT License</string>
+    <string name="barcode_scanner_missing_error">No Scanner app installed on this device. Do you want to install one now?</string>
+    <string name="install">Install</string>
     <string name="signature_name_hint">Please, type your name</string>
 
 </resources>

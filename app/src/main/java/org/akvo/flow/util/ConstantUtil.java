@@ -19,6 +19,8 @@
 
 package org.akvo.flow.util;
 
+import org.akvo.flow.R;
+
 /**
  * Class to hold all public constants used in the application
  *
@@ -38,8 +40,6 @@ public class ConstantUtil {
     public static final String PROCESSED_OK_SUFFIX = ".processed";
     public static final String PROCESSED_ERROR_SUFFIX = ".error";
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
     public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
     public static final String DOT_SEPARATOR = ".";
 
@@ -94,7 +94,6 @@ public class ConstantUtil {
      * validation types
      */
     public static final String NUMERIC_VALIDATION_TYPE = "numeric";
-    public static final String NAME_VALIDATION_TYPE = "name";
 
     /**
      * scoring types
@@ -129,19 +128,17 @@ public class ConstantUtil {
     /**
      * keys for saved state and bundle extras
      */
-    public static final String USER_ID_KEY = "UID";
-    public static final String SURVEY_ID_KEY = "SID";
-    public static final String RESPONDENT_ID_KEY = "survey_respondent_id";
-    public static final String READONLY_KEY = "readonly";
-    public static final String SINGLE_SURVEY_KEY = "single_survey";
-    public static final String SURVEY_GROUP = "survey_group";
-    public static final String SURVEYED_LOCALE_ID = "surveyed_locale_id";
+    public static final String FORM_ID_EXTRA = "SID";
+    public static final String RESPONDENT_ID_EXTRA = "survey_respondent_id";
+    public static final String READ_ONLY_EXTRA = "readonly";
+    public static final String SURVEY_GROUP_EXTRA = "survey_group";
+    public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
+    public static final String RECORD_ID_EXTRA = "record_id";
 
     /**
      * settings keys
      */
     public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
-    public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
@@ -177,7 +174,6 @@ public class ConstantUtil {
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";
-    public static final String SENTRY_DSN = "sentryDsn";
 
     /**
      * S3 bucket directories (object prefixes)
@@ -281,6 +277,11 @@ public class ConstantUtil {
     public static final int DATA_SYNC_RESULT_ERROR_UNKNOWN = 1;
     public static final int DATA_SYNC_RESULT_ERROR_NETWORK = 2;
     public static final int DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT = 3;
+
+    //view tags
+    public static final int SURVEY_ID_TAG_KEY = R.integer.surveyidkey;
+    public static final int RESPONDENT_ID_TAG_KEY = R.integer.respidkey;
+    public static final int READ_ONLY_TAG_KEY = R.integer.finishedkey;
 
     /**
      * prevent instantiation

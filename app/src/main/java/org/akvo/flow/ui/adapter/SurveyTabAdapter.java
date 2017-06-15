@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,10 +21,8 @@ package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -41,19 +39,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
-//TODO: refactor to using new toolbar and TabLayout
-public class SurveyTabAdapter extends PagerAdapter
-        implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
 
-    private final ActionBar mActionBar;
+public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener {
+
     private final ViewPager mPager;
     private List<QuestionGroup> mQuestionGroups;
     private List<QuestionGroupTab> mQuestionGroupTabs;
     private SubmitTab mSubmitTab;
 
-    public SurveyTabAdapter(Context context, ActionBar actionBar, ViewPager pager,
-            SurveyListener surveyListener, QuestionInteractionListener questionListener) {
-        mActionBar = actionBar;
+    public SurveyTabAdapter(Context context, ViewPager pager, SurveyListener surveyListener,
+            QuestionInteractionListener questionListener) {
         mPager = pager;
         init(context, surveyListener, questionListener);
     }
@@ -73,19 +68,7 @@ public class SurveyTabAdapter extends PagerAdapter
             mSubmitTab = new SubmitTab(context, surveyListener);
         }
 
-        // Setup the tabs in the action bar
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        for (QuestionGroup group : mQuestionGroups) {
-            mActionBar.addTab(mActionBar.newTab().setText(group.getHeading()).setTabListener(this));
-        }
-
-        if (mSubmitTab != null) {
-            mActionBar.addTab(mActionBar.newTab().setText(R.string.submitbutton)
-                    .setTabListener(this));
-        }
-
-        mPager.setOnPageChangeListener(this);
+        mPager.addOnPageChangeListener(this);
     }
 
     public void notifyOptionsChanged() {
@@ -199,6 +182,15 @@ public class SurveyTabAdapter extends PagerAdapter
     }
 
     @Override
+    public CharSequence getPageTitle(int position) {
+        if (position < mQuestionGroups.size()) {
+            return mQuestionGroups.get(position).getHeading();
+        } else {
+            return mPager.getContext().getString(R.string.submitbutton);
+        }
+    }
+
+    @Override
     public void destroyItem(ViewGroup container, int position, Object view) {
         container.removeView((View) view);
     }
@@ -230,28 +222,10 @@ public class SurveyTabAdapter extends PagerAdapter
             }
             mSubmitTab.refresh(checkInvalidQuestions());
         }
-
-        // Select the corresponding tab
-        mActionBar.setSelectedNavigationItem(position);
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        // EMPTY
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // EMPTY
-    }
-
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        mPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // EMPTY
     }
 

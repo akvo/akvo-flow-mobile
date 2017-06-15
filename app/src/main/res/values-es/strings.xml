@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">Prec</string>
-  <string name="searching">Buscando...</string>
-  <string name="ready">Listo</string>
-  <string name="timeout">Tiempo de espera</string>
   <string name="nocardspacetitle">No hay espacio de almacenamiento</string>
   <string name="lowcardspacetitle">Poco espacio de almacenamiento</string>
   <string name="nocardspacedialog">La tarjeta SD está llena y no se pueden recopilar más datos. Debe liberar espacio para poder continuar.</string>
@@ -149,7 +145,6 @@
   <string name="error_img_preview">La imagen no pude ser cargada</string>
   <string name="use_external_source">Utilizar aplicación externa</string>
   <string name="caddisfly_test">Ir a la prueba</string>
-  <string name="caddisfly_response">Prueba capturada correctamente</string>
   <string name="error_empty_form">Un formulario sin respuestas no puede ser enviado. Por favor, responda a las preguntas antes de enviar.</string>
   <string name="select">por favor, seleccione</string>
   <string name="clear_value_msg">¿Está seguro de que quiere borrar este valor?</string>
@@ -257,7 +252,7 @@
   <string name="drawer_open">Abrir menú</string>
   <string name="drawer_close">Cerrar menú</string>
   <!--settings activity-->
-  <string name="settings_app_update_title">Comprobar si hay actualizaciones</string>
+  <string name="about_view_update">Comprobar si hay actualizaciones</string>
   <string name="settings_app_update_description">Compruebe si hay una nueva versión de Akvo Flow.</string>
   <!--app update service-->
   <string name="apk_update_service_no_update">Ya que tiene la última versión de la aplicación.</string>

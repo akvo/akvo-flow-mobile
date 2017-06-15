@@ -1,9 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="accuracy">Acc</string>
-    <string name="searching">Searching...</string>
-    <string name="ready">Ready</string>
-    <string name="timeout">Timeout</string>
+    <string name="geo_location_accuracy_default">Accuracy: unknown</string>
+    <string name="geo_location_accuracy">Accuracy: %1$s m</string>
     <string name="nocardspacetitle">No Storage Space</string>
     <string name="lowcardspacetitle">Low Storage Space</string>
     <string name="nocardspacedialog">The SD card on this device is full and you can no longer collect data. You must clear space on the SD card in order to continue.</string>
@@ -15,7 +13,8 @@
     <string name="lon">Lon</string>
     <string name="elevation">Height</string>
     <string name="submitbutton">Submit</string>
-    <string name="geodialog">GPS must be enabled to do this. Select OK to go to the settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
+    <string name="geodialog">Please enable location settings</string>
+    <string name="settings">Settings</string>
     <string name="resize_large_images">Resize large images</string>
     <string name="settingslabel">Settings</string>
     <string name="nouser">No Users!</string>
@@ -30,8 +29,6 @@
     <string name="screenoptdesc">Prevents the screen from turning off while in survey entry mode. Be sure to manually shut the screen off (or exit the app) when not in use to avoid draining the battery.</string>
     <string name="aboutlabel">About</string>
     <string name="aboutdesc">Displays version information.</string>
-    <string name="abouttitle">About - Akvo Flow app</string>
-    <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow app\nDeveloped By: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
     <string name="gpsstatuslabel">GPS Status</string>
     <string name="gpsstatusdesc">Launches the GPS Status application if you have it installed on this device.</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>
@@ -253,15 +250,30 @@
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
 
-    <!--settings activity-->
-    <string name="settings_app_update_title">Check for updates</string>
-    <string name="settings_app_update_description">Check if there is a newer version for the Flow app.</string>
-
     <!--app update service -->
     <string name="apk_update_service_no_update">You are running the latest version of the app.</string>
     <string name="apk_update_service_error_update">There was an error when updating the app. Please try again.</string>
     <string name="apk_update_service_error_no_internet">There was an error when updating the app. You are not connected to the internet.</string>
 
     <string name="locale_list_error_unknown_location">Unknown Location</string>
-
+    <string name="location_timeout">Unable to get location</string>
+    <string name="auto_geo_location_pending">Waiting for device location...</string>
+    <string name="invalid_latitude">Invalid latitude</string>
+    <string name="invalid_longitude">Invalid longitude</string>
+    <string name="invalid_elevation">Invalid height</string>
+    <string name="about_activity_title">About</string>
+    <string name="about_view_title">Akvo Flow App</string>
+    <string name="app_icon_description">App icon</string>
+    <string name="about_view_subtitle">Capture better quality data, faster</string>
+    <string name="about_view_version">Version %1$s</string>
+    <string name="about_view_copyright">Copyright © 2010-%1$s Stichting Akvo</string>
+    <string name="about_view_update">Check for Updates</string>
+    <string name="about_view_legal">Legal Information</string>
+    <string name="about_view_release_notes">Release Notes</string>
+    <string name="about_view_terms">Terms of Use</string>
+    <string name="licences_title">Third Party Licences</string>
+    <string name="licences_description">This software incorporates material from the projects listed below.</string>
+    <string name="apache_licence_title">Apache License 2.0</string>
+    <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
+    <string name="mit_licence_title">MIT License</string>
 </resources>

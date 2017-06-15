@@ -28,6 +28,7 @@ import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Singleton;
 
@@ -43,11 +44,11 @@ public interface ApplicationComponent {
 
     PostExecutionThread getPostExecutionThread();
 
-    Context context();
-
     void inject(FlowApp app);
 
     void inject(BaseActivity baseActivity);
 
+    Context context();
 
+    LoggingHelper loggingHelper();
 }

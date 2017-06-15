@@ -58,6 +58,8 @@ import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.UserColumns;
+import org.akvo.flow.data.loader.SurveyGroupLoader;
+import org.akvo.flow.data.loader.UserLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
@@ -392,16 +394,24 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     class DrawerAdapter extends BaseExpandableListAdapter implements
             ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
-        LayoutInflater mInflater;
+
+        private static final int PADDING_LEFT_IN_DPS = 30;
+        private static final int PADDING_RIGHT_IN_DPS = 16;
+
+        private final LayoutInflater mInflater;
 
         @ColorInt
         private final int mHighlightColor;
+        private final int leftPadding;
+        private final int rightPadding;
 
         public DrawerAdapter(Context context) {
             mInflater = LayoutInflater.from(context);
             mUsers = new ArrayList<>();
             mSurveys = new ArrayList<>();
             mHighlightColor = ContextCompat.getColor(context, R.color.orange_main);
+            leftPadding = (int) PlatformUtil.dp2Pixel(getActivity(), PADDING_LEFT_IN_DPS);
+            rightPadding = (int) PlatformUtil.dp2Pixel(getActivity(), PADDING_RIGHT_IN_DPS);
         }
 
         @Override
@@ -451,7 +461,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                v = mInflater.inflate(R.layout.drawer_item, null);
+                v = mInflater.inflate(R.layout.drawer_item, parent, false);
             }
             View divider = v.findViewById(R.id.divider);
             TextView tv = (TextView) v.findViewById(R.id.item_txt);
@@ -501,14 +511,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 View convertView, ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                v = mInflater.inflate(android.R.layout.simple_list_item_1, null);
+                v = mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             }
             TextView tv = (TextView) v.findViewById(android.R.id.text1);
-            v.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 30), 0, 0, 0);
+            v.setPadding(leftPadding, 0, rightPadding, 0);
 
             tv.setTextSize(ITEM_TEXT_SIZE);
             tv.setTextColor(Color.BLACK);
-            v.setBackgroundColor(Color.TRANSPARENT);
 
             switch (groupPosition) {
                 case GROUP_USERS:
@@ -523,9 +532,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     tv.setText(sg.getName());
                     if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
                         tv.setTextColor(mHighlightColor);
-                        v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_alternate));
                     }
                     v.setTag(sg);
+                    break;
+                default:
                     break;
             }
 
@@ -570,5 +580,4 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             return false;
         }
     }
-
 }

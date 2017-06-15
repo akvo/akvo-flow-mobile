@@ -33,23 +33,13 @@ import java.util.List;
 
 public class CascadeDB {
 
-    public static final String TABLE_NODE = "nodes";
+    private static final String TABLE_NODE = "nodes";
 
-    private String mDBPath;
-
-    public interface NodeColumns {
-        String ID = "id";
-        String NAME = "name";
-        String CODE = "code";
-        String PARENT = "parent";
-    }
-
-    private DatabaseHelper mHelper;
-    public SQLiteDatabase mDatabase;
-
-    private static final int VERSION = 1;
-
+    private final String mDBPath;
     private final Context mContext;
+
+    private SQLiteDatabase mDatabase;
+    private DatabaseHelper mHelper;
 
     public CascadeDB(Context context, String dbPath) {
         mContext = context;
@@ -71,13 +61,15 @@ public class CascadeDB {
     }
 
     public List<Node> getValues(long parent) {
-        // For backwards compatibility, we'll query all columns, and check if the code exist.
+        final List<Node> result = new ArrayList<>();
+        if (!isOpen()) {
+            return result;
+        }
         Cursor c = mDatabase.query(TABLE_NODE, null,
                 NodeColumns.PARENT + "=?",
                 new String[]{String.valueOf(parent)},
                 null, null, NodeColumns.NAME);
 
-        final List<Node> result = new ArrayList<>();
         if (c != null) {
             if (c.moveToFirst()) {
                 final int codeCol = c.getColumnIndex(NodeColumns.CODE);
@@ -95,6 +87,8 @@ public class CascadeDB {
 
     static class DatabaseHelper extends SQLiteOpenHelper {
 
+        private static final int VERSION = 1;
+
         DatabaseHelper(Context context, String dbPath) {
             super(context, dbPath, null, VERSION);
         }
@@ -108,7 +102,12 @@ public class CascadeDB {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             //EMPTY
         }
-
     }
 
+    class NodeColumns {
+        static final String ID = "id";
+        static final String NAME = "name";
+        static final String CODE = "code";
+        static final String PARENT = "parent";
+    }
 }

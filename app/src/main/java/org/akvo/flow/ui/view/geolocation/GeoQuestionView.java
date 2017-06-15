@@ -1,27 +1,29 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.view.geolocation;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -29,7 +31,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 
 import org.akvo.flow.R;
@@ -38,6 +39,7 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LocationValidator;
 
@@ -49,12 +51,16 @@ import timber.log.Timber;
  *
  * @author Christopher Fagiani
  */
-public class GeoQuestionView extends QuestionView implements OnClickListener, OnFocusChangeListener,
-        TimedLocationListener.Listener {
+public class GeoQuestionView extends QuestionView
+        implements OnClickListener, TimedLocationListener.Listener {
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
     private static final int SNACK_BAR_DURATION_IN_MS = 4000;
+    public static final int POSITION_LATITUDE = 0;
+    public static final int POSITION_LONGITUDE = 1;
+    private static final int POSITION_ALTITUDE = 2;
+    private static final int POSITION_CODE = 3;
 
     private final TimedLocationListener mLocationListener;
     private final LocationValidator locationValidator = new LocationValidator();
@@ -79,7 +85,7 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         geoLoading = findViewById(R.id.auto_geo_location_progress);
         geoInputContainer = (GeoInputContainer) findViewById(R.id.manual_geo_input_container);
 
-        geoInputContainer.setInputsFocusChangeListeners(this);
+        geoInputContainer.setTextWatchers(this);
         mGeoButton.setOnClickListener(this);
 
         if (isReadOnly()) {
@@ -173,21 +179,59 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         super.rehydrate(resp);
         if (resp != null && resp.getValue() != null) {
             String[] tokens = resp.getValue().split("\\|", -1);
-            if (tokens.length > 2) {
-                String latitude = tokens[0];
-                String longitude = tokens[1];
-                String altitude = tokens[2];
-                geoInputContainer.displayCoordinates(latitude, longitude, altitude);
-                if (tokens.length > 3) {
-                    mCode = tokens[3];
-                }
-            }
+            String latitude = getLatitudeFromResponseToken(tokens);
+            String longitude = getLongitudeFromToken(tokens);
+            String altitude = getAltitudeFromToken(tokens);
+            geoInputContainer.displayCoordinates(latitude, longitude, altitude);
+            mCode = getCodeFromToken(tokens);
         }
+    }
+
+    @NonNull
+    private String getLatitudeFromResponseToken(@Nullable String[] token) {
+        if (token == null || token.length == 0) {
+            return "";
+        }
+        return token[POSITION_LATITUDE];
+    }
+
+    @NonNull
+    private String getLongitudeFromToken(String[] token) {
+        if (token == null || token.length <= POSITION_LONGITUDE) {
+            return "";
+        }
+        return token[POSITION_LONGITUDE];
+    }
+
+    @NonNull
+    private String getAltitudeFromToken(String[] token) {
+        if (token == null || token.length <= POSITION_ALTITUDE) {
+            return "";
+        }
+        return token[POSITION_ALTITUDE];
+    }
+
+    @NonNull
+    private String getCodeFromToken(String[] token) {
+        if (token == null || token.length <= POSITION_CODE) {
+            return "";
+        }
+        return token[POSITION_CODE];
     }
 
     @Override
     public void questionComplete(Bundle data) {
         //EMPTY
+    }
+
+    /**
+     * clears the file path and the complete icon
+     */
+    @Override
+    public void resetQuestion(boolean fireEvent) {
+        super.resetQuestion(fireEvent);
+        resetResponseValues();
+        geoInputContainer.displayCoordinates("", "", "");
     }
 
     @Override
@@ -213,7 +257,8 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     private void updateWithNewCoordinates(double latitude, double longitude, double altitude,
             float accuracy) {
-        geoInputContainer.displayCoordinates(latitude + "", longitude + "", altitude +"", accuracy);
+        geoInputContainer
+                .displayCoordinates(latitude + "", longitude + "", altitude + "", accuracy);
         updateCode(latitude, longitude);
     }
 
@@ -247,23 +292,16 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
         }
     }
 
-    /**
-     * used to capture lat/lon/elevation if manually typed
-     */
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            final String lat = geoInputContainer.getLatitudeText();
-            final String lon = geoInputContainer.getLongitudeText();
-            if (locationValidator.validCoordinates(lat, lon)) {
-                updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
-                setResponse(
-                        new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
-                                getQuestion().getId()));
-            } else {
-                resetCode();
-                setResponse(null);
-            }
+    private void saveManualFields() {
+        final String lat = geoInputContainer.getLatitudeText();
+        final String lon = geoInputContainer.getLongitudeText();
+        if (locationValidator.validCoordinates(lat, lon)) {
+            updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
+            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
+                    getQuestion().getId()));
+        } else {
+            resetCode();
+            setResponse(null);
         }
     }
 
@@ -287,6 +325,6 @@ public class GeoQuestionView extends QuestionView implements OnClickListener, On
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        //EMPTY
+        saveManualFields();
     }
 }

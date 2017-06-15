@@ -1,5 +1,49 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.4.1
+Date: 13 June 2017
+
+# Resolved issues
+* **Cookstoves and Biogas app icon is wrong** - [#757](https://github.com/akvo/akvo-flow-mobile/issues/757) Restored both app icons to the correct one.
+
+---------------
+# ver 2.3.4
+Date: 08 June 2017
+
+# New and noteworthy
+* **Remove validation code for free text question types** - [#709](https://github.com/akvo/akvo-flow-mobile/issues/709) Removed unused validation code.
+* **Sentry improvements** - [#666](https://github.com/akvo/akvo-flow-mobile/issues/666) We are now using the official raven-android library and have further filtered out some unnecessary exceptions.
+
+# Resolved issues
+* **Crash related to option question** - [#739](https://github.com/akvo/akvo-flow-mobile/issues/739) Fixed crash related to question options when those contained no options.
+* **App icon is huge** - [#722](https://github.com/akvo/akvo-flow-mobile/issues/722) The app icon is now a mipmap and has alternative sizes for different screen resolutions.
+* **Crash in CascadeQuestionView** - [#716](https://github.com/akvo/akvo-flow-mobile/issues/716) Fixed random crash related to cascades.
+* **Crash in RecordActivity** - [#655](https://github.com/akvo/akvo-flow-mobile/issues/655) Fixed crash in record list after a record was deleted.
+
+---------------
+# ver 2.3.3
+Date: 25 May 2017
+
+# Resolved issues
+* **Long form names do not look nice on some devices** - [#727](https://github.com/akvo/akvo-flow-mobile/issues/727) Long form names in the navigation drawer now have a small right margin. 
+* **Pressing back with the navigation drawer shown closes app** - [#711](https://github.com/akvo/akvo-flow-mobile/issues/711) Fixed the issue with pressing the back button when the navigation drawer was being displayed.
+* **NumberFormatException: Invalid long: "21474836472147483647"** - [#701](https://github.com/akvo/akvo-flow-mobile/issues/701) Fixed issue with excessively long numbers which no longer wil be accepted.
+* **GeoQuestion Location Invalid Input** - [#679](https://github.com/akvo/akvo-flow-mobile/issues/679) Manually input coordinates are now verified before submission.
+* **Crash: NullPointerException when trying to open FormActivity** - [#637](https://github.com/akvo/akvo-flow-mobile/issues/637) Fixed a crash when trying to view a deleted datapoint.
+
+---------------
+# ver 2.3.2
+Date: 27 April 2017
+
+# New and noteworthy
+* **Transmission History improved** - [#695](https://github.com/akvo/akvo-flow-mobile/issues/695) The transmission screen has been redesigned.
+* **App ToolBar color change** - [#668](https://github.com/akvo/akvo-flow-mobile/issues/668) The toolbar of the whole app has been redesigned respecting google material design and Akvo colors.
+
+# Resolved issues
+* **Data point distances are back** - [#710](https://github.com/akvo/akvo-flow-mobile/issues/710) Restored display of distances to the datapoint list.
+* **Selected survey background no longer grey** - [#704](https://github.com/akvo/akvo-flow-mobile/issues/704) Removed grey background when a survey is selected.
+
+---------------
 # ver 2.3.1.1
 Date: 13 April 2017
 

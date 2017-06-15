@@ -9,29 +9,37 @@
 
     <include layout="@layout/app_bar_layout"/>
 
-    <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
+    <FrameLayout
             android:layout_marginTop="?actionBarSize"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_gravity="top"
+        <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/orange_main"
-                app:tabIndicatorColor="@color/white"
-                app:tabIndicatorHeight="4dp"
-                app:tabTextColor="@color/white"
-                app:tabTextAppearance="@style/TextAppearance.Tabs"
-                app:tabSelectedTextColor="@color/white"
-                app:tabMode="scrollable"
-                app:tabMaxWidth="140dp"
-                app:tabMinWidth="140dp"
-                tools:showIn="@layout/form_activity">
+                android:layout_height="match_parent">
 
-        </android.support.design.widget.TabLayout>
-    </android.support.v4.view.ViewPager>
+            <org.akvo.flow.ui.view.AdaptableTabLayout
+                    android:id="@+id/tabs"
+                    android:layout_gravity="top"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/orange_main"
+                    app:tabIndicatorColor="@color/white"
+                    app:tabIndicatorHeight="4dp"
+                    app:tabTextColor="@color/white"
+                    app:tabTextAppearance="@style/TextAppearance.Tabs"
+                    app:tabSelectedTextColor="@color/white"
+                    app:tabMode="scrollable"
+                    tools:showIn="@layout/form_activity">
 
+            </org.akvo.flow.ui.view.AdaptableTabLayout>
+        </android.support.v4.view.ViewPager>
+
+        <View
+                android:layout_marginTop="@dimen/tabs_height"
+                android:layout_height="6dp"
+                android:layout_width="match_parent"
+                android:background="@drawable/shadow_background"/>
+    </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

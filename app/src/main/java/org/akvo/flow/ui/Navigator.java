@@ -43,10 +43,13 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+
+import javax.inject.Inject;
 
 import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
 import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
@@ -54,7 +57,11 @@ import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
 
+    private static final String TERMS_URL = "http://akvo.org/help/akvo-policies-and-terms-2/akvo-flow-terms-of-use/";
+    private static final String RELEASE_NOTES_URL = "https://github.com/akvo/akvo-flow-mobile/releases";
+
     //TODO: inject activity
+    @Inject
     public Navigator() {
     }
 
@@ -80,22 +87,21 @@ public class Navigator {
         // Display form list and history
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
-        extras.putSerializable(EXTRA_SURVEY_GROUP, mSurveyGroup);
-        extras.putString(EXTRA_RECORD_ID, surveyedLocaleId);
+        extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        extras.putString(ConstantUtil.RECORD_ID_EXTRA, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }
 
-    public void navigateToFormActivity(Context context, String surveyedLocaleId, User user,
-            String formId,
+    //TODO: confusing, too many params, use object
+    public void navigateToFormActivity(Context context, String surveyedLocaleId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
         Intent i = new Intent(context, FormActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, user.getId());
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, formId);
-        i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, surveyedLocaleId);
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, formInstanceId);
-        i.putExtra(ConstantUtil.READONLY_KEY, readOnly);
+        i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
+        i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, surveyedLocaleId);
+        i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
+        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         context.startActivity(i);
     }
 
@@ -164,12 +170,12 @@ public class Navigator {
 
     public void navigateToMapActivity(@NonNull Context context, String recordId) {
         context.startActivity(new Intent(context, MapActivity.class)
-                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId));
+                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
     }
 
     public void navigateToTransmissionActivity(Context context, long surveyInstanceId) {
         context.startActivity(new Intent(context, TransmissionHistoryActivity.class)
-                .putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId));
+                .putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, surveyInstanceId));
     }
 
     public void navigateToLocationSettings(@NonNull Context context) {
@@ -187,5 +193,26 @@ public class Navigator {
      */
     private void navigateToSettings(@NonNull Context context) {
         context.startActivity(new Intent(Settings.ACTION_SETTINGS));
+    }
+
+    public void navigateToAbout(@NonNull Context context) {
+        context.startActivity(new Intent(context, AboutActivity.class));
+    }
+
+    public void navigateToTerms(@NonNull Context context) {
+        openUrl(context, TERMS_URL);
+    }
+
+    public void openUrl(@NonNull Context context, String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        context.startActivity(browserIntent);
+    }
+
+    public void navigateToReleaseNotes(@NonNull Context context) {
+        openUrl(context, RELEASE_NOTES_URL);
+    }
+
+    public void navigateToLegalInfo(@NonNull Context context) {
+        context.startActivity(new Intent(context, LegalNoticesActivity.class));
     }
 }

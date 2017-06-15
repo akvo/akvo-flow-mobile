@@ -50,8 +50,6 @@
 
     <color name="red">#FF0000</color>
 
-    <color name="default_underline_indicator_selected_color">#ff33b5e5</color>
-
     <color name="record_name_background">#cec6bc</color>
     <color name="feature_menu_background">#e0736357</color>
 

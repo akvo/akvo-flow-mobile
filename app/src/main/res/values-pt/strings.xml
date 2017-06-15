@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">Precisão</string>
-  <string name="searching">Procurando...</string>
-  <string name="ready">Pronto</string>
-  <string name="timeout">Tempo esgotado</string>
   <string name="nocardspacetitle">
 Sem espaço para armazenamento
 </string>
@@ -151,7 +147,6 @@ Sem espaço para armazenamento
   <string name="error_img_preview">Não é possível carregar pré-visualização da imagem</string>
   <string name="use_external_source">Usar uma fonte externa</string>
   <string name="caddisfly_test">Vá ao testa</string>
-  <string name="caddisfly_response">Teste capturado com sucesso</string>
   <string name="error_empty_form">Formulários não preenchidos não podem ser submetidos. Por favor, primeiro insira as devidas respostas.</string>
   <string name="select">Por favor, seleccione</string>
   <string name="clear_value_msg">Deseja apagar este valor?</string>
@@ -260,7 +255,7 @@ Sem espaço para armazenamento
   <string name="drawer_open">Desenhador aberto</string>
   <string name="drawer_close">Desenhador fechado</string>
   <!--settings activity-->
-  <string name="settings_app_update_title">Verificar actualizações</string>
+  <string name="about_view_update">Verificar actualizações</string>
   <string name="settings_app_update_description">Verifique se existe uma versão mais recente do Akvo Flow.</string>
   <!--app update service-->
   <string name="apk_update_service_no_update">Você já tem a versão mais recente do aplicativo.</string>

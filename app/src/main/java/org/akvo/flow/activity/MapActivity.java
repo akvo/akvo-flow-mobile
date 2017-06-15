@@ -57,7 +57,7 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID);
+        datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
         loadDataPoint();
     }
 

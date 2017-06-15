@@ -37,6 +37,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,9 +47,9 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
@@ -246,6 +247,15 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
+    public void onBackPressed() {
+        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.START)) {
+            mDrawerLayout.closeDrawer(Gravity.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mSurveysSyncReceiver);
@@ -361,38 +371,45 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             return;
         }
 
-        // Non-monitored surveys display the form directly
-        if (!mSurveyGroup.isMonitored()) {
-            Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
-            if (registrationForm == null) {
-                Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
-                return;
-            } else if (!registrationForm.isHelpDownloaded()) {
-                Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            final String formId = registrationForm.getId();
-            long formInstanceId;
-            boolean readOnly = false;
-            Cursor c = mDatabase.getFormInstances(surveyedLocaleId);
-            if (c.moveToFirst()) {
-                formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
-                int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
-                readOnly = status != SurveyInstanceStatus.SAVED;
-            } else {
-                formInstanceId = mDatabase
-                        .createSurveyRespondent(formId, registrationForm.getVersion(), user,
-                                surveyedLocaleId);
-            }
-            c.close();
-
-            navigator.navigateToFormActivity(this, surveyedLocaleId, user, formId, formInstanceId,
-                    readOnly, mSurveyGroup);
+        if (mSurveyGroup.isMonitored()) {
+            displayRecord(surveyedLocaleId);
         } else {
-            navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
-
+            displayForm(surveyedLocaleId, user);
         }
+    }
+
+    private void displayRecord(String surveyedLocaleId) {
+        navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
+    }
+
+    private void displayForm(String surveyedLocaleId, User user) {
+        Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
+        if (registrationForm == null) {
+            Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
+            return;
+        } else if (!registrationForm.isHelpDownloaded()) {
+            Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        final String registrationFormId = registrationForm.getId();
+        long formInstanceId;
+        boolean readOnly;
+        Cursor c = mDatabase.getFormInstances(surveyedLocaleId);
+        if (c.moveToFirst()) {
+            formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
+            int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
+            readOnly = status != SurveyInstanceStatus.SAVED;
+        } else {
+            formInstanceId = mDatabase
+                    .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
+                            user, surveyedLocaleId);
+            readOnly = false;
+        }
+        c.close();
+
+        navigator.navigateToFormActivity(this, surveyedLocaleId, registrationFormId,
+                formInstanceId, readOnly, mSurveyGroup);
     }
 
     private void displaySelectedUser() {

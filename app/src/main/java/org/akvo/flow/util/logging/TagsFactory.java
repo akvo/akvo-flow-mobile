@@ -48,7 +48,7 @@ public class TagsFactory {
     /**
      * The initial capacity is set to 9 for 6 tags (it should be increased if there are more tags)
      */
-    public static final int INITIAL_CAPACITY = 9;
+    private static final int INITIAL_CAPACITY = 9;
 
     private final Map<String, String> tags = new HashMap<>(INITIAL_CAPACITY);
 
@@ -57,6 +57,7 @@ public class TagsFactory {
         initTags(context, prefs);
     }
 
+    @NonNull
     public Map<String, String> getTags() {
         return tags;
     }

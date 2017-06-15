@@ -120,14 +120,22 @@ public class Navigator {
         try {
             activity.startActivityForResult(intent, ConstantUtil.SCAN_ACTIVITY_REQUEST);
         } catch (ActivityNotFoundException ex) {
-            displayAppNotFoundDialog(activity, R.string.barcodeerror);
+            displayScannerNotFoundDialog(activity, R.string.barcode_scanner_missing_error);
         }
     }
 
-    private void displayAppNotFoundDialog(@NonNull Activity activity, @StringRes int messageId) {
+    private void displayScannerNotFoundDialog(@NonNull final Activity activity, @StringRes int messageId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.okbutton,
+        builder.setPositiveButton(R.string.install,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("http://play.google.com/store/search?q=Barcode Scanner"));
+                        activity.startActivity(intent);
+                    }
+                });
+        builder.setNegativeButton(R.string.cancelbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();

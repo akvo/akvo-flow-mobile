@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">Akurasi</string>
-  <string name="searching">Sedang mencari...</string>
-  <string name="ready">Siap digunakan</string>
-  <string name="timeout">Waktu habis</string>
   <string name="nocardspacetitle">Media Penyimpanan Penuh</string>
   <string name="lowcardspacetitle">Media Penyimpanan Hampir Penuh</string>
   <string name="nocardspacedialog">Memori SD card penuh dan tidak bisa digunakan untuk menyimpan data. Untuk melanjutkan, hapus atau kosongi memori tersebut.</string>
@@ -146,7 +142,6 @@
   <string name="error_img_preview">Tidak dapat memuat gambar pratayang</string>
   <string name="use_external_source">Gunakan sumber dari luar</string>
   <string name="caddisfly_test">Pindah ke halaman test</string>
-  <string name="caddisfly_response">Sukses mendapatkan test</string>
   <string name="error_empty_form">Tidak dapat mengirim formulir kosong. Mohon jawab pertanyaan terlebih dulu.</string>
   <string name="select">mohon pilih</string>
   <string name="clear_value_msg">Apakah Anda ingin menghapus isian ini?</string>

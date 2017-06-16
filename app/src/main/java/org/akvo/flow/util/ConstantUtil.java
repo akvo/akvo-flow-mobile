@@ -94,7 +94,6 @@ public class ConstantUtil {
      * validation types
      */
     public static final String NUMERIC_VALIDATION_TYPE = "numeric";
-    public static final String NAME_VALIDATION_TYPE = "name";
 
     /**
      * scoring types

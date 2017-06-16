@@ -26,14 +26,15 @@
             android:theme="@style/FlowAppTheme">
         <activity
                 android:name=".activity.AddUserActivity"
-                android:label="@string/add_user"
-                android:configChanges="locale|layoutDirection"/>
+                android:configChanges="locale|layoutDirection"
+                android:label="@string/add_user"/>
         <activity
                 android:name=".activity.SurveyActivity"
                 android:configChanges="locale|layoutDirection"
                 android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
@@ -79,11 +80,10 @@
                 android:launchMode="singleTop"
                 android:theme="@style/Flow.Dialog"/>
         <activity android:name=".activity.MapActivity"/>
-
         <activity
                 android:name=".activity.SignatureActivity"
-                android:screenOrientation="landscape"
-                android:configChanges="locale|layoutDirection"/>
+                android:configChanges="locale|layoutDirection"
+                android:screenOrientation="landscape"/>
 
         <service android:name=".service.DataSyncService"/>
         <service android:name=".service.SurveyDownloadService"/>
@@ -93,8 +93,8 @@
         <service android:name=".service.TimeCheckService"/>
         <service
                 android:name=".service.ApkUpdateService"
-                android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
-                android:exported="true">
+                android:exported="true"
+                android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
             <intent-filter>
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
             </intent-filter>
@@ -121,6 +121,14 @@
                 android:syncable="true"
                 android:writePermission="org.akvo.flow.permission.WRITE_SCHEDULE"/>
 
+        <activity
+                android:name=".presentation.AboutActivity"
+                android:label="@string/about_activity_title">
+        </activity>
+        <activity
+                android:name=".presentation.legal.LegalNoticesActivity"
+                android:label="@string/licences_title">
+        </activity>
     </application>
 
 </manifest>

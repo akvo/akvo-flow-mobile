@@ -19,33 +19,27 @@
 
 package org.akvo.flow.util.logging;
 
-import android.content.Context;
-
-import com.joshdholtz.sentry.PostPermissionVerifier;
-
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.ConnectivityStateManager;
 
-public class FlowPostPermissionVerifier extends PostPermissionVerifier {
+public class LoggingSendPermissionVerifier {
+
     private final ConnectivityStateManager connectivityStateManager;
     private final Prefs prefs;
 
-    public FlowPostPermissionVerifier(Context context) {
-        this.connectivityStateManager = new ConnectivityStateManager(context);
-        this.prefs = new Prefs(context);
+    public LoggingSendPermissionVerifier(ConnectivityStateManager connectivityStateManager,
+            Prefs prefs) {
+        this.connectivityStateManager = connectivityStateManager;
+        this.prefs = prefs;
     }
 
     /**
      * Decides if the stacktrace should be sent to the server
      *
-     * @return
-     * @param context
      */
-    public boolean shouldAttemptPost(Context context) {
+    public boolean shouldAttemptPost() {
         boolean syncOver3GAllowed = prefs
                 .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
-        //User did not allow using 3G and wifi is not connected
-        return connectivityStateManager.isConnectionAvailable(syncOver3GAllowed) && super
-                .shouldAttemptPost(context);
+        return connectivityStateManager.isConnectionAvailable(syncOver3GAllowed);
     }
 }

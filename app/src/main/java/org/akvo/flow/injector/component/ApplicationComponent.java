@@ -25,6 +25,7 @@ import android.content.Context;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Singleton;
 
@@ -41,4 +42,6 @@ public interface ApplicationComponent {
     void inject(BaseActivity baseActivity);
 
     Context context();
+
+    LoggingHelper loggingHelper();
 }

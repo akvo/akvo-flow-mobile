@@ -79,6 +79,15 @@ android {
             }
         }
 
+        sourceSets {
+            biogas {
+                res.srcDirs = ['snv/res', 'biogas/res']
+            }
+            cookstoves {
+                res.srcDirs = ['snv/res', 'cookstoves/res']
+            }
+        }
+
         testOptions {
             unitTests.returnDefaultValues = true
         }

@@ -7,7 +7,7 @@
     <color name="snv_green_selected">#8cb07e</color>
 
     <!-- SNV branding-->
-    <color name="background_main">#ffffff</color>
+    <color name="app_background_main">#ffffff</color>
     <color name="background_alternate">#e4f1f9</color>
 
     <!-- Text -->
@@ -39,5 +39,9 @@
 
     <color name="record_name_background">#cec6bc</color>
     <color name="feature_menu_background">#e0736357</color>
+
+    <color name="colorPrimary">#2BB5E5</color>
+    <color name="colorPrimaryDark">@color/snv_blue</color>
+    <color name="colorAccent">@color/snv_green</color>
 
 </resources>

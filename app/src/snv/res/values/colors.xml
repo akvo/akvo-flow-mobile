@@ -43,5 +43,6 @@
     <color name="colorPrimary">#2BB5E5</color>
     <color name="colorPrimaryDark">@color/snv_blue</color>
     <color name="colorAccent">@color/snv_green</color>
+    <color name="tabIndicatorColor">@color/orange_main</color>
 
 </resources>

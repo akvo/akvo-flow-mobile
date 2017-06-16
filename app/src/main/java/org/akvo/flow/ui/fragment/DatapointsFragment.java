@@ -186,12 +186,12 @@ public class DatapointsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.new_datapoint:
-                if (listener != null) {
-                    String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-                    listener.onRecordSelected(newLocaleId);
-                }
-                return true;
+//            case R.id.new_datapoint:
+//                if (listener != null) {
+//                    String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+//                    listener.onRecordSelected(newLocaleId);
+//                }
+//                return true;
             case R.id.search:
                 if (listener != null) {
                     return listener.onSearchTap();

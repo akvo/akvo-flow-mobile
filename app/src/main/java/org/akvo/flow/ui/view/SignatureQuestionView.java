@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -42,6 +43,7 @@ public class SignatureQuestionView extends QuestionView {
     private EditText mName;
     private ImageView mImage;
     private Button signButton;
+    private TextView nameLabel;
 
     private Signature mSignature;
 
@@ -56,6 +58,7 @@ public class SignatureQuestionView extends QuestionView {
         mSignature = new Signature();
 
         mName = (EditText)findViewById(R.id.name);
+        nameLabel = (TextView)findViewById(R.id.name_label);
         mImage = (ImageView)findViewById(R.id.image);
         signButton = (Button)findViewById(R.id.sign_btn);
 
@@ -115,7 +118,15 @@ public class SignatureQuestionView extends QuestionView {
     }
 
     private void displayResponse() {
-        mName.setText(mSignature.getName());
+        String name = mSignature.getName();
+        if (!TextUtils.isEmpty(name)) {
+            mName.setText(name);
+            mName.setVisibility(VISIBLE);
+            nameLabel.setVisibility(VISIBLE);
+        } else {
+            mName.setVisibility(GONE);
+            nameLabel.setVisibility(GONE);
+        }
         String imageAsString = mSignature.getImage();
         boolean isEmptyImage = TextUtils.isEmpty(imageAsString);
         if (!isEmptyImage) {

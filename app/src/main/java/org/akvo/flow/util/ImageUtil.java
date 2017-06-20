@@ -100,7 +100,7 @@ public class ImageUtil {
         options.inJustDecodeBounds = false;
         Bitmap bitmap = BitmapFactory.decodeFile(origFilename, options);
 
-        if (bitmap != null && saveImage(bitmap, outFilename)) {
+        if (bitmap != null && saveImage(bitmap, outFilename, 75)) {
             checkOrientation(origFilename, outFilename);// Ensure the EXIF data is not lost
             Timber.d("Resized Image size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
             return true;
@@ -163,11 +163,11 @@ public class ImageUtil {
         return false;
     }
 
-    private static boolean saveImage(Bitmap bitmap, String filename) {
+    public static boolean saveImage(Bitmap bitmap, String filename, int quality) {
         OutputStream out = null;
         try {
             out = new BufferedOutputStream(new FileOutputStream(filename));
-            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out)) {
+            if (bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)) {
                 return true;
             }
         } catch (FileNotFoundException e) {

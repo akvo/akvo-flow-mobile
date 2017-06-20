@@ -169,8 +169,11 @@ public class Navigator {
         activity.startActivityForResult(i, ConstantUtil.PLOTTING_REQUEST);
     }
 
-    public void navigateToSignatureActivity(@NonNull Activity activity) {
+    public void navigateToSignatureActivity(@NonNull Activity activity, @Nullable Bundle data) {
         Intent i = new Intent(activity, SignatureActivity.class);
+        if (data != null) {
+            i.putExtras(data);
+        }
         activity.startActivityForResult(i, ConstantUtil.SIGNATURE_REQUEST);
     }
 

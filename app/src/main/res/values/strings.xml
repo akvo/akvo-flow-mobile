@@ -282,5 +282,6 @@
     <string name="barcode_scanner_missing_error">No Scanner app installed on this device. Do you want to install one now?</string>
     <string name="install">Install</string>
     <string name="signature_name_hint">Please, type your name</string>
+    <string name="saving">Saving...</string>
 
 </resources>

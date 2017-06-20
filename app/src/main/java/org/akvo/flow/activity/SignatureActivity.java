@@ -23,17 +23,31 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+
 import org.akvo.flow.R;
-import org.akvo.flow.ui.view.SignatureView;
+import org.akvo.flow.domain.response.value.Signature;
+import org.akvo.flow.ui.view.signature.SignatureView;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
+
+import java.io.File;
+
+import static org.akvo.flow.R.id.signature;
 
 public class SignatureActivity extends Activity implements SignatureView.SignatureViewListener {
 
@@ -42,38 +56,34 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
 
     private SignatureView mSignatureView;
     private EditText nameEditText;
-    private View sendButton;
+    private Button sendButton;
+    private String questionId;
+    private String name;
+    private String datapointId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_signature);
-        mSignatureView = (SignatureView) findViewById(R.id.signature);
         nameEditText = (EditText) findViewById(R.id.name_edit_text);
-        findViewById(R.id.clear).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clear();
-            }
-        });
-        findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResult(RESULT_CANCELED);
-                finish();
-            }
-        });
-        sendButton = findViewById(R.id.save);
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mSignatureView.isEmpty() && !TextUtils
-                        .isEmpty(nameEditText.getText().toString())) {
-                    save();
-                }
-            }
-        });
+        mSignatureView = (SignatureView) findViewById(signature);
+        sendButton = (Button) findViewById(R.id.save);
+        questionId = getIntent().getStringExtra(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA);
+        datapointId = getIntent().getStringExtra(ConstantUtil.SIGNATURE_DATAPOINT_ID_EXTRA);
+        name = getIntent().getStringExtra(ConstantUtil.SIGNATURE_NAME_EXTRA);
+
+        setSignatureView();
+        setClearButton();
+        setCancelButton();
+        setSendButton();
+        setNameEditText();
+    }
+
+    private void setNameEditText() {
+        if (!TextUtils.isEmpty(name)) {
+            nameEditText.setText(name);
+        }
         nameEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
@@ -91,7 +101,74 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
                 updateSendButton();
             }
         });
+    }
+
+    private void setSignatureView() {
         mSignatureView.setListener(this);
+        mSignatureView.getViewTreeObserver()
+                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        mSignatureView.getViewTreeObserver()
+                                .removeGlobalOnLayoutListener(this);
+                        File originalSignatureImage = getOriginalSignatureImage();
+                        if (originalSignatureImage.exists()) {
+                            Glide.with(SignatureActivity.this)
+                                    .load(originalSignatureImage)
+                                    .asBitmap()
+                                    .skipMemoryCache(true)
+                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                    .into(new SimpleTarget<Bitmap>() {
+                                        @Override
+                                        public void onResourceReady(Bitmap bitmap,
+                                                GlideAnimation<? super Bitmap> glideAnimation) {
+                                            if (bitmap != null) {
+                                                mSignatureView.setBitmap(bitmap);
+                                                mSignatureView.invalidate();
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                });
+
+    }
+
+    @NonNull
+    private File getOriginalSignatureImage() {
+        return new File(FileUtil.getFilesDir(FileUtil.FileType.TMP),
+                "sign_" + questionId + "_" + datapointId + "_original.png");
+    }
+
+    private void setSendButton() {
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mSignatureView.isEmpty() && !TextUtils
+                        .isEmpty(nameEditText.getText().toString())) {
+                    save();
+                }
+            }
+        });
+    }
+
+    private void setCancelButton() {
+        findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
+        });
+    }
+
+    private void setClearButton() {
+        findViewById(R.id.clear).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clear();
+            }
+        });
     }
 
     private void updateSendButton() {
@@ -106,11 +183,17 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
     }
 
     private void save() {
+        sendButton.setText(R.string.saving);
+        sendButton.setEnabled(false);
         Bitmap bitmap = mSignatureView.getBitmap();
+        //TODO: this should be done on separate thread
         String data = ImageUtil.encodeBase64(bitmap, SIGNATURE_WIDTH, SIGNATURE_HEIGHT);
+        ImageUtil.saveImage(bitmap, getOriginalSignatureImage().getAbsolutePath(), 100);
         Intent intent = new Intent();
-        intent.putExtra(ConstantUtil.SIGNATURE_IMAGE, data);
-        intent.putExtra(ConstantUtil.SIGNATURE_NAME, nameEditText.getText().toString());
+        Signature signature = new Signature();
+        signature.setName(nameEditText.getText().toString());
+        signature.setImage(data);
+        intent.putExtra(ConstantUtil.SIGNATURE_EXTRA, signature);
         setResult(RESULT_OK, intent);
         finish();
     }

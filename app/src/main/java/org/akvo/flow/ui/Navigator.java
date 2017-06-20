@@ -40,7 +40,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SignatureActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;

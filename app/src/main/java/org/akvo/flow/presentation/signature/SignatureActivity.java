@@ -1,23 +1,24 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-package org.akvo.flow.activity;
+package org.akvo.flow.presentation.signature;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -38,6 +39,7 @@ import org.akvo.flow.ui.view.signature.SignatureView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
+import org.akvo.flow.util.ViewUtil;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;
@@ -111,8 +113,7 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
                 .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        mSignatureView.getViewTreeObserver()
-                                .removeGlobalOnLayoutListener(this);
+                        ViewUtil.removeLayoutListener(mSignatureView.getViewTreeObserver(), this);
                         File originalSignatureImage = getOriginalSignatureImage();
                         if (originalSignatureImage.exists()) {
                             imageLoader.loadFromFile(originalSignatureImage,
@@ -127,6 +128,7 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
                                     });
                         }
                     }
+
                 });
 
     }

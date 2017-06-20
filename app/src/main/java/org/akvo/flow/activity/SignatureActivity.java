@@ -27,7 +27,6 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
@@ -47,16 +46,24 @@ import org.akvo.flow.util.ImageUtil;
 
 import java.io.File;
 
-import static org.akvo.flow.R.id.signature;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SignatureActivity extends Activity implements SignatureView.SignatureViewListener {
 
     private static final int SIGNATURE_WIDTH = 320;
     private static final int SIGNATURE_HEIGHT = 240;
 
-    private SignatureView mSignatureView;
-    private EditText nameEditText;
-    private Button sendButton;
+    @BindView(R.id.signature)
+    SignatureView mSignatureView;
+
+    @BindView(R.id.name_edit_text)
+    EditText nameEditText;
+
+    @BindView(R.id.save)
+    Button saveButton;
+
     private String questionId;
     private String name;
     private String datapointId;
@@ -66,17 +73,12 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_signature);
-        nameEditText = (EditText) findViewById(R.id.name_edit_text);
-        mSignatureView = (SignatureView) findViewById(signature);
-        sendButton = (Button) findViewById(R.id.save);
+        ButterKnife.bind(this);
         questionId = getIntent().getStringExtra(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA);
         datapointId = getIntent().getStringExtra(ConstantUtil.SIGNATURE_DATAPOINT_ID_EXTRA);
         name = getIntent().getStringExtra(ConstantUtil.SIGNATURE_NAME_EXTRA);
 
         setSignatureView();
-        setClearButton();
-        setCancelButton();
-        setSendButton();
         setNameEditText();
     }
 
@@ -140,62 +142,42 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
                 "sign_" + questionId + "_" + datapointId + "_original.png");
     }
 
-    private void setSendButton() {
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mSignatureView.isEmpty() && !TextUtils
-                        .isEmpty(nameEditText.getText().toString())) {
-                    save();
-                }
-            }
-        });
-    }
-
-    private void setCancelButton() {
-        findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResult(RESULT_CANCELED);
-                finish();
-            }
-        });
-    }
-
-    private void setClearButton() {
-        findViewById(R.id.clear).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clear();
-            }
-        });
-    }
-
     private void updateSendButton() {
         boolean isNameEmpty = TextUtils.isEmpty(nameEditText.getText().toString());
         boolean signatureEmpty = mSignatureView.isEmpty();
-        sendButton.setEnabled(!isNameEmpty && !signatureEmpty);
+        saveButton.setEnabled(!isNameEmpty && !signatureEmpty);
     }
 
-    private void clear() {
+    @OnClick(R.id.cancel)
+    void onCancelTap() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    @OnClick(R.id.clear)
+    void onClearTap() {
         mSignatureView.clear();
         updateSendButton();
     }
 
-    private void save() {
-        sendButton.setText(R.string.saving);
-        sendButton.setEnabled(false);
-        Bitmap bitmap = mSignatureView.getBitmap();
-        //TODO: this should be done on separate thread
-        String data = ImageUtil.encodeBase64(bitmap, SIGNATURE_WIDTH, SIGNATURE_HEIGHT);
-        ImageUtil.saveImage(bitmap, getOriginalSignatureImage().getAbsolutePath(), 100);
-        Intent intent = new Intent();
-        Signature signature = new Signature();
-        signature.setName(nameEditText.getText().toString());
-        signature.setImage(data);
-        intent.putExtra(ConstantUtil.SIGNATURE_EXTRA, signature);
-        setResult(RESULT_OK, intent);
-        finish();
+    @OnClick(R.id.save)
+    void onSaveButtonTap() {
+        if (!mSignatureView.isEmpty() && !TextUtils
+                .isEmpty(nameEditText.getText().toString())) {
+            saveButton.setText(R.string.saving);
+            saveButton.setEnabled(false);
+            Bitmap bitmap = mSignatureView.getBitmap();
+            //TODO: this should be done on separate thread
+            String data = ImageUtil.encodeBase64(bitmap, SIGNATURE_WIDTH, SIGNATURE_HEIGHT);
+            ImageUtil.saveImage(bitmap, getOriginalSignatureImage().getAbsolutePath(), 100);
+            Intent intent = new Intent();
+            Signature signature = new Signature();
+            signature.setName(nameEditText.getText().toString());
+            signature.setImage(data);
+            intent.putExtra(ConstantUtil.SIGNATURE_EXTRA, signature);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
     }
 
     @Override

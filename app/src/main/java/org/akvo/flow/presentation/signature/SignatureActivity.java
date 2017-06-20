@@ -25,9 +25,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
@@ -49,6 +47,7 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
 public class SignatureActivity extends Activity implements SignatureView.SignatureViewListener {
 
@@ -88,23 +87,6 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
         if (!TextUtils.isEmpty(name)) {
             nameEditText.setText(name);
         }
-        nameEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-                //EMPTY
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //EMPTY
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updateSendButton();
-            }
-        });
     }
 
     private void setSignatureView() {
@@ -128,9 +110,7 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
                                     });
                         }
                     }
-
                 });
-
     }
 
     @NonNull
@@ -143,6 +123,12 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
         boolean isNameEmpty = TextUtils.isEmpty(nameEditText.getText().toString());
         boolean signatureEmpty = mSignatureView.isEmpty();
         saveButton.setEnabled(!isNameEmpty && !signatureEmpty);
+    }
+
+    @OnTextChanged(value = R.id.name_edit_text,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void onNameTextChanged() {
+        updateSendButton();
     }
 
     @OnClick(R.id.cancel)
@@ -159,8 +145,8 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
 
     @OnClick(R.id.save)
     void onSaveButtonTap() {
-        if (!mSignatureView.isEmpty() && !TextUtils
-                .isEmpty(nameEditText.getText().toString())) {
+        String name = nameEditText.getText().toString();
+        if (!mSignatureView.isEmpty() && !TextUtils.isEmpty(name)) {
             saveButton.setText(R.string.saving);
             saveButton.setEnabled(false);
             Bitmap bitmap = mSignatureView.getBitmap();
@@ -169,7 +155,7 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
             ImageUtil.saveImage(bitmap, getOriginalSignatureImage().getAbsolutePath(), 100);
             Intent intent = new Intent();
             Signature signature = new Signature();
-            signature.setName(nameEditText.getText().toString());
+            signature.setName(name);
             signature.setImage(data);
             intent.putExtra(ConstantUtil.SIGNATURE_EXTRA, signature);
             setResult(RESULT_OK, intent);

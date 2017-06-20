@@ -32,17 +32,15 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
-
 import org.akvo.flow.R;
 import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.ui.view.signature.SignatureView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
+import org.akvo.flow.util.image.GlideImageLoader;
+import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.util.image.ImageLoaderListener;
 
 import java.io.File;
 
@@ -68,6 +66,8 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
     private String name;
     private String datapointId;
 
+    private ImageLoader imageLoader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +77,7 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
         questionId = getIntent().getStringExtra(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA);
         datapointId = getIntent().getStringExtra(ConstantUtil.SIGNATURE_DATAPOINT_ID_EXTRA);
         name = getIntent().getStringExtra(ConstantUtil.SIGNATURE_NAME_EXTRA);
-
+        imageLoader = new GlideImageLoader(this);
         setSignatureView();
         setNameEditText();
     }
@@ -115,15 +115,10 @@ public class SignatureActivity extends Activity implements SignatureView.Signatu
                                 .removeGlobalOnLayoutListener(this);
                         File originalSignatureImage = getOriginalSignatureImage();
                         if (originalSignatureImage.exists()) {
-                            Glide.with(SignatureActivity.this)
-                                    .load(originalSignatureImage)
-                                    .asBitmap()
-                                    .skipMemoryCache(true)
-                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                    .into(new SimpleTarget<Bitmap>() {
+                            imageLoader.loadFromFile(originalSignatureImage,
+                                    new ImageLoaderListener() {
                                         @Override
-                                        public void onResourceReady(Bitmap bitmap,
-                                                GlideAnimation<? super Bitmap> glideAnimation) {
+                                        public void onImageReady(Bitmap bitmap) {
                                             if (bitmap != null) {
                                                 mSignatureView.setBitmap(bitmap);
                                                 mSignatureView.invalidate();

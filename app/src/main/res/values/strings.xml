@@ -283,5 +283,6 @@
     <string name="install">Install</string>
     <string name="signature_name_hint">Please, type your name</string>
     <string name="saving">Saving...</string>
+    <string name="error_saving_signature">Error saving signature, please try again.</string>
 
 </resources>

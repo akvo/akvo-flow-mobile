@@ -28,6 +28,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -99,12 +100,6 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
     protected void onDestroy() {
         super.onDestroy();
         presenter.destroy();
-    }
-
-    @Override
-    public void setNameText(String name) {
-        nameEditText.setText(name);
-        nameEditText.setSelection(nameEditText.getText().length());
     }
 
     private void setSignatureDrawView() {
@@ -192,5 +187,23 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
     @Override
     public void disableSaveButton() {
         saveButton.setEnabled(false);
+    }
+
+    @Override
+    public void setNameText(String name) {
+        nameEditText.setText(name);
+        nameEditText.setSelection(nameEditText.getText().length());
+    }
+
+    @Override
+    public void hideSaving() {
+        saveButton.setText(R.string.savebutton);
+        enableSaveButton();
+    }
+
+    @Override
+    public void displayErrorSavingImage() {
+        Toast.makeText(getApplicationContext(), R.string.error_saving_signature, Toast.LENGTH_LONG)
+                .show();
     }
 }

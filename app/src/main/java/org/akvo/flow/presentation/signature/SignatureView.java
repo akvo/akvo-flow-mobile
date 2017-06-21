@@ -31,4 +31,8 @@ interface SignatureView {
     void finishWithResultOK(String signatureName);
 
     void setNameText(String name);
+
+    void hideSaving();
+
+    void displayErrorSavingImage();
 }

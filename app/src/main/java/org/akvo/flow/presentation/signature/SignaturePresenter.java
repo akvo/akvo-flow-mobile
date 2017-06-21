@@ -68,7 +68,8 @@ public class SignaturePresenter implements Presenter {
         return mediaFileHelper.getImageFile(ORIGINAL_SUFFIX, questionId, datapointId);
     }
 
-    @NonNull private File getResizedSignatureFile() {
+    @NonNull
+    private File getResizedSignatureFile() {
         return mediaFileHelper.getImageFile(RESIZED_SUFFIX, questionId, datapointId);
     }
 
@@ -108,7 +109,8 @@ public class SignaturePresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error saving image");
-                    //TODO: display error???
+                    view.hideSaving();
+                    view.displayErrorSavingImage();
                 }
 
                 @Override

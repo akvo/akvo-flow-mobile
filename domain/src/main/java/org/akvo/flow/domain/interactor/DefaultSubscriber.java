@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,22 +18,26 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+/**
+ * Default subscriber base class to be used whenever you want to avoid having to implement all
+ * 3 methods.
+ */
+public class DefaultSubscriber<T> extends rx.Subscriber<T> {
 
-import javax.inject.Named;
+    @Override
+    public void onCompleted() {
+        // no-op by default.
+    }
 
-import dagger.Module;
-import dagger.Provides;
+    @Override
+    public void onError(Throwable e) {
+        // no-op by default.
+    }
 
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
+    @Override
+    public void onNext(T t) {
+        // no-op by default.
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,22 +18,29 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.thread;
 
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.executor.PostExecutionThread;
 
-import javax.inject.Named;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import dagger.Module;
-import dagger.Provides;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
-@Module
-public class ViewModule {
+/**
+ * MainThread (UI Thread) implementation based on a {@link Scheduler}
+ * which will execute actions on the Android UI thread
+ */
+@Singleton
+public class UIThread implements PostExecutionThread {
 
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
+    @Inject
+    public UIThread() {
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return AndroidSchedulers.mainThread();
     }
 }

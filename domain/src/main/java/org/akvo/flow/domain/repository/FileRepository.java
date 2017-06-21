@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,22 +18,13 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.domain.repository;
 
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+import android.graphics.Bitmap;
 
-import javax.inject.Named;
+import rx.Observable;
 
-import dagger.Module;
-import dagger.Provides;
+public interface FileRepository {
 
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
-    }
+    Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
 }

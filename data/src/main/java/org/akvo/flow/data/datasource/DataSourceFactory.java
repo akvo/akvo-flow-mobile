@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,22 +18,22 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.datasource;
 
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import javax.inject.Named;
+@Singleton
+public class DataSourceFactory {
 
-import dagger.Module;
-import dagger.Provides;
+    private final ImageDataSource imageDataSource;
 
-@Module
-public class ViewModule {
+    @Inject
+    public DataSourceFactory(ImageDataSource imageDataSource) {
+        this.imageDataSource = imageDataSource;
+    }
 
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
+    public ImageDataSource getImageDataSource() {
+        return imageDataSource;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,22 +18,16 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.domain.executor;
 
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+import rx.Scheduler;
 
-import javax.inject.Named;
+/**
+ * Thread abstraction created to change the execution context from any thread to any other thread.
+ * Useful to encapsulate a UI Thread for example, since some job will be done in background, an
+ * implementation of this interface will change context and update the UI.
+ */
+public interface PostExecutionThread {
 
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
-    }
+    Scheduler getScheduler();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,22 +18,17 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.presentation.signature;
 
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+interface SignatureView {
 
-import javax.inject.Named;
+    void enableSaveButton();
 
-import dagger.Module;
-import dagger.Provides;
+    void disableSaveButton();
 
-@Module
-public class ViewModule {
+    void showSaving();
 
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
-    }
+    void finishWithResultOK(String signatureName);
+
+    void setNameText(String name);
 }

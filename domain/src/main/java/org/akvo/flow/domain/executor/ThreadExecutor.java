@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,22 +18,10 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.domain.executor;
 
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+import java.util.concurrent.Executor;
 
-import javax.inject.Named;
+public interface ThreadExecutor extends Executor {
 
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
-    }
 }

@@ -124,16 +124,20 @@ public class SignatureQuestionView extends QuestionView {
 
         mSignature = SignatureValue.deserialize(getResponse().getValue());
         String name = mSignature == null ? "" : mSignature.getName();
-        Bitmap imageBitmap = getImageBitmapFromString();
-        displayResponse(name, imageBitmap);
-    }
+        String base64ImageString = mSignature == null ? "" : mSignature.getImage();
+        if (!TextUtils.isEmpty(base64ImageString)) {
+            setUpName(name);
+            imageLoader.loadFromBase64String(base64ImageString, new ImageLoaderListener() {
+                @Override
+                public void onImageReady(@Nullable Bitmap bitmap) {
+                    setUpImage(bitmap);
+                    updateSignButton();
+                }
+            });
+        } else {
+            displayResponse(name, null);
+        }
 
-    @Nullable
-    private Bitmap getImageBitmapFromString() {
-        String imageAsString = mSignature == null? "": mSignature.getImage();
-        return TextUtils.isEmpty(imageAsString) ?
-                null :
-                ImageUtil.decodeBase64(imageAsString);
     }
 
     @Override

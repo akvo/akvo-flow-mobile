@@ -46,11 +46,6 @@ public class ImageUtil {
         return Base64.encodeToString(image, Base64.DEFAULT);
     }
 
-    public static Bitmap decodeBase64(String data) {
-        byte[] image = Base64.decode(data, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(image, 0, image.length);
-    }
-
     /**
      * resizeImage handles resizing a too-large image file from the camera,
      * @return true if the image was successfully resized to the new file, false otherwise

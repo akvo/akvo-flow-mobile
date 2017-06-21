@@ -25,4 +25,6 @@ import java.io.File;
 public interface ImageLoader {
 
     void loadFromFile(File file, ImageLoaderListener listener);
+
+    void loadFromBase64String(String image, final ImageLoaderListener listener);
 }

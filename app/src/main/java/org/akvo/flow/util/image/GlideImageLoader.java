@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
@@ -52,6 +53,22 @@ public class GlideImageLoader implements ImageLoader {
     @Override
     public void loadFromFile(File file, final ImageLoaderListener listener) {
         requestManager.load(file)
+                .asBitmap()
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap,
+                            GlideAnimation<? super Bitmap> glideAnimation) {
+                        listener.onImageReady(bitmap);
+                    }
+                });
+    }
+
+    @Override
+    public void loadFromBase64String(String base64ImageString, final ImageLoaderListener listener) {
+        requestManager
+                .load(Base64.decode(base64ImageString, Base64.DEFAULT))
                 .asBitmap()
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)

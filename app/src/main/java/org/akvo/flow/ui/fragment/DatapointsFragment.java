@@ -50,8 +50,6 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import timber.log.Timber;
-
 public class DatapointsFragment extends Fragment {
 
     private static final String TAG = DatapointsFragment.class.getSimpleName();
@@ -101,7 +99,6 @@ public class DatapointsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
-        Timber.d("Survey group id is %d", mSurveyGroup.getId());
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
     }

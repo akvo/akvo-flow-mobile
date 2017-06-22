@@ -18,13 +18,13 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.domain.repository;
 
-import java.io.File;
+import android.graphics.Bitmap;
 
-public interface ImageLoader {
+import rx.Observable;
 
-    void loadFromFile(File file, ImageLoaderListener listener);
+public interface FileRepository {
 
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+    Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
 }

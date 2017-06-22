@@ -31,7 +31,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class SignatureView extends View {
+public class SignatureDrawView extends View {
 
     private static final int BACKGROUND_COLOR = Color.WHITE;
     private static final int STROKE_COLOR = Color.BLACK;
@@ -40,9 +40,10 @@ public class SignatureView extends View {
 
     private float mX, mY;
 
-    private Path mPath;
-    private Paint mPaint;
-    private Paint mBitmapPaint;
+    private final Path mPath;
+    private final Paint mPaint;
+    private final Paint mBitmapPaint;
+
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private boolean mIsEmpty;
@@ -50,7 +51,7 @@ public class SignatureView extends View {
     @Nullable
     private SignatureViewListener listener;
 
-    public SignatureView(Context context, AttributeSet attrs) {
+    public SignatureDrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         mPath = new Path();
@@ -70,7 +71,7 @@ public class SignatureView extends View {
         this.listener = listener;
     }
 
-    public void resetBitmap() {
+    private void resetBitmap() {
         mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(BACKGROUND_COLOR);
@@ -82,6 +83,7 @@ public class SignatureView extends View {
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(BACKGROUND_COLOR);
         mCanvas.drawBitmap(bitmap, 0, 0, mPaint);
+        mIsEmpty = true;
     }
 
     public void clear() {

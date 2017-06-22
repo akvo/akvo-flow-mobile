@@ -18,13 +18,21 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.presentation.signature;
 
-import java.io.File;
+interface SignatureView {
 
-public interface ImageLoader {
+    void enableSaveButton();
 
-    void loadFromFile(File file, ImageLoaderListener listener);
+    void disableSaveButton();
 
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+    void showSaving();
+
+    void finishWithResultOK(String signatureName);
+
+    void setNameText(String name);
+
+    void hideSaving();
+
+    void displayErrorSavingImage();
 }

@@ -20,8 +20,6 @@ package org.akvo.flow.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -41,21 +39,11 @@ import timber.log.Timber;
 
 public class ImageUtil {
 
-    public static String encodeBase64(Bitmap bitmap, int reqWidth, int reqHeight) {
-        Matrix m = new Matrix();
-        m.setRectToRect(new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight()),
-                new RectF(0, 0, reqWidth, reqHeight), Matrix.ScaleToFit.CENTER);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
-
+    public static String encodeBase64(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] image = stream.toByteArray();
         return Base64.encodeToString(image, Base64.DEFAULT);
-    }
-
-    public static Bitmap decodeBase64(String data) {
-        byte[] image = Base64.decode(data, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 
     /**
@@ -91,7 +79,7 @@ public class ImageUtil {
             reqWidth = tmp;
         }
 
-        Timber.d("Orig Image size: " + options.outWidth + "x" + options.outHeight);
+        Timber.d("Orig Image size: %d x %d", options.outWidth, options.outHeight);
 
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
@@ -100,9 +88,9 @@ public class ImageUtil {
         options.inJustDecodeBounds = false;
         Bitmap bitmap = BitmapFactory.decodeFile(origFilename, options);
 
-        if (bitmap != null && saveImage(bitmap, outFilename, 75)) {
+        if (bitmap != null && saveImage(bitmap, outFilename)) {
             checkOrientation(origFilename, outFilename);// Ensure the EXIF data is not lost
-            Timber.d("Resized Image size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+            Timber.d("Resized Image size: %d x %d", bitmap.getWidth(), bitmap.getHeight());
             return true;
         }
         return false;
@@ -163,11 +151,11 @@ public class ImageUtil {
         return false;
     }
 
-    public static boolean saveImage(Bitmap bitmap, String filename, int quality) {
+    private static boolean saveImage(Bitmap bitmap, String filename) {
         OutputStream out = null;
         try {
             out = new BufferedOutputStream(new FileOutputStream(filename));
-            if (bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)) {
+            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out)) {
                 return true;
             }
         } catch (FileNotFoundException e) {
@@ -246,7 +234,7 @@ public class ImageUtil {
         Bitmap bitmap = BitmapFactory.decodeFile(filename, options);
 
         if (bitmap != null) {
-            Timber.d("Displaying image with inSampleSize: " + options.inSampleSize);
+            Timber.d("Displaying image with inSampleSize: %d", options.inSampleSize);
             imageView.setImageBitmap(bitmap);
         }
     }
@@ -257,7 +245,7 @@ public class ImageUtil {
      * 2) Get maxWidth and maxHeight. If both of them are not set then go to step #3.
      * 3) Get device screen dimensions.
      */
-    public static int[] getImageSize(ImageView imageView) {
+    private static int[] getImageSize(ImageView imageView) {
         DisplayMetrics displayMetrics = imageView.getContext().getResources().getDisplayMetrics();
 
         ViewGroup.LayoutParams params = imageView.getLayoutParams();
@@ -322,5 +310,4 @@ public class ImageUtil {
         sb.append("/").append(secondsDenom);
         return sb.toString();
     }
-
 }

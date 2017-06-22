@@ -18,13 +18,9 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.presentation;
 
-import java.io.File;
+public interface Presenter {
 
-public interface ImageLoader {
-
-    void loadFromFile(File file, ImageLoaderListener listener);
-
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+    void destroy();
 }

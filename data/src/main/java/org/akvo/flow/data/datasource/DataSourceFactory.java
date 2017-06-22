@@ -18,13 +18,22 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.data.datasource;
 
-import java.io.File;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-public interface ImageLoader {
+@Singleton
+public class DataSourceFactory {
 
-    void loadFromFile(File file, ImageLoaderListener listener);
+    private final ImageDataSource imageDataSource;
 
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+    @Inject
+    public DataSourceFactory(ImageDataSource imageDataSource) {
+        this.imageDataSource = imageDataSource;
+    }
+
+    public ImageDataSource getImageDataSource() {
+        return imageDataSource;
+    }
 }

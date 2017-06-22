@@ -18,13 +18,29 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.thread;
 
-import java.io.File;
+import org.akvo.flow.domain.executor.PostExecutionThread;
 
-public interface ImageLoader {
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-    void loadFromFile(File file, ImageLoaderListener listener);
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+/**
+ * MainThread (UI Thread) implementation based on a {@link Scheduler}
+ * which will execute actions on the Android UI thread
+ */
+@Singleton
+public class UIThread implements PostExecutionThread {
+
+    @Inject
+    public UIThread() {
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return AndroidSchedulers.mainThread();
+    }
 }

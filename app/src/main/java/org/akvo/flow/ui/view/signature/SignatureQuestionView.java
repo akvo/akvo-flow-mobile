@@ -21,7 +21,9 @@
 package org.akvo.flow.ui.view.signature;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +41,12 @@ import org.akvo.flow.serialization.response.value.SignatureValue;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
+import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.image.GlideImageLoader;
+import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.util.image.ImageLoaderListener;
+
+import static org.akvo.flow.util.MediaFileHelper.RESIZED_SUFFIX;
 
 public class SignatureQuestionView extends QuestionView {
 
@@ -48,6 +56,8 @@ public class SignatureQuestionView extends QuestionView {
     private TextView nameLabel;
 
     private Signature mSignature;
+    private ImageLoader imageLoader;
+    private MediaFileHelper mediaFileHelper;
 
     public SignatureQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -63,6 +73,9 @@ public class SignatureQuestionView extends QuestionView {
         nameLabel = (TextView)findViewById(R.id.name_label);
         mImage = (ImageView)findViewById(R.id.image);
         signButton = (Button)findViewById(R.id.sign_btn);
+        Context context = getContext();
+        imageLoader = new GlideImageLoader(context);
+        mediaFileHelper = new MediaFileHelper(context);
 
         if (isReadOnly()) {
             signButton.setEnabled(false);
@@ -85,9 +98,19 @@ public class SignatureQuestionView extends QuestionView {
     @Override
     public void questionComplete(Bundle data) {
         if (data != null) {
-            mSignature = data.getParcelable(ConstantUtil.SIGNATURE_EXTRA);
-            captureResponse();
-            displayResponse();
+            final String name = data.getString(ConstantUtil.SIGNATURE_NAME_EXTRA);
+            mSignature.setName(name);
+            imageLoader.loadFromFile(mediaFileHelper.getImageFile(RESIZED_SUFFIX, mQuestion.getId(),
+                    mSurveyListener.getDatapointId()), new ImageLoaderListener() {
+                @Override
+                public void onImageReady(@Nullable Bitmap bitmap) {
+                    displayResponse(name, bitmap);
+                    if (bitmap != null) {
+                        mSignature.setImage(ImageUtil.encodeBase64(bitmap));
+                    }
+                    captureResponse();
+                }
+            });
         }
     }
 
@@ -100,14 +123,28 @@ public class SignatureQuestionView extends QuestionView {
         }
 
         mSignature = SignatureValue.deserialize(getResponse().getValue());
-        displayResponse();
+        String name = mSignature == null ? "" : mSignature.getName();
+        String base64ImageString = mSignature == null ? "" : mSignature.getImage();
+        if (!TextUtils.isEmpty(base64ImageString)) {
+            setUpName(name);
+            imageLoader.loadFromBase64String(base64ImageString, new ImageLoaderListener() {
+                @Override
+                public void onImageReady(@Nullable Bitmap bitmap) {
+                    setUpImage(bitmap);
+                    updateSignButton();
+                }
+            });
+        } else {
+            displayResponse(name, null);
+        }
+
     }
 
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mSignature = new Signature();
-        displayResponse();
+        displayResponse("", null);
     }
 
     @Override
@@ -117,26 +154,23 @@ public class SignatureQuestionView extends QuestionView {
                 getQuestion().getId()));
     }
 
-    private void displayResponse() {
-        String name = mSignature == null? "" : mSignature.getName();
-        String imageAsString = mSignature == null? "" : mSignature.getImage();
-
+    private void displayResponse(String name, Bitmap imageBitmap) {
         setUpName(name);
-        setUpImage(imageAsString);
-        updateSignButton(imageAsString);
+        setUpImage(imageBitmap);
+        updateSignButton();
     }
 
-    private void updateSignButton(String imageAsString) {
-        if (!TextUtils.isEmpty(mName.getText().toString()) && !TextUtils.isEmpty(imageAsString)) {
+    private void updateSignButton() {
+        if (!TextUtils.isEmpty(mName.getText().toString()) && mImage.getVisibility() == VISIBLE) {
             signButton.setText(R.string.modify_signature);
         } else {
             signButton.setText(R.string.add_signature);
         }
     }
 
-    private void setUpImage(String imageAsString) {
-        if (!TextUtils.isEmpty(imageAsString)) {
-            mImage.setImageBitmap(ImageUtil.decodeBase64(imageAsString));
+    private void setUpImage(Bitmap imageBitmap) {
+        if (imageBitmap != null) {
+            mImage.setImageBitmap(imageBitmap);
             mImage.setVisibility(VISIBLE);
         } else {
             mImage.setImageDrawable(null);

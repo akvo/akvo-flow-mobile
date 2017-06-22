@@ -18,13 +18,10 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.domain.executor;
 
-import java.io.File;
+import java.util.concurrent.Executor;
 
-public interface ImageLoader {
+public interface ThreadExecutor extends Executor {
 
-    void loadFromFile(File file, ImageLoaderListener listener);
-
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
 }

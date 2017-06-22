@@ -18,13 +18,26 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.domain.interactor;
 
-import java.io.File;
+/**
+ * Default subscriber base class to be used whenever you want to avoid having to implement all
+ * 3 methods.
+ */
+public class DefaultSubscriber<T> extends rx.Subscriber<T> {
 
-public interface ImageLoader {
+    @Override
+    public void onCompleted() {
+        // no-op by default.
+    }
 
-    void loadFromFile(File file, ImageLoaderListener listener);
+    @Override
+    public void onError(Throwable e) {
+        // no-op by default.
+    }
 
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+    @Override
+    public void onNext(T t) {
+        // no-op by default.
+    }
 }

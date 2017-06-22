@@ -19,11 +19,34 @@
 
 package org.akvo.flow.domain.response.value;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
-public class Signature {
+public class Signature implements Parcelable {
+
     private String name;
     private String image;
+
+    public Signature() {
+    }
+
+    public Signature(Parcel in) {
+        name = in.readString();
+        image = in.readString();
+    }
+
+    public static final Creator<Signature> CREATOR = new Creator<Signature>() {
+        @Override
+        public Signature createFromParcel(Parcel in) {
+            return new Signature(in);
+        }
+
+        @Override
+        public Signature[] newArray(int size) {
+            return new Signature[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -49,4 +72,14 @@ public class Signature {
         return !TextUtils.isEmpty(image);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(image);
+    }
 }

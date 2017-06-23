@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -68,6 +69,8 @@ import org.akvo.flow.util.ViewUtil;
 
 import java.lang.ref.WeakReference;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import timber.log.Timber;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
@@ -76,15 +79,21 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     private static final String DRAWER_FRAGMENT_TAG = "f";
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+
+    @BindView(R.id.add_data_point_fab)
+    FloatingActionButton addDataPointFab;
+
     private SurveyDbAdapter mDatabase;
     private SurveyGroup mSurveyGroup;
-
-    private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
     private CharSequence mDrawerTitle, mTitle;
     private Navigator navigator = new Navigator();
-
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
 
@@ -98,6 +107,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
+
+        ButterKnife.bind(this);
 
         initializeToolBar();
 
@@ -130,7 +141,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initializeToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
@@ -139,7 +149,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initNavigationDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,

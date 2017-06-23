@@ -22,7 +22,10 @@
             android:clickable="true"
             android:layout_marginBottom="16dp"
             android:layout_marginRight="16dp"
-            android:layout_gravity="right|bottom"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="end|bottom"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:srcCompat="@drawable/ic_action_new"
-            android:id="@+id/floatingActionButton"/>
+            android:id="@+id/add_data_point_fab"/>
 </android.support.design.widget.CoordinatorLayout>

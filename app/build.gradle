@@ -79,6 +79,8 @@ android {
             }
         }
 
+
+
         testOptions {
             unitTests.returnDefaultValues = true
         }
@@ -94,6 +96,11 @@ android {
         }
     } else {
         throw new GradleException("Could not read version.properties!")
+    }
+
+    sourceSets {
+        biogas.res.srcDirs = ['src/snv/res', 'src/biogas/res']
+        cookstoves.res.srcDirs = ['src/snv/res', 'src/cookstoves/res']
     }
 }
 

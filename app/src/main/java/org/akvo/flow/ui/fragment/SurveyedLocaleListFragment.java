@@ -121,7 +121,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
             mAdapter = new SurveyedLocaleListAdapter(getActivity(), mSurveyGroup);
             setListAdapter(mAdapter);
         }
-        setEmptyText(getString(R.string.no_records_text));
+        setEmptyText(getString(R.string.no_datapoints_error_text));
         getListView().setOnItemClickListener(this);
     }
 
@@ -179,7 +179,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
         if (mSurveyGroup == null) {
             setEmptyText(getString(R.string.no_survey_selected_text));
         } else {
-            setEmptyText(getString(R.string.no_records_text));
+            setEmptyText(getString(R.string.no_datapoints_error_text));
         }
 
         if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {

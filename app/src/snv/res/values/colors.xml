@@ -7,7 +7,7 @@
     <color name="snv_green_selected">#8cb07e</color>
 
     <!-- SNV branding-->
-    <color name="background_main">#ffffff</color>
+    <color name="app_background_main">#ffffff</color>
     <color name="background_alternate">#e4f1f9</color>
 
     <!-- Text -->
@@ -17,11 +17,6 @@
     <color name="text_secondary_disabled">@color/snv_blue_selected</color>
     <color name="text_tertiary">@color/snv_green</color>
     <color name="text_tertiary_disabled">@color/snv_green_selected</color>
-
-    <color name="tab_text">@color/white</color>
-    <color name="tab_text_selected">@color/snv_blue</color>
-
-    <color name="action_bar_text">@color/white</color>
 
     <!-- Buttons -->
     <color name="button_primary">@color/snv_green</color>
@@ -35,9 +30,12 @@
     <color name="button_tertiary_selected">@color/button_grey_dark_selected</color>
     <color name="button_tertiary_text">@color/white</color>
 
-    <color name="default_underline_indicator_selected_color">#ff33b5e5</color>
-
     <color name="record_name_background">#cec6bc</color>
     <color name="feature_menu_background">#e0736357</color>
+
+    <color name="colorPrimary">#2BB5E5</color>
+    <color name="colorPrimaryDark">@color/snv_blue</color>
+    <color name="colorAccent">@color/snv_blue</color>
+    <color name="tabIndicatorColor">@color/orange_main</color>
 
 </resources>

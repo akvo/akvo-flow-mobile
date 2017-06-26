@@ -42,7 +42,7 @@ public class TagsFactory {
     private static final String DEVICE_ID_TAG_KEY = "flow.device.id";
     private static final String DEVICE_MODEL_TAG_KEY = "device.model";
     private static final String OS_VERSION_TAG_KEY = "os.version";
-    private static final String VERSION_NAME_TAG_KEY = "version.name";
+    static final String VERSION_NAME_TAG_KEY = "version.name";
     private static final String VERSION_CODE_TAG_KEY = "version.code";
     private static final String DEFAULT_TAG_VALUE = "NotSet";
     /**

@@ -327,4 +327,11 @@ public class GeoQuestionView extends QuestionView
     public void captureResponse(boolean suppressListeners) {
         saveManualFields();
     }
+
+    @Override
+    public void onDestroy() {
+        if (mLocationListener != null && mLocationListener.isListening()) {
+            mLocationListener.stop();
+        }
+    }
 }

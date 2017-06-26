@@ -30,11 +30,14 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.DatabaseHelper;
 import org.akvo.flow.data.database.LanguageTable;
 import org.akvo.flow.data.database.RecordColumns;
 import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.domain.SurveyGroup;
+
+import static org.akvo.flow.data.preference.Prefs.KEY_SURVEY_GROUP_ID;
 
 public class DataProvider extends ContentProvider {
     
@@ -66,13 +69,14 @@ public class DataProvider extends ContentProvider {
             String sortOrder) {
         // Do the query against a read-only version of the database
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+        Prefs prefs = new Prefs(getContext().getApplicationContext());
         Cursor cursor = null;
         // Decodes the content URI and maps it to a code
         switch (sUriMatcher.match(uri)) {
             case SEARCH_SUGGEST:
                 // Suggestions search
                 // Adjust incoming query to become SQL text match
-                long surveyGroupId = FlowApp.getApp().getSurveyGroupId();
+                long surveyGroupId = prefs.getLong(KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
 
                 String nameSearchTerm = createNameSearchTerm(selectionArgs);
                 String idSearchTerm = createIdSearchTerm(selectionArgs);

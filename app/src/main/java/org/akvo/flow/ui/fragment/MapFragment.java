@@ -241,6 +241,7 @@ public class MapFragment extends SupportMapFragment
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         refresh();
     }
 

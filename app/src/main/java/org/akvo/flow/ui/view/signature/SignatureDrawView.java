@@ -83,7 +83,7 @@ public class SignatureDrawView extends View {
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(BACKGROUND_COLOR);
         mCanvas.drawBitmap(bitmap, 0, 0, mPaint);
-        mIsEmpty = true;
+        mIsEmpty = false;
     }
 
     public void clear() {

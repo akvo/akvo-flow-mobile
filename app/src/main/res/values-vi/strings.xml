@@ -11,7 +11,6 @@
   <string name="lon">Kinh độ</string>
   <string name="elevation">Độ cao</string>
   <string name="submitbutton">Đệ trình</string>
-  <string name="geodialog">Cần phải kích hoạt ứng dụng định vị tọa độ để thực hiện chức năng này. Chọn Ok để vào trang Cài đặt. Chọn \"Sử dụng vệ tinh để định vị tọa độ\" và sau đó ấn nút quay lại. Khi ứng dụng định vị tọa độ được kích hoạt, bạn có thể nhấp lại \"Kiểm tra tọa độ địa lý\" để biết được vị trí hiện tại của bạn</string>
   <string name="resize_large_images">Thay đổi kích thước của những ảnh cỡ lớn</string>
   <string name="settingslabel">Cài đặt</string>
   <string name="nouser">Chưa có người sử dụng</string>
@@ -26,7 +25,6 @@
   <string name="screenoptdesc">Tránh để màn hình bị tắt khi đang ở chế độ nhập dữ liệu. Chắc chắn rằng tắt màn hình hoặc thoát khỏi ứng dụng bằng tay khi không sử dụng để tránh bị hao pin</string>
   <string name="aboutlabel">Phiên bản</string>
   <string name="aboutdesc">Hiển thị thông tin của phiên bản</string>
-  <string name="abouttitle">Giới thiệu ứng dụng Akvo Flow</string>
   <string name="gpsstatuslabel">Trạng thái định vị tọa độ</string>
   <string name="gpsstatusdesc">Khởi động ứng dụng định vị tọa độ nếu bạn đã cài đặt nó trên thiết bị này</string>
   <string name="nogpsstatus">Ứng dụng định vị tọa độ chưa được cài đặt trên thiết bị này. Vui lòng cài đặt nó bằng sử dụng kho dữ liệu của Google Play</string>
@@ -41,7 +39,6 @@
   <string name="uploadoptionlabel">Đồng bộ hóa dữ liệu qua mạng di động </string>
   <string name="surveylanglabel">Những ngôn ngữ của đợt khảo sát</string>
   <string name="scanbarcode">Quét mã vạch</string>
-  <string name="barcodeerror">Máy quét chưa được cài đặt. Vui lòng cài đặt ứng dụng Quét mã vạch của Anroid Market</string>
   <string name="toosmallerr">Giá trị quá nhỏ. Giá trị nhỏ nhất là: </string>
   <string name="toolargeerr">Giá trị quá lớn. Giá trị lớn nhất là: </string>
   <string name="baddatatypeerr">Câu trả lời phải là dạng số học</string>
@@ -79,7 +76,6 @@
   <string name="bootstrapstart">Tải dữ liệu điều tra từ thẻ nhớ SD</string>
   <string name="bootstrapcomplete">Hoàn thành tải dữ liệu khảo sát từ thẻ nhớ SD</string>
   <string name="bootstraperror">Lỗi khi xử lý tập tin zip bootstrap</string>
-  <string name="bootstrap_invalid_app">Lỗi vì biểu mẫu không thuộc về trường hợp của Flow này</string>
   <string name="transmissionhist">Lịch sử truyền dữ liệu</string>
   <string name="transstartdate">Quá trình truyền dữ liệu đã bắt đầu</string>
   <string name="transenddate">Quá trình truyền dữ liệu đã kết thúc</string>
@@ -121,7 +117,6 @@
   <string name="app_language">Ngôn ngữ của ứng dụng</string>
   <string name="please_restart">Vui lòng, khởi động lại ứng dụng</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">Bạn chưa được phân công nhiệm vụ khảo sát. Những đợt khảo sát được phân công trong bảng điều khiển Flow</string>
   <string name="no_records_text">Bạn chưa có dữ liệu. Ấn nút \'\+\' để bắt đầu</string>
   <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
   <!--Activity Labels-->
@@ -195,11 +190,8 @@
   <string name="status_exported">Đã xuất dữ liệu</string>
   <!--APK update-->
   <string name="app_update_activity">Cập nhật ứng dụng Ako Flow</string>
-  <string name="app_update">Một phiên bản mới của ứng dụng Flow đang có sẵn. Ấn \"Cập nhật\" để tải về và cài đặt phiên bản mới</string>
   <string name="update">Cập nhật</string>
   <string name="not_now">Không phải bây giờ</string>
-  <string name="clicktoinstall">Phiên bản mới của Flow đã được tải về. Bạn có muốn cài đặt bây giờ không?</string>
-  <string name="apk_upgrade_error">Lỗi trong quá trình tải về phiên bản cập nhật Flow.</string>
   <!--Time check-->
   <string name="time_check_activity">Ngày tháng và thời gian</string>
   <string name="time_warning">Thời gian trên máy điện thoại của bạn không chính xác! Thay đổi đồng hồ của bạn và thử lại. Ngày tháng và thời gian trên điện thoại của bạn là:</string>
@@ -207,8 +199,6 @@
   <!--Form sync-->
   <string name="downloading_forms">Đang tải các biểu mẫu</string>
   <string name="error_form_sync_title">Lỗi khi đồng bộ hóa biểu mẫu</string>
-  <string name="error_assignment_read">Không thể hiểu được việc chỉ định biểu mẫu từ bảng điều khiển Flow</string>
-  <string name="error_form_header">Phần trăm %1$s biểu mẫu không được hiểu từ bảng điều khiển Flow</string>
   <string name="error_form_download">Chắc chắn rằng biểu mẫu này đã được công bố, và ngày tháng/thời gian của khu vực của bạn là ok</string>
   <string name="form_deleted">Biểu mẫu này đã bị xóa</string>
   <!--File sync-->
@@ -245,6 +235,5 @@
   <string name="error_value_required">Trường dữ liệu này không thể bỏ trống</string>
   <string name="drawer_open">Drawer open</string>
   <string name="drawer_close">Drawer close</string>
-  <!--settings activity-->
   <!--app update service-->
 </resources>

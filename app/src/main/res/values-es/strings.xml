@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+  <string name="geo_location_accuracy_default">Precisión: desconocida</string>
+  <string name="geo_location_accuracy">Precisión: %1$s m</string>
   <string name="nocardspacetitle">No hay espacio de almacenamiento</string>
   <string name="lowcardspacetitle">Poco espacio de almacenamiento</string>
   <string name="nocardspacedialog">La tarjeta SD está llena y no se pueden recopilar más datos. Debe liberar espacio para poder continuar.</string>
@@ -11,7 +13,8 @@
   <string name="lon">Lon</string>
   <string name="elevation">Altura</string>
   <string name="submitbutton">Enviar</string>
-  <string name="geodialog">Para realizar esta acción el GPS debe estar activado. Pulse OK para ir a sección de ajustes. Seleccione Satélites GPS y regrese a la aplicación. Una vez activado el GPS, vuelva a intentar la búsqueda.</string>
+  <string name="geodialog">Habilita el acceso a la ubicación</string>
+  <string name="settings">Ajustes</string>
   <string name="resize_large_images">Reducir imágenes grandes</string>
   <string name="settingslabel">Ajustes</string>
   <string name="nouser">¡No hay usuarios!</string>
@@ -26,8 +29,6 @@
   <string name="screenoptdesc">Evitar que la pantalla se apague durante la introducción de datos. Asegúrese de apagar la pantalla (o cerrar la aplicación) cuando no esté en uso, para reducir el consumo de batería.</string>
   <string name="aboutlabel">Acerca de</string>
   <string name="aboutdesc">Muestra información sobre la versión actual</string>
-  <string name="abouttitle">Acerca de - Akvo Flow app</string>
-  <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow app\nDesarrollada por: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
   <string name="gpsstatuslabel">Estado del GPS</string>
   <string name="gpsstatusdesc">Abrir la aplicación GPS Status si la tiene instalada en este dispositivo.</string>
   <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instale la aplicación a través de Google Play Store.</string>
@@ -42,7 +43,6 @@
   <string name="uploadoptionlabel">Enviar datos mediante red móvil</string>
   <string name="surveylanglabel">Idiomas de la encuesta</string>
   <string name="scanbarcode">Escanear código de barras</string>
-  <string name="barcodeerror">Barcode Scanner no está instalado. Por favor, instale Barcode Scanner a través de Play Store.</string>
   <string name="toosmallerr">El valor es demasiado pequeño. Valor mínimo: </string>
   <string name="toolargeerr">El valor es demasiado grande. Valor máximo: </string>
   <string name="baddatatypeerr">La respuesta ha de ser numérica</string>
@@ -203,7 +203,7 @@
   <string name="update">Actualizar</string>
   <string name="not_now">Ahora no</string>
   <string name="clicktoinstall">La nueva versión de Flow está descargada. ¿Quiere instalarla ahora?</string>
-  <string name="apk_upgrade_error">Error descargando la actualización de Flow</string>
+  <string name="apk_upgrade_error">Error al descargar la actualización de Flow</string>
   <!--Time check-->
   <string name="time_check_activity">Fecha y hora</string>
   <string name="time_warning">¡La hora de su dispositivo no es correcta! Ajuste la hora y vuelta a intentar. La hora local de su dispositivo es:</string>
@@ -251,12 +251,29 @@
   <string name="error_value_required">Este campo no puede ser dejado en blanco</string>
   <string name="drawer_open">Abrir menú</string>
   <string name="drawer_close">Cerrar menú</string>
-  <!--settings activity-->
-  <string name="about_view_update">Comprobar si hay actualizaciones</string>
-  <string name="settings_app_update_description">Compruebe si hay una nueva versión de Akvo Flow.</string>
   <!--app update service-->
   <string name="apk_update_service_no_update">Ya que tiene la última versión de la aplicación.</string>
   <string name="apk_update_service_error_update">Se ha producido un error al intentar actualizar la aplicación, por favor intente-lo de nuevo.</string>
   <string name="apk_update_service_error_no_internet">Se ha producido un error al intentar actualizar la aplicación, usted no está conectado a Internet.</string>
   <string name="locale_list_error_unknown_location">Localización desconocida</string>
+  <string name="location_timeout">Localización fallida</string>
+  <string name="auto_geo_location_pending">Esperando la ubicación del dispositivo ...</string>
+  <string name="invalid_latitude">Latitud inválida</string>
+  <string name="invalid_longitude">Longitud inválida</string>
+  <string name="invalid_elevation">Altitud inválida</string>
+  <string name="about_activity_title">Acerca de</string>
+  <string name="about_view_title">Aplicación Akvo Flow</string>
+  <string name="app_icon_description">Icono de la aplicación</string>
+  <string name="about_view_subtitle">Captura de datos de mejor calidad, más rápido</string>
+  <string name="about_view_version">Versión %1$s</string>
+  <string name="about_view_copyright">Copyright © 2010-%1$s Stichting Akvo</string>
+  <string name="about_view_update">Comprobar si hay actualizaciones</string>
+  <string name="about_view_legal">Información legal</string>
+  <string name="about_view_release_notes">Notas de la versión</string>
+  <string name="about_view_terms">Términos de Uso</string>
+  <string name="licences_title">Licencias de terceros</string>
+  <string name="licences_description">Este software incorpora material de los proyectos enumerados a continuación.</string>
+  <string name="apache_licence_title">Apache License 2.0</string>
+  <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
+  <string name="mit_licence_title">MIT License</string>
 </resources>

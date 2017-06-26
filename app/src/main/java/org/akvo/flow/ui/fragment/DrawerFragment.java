@@ -352,6 +352,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                                 public void onClick(DialogInterface dialog, int id) {
                                     mDatabase.deleteSurveyGroup(surveyGroupId);
                                     if (selectedSurveyId == surveyGroupId) {
+                                        selectedSurveyId = SurveyGroup.ID_NONE;
                                         mListener.onSurveySelected(null);
                                     }
                                     load();
@@ -567,6 +568,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     return true;
                 case GROUP_SURVEYS:
                     SurveyGroup sg = (SurveyGroup) v.getTag();
+                    selectedSurveyId = sg.getId();
+                    notifyDataSetChanged();
                     mListener.onSurveySelected(sg);
                     return true;
             }

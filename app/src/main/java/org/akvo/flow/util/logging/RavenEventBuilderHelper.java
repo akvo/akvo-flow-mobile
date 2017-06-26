@@ -20,8 +20,6 @@
 
 package org.akvo.flow.util.logging;
 
-import android.text.TextUtils;
-
 import com.getsentry.raven.environment.RavenEnvironment;
 import com.getsentry.raven.event.EventBuilder;
 import com.getsentry.raven.event.helper.EventBuilderHelper;
@@ -42,10 +40,10 @@ public class RavenEventBuilderHelper implements EventBuilderHelper {
     public void helpBuildingEvent(EventBuilder eventBuilder) {
         eventBuilder.withSdkName(RavenEnvironment.SDK_NAME + ":android");
         String release = tags.get(VERSION_NAME_TAG_KEY);
-        if (!TextUtils.isEmpty(release)) {
-            eventBuilder.withRelease(release);
-        }
         for (String key : tags.keySet()) {
+            if (VERSION_NAME_TAG_KEY.equals(key)) {
+                eventBuilder.withRelease(release);
+            }
             eventBuilder.withTag(key, tags.get(key));
         }
     }

@@ -40,10 +40,11 @@ public class RavenEventBuilderHelper implements EventBuilderHelper {
     public void helpBuildingEvent(EventBuilder eventBuilder) {
         eventBuilder.withSdkName(RavenEnvironment.SDK_NAME + ":android");
         for (String key : tags.keySet()) {
+            String value = tags.get(key);
             if (VERSION_NAME_TAG_KEY.equals(key)) {
-                eventBuilder.withRelease(key);
+                eventBuilder.withRelease(value);
             }
-            eventBuilder.withTag(key, tags.get(key));
+            eventBuilder.withTag(key, value);
         }
     }
 }

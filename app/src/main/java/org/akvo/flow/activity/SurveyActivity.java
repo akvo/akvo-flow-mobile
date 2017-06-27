@@ -423,7 +423,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public boolean onSearchTap() {
-        return onSearchRequested();
+//        return onSearchRequested();
+        return true;
+
     }
 
     private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {

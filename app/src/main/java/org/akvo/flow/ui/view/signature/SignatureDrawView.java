@@ -1,23 +1,24 @@
 /*
- *  Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.view.signature;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -30,7 +31,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class SignatureView extends View {
+public class SignatureDrawView extends View {
 
     private static final int BACKGROUND_COLOR = Color.WHITE;
     private static final int STROKE_COLOR = Color.BLACK;
@@ -39,9 +40,10 @@ public class SignatureView extends View {
 
     private float mX, mY;
 
-    private Path mPath;
-    private Paint mPaint;
-    private Paint mBitmapPaint;
+    private final Path mPath;
+    private final Paint mPaint;
+    private final Paint mBitmapPaint;
+
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private boolean mIsEmpty;
@@ -49,7 +51,7 @@ public class SignatureView extends View {
     @Nullable
     private SignatureViewListener listener;
 
-    public SignatureView(Context context, AttributeSet attrs) {
+    public SignatureDrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         mPath = new Path();
@@ -69,11 +71,19 @@ public class SignatureView extends View {
         this.listener = listener;
     }
 
-    public void resetBitmap() {
+    private void resetBitmap() {
         mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(BACKGROUND_COLOR);
         mIsEmpty = true;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        mCanvas = new Canvas(mBitmap);
+        mCanvas.drawColor(BACKGROUND_COLOR);
+        mCanvas.drawBitmap(bitmap, 0, 0, mPaint);
+        mIsEmpty = false;
     }
 
     public void clear() {

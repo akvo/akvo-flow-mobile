@@ -81,7 +81,7 @@
                 android:theme="@style/Flow.Dialog"/>
         <activity android:name=".activity.MapActivity"/>
         <activity
-                android:name=".activity.SignatureActivity"
+                android:name=".presentation.signature.SignatureActivity"
                 android:configChanges="locale|layoutDirection"
                 android:screenOrientation="landscape"/>
 

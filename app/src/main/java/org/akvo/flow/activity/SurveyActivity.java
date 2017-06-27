@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -77,6 +78,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private static final String DRAWER_FRAGMENT_TAG = "f";
 
     private SurveyDbAdapter mDatabase;
+
+    @Nullable
     private SurveyGroup mSurveyGroup;
 
     private DrawerLayout mDrawerLayout;
@@ -87,6 +90,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
+
+    private long selectedSurveyId;
 
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be
@@ -104,6 +109,13 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDatabase = new SurveyDbAdapter(this);
         mDatabase.open();
 
+        prefs = new Prefs(getApplicationContext());
+        selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        if (selectedSurveyId != SurveyGroup.ID_NONE) {
+            mSurveyGroup = mDatabase.getSurveyGroup(selectedSurveyId);
+        }
+        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
+
         mTitle = mDrawerTitle = getString(R.string.app_name);
 
         // Init navigation drawer
@@ -111,8 +123,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initDataPointsFragment(savedInstanceState);
 
-        prefs = new Prefs(getApplicationContext());
-        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
         // Start the setup Activity if necessary.
         boolean noDevIdYet = false;
         if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
@@ -176,9 +186,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         // Automatically select the survey
-        SurveyGroup sg = mDatabase.getSurveyGroup(FlowApp.getApp().getSurveyGroupId());
-        if (sg != null) {
-            onSurveySelected(sg);
+        if (mSurveyGroup != null) {
+            onSurveySelected(mSurveyGroup);
         } else {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
@@ -313,8 +322,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         long id = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
         setTitle(title);
-
-        FlowApp.getApp().setSurveyGroupId(id);
+        selectedSurveyId = id;
+        prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, id);
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
                 DATA_POINTS_FRAGMENT_TAG);

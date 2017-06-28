@@ -19,6 +19,8 @@
 
 package org.akvo.flow.activity;
 
+import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,6 +37,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
@@ -90,6 +93,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @BindView(R.id.add_data_point_fab)
     FloatingActionButton addDataPointFab;
 
+    @BindView(R.id.searchView)
+    SearchView searchView;
+
     private SurveyDbAdapter mDatabase;
 
     @Nullable
@@ -99,7 +105,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
-
     private long selectedSurveyId;
 
     /**
@@ -154,13 +159,16 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
+        searchView.setSearchableInfo(searchableInfo);
     }
 
     private void initNavigationDrawer() {
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                 R.string.drawer_open, R.string.drawer_close) {
+                R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             @Override
@@ -441,9 +449,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public boolean onSearchTap() {
-//        return onSearchRequested();
+        searchView.setVisibility(View.VISIBLE);
         return true;
-
     }
 
     private void reloadDrawer() {
@@ -474,5 +481,4 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             }
         }
     }
-
 }

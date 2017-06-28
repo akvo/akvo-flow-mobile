@@ -25,8 +25,11 @@
                     android:id="@+id/searchView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:iconifiedByDefault="false"
+                    app:iconifiedByDefault="false"
                     app:queryHint="@string/search_hint"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    style="@style/SearchView"
                     android:layout_centerHorizontal="true" />
                 </android.support.v7.widget.Toolbar>
 

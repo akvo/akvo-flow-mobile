@@ -179,19 +179,6 @@ public class DatapointsFragment extends Fragment {
                 //TODO: maybe instead of removing we should use custom menu for each fragment
                 subMenu.removeItem(R.id.order_by);
             }
-            // Associate searchable configuration with the SearchView
-//            MenuItem search = menu.findItem(R.id.search);
-//            searchView = (SearchView) MenuItemCompat.getActionView(search);
-//            searchView.setQueryHint(getString(R.string.search_hint));
-//            MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
-//                @Override public boolean onMenuItemActionExpand(MenuItem item) {
-//                    return true;
-//                }
-//
-//                @Override public boolean onMenuItemActionCollapse(MenuItem item) {
-//                    return true;
-//                }
-//            });
         }
         super.onCreateOptionsMenu(menu, inflater);
     }

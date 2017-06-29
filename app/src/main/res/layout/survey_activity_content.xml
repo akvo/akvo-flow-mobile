@@ -21,17 +21,19 @@
                 android:background="?attr/colorPrimary"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:popupTheme="@style/FlowAppTheme.PopupOverlay">
+
             <android.support.v7.widget.SearchView
                     android:id="@+id/searchView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:iconifiedByDefault="false"
                     app:queryHint="@string/search_hint"
+                    android:background="@color/colorPrimaryDark"
                     android:visibility="gone"
                     tools:visibility="visible"
                     style="@style/SearchView"
-                    android:layout_centerHorizontal="true" />
-                </android.support.v7.widget.Toolbar>
+                    android:layout_centerHorizontal="true"/>
+        </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -40,6 +42,7 @@
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+
     <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -49,7 +49,7 @@
 
     <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-    <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar"/>
 
     <style name="LinkTextViewStyle">
         <item name="android:layout_width">match_parent</item>

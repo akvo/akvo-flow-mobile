@@ -20,6 +20,7 @@
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,9 +29,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -74,7 +77,6 @@ public class DatapointsFragment extends Fragment {
     @Nullable
     private DatapointFragmentListener listener;
     private String[] tabNames;
-    private SearchView searchView;
 
     public DatapointsFragment() {
     }
@@ -179,6 +181,15 @@ public class DatapointsFragment extends Fragment {
                 //TODO: maybe instead of removing we should use custom menu for each fragment
                 subMenu.removeItem(R.id.order_by);
             }
+            FragmentActivity activity = getActivity();
+            SearchManager searchManager = (SearchManager)
+                    activity.getSystemService(Context.SEARCH_SERVICE);
+            MenuItem searchMenuItem = menu.findItem(R.id.search);
+            SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+            searchView.setSearchableInfo(searchManager.
+                    getSearchableInfo(activity.getComponentName()));
+            searchView.setIconifiedByDefault(true);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -187,10 +198,6 @@ public class DatapointsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.search:
-                if (listener != null) {
-                    return listener.onSearchTap();
-                }
             case R.id.sync_records:
                 if (listener != null && mSurveyGroup != null) {
                     listener.onSyncRecordsTap(mSurveyGroup.getId());
@@ -303,8 +310,6 @@ public class DatapointsFragment extends Fragment {
     public interface DatapointFragmentListener {
 
         void refreshMenu();
-
-        boolean onSearchTap();
 
         void onSyncRecordsTap(long surveyGroupId);
     }

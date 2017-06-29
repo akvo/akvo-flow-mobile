@@ -65,8 +65,13 @@ public class SurveyDbAdapter {
     private static final String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
             + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
             + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
+    private static final String SURVEY_INSTANCE_JOIN_SURVEY_AND_RESPONSE = "survey_instance "
+            + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
+            + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id "
+            + "JOIN response ON survey_instance._id=response.survey_instance_id";
 
-    public static final String SURVEY_JOIN_SURVEY_INSTANCE = "survey LEFT OUTER JOIN survey_instance ON "
+    public static final String SURVEY_JOIN_SURVEY_INSTANCE =
+            "survey LEFT OUTER JOIN survey_instance ON "
             + "survey.survey_id=survey_instance.survey_id";
 
     private static final int DOES_NOT_EXIST = -1;
@@ -815,7 +820,7 @@ public class SurveyDbAdapter {
     public SurveyedLocale getSurveyedLocale(String surveyedLocaleId) {
         Cursor cursor = database.query(Tables.RECORD, RecordQuery.PROJECTION,
                 RecordColumns.RECORD_ID + " = ?",
-                new String[] { String.valueOf(surveyedLocaleId) },
+                new String[] {surveyedLocaleId},
                 null, null, null);
 
         SurveyedLocale locale = null;
@@ -963,6 +968,21 @@ public class SurveyDbAdapter {
     }
 
     /**
+     * Get all the SurveyInstances for a particular data point which actually have non empty
+     * responses. Registration form will be at the top of the list, all other forms will be ordered
+     * by submission date (desc).
+     */
+    public Cursor getFormInstancesWithResponses(String recordId) {
+        return database.query(SURVEY_INSTANCE_JOIN_SURVEY_AND_RESPONSE,
+                FormInstanceQuery.PROJECTION,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
+                new String[] { recordId },
+                ResponseColumns.SURVEY_INSTANCE_ID, null,
+                "CASE WHEN survey.survey_id = survey_group.register_survey_id THEN 0 ELSE 1 END, "
+                        + SurveyInstanceColumns.START_DATE + " DESC");
+    }
+
+    /**
      * Get SurveyInstances with a particular status.
      * If the recordId is not null, results will be filtered by Record.
      */
@@ -1037,6 +1057,15 @@ public class SurveyDbAdapter {
         }
         cursor.close();
         return id;
+    }
+
+    public void clearSurveyedLocaleName(long surveyInstanceId) {
+        String surveyedLocaleId = getSurveyedLocaleId(surveyInstanceId);
+        ContentValues surveyedLocaleValues = new ContentValues();
+        surveyedLocaleValues.put(RecordColumns.NAME, "");
+        database.update(Tables.RECORD, surveyedLocaleValues,
+                RecordColumns.RECORD_ID + " = ?",
+                new String[] { surveyedLocaleId });
     }
 
     /**
@@ -1191,9 +1220,9 @@ public class SurveyDbAdapter {
                     new String[] { surveyInstance.getUuid() },
                     null, null, null);
 
-            long id = DOES_NOT_EXIST;
+            long surveyInstanceId = DOES_NOT_EXIST;
             if (cursor.moveToFirst()) {
-                id = cursor.getLong(0);
+                surveyInstanceId = cursor.getLong(0);
             }
             cursor.close();
 
@@ -1205,22 +1234,55 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
             values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
 
-            if (id != DOES_NOT_EXIST) {
+            if (surveyInstanceId != DOES_NOT_EXIST) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
                         + " = ?", new String[] { surveyInstance.getUuid() });
             } else {
                 values.put(SurveyInstanceColumns.UUID, surveyInstance.getUuid());
-                id = database.insert(Tables.SURVEY_INSTANCE, null, values);
+                surveyInstanceId = database.insert(Tables.SURVEY_INSTANCE, null, values);
             }
 
-            // Now the responses...
-            syncResponses(surveyInstance.getResponses(), id);
+            syncResponses(surveyInstance.getResponses(), surveyInstanceId);
+            updateTransmission(surveyInstance, surveyInstanceId);
+        }
+    }
 
-            // The filename is a unique column in the transmission table, and as we do not have
-            // a file to hold this data, we set the value to the instance UUID
-            createTransmission(id, surveyInstance.getSurveyId(), surveyInstance.getUuid(),
+    private void updateTransmission(SurveyInstance surveyInstance, long surveyInstanceId) {
+        // The filename is a unique column in the transmission table, if we do not have
+        // a file to hold this data, we set the value to the instance UUID
+        Cursor cursor = null;
+        if (surveyInstanceId != DOES_NOT_EXIST) {
+            cursor = database.query(Tables.TRANSMISSION,
+                    new String[] {
+                            TransmissionColumns._ID,
+                    },
+                    TransmissionColumns.SURVEY_INSTANCE_ID + " = ? ",
+                    new String[] { String.valueOf(surveyInstanceId)},
+                    null, null, null);
+        }
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex(TransmissionColumns._ID);
+            do {
+                updateTransmission(cursor.getInt(columnIndex));
+            } while (cursor.moveToNext());
+        } else {
+            createTransmission(surveyInstanceId, surveyInstance.getSurveyId(),
+                    surveyInstance.getUuid(),
                     TransmissionStatus.SYNCED);
         }
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    private void updateTransmission(int transmissionID) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TransmissionColumns.STATUS, TransmissionStatus.SYNCED);
+        final String date = String.valueOf(System.currentTimeMillis());
+        contentValues.put(TransmissionColumns.START_DATE, date);
+        contentValues.put(TransmissionColumns.END_DATE, date);
+        database.update(Tables.TRANSMISSION, contentValues, TransmissionColumns._ID + " = ?",
+                new String[] {transmissionID + ""});
     }
 
     public void syncSurveyedLocale(SurveyedLocale surveyedLocale) {

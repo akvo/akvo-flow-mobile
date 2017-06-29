@@ -101,7 +101,6 @@ public class DatapointsFragment extends Fragment {
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
     }
 
     @Override
@@ -274,6 +273,7 @@ public class DatapointsFragment extends Fragment {
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         refreshView();
     }
 

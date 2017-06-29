@@ -40,10 +40,12 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SignatureActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
@@ -52,6 +54,9 @@ import javax.inject.Inject;
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
+
+    private static final String TERMS_URL = "http://akvo.org/help/akvo-policies-and-terms-2/akvo-flow-terms-of-use/";
+    private static final String RELEASE_NOTES_URL = "https://github.com/akvo/akvo-flow-mobile/releases";
 
     //TODO: inject activity
     @Inject
@@ -115,14 +120,22 @@ public class Navigator {
         try {
             activity.startActivityForResult(intent, ConstantUtil.SCAN_ACTIVITY_REQUEST);
         } catch (ActivityNotFoundException ex) {
-            displayAppNotFoundDialog(activity, R.string.barcodeerror);
+            displayScannerNotFoundDialog(activity, R.string.barcode_scanner_missing_error);
         }
     }
 
-    private void displayAppNotFoundDialog(@NonNull Activity activity, @StringRes int messageId) {
+    private void displayScannerNotFoundDialog(@NonNull final Activity activity, @StringRes int messageId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.okbutton,
+        builder.setPositiveButton(R.string.install,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("http://play.google.com/store/search?q=Barcode Scanner"));
+                        activity.startActivity(intent);
+                    }
+                });
+        builder.setNegativeButton(R.string.cancelbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
@@ -156,8 +169,11 @@ public class Navigator {
         activity.startActivityForResult(i, ConstantUtil.PLOTTING_REQUEST);
     }
 
-    public void navigateToSignatureActivity(@NonNull Activity activity) {
+    public void navigateToSignatureActivity(@NonNull Activity activity, @Nullable Bundle data) {
         Intent i = new Intent(activity, SignatureActivity.class);
+        if (data != null) {
+            i.putExtras(data);
+        }
         activity.startActivityForResult(i, ConstantUtil.SIGNATURE_REQUEST);
     }
 
@@ -186,5 +202,26 @@ public class Navigator {
      */
     private void navigateToSettings(@NonNull Context context) {
         context.startActivity(new Intent(Settings.ACTION_SETTINGS));
+    }
+
+    public void navigateToAbout(@NonNull Context context) {
+        context.startActivity(new Intent(context, AboutActivity.class));
+    }
+
+    public void navigateToTerms(@NonNull Context context) {
+        openUrl(context, TERMS_URL);
+    }
+
+    public void openUrl(@NonNull Context context, String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        context.startActivity(browserIntent);
+    }
+
+    public void navigateToReleaseNotes(@NonNull Context context) {
+        openUrl(context, RELEASE_NOTES_URL);
+    }
+
+    public void navigateToLegalInfo(@NonNull Context context) {
+        context.startActivity(new Intent(context, LegalNoticesActivity.class));
     }
 }

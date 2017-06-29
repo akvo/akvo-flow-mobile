@@ -30,7 +30,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
@@ -51,7 +50,6 @@ public class FlowApp extends Application {
     private Locale mLocale;
 
     private User mUser;
-    private long mSurveyGroupId;// Hacky way of filtering the survey group in Record search
     private Prefs prefs;
 
     private ApplicationComponent applicationComponent;
@@ -128,9 +126,6 @@ public class FlowApp extends Application {
         setAppLanguage(language, false);
 
         loadLastUser();
-
-        // Load last survey group
-        mSurveyGroupId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
     }
 
     public void setUser(User user) {
@@ -140,15 +135,6 @@ public class FlowApp extends Application {
 
     public User getUser() {
         return mUser;
-    }
-
-    public void setSurveyGroupId(long surveyGroupId) {
-        mSurveyGroupId = surveyGroupId;
-        prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, surveyGroupId);
-    }
-
-    public long getSurveyGroupId() {
-        return mSurveyGroupId;
     }
 
     public String getAppLanguageCode() {

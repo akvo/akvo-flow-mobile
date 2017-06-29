@@ -25,6 +25,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
 
 public abstract class BackActivity extends AppCompatActivity {
 
@@ -35,6 +37,10 @@ public abstract class BackActivity extends AppCompatActivity {
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override

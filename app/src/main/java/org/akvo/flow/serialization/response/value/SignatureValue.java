@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015,2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -47,9 +47,8 @@ public class SignatureValue {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(data, Signature.class);
         } catch (IOException e) {
-            Timber.e("Value is not a valid JSON response: " + data);
+            Timber.e("Value is not a valid JSON response: %s", data);
         }
         return new Signature();
     }
-
 }

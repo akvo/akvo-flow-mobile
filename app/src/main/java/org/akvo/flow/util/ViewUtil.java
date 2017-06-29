@@ -28,6 +28,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.Display;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -262,6 +263,16 @@ public class ViewUtil {
             return size.x;
         } else {
             return display.getWidth();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public static void removeLayoutListener(ViewTreeObserver viewTreeObserver,
+            ViewTreeObserver.OnGlobalLayoutListener victim) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            viewTreeObserver.removeOnGlobalLayoutListener(victim);
+        } else {
+            viewTreeObserver.removeGlobalOnLayoutListener(victim);
         }
     }
 

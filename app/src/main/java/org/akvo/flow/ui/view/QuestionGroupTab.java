@@ -38,6 +38,7 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewFactory;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.option.OptionQuestionFactory;
+import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;

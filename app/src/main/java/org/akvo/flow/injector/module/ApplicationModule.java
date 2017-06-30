@@ -24,7 +24,13 @@ import android.content.Context;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.FlowAndroidRavenFactory;
@@ -52,6 +58,24 @@ public class ApplicationModule {
     @Singleton
     Context provideContext() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
+        return jobExecutor;
+    }
+
+    @Provides
+    @Singleton
+    PostExecutionThread providePostExecutionThread(UIThread uiThread) {
+        return uiThread;
+    }
+
+    @Provides
+    @Singleton
+    FileRepository provideSurveyRepository(FileDataRepository fileDataRepository) {
+        return fileDataRepository;
     }
 
     @Provides

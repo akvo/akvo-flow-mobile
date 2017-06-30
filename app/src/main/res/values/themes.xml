@@ -7,10 +7,10 @@
     </style>
 
     <style name="FlowAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/orange_main</item>
-        <item name="colorPrimaryDark">@color/orange_dark</item>
-        <item name="colorAccent">@color/green</item>
-        <item name="colorControlNormal">@color/black_main</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/colorControlNormal</item>
 
         <item name="android:windowBackground">@color/app_background_main</item>
 

@@ -1,5 +1,25 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.5
+Date: 29 June 2017
+
+# New and noteworthy
+* **Update translations** - [#762](https://github.com/akvo/akvo-flow-mobile/issues/762) Translations for Portuguese, Spanish and French have been reviewed.
+* **Signature question view design** - [#751](https://github.com/akvo/akvo-flow-mobile/issues/751) The signature question view has been redesigned to make it easier to use.
+* **New About page** - [#595](https://github.com/akvo/akvo-flow-mobile/issues/595) The Flow app now has a new About Us page.
+* **Take user to play store when Barcode Scanner is not installed** - [#512](https://github.com/akvo/akvo-flow-mobile/issues/512) For barcode questions, if a user does not have any scanner app installed, he will have the chance to be redirected to the Play Store in order to pick one of the available apps.
+
+# Resolved issues
+* **Screen rotation by point lists shows wrong points** - [#767](https://github.com/akvo/akvo-flow-mobile/issues/767) Fixed the issue where a wrong survey was selected after the device was rotated.
+* **Cookstoves and Biogas app styling** - [#759](https://github.com/akvo/akvo-flow-mobile/issues/759) The Cookstoves and Biogas flavours now have the correct app styling.
+* **Manually entered barcode does not get saved for unsubmitted forms** - [#749](https://github.com/akvo/akvo-flow-mobile/issues/749) Fixed manually entered barcode not being saved when a form was not immediately submitted.
+* **Signature question not properly saved in unsubmitted forms** - [#748](https://github.com/akvo/akvo-flow-mobile/issues/748) Fixed signature name not properly saved when a form was not immediately submitted.
+* **Geolocation manually edited text fields do not get properly saved for unsubmitted forms** - [#747](https://github.com/akvo/akvo-flow-mobile/issues/747) Fixed manually entered location fields not properly saved when a form was not immediately submitted.
+* **After removing form answers, the datapoint still shows if the back button is pressed** - [#742](https://github.com/akvo/akvo-flow-mobile/issues/742) Datapoint no longer shows if all its answers have been cleared.
+* **Transmission history after datapoint is synced** - [#737](https://github.com/akvo/akvo-flow-mobile/issues/737) Fixed inconsistent transmission state after the datapoint was synced.
+* **IllegalStateException in FormActivity** - [#552](https://github.com/akvo/akvo-flow-mobile/issues/552) Fixed random crash inside FormActivity.
+
+---------------
 # ver 2.3.4.1
 Date: 13 June 2017
 

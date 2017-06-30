@@ -1220,9 +1220,9 @@ public class SurveyDbAdapter {
                     new String[] { surveyInstance.getUuid() },
                     null, null, null);
 
-            long id = DOES_NOT_EXIST;
+            long surveyInstanceId = DOES_NOT_EXIST;
             if (cursor.moveToFirst()) {
-                id = cursor.getLong(0);
+                surveyInstanceId = cursor.getLong(0);
             }
             cursor.close();
 
@@ -1234,22 +1234,55 @@ public class SurveyDbAdapter {
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
             values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
 
-            if (id != DOES_NOT_EXIST) {
+            if (surveyInstanceId != DOES_NOT_EXIST) {
                 database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
                         + " = ?", new String[] { surveyInstance.getUuid() });
             } else {
                 values.put(SurveyInstanceColumns.UUID, surveyInstance.getUuid());
-                id = database.insert(Tables.SURVEY_INSTANCE, null, values);
+                surveyInstanceId = database.insert(Tables.SURVEY_INSTANCE, null, values);
             }
 
-            // Now the responses...
-            syncResponses(surveyInstance.getResponses(), id);
+            syncResponses(surveyInstance.getResponses(), surveyInstanceId);
+            updateTransmission(surveyInstance, surveyInstanceId);
+        }
+    }
 
-            // The filename is a unique column in the transmission table, and as we do not have
-            // a file to hold this data, we set the value to the instance UUID
-            createTransmission(id, surveyInstance.getSurveyId(), surveyInstance.getUuid(),
+    private void updateTransmission(SurveyInstance surveyInstance, long surveyInstanceId) {
+        // The filename is a unique column in the transmission table, if we do not have
+        // a file to hold this data, we set the value to the instance UUID
+        Cursor cursor = null;
+        if (surveyInstanceId != DOES_NOT_EXIST) {
+            cursor = database.query(Tables.TRANSMISSION,
+                    new String[] {
+                            TransmissionColumns._ID,
+                    },
+                    TransmissionColumns.SURVEY_INSTANCE_ID + " = ? ",
+                    new String[] { String.valueOf(surveyInstanceId)},
+                    null, null, null);
+        }
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex(TransmissionColumns._ID);
+            do {
+                updateTransmission(cursor.getInt(columnIndex));
+            } while (cursor.moveToNext());
+        } else {
+            createTransmission(surveyInstanceId, surveyInstance.getSurveyId(),
+                    surveyInstance.getUuid(),
                     TransmissionStatus.SYNCED);
         }
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    private void updateTransmission(int transmissionID) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TransmissionColumns.STATUS, TransmissionStatus.SYNCED);
+        final String date = String.valueOf(System.currentTimeMillis());
+        contentValues.put(TransmissionColumns.START_DATE, date);
+        contentValues.put(TransmissionColumns.END_DATE, date);
+        database.update(Tables.TRANSMISSION, contentValues, TransmissionColumns._ID + " = ?",
+                new String[] {transmissionID + ""});
     }
 
     public void syncSurveyedLocale(SurveyedLocale surveyedLocale) {

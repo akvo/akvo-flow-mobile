@@ -40,7 +40,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SignatureActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
@@ -120,14 +120,22 @@ public class Navigator {
         try {
             activity.startActivityForResult(intent, ConstantUtil.SCAN_ACTIVITY_REQUEST);
         } catch (ActivityNotFoundException ex) {
-            displayAppNotFoundDialog(activity, R.string.barcodeerror);
+            displayScannerNotFoundDialog(activity, R.string.barcode_scanner_missing_error);
         }
     }
 
-    private void displayAppNotFoundDialog(@NonNull Activity activity, @StringRes int messageId) {
+    private void displayScannerNotFoundDialog(@NonNull final Activity activity, @StringRes int messageId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.okbutton,
+        builder.setPositiveButton(R.string.install,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("http://play.google.com/store/search?q=Barcode Scanner"));
+                        activity.startActivity(intent);
+                    }
+                });
+        builder.setNegativeButton(R.string.cancelbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
@@ -161,8 +169,11 @@ public class Navigator {
         activity.startActivityForResult(i, ConstantUtil.PLOTTING_REQUEST);
     }
 
-    public void navigateToSignatureActivity(@NonNull Activity activity) {
+    public void navigateToSignatureActivity(@NonNull Activity activity, @Nullable Bundle data) {
         Intent i = new Intent(activity, SignatureActivity.class);
+        if (data != null) {
+            i.putExtras(data);
+        }
         activity.startActivityForResult(i, ConstantUtil.SIGNATURE_REQUEST);
     }
 

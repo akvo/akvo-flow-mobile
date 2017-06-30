@@ -163,6 +163,7 @@ public class SurveyedLocaleListFragment extends ListFragment implements Location
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         refresh();
     }
 

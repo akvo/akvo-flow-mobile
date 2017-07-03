@@ -1,9 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">Precisão</string>
-  <string name="searching">Procurando...</string>
-  <string name="ready">Pronto</string>
-  <string name="timeout">Tempo esgotado</string>
+  <string name="geo_location_accuracy_default">Precisão: desconhecida</string>
+  <string name="geo_location_accuracy">Precisão: %1$s m</string>
   <string name="nocardspacetitle">
 Sem espaço para armazenamento
 </string>
@@ -17,7 +15,8 @@ Sem espaço para armazenamento
   <string name="lon">Long</string>
   <string name="elevation">Altura</string>
   <string name="submitbutton">Submeter</string>
-  <string name="geodialog">O GPS deve estar ligado para fazer isto. Seleccione OK para ir à página de definições. Seleccione Usar satélites do GPS e, em seguida, pressione o botão Voltar para retornar. Uma vez que o GPS esteja activo você pode clicar de novo em Verificar Localização Geográfica para obter a sua posição.</string>
+  <string name="geodialog">Autorize o acesso à sua localização</string>
+  <string name="settings">Configurações</string>
   <string name="resize_large_images">Redimensionar imagens grandes</string>
   <string name="settingslabel">Definições</string>
   <string name="nouser">Sem usuários!</string>
@@ -32,8 +31,6 @@ Sem espaço para armazenamento
   <string name="screenoptdesc">Impedir que a tela se desligue enquanto no modo de preenchimento de dados no inquérito. Certifique-se de desligar manualmente a tela (ou sair do aplicativo) quando não estiver em uso para evitar gastar a bateria.</string>
   <string name="aboutlabel">Sobre</string>
   <string name="aboutdesc">Exibir informações sobre a versão.</string>
-  <string name="abouttitle">Sobre o aplicativo Akvo Flow</string>
-  <string name="about_text" tools:ignore="PluralsCandidate">Aplicação Akvo Flow\nDesenvolvido por: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersão %2$s</string>
   <string name="gpsstatuslabel">Estado do GPS</string>
   <string name="gpsstatusdesc">Iniciar a aplicação do Estado do GPS se o tiver instalado no dispositivo.</string>
   <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>
@@ -48,7 +45,6 @@ Sem espaço para armazenamento
   <string name="uploadoptionlabel">Sincronizar dados através da rede móvel</string>
   <string name="surveylanglabel"> Idiomas do inquérito</string>
   <string name="scanbarcode">Digitalizar o código de barras</string>
-  <string name="barcodeerror">Scanner não instalado. Por favor, instale a aplicação Barcode Scanner do Android Market.</string>
   <string name="toosmallerr">O valor é demasiado pequeno. Valor mínimo:</string>
   <string name="toolargeerr">O valor é muito longo. Valor máximo:</string>
   <string name="baddatatypeerr">A resposta deve ser numérica</string>
@@ -151,7 +147,6 @@ Sem espaço para armazenamento
   <string name="error_img_preview">Não é possível carregar pré-visualização da imagem</string>
   <string name="use_external_source">Usar uma fonte externa</string>
   <string name="caddisfly_test">Vá ao testa</string>
-  <string name="caddisfly_response">Teste capturado com sucesso</string>
   <string name="error_empty_form">Formulários não preenchidos não podem ser submetidos. Por favor, primeiro insira as devidas respostas.</string>
   <string name="select">Por favor, seleccione</string>
   <string name="clear_value_msg">Deseja apagar este valor?</string>
@@ -259,12 +254,29 @@ Sem espaço para armazenamento
   <string name="error_value_required">Este campo não pode ficar em branco</string>
   <string name="drawer_open">Desenhador aberto</string>
   <string name="drawer_close">Desenhador fechado</string>
-  <!--settings activity-->
-  <string name="settings_app_update_title">Verificar actualizações</string>
-  <string name="settings_app_update_description">Verifique se existe uma versão mais recente do Akvo Flow.</string>
   <!--app update service-->
   <string name="apk_update_service_no_update">Você já tem a versão mais recente do aplicativo.</string>
   <string name="apk_update_service_error_update">Houve um erro ao tentar atualizar o aplicativo, por favor, tente novamente.</string>
   <string name="apk_update_service_error_no_internet">Houve um erro ao tentar atualizar o aplicativo, você não está conectado à Internet.</string>
   <string name="locale_list_error_unknown_location"> Localização desconhecida</string>
+  <string name="location_timeout">Erro de localização</string>
+  <string name="auto_geo_location_pending">Aguardando a localização do dispositivo ...</string>
+  <string name="invalid_latitude">Latitude inválida</string>
+  <string name="invalid_longitude">Longitude inválida</string>
+  <string name="invalid_elevation">Altitude inválida</string>
+  <string name="about_activity_title">Sobre</string>
+  <string name="about_view_title">Aplicativo Akvo Flow</string>
+  <string name="app_icon_description">Icone da aplicação</string>
+  <string name="about_view_subtitle">Capture dados de melhor qualidade, mais rápido</string>
+  <string name="about_view_version">Versão %1$s</string>
+  <string name="about_view_copyright">Copyright © 2010-%1$s Stichting Akvo</string>
+  <string name="about_view_update">Verificar actualizações</string>
+  <string name="about_view_legal">Informação legal</string>
+  <string name="about_view_release_notes">Notas de versão</string>
+  <string name="about_view_terms">Termos de uso</string>
+  <string name="licences_title">Licenças de terceiros</string>
+  <string name="licences_description">Este software incorpora material dos projetos listados abaixo.</string>
+  <string name="apache_licence_title">Apache License 2.0</string>
+  <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
+  <string name="mit_licence_title">MIT License</string>
 </resources>

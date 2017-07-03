@@ -25,9 +25,12 @@ import android.content.Context;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Singleton;
 
@@ -39,15 +42,19 @@ import dagger.Component;
 })
 public interface ApplicationComponent {
 
-    ThreadExecutor getThreadExecutor();
-
-    PostExecutionThread getPostExecutionThread();
-
-    Context context();
-
     void inject(FlowApp app);
 
     void inject(BaseActivity baseActivity);
 
+    Context context();
 
+    LoggingHelper loggingHelper();
+
+    ThreadExecutor threadExecutor();
+
+    PostExecutionThread postExecutionThread();
+
+    FileRepository fileRepository();
+
+    UserRepository userRepository();
 }

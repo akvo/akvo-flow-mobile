@@ -68,7 +68,7 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POLYGON, getQuestion().isAllowPolygon());
                 data.putBoolean(ConstantUtil.EXTRA_MANUAL_INPUT, !getQuestion().isLocked());
-                data.putBoolean(ConstantUtil.READONLY_KEY, isReadOnly());
+                data.putBoolean(ConstantUtil.READ_ONLY_EXTRA, isReadOnly());
                 if (!TextUtils.isEmpty(mValue)) {
                     data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
                 }

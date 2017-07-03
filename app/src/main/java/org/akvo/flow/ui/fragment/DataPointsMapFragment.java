@@ -91,6 +91,7 @@ public class DataPointsMapFragment extends SupportMapFragment
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         GoogleMapOptions options = new GoogleMapOptions();
         options.zOrderOnTop(true);
@@ -104,7 +105,7 @@ public class DataPointsMapFragment extends SupportMapFragment
         super.onCreate(savedInstanceState);
         mItems = new ArrayList<>();
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         setHasOptionsMenu(true);
     }
 
@@ -242,6 +243,7 @@ public class DataPointsMapFragment extends SupportMapFragment
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         refresh();
     }
 

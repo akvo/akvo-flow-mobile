@@ -7,8 +7,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     def versionPropsFile = file('version.properties')
 
     if (versionPropsFile.canRead()) {
@@ -24,13 +24,14 @@ android {
         defaultConfig {
             versionCode versionCodeProperty
             versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-            minSdkVersion 10
-            targetSdkVersion 21
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
             applicationId "org.akvo.flow"
             testApplicationId "org.akvo.flow.tests"
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
             testHandleProfiling true
             testFunctionalTest true
+            vectorDrawables.useSupportLibrary = true
         }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
@@ -45,31 +46,29 @@ android {
                 storePassword 'android'
             }
 
-        flowRelease {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-        }
-
-        buildTypes {
-            release {
-                signingConfig signingConfigs.flowRelease
+            flowRelease {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
+            buildTypes {
+                release {
+                    signingConfig signingConfigs.flowRelease
+                }
             }
         }
-    }
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-        exclude '.readme'
-    }
+        packagingOptions {
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/license.txt'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/notice.txt'
+            exclude 'META-INF/ASL2.0'
+            exclude '.readme'
+        }
 
         productFlavors {
             flow {
@@ -79,6 +78,8 @@ android {
             cookstoves {
             }
         }
+
+
 
         testOptions {
             unitTests.returnDefaultValues = true
@@ -96,6 +97,11 @@ android {
     } else {
         throw new GradleException("Could not read version.properties!")
     }
+
+    sourceSets {
+        biogas.res.srcDirs = ['src/snv/res', 'src/biogas/res']
+        cookstoves.res.srcDirs = ['src/snv/res', 'src/cookstoves/res']
+    }
 }
 
 android.applicationVariants.all { variant ->
@@ -106,10 +112,10 @@ android.applicationVariants.all { variant ->
 
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:recyclerview-v7:25.0.1'
-    compile 'com.android.support:support-annotations:25.0.1'
-    compile 'com.android.support:design:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:support-annotations:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.google.android.gms:play-services-base:7.5.0'
     compile 'com.google.android.gms:play-services-maps:7.5.0'
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
@@ -120,6 +126,10 @@ dependencies {
     compile 'com.jakewharton.timber:timber:4.3.1'
     compile 'com.google.dagger:dagger:2.4'
     apt 'com.google.dagger:dagger-compiler:2.4'
+    compile 'com.jakewharton:butterknife:8.5.1'
+    apt 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.getsentry.raven:raven-android:8.0.2'
+    compile 'com.github.bumptech.glide:glide:3.8.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -127,10 +137,21 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
     testCompile 'org.powermock:powermock-api-mockito:1.6.2'
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
+
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile ('com.android.support.test:rules:0.5') {
+        exclude module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2') {
+        exclude module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
     androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.1') {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'

@@ -101,7 +101,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -110,7 +110,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mOrderBy = ConstantUtil.ORDER_BY_DATE;// Default case
         setHasOptionsMenu(true);
     }
@@ -193,6 +193,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        refreshLocalData();
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         refreshLocalData();
     }
 
@@ -421,6 +423,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             final int res = PlatformUtil.getResource(context, attr);
             view.setBackgroundResource(res);
             return view;
+        }
+
+        public void setCurrentLocation(Location location) {
+            mLatitude = location.getLatitude();
+            mLongitude = location.getLongitude();
         }
 
         private String getDistanceText(SurveyedLocale surveyedLocale, Context context) {

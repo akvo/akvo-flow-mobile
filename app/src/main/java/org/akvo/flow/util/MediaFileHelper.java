@@ -27,9 +27,14 @@ import org.akvo.flow.R;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class MediaFileHelper {
+
+    public static final String RESIZED_SUFFIX = "resized";
+    public static final String ORIGINAL_SUFFIX = "original";
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
@@ -38,6 +43,7 @@ public class MediaFileHelper {
 
     private final Context context;
 
+    @Inject
     public MediaFileHelper(Context context) {
         this.context = context;
     }
@@ -109,5 +115,11 @@ public class MediaFileHelper {
     @NonNull
     private File getMediaFile(String filename) {
         return new File(FileUtil.getFilesDir(FileUtil.FileType.TMP), filename);
+    }
+
+    @NonNull
+    public File getImageFile(String sizeSuffix, String questionId, String datapointId) {
+        return new File(FileUtil.getFilesDir(FileUtil.FileType.TMP),
+                "signature_" + questionId + "_" + datapointId + "_" + sizeSuffix + IMAGE_SUFFIX);
     }
 }

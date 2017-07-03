@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">អាស៊ីស៊ី</string>
-  <string name="searching">ស្វែងរក...</string>
-  <string name="ready">រួចរាល់</string>
-  <string name="timeout"> ផុតពេលកំណត់</string>
   <string name="nocardspacetitle">ពុំមានចន្លោះសម្រាប់ស្តុកទុក</string>
   <string name="lowcardspacetitle">មានលំហស្តុកទុកតិច</string>
   <string name="nocardspacedialog">SD card ក្នុងឧបករណ៍នេះបានពេញ ដូចនេះអ្នកមិនអាចប្រមូលទិន្នន័យបានទៀតឡើយ។ អ្នកត្រូវតែសំអាតចន្លោះក្នុងSD card ដើម្បីអាចបន្តការប្រមូលពត៌មានតទៀត។</string>
@@ -15,7 +11,6 @@
   <string name="lon">រយៈបណ្តោយ </string>
   <string name="elevation">កំពស់</string>
   <string name="submitbutton">ចុចបញ្ជូនចេញ </string>
-  <string name="geodialog">អ្នកត្រូវបើកជីភីអេសដើម្បីធ្វើការងារនេះ។ ចុច OK ដើម្បីទៅកាន់ទំព័រ settings។ ចុចលើ ប្រើផ្កាយរណបជីភីអេស បន្ទាប់មកចុចប៊ូតុង \"back\" ដើម្បីត្រឡប់ក្រោយ។ នៅពេលដែលជីភីអេសបានបើក អ្នកអាចចុចលើ \"ស្វែងរកទីតាំងជីភីអេស\" ម្តងទៀតដើម្បីរកទីតាំងរបស់អ្នក។ </string>
   <string name="resize_large_images">ដាក់រូបភាពទំហំធំឲ្យតូចឡើងវិញ</string>
   <string name="settingslabel">ចុចកំណត់ (settings) </string>
   <string name="nouser">ពុំមានអ្នកប្រើប្រាស់! </string>
@@ -30,8 +25,6 @@
   <string name="screenoptdesc">បង្ការស្គ្រីនទូរស័ព្ទកុំឲ្យរលត់ពេលកំពុងបញ្ចូលទិន្នន័យអង្កេត។ ត្រូវបិទពន្លត់ស្គ្រីន (ឬចេញពី app) ពេលមិនប្រើ ដើម្បីចៀសវាងការស៊ីថ្មខ្លាំង </string>
   <string name="aboutlabel">អំពី</string>
   <string name="aboutdesc">ពត៌មានអំពីច្បាប់កំណែនៃអេក្រង់</string>
-  <string name="abouttitle">អំពី - Akvo Flow App</string>
-  <string name="about_text" tools:ignore="PluralsCandidate">Akvo Flow App\nបង្កើតដោយ: Akvo Foundation\nCopyright © 2010-%1$s Stichting Akvo\nVersion %2$s</string>
   <string name="gpsstatuslabel">ស្ថានភាពជីភីអេស </string>
   <string name="gpsstatusdesc">ដំណើរការស្ថានភាពជីភីអេស ប្រសិនបើអ្នកបានតម្លើងវាក្នុងឧបករណ៍នេះ </string>
   <string name="nogpsstatus">ស្ថានភាពជីភីអេសពុំមានតម្លើងក្នុងឧបករណ៍នេះឡើយ។ សូមតម្លើងវាដោយចូលទៅក្នុង Google Play Store </string>
@@ -46,7 +39,6 @@
   <string name="uploadoptionlabel">ទិន្នន័យដោយប្រើបណ្តាញទូរស័ព្ទ (3G)</string>
   <string name="surveylanglabel">ភាសាប្រើក្នុងការអង្កេត</string>
   <string name="scanbarcode">ស្គែនសញ្ញានាំផ្លូវ</string>
-  <string name="barcodeerror">ឧបករណ៍ស្គែនមិនបានតម្លើងឡើយ។ សូមតម្លើង Appសម្រាប់ស្កែនសញ្ញានាំផ្លូវនៅក្នុងផ្សារអាន់ដ្រូយ </string>
   <string name="toosmallerr">តម្លៃតូចជ្រុល។ តម្លៃអប្បបរមាៈ  </string>
   <string name="toolargeerr">តម្លៃធំជ្រុល។ តម្លៃអតិបរមាៈ </string>
   <string name="baddatatypeerr">ចម្លើយត្រូវតែជាលេខ </string>
@@ -84,7 +76,6 @@
   <string name="bootstrapstart">កំពុងផ្ទុកទិន្នន័យអង្កេតពី SD card </string>
   <string name="bootstrapcomplete">ការផ្ទុកទិន្នន័យអង្កេតពី SD card បានធ្វើរួចរាល់ </string>
   <string name="bootstraperror">ដំណើរការ bootstrap ឯកសារzip​មានកំហុសឆ្គង </string>
-  <string name="bootstrap_invalid_app">កំហុសឆ្គងៈ ទម្រង់មិនមែនជារបស់​ Flow instance នេះទេ </string>
   <string name="transmissionhist">ប្រវតិ្តការបញ្ជូន </string>
   <string name="transstartdate">បានចាប់ផ្តើមៈ </string>
   <string name="transenddate">បានបញ្ចប់ៈ </string>
@@ -126,7 +117,6 @@
   <string name="app_language">ភាសា​ App </string>
   <string name="please_restart">សូមចាប់ផ្តើម Appឡើងវិញ </string>
   <!--Empty Views-->
-  <string name="no_surveys_text">អ្នកពុំមានទម្រង់អង្កេតដែលគេប្រគល់ឲ្យឡើយ។ ទម្រង់អង្កេតត្រូវបានកំណត់នៅក្នុងដាសបូត Flow</string>
   <string name="no_records_text">អ្នកមិនទាន់មានចំណុចទិន្នន័យនៅឡើយទេ។ សូចចុច សញ្ញា \'+\' នៅផ្នែកខាងលើអេក្រង់របស់អ្នកដើម្បីបន្ថែមចំណុចទិន្នន័យថ្មីរបស់អ្នក </string>
   <string name="no_survey_selected_text">អ្នកបានជ្រើសរើសការអង្កេតឡើយ។ ចូរបើកម៉ឺនុយនៅចំហៀង ដើម្បីជ្រើសរើស។  </string>
   <!--Activity Labels-->
@@ -146,7 +136,6 @@
   <string name="error_img_preview">មិនអាចផ្ទុករូបភាពមើលជាមុន </string>
   <string name="use_external_source">ចូរប្រើប្រភពខាងក្រៅ </string>
   <string name="caddisfly_test">ចូលទៅកាន់ការសាកល្បង</string>
-  <string name="caddisfly_response">ការសាកល្បងធ្វើបានជោគជ័យ</string>
   <string name="error_empty_form">ទម្រង់ទទេមិនអាចបញ្ជូនចេញបានទេ។ សូមបន្ថែមចម្លើយដែលត្រូវគ្នា ជាមុន </string>
   <string name="select">សូមជ្រើសរើស </string>
   <string name="clear_value_msg">តើអ្នកចង់លុបតម្លៃនេះឬទេ?</string>
@@ -201,11 +190,8 @@
   <string name="status_exported">បាននាំចេញ </string>
   <!--APK update-->
   <string name="app_update_activity">ធ្វើបច្ចុប្បន្នភាព Akvo Flow</string>
-  <string name="app_update">មានច្បាប់កំណែថ្មីរបស់ Akvo App។ ចូរចុច ​\'ធ្វើបច្ចុប្បន្នភាព\' ដើម្បីដោនឡូត និងតម្លើងច្បាប់កំណែថ្មី។</string>
   <string name="update">ធ្វើបច្ចុប្បន្នភាព</string>
   <string name="not_now">មិនមែនពេលនេះទេ </string>
-  <string name="clicktoinstall">ច្បាប់កំណែថ្មីរបស់ Flow បានដោនឡូត។ តើអ្នកចង់តម្លើងវាឥឡូវឬទេ?</string>
-  <string name="apk_upgrade_error">មានកំហុសឆ្គងក្នុងការដោនឡូតបច្ចុប្បន្នភាព Flow</string>
   <!--Time check-->
   <string name="time_check_activity">កាលបរិច្ឆេទ និងពេលវេលា</string>
   <string name="time_warning">ពេលវេលាទូរស័ព្ទរបស់អ្នកមិនត្រឹមត្រូវទេ! ចូរកែតម្រូវម៉ោងរបស់អ្នក និងព្យាយាមម្តងទៀត។ កាលបរិច្ឆេទ និងពេលវេលាទូរស័ព្ទរបស់អ្នកគឺៈ</string>
@@ -213,8 +199,6 @@
   <!--Form sync-->
   <string name="downloading_forms">កំពុងដោនឡូតទម្រង់នានា </string>
   <string name="error_form_sync_title">មានកំហុសឆ្គងក្នុងការដាក់ទម្រង់ឲ្យចេញដំណាលគ្នា</string>
-  <string name="error_assignment_read">ការកំណត់កិច្ចការរបស់ទម្រង់មិនអាចអាចចេញពីដាសបូត Flow ឡើយ</string>
-  <string name="error_form_header">ទម្រង់ %1$s មិនអាចអានចេញពីដាសបូតលំហូឡើយ</string>
   <string name="error_form_download">ត្រូវប្រាកដថា ទម្រង់បានបោះពុម្ភ និងការកំណត់កាលបរិចេ្ឆទ និងពេលវេលាក្នុងស្រុករបស់អ្នក OK  </string>
   <string name="form_deleted">ទម្រង់នេះត្រូវបានលុបចេញ</string>
   <!--File sync-->
@@ -251,6 +235,5 @@
   <string name="error_value_required">ចន្លោះនេះមិនអាចចំហចោលឡើយ</string>
   <string name="drawer_open">ថត បើក</string>
   <string name="drawer_close">ថត បិទ </string>
-  <!--settings activity-->
   <!--app update service-->
 </resources>

@@ -35,7 +35,8 @@ public class DataSourceFactory {
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
-            ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource, PropertiesDataSource propertiesDataSource) {
+            ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
+            PropertiesDataSource propertiesDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;

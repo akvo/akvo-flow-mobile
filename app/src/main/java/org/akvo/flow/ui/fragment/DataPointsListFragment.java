@@ -267,9 +267,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             case R.id.sync_records:
                 requestRemoteDataRefresh();
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     @Override

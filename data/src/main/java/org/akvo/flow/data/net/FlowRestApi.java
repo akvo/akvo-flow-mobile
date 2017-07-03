@@ -57,7 +57,7 @@ public class FlowRestApi {
 
     @Inject
     public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
-        this.androidId = deviceHelper.getAndroidID();
+        this.androidId = deviceHelper.getAndroidId();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
         this.serviceFactory = serviceFactory;

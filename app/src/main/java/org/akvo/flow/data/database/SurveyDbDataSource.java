@@ -570,4 +570,8 @@ public class SurveyDbDataSource {
     public String createSurveyedLocale(long id, String recordUuid) {
         return surveyDbAdapter.createSurveyedLocale(id, recordUuid);
     }
+
+    public void clearSurveyedLocaleName(long surveyInstanceId) {
+        surveyDbAdapter.clearSurveyedLocaleName(surveyInstanceId);
+    }
 }

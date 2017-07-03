@@ -64,8 +64,8 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.preferences);
-
+        setContentView(R.layout.activity_preferences);
+        setupToolBar();
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
         mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
         serverTextView = (TextView) findViewById(R.id.servervalue);

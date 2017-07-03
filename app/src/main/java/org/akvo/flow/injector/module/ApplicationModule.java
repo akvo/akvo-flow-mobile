@@ -34,15 +34,25 @@ import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.thread.UIThread;
+import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.util.logging.DebugLoggingHelper;
+import org.akvo.flow.util.logging.FlowAndroidRavenFactory;
+import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
+import org.akvo.flow.util.logging.RavenEventBuilderHelper;
+import org.akvo.flow.util.logging.ReleaseLoggingHelper;
+import org.akvo.flow.util.logging.TagsFactory;
 
 import javax.inject.Singleton;
 
@@ -68,6 +78,29 @@ public class ApplicationModule {
     @Singleton
     Context provideContext() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
+        return fileDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    LoggingHelper loggingHelper() {
+        if (BuildConfig.DEBUG) {
+            return new DebugLoggingHelper();
+        } else {
+            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
+                    new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
+                            new Prefs(application));
+            RavenEventBuilderHelper loggingEventBuilderHelper
+                    = new RavenEventBuilderHelper(new TagsFactory(application).getTags());
+            FlowAndroidRavenFactory flowAndroidRavenFactory = new FlowAndroidRavenFactory(
+                    application, loggingSendPermissionVerifier, loggingEventBuilderHelper);
+            return new ReleaseLoggingHelper(application, flowAndroidRavenFactory);
+        }
     }
 
     @Provides
@@ -118,13 +151,6 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SharedPreferencesDataSource provideSharedPreferences() {
-        return new SharedPreferencesDataSource(
-                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
-    }
-
-    @Provides
-    @Singleton
     RestServiceFactory provideServiceFactory() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
@@ -133,5 +159,12 @@ public class ApplicationModule {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
         return new RestServiceFactory(httpClient);
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferencesDataSource provideSharedPreferences() {
+        return new SharedPreferencesDataSource(
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
     }
 }

@@ -99,6 +99,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         GoogleMapOptions options = new GoogleMapOptions();
         options.zOrderOnTop(true);
@@ -271,6 +272,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     public void refreshData(SurveyGroup surveyGroup) {
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         presenter.onDataReady(surveyGroup);
         presenter.refresh();
     }

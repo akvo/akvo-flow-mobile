@@ -20,6 +20,7 @@ android:
 before_script:
     - mkdir app/src/main/res/raw
     - mv app/config/survey.properties.template app/src/main/res/raw/survey.properties
+    - mv app/config/survey.properties.template app/src/data/res/raw/survey.properties
     - mv app/gradle.properties.template app/gradle.properties
     - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
     - emulator -avd test -no-audio -no-window &

@@ -115,6 +115,8 @@
     <string name="please_restart">Please, restart the app</string>
     <!--Empty Views-->
     <string name="no_records_text">You have no data points yet. Click \'+\' at the top of your screen to add a new data point</string>
+    <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the Flow dashboard</string>
+    <string name="no_datapoints_error_text">You have no data points yet. Click \'+\' to add a new data point</string>
     <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
     <!--ToolBar-->
     <string name="more">More</string>

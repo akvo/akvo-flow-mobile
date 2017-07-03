@@ -475,19 +475,49 @@ public class SurveyDbDataSource {
 
             // Now the responses...
             syncResponses(surveyInstance.getResponses(), id);
-
-            // The filename is a unique column in the transmission table, and as we do not have
-            // a file to hold this data, we set the value to the instance UUID
-            ContentValues transmissionContentValues = new ContentValues();
-            transmissionContentValues.put(TransmissionColumns.SURVEY_INSTANCE_ID, id);
-            transmissionContentValues.put(TransmissionColumns.SURVEY_ID, surveyInstance.getSurveyId());
-            transmissionContentValues.put(TransmissionColumns.FILENAME, surveyInstance.getUuid());
-            transmissionContentValues.put(TransmissionColumns.STATUS, TransmissionStatus.SYNCED);
-            final String date = String.valueOf(System.currentTimeMillis());
-            transmissionContentValues.put(TransmissionColumns.START_DATE, date);
-            transmissionContentValues.put(TransmissionColumns.END_DATE, date);
-            surveyDbAdapter.createTransmission(transmissionContentValues);
+            syncTransmission(surveyInstance, id);
         }
+    }
+
+    private void syncTransmission(SurveyInstance surveyInstance, long surveyInstanceId) {
+        Cursor cursor = null;
+        if (surveyInstanceId != SurveyDbAdapter.DOES_NOT_EXIST) {
+            cursor = surveyDbAdapter.getTransmission(surveyInstanceId);
+        }
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex(TransmissionColumns._ID);
+            do {
+                updateTransmission(cursor.getInt(columnIndex));
+            } while (cursor.moveToNext());
+        } else {
+            createTransmission(surveyInstance, surveyInstanceId);
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    private void createTransmission(SurveyInstance surveyInstance, long id) {
+        // The filename is a unique column in the transmission table, and if we do not have
+        // a file to hold this data, we set the value to the instance UUID
+        ContentValues transmissionContentValues = new ContentValues();
+        transmissionContentValues.put(TransmissionColumns.SURVEY_INSTANCE_ID, id);
+        transmissionContentValues.put(TransmissionColumns.SURVEY_ID, surveyInstance.getSurveyId());
+        transmissionContentValues.put(TransmissionColumns.FILENAME, surveyInstance.getUuid());
+        transmissionContentValues.put(TransmissionColumns.STATUS, TransmissionStatus.SYNCED);
+        final String date = String.valueOf(System.currentTimeMillis());
+        transmissionContentValues.put(TransmissionColumns.START_DATE, date);
+        transmissionContentValues.put(TransmissionColumns.END_DATE, date);
+        surveyDbAdapter.createTransmission(transmissionContentValues);
+    }
+
+    private void updateTransmission(int transmissionID) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TransmissionColumns.STATUS, TransmissionStatus.SYNCED);
+        final String date = String.valueOf(System.currentTimeMillis());
+        contentValues.put(TransmissionColumns.START_DATE, date);
+        contentValues.put(TransmissionColumns.END_DATE, date);
+        surveyDbAdapter.createTransmission(contentValues);
     }
 
     public void syncSurveyedLocale(SurveyedLocale surveyedLocale) {

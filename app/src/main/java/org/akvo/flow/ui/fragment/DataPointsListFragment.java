@@ -194,6 +194,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
         refreshLocalData();
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        refreshLocalData();
     }
 
     /**

@@ -24,7 +24,16 @@ import android.content.Context;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
+import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.UserDataRepository;
+import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.FlowAndroidRavenFactory;
@@ -33,12 +42,6 @@ import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
 import org.akvo.flow.util.logging.RavenEventBuilderHelper;
 import org.akvo.flow.util.logging.ReleaseLoggingHelper;
 import org.akvo.flow.util.logging.TagsFactory;
-import org.akvo.flow.data.executor.JobExecutor;
-import org.akvo.flow.data.repository.UserDataRepository;
-import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.domain.repository.UserRepository;
-import org.akvo.flow.thread.UIThread;
 
 import javax.inject.Singleton;
 
@@ -50,6 +53,9 @@ public class ApplicationModule {
 
     private final FlowApp application;
 
+    private static final String PREFS_NAME = "flow_prefs";
+    private static final int PREFS_MODE = Context.MODE_PRIVATE;
+
     public ApplicationModule(FlowApp application) {
         this.application = application;
     }
@@ -58,6 +64,12 @@ public class ApplicationModule {
     @Singleton
     Context provideContext() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
+        return fileDataRepository;
     }
 
     @Provides
@@ -93,5 +105,12 @@ public class ApplicationModule {
     @Singleton
     UserRepository provideUserRepository(UserDataRepository userDataRepository) {
         return userDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferencesDataSource provideSharedPreferences() {
+        return new SharedPreferencesDataSource(
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
     }
 }

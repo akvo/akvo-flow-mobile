@@ -11,7 +11,6 @@
   <string name="lon">लोंगिट्यूड</string>
   <string name="elevation">ऊंचाई </string>
   <string name="submitbutton">जमा करें</string>
-  <string name="geodialog">फ़ोन का GPS चालू होना चाहिए | Settings में जाने के लिए OK करें | Use GPS Satellite चुनें और वापस जाने के लिए बैक बटन दबाएं | GPS चालू होने पर, \'भौगोलिक स्थिति जांचे\' बटन दबाकर अपनी स्थिति दर्ज करें |</string>
   <string name="resize_large_images">फोटो का साइज़</string>
   <string name="settingslabel">सेटिंग्स </string>
   <string name="nouser">कोई प्रयोगकर्ता नहीं हैं!</string>
@@ -26,7 +25,6 @@
   <string name="screenoptdesc">सर्वे करते समय स्क्रीन को बंद नहीं होने देना  | याद रहे की बैटरी की बचत के लिए, इस्तमाल न करते समय स्क्रीन को स्वयं बंद करदें (या ऐप्प से बाहर निकल जाएं )</string>
   <string name="aboutlabel">ऐप्प के बारे में</string>
   <string name="aboutdesc">ऐप्प का वर्शन संख्या या प्रारूप जानने के लिए</string>
-  <string name="abouttitle">Akvo Flow ऐप्प के बारे में</string>
   <string name="gpsstatuslabel">GPS स्टेटस </string>
   <string name="gpsstatusdesc">GPS स्टेटस ऐप्प को इस्तेमाल करने के लिए | इस ऐप्प का आपके फ़ोन या टैबलेट में होना आवश्यक है</string>
   <string name="nogpsstatus">आपके उपकरण में GPS स्टेटस स्तापित नहीं है I इसे स्तापित करने के गूगल प्ले स्टोर इस्तमाल करैं I</string>
@@ -41,7 +39,6 @@
   <string name="uploadoptionlabel">मोबाइल नेटवर्क का इस्तमाल करते हुए डेटा सिंक करें </string>
   <string name="surveylanglabel">सर्वे की  भाषाएँ </string>
   <string name="scanbarcode">बारकोड को स्कैन करें </string>
-  <string name="barcodeerror">स्कैनर आपके फ़ोन अथवा टेबलेट पे उपलब्ध नहीं है I एंड्राइड मार्किट से बारकोड स्कैनर एप्प उपलब्ध करें I</string>
   <string name="toosmallerr"> संख्या अति छोटी है I नुन्यतम संख्या डाले :</string>
   <string name="toolargeerr">संख्या अति बड़ी है I अधिकतम संख्या डाले :</string>
   <string name="baddatatypeerr">उत्तर संख्या में दें </string>
@@ -79,7 +76,6 @@
   <string name="bootstrapstart">S.D  कार्ड से सर्वे डेटा लोड हो रहा है </string>
   <string name="bootstrapcomplete">SD कार्ड से डेटा लोड पूर्ण हुआ </string>
   <string name="bootstraperror">बूटस्ट्रैप ज़िप फाइल की प्रक्रिया में त्रुटि</string>
-  <string name="bootstrap_invalid_app">त्रुटि : फॉर्म इस डैशबोर्ड का नहीं है </string>
   <string name="transmissionhist">ट्रांसमिशन हिस्ट्री </string>
   <string name="transstartdate">शुरू </string>
   <string name="transenddate">समाप्त</string>
@@ -121,7 +117,6 @@
   <string name="app_language">ऐप  की भाषा </string>
   <string name="please_restart">कृपया ऐप को पुनर्प्रारंभ करें </string>
   <!--Empty Views-->
-  <string name="no_surveys_text">आप के पास कोई सर्वे नियुक्त नहीं हैI   फ्लो, Flow डैशबोर्ड में सर्वे नियुक्त किये जाते हैंI</string>
   <string name="no_records_text">आपके पास कोई डेटा पॉइंट नहीं है ।  नया डेटा पॉइंट बनाने के लिए स्क्रीन के ऊपरी ओर  \'+\' निशान को चुनियें । </string>
   <string name="no_survey_selected_text">आपने कोई सर्वे नहीं चुना है । कृपया साइड मेनू से कोई सर्वे चुने । </string>
   <!--Activity Labels-->
@@ -195,11 +190,8 @@
   <string name="status_exported">निर्यातित </string>
   <!--APK update-->
   <string name="app_update_activity">Akvo Flow अपडेट </string>
-  <string name="app_update">नया Flow वर्शन उपलब्ध है | \"Update\" को चुनें व इसे डाउनलोड करें </string>
   <string name="update">अपडेट </string>
   <string name="not_now">अभी नहीं </string>
-  <string name="clicktoinstall">नया Flow संस्करण उपलब्ध है. क्या आप इसे स्तापित करना चाहेंगे ?</string>
-  <string name="apk_upgrade_error">Flow update  दोव्न्लोडिंग त्रुटिपूर्ण </string>
   <!--Time check-->
   <string name="time_check_activity">समय व दिनांक </string>
   <string name="time_warning">आपके फ़ोन पे दिखाया जा रहा समय सही नहीं है। उसे सही करें और पुन:प्रयास करें। आपका दिखाया गया समय व दिनांक यह है </string>
@@ -207,8 +199,6 @@
   <!--Form sync-->
   <string name="downloading_forms">फॉर्म डाउनलोड जारी </string>
   <string name="error_form_sync_title">फॉर्म सिंक करने में त्रुटि </string>
-  <string name="error_assignment_read">फॉर्म असाइनमेंट्स Flow dashboard पर पढ़े नहीं जा रहे हैं </string>
-  <string name="error_form_header">यह फॉर्म  %1$s Flow dashboard पर पढ़ा नहीं जा सकता </string>
   <string name="error_form_download">सुनिशिचित करें की फॉर्म प्रकाशित हो और आपका स्थानिक समय  व दिनांक सही हो </string>
   <string name="form_deleted">यह फॉर्म हटा दिया गया है</string>
   <!--File sync-->
@@ -243,6 +233,5 @@
   <string name="retry">पुन: प्रयास</string>
   <string name="delete">हटाएं </string>
   <string name="error_value_required">इस स्थान को खली नहीं छोड़ें </string>
-  <!--settings activity-->
   <!--app update service-->
 </resources>

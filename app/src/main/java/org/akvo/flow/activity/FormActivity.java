@@ -674,7 +674,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void navigateToSignatureActivity(QuestionInteractionEvent event) {
         mRequestQuestionId = event.getSource().getQuestion().getId();
-        navigator.navigateToSignatureActivity(this);
+        navigator.navigateToSignatureActivity(this, event.getData());
     }
 
     private void navigateToGeoShapeActivity(QuestionInteractionEvent event) {

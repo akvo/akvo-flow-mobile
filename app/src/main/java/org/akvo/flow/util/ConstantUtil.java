@@ -111,11 +111,9 @@ public class ConstantUtil {
      */
     public static final String MEDIA_FILE_KEY = "filename";
 
-    /**
-     * Signature result data
-     */
-    public static final String SIGNATURE_IMAGE = "signature_image";
-    public static final String SIGNATURE_NAME = "signature_name";
+    public static final String SIGNATURE_NAME_EXTRA = "signature_name";
+    public static final String SIGNATURE_QUESTION_ID_EXTRA = "signature_question_id";
+    public static final String SIGNATURE_DATAPOINT_ID_EXTRA = "signature_datapoint_id";
 
     /**
      * Plot measurement result data

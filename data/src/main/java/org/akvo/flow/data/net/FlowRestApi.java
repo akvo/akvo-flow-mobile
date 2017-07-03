@@ -76,14 +76,14 @@ public class FlowRestApi {
         StringBuilder queryStringBuilder = new StringBuilder();
         appendParam(queryStringBuilder, Param.ANDROID_ID, encodeParam(androidId));
         appendParam(queryStringBuilder, Param.IMEI, encodeParam(imei));
-        appendParam(queryStringBuilder, Param.LAST_UPDATED, (!TextUtils.isEmpty(timestamp) ?
-                timestamp : "0"));
+        String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
+        appendParam(queryStringBuilder, Param.LAST_UPDATED, lastUpdated);
         appendParam(queryStringBuilder, Param.PHONE_NUMBER, encodeParam(phoneNumber));
         appendParam(queryStringBuilder, Param.SURVEY_GROUP, surveyGroup + "");
         queryStringBuilder.append(Param.TIMESTAMP).append(Param.EQUALS).append(getTimestamp());
         final String query = queryStringBuilder.toString();
-        return serverBaseUrl + "/" + Path.SURVEYED_LOCALE + "?" + query +
-                Param.SEPARATOR + Param.HMAC + Param.EQUALS + getAuthorization(query, apiKey);
+        return serverBaseUrl + "/" + Path.SURVEYED_LOCALE + "?" + query + Param.SEPARATOR
+                + Param.HMAC + Param.EQUALS + getAuthorization(query, apiKey);
     }
 
     private void appendParam(@NonNull StringBuilder queryStringBuilder, @NonNull String paramName,

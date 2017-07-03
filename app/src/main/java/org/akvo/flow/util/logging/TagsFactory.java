@@ -42,13 +42,13 @@ public class TagsFactory {
     private static final String DEVICE_ID_TAG_KEY = "flow.device.id";
     private static final String DEVICE_MODEL_TAG_KEY = "device.model";
     private static final String OS_VERSION_TAG_KEY = "os.version";
-    private static final String VERSION_NAME_TAG_KEY = "version.name";
+    static final String VERSION_NAME_TAG_KEY = "version.name";
     private static final String VERSION_CODE_TAG_KEY = "version.code";
     private static final String DEFAULT_TAG_VALUE = "NotSet";
     /**
      * The initial capacity is set to 9 for 6 tags (it should be increased if there are more tags)
      */
-    public static final int INITIAL_CAPACITY = 9;
+    private static final int INITIAL_CAPACITY = 9;
 
     private final Map<String, String> tags = new HashMap<>(INITIAL_CAPACITY);
 
@@ -57,6 +57,7 @@ public class TagsFactory {
         initTags(context, prefs);
     }
 
+    @NonNull
     public Map<String, String> getTags() {
         return tags;
     }

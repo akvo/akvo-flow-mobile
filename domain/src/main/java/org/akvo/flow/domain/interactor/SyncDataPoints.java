@@ -55,8 +55,8 @@ public class SyncDataPoints extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(final Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(KEY_SURVEY_GROUP_ID)) {
-            return Observable.error(new IllegalArgumentException("missing survey group id"));
+        if (parameters == null || parameters.get(KEY_SURVEY_GROUP_ID) == null) {
+            return Observable.error(new IllegalArgumentException("Missing survey group id"));
         }
         if (!connectivityStateManager.isConnectionAvailable()) {
             return Observable.just(new SyncResult(SyncResult.ResultCode.ERROR_NO_NETWORK, 0));

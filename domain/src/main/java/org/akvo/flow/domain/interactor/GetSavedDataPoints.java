@@ -48,8 +48,7 @@ public class GetSavedDataPoints extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(KEY_SURVEY_GROUP_ID)
-                || parameters.get(KEY_SURVEY_GROUP_ID) == null) {
+        if (parameters == null || parameters.get(KEY_SURVEY_GROUP_ID) == null) {
             return Observable.error(new IllegalArgumentException("Missing survey group id"));
         }
         Long surveyGroupId = (Long) parameters.get(KEY_SURVEY_GROUP_ID);

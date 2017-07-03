@@ -19,6 +19,7 @@ android:
 
 before_script:
     - mkdir app/src/main/res/raw
+    - mkdir app/src/data/res/raw
     - mv app/config/survey.properties.template app/src/main/res/raw/survey.properties
     - cp app/src/main/res/raw/survey.properties app/src/data/res/raw/survey.properties
     - mv app/gradle.properties.template app/gradle.properties

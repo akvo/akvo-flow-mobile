@@ -20,8 +20,20 @@
 
 package org.akvo.flow.injector.module;
 
+import org.akvo.flow.domain.interactor.SaveImage;
+import org.akvo.flow.domain.interactor.UseCase;
+
+import javax.inject.Named;
+
 import dagger.Module;
+import dagger.Provides;
 
 @Module
 public class ViewModule {
+
+    @Provides
+    @Named("saveImage")
+    UseCase provideSaveImageUseCase(SaveImage saveImage) {
+        return saveImage;
+    }
 }

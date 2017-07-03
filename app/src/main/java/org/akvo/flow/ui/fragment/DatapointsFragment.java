@@ -84,7 +84,6 @@ public class DatapointsFragment extends Fragment {
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
     }
 
     @Override
@@ -117,11 +116,6 @@ public class DatapointsFragment extends Fragment {
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
         // TODO: this is very strange, verify what it does and move it to some service
         mDatabase.deleteEmptyRecords();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -228,6 +222,11 @@ public class DatapointsFragment extends Fragment {
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        refreshView();
+    }
+
+    private void refreshView() {
         if (mTabsAdapter != null) {
             mTabsAdapter.refreshFragments(mSurveyGroup);
         }

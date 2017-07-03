@@ -60,6 +60,7 @@ import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.data.loader.SurveyGroupLoader;
 import org.akvo.flow.data.loader.UserLoader;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.PlatformUtil;
@@ -67,6 +68,8 @@ import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.akvo.flow.data.preference.Prefs.KEY_SURVEY_GROUP_ID;
 
 public class DrawerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final float ITEM_TEXT_SIZE = 14;
@@ -85,11 +88,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int LOADER_SURVEYS = 0;
     private static final int LOADER_USERS = 1;
 
-    public interface DrawerListener {
-        void onSurveySelected(SurveyGroup surveyGroup);
-
-        void onUserSelected(User user);
-    }
+    private long selectedSurveyId;
 
     private ExpandableListView mListView;
     private DrawerAdapter mAdapter;
@@ -113,6 +112,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        selectedSurveyId = new Prefs(getContext())
+                .getLong(KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
         if (mDatabase == null) {
             Context context = getActivity().getApplicationContext();
             mDatabase = new SurveyDbAdapter(context,
@@ -359,7 +360,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     mDatabase.deleteSurveyGroup(surveyGroupId);
-                                    if (FlowApp.getApp().getSurveyGroupId() == surveyGroupId) {
+                                    if (selectedSurveyId == surveyGroupId) {
+                                        selectedSurveyId = SurveyGroup.ID_NONE;
                                         mListener.onSurveySelected(null);
                                     }
                                     load();
@@ -392,6 +394,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         return false;
     }
 
+    //TODO: make static to avoid memory leaks
     class DrawerAdapter extends BaseExpandableListAdapter implements
             ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
 
@@ -530,7 +533,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     SurveyGroup sg = mSurveys.get(childPosition);
                     tv.setText(sg.getName());
-                    if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
+                    if (sg.getId() == selectedSurveyId) {
                         tv.setTextColor(mHighlightColor);
                     }
                     v.setTag(sg);
@@ -574,10 +577,19 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     return true;
                 case GROUP_SURVEYS:
                     SurveyGroup sg = (SurveyGroup) v.getTag();
+                    selectedSurveyId = sg.getId();
+                    notifyDataSetChanged();
                     mListener.onSurveySelected(sg);
                     return true;
             }
             return false;
         }
+    }
+
+    public interface DrawerListener {
+
+        void onSurveySelected(SurveyGroup surveyGroup);
+
+        void onUserSelected(User user);
     }
 }

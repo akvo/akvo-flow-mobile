@@ -58,8 +58,9 @@ public class JobExecutor implements ThreadExecutor {
         this.workQueue = new LinkedBlockingQueue<>();
         this.threadFactory = new JobThreadFactory();
         this.threadPoolExecutor =
-            new ThreadPoolExecutor(INITIAL_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT,
-                                   this.workQueue, this.threadFactory);
+                new ThreadPoolExecutor(INITIAL_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME,
+                        KEEP_ALIVE_TIME_UNIT,
+                        this.workQueue, this.threadFactory);
     }
 
     @Override

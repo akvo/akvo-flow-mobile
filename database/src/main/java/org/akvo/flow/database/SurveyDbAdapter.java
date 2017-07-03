@@ -61,7 +61,7 @@ public class SurveyDbAdapter {
             "survey LEFT OUTER JOIN survey_instance ON "
             + "survey.survey_id=survey_instance.survey_id";
 
-    private static final int DOES_NOT_EXIST = -1;
+    public static final int DOES_NOT_EXIST = -1;
 
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
@@ -857,6 +857,21 @@ public class SurveyDbAdapter {
             id = database.insert(Tables.SURVEY_INSTANCE, null, values);
         }
         return id;
+    }
+
+    public Cursor getTransmission(long surveyInstanceId) {
+        return database.query(Tables.TRANSMISSION,
+                new String[] {
+                        TransmissionColumns._ID,
+                },
+                TransmissionColumns.SURVEY_INSTANCE_ID + " = ? ",
+                new String[] { String.valueOf(surveyInstanceId)},
+                null, null, null);
+    }
+
+    public void updateTransmission(int transmissionID, ContentValues contentValues) {
+        database.update(Tables.TRANSMISSION, contentValues, TransmissionColumns._ID + " = ?",
+                new String[] {transmissionID + ""});
     }
 
     public void endTransaction() {

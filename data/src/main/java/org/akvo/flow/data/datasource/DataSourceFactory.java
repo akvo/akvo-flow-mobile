@@ -29,13 +29,20 @@ import javax.inject.Singleton;
 public class DataSourceFactory {
 
     private final SharedPreferencesDataSource sharedPreferencesDataSource;
+    private final ImageDataSource imageDataSource;
 
     @Inject
-    public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource) {
+    public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
+            ImageDataSource imageDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
+        this.imageDataSource = imageDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
         return sharedPreferencesDataSource;
+    }
+
+    public ImageDataSource getImageDataSource() {
+        return imageDataSource;
     }
 }

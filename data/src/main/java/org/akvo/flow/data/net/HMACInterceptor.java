@@ -22,6 +22,7 @@ package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.IOException;
@@ -45,6 +46,8 @@ import timber.log.Timber;
 
 import static org.akvo.flow.data.net.FlowRestApi.CHARSET_UTF8;
 import static org.akvo.flow.data.net.FlowRestApi.HMAC_SHA_1_ALGORITHM;
+import static org.akvo.flow.data.net.FlowRestApi.Param.HMAC;
+import static org.akvo.flow.data.net.FlowRestApi.Param.TIMESTAMP;
 
 public class HMACInterceptor implements Interceptor {
 
@@ -55,44 +58,45 @@ public class HMACInterceptor implements Interceptor {
     }
 
     @Override
-
     public Response intercept(Chain chain) throws IOException {
-
         Request request = chain.request();
-
         HttpUrl url = request.url();
-
-        Timber.i("Sending request %s on %s%n%s", url.toString(), chain.connection(),
+        String uriString = url.toString();
+        Timber.i("Intercepted request %s on %s%n%s", uriString, chain.connection(),
                 request.headers());
-
-        //append hmac authorization
-
-//        String query = url.toString()
-//                .replace("https://akvoflowsandbox.appspot.com/surveyedlocale?", "");
-        query = query + "&ts=" + getTimestamp();
-        Timber.i("query encoded %s", query);
         String query = url.query();
-        if (!url.queryParameterNames().contains("ts")) {
+        String urlBeginning = uriString.replace(query, "");
 
-        }
-        Timber.i("request.url().query() %s", query);
+        query = appendNonEncodedQueryParam(query, TIMESTAMP, getTimestamp());
         String auth = getAuthorization(query, key);
-        request = request.newBuilder()
-                .url(url.toString() + "&ts=" + getTimestamp() + "&h=" + auth).build();
-        Timber.i("AUTHORIZED url:: %s", url.toString());
+        query = appendNonEncodedQueryParam(query, HMAC, auth);
+
+        request = request.newBuilder().url(urlBeginning + query).build();
+        Timber.i("Authorised url:: %s", request.url().toString());
         Response response = chain.proceed(request);
         return response;
+    }
+
+    @NonNull
+    private String appendNonEncodedQueryParam(String query, String name, String value) {
+        return query + "&" + name + "=" + value;
     }
 
     private String getTimestamp() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return encodeParam(dateFormat.format(new Date()));
+    }
 
+    private String encodeParam(@Nullable String param) {
+        if (TextUtils.isEmpty(param)) {
+            return "";
+        }
         try {
-            return URLEncoder.encode(dateFormat.format(new Date()), CHARSET_UTF8);
+            return URLEncoder.encode(param, CHARSET_UTF8);
         } catch (UnsupportedEncodingException e) {
             Timber.e(e.getMessage());
-            return null;
+            return "";
         }
     }
 

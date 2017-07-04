@@ -44,12 +44,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 import timber.log.Timber;
 
-import static org.akvo.flow.data.net.FlowRestApi.CHARSET_UTF8;
-import static org.akvo.flow.data.net.FlowRestApi.HMAC_SHA_1_ALGORITHM;
-import static org.akvo.flow.data.net.FlowRestApi.Param.HMAC;
-import static org.akvo.flow.data.net.FlowRestApi.Param.TIMESTAMP;
+import static org.akvo.flow.data.util.Constants.HMAC;
+import static org.akvo.flow.data.util.Constants.TIMESTAMP;
 
 public class HMACInterceptor implements Interceptor {
+
+    private static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
+    private static final String CHARSET_UTF8 = "UTF-8";
 
     private final String key;
 
@@ -62,8 +63,6 @@ public class HMACInterceptor implements Interceptor {
         Request request = chain.request();
         HttpUrl url = request.url();
         String uriString = url.toString();
-        Timber.i("Intercepted request %s on %s%n%s", uriString, chain.connection(),
-                request.headers());
         String query = url.query();
         String urlBeginning = uriString.replace(query, "");
 
@@ -72,7 +71,6 @@ public class HMACInterceptor implements Interceptor {
         query = appendNonEncodedQueryParam(query, HMAC, auth);
 
         request = request.newBuilder().url(urlBeginning + query).build();
-        Timber.i("Authorised url:: %s", request.url().toString());
         Response response = chain.proceed(request);
         return response;
     }

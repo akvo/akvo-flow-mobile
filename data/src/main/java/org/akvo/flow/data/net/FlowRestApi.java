@@ -32,10 +32,6 @@ import rx.Observable;
 
 @Singleton
 public class FlowRestApi {
-
-    public static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
-    public static final String CHARSET_UTF8 = "UTF-8";
-
     private final String androidId;
     private final String imei;
     private final String phoneNumber;
@@ -54,23 +50,5 @@ public class FlowRestApi {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
         return serviceFactory.createRetrofitService(baseUrl, DataPointSyncService.class, apiKey)
                 .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "");
-    }
-
-    //TODO: move these to constants
-    interface Path {
-
-        String SURVEYED_LOCALE = "/surveyedlocale";
-    }
-
-    interface Param {
-
-        String SURVEY_GROUP = "surveyGroupId";
-        String PHONE_NUMBER = "phoneNumber";
-        String IMEI = "imei";
-        String TIMESTAMP = "ts";
-        String LAST_UPDATED = "lastUpdateTime";
-        String HMAC = "h";
-        String VERSION = "ver";
-        String ANDROID_ID = "androidId";
     }
 }

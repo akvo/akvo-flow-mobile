@@ -27,12 +27,12 @@ import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import rx.Observable;
 
-import static org.akvo.flow.data.net.FlowRestApi.Param.ANDROID_ID;
-import static org.akvo.flow.data.net.FlowRestApi.Param.IMEI;
-import static org.akvo.flow.data.net.FlowRestApi.Param.LAST_UPDATED;
-import static org.akvo.flow.data.net.FlowRestApi.Param.PHONE_NUMBER;
-import static org.akvo.flow.data.net.FlowRestApi.Param.SURVEY_GROUP;
-import static org.akvo.flow.data.net.FlowRestApi.Path.SURVEYED_LOCALE;
+import static org.akvo.flow.data.util.Constants.ANDROID_ID;
+import static org.akvo.flow.data.util.Constants.IMEI;
+import static org.akvo.flow.data.util.Constants.LAST_UPDATED;
+import static org.akvo.flow.data.util.Constants.PHONE_NUMBER;
+import static org.akvo.flow.data.util.Constants.SURVEYED_LOCALE;
+import static org.akvo.flow.data.util.Constants.SURVEY_GROUP;
 
 interface DataPointSyncService {
 

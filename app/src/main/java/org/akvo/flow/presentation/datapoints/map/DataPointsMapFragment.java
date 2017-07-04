@@ -99,6 +99,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         GoogleMapOptions options = new GoogleMapOptions();
         options.zOrderOnTop(true);
@@ -196,7 +197,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         }
 
         final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        LatLng ne = bounds.northeast, sw = bounds.southwest;
+        LatLng ne = bounds.northeast;
+        LatLng sw = bounds.southwest;
         double latDst = Math.abs(ne.latitude - sw.latitude);
         double lonDst = Math.abs(ne.longitude - sw.longitude);
 
@@ -270,6 +272,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     public void refreshData(SurveyGroup surveyGroup) {
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         presenter.onDataReady(surveyGroup);
         presenter.refresh();
     }
@@ -286,13 +289,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.sync_records:
                 presenter.onSyncRecordsPressed();
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     @Override

@@ -21,6 +21,7 @@ package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ListFragment;
@@ -44,6 +45,7 @@ import org.akvo.flow.data.loader.models.SurveyInfo;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.model.ViewSurveyInfo;
 import org.akvo.flow.ui.model.ViewSurveyInfoMapper;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ import java.util.List;
 import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
+import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
 import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 
@@ -59,20 +62,16 @@ public class FormListFragment extends ListFragment
         implements LoaderCallbacks<Pair<List<SurveyInfo>, Boolean>>, OnItemClickListener {
 
     private SurveyGroup mSurveyGroup;
-    private String recordId;
     private SurveyAdapter mAdapter;
     private SurveyListListener mListener;
     private final ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+    private String recordId;
 
     public FormListFragment() {
     }
 
-    public static FormListFragment newInstance(SurveyGroup surveyGroup, String recordId) {
+    public static FormListFragment newInstance() {
         FormListFragment fragment = new FormListFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
-        args.putString(EXTRA_RECORD_ID, recordId);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -91,15 +90,11 @@ public class FormListFragment extends ListFragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
-        recordId = getArguments().getString(EXTRA_RECORD_ID);
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Intent intent = getActivity().getIntent();
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        recordId = intent.getStringExtra(RECORD_ID_EXTRA);
         setHasOptionsMenu(true);
         if (mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity());
@@ -120,7 +115,7 @@ public class FormListFragment extends ListFragment
         mListener.onSurveyClick(surveyId);
     }
 
-   static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
+    static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
 
         private static final int LAYOUT_RES = R.layout.survey_item;
 

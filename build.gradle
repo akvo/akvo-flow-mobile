@@ -1,21 +1,40 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
         mavenCentral()
         jcenter()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
 
+ext {
+    compileSdkVersion = 25
+    buildToolsVersion = "25.0.1"
+    minSdkVersion = 10
+    targetSdkVersion = 21
+}
+
 allprojects {
     repositories {
         jcenter()
+        maven { url "https://jitpack.io" }
     }
+}
+
+task checkstyle(type: Checkstyle) {
+    configFile file("${project.rootDir}/config/checkstyle.xml")
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    ignoreFailures = true //there are too many checkstyle errors for now to fix them all
+    classpath = files()
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+apply plugin: 'checkstyle'

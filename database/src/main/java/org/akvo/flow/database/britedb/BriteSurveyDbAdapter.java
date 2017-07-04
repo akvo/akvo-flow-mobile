@@ -96,6 +96,8 @@ public class BriteSurveyDbAdapter {
             case Constants.ORDER_BY_NAME:
                 orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
                 break;
+            default:
+                break;
         }
 
         String[] whereValues = new String[] { String.valueOf(surveyGroupId) };

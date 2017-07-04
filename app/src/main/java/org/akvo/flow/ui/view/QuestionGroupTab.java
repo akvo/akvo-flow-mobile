@@ -36,6 +36,10 @@ import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewFactory;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
+import org.akvo.flow.ui.view.option.OptionQuestionFactory;
+import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -269,7 +273,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new OptionQuestionView(context, q, mSurveyListener);
+                questionView = OptionQuestionFactory.createOptionQuestion(context, q, mSurveyListener);
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
@@ -281,7 +285,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new GeoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new BarcodeQuestionView(context, q, mSurveyListener);
+                questionView = BarcodeQuestionViewFactory
+                        .createBarcodeQuestion(context, q, mSurveyListener);
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new DateQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.CASCADE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {

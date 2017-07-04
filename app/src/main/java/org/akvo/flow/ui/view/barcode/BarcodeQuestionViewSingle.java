@@ -83,9 +83,12 @@ public class BarcodeQuestionViewSingle extends QuestionView implements
      */
     public void captureResponse(boolean suppressListeners) {
         String value = questionInput.getBarcode();
-        setResponse(new QuestionResponse(value, ConstantUtil.VALUE_RESPONSE_TYPE,
-                        getQuestion().getId()),
-                suppressListeners);
+        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                .setQuestionId(getQuestion().getId())
+                .createQuestionResponse();
+        setResponse(questionResponse, suppressListeners);
     }
 
     @Override

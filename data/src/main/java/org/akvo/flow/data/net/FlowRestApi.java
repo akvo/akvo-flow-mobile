@@ -41,6 +41,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import retrofit2.http.HEAD;
 import rx.Observable;
 import timber.log.Timber;
 
@@ -57,7 +58,7 @@ public class FlowRestApi {
 
     @Inject
     public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
-        this.androidId = deviceHelper.getAndroidID();
+        this.androidId = deviceHelper.getAndroidId();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
         this.serviceFactory = serviceFactory;
@@ -66,7 +67,7 @@ public class FlowRestApi {
     public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
-        return serviceFactory.createRetrofitService(baseUrl, FlowApiService.class, apiKey)
+        return serviceFactory.createRetrofitService(baseUrl, DataPointSyncService.class, apiKey)
                 .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "");
     }
 
@@ -108,13 +109,7 @@ public class FlowRestApi {
     private String getTimestamp() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-        try {
-            return URLEncoder.encode(dateFormat.format(new Date()), CHARSET_UTF8);
-        } catch (UnsupportedEncodingException e) {
-            Timber.e(e.getMessage());
-            return null;
-        }
+        return encodeParam(dateFormat.format(new Date()));
     }
 
     @Nullable

@@ -34,7 +34,7 @@ import static org.akvo.flow.data.net.FlowRestApi.Param.PHONE_NUMBER;
 import static org.akvo.flow.data.net.FlowRestApi.Param.SURVEY_GROUP;
 import static org.akvo.flow.data.net.FlowRestApi.Path.SURVEYED_LOCALE;
 
-interface FlowApiService {
+interface DataPointSyncService {
 
     @GET(SURVEYED_LOCALE)
     @Headers("Cache-Control: no-cache")

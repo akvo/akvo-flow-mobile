@@ -48,9 +48,10 @@ public class RestServiceFactory {
         this.httpClient = httpClient;
     }
 
-    public <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz) {
+    public <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz, String key) {
         httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
         httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
+        httpClient.addInterceptor(new HMACInterceptor(key));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

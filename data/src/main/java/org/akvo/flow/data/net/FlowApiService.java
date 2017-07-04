@@ -24,12 +24,21 @@ import org.akvo.flow.data.entity.ApiLocaleResult;
 
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
-import retrofit2.http.Url;
+import retrofit2.http.Query;
 import rx.Observable;
+
+import static org.akvo.flow.data.net.FlowRestApi.Param.ANDROID_ID;
+import static org.akvo.flow.data.net.FlowRestApi.Param.IMEI;
+import static org.akvo.flow.data.net.FlowRestApi.Param.LAST_UPDATED;
+import static org.akvo.flow.data.net.FlowRestApi.Param.PHONE_NUMBER;
+import static org.akvo.flow.data.net.FlowRestApi.Param.SURVEY_GROUP;
+import static org.akvo.flow.data.net.FlowRestApi.Path.SURVEYED_LOCALE;
 
 interface FlowApiService {
 
-    @GET
+    @GET(SURVEYED_LOCALE)
     @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+    Observable<ApiLocaleResult> loadNewDataPoints(@Query(ANDROID_ID) String androidId,
+            @Query(IMEI) String imei, @Query(LAST_UPDATED) String lastUpdated,
+            @Query(PHONE_NUMBER) String phoneNumber, @Query(SURVEY_GROUP) String surveyGroup);
 }

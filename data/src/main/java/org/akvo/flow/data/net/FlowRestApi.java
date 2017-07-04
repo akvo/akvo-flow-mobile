@@ -47,8 +47,8 @@ import timber.log.Timber;
 @Singleton
 public class FlowRestApi {
 
-    private static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
-    private static final String CHARSET_UTF8 = "UTF-8";
+    public static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
+    public static final String CHARSET_UTF8 = "UTF-8";
 
     private final String androidId;
     private final String imei;
@@ -65,8 +65,9 @@ public class FlowRestApi {
 
     public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
-        return serviceFactory.createRetrofitService(baseUrl, FlowApiService.class)
-                .loadNewDataPoints(buildSyncUrl(baseUrl, apiKey, surveyGroup, timestamp));
+        String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
+        return serviceFactory.createRetrofitService(baseUrl, FlowApiService.class, apiKey)
+                .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "");
     }
 
     @NonNull
@@ -137,7 +138,7 @@ public class FlowRestApi {
 
     interface Path {
 
-        String SURVEYED_LOCALE = "surveyedlocale";
+        String SURVEYED_LOCALE = "/surveyedlocale";
     }
 
     interface Param {

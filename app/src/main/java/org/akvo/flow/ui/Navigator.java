@@ -24,8 +24,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -39,11 +41,12 @@ import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.PreferencesActivity;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SignatureActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
@@ -54,6 +57,9 @@ import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
+
+    private static final String TERMS_URL = "http://akvo.org/help/akvo-policies-and-terms-2/akvo-flow-terms-of-use/";
+    private static final String RELEASE_NOTES_URL = "https://github.com/akvo/akvo-flow-mobile/releases";
 
     //TODO: inject activity
     @Inject
@@ -82,22 +88,21 @@ public class Navigator {
         // Display form list and history
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
-        extras.putSerializable(EXTRA_SURVEY_GROUP, mSurveyGroup);
-        extras.putString(EXTRA_RECORD_ID, surveyedLocaleId);
+        extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        extras.putString(ConstantUtil.RECORD_ID_EXTRA, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }
 
-    public void navigateToFormActivity(Context context, String surveyedLocaleId, User user,
-            String formId,
+    //TODO: confusing, too many params, use object
+    public void navigateToFormActivity(Context context, String surveyedLocaleId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
         Intent i = new Intent(context, FormActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, user.getId());
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, formId);
-        i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, surveyedLocaleId);
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, formInstanceId);
-        i.putExtra(ConstantUtil.READONLY_KEY, readOnly);
+        i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
+        i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, surveyedLocaleId);
+        i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
+        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         context.startActivity(i);
     }
 
@@ -118,14 +123,22 @@ public class Navigator {
         try {
             activity.startActivityForResult(intent, ConstantUtil.SCAN_ACTIVITY_REQUEST);
         } catch (ActivityNotFoundException ex) {
-            displayAppNotFoundDialog(activity, R.string.barcodeerror);
+            displayScannerNotFoundDialog(activity, R.string.barcode_scanner_missing_error);
         }
     }
 
-    private void displayAppNotFoundDialog(@NonNull Activity activity, @StringRes int messageId) {
+    private void displayScannerNotFoundDialog(@NonNull final Activity activity, @StringRes int messageId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.okbutton,
+        builder.setPositiveButton(R.string.install,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("http://play.google.com/store/search?q=Barcode Scanner"));
+                        activity.startActivity(intent);
+                    }
+                });
+        builder.setNegativeButton(R.string.cancelbutton,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
@@ -159,23 +172,60 @@ public class Navigator {
         activity.startActivityForResult(i, ConstantUtil.PLOTTING_REQUEST);
     }
 
-    public void navigateToSignatureActivity(@NonNull Activity activity) {
+    public void navigateToSignatureActivity(@NonNull Activity activity, @Nullable Bundle data) {
         Intent i = new Intent(activity, SignatureActivity.class);
+        if (data != null) {
+            i.putExtras(data);
+        }
         activity.startActivityForResult(i, ConstantUtil.SIGNATURE_REQUEST);
     }
 
     public void navigateToMapActivity(@NonNull Context context, String recordId) {
         context.startActivity(new Intent(context, MapActivity.class)
-                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, recordId));
+                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
     }
 
     public void navigateToTransmissionActivity(Context context, long surveyInstanceId) {
         context.startActivity(new Intent(context, TransmissionHistoryActivity.class)
-                .putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId));
+                .putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, surveyInstanceId));
     }
 
-    public void navigateToLocationSettings(Context context) {
-         context.startActivity(new Intent("android.settings.LOCATION_SOURCE_SETTINGS"));
+    public void navigateToLocationSettings(@NonNull Context context) {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        PackageManager packageManager = context.getPackageManager();
+        if (intent.resolveActivity(packageManager) != null) {
+            context.startActivity(intent);
+        } else {
+            navigateToSettings(context);
+        }
+    }
+
+    /**
+     * Fallback as Settings.ACTION_LOCATION_SOURCE_SETTINGS may not be available on some devices
+     */
+    private void navigateToSettings(@NonNull Context context) {
+        context.startActivity(new Intent(Settings.ACTION_SETTINGS));
+    }
+
+    public void navigateToAbout(@NonNull Context context) {
+        context.startActivity(new Intent(context, AboutActivity.class));
+    }
+
+    public void navigateToTerms(@NonNull Context context) {
+        openUrl(context, TERMS_URL);
+    }
+
+    public void openUrl(@NonNull Context context, String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        context.startActivity(browserIntent);
+    }
+
+    public void navigateToReleaseNotes(@NonNull Context context) {
+        openUrl(context, RELEASE_NOTES_URL);
+    }
+
+    public void navigateToLegalInfo(@NonNull Context context) {
+        context.startActivity(new Intent(context, LegalNoticesActivity.class));
     }
 
     public void navigateToPreferences(@Nullable Context context) {

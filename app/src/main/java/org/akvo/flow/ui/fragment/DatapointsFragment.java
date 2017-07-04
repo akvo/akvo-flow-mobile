@@ -33,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
@@ -74,7 +73,7 @@ public class DatapointsFragment extends Fragment {
     public static DatapointsFragment newInstance(SurveyGroup surveyGroup) {
         DatapointsFragment fragment = new DatapointsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -92,10 +91,9 @@ public class DatapointsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
     }
 
     @Override
@@ -144,18 +142,12 @@ public class DatapointsFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
         mPager = (ViewPager) v.findViewById(R.id.pager);
         TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
-        // Init tabs
         mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
         tabs.setupWithViewPager(mPager);
@@ -253,6 +245,11 @@ public class DatapointsFragment extends Fragment {
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        refreshView();
+    }
+
+    private void refreshView() {
         if (mTabsAdapter != null) {
             mTabsAdapter.refreshFragments(mSurveyGroup);
         }

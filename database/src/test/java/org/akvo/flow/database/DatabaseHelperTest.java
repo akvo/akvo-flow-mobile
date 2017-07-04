@@ -127,7 +127,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionFormVersion() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionFormVersion() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -144,7 +144,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionCaddisfly() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionCaddisfly() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -161,7 +161,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionPreferences() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionPreferences() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);

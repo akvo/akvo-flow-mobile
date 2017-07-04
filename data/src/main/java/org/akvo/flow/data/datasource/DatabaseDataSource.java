@@ -57,16 +57,20 @@ public class DatabaseDataSource {
 
     public Observable<Cursor> getDataPoints(@NonNull Long surveyGroupId, @Nullable Double latitude,
             @Nullable Double longitude, @Nullable Integer orderBy) {
+        int safeOrderBy;
         if (orderBy == null) {
-            orderBy = Constants.ORDER_BY_NONE;
+            safeOrderBy = Constants.ORDER_BY_NONE;
+        } else {
+            safeOrderBy = orderBy;
         }
-        switch (orderBy) {
+        switch (safeOrderBy) {
             case Constants.ORDER_BY_DISTANCE:
             case Constants.ORDER_BY_DATE:
             case Constants.ORDER_BY_STATUS:
             case Constants.ORDER_BY_NAME:
                 return briteSurveyDbAdapter
-                        .getFilteredSurveyedLocales(surveyGroupId, latitude, longitude, orderBy);
+                        .getFilteredSurveyedLocales(surveyGroupId, latitude, longitude,
+                                safeOrderBy);
             default:
                 return briteSurveyDbAdapter.getSurveyedLocales(surveyGroupId);
         }

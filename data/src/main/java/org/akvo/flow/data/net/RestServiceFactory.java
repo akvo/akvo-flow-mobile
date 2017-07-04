@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -41,14 +42,16 @@ public class RestServiceFactory {
      */
     public static final int NO_TIMEOUT = 0;
 
-    private final OkHttpClient.Builder httpClient;
+    private final HttpLoggingInterceptor loggingInterceptor;
 
     @Inject
-    public RestServiceFactory(OkHttpClient.Builder httpClient) {
-        this.httpClient = httpClient;
+    public RestServiceFactory(HttpLoggingInterceptor loggingInterceptor) {
+        this.loggingInterceptor = loggingInterceptor;
     }
 
     public <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz, String key) {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(loggingInterceptor);
         httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
         httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
         httpClient.addInterceptor(new HMACInterceptor(key));

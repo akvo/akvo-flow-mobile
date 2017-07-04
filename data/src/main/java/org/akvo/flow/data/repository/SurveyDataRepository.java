@@ -84,8 +84,7 @@ public class SurveyDataRepository implements SurveyRepository {
                                 .concatMap(new Func1<String, Observable<Integer>>() {
                                     @Override
                                     public Observable<Integer> call(String apiKey) {
-                                        return syncDataPoints(serverBaseUrl, apiKey,
-                                                surveyGroupId);
+                                        return syncDataPoints(serverBaseUrl, apiKey, surveyGroupId);
                                     }
                                 });
                     }

@@ -20,7 +20,6 @@
 package org.akvo.flow.testhelper;
 
 import android.content.Context;
-import android.content.Intent;
 
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.Survey;
@@ -80,18 +79,6 @@ public class SurveyInstaller {
         adapter.addSurveyGroup(survey.getSurveyGroup());
         adapter.close();
 
-        notifyNewSurvey(context);
         return survey;
     }
-
-    /**
-     *  Notifies the UI that a new survey has been implemented
-     *
-     * @param context in which to send the notification
-     */
-    private void notifyNewSurvey(Context context) {
-        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_SURVEY_SYNC);
-        context.sendBroadcast(intentBroadcast);
-    }
-
 }

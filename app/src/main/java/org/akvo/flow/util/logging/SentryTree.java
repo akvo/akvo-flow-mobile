@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,7 +25,7 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.joshdholtz.sentry.Sentry;
+import com.getsentry.raven.android.Raven;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +39,10 @@ class SentryTree extends Timber.Tree {
                     javax.net.ssl.SSLHandshakeException.class,
                     java.security.cert.CertificateNotYetValidException.class,
                     javax.net.ssl.SSLProtocolException.class,
-                    java.net.SocketTimeoutException.class
+                    java.net.SocketTimeoutException.class,
+                    java.net.UnknownHostException.class,
+                    java.net.ConnectException.class,
+                    javax.net.ssl.SSLException.class
             });
 
     @Override
@@ -56,16 +59,14 @@ class SentryTree extends Timber.Tree {
     @VisibleForTesting
     void captureException(@NonNull Throwable t, @Nullable String message) {
         if (TextUtils.isEmpty(message)) {
-            Sentry.captureException(t);
+            Raven.capture(t);
         } else {
-            Sentry.captureException(t, message);
+            Raven.capture(new Throwable(message, t));
         }
     }
 
     /**
      * Some exceptions are not useful to be sent to sentry, this method will filter them out
-     * @param t
-     * @return
      */
     private boolean isThrowableExcluded(Throwable t) {
         return IGNORED_EXCEPTIONS.contains(t.getClass()) || containsFilteredMessage(t);
@@ -78,8 +79,6 @@ class SentryTree extends Timber.Tree {
 
     /**
      * Configure which level should be sent
-     * @param priority
-     * @return
      */
     private boolean priorityTooLow(int priority) {
         return priority < Log.ERROR;

@@ -1,5 +1,92 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.5
+Date: 29 June 2017
+
+# New and noteworthy
+* **Update translations** - [#762](https://github.com/akvo/akvo-flow-mobile/issues/762) Translations for Portuguese, Spanish and French have been reviewed.
+* **Signature question view design** - [#751](https://github.com/akvo/akvo-flow-mobile/issues/751) The signature question view has been redesigned to make it easier to use.
+* **New About page** - [#595](https://github.com/akvo/akvo-flow-mobile/issues/595) The Flow app now has a new About Us page.
+* **Take user to play store when Barcode Scanner is not installed** - [#512](https://github.com/akvo/akvo-flow-mobile/issues/512) For barcode questions, if a user does not have any scanner app installed, he will have the chance to be redirected to the Play Store in order to pick one of the available apps.
+
+# Resolved issues
+* **Screen rotation by point lists shows wrong points** - [#767](https://github.com/akvo/akvo-flow-mobile/issues/767) Fixed the issue where a wrong survey was selected after the device was rotated.
+* **Cookstoves and Biogas app styling** - [#759](https://github.com/akvo/akvo-flow-mobile/issues/759) The Cookstoves and Biogas flavours now have the correct app styling.
+* **Manually entered barcode does not get saved for unsubmitted forms** - [#749](https://github.com/akvo/akvo-flow-mobile/issues/749) Fixed manually entered barcode not being saved when a form was not immediately submitted.
+* **Signature question not properly saved in unsubmitted forms** - [#748](https://github.com/akvo/akvo-flow-mobile/issues/748) Fixed signature name not properly saved when a form was not immediately submitted.
+* **Geolocation manually edited text fields do not get properly saved for unsubmitted forms** - [#747](https://github.com/akvo/akvo-flow-mobile/issues/747) Fixed manually entered location fields not properly saved when a form was not immediately submitted.
+* **After removing form answers, the datapoint still shows if the back button is pressed** - [#742](https://github.com/akvo/akvo-flow-mobile/issues/742) Datapoint no longer shows if all its answers have been cleared.
+* **Transmission history after datapoint is synced** - [#737](https://github.com/akvo/akvo-flow-mobile/issues/737) Fixed inconsistent transmission state after the datapoint was synced.
+* **IllegalStateException in FormActivity** - [#552](https://github.com/akvo/akvo-flow-mobile/issues/552) Fixed random crash inside FormActivity.
+
+---------------
+# ver 2.3.4.1
+Date: 13 June 2017
+
+# Resolved issues
+* **Cookstoves and Biogas app icon is wrong** - [#757](https://github.com/akvo/akvo-flow-mobile/issues/757) Restored both app icons to the correct one.
+
+---------------
+# ver 2.3.4
+Date: 08 June 2017
+
+# New and noteworthy
+* **Remove validation code for free text question types** - [#709](https://github.com/akvo/akvo-flow-mobile/issues/709) Removed unused validation code.
+* **Sentry improvements** - [#666](https://github.com/akvo/akvo-flow-mobile/issues/666) We are now using the official raven-android library and have further filtered out some unnecessary exceptions.
+
+# Resolved issues
+* **Crash related to option question** - [#739](https://github.com/akvo/akvo-flow-mobile/issues/739) Fixed crash related to question options when those contained no options.
+* **App icon is huge** - [#722](https://github.com/akvo/akvo-flow-mobile/issues/722) The app icon is now a mipmap and has alternative sizes for different screen resolutions.
+* **Crash in CascadeQuestionView** - [#716](https://github.com/akvo/akvo-flow-mobile/issues/716) Fixed random crash related to cascades.
+* **Crash in RecordActivity** - [#655](https://github.com/akvo/akvo-flow-mobile/issues/655) Fixed crash in record list after a record was deleted.
+
+---------------
+# ver 2.3.3
+Date: 25 May 2017
+
+# Resolved issues
+* **Long form names do not look nice on some devices** - [#727](https://github.com/akvo/akvo-flow-mobile/issues/727) Long form names in the navigation drawer now have a small right margin. 
+* **Pressing back with the navigation drawer shown closes app** - [#711](https://github.com/akvo/akvo-flow-mobile/issues/711) Fixed the issue with pressing the back button when the navigation drawer was being displayed.
+* **NumberFormatException: Invalid long: "21474836472147483647"** - [#701](https://github.com/akvo/akvo-flow-mobile/issues/701) Fixed issue with excessively long numbers which no longer wil be accepted.
+* **GeoQuestion Location Invalid Input** - [#679](https://github.com/akvo/akvo-flow-mobile/issues/679) Manually input coordinates are now verified before submission.
+* **Crash: NullPointerException when trying to open FormActivity** - [#637](https://github.com/akvo/akvo-flow-mobile/issues/637) Fixed a crash when trying to view a deleted datapoint.
+
+---------------
+# ver 2.3.2
+Date: 27 April 2017
+
+# New and noteworthy
+* **Transmission History improved** - [#695](https://github.com/akvo/akvo-flow-mobile/issues/695) The transmission screen has been redesigned.
+* **App ToolBar color change** - [#668](https://github.com/akvo/akvo-flow-mobile/issues/668) The toolbar of the whole app has been redesigned respecting google material design and Akvo colors.
+
+# Resolved issues
+* **Data point distances are back** - [#710](https://github.com/akvo/akvo-flow-mobile/issues/710) Restored display of distances to the datapoint list.
+* **Selected survey background no longer grey** - [#704](https://github.com/akvo/akvo-flow-mobile/issues/704) Removed grey background when a survey is selected.
+
+---------------
+# ver 2.3.1.1
+Date: 13 April 2017
+
+# Resolved issues
+* **Crash when loading geoquestion: NumberFormatException: Invalid double** - [#697](https://github.com/akvo/akvo-flow-mobile/issues/697) Fixed crash due to unexpected double formatting in some geolocation questions.
+
+---------------
+# ver 2.3.1
+Date: 10 April 2017
+
+# New and noteworthy
+* **Improve UI for when searching for location** - [#673](https://github.com/akvo/akvo-flow-mobile/issues/673) Improved the look of geo question: it is now clearer when you can input the coordinates manually. 
+* **Add dependency injection with dagger 2** - [#534](https://github.com/akvo/akvo-flow-mobile/issues/534) First step to introduce dependency injection.
+* **Show Caddisfly result in more meaningful way** - [#470](https://github.com/akvo/akvo-flow-mobile/issues/470) Caddisfly test results are now displayed with the actual test values.
+
+# Resolved issues
+* **GeoQuestion Location Timeout** - [#675](https://github.com/akvo/akvo-flow-mobile/issues/675) If the location fails to be retrieved, you will now see a SnackBar which will allow you to retry.
+* **Remove "searching" textView** - [#674](https://github.com/akvo/akvo-flow-mobile/issues/674) The "searching" text was confusing and has been removed.
+* **Simplify dialogue for failed GPS search** - [#672](https://github.com/akvo/akvo-flow-mobile/issues/672) The dialog prompting for enabling the GPS setting now has a clearer message.
+* **Date Picker using GMT formatting by default** - [#662](https://github.com/akvo/akvo-flow-mobile/issues/662) Fixed the issue where a wrong day was displayed for some timezones.
+* **Crash when attempting to display the gps dialog** - [#656](https://github.com/akvo/akvo-flow-mobile/issues/656) Fixed the crash when the device was rotated while the GPS prompt dialog was displayed.
+
+---------------
 # ver 2.3.0
 Date: 16 March 2017
 

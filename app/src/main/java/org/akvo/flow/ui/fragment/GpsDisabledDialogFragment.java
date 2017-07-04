@@ -42,9 +42,9 @@ public class GpsDisabledDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new AlertDialog.Builder(getActivity()).setMessage(R.string.geodialog)
+        return new AlertDialog.Builder(getActivity()).setTitle(R.string.geodialog)
                 .setCancelable(true)
-                .setPositiveButton(R.string.okbutton,
+                .setPositiveButton(R.string.settings,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 navigator.navigateToLocationSettings(getActivity());

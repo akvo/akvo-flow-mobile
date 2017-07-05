@@ -82,7 +82,7 @@ public class FreeTextSurveyTest {
 
         openDrawer();
         onView(withText(survey.getName())).check(matches(isDisplayed())).perform(click());
-        onView(withId(R.id.new_datapoint)).perform(click());
+        onView(withId(R.id.add_point_btn)).perform(click());
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
         onView(withId(R.id.input_et)).perform(typeText(text));
         onView(withId(R.id.next_btn)).perform(click());

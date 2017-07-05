@@ -45,10 +45,14 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.tests.R.raw.optionsurvey;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.allOf;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -100,9 +104,8 @@ public class OptionsFormActivityTest {
     }
 
     private void verifySubmitButtonEnabled() {
-//        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-//                .check(matches(isEnabled()));
-        onView(withId(R.id.submit_button_id)).check(matches(isEnabled()));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(isEnabled()));
     }
 
     private void fillOptionsQuestion(int option) {
@@ -117,11 +120,13 @@ public class OptionsFormActivityTest {
 
     @Test
     public void cannotSubmitIfNoOptionSelected() throws Exception {
+        onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
         onView(withId(R.id.next_btn)).perform(click());
         verifySubmitButtonDisabled();
     }
 
     private void verifySubmitButtonDisabled() {
-        onView(withId(R.id.submit_button_id)).check(matches(not(isEnabled())));
+        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+                .check(matches(not(isEnabled())));
     }
 }

@@ -33,8 +33,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.util.ConstantUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -42,22 +40,22 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static java.util.Calendar.SHORT;
+import static org.akvo.flow.activity.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.datesurvey;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.not;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -70,16 +68,7 @@ public class DateFormActivityTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getInstrumentation()
-                    .getTargetContext();
-            Intent result = new Intent(targetContext, FormActivity.class);
-            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "49803002");
-            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0L);
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
-                    new SurveyGroup(41713002L, "DateForm", null, false));
-            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA,
-                    Constants.TEST_FORM_SURVEY_INSTANCE_ID);
-            return result;
+            return getFormActivityIntent(41713002L, "49803002", "DateForm");
         }
     };
 
@@ -103,7 +92,7 @@ public class DateFormActivityTest {
     }
 
     @Test
-    public void canFillDateQuestion() throws IOException {
+    public void canFillDateQuestion() throws Exception {
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
@@ -113,16 +102,14 @@ public class DateFormActivityTest {
 
         pickDate(year, month + 1, day); // +1 on month due to January starting at 0
         onView(withId(R.id.date_et)).check(matches(withText(dateString)));
-        onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(isEnabled()));
+        clickNext();
+        verifySubmitButtonEnabled();
     }
 
     @Test
-    public void canNotSubmitEmptyDateQuestion() throws IOException {
-        onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(not(isEnabled())));
+    public void canNotSubmitEmptyDateQuestion() throws Exception {
+        clickNext();
+        verifySubmitButtonDisabled();
     }
 
     /**

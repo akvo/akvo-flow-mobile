@@ -26,12 +26,9 @@ import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.util.ConstantUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -44,20 +41,21 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
+import static org.akvo.flow.activity.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.FormActivityTestUtil.matchToolbarTitle;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifyQuestionTitleDisplayed;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.optionsurvey;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.allOf;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
 public class OptionsFormActivityTest {
 
+    private static final String FORM_TITLE = "OptionsQuestionForm";
     private static SurveyInstaller installer;
 
     @Rule
@@ -65,15 +63,7 @@ public class OptionsFormActivityTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getInstrumentation()
-                    .getTargetContext();
-            Intent result = new Intent(targetContext, FormActivity.class);
-            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "43623002");
-            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0L);
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
-                    new SurveyGroup(42573002L, "OptionsQuestionForm", null, false));
-            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, TEST_FORM_SURVEY_INSTANCE_ID);
-            return result;
+            return getFormActivityIntent(42573002L, "43623002", FORM_TITLE);
         }
     };
 
@@ -98,35 +88,23 @@ public class OptionsFormActivityTest {
 
     @Test
     public void canFillOptionsQuestion() throws Exception {
+        verifyQuestionTitleDisplayed();
+        matchToolbarTitle(FORM_TITLE);
         fillOptionsQuestion(0);
-
+        clickNext();
         verifySubmitButtonEnabled();
     }
 
-    private void verifySubmitButtonEnabled() {
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(isEnabled()));
-    }
-
     private void fillOptionsQuestion(int option) {
-        onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
-        //Ensure we get the RadioButton View with the ID (each button/option has an ID starting from 0) and click it
-        onView(withId(option))
-                .check(matches(isDisplayed())).perform(click());
-        onView(withId(option))
-                .check(matches(isDisplayed())).check(matches(isChecked()));
-        onView(withId(R.id.next_btn)).perform(click());
+        onView(withId(option)).check(matches(isDisplayed())).perform(click());
+        onView(withId(option)).check(matches(isDisplayed())).check(matches(isChecked()));
     }
 
     @Test
     public void cannotSubmitIfNoOptionSelected() throws Exception {
-        onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
-        onView(withId(R.id.next_btn)).perform(click());
+        matchToolbarTitle(FORM_TITLE);
+        verifyQuestionTitleDisplayed();
+        clickNext();
         verifySubmitButtonDisabled();
-    }
-
-    private void verifySubmitButtonDisabled() {
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(not(isEnabled())));
     }
 }

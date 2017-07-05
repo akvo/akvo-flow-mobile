@@ -35,8 +35,7 @@ import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.domain.ValidationRule;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,19 +46,16 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
+import static org.akvo.flow.activity.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.numbersurvey;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.StringEndsWith.endsWith;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -73,15 +69,7 @@ public class NumberFreeTextFormActivityTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getInstrumentation()
-                    .getTargetContext();
-            Intent result = new Intent(targetContext, FormActivity.class);
-            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "49783002");
-            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0L);
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
-                    new SurveyGroup(47323002L, "NumberForm", null, false));
-            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, TEST_FORM_SURVEY_INSTANCE_ID);
-            return result;
+            return getFormActivityIntent(47323002L, "49783002", "NumberForm");
         }
     };
 
@@ -107,14 +95,8 @@ public class NumberFreeTextFormActivityTest {
     @Test
     public void canFillNumberQuestion() throws IOException {
         fillNumberQuestion(50);
-
+        clickNext();
         verifySubmitButtonEnabled();
-    }
-
-    private void verifySubmitButtonEnabled() {
-        onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches((isEnabled())));
     }
 
     @NonNull
@@ -124,44 +106,40 @@ public class NumberFreeTextFormActivityTest {
     }
 
     @Test
-    public void canNotifyWrongMaxInputNumberQuestion() throws IOException {
+    public void canNotifyWrongMaxInputNumberQuestion() throws Exception {
         fillNumberQuestion(2000);
 
         verifyNumberTooLargeErrorShown();
+        clickNext();
         verifySubmitButtonDisabled();
     }
 
     @Test
-    public void canNotifyWrongMinInputNumberQuestion() throws IOException {
+    public void canNotifyWrongMinInputNumberQuestion() throws Exception {
         fillNumberQuestion(0);
 
         verifyNumberTooSmallErrorShown();
+        clickNext();
         verifySubmitButtonDisabled();
     }
 
-    private void verifySubmitButtonDisabled() {
-        onView(withId(R.id.next_btn)).perform(click());
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(not(isEnabled())));
-    }
-
     private void verifyNumberTooLargeErrorShown() {
-        int maxValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
-                .getMaxVal().intValue();
+        int maxValue = getValidationRule().getMaxVal().intValue();
         String tooLargeError = getString(R.string.toolargeerr);
         onView(withId(R.id.input_et)).check(matches(hasErrorText(tooLargeError + maxValue)));
     }
 
     private void verifyNumberTooSmallErrorShown() {
-        int minValue = survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule()
-                .getMinVal().intValue();
+        int minValue = getValidationRule().getMinVal().intValue();
         String tooSmallError = getString(R.string.toosmallerr);
         onView(withId(R.id.input_et)).check(matches(hasErrorText(tooSmallError + minValue)));
     }
 
+    private ValidationRule getValidationRule() {
+        return survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule();
+    }
 
-    private void fillNumberQuestion(int firstValue)
-            throws IOException {
+    private void fillNumberQuestion(int firstValue) throws IOException {
         onView(withId(R.id.input_et)).perform(typeText(String.valueOf(firstValue)));
         Espresso.closeSoftKeyboard();
     }

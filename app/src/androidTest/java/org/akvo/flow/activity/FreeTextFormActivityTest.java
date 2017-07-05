@@ -32,8 +32,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
 import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.util.ConstantUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -44,19 +42,15 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
+import static org.akvo.flow.activity.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifyQuestionTitleDisplayed;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.freetextsurvey;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.not;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -68,15 +62,7 @@ public class FreeTextFormActivityTest {
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getInstrumentation()
-                    .getTargetContext();
-            Intent result = new Intent(targetContext, FormActivity.class);
-            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "47313002");
-            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0L);
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
-                    new SurveyGroup(44173002L, "FreeTextForm", null, false));
-            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, TEST_FORM_SURVEY_INSTANCE_ID);
-            return result;
+            return getFormActivityIntent(44173002L, "47313002", "FreeTextForm");
         }
     };
 
@@ -100,23 +86,23 @@ public class FreeTextFormActivityTest {
     }
 
     @Test
-    public void canFillFreeTextQuestion() throws IOException {
+    public void canFillFreeTextQuestion() throws Exception {
+        verifyQuestionTitleDisplayed();
         fillFreeTextQuestion("This is an answer to your question");
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches((isEnabled())));
+        clickNext();
+        verifySubmitButtonEnabled();
     }
 
     @Test
-    public void ensureCantSubmitEmptyFreeText() throws IOException {
+    public void ensureCantSubmitEmptyFreeText() throws Exception {
+        verifyQuestionTitleDisplayed();
         fillFreeTextQuestion("");
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
-                .check(matches(not(isEnabled())));
+        clickNext();
+        verifySubmitButtonDisabled();
     }
 
     private void fillFreeTextQuestion(String text) throws IOException {
-        onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
         onView(withId(R.id.input_et)).perform(typeText(text));
         Espresso.closeSoftKeyboard();
-        onView(withId(R.id.next_btn)).perform(click());
     }
 }

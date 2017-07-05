@@ -58,7 +58,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.schedulers.Schedulers;
 
@@ -152,13 +151,11 @@ public class ApplicationModule {
     @Provides
     @Singleton
     RestServiceFactory provideServiceFactory() {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         }
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
-        return new RestServiceFactory(httpClient);
+        return new RestServiceFactory(loggingInterceptor);
     }
 
     @Provides

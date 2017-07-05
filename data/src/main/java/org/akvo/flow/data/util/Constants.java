@@ -18,18 +18,17 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.data.util;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+public class Constants {
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
-
-interface FlowApiService {
-
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+    public static final String SURVEYED_LOCALE = "/surveyedlocale";
+    public static final String SURVEY_GROUP = "surveyGroupId";
+    public static final String PHONE_NUMBER = "phoneNumber";
+    public static final String IMEI = "imei";
+    public static final String TIMESTAMP = "ts";
+    public static final String LAST_UPDATED = "lastUpdateTime";
+    public static final String HMAC = "h";
+    public static final String VERSION = "ver";
+    public static final String ANDROID_ID = "androidId";
 }

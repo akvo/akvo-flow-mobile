@@ -36,7 +36,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -136,13 +135,6 @@ public class DatapointsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.new_datapoint:
-                if (listener != null) {
-                    String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId(),
-                            PlatformUtil.recordUuid());
-                    listener.onRecordSelected(newLocaleId);
-                }
-                return true;
             case R.id.search:
                 if (listener != null) {
                     return listener.onSearchTap();
@@ -233,8 +225,6 @@ public class DatapointsFragment extends Fragment {
     }
 
     public interface DatapointFragmentListener {
-
-        void onRecordSelected(String recordId);
 
         boolean onSearchTap();
     }

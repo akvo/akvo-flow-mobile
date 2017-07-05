@@ -150,6 +150,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                     mSurveyGroup);
             listView.setAdapter(mAdapter);
         }
+        emptyTextView.setText(R.string.no_datapoints_error_text);
         listView.setOnItemClickListener(this);
         progressBar = (ProgressBar) view.findViewById(R.id.progress);
     }
@@ -210,7 +211,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         if (mSurveyGroup == null) {
             emptyTextView.setText(R.string.no_survey_selected_text);
         } else {
-            emptyTextView.setText(R.string.no_records_text);
+            emptyTextView.setText(R.string.no_datapoints_error_text);
         }
 
         if (mOrderBy == ConstantUtil.ORDER_BY_DISTANCE && mLatitude == 0.0d && mLongitude == 0.0d) {

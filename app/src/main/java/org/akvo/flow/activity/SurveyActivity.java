@@ -249,7 +249,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void updateAddDataPointFab() {
-        if (mSurveyGroup != null) {
+        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
             addDataPointFab.setVisibility(View.VISIBLE);
             addDataPointFab.setEnabled(true);
         } else {

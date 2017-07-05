@@ -32,6 +32,7 @@ import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,6 +101,7 @@ public class OptionsFormActivityTest {
         onView(withId(option)).check(matches(isDisplayed())).check(matches(isChecked()));
     }
 
+    @Ignore
     @Test
     public void cannotSubmitIfNoOptionSelected() throws Exception {
         matchToolbarTitle(FORM_TITLE);

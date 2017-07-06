@@ -47,6 +47,7 @@ import static org.akvo.flow.activity.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.FormActivityTestUtil.matchToolbarTitle;
 import static org.akvo.flow.activity.FormActivityTestUtil.verifyQuestionTitleDisplayed;
+import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.optionsurvey;
 
@@ -104,6 +105,6 @@ public class OptionsFormActivityTest {
         matchToolbarTitle(FORM_TITLE);
         verifyQuestionTitleDisplayed();
         clickNext();
-        //verifySubmitButtonDisabled();
+        verifySubmitButtonDisabled();
     }
 }

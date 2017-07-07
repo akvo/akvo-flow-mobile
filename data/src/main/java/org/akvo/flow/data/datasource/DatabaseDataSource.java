@@ -71,7 +71,6 @@ public class DatabaseDataSource {
                 orderBy ==  Constants.ORDER_BY_DATE ||
                 orderBy ==  Constants.ORDER_BY_STATUS ||
                 orderBy ==  Constants.ORDER_BY_NAME);
-        return false;
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {

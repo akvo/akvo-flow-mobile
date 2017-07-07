@@ -176,7 +176,7 @@ public class SurveyDataRepository implements SurveyRepository {
         lastBatch.addAll(dataPoints);
         allResults.addAll(dataPoints);
         return dataSourceFactory.getDataBaseDataSource()
-                .syncSurveyedLocales(dataPoints);
+                .syncDataPoints(dataPoints);
     }
 
     private Observable<ApiLocaleResult> loadNewDataPoints(final String baseUrl, final String apiKey,

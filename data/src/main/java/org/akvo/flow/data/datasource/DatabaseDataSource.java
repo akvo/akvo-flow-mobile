@@ -57,55 +57,53 @@ public class DatabaseDataSource {
 
     public Observable<Cursor> getDataPoints(@NonNull Long surveyGroupId, @Nullable Double latitude,
             @Nullable Double longitude, @Nullable Integer orderBy) {
-        int safeOrderBy;
-        if (orderBy == null) {
-            safeOrderBy = Constants.ORDER_BY_NONE;
+        if (isRequestFiltered(orderBy)) {
+            return briteSurveyDbAdapter
+                    .getFilteredDataPoints(surveyGroupId, latitude, longitude, orderBy);
         } else {
-            safeOrderBy = orderBy;
+            return briteSurveyDbAdapter.getDataPoints(surveyGroupId);
         }
-        switch (safeOrderBy) {
-            case Constants.ORDER_BY_DISTANCE:
-            case Constants.ORDER_BY_DATE:
-            case Constants.ORDER_BY_STATUS:
-            case Constants.ORDER_BY_NAME:
-                return briteSurveyDbAdapter
-                        .getFilteredSurveyedLocales(surveyGroupId, latitude, longitude,
-                                safeOrderBy);
-            default:
-                return briteSurveyDbAdapter.getSurveyedLocales(surveyGroupId);
-        }
+
+    }
+
+    private boolean isRequestFiltered(@Nullable Integer orderBy) {
+        return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
+                orderBy ==  Constants.ORDER_BY_DATE ||
+                orderBy ==  Constants.ORDER_BY_STATUS ||
+                orderBy ==  Constants.ORDER_BY_NAME);
+        return false;
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
-    public Observable<List<ApiDataPoint>> syncSurveyedLocales(List<ApiDataPoint> apiDataPoints) {
+    public Observable<List<ApiDataPoint>> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
             return Observable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
         }
-        syncSurveyedLocale(apiDataPoints);
+        syncDataPointsWithDataBase(apiDataPoints);
         return Observable.just(apiDataPoints);
     }
 
-    private void syncSurveyedLocale(List<ApiDataPoint> apiDataPoints) {
+    private void syncDataPointsWithDataBase(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null || apiDataPoints.size() == 0) {
             return;
         }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         try {
-            for (ApiDataPoint surveyedLocale : apiDataPoints) {
-                final String id = surveyedLocale.getId();
+            for (ApiDataPoint dataPoint : apiDataPoints) {
+                final String id = dataPoint.getId();
                 ContentValues values = new ContentValues();
                 values.put(RecordColumns.RECORD_ID, id);
-                values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
-                values.put(RecordColumns.NAME, surveyedLocale.getDisplayName());
-                values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
-                values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
+                values.put(RecordColumns.SURVEY_GROUP_ID, dataPoint.getSurveyGroupId());
+                values.put(RecordColumns.NAME, dataPoint.getDisplayName());
+                values.put(RecordColumns.LATITUDE, dataPoint.getLatitude());
+                values.put(RecordColumns.LONGITUDE, dataPoint.getLongitude());
 
-                syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
+                syncSurveyInstances(dataPoint.getSurveyInstances(), id);
 
-                briteSurveyDbAdapter.updateRecord(id, values, surveyedLocale.getLastModified());
+                briteSurveyDbAdapter.updateRecord(id, values, dataPoint.getLastModified());
             }
             updateLastUpdatedDateTime(apiDataPoints);
             transaction.markSuccessful();
@@ -141,13 +139,13 @@ public class DatabaseDataSource {
     }
 
     private void syncSurveyInstances(List<ApiSurveyInstance> surveyInstances,
-            String surveyedLocaleId) {
+            String dataPointId) {
         for (ApiSurveyInstance surveyInstance : surveyInstances) {
 
             ContentValues values = new ContentValues();
             values.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.getSurveyId());
             values.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getCollectionDate());
-            values.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
+            values.put(SurveyInstanceColumns.RECORD_ID, dataPointId);
             values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
             values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());

@@ -26,7 +26,6 @@
     <string name="screenoptlabel">Keep Screen on During Survey Input</string>
     <string name="screenoptdesc">Prevents the screen from turning off while in survey entry mode. Be sure to manually shut the screen off (or exit the app) when not in use to avoid draining the battery.</string>
     <string name="aboutlabel">About</string>
-    <string name="aboutdesc">Displays version information.</string>
     <string name="gpsstatuslabel">GPS Status</string>
     <string name="gpsstatusdesc">Launches the GPS Status application if you have it installed on this device.</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>

@@ -125,7 +125,7 @@ public class DatabaseDataSource {
     }
 
     /**
-     * Save the time of synchronization time for a particular SurveyGroup
+     * Save the time of last synchronization for a particular SurveyGroup
      *
      * @param surveyGroupId id of the SurveyGroup
      * @param time          String containing the timestamp
@@ -137,8 +137,7 @@ public class DatabaseDataSource {
         briteSurveyDbAdapter.insertSyncedTime(values);
     }
 
-    private void syncSurveyInstances(List<ApiSurveyInstance> surveyInstances,
-            String dataPointId) {
+    private void syncSurveyInstances(List<ApiSurveyInstance> surveyInstances, String dataPointId) {
         for (ApiSurveyInstance surveyInstance : surveyInstances) {
 
             ContentValues values = new ContentValues();
@@ -170,7 +169,7 @@ public class DatabaseDataSource {
             values.put(ResponseColumns.ANSWER, response.getAnswer());
             values.put(ResponseColumns.TYPE, response.getType());
             values.put(ResponseColumns.QUESTION_ID, response.getQuestionId());
-            /**
+            /*
              * true by default when parsing api response
              * Not sure what this fields is used for ??
              */

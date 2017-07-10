@@ -53,8 +53,8 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper,
-            SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi) {
+            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper,
+            FlowRestApi restApi) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -175,8 +175,7 @@ public class SurveyDataRepository implements SurveyRepository {
         lastBatch.clear();
         lastBatch.addAll(dataPoints);
         allResults.addAll(dataPoints);
-        return dataSourceFactory.getDataBaseDataSource()
-                .syncDataPoints(dataPoints);
+        return dataSourceFactory.getDataBaseDataSource().syncDataPoints(dataPoints);
     }
 
     private Observable<ApiLocaleResult> loadNewDataPoints(final String baseUrl, final String apiKey,
@@ -190,5 +189,4 @@ public class SurveyDataRepository implements SurveyRepository {
             }
         });
     }
-
 }

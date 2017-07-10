@@ -85,7 +85,7 @@ public class DatabaseDataSource {
         return Observable.just(apiDataPoints);
     }
 
-    private void syncDataPointsWithDataBase(List<ApiDataPoint> apiDataPoints) {
+    private void syncDataPointsWithDataBase(@Nullable List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null || apiDataPoints.size() == 0) {
             return;
         }
@@ -116,11 +116,11 @@ public class DatabaseDataSource {
      * we record it to make the next query using it
      * @param apiDataPoints
      */
-    private void updateLastUpdatedDateTime(List<ApiDataPoint> apiDataPoints) {
-        ApiDataPoint surveyedLocale = apiDataPoints.get(apiDataPoints.size() - 1);
-        if (surveyedLocale != null) {
-            String syncTime = String.valueOf(surveyedLocale.getLastModified());
-            setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
+    private void updateLastUpdatedDateTime(@NonNull List<ApiDataPoint> apiDataPoints) {
+        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty()? null : apiDataPoints.get(apiDataPoints.size() - 1);
+        if (apiDataPoint != null) {
+            String syncTime = String.valueOf(apiDataPoint.getLastModified());
+            setSyncTime(apiDataPoint.getSurveyGroupId(), syncTime);
         }
     }
 

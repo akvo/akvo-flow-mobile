@@ -27,6 +27,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -37,6 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.ui.view.ErrorMessageFormatter;
 import org.akvo.flow.ui.view.ResponseInputWatcher;
 import org.akvo.flow.util.LocationValidator;
 
@@ -50,6 +52,7 @@ public class GeoInputContainer extends LinearLayout {
 
     private final DecimalFormat accuracyFormat = new DecimalFormat("#");
     private final LocationValidator locationValidator = new LocationValidator();
+    private final ErrorMessageFormatter errorMessageFormatter = new ErrorMessageFormatter();
 
     private EditText latitudeInput;
     private EditText longitudeInput;
@@ -124,7 +127,9 @@ public class GeoInputContainer extends LinearLayout {
 
     private void setTextInputError(EditText editText, @StringRes int resId) {
         if (editText != null) {
-            editText.setError(getContext().getString(resId));
+            SpannableStringBuilder errorSpannable = errorMessageFormatter
+                    .getErrorSpannable(getContext().getString(resId));
+            editText.setError(errorSpannable);
         }
     }
 

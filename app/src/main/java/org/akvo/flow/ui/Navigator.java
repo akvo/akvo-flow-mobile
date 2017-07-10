@@ -40,12 +40,13 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
@@ -223,5 +224,9 @@ public class Navigator {
 
     public void navigateToLegalInfo(@NonNull Context context) {
         context.startActivity(new Intent(context, LegalNoticesActivity.class));
+    }
+
+    public void navigateToAppSettings(@NonNull Context context) {
+        context.startActivity(new Intent(context, SettingsActivity.class));
     }
 }

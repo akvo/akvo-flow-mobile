@@ -455,10 +455,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         onRecordSelected(newLocaleId);
     }
 
-    private void onAboutOptionTap() {
-        navigator.navigateToAbout(this);
-    }
-
     private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
 
         private final WeakReference<SurveyActivity> activityWeakReference;

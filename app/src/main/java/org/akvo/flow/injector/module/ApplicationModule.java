@@ -24,12 +24,15 @@ import android.content.Context;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
@@ -49,6 +52,9 @@ import dagger.Provides;
 public class ApplicationModule {
 
     private final FlowApp application;
+
+    private static final String PREFS_NAME = "flow_prefs";
+    private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
     public ApplicationModule(FlowApp application) {
         this.application = application;
@@ -93,5 +99,18 @@ public class ApplicationModule {
                     application, loggingSendPermissionVerifier, loggingEventBuilderHelper);
             return new ReleaseLoggingHelper(application, flowAndroidRavenFactory);
         }
+    }
+
+    @Provides
+    @Singleton
+    UserRepository provideUserRepository(UserDataRepository userDataRepository) {
+        return userDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferencesDataSource provideSharedPreferences() {
+        return new SharedPreferencesDataSource(
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
     }
 }

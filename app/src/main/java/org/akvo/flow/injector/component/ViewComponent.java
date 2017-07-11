@@ -25,6 +25,7 @@ import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DrawerFragment;
@@ -49,4 +50,6 @@ public interface ViewComponent {
     void inject(SignatureActivity signatureActivity);
 
     void inject(DrawerFragment drawerFragment);
+
+    void inject(HelpActivity activity);
 }

@@ -283,5 +283,7 @@
     <string name="saving">Saving...</string>
     <string name="error_saving_signature">Error saving signature, please try again.</string>
     <string name="help">Help</string>
+    <string name="error_loading_help">Error loading help content</string>
+    <string name="error_mobile_data_sync">Mobile data sync disabled</string>
 
 </resources>

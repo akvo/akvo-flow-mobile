@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,29 +18,15 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.presentation.help;
 
-import org.akvo.flow.domain.interactor.AllowedToConnect;
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+public interface HelpView {
 
-import javax.inject.Named;
+    void displayError();
 
-import dagger.Module;
-import dagger.Provides;
+    void loadWebView();
 
-@Module
-public class ViewModule {
+    void displayErrorDataSyncDisabled();
 
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
-    }
-
-    @Provides
-    @Named("allowedToConnect")
-    UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
-        return allowedToConnect;
-    }
+    void hideProgress();
 }

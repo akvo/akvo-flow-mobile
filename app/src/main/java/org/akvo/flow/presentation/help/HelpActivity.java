@@ -66,7 +66,7 @@ public class HelpActivity extends BackActivity implements HelpView {
         initializeInjector();
         ButterKnife.bind(this);
         setupToolBar();
-        helpPb.setVisibility(View.VISIBLE);
+        showProgress();
         setUpWebView();
         presenter.setView(this);
     }
@@ -125,6 +125,11 @@ public class HelpActivity extends BackActivity implements HelpView {
     @Override
     public void hideProgress() {
         helpPb.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showProgress() {
+        helpPb.setVisibility(View.VISIBLE);
     }
 
     static class HelpWebViewClient extends WebViewClient {

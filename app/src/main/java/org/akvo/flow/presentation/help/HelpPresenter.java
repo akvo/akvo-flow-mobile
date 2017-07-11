@@ -47,6 +47,7 @@ public class HelpPresenter implements Presenter {
     }
 
     public void load() {
+        view.showProgress();
         allowedToConnect.execute(new DefaultSubscriber<Boolean>() {
 
             @Override

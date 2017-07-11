@@ -29,4 +29,6 @@ public interface HelpView {
     void displayErrorDataSyncDisabled();
 
     void hideProgress();
+
+    void showProgress();
 }

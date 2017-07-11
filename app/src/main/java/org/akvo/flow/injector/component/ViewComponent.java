@@ -27,6 +27,7 @@ import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 
 import dagger.Component;
@@ -46,4 +47,6 @@ public interface ViewComponent {
     void inject(LegalNoticesActivity legalNoticesActivity);
 
     void inject(SignatureActivity signatureActivity);
+
+    void inject(DrawerFragment drawerFragment);
 }

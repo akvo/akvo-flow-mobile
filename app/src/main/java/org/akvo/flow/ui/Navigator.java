@@ -40,6 +40,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
+import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
@@ -223,5 +224,9 @@ public class Navigator {
 
     public void navigateToLegalInfo(@NonNull Context context) {
         context.startActivity(new Intent(context, LegalNoticesActivity.class));
+    }
+
+    public void navigateToHelp(@NonNull Context context) {
+        context.startActivity(new Intent(context, HelpActivity.class));
     }
 }

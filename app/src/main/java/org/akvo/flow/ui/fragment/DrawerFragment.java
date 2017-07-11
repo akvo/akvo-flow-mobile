@@ -57,11 +57,17 @@ import org.akvo.flow.data.loader.UserLoader;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import static org.akvo.flow.data.preference.Prefs.KEY_SURVEY_GROUP_ID;
 
@@ -77,6 +83,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int GROUP_USERS = 0;
     private static final int GROUP_SURVEYS = 1;
     private static final int GROUP_SETTINGS = 2;
+    private static final int GROUP_HELP = 3;
 
     // Loader IDs
     private static final int LOADER_SURVEYS = 0;
@@ -92,6 +99,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private List<User> mUsers = new ArrayList<>();
     private List<SurveyGroup> mSurveys = new ArrayList<>();
+
+    @Inject
+    Navigator navigator;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -120,6 +130,23 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mListView.setOnChildClickListener(mAdapter);
             registerForContextMenu(mListView);
         }
+        initializeInjector();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override
@@ -215,6 +242,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        //EMPTY
     }
 
     private void addUser() {
@@ -410,7 +438,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
         @Override
         public int getGroupCount() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -495,6 +523,14 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;
+                case GROUP_HELP:
+                    divider.setVisibility(View.GONE);
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
+                    tv.setText(getString(R.string.help));
+                    img.setVisibility(View.GONE);
+                    dropdown.setVisibility(View.GONE);
+                    break;
             }
 
             return v;
@@ -548,6 +584,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     return true; // This way the expander cannot be collapsed
                 case GROUP_SETTINGS:
                     startActivity(new Intent(getActivity(), SettingsActivity.class));
+                    return true;
+                case GROUP_HELP:
+                    navigator.navigateToHelp(getContext());
                     return true;
                 default:
                     return false;

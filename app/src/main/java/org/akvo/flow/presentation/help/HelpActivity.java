@@ -32,6 +32,8 @@ import android.widget.ProgressBar;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 
+import java.lang.ref.WeakReference;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -52,24 +54,49 @@ public class HelpActivity extends BackActivity {
         ButterKnife.bind(this);
         setupToolBar();
         helpPb.setVisibility(View.VISIBLE);
-        helpWv.setWebViewClient(new HelpWebViewClient());
-        helpWv.loadUrl(SUPPORT_URL);
-        helpWv.getSettings().setJavaScriptEnabled(true);
+        setUpWebView();
     }
 
-    //TODO: make static
-    class HelpWebViewClient extends WebViewClient {
+    private void setUpWebView() {
+        helpWv.setWebViewClient(new HelpWebViewClient(this));
+        helpWv.getSettings().setJavaScriptEnabled(true);
+        loadUrl();
+    }
+
+    private void loadUrl() {
+        helpWv.loadUrl(SUPPORT_URL);
+    }
+
+    void hideProgress() {
+        helpPb.setVisibility(View.GONE);
+    }
+
+    static class HelpWebViewClient extends WebViewClient {
+
+        private final WeakReference<HelpActivity> activityWeakReference;
+
+        HelpWebViewClient(HelpActivity activity) {
+            this.activityWeakReference = new WeakReference<>(activity);
+        }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            helpPb.setVisibility(View.GONE);
+            hideProgress();
         }
 
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request,
                 WebResourceError error) {
-            helpPb.setVisibility(View.GONE);
+            hideProgress();
             super.onReceivedError(view, request, error);
         }
+
+        private void hideProgress() {
+            HelpActivity helpActivity = activityWeakReference.get();
+            if (helpActivity != null) {
+                helpActivity.hideProgress();
+            }
+        }
     }
+
 }

@@ -32,6 +32,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -84,8 +86,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private long selectedSurveyId;
 
-    private ExpandableListView mListView;
-    private DrawerAdapter mAdapter;
+//    private ExpandableListView mListView;
+//    private DrawerAdapter mAdapter;
 
     private SurveyDbAdapter mDatabase;
     private DrawerListener mListener;
@@ -96,8 +98,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.navigation_drawer, container, false);
-        mListView = (ExpandableListView) v.findViewById(R.id.list);
+        View v = inflater.inflate(R.layout.drawer_header_layout, container, false);
+//        mListView = (ExpandableListView) v.findViewById(R.id.list);
 
         return v;
     }
@@ -112,14 +114,18 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mDatabase = new SurveyDbAdapter(getActivity());
             mDatabase.open();
         }
-        if (mAdapter == null) {
-            mAdapter = new DrawerAdapter(getActivity());
-            mListView.setAdapter(mAdapter);
-            mListView.expandGroup(GROUP_SURVEYS);
-            mListView.setOnGroupClickListener(mAdapter);
-            mListView.setOnChildClickListener(mAdapter);
-            registerForContextMenu(mListView);
-        }
+//        if (mAdapter == null) {
+//            mAdapter = new DrawerAdapter(getActivity());
+//            mListView.setAdapter(mAdapter);
+//            mListView.expandGroup(GROUP_SURVEYS);
+//            mListView.setOnGroupClickListener(mAdapter);
+//            mListView.setOnChildClickListener(mAdapter);
+//            registerForContextMenu(mListView);
+//        }
+
+        RecyclerView recyclerView = (RecyclerView) getView().findViewById(R.id.surveys_rv);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(new SurveyAdapter());
     }
 
     @Override
@@ -146,9 +152,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public void onResume() {
         super.onResume();
         load();
-        if (mAdapter != null) {
-            mAdapter.notifyDataSetInvalidated();
-        }
+//        if (mAdapter != null) {
+//            mAdapter.notifyDataSetInvalidated();
+//        }
     }
 
     public void load() {
@@ -161,7 +167,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public void onDrawerClosed() {
-        mListView.collapseGroup(GROUP_USERS);
+        //mListView.collapseGroup(GROUP_USERS);
     }
 
     @Override
@@ -187,7 +193,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                         } while (cursor.moveToNext());
                         cursor.close();
                     }
-                    mAdapter.notifyDataSetInvalidated();
+//                    mAdapter.notifyDataSetInvalidated();
                 }
                 break;
             case LOADER_USERS:
@@ -207,7 +213,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                         } while (cursor.moveToNext());
                         cursor.close();
                     }
-                    mAdapter.notifyDataSetInvalidated();
+//                    mAdapter.notifyDataSetInvalidated();
                 }
                 break;
         }
@@ -582,5 +588,40 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         void onSurveySelected(SurveyGroup surveyGroup);
 
         void onUserSelected(User user);
+    }
+
+    private class SurveyAdapter extends RecyclerView.Adapter<SurveyViewHolder> {
+
+        @Override
+        public SurveyViewHolder onCreateViewHolder(ViewGroup parent,
+                int viewType) {
+            TextView view = (TextView) LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.caddisfly_question_view_result_item, parent, false);
+            return new SurveyViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(SurveyViewHolder holder, int position) {
+            holder.setText("Survey " + position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return 50;
+        }
+    }
+
+    class SurveyViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView view;
+
+        SurveyViewHolder(TextView view) {
+            super(view);
+            this.view = view;
+        }
+
+        void setText(String surveyName) {
+            view.setText(surveyName);
+        }
     }
 }

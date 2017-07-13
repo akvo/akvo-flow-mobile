@@ -464,7 +464,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 v = mInflater.inflate(R.layout.drawer_item, parent, false);
             }
             View divider = v.findViewById(R.id.divider);
-            TextView tv = (TextView) v.findViewById(R.id.item_txt);
+            TextView tv = (TextView) v.findViewById(R.id.current_user_name);
             ImageView img = (ImageView) v.findViewById(R.id.item_img);
             ImageView dropdown = (ImageView) v.findViewById(R.id.dropdown);
 

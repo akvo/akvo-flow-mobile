@@ -63,6 +63,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.ui.view.navigation.AkvoNavigationView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -79,7 +80,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
-    private static final String DRAWER_FRAGMENT_TAG = "f";
+//    private static final String DRAWER_FRAGMENT_TAG = "f";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -90,12 +91,15 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @BindView(R.id.add_data_point_fab)
     FloatingActionButton addDataPointFab;
 
+    @BindView(R.id.nav_view)
+    AkvoNavigationView navigationView;
+
     private SurveyDbAdapter mDatabase;
 
     @Nullable
     private SurveyGroup mSurveyGroup;
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerFragment mDrawer;
+//    private DrawerFragment mDrawer;
     private Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
@@ -145,7 +149,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
-
     }
 
     private void initializeToolBar() {
@@ -157,8 +160,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initNavigationDrawer() {
-        FragmentManager supportFragmentManager = getSupportFragmentManager();
-        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
+//        FragmentManager supportFragmentManager = getSupportFragmentManager();
+//        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                  R.string.drawer_open, R.string.drawer_close) {
 
@@ -166,7 +169,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                mDrawer.onDrawerClosed();
+//                mDrawer.onDrawerClosed();
                 supportInvalidateOptionsMenu();
             }
 
@@ -318,7 +321,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onUserSelected(User user) {
         FlowApp.getApp().setUser(user);
-        mDrawer.load();
+//        mDrawer.load();
         mDrawerLayout.closeDrawers();
         displaySelectedUser();
     }
@@ -341,7 +344,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         } else {
             supportInvalidateOptionsMenu();
         }
-        mDrawer.load();
+//        mDrawer.load();
         mDrawerLayout.closeDrawers();
         updateAddDataPointFab();
     }
@@ -445,7 +448,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void reloadDrawer() {
-        mDrawer.load();
+//        mDrawer.load();
     }
 
     @OnClick(R.id.add_data_point_fab)

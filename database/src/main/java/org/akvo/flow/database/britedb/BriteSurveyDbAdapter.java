@@ -59,7 +59,7 @@ public class BriteSurveyDbAdapter {
     /**
      * Filters surveyed locales based on the parameters passed in.
      */
-    public Observable<Cursor> getFilteredSurveyedLocales(long surveyGroupId, Double latitude,
+    public Observable<Cursor> getFilteredDataPoints(long surveyGroupId, Double latitude,
             Double longitude, int orderBy) {
         // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
         // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
@@ -117,7 +117,7 @@ public class BriteSurveyDbAdapter {
                         });
     }
 
-    public Observable<Cursor> getSurveyedLocales(long surveyGroupId) {
+    public Observable<Cursor> getDataPoints(long surveyGroupId) {
         String sqlQuery =
                 "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
                         + " = ?";
@@ -142,9 +142,9 @@ public class BriteSurveyDbAdapter {
                 recordId, String.valueOf(timestamp));
     }
 
-    public void updateSurveyedLocale(String surveyedLocaleId, ContentValues surveyedLocaleValues) {
-        briteDatabase.update(Tables.RECORD, surveyedLocaleValues, RecordColumns.RECORD_ID + " = ?",
-                surveyedLocaleId);
+    public void updateDataPoint(String datapointId, ContentValues dataPointValues) {
+        briteDatabase.update(Tables.RECORD, dataPointValues, RecordColumns.RECORD_ID + " = ?",
+                datapointId);
     }
 
     public void updateRecord(String id, ContentValues values, long lastModified) {

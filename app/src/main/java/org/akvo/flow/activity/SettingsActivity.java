@@ -48,7 +48,6 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
-import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -58,8 +57,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -72,9 +69,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     private static final String LABEL = "label";
     private static final String DESC = "desc";
-
-    @Inject
-    Navigator navigator;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,9 +93,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 resources.getString(R.string.resetalldesc)));
         list.add(createMap(resources.getString(R.string.checksd),
                 resources.getString(R.string.checksddesc)));
-        list.add(createMap(resources.getString(R.string.aboutlabel),
-                resources.getString(R.string.aboutdesc)));
-
         String[] fromKeys = {
                 LABEL, DESC
         };
@@ -144,8 +135,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 onPreferencesOptionTap();
             } else if (resources.getString(R.string.gpsstatuslabel).equals(val)) {
                 onGpsStatusOptionTap();
-            } else if (resources.getString(R.string.aboutlabel).equals(val)) {
-                onAboutOptionTap();
             } else if (resources.getString(R.string.reloadsurveyslabel).equals(val)) {
                 onReloadAllSurveysOptionTap();
             } else if (resources.getString(R.string.downloadsurveylabel).equals(val)) {
@@ -165,7 +154,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     private void onSyncDataOptionTap(View view) {
         Intent i = new Intent(view.getContext(), DataSyncService.class);
         getApplicationContext().startService(i);
-        // terminate this activity
         finish();
     }
 
@@ -284,10 +272,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 builder.show();
             }
         });
-    }
-
-    private void onAboutOptionTap() {
-        navigator.navigateToAbout(this);
     }
 
     private void onGpsStatusOptionTap() {

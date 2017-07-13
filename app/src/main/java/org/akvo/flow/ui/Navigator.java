@@ -41,6 +41,7 @@ import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.PreferencesActivity;
 import org.akvo.flow.activity.RecordActivity;
+import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
@@ -225,6 +226,10 @@ public class Navigator {
 
     public void navigateToLegalInfo(@NonNull Context context) {
         context.startActivity(new Intent(context, LegalNoticesActivity.class));
+    }
+
+    public void navigateToAppSettings(@NonNull Context context) {
+        context.startActivity(new Intent(context, SettingsActivity.class));
     }
 
     public void navigateToHelp(@NonNull Context context) {

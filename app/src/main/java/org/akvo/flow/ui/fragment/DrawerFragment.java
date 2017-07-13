@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -48,7 +47,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
@@ -83,7 +81,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int GROUP_USERS = 0;
     private static final int GROUP_SURVEYS = 1;
     private static final int GROUP_SETTINGS = 2;
-    private static final int GROUP_HELP = 3;
+    private static final int GROUP_ABOUT = 3;
+    private static final int GROUP_HELP = 4;
 
     // Loader IDs
     private static final int LOADER_SURVEYS = 0;
@@ -438,7 +437,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
         @Override
         public int getGroupCount() {
-            return 4;
+            return 5;
         }
 
         @Override
@@ -531,6 +530,14 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;
+                case GROUP_ABOUT:
+                    divider.setVisibility(View.GONE);
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
+                    tv.setText(getString(R.string.aboutlabel));
+                    img.setVisibility(View.GONE);
+                    dropdown.setVisibility(View.GONE);
+                    break;
             }
 
             return v;
@@ -583,7 +590,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     return true; // This way the expander cannot be collapsed
                 case GROUP_SETTINGS:
-                    startActivity(new Intent(getActivity(), SettingsActivity.class));
+                    navigator.navigateToAppSettings(getActivity());
+                    return true;
+                case GROUP_ABOUT:
+                    navigator.navigateToAbout(getActivity());
                     return true;
                 case GROUP_HELP:
                     navigator.navigateToHelp(getContext());

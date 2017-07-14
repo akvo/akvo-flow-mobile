@@ -18,17 +18,37 @@
  *
  */
 
-package org.akvo.flow.ui.view.navigation;
+package org.akvo.flow.presentation.navigation;
 
-class SurveyItem {
+class ViewSurvey {
 
-    private final String title;
+    public static final long ID_NONE = -1;
 
-    SurveyItem(String title) {
-        this.title = title;
+    private final long id;
+    private final String name;
+    private final boolean isMonitored;
+    private final String registrationSurveyId;
+
+    ViewSurvey(long id, String name, boolean isMonitored, String registrationSurveyId) {
+        this.id = id;
+        this.name = name;
+        this.isMonitored = isMonitored;
+        this.registrationSurveyId = registrationSurveyId;
     }
 
-    public String getTitle() {
-        return title;
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isMonitored() {
+        return isMonitored;
+    }
+
+    public String getRegistrationSurveyId() {
+        return registrationSurveyId;
     }
 }

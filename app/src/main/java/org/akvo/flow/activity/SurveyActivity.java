@@ -63,7 +63,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.ui.view.navigation.AkvoNavigationView;
+import org.akvo.flow.presentation.navigation.FlowNavigation;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -77,7 +77,8 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
+        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener,
+        FlowNavigation.DrawerNavigationListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
 //    private static final String DRAWER_FRAGMENT_TAG = "f";
@@ -92,7 +93,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     FloatingActionButton addDataPointFab;
 
     @BindView(R.id.nav_view)
-    AkvoNavigationView navigationView;
+    FlowNavigation navigationView;
 
     private SurveyDbAdapter mDatabase;
 
@@ -149,6 +150,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
+        navigationView.setSurveyListener(this);
     }
 
     private void initializeToolBar() {

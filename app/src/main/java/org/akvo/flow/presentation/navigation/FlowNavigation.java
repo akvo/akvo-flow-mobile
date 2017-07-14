@@ -27,6 +27,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -36,6 +37,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
@@ -54,7 +56,10 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     //TODO: move mapper to presenter
     @Inject
-    SurveyGroupMapper surveyGroupMapper = new SurveyGroupMapper();
+    SurveyGroupMapper surveyGroupMapper;
+
+    @Inject
+    Navigator navigator;
 
     public FlowNavigation(Context context) {
         this(context, null);
@@ -103,7 +108,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         });
         surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
         usersRv = ButterKnife.findById(headerView, R.id.users_rv);
-        Context context = getContext();
+        final Context context = getContext();
         surveysRv.setLayoutManager(new LinearLayoutManager(context));
         final SurveyAdapter adapter = new SurveyAdapter(context);
         surveysRv.setAdapter(adapter);
@@ -111,44 +116,69 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View childView, int position) {
-                        ViewSurvey viewSurvey = adapter.getItem(position);
-                        if (viewSurvey != null) {
-                            if (surveyListener != null) {
-                                surveyListener
-                                        .onSurveySelected(surveyGroupMapper.transform(viewSurvey));
-                            }
-                            adapter.updateSelected(position);
-                        }
+                        onSurveyItemTap(position, adapter);
                     }
 
                     @Override
                     public void onItemLongPress(View childView, int position) {
-                        ViewSurvey viewSurvey = adapter.getItem(position);
-                        if (viewSurvey != null) {
-                            final long surveyGroupId = viewSurvey.getId();
-                            //TODO: make fragment?
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                            builder.setMessage(R.string.delete_project_text)
-                                    .setCancelable(true)
-                                    .setPositiveButton(R.string.okbutton,
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog,
-                                                        int id) {
-                                                    presenter.onDeleteSurvey(surveyGroupId);
-                                                }
-                                            })
-                                    .setNegativeButton(R.string.cancelbutton,
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog,
-                                                        int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-                            builder.show();
-                        }
+                        onSurveyItemLongPress(position, adapter);
                     }
                 })
         );
+        setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.settings:
+                        navigator.navigateToAppSettings(context);
+                        return true;
+                    case R.id.about:
+                        navigator.navigateToAbout(context);
+                        return true;
+                    case R.id.help:
+                        navigator.navigateToHelp(context);
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void onSurveyItemLongPress(int position, SurveyAdapter adapter) {
+        ViewSurvey viewSurvey = adapter.getItem(position);
+        if (viewSurvey != null) {
+            final long surveyGroupId = viewSurvey.getId();
+            //TODO: make fragment?
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage(R.string.delete_project_text)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.okbutton,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                        int id) {
+                                    presenter.onDeleteSurvey(surveyGroupId);
+                                }
+                            })
+                    .setNegativeButton(R.string.cancelbutton,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                        int id) {
+                                    dialog.cancel();
+                                }
+                            });
+            builder.show();
+        }
+    }
+
+    private void onSurveyItemTap(int position, SurveyAdapter adapter) {
+        ViewSurvey viewSurvey = adapter.getItem(position);
+        if (viewSurvey != null) {
+            if (surveyListener != null) {
+                surveyListener
+                        .onSurveySelected(surveyGroupMapper.transform(viewSurvey));
+            }
+            adapter.updateSelected(position);
+        }
     }
 
     public void setSurveyListener(DrawerNavigationListener surveyListener) {

@@ -33,9 +33,6 @@
     <color name="text_primary">@color/black_main</color>
     <color name="text_primary_disabled">@color/black_disabled</color>
 
-    <color name="tab_text">@color/white</color>
-    <color name="tab_text_selected">@color/orange_main</color>
-
     <!-- Buttons -->
     <color name="button_primary">@color/button_green</color>
     <color name="button_primary_selected">@color/button_green_selected</color>

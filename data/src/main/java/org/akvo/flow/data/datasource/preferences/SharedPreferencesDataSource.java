@@ -18,31 +18,33 @@
  *
  */
 
-package org.akvo.flow.data.datasource;
+package org.akvo.flow.data.datasource.preferences;
 
-import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
+import android.content.SharedPreferences;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Singleton
-public class DataSourceFactory {
+import rx.Observable;
 
-    private final SharedPreferencesDataSource sharedPreferencesDataSource;
-    private final ImageDataSource imageDataSource;
+@Singleton
+public class SharedPreferencesDataSource {
+
+    private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+
+    private final SharedPreferences preferences;
 
     @Inject
-    public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
-            ImageDataSource imageDataSource) {
-        this.sharedPreferencesDataSource = sharedPreferencesDataSource;
-        this.imageDataSource = imageDataSource;
+    public SharedPreferencesDataSource(SharedPreferences prefs) {
+        this.preferences = prefs;
     }
 
-    public ImageDataSource getImageDataSource() {
-        return imageDataSource;
+    public Observable<Boolean> mobileSyncEnabled() {
+        return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
     }
 
-    public SharedPreferencesDataSource getSharedPreferencesDataSource() {
-        return sharedPreferencesDataSource;
+    public boolean getBoolean(String key, boolean defValue) {
+        return preferences.getBoolean(key, defValue);
     }
 }

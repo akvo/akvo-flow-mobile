@@ -20,21 +20,42 @@
 
 package org.akvo.flow.presentation.navigation;
 
+import android.support.v4.util.Pair;
+
+import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import timber.log.Timber;
 
 public class FlowNavigationPresenter implements Presenter {
 
+    private final UseCase getAllSurveys;
     private FlowNavigationView view;
+    private final SurveyMapper surveyMapper;
+    private final UseCase deleteSurvey;
 
     @Inject
-    public FlowNavigationPresenter() {
+    public FlowNavigationPresenter(@Named("getAllSurveys") UseCase getAllSurveys,
+            SurveyMapper surveyMapper, @Named("deleteSurvey") UseCase deleteSurvey) {
+        this.getAllSurveys = getAllSurveys;
+        this.surveyMapper = surveyMapper;
+        this.deleteSurvey = deleteSurvey;
     }
 
     @Override
     public void destroy() {
-
+        getAllSurveys.unSubscribe();
+        deleteSurvey.unSubscribe();
     }
 
     public void setView(FlowNavigationView view) {
@@ -42,16 +63,36 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void load() {
-        //load
+        getAllSurveys.execute(new DefaultSubscriber<Pair<List<Survey>, Long>>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                //what error to display here and how?
+            }
+
+            @Override
+            public void onNext(Pair<List<Survey>, Long> result) {
+               view.display(surveyMapper.transform(result.first), result.second);
+            }
+        }, null);
     }
 
-    public void onDeleteSurvey(long surveyGroupId) {
-        //TODO
-//        mDatabase.deleteSurveyGroup(surveyGroupId);
-//        if (selectedSurveyId == surveyGroupId) {
-//            selectedSurveyId = ViewSurvey.ID_NONE;
-//            mListener.onSurveySelected(null);
-//        }
-//        load();
+    public void onDeleteSurvey(final long surveyGroupId) {
+        Map<String, Long> params = new HashMap<>(2);
+        params.put(DeleteSurvey.SURVEY_ID_PARAM, surveyGroupId);
+        deleteSurvey.execute(new DefaultSubscriber<Boolean>(){
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                //TODO: notify user
+                load();
+            }
+
+            @Override
+            public void onNext(Boolean aBoolean) {
+                view.notifySurveyDeleted(surveyGroupId);
+                load();
+            }
+        }, params);
     }
 }

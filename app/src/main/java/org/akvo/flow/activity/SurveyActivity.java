@@ -58,6 +58,7 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.navigation.FlowNavigation;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
@@ -67,7 +68,6 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.presentation.navigation.FlowNavigation;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -101,8 +101,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @BindView(R.id.nav_view)
     FlowNavigation navigationView;
-
-    private SurveyDbAdapter mDatabase;
 
     @Nullable
     private SurveyDbDataSource mDatabase;

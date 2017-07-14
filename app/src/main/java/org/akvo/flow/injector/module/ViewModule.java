@@ -21,6 +21,8 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.UseCase;
 
@@ -42,5 +44,17 @@ public class ViewModule {
     @Named("allowedToConnect")
     UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
         return allowedToConnect;
+    }
+
+    @Provides
+    @Named("getAllSurveys")
+    UseCase provideGetAllSurveys(GetAllSurveys getAllSurveys) {
+        return getAllSurveys;
+    }
+
+    @Provides
+    @Named("deleteSurvey")
+    UseCase provideDeleteSurvey(DeleteSurvey deleteSurvey) {
+        return deleteSurvey;
     }
 }

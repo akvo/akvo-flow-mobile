@@ -23,7 +23,8 @@ package org.akvo.flow.data.datasource.preferences;
 import android.content.SharedPreferences;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import rx.Observable;
 
 public class SharedPreferencesDataSource {
 
@@ -50,6 +51,10 @@ public class SharedPreferencesDataSource {
     public Observable<Boolean> setSelectedSurvey(long surveyId) {
         setLong(KEY_SURVEY_GROUP_ID, surveyId);
         return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearSelectedSurvey() {
+        return setSelectedSurvey(NO_SURVEY_SELECTED);
     }
 
     private boolean getBoolean(String key, boolean defValue) {

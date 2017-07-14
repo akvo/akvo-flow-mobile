@@ -27,4 +27,6 @@ public interface UserRepository {
     Observable<Boolean> mobileSyncAllowed();
 
     Observable<Long> getSelectedSurvey();
+
+    Observable<Boolean> clearSelectedSurvey();
 }

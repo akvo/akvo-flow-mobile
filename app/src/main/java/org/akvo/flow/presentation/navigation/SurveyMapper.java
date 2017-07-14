@@ -18,34 +18,33 @@
  *
  */
 
-package org.akvo.flow.domain.entity;
+package org.akvo.flow.presentation.navigation;
 
-public class Survey {
-    private final long id;
-    private final String name;
-    private final boolean isMonitored;
-    private final String registrationSurveyId;
+import org.akvo.flow.domain.entity.Survey;
 
-    public Survey(long id, String name, boolean isMonitored, String registrationSurveyId) {
-        this.id = id;
-        this.name = name;
-        this.isMonitored = isMonitored;
-        this.registrationSurveyId = registrationSurveyId;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+public class SurveyMapper {
+
+    @Inject
+    public SurveyMapper() {
     }
 
-    public long getId() {
-        return id;
+    public List<ViewSurvey> transform(List<Survey> surveys) {
+        List<ViewSurvey> viewSurveys = new ArrayList<>();
+        if (surveys != null) {
+            for (Survey s: surveys) {
+                viewSurveys.add(transform(s));
+            }
+        }
+        return viewSurveys;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public boolean isMonitored() {
-        return isMonitored;
-    }
-
-    public String getRegistrationSurveyId() {
-        return registrationSurveyId;
+    private ViewSurvey transform(Survey survey) {
+        return new ViewSurvey(survey.getId(), survey.getName(), survey.isMonitored(),
+                survey.getRegistrationSurveyId());
     }
 }

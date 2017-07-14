@@ -43,6 +43,8 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
 
     SurveyAdapter(Context context) {
         this.surveyList = new ArrayList<>();
+        surveyList.add(new ViewSurvey(0L, "name", false, ""));
+        surveyList.add(new ViewSurvey(1L, "name2", false, ""));
         this.selectedTextColor = ContextCompat.getColor(context, R.color.orange_main);
         this.textColor = ContextCompat.getColor(context, R.color.black_main);
     }

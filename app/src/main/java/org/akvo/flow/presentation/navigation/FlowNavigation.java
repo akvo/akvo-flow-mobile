@@ -39,6 +39,8 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -61,6 +63,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     @Inject
     Navigator navigator;
 
+    private SurveyAdapter adapter;
+
     public FlowNavigation(Context context) {
         this(context, null);
     }
@@ -71,10 +75,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     public FlowNavigation(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initialiseInjector();
         init();
-        presenter.setView(this);
-        presenter.load();
     }
 
     private void initialiseInjector() {
@@ -89,6 +90,9 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void init() {
+        initialiseInjector();
+        presenter.setView(this);
+        presenter.load();
         View headerView = getHeaderView(0);
         currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
         surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
@@ -110,13 +114,13 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         usersRv = ButterKnife.findById(headerView, R.id.users_rv);
         final Context context = getContext();
         surveysRv.setLayoutManager(new LinearLayoutManager(context));
-        final SurveyAdapter adapter = new SurveyAdapter(context);
+        adapter = new SurveyAdapter(context);
         surveysRv.setAdapter(adapter);
         surveysRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View childView, int position) {
-                        onSurveyItemTap(position, adapter);
+                        onSurveyItemTap(position);
                     }
 
                     @Override
@@ -170,7 +174,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         }
     }
 
-    private void onSurveyItemTap(int position, SurveyAdapter adapter) {
+    private void onSurveyItemTap(int position) {
         ViewSurvey viewSurvey = adapter.getItem(position);
         if (viewSurvey != null) {
             if (surveyListener != null) {
@@ -183,6 +187,11 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     public void setSurveyListener(DrawerNavigationListener surveyListener) {
         this.surveyListener = surveyListener;
+    }
+
+    @Override
+    public void display(List<ViewSurvey> surveys, Long selectedSurveyId) {
+        adapter.setSurveys(surveys, selectedSurveyId);
     }
 
     public interface DrawerNavigationListener {

@@ -20,29 +20,27 @@
 
 package org.akvo.flow.domain.interactor;
 
-import android.support.v4.util.Pair;
-
-import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.functions.Func2;
+import rx.functions.Func1;
 
-public class GetAllSurveys extends UseCase {
+public class DeleteSurvey extends UseCase {
+
+    public static final String SURVEY_ID_PARAM = "survey_id";
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
 
     @Inject
-    protected GetAllSurveys(ThreadExecutor threadExecutor,
+    protected DeleteSurvey(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
@@ -52,13 +50,28 @@ public class GetAllSurveys extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return Observable.zip(surveyRepository.getSurveys(), userRepository.getSelectedSurvey(),
-                new Func2<List<Survey>, Long, Pair<List<Survey>, Long>>() {
-                    @Override
-                    public Pair<List<Survey>, Long> call(List<Survey> allSurveys,
-                            Long selectedSurveyId) {
-                        return new Pair<>(allSurveys, selectedSurveyId);
-                    }
-                });
+        if (parameters == null || parameters.get(SURVEY_ID_PARAM) == null) {
+            return Observable.error(new IllegalArgumentException("params missing"));
+        }
+        final long surveyToDeleteId = (Long) parameters.get(SURVEY_ID_PARAM);
+        return userRepository.getSelectedSurvey().concatMap(new Func1<Long, Observable<?>>() {
+            @Override
+            public Observable<?> call(Long currentSelectedSurvey) {
+                if (currentSelectedSurvey == surveyToDeleteId) {
+                    return userRepository.clearSelectedSurvey().concatMap(
+                            new Func1<Boolean, Observable<?>>() {
+                                @Override
+                                public Observable<?> call(Boolean aBoolean) {
+                                    return deleteSurvey(surveyToDeleteId);
+                                }
+                            });
+                }
+                return deleteSurvey(surveyToDeleteId);
+            }
+        });
+    }
+
+    private Observable<Boolean> deleteSurvey(long surveyToDeleteId) {
+        return surveyRepository.deleteSurvey(surveyToDeleteId);
     }
 }

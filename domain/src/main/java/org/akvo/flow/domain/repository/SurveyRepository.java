@@ -35,4 +35,6 @@ public interface SurveyRepository {
             Double longitude, Integer orderBy);
 
     Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
+
+    Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 }

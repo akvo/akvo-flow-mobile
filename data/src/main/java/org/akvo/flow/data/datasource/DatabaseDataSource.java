@@ -20,27 +20,11 @@
 
 package org.akvo.flow.data.datasource;
 
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.squareup.sqlbrite.BriteDatabase;
 
-import org.akvo.flow.data.entity.ApiDataPoint;
-import org.akvo.flow.data.entity.ApiQuestionAnswer;
-import org.akvo.flow.data.entity.ApiSurveyInstance;
-import org.akvo.flow.database.Constants;
-import org.akvo.flow.database.RecordColumns;
-import org.akvo.flow.database.ResponseColumns;
-import org.akvo.flow.database.SurveyInstanceColumns;
-import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.SyncTimeColumns;
-import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
-
-import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -53,5 +37,13 @@ public class DatabaseDataSource {
     @Inject
     public DatabaseDataSource(BriteDatabase db) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
+    }
+
+    public Observable<Cursor> getSurveys() {
+        return briteSurveyDbAdapter.getSurveys();
+    }
+
+    public Observable<Boolean> deleteSurvey(long surveyId) {
+        return briteSurveyDbAdapter.deleteSurvey(surveyId);
     }
 }

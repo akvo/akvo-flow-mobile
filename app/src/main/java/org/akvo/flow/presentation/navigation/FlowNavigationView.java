@@ -20,5 +20,9 @@
 
 package org.akvo.flow.presentation.navigation;
 
+import java.util.List;
+
 public interface FlowNavigationView {
+
+    void display(List<ViewSurvey> surveys, Long selectedSurveyId);
 }

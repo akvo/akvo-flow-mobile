@@ -18,13 +18,34 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.entity;
 
-import rx.Observable;
+public class Survey {
+    private final long id;
+    private final String name;
+    private final boolean isMonitored;
+    private final String registrationSurveyId;
 
-public interface UserRepository {
+    Survey(long id, String name, boolean isMonitored, String registrationSurveyId) {
+        this.id = id;
+        this.name = name;
+        this.isMonitored = isMonitored;
+        this.registrationSurveyId = registrationSurveyId;
+    }
 
-    Observable<Boolean> mobileSyncAllowed();
+    public long getId() {
+        return id;
+    }
 
-    Observable<Long> getSelectedSurvey();
+    public String getName() {
+        return name;
+    }
+
+    public boolean isMonitored() {
+        return isMonitored;
+    }
+
+    public String getRegistrationSurveyId() {
+        return registrationSurveyId;
+    }
 }

@@ -20,11 +20,13 @@
 
 package org.akvo.flow.domain.repository;
 
+import org.akvo.flow.domain.entity.Survey;
+
+import java.util.List;
+
 import rx.Observable;
 
-public interface UserRepository {
+public interface SurveyRepository {
 
-    Observable<Boolean> mobileSyncAllowed();
-
-    Observable<Long> getSelectedSurvey();
+    Observable<List<Survey>> getSurveys();
 }

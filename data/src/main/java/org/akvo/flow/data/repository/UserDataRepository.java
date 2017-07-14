@@ -29,7 +29,6 @@ import rx.Observable;
 
 public class UserDataRepository implements UserRepository {
 
-
     private final DataSourceFactory dataSourceFactory;
 
     @Inject
@@ -40,5 +39,10 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> mobileSyncAllowed() {
         return dataSourceFactory.getSharedPreferencesDataSource().mobileSyncEnabled();
+    }
+
+    @Override
+    public Observable<Long> getSelectedSurvey() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getSelectedSurvey();
     }
 }

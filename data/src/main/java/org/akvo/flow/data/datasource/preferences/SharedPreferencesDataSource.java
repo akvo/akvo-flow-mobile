@@ -32,6 +32,8 @@ public class SharedPreferencesDataSource {
 
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
+    private static final long NO_SURVEY_SELECTED = -1;
 
     private final SharedPreferences preferences;
 
@@ -44,7 +46,24 @@ public class SharedPreferencesDataSource {
         return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
     }
 
-    public boolean getBoolean(String key, boolean defValue) {
+    public Observable<Long> getSelectedSurvey() {
+        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, NO_SURVEY_SELECTED));
+    }
+
+    public Observable<Boolean> setSelectedSurvey(long surveyId) {
+        setLong(KEY_SURVEY_GROUP_ID, surveyId);
+        return Observable.just(true);
+    }
+
+    private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
+    }
+
+    private long getLong(String key, long defValue) {
+        return preferences.getLong(key, defValue);
+    }
+
+    private void setLong(String key, long value) {
+        preferences.edit().putLong(key, value).apply();
     }
 }

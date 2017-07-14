@@ -54,6 +54,8 @@ import org.akvo.flow.util.StringUtil;
 
 import javax.inject.Inject;
 
+import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
+import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {

@@ -99,9 +99,12 @@
     <string name="sync_error">Data Points Sync failed</string>
     <string name="syncing_corrupted_data_points_error">Please sync again.</string>
     <string name="network_error">Network Error</string>
+    <string name="data_points_sync_success_message">%1$d data points successfully synced</string>
+    <string name="data_points_sync_error_message_network">Sync failed. No connection.</string>
+    <string name="data_points_sync_error_message_assignment">Sync failed. Assignment missing.</string>
+    <string name="data_points_sync_error_message_default">Sync failed</string>
     <string name="prefill_title">Pre-fill Responses</string>
     <string name="prefill_text">Pre-fill form with previous answers?</string>
-    <string name="error_assignment_text">Flow dashboard assignment required</string>
     <!--Data sync-->
     <string name="data_sync_all">Synced Forms: %1$d - Failed: %2$d</string>
     <string name="data_sync_synced">Synced Forms: %1$d</string>

@@ -29,4 +29,5 @@ public interface RecordListListener {
     
     void onRecordSelected(String surveyedLocaleId);
 
+    void onSyncRecordsRequested(long surveyGroupId);
 }

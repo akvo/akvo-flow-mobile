@@ -25,9 +25,6 @@ import android.content.SharedPreferences;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
-
-@Singleton
 public class SharedPreferencesDataSource {
 
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";

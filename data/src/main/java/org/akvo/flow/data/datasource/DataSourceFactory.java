@@ -40,12 +40,12 @@ public class DataSourceFactory {
         this.dataBaseDataSource = dataBaseDataSource;
     }
 
-    public ImageDataSource getImageDataSource() {
-        return imageDataSource;
-    }
-
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
         return sharedPreferencesDataSource;
+    }
+
+    public ImageDataSource getImageDataSource() {
+        return imageDataSource;
     }
 
     public DatabaseDataSource getDataBaseDataSource() {

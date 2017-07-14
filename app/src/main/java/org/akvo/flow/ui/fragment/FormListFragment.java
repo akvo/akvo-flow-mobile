@@ -55,6 +55,8 @@ import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
+import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 
 public class FormListFragment extends ListFragment
         implements LoaderCallbacks<Pair<List<SurveyInfo>, Boolean>>, OnItemClickListener {
@@ -116,6 +118,7 @@ public class FormListFragment extends ListFragment
     static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
 
         private static final int LAYOUT_RES = R.layout.survey_item;
+
         private final int[] backgrounds;
         private final int versionTextSize;
         private final int titleTextSize;

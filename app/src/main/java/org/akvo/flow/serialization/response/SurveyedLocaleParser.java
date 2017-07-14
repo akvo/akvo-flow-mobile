@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,6 +19,7 @@
 
 package org.akvo.flow.serialization.response;
 
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.response.SurveyedLocalesResponse;
@@ -34,7 +35,7 @@ import timber.log.Timber;
 public class SurveyedLocaleParser {
 
     public SurveyedLocalesResponse parseResponse(String response) {
-        final List<SurveyedLocale> surveyedLocales = new ArrayList<SurveyedLocale>();
+        final List<SurveyedLocale> surveyedLocales = new ArrayList<>();
         String error = null;
         try {
             JSONObject jResponse = new JSONObject(response);
@@ -73,7 +74,7 @@ public class SurveyedLocaleParser {
                 .parseList(jSurveyInstances);
 
         SurveyedLocale surveyedLocale = new SurveyedLocale(id, name, lastModified, surveyGroupId,
-                latitude, longitude);
+                latitude, longitude, SurveyInstanceStatus.SAVED);
         surveyedLocale.setSurveyInstances(surveyInstances);
 
         return surveyedLocale;

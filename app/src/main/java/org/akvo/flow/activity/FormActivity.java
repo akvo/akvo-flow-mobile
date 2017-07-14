@@ -20,6 +20,7 @@
 
 package org.akvo.flow.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -40,12 +41,15 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.SurveyLanguagesDataSource;
 import org.akvo.flow.data.dao.SurveyDao;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyDbAdapter.SurveyedLocaleMeta;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
-import org.akvo.flow.data.database.SurveyLanguagesDbDataSource;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
+import org.akvo.flow.database.SurveyInstanceStatus;
+import org.akvo.flow.database.SurveyLanguagesDataSource;
+import org.akvo.flow.database.SurveyLanguagesDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
@@ -104,7 +108,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
 
@@ -128,13 +132,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mRecordId = intent.getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
 
         mQuestionResponses = new HashMap<>();
-        mDatabase = new SurveyDbAdapter(this);
+        mDatabase = new SurveyDbDataSource(this);
         mDatabase.open();
 
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(getApplicationContext());
+        Context context = getApplicationContext();
+        prefs = new Prefs(context);
+        languageMapper = new LanguageMapper(context);
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context, new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
 
-        prefs = new Prefs(getApplicationContext());
-        languageMapper = new LanguageMapper(getApplicationContext());
         mediaFileHelper = new MediaFileHelper(this);
 
         //TODO: move all loading to worker thread

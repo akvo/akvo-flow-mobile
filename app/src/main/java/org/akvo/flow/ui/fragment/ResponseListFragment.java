@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -42,7 +43,13 @@ import android.widget.ListView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.loader.SurveyInstanceResponseLoader;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.TransmissionHistoryActivity;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.data.loader.SurveyInstanceResponseLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
@@ -61,9 +68,17 @@ import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
 
-public class  ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
+import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
+import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
+
+public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
+    private static final String TAG = ResponseListFragment.class.getSimpleName();
 
     private static final String EXTRA_SURVEY_GROUP = "survey_group";
+    // TODO: Move all id constants to ConstantUtil
+    private static int SURVEY_ID_KEY = R.integer.surveyidkey;
+    private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
+    private static int FINISHED_KEY = R.integer.finishedkey;
 
     // Context menu items
     private static final int DELETE_ONE = 0;
@@ -203,7 +218,10 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
     }
 
     private void deleteSurveyInstance(String surveyId, long surveyInstanceId) {
-        SurveyDbAdapter db = new SurveyDbAdapter(getActivity().getApplicationContext()).open();
+        Context context = getActivity().getApplicationContext();
+        SurveyDbAdapter db = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context),
+                        new MigrationLanguageMapper(context)));
         boolean nameResetNeeded = surveyId != null && surveyId
                 .equals(mSurveyGroup.getRegisterSurveyId());
         if (nameResetNeeded) {

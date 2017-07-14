@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,58 +20,40 @@
 package org.akvo.flow.ui.fragment;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 public class DatapointsFragment extends Fragment {
 
-    private static final String TAG = DatapointsFragment.class.getSimpleName();
-
     private static final int POSITION_LIST = 0;
     private static final int POSITION_MAP = 1;
     private static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
 
-    /**
-     * BroadcastReceiver to notify of records synchronisation. This should be
-     * fired from SurveyedLocalesSyncService.
-     */
-    private final BroadcastReceiver mSurveyedLocalesSyncReceiver = new DataPointSyncBroadcastReceiver(
-            this);
-
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
     private TabsAdapter mTabsAdapter;
     private ViewPager mPager;
     private SurveyGroup mSurveyGroup;
 
     @Nullable
     private DatapointFragmentListener listener;
+
     private String[] tabNames;
 
     public DatapointsFragment() {
@@ -108,7 +90,7 @@ public class DatapointsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
+            mDatabase = new SurveyDbDataSource(getActivity());
             mDatabase.open();
         }
     }
@@ -131,18 +113,8 @@ public class DatapointsFragment extends Fragment {
         // Delete empty Records, if any
         // TODO: For a more efficient cleanup, attempt to wipe ONLY the latest Record,
         // TODO: providing the id to RecordActivity, and reading it back on onActivityResult(...)
+        // TODO: this is very strange, verify what it does and move it to some service
         mDatabase.deleteEmptyRecords();
-
-        LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(mSurveyedLocalesSyncReceiver,
-                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity())
-                .unregisterReceiver(mSurveyedLocalesSyncReceiver);
     }
 
     @Override
@@ -152,33 +124,11 @@ public class DatapointsFragment extends Fragment {
         mPager = (ViewPager) v.findViewById(R.id.pager);
         TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
-        mTabsAdapter = new TabsAdapter(getFragmentManager(), tabNames, mSurveyGroup);
+        mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
         tabs.setupWithViewPager(mPager);
+
         return v;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (mSurveyGroup != null) {
-            inflater.inflate(R.menu.datapoints_fragment, menu);
-            SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
-            if (!mSurveyGroup.isMonitored()) {
-                subMenu.removeItem(R.id.sync_records);
-            }
-
-            // "Order By" is only available for the ListFragment, not the MapFragment.
-            // The navigation components maintain 2 different indexes: Tab index and Pager index.
-            // The system seems to always update the tab index first, prior to the onCreateOptionsMenu
-            // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
-            // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
-            // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
-            if (mPager != null && mPager.getCurrentItem() == POSITION_MAP) {
-                //TODO: maybe instead of removing we should use custom menu for each fragment
-                subMenu.removeItem(R.id.order_by);
-            }
-        }
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -189,11 +139,6 @@ public class DatapointsFragment extends Fragment {
                 if (listener != null) {
                     return listener.onSearchTap();
                 }
-            case R.id.sync_records:
-                if (listener != null && mSurveyGroup != null) {
-                    listener.onSyncRecordsTap(mSurveyGroup.getId());
-                }
-                return true;
             case R.id.stats:
                 StatsDialogFragment dialogFragment = StatsDialogFragment
                         .newInstance(mSurveyGroup.getId());
@@ -204,13 +149,13 @@ public class DatapointsFragment extends Fragment {
         }
     }
 
-    private static class TabsAdapter extends FragmentPagerAdapter {
+    static class TabsAdapter extends FragmentPagerAdapter {
 
         private final String[] tabs;
         private SurveyGroup surveyGroup;
         private final Map<Integer, Fragment> fragmentsRef = new WeakHashMap<>(2);
 
-        public TabsAdapter(FragmentManager fm, String[] tabs, SurveyGroup surveyGroup) {
+        TabsAdapter(FragmentManager fm, String[] tabs, SurveyGroup surveyGroup) {
             super(fm);
             this.tabs = tabs;
             this.surveyGroup = surveyGroup;
@@ -221,11 +166,12 @@ public class DatapointsFragment extends Fragment {
             return tabs.length;
         }
 
-        public void refreshFragments(SurveyGroup newSurveyGroup) {
+        void refreshFragments(SurveyGroup newSurveyGroup) {
             this.surveyGroup = newSurveyGroup;
-            SurveyedLocaleListFragment listFragment = (SurveyedLocaleListFragment) fragmentsRef
+            DataPointsListFragment listFragment = (DataPointsListFragment) fragmentsRef
                     .get(POSITION_LIST);
-            MapFragment mapFragment = (MapFragment) fragmentsRef.get(POSITION_MAP);
+            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef
+                    .get(POSITION_MAP);
 
             if (listFragment != null) {
                 listFragment.refresh(surveyGroup);
@@ -238,12 +184,13 @@ public class DatapointsFragment extends Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             if (position == POSITION_LIST) {
-                SurveyedLocaleListFragment surveyedLocaleListFragment = (SurveyedLocaleListFragment) super
+                DataPointsListFragment dataPointsListFragment = (DataPointsListFragment) super
                         .instantiateItem(container, position);
-                fragmentsRef.put(POSITION_LIST, surveyedLocaleListFragment);
-                return surveyedLocaleListFragment;
+                fragmentsRef.put(POSITION_LIST, dataPointsListFragment);
+                return dataPointsListFragment;
             } else {
-                MapFragment mapFragment = (MapFragment) super.instantiateItem(container, position);
+                DataPointsMapFragment mapFragment = (DataPointsMapFragment) super
+                        .instantiateItem(container, position);
                 fragmentsRef.put(POSITION_MAP, mapFragment);
                 return mapFragment;
             }
@@ -252,10 +199,10 @@ public class DatapointsFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             if (position == POSITION_LIST) {
-                return SurveyedLocaleListFragment.newInstance(surveyGroup);
+                return DataPointsListFragment.newInstance(surveyGroup);
             }
             // Map mode
-            return MapFragment.newInstance(surveyGroup, null);
+            return DataPointsMapFragment.newInstance(surveyGroup);
         }
 
         @Override
@@ -275,35 +222,10 @@ public class DatapointsFragment extends Fragment {
         if (mTabsAdapter != null) {
             mTabsAdapter.refreshFragments(mSurveyGroup);
         }
-        if (listener != null) {
-            listener.refreshMenu();
-        }
-    }
-
-    private static class DataPointSyncBroadcastReceiver extends BroadcastReceiver {
-
-        private final WeakReference<DatapointsFragment> fragmentWeakReference;
-
-        private DataPointSyncBroadcastReceiver(DatapointsFragment fragment) {
-            this.fragmentWeakReference = new WeakReference<>(fragment);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "New Records have been synchronised. Refreshing fragments...");
-            DatapointsFragment datapointsFragment = fragmentWeakReference.get();
-            if (datapointsFragment != null) {
-                datapointsFragment.refreshView();
-            }
-        }
     }
 
     public interface DatapointFragmentListener {
 
-        void refreshMenu();
-
         boolean onSearchTap();
-
-        void onSyncRecordsTap(long surveyGroupId);
     }
 }

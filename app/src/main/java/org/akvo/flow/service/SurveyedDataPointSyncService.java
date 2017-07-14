@@ -21,20 +21,18 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
 
-import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyInstance;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.exception.HttpException;
+import org.akvo.flow.ui.fragment.DataPointsListFragment;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.NotificationHelper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -50,8 +48,6 @@ public class SurveyedDataPointSyncService extends IntentService {
 
     public static final String SURVEY_GROUP = "survey_group";
 
-    private final Handler mHandler = new Handler();
-
     public SurveyedDataPointSyncService() {
         super(TAG);
         // Tell the system to restart the service if it was unexpectedly stopped before completion
@@ -61,14 +57,12 @@ public class SurveyedDataPointSyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
-        int syncedRecords = 0;
         FlowApi api = new FlowApi(getApplicationContext());
-        SurveyDbAdapter database = new SurveyDbAdapter(getApplicationContext()).open();
+        SurveyDbDataSource database = new SurveyDbDataSource(getApplicationContext());
+        database.open();
         boolean correctSync = true;
-        NotificationHelper
-                .displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                        getString(R.string.pleasewait), true, true,
-                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
+        int resultCode = ConstantUtil.DATA_SYNC_RESULT_SUCCESS;
+        int syncedRecords = 0;
         try {
             Set<String> batch, lastBatch = new HashSet<>();
             while (true) {
@@ -83,69 +77,44 @@ public class SurveyedDataPointSyncService extends IntentService {
                     break;
                 }
                 syncedRecords += batch.size();
-                sendBroadcastNotification();// Keep the UI fresh!
-                NotificationHelper
-                        .displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                                String.format(getString(R.string.synced_records),
-                                        syncedRecords), true, true,
-                                ConstantUtil.NOTIFICATION_RECORD_SYNC);
+                sendUpdateUiBroadcastNotification();// Keep the UI fresh!
                 lastBatch = batch;
             }
-            if (correctSync) {
-                NotificationHelper
-                        .displayNotificationWithProgress(this, getString(R.string.syncing_records),
-                                String.format(getString(R.string.synced_records),
-                                        syncedRecords), false, false,
-                                ConstantUtil.NOTIFICATION_RECORD_SYNC);
-            } else {
-                NotificationHelper.displayErrorNotificationWithProgress(this,
-                        getString(R.string.sync_error),
-                        getString(R.string.syncing_corrupted_data_points_error), false, false,
-                        ConstantUtil.NOTIFICATION_RECORD_SYNC);
+            if (!correctSync) {
+                resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_UNKNOWN;
             }
         } catch (HttpException e) {
             String message = e.getMessage();
             switch (e.getStatus()) {
                 case HttpURLConnection.HTTP_FORBIDDEN:
                     // A missing assignment might be the issue. Let's hint the user.
-                    message = getString(R.string.error_assignment_text);
                     Timber.w(e, e.getMessage());
+                    resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT;
                     break;
                 default:
                     Timber.e(e, e.getMessage());
+                    resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_UNKNOWN;
                     break;
             }
-            displayToast(message);
-            NotificationHelper
-                    .displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
-                            message, false,
-                            false, ConstantUtil.NOTIFICATION_RECORD_SYNC);
         } catch (IOException e) {
             Timber.e(e, e.getMessage());
-            displayToast(getString(R.string.network_error));
-            NotificationHelper
-                    .displayErrorNotificationWithProgress(this, getString(R.string.sync_error),
-                            getString(R.string.network_error), false, false,
-                            ConstantUtil.NOTIFICATION_RECORD_SYNC);
+            resultCode = ConstantUtil.DATA_SYNC_RESULT_ERROR_NETWORK;
         } finally {
             database.close();
         }
-
-        sendBroadcastNotification();
+        sendResultBroadcastNotification(resultCode, syncedRecords);
     }
 
     /**
      * Sync a Record batch, and return the Set of Record IDs within the response
      */
     @NonNull
-    private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbAdapter database, @NonNull FlowApi api,
-            long surveyGroupId)
-            throws IOException {
+    private Pair<Set<String>, Boolean> sync(@NonNull SurveyDbDataSource database, @NonNull FlowApi api,
+            long surveyGroupId) throws IOException {
         final String syncTime = database.getSyncTime(surveyGroupId);
         Set<String> records = new HashSet<>();
         Timber.d("sync() - SurveyGroup: " + surveyGroupId + ". SyncTime: " + syncTime);
-        List<SurveyedLocale> locales = api
-                .getSurveyedLocales(surveyGroupId, syncTime);
+        List<SurveyedLocale> locales = api.getSurveyedLocales(surveyGroupId, syncTime);
         boolean correctData = true;
         if (locales != null) {
             for (SurveyedLocale locale : locales) {
@@ -162,17 +131,22 @@ public class SurveyedDataPointSyncService extends IntentService {
         return new Pair<>(records, correctData);
     }
 
-    private void displayToast(final String text) {
-        mHandler.post(new ServiceToastRunnable(getApplicationContext(), text));
-    }
-
     /**
      * Dispatch a Broadcast notification to notify of SurveyedLocales synchronization.
-     * This notification will be received in {@link org.akvo.flow.ui.fragment.DatapointsFragment}, in order to
-     * refresh its data
+     * This notification will be received in {@link DataPointsListFragment}
+     * or {@link org.akvo.flow.ui.fragment.DataPointsMapFragment}, in order to load data from DB
      */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC);
+    private void sendUpdateUiBroadcastNotification() {
+        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
+    }
+
+    private void sendResultBroadcastNotification(int resultCode, int syncedRecords) {
+        Intent intentBroadcast = new Intent(ConstantUtil.ACTION_LOCALE_SYNC_RESULT);
+        intentBroadcast.putExtra(ConstantUtil.EXTRA_DATAPOINT_SYNC_RESULT, resultCode);
+        if (resultCode == ConstantUtil.DATA_SYNC_RESULT_SUCCESS && syncedRecords > 0) {
+            intentBroadcast.putExtra(ConstantUtil.EXTRA_DATAPOINT_NUMBER, syncedRecords);
+        }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 }

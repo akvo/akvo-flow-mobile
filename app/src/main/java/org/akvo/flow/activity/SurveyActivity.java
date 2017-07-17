@@ -126,7 +126,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initializeToolBar();
 
-        mDatabase = new SurveyDbDataSource(this);
+        mDatabase = new SurveyDbDataSource(this, null);
         mDatabase.open();
 
         prefs = new Prefs(getApplicationContext());

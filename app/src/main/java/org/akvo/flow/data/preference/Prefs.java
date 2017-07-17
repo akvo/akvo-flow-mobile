@@ -28,6 +28,8 @@ import android.text.TextUtils;
 import org.akvo.flow.data.migration.preferences.InsertablePreferences;
 import org.akvo.flow.util.ConstantUtil;
 
+import javax.inject.Inject;
+
 /**
  * Prefs is a SharedPreferences wrapper, with utility methods to
  * access and edit key/value pairs.
@@ -56,6 +58,7 @@ public class Prefs {
 
     private final Context context;
 
+    @Inject
     public Prefs(Context context) {
         this.context = context;
     }

@@ -20,6 +20,7 @@
 
 package org.akvo.flow.database.britedb;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.squareup.sqlbrite.BriteDatabase;
@@ -54,12 +55,17 @@ public class BriteSurveyDbAdapter {
 
     public Observable<Cursor> getSurveys() {
         String sqlQuery = "SELECT * FROM " + Tables.SURVEY_GROUP;
-        return briteDatabase.createQuery(Tables.SURVEY_GROUP, sqlQuery, null).concatMap(
-                new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
+        return briteDatabase
+                .createQuery(Tables.SURVEY_GROUP, sqlQuery)
+                .concatMap(new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
                     @Override
                     public Observable<? extends Cursor> call(SqlBrite.Query query) {
                         return Observable.just(query.run());
                     }
                 });
+    }
+
+    public void addSurveyGroup(ContentValues values) {
+        briteDatabase.insert(Tables.SURVEY_GROUP, values);
     }
 }

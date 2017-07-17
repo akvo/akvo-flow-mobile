@@ -29,4 +29,6 @@ public interface UserRepository {
     Observable<Long> getSelectedSurvey();
 
     Observable<Boolean> clearSelectedSurvey();
+
+    Observable<Boolean> setSelectedSurvey(long surveyGroupId);
 }

@@ -131,7 +131,7 @@ public class DataSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         try {
             mProps = new PropertyUtil(getResources());
-            mDatabase = new SurveyDbDataSource(this);
+            mDatabase = new SurveyDbDataSource(this, null);
             mDatabase.open();
             preferences = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());

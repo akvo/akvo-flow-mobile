@@ -24,10 +24,13 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import javax.inject.Inject;
+
 public class ConnectivityStateManager {
 
     private final Context context;
 
+    @Inject
     public ConnectivityStateManager(Context appContext) {
         this.context = appContext;
     }

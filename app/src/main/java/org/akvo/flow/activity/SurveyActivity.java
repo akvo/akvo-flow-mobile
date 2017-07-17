@@ -131,7 +131,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initializeToolBar();
 
-        mDatabase = new SurveyDbDataSource(this);
+        mDatabase = new SurveyDbDataSource(this, null);
         mDatabase.open();
 
         prefs = new Prefs(getApplicationContext());
@@ -148,7 +148,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         rootView = findViewById(R.id.content_frame);
 
-        prefs = new Prefs(getApplicationContext());
         apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
         // Start the setup Activity if necessary.
         boolean noDevIdYet = false;

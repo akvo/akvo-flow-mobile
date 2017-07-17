@@ -90,7 +90,7 @@ public class DatapointsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if (mDatabase == null) {
-            mDatabase = new SurveyDbDataSource(getActivity());
+            mDatabase = new SurveyDbDataSource(getActivity(), null);
             mDatabase.open();
         }
     }

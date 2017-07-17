@@ -80,9 +80,8 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
         return surveyList.get(position);
     }
 
-    void updateSelected(int position) {
-        ViewSurvey viewSurvey = getItem(position);
-        selectedSurveyId = viewSurvey.getId();
+    void updateSelected(long surveyId) {
+        selectedSurveyId = surveyId;
         notifyDataSetChanged();
     }
 

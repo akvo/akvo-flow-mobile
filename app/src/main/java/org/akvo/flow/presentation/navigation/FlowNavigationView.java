@@ -20,6 +20,8 @@
 
 package org.akvo.flow.presentation.navigation;
 
+import org.akvo.flow.domain.SurveyGroup;
+
 import java.util.List;
 
 public interface FlowNavigationView {
@@ -27,4 +29,6 @@ public interface FlowNavigationView {
     void display(List<ViewSurvey> surveys, Long selectedSurveyId);
 
     void notifySurveyDeleted(long surveyGroupId);
+
+    void onSurveySelected(SurveyGroup viewSurveyId);
 }

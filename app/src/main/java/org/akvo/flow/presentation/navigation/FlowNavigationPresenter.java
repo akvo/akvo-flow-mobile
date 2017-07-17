@@ -25,6 +25,7 @@ import android.support.v4.util.Pair;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -40,22 +41,31 @@ import timber.log.Timber;
 public class FlowNavigationPresenter implements Presenter {
 
     private final UseCase getAllSurveys;
-    private FlowNavigationView view;
-    private final SurveyMapper surveyMapper;
     private final UseCase deleteSurvey;
+    private final UseCase saveSelectedSurvey;
+
+    private final SurveyMapper surveyMapper;
+    private final SurveyGroupMapper surveyGroupMapper;
+
+    private FlowNavigationView view;
 
     @Inject
     public FlowNavigationPresenter(@Named("getAllSurveys") UseCase getAllSurveys,
-            SurveyMapper surveyMapper, @Named("deleteSurvey") UseCase deleteSurvey) {
+            SurveyMapper surveyMapper, @Named("deleteSurvey") UseCase deleteSurvey,
+            SurveyGroupMapper surveyGroupMapper,
+            @Named("saveSelectedSurvey") UseCase saveSelectedSurvey) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
         this.deleteSurvey = deleteSurvey;
+        this.surveyGroupMapper = surveyGroupMapper;
+        this.saveSelectedSurvey = saveSelectedSurvey;
     }
 
     @Override
     public void destroy() {
         getAllSurveys.unSubscribe();
         deleteSurvey.unSubscribe();
+        saveSelectedSurvey.unSubscribe();
     }
 
     public void setView(FlowNavigationView view) {
@@ -72,7 +82,7 @@ public class FlowNavigationPresenter implements Presenter {
 
             @Override
             public void onNext(Pair<List<Survey>, Long> result) {
-               view.display(surveyMapper.transform(result.first), result.second);
+                view.display(surveyMapper.transform(result.first), result.second);
             }
         }, null);
     }
@@ -80,7 +90,7 @@ public class FlowNavigationPresenter implements Presenter {
     public void onDeleteSurvey(final long surveyGroupId) {
         Map<String, Long> params = new HashMap<>(2);
         params.put(DeleteSurvey.SURVEY_ID_PARAM, surveyGroupId);
-        deleteSurvey.execute(new DefaultSubscriber<Boolean>(){
+        deleteSurvey.execute(new DefaultSubscriber<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -94,5 +104,25 @@ public class FlowNavigationPresenter implements Presenter {
                 load();
             }
         }, params);
+    }
+
+    public void onSurveyItemTap(final ViewSurvey viewSurvey) {
+        if (viewSurvey != null) {
+            Map<String, Long> params = new HashMap<>(2);
+            params.put(SaveSelectedSurvey.KEY_SURVEY_GROUP_ID, viewSurvey.getId());
+            saveSelectedSurvey.execute(new DefaultSubscriber<Boolean>() {
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e);
+                    //TODO: error
+                }
+
+                @Override
+                public void onNext(Boolean aBoolean) {
+                    view.onSurveySelected(surveyGroupMapper.transform(viewSurvey));
+                }
+            }, params);
+        }
+
     }
 }

@@ -27,6 +27,8 @@ import android.database.SQLException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.squareup.sqlbrite.BriteDatabase;
+
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
@@ -38,6 +40,7 @@ import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionColumns;
+import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -54,14 +57,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture
  */
 public class SurveyDbDataSource {
 
     private final SurveyDbAdapter surveyDbAdapter;
+    private final BriteSurveyDbAdapter briteSurveyDbAdapter;
 
-    public SurveyDbDataSource(Context context) {
+    @Inject
+    public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
+        this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(briteDatabase);
         this.surveyDbAdapter = new SurveyDbAdapter(context,
                 new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
     }
@@ -342,7 +350,7 @@ public class SurveyDbDataSource {
         values.put(SurveyGroupColumns.NAME, surveyGroup.getName());
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
-        surveyDbAdapter.addSurveyGroup(values);
+        briteSurveyDbAdapter.addSurveyGroup(values);
     }
 
     // Attempt to fetch the registation form. If the form ID is explicitely set on the SurveyGroup,

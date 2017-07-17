@@ -58,7 +58,7 @@ public class SurveyedDataPointSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         final long surveyGroupId = intent.getLongExtra(SURVEY_GROUP, SurveyGroup.ID_NONE);
         FlowApi api = new FlowApi(getApplicationContext());
-        SurveyDbDataSource database = new SurveyDbDataSource(getApplicationContext());
+        SurveyDbDataSource database = new SurveyDbDataSource(getApplicationContext(), null);
         database.open();
         boolean correctSync = true;
         int resultCode = ConstantUtil.DATA_SYNC_RESULT_SUCCESS;

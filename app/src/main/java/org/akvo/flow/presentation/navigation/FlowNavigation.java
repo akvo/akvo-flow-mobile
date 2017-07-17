@@ -56,10 +56,6 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     @Inject
     FlowNavigationPresenter presenter;
 
-    //TODO: move mapper to presenter
-    @Inject
-    SurveyGroupMapper surveyGroupMapper;
-
     @Inject
     Navigator navigator;
 
@@ -175,14 +171,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void onSurveyItemTap(int position) {
-        ViewSurvey viewSurvey = adapter.getItem(position);
-        if (viewSurvey != null) {
-            if (surveyListener != null) {
-                surveyListener
-                        .onSurveySelected(surveyGroupMapper.transform(viewSurvey));
-            }
-            adapter.updateSelected(position);
-        }
+        presenter.onSurveyItemTap(adapter.getItem(position));
     }
 
     public void setSurveyListener(DrawerNavigationListener surveyListener) {
@@ -198,6 +187,14 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     public void notifySurveyDeleted(long surveyGroupId) {
         if (surveyListener != null) {
             surveyListener.onSurveyDeleted(surveyGroupId);
+        }
+    }
+
+    @Override
+    public void onSurveySelected(SurveyGroup surveyGroup) {
+        if (surveyListener != null) {
+            surveyListener.onSurveySelected(surveyGroup);
+            adapter.updateSelected(surveyGroup.getId());
         }
     }
 

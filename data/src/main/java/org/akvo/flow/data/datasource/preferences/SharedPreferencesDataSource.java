@@ -30,6 +30,7 @@ public class SharedPreferencesDataSource {
 
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    private static final String KEY_BACKEND_SERVER = "backend.server";
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     private static final long NO_SURVEY_SELECTED = -1;
 
@@ -42,6 +43,18 @@ public class SharedPreferencesDataSource {
 
     public Observable<Boolean> mobileSyncEnabled() {
         return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
+    }
+
+    public Observable<String> getBaseUrl() {
+        return Observable.just(preferences.getString(KEY_BACKEND_SERVER, null));
+    }
+
+    public String getString(String key, String defValue) {
+        return preferences.getString(key, defValue);
+    }
+
+    public void setString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
     }
 
     public Observable<Long> getSelectedSurvey() {
@@ -67,5 +80,21 @@ public class SharedPreferencesDataSource {
 
     private void setLong(String key, long value) {
         preferences.edit().putLong(key, value).apply();
+    }
+
+    public void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
+    }
+
+    public int getInt(String key, int defValue) {
+        return preferences.getInt(key, defValue);
+    }
+
+    public void setInt(String key, int value) {
+        preferences.edit().putInt(key, value).apply();
+    }
+
+    public void removePreference(String key) {
+        preferences.edit().remove(key).apply();
     }
 }

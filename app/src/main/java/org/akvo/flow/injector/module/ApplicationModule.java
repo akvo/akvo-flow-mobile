@@ -115,18 +115,6 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
-        return jobExecutor;
-    }
-
-    @Provides
-    @Singleton
-    PostExecutionThread providePostExecutionThread(UIThread uiThread) {
-        return uiThread;
-    }
-
-    @Provides
-    @Singleton
     SQLiteOpenHelper provideOpenHelper() {
         return new DatabaseHelper(application, new LanguageTable(),
                 new FlowMigrationListener(new Prefs(application),
@@ -137,6 +125,18 @@ public class ApplicationModule {
     @Singleton
     SqlBrite provideSqlBrite() {
         return new SqlBrite.Builder().build();
+    }
+
+    @Provides
+    @Singleton
+    ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
+        return jobExecutor;
+    }
+
+    @Provides
+    @Singleton
+    PostExecutionThread providePostExecutionThread(UIThread uiThread) {
+        return uiThread;
     }
 
     @Provides

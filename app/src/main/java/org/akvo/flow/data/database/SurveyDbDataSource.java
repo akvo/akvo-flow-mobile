@@ -668,10 +668,8 @@ public class SurveyDbDataSource {
         surveyDbAdapter.deleteSurvey(id);
     }
 
-
-
-    public String createSurveyedLocale(long id, String recordUuid) {
-        return surveyDbAdapter.createSurveyedLocale(id, recordUuid);
+    public String createSurveyedLocale(long surveyGroupId) {
+        return surveyDbAdapter.createSurveyedLocale(surveyGroupId, PlatformUtil.recordUuid());
     }
 
     public void clearSurveyedLocaleName(long surveyInstanceId) {

@@ -67,7 +67,6 @@ public class PropertiesDataSource {
      * reads the property file from the apk and returns the contents in a
      * Properties object.
      *
-     * @return
      */
     private void loadProperties() {
         try {

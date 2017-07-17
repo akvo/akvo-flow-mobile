@@ -59,11 +59,8 @@ public class BriteSurveyDbAdapter {
     /**
      * Filters surveyed locales based on the parameters passed in.
      */
-    public Observable<Cursor> getFilteredSurveyedLocales(long surveyGroupId, Double latitude,
+    public Observable<Cursor> getFilteredDataPoints(long surveyGroupId, Double latitude,
             Double longitude, int orderBy) {
-        // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
-        // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
-        // fully compatible. TODO: This should be refactored and replaced with a less complex approach.
         String queryString = "SELECT sl.*,"
                 + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
                 + " FROM "
@@ -75,30 +72,18 @@ public class BriteSurveyDbAdapter {
         String orderByStr = "";
         switch (orderBy) {
             case ORDER_BY_DATE:
-                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
+                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";
                 break;
             case ORDER_BY_DISTANCE:
                 if (latitude != null && longitude != null) {
-                    // this is to correct the distance for the shortening at higher latitudes
-                    Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)), 2);
-
-                    // this uses a simple planar approximation of distance. this should be good
-                    // enough for our purpose.
-                    String orderByTempl = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE
-                            + " IS NULL THEN 1 ELSE 0 END,"
-                            + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
-                            + RecordColumns.LATITUDE
-                            + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
-                            + RecordColumns.LONGITUDE + ") * %s)";
-                    orderByStr = String
-                            .format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
+                    orderByStr = getOrderByDistanceString(latitude, longitude);
                 }
                 break;
             case ORDER_BY_STATUS:
                 orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
                 break;
             case ORDER_BY_NAME:
-                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
+                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";
                 break;
         }
 
@@ -117,7 +102,32 @@ public class BriteSurveyDbAdapter {
                         });
     }
 
-    public Observable<Cursor> getSurveyedLocales(long surveyGroupId) {
+    /**
+     * Uses a simple planar approximation of distance
+     */
+    private String getOrderByDistanceString(Double latitude, Double longitude) {
+        Double fudge = correctDistanceForShortening(latitude);
+
+        String orderBy = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE
+                + " IS NULL THEN 1 ELSE 0 END,"
+                + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
+                + RecordColumns.LATITUDE
+                + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
+                + RecordColumns.LONGITUDE + ") * %s)";
+        return String
+                .format(orderBy, latitude, latitude, longitude, longitude, fudge);
+    }
+
+    /**
+     * correct the distance for the shortening at higher latitudes
+     * @param latitude
+     * @return
+     */
+    private double correctDistanceForShortening(Double latitude) {
+        return Math.pow(Math.cos(Math.toRadians(latitude)), 2);
+    }
+
+    public Observable<Cursor> getDataPoints(long surveyGroupId) {
         String sqlQuery =
                 "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
                         + " = ?";
@@ -142,9 +152,9 @@ public class BriteSurveyDbAdapter {
                 recordId, String.valueOf(timestamp));
     }
 
-    public void updateSurveyedLocale(String surveyedLocaleId, ContentValues surveyedLocaleValues) {
-        briteDatabase.update(Tables.RECORD, surveyedLocaleValues, RecordColumns.RECORD_ID + " = ?",
-                surveyedLocaleId);
+    public void updateDataPoint(String datapointId, ContentValues dataPointValues) {
+        briteDatabase.update(Tables.RECORD, dataPointValues, RecordColumns.RECORD_ID + " = ?",
+                datapointId);
     }
 
     public void updateRecord(String id, ContentValues values, long lastModified) {

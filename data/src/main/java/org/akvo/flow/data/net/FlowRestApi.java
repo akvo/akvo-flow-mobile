@@ -57,7 +57,7 @@ public class FlowRestApi {
 
     @Inject
     public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
-        this.androidId = deviceHelper.getAndroidID();
+        this.androidId = deviceHelper.getAndroidId();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
         this.serviceFactory = serviceFactory;
@@ -65,7 +65,7 @@ public class FlowRestApi {
 
     public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
-        return serviceFactory.createRetrofitService(baseUrl, FlowApiService.class)
+        return serviceFactory.createRetrofitService(baseUrl, DataPointSyncService.class)
                 .loadNewDataPoints(buildSyncUrl(baseUrl, apiKey, surveyGroup, timestamp));
     }
 
@@ -107,13 +107,7 @@ public class FlowRestApi {
     private String getTimestamp() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-        try {
-            return URLEncoder.encode(dateFormat.format(new Date()), CHARSET_UTF8);
-        } catch (UnsupportedEncodingException e) {
-            Timber.e(e.getMessage());
-            return null;
-        }
+        return encodeParam(dateFormat.format(new Date()));
     }
 
     @Nullable

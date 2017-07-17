@@ -61,9 +61,6 @@ public class BriteSurveyDbAdapter {
      */
     public Observable<Cursor> getFilteredDataPoints(long surveyGroupId, Double latitude,
             Double longitude, int orderBy) {
-        // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
-        // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
-        // fully compatible. TODO: This should be refactored and replaced with a less complex approach.
         String queryString = "SELECT sl.*,"
                 + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
                 + " FROM "
@@ -75,7 +72,7 @@ public class BriteSurveyDbAdapter {
         String orderByStr = "";
         switch (orderBy) {
             case ORDER_BY_DATE:
-                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
+                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";
                 break;
             case ORDER_BY_DISTANCE:
                 if (latitude != null && longitude != null) {
@@ -115,6 +112,31 @@ public class BriteSurveyDbAdapter {
                                 return Observable.just(query.run());
                             }
                         });
+    }
+
+    /**
+     * Uses a simple planar approximation of distance
+     */
+    private String getOrderByDistanceString(Double latitude, Double longitude) {
+        Double fudge = correctDistanceForShortening(latitude);
+
+        String orderBy = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE
+                + " IS NULL THEN 1 ELSE 0 END,"
+                + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
+                + RecordColumns.LATITUDE
+                + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
+                + RecordColumns.LONGITUDE + ") * %s)";
+        return String
+                .format(orderBy, latitude, latitude, longitude, longitude, fudge);
+    }
+
+    /**
+     * correct the distance for the shortening at higher latitudes
+     * @param latitude
+     * @return
+     */
+    private double correctDistanceForShortening(Double latitude) {
+        return Math.pow(Math.cos(Math.toRadians(latitude)), 2);
     }
 
     public Observable<Cursor> getDataPoints(long surveyGroupId) {

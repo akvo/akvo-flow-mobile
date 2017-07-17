@@ -18,20 +18,15 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.presentation.datapoints;
 
-public class Constants {
+import android.view.View;
 
-    public static final int IMAGE_SIZE_320_240 = 0;
-    public static final long SURVEY_GROUP_ID_NONE = -1;
-    public static final Integer ORDER_BY_NONE = -1;
-    public static final int ORDER_BY_DATE = 0;
-    public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
+public interface DataPointSyncView {
 
-    /**
-     * language codes
-     */
-    public static final String ENGLISH_CODE = "en";
+    void onRetryRequested();
+
+    View getRootView();
+
+    void onSettingsPressed();
 }

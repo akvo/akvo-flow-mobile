@@ -34,11 +34,11 @@ import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.data.database.SurveyDbDataSource;
-import org.akvo.flow.data.database.TransmissionStatus;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
+import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
@@ -131,7 +131,7 @@ public class DataSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         try {
             mProps = new PropertyUtil(getResources());
-            mDatabase = new SurveyDbDataSource(this);
+            mDatabase = new SurveyDbDataSource(this, null);
             mDatabase.open();
             preferences = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());

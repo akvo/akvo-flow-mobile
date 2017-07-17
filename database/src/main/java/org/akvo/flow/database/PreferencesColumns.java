@@ -20,7 +20,7 @@
 
 package org.akvo.flow.database;
 
-public class PreferencesColumns {
+class PreferencesColumns {
 
     public static final String KEY = "key";
     public static final String VALUE = "value";

@@ -70,7 +70,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
         RecordTabsAdapter recordTabsAdapter = new RecordTabsAdapter(getSupportFragmentManager(),
                 getResources().getStringArray(R.array.record_tabs));
         viewPager.setAdapter(recordTabsAdapter);
-        mDatabase = new SurveyDbDataSource(this);
+        mDatabase = new SurveyDbDataSource(this, null);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(
                 ConstantUtil.SURVEY_GROUP_EXTRA);

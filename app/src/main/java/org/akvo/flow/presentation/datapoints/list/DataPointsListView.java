@@ -18,20 +18,37 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.presentation.datapoints.list;
 
-public class Constants {
+import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 
-    public static final int IMAGE_SIZE_320_240 = 0;
-    public static final long SURVEY_GROUP_ID_NONE = -1;
-    public static final Integer ORDER_BY_NONE = -1;
-    public static final int ORDER_BY_DATE = 0;
-    public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
+import java.util.List;
 
-    /**
-     * language codes
-     */
-    public static final String ENGLISH_CODE = "en";
+interface DataPointsListView {
+
+    void showNoDataPoints();
+
+    void showLoading();
+
+    void hideLoading();
+
+    void showSyncedResults(int numberOfSyncedItems);
+
+    void showErrorSyncNotAllowed();
+
+    void showErrorNoNetwork();
+
+    void showErrorSync();
+
+    void displayData(List<ListDataPoint> mapDataPoints);
+
+    void displayMenu(boolean monitored);
+
+    void showErrorMissingLocation();
+
+    void showNoSurveySelected();
+
+    void showOrderByDialog(int orderBy);
+
+    void showErrorAssignmentMissing();
 }

@@ -41,16 +41,16 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.SurveyDbAdapter.SurveyedLocaleMeta;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -58,6 +58,9 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -80,6 +83,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -108,7 +113,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
-    private SurveyDbDataSource mDatabase;
+
+    @Inject
+    SurveyDbDataSource mDatabase;
+
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
 
@@ -122,7 +130,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_activity);
-
+        initializeInjector();
         // Read all the params. Note that the survey instance id is now mandatory
         Intent intent = getIntent();
         surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
@@ -132,13 +140,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mRecordId = intent.getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
 
         mQuestionResponses = new HashMap<>();
-        mDatabase = new SurveyDbDataSource(this);
         mDatabase.open();
 
         Context context = getApplicationContext();
         prefs = new Prefs(context);
         languageMapper = new LanguageMapper(context);
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context, new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
+                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
 
         mediaFileHelper = new MediaFileHelper(this);
 
@@ -169,6 +177,21 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             spaceLeftOnCard();
         }
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent()).build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     /**
@@ -312,7 +335,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             QuestionResponse response = mDatabase.getResponse(mSurveyInstanceId, localeGeoQuestion);
             if (response != null) {
                 mDatabase.updateSurveyedLocale(mSurveyInstanceId, response.getValue(),
-                        SurveyedLocaleMeta.GEOLOCATION);
+                        SurveyDbAdapter.SurveyedLocaleMeta.GEOLOCATION);
             }
         }
     }
@@ -343,7 +366,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             builder.setLength(Math.min(builder.length(), 500));
 
             mDatabase.updateSurveyedLocale(mSurveyInstanceId, builder.toString(),
-                    SurveyedLocaleMeta.NAME);
+                    SurveyDbAdapter.SurveyedLocaleMeta.NAME);
         }
     }
 

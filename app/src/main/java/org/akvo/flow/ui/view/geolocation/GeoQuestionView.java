@@ -58,7 +58,6 @@ public class GeoQuestionView extends QuestionView
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
-    private static final int SNACK_BAR_DURATION_IN_MS = 4000;
     public static final int POSITION_LATITUDE = 0;
     public static final int POSITION_LONGITUDE = 1;
     private static final int POSITION_ALTITUDE = 2;
@@ -273,7 +272,7 @@ public class GeoQuestionView extends QuestionView
         showLocationListenerStopped();
         View rootView = getRootView().findViewById(R.id.coordinator_layout);
         Snackbar snackbar = Snackbar
-                .make(rootView, R.string.location_timeout, SNACK_BAR_DURATION_IN_MS)
+                .make(rootView, R.string.location_timeout, ConstantUtil.SNACK_BAR_DURATION_IN_MS)
                 .setAction(R.string.retry, new OnClickListener() {
                     @Override
                     public void onClick(View v) {

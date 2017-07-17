@@ -32,6 +32,7 @@ import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
@@ -57,6 +58,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import rx.schedulers.Schedulers;
 
 @Module
@@ -125,6 +128,18 @@ public class ApplicationModule {
     @Singleton
     SqlBrite provideSqlBrite() {
         return new SqlBrite.Builder().build();
+    }
+
+    @Provides
+    @Singleton
+    RestServiceFactory provideServiceFactory() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        }
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+        return new RestServiceFactory(httpClient);
     }
 
     @Provides

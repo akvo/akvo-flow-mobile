@@ -772,7 +772,6 @@ public class SurveyDbAdapter {
     /**
      * Filters surveyd locales based on the parameters passed in.
      */
-    //TODO: remove
     public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
             int orderBy) {
         // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,

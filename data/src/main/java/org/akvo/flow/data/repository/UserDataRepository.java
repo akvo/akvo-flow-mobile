@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,29 +18,27 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.data.repository;
 
-import org.akvo.flow.domain.interactor.AllowedToConnect;
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.domain.repository.UserRepository;
 
-import javax.inject.Named;
+import javax.inject.Inject;
 
-import dagger.Module;
-import dagger.Provides;
+import rx.Observable;
 
-@Module
-public class ViewModule {
+public class UserDataRepository implements UserRepository {
 
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
+
+    private final DataSourceFactory dataSourceFactory;
+
+    @Inject
+    public UserDataRepository(DataSourceFactory dataSourceFactory) {
+        this.dataSourceFactory = dataSourceFactory;
     }
 
-    @Provides
-    @Named("allowedToConnect")
-    UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
-        return allowedToConnect;
+    @Override
+    public Observable<Boolean> mobileSyncAllowed() {
+        return dataSourceFactory.getSharedPreferencesDataSource().mobileSyncEnabled();
     }
 }

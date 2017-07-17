@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,29 +18,11 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.domain.repository;
 
-import org.akvo.flow.domain.interactor.AllowedToConnect;
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
+import rx.Observable;
 
-import javax.inject.Named;
+public interface UserRepository {
 
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
-    }
-
-    @Provides
-    @Named("allowedToConnect")
-    UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
-        return allowedToConnect;
-    }
+    Observable<Boolean> mobileSyncAllowed();
 }

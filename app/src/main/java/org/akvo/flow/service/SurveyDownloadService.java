@@ -87,7 +87,7 @@ public class SurveyDownloadService extends IntentService {
 
     public void onHandleIntent(@Nullable Intent intent) {
         try {
-            databaseAdaptor = new SurveyDbDataSource(this);
+            databaseAdaptor = new SurveyDbDataSource(this, null);
             databaseAdaptor.open();
             prefs = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());

@@ -41,17 +41,21 @@ import dagger.Component;
 @Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
 public interface ViewComponent {
 
+    void inject(FormActivity formActivity);
+
+    void inject(DatapointsFragment datapointsFragment);
+
     void inject(RecordActivity recordActivity);
+
+    void inject(SignatureActivity signatureActivity);
+
+    void inject(LegalNoticesActivity legalNoticesActivity);
+
+    void inject(AboutActivity aboutActivity);
 
     void inject(ResponseListFragment responseListFragment);
 
     void inject(SettingsActivity settingsActivity);
-
-    void inject(AboutActivity aboutActivity);
-
-    void inject(LegalNoticesActivity legalNoticesActivity);
-
-    void inject(SignatureActivity signatureActivity);
 
     void inject(DrawerFragment drawerFragment);
 

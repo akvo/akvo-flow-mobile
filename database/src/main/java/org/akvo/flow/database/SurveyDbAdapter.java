@@ -32,11 +32,6 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
-
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
@@ -266,19 +261,19 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public long updateSurveyResponse(Long responseToSaveId, long id,
-            ContentValues initialValues) {
+    public long updateSurveyResponse(Long responseToSaveId, ContentValues initialValues) {
+        long insertedResponseId = -1;
         if (responseToSaveId == null) {
-            id = database.insert(Tables.RESPONSE, null, initialValues);
+            insertedResponseId = database.insert(Tables.RESPONSE, null, initialValues);
         } else {
             if (database.update(Tables.RESPONSE, initialValues, ResponseColumns._ID
                     + "=?", new String[] {
                     responseToSaveId.toString()
             }) > 0) {
-                id = responseToSaveId;
+                insertedResponseId = responseToSaveId;
             }
         }
-        return id;
+        return insertedResponseId;
     }
 
     /**
@@ -397,22 +392,7 @@ public class SurveyDbAdapter {
         });
     }
 
-    public void createTransmission(long surveyInstanceId, String formID, String filename) {
-        createTransmission(surveyInstanceId, formID, filename, TransmissionStatus.QUEUED);
-    }
-
-    public void createTransmission(long surveyInstanceId, String formID, String filename,
-            int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-        values.put(TransmissionColumns.SURVEY_ID, formID);
-        values.put(TransmissionColumns.FILENAME, filename);
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            final String date = String.valueOf(System.currentTimeMillis());
-            values.put(TransmissionColumns.START_DATE, date);
-            values.put(TransmissionColumns.END_DATE, date);
-        }
+    public void createTransmission(ContentValues values) {
         database.insert(Tables.TRANSMISSION, null, values);
     }
 
@@ -422,20 +402,12 @@ public class SurveyDbAdapter {
      * the status == In Progress, the start date is updated.
      *
      * @param fileName
-     * @param status
+     * @param values
      * @return the number of rows affected
      */
-    public int updateTransmissionHistory(String fileName, int status) {
+    public int updateTransmission(String fileName, ContentValues values) {
         // TODO: Update Survey Instance STATUS as well
-        ContentValues vals = new ContentValues();
-        vals.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            vals.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
-        } else if (TransmissionStatus.IN_PROGRESS == status) {
-            vals.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
-        }
-
-        return database.update(Tables.TRANSMISSION, vals,
+        return database.update(Tables.TRANSMISSION, values,
                 TransmissionColumns.FILENAME + " = ?",
                 new String[] { fileName });
     }
@@ -453,7 +425,7 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public Cursor getUnsyncedTransmissions() {
+    public Cursor getUnSyncedTransmissions(String[] selectionArgs) {
         return database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
@@ -462,11 +434,7 @@ public class SurveyDbAdapter {
                         TransmissionColumns.END_DATE
                 },
                 TransmissionColumns.STATUS + " IN (?, ?, ?)",
-                new String[] {
-                        String.valueOf(TransmissionStatus.FAILED),
-                        String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
-                        String.valueOf(TransmissionStatus.QUEUED)
-                }, null, null, null);
+                selectionArgs, null, null, null);
     }
 
     /**
@@ -568,13 +536,6 @@ public class SurveyDbAdapter {
         database.insert(Tables.RECORD, null, values);
 
         return recordUid;
-    }
-
-    public Cursor getSurveyedLocales(long surveyGroupId) {
-        return database.query(Tables.RECORD, RecordQuery.PROJECTION,
-                RecordColumns.SURVEY_GROUP_ID + " = ?",
-                new String[] { String.valueOf(surveyGroupId) },
-                null, null, null);
     }
 
     public Cursor getSurveyedLocale(String surveyedLocaleId) {
@@ -767,158 +728,6 @@ public class SurveyDbAdapter {
      */
     public enum SurveyedLocaleMeta {
         NAME, GEOLOCATION
-    }
-
-    /**
-     * Filters surveyd locales based on the parameters passed in.
-     */
-    public Cursor getFilteredSurveyedLocales(long surveyGroupId, Double latitude, Double longitude,
-            int orderBy) {
-        // Note: This PROJECTION column indexes have to match the default RecordQuery PROJECTION ones,
-        // as this one will only APPEND new columns to the resultset, making the generic getSurveyedLocale(Cursor)
-        // fully compatible. TODO: This should be refactored and replaced with a less complex approach.
-        String queryString = "SELECT sl.*,"
-                + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
-                + " FROM "
-                + Tables.RECORD + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
-                + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;
-        String whereClause = " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " =?";
-        String groupBy = " GROUP BY sl." + RecordColumns.RECORD_ID;
-
-        String orderByStr = "";
-        switch (orderBy) {
-            case ORDER_BY_DATE:
-                orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";// By date
-                break;
-            case ORDER_BY_DISTANCE:
-                if (latitude != null && longitude != null) {
-                    // this is to correct the distance for the shortening at higher latitudes
-                    Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)), 2);
-
-                    // this uses a simple planar approximation of distance. this should be good enough for our purpose.
-                    String orderByTempl = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE
-                            + " IS NULL THEN 1 ELSE 0 END,"
-                            + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
-                            + RecordColumns.LATITUDE
-                            + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
-                            + RecordColumns.LONGITUDE + ") * %s)";
-                    orderByStr = String
-                            .format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
-                }
-                break;
-            case ORDER_BY_STATUS:
-                orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
-                break;
-            case ORDER_BY_NAME:
-                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
-                break;
-        }
-
-        String[] whereValues = new String[] { String.valueOf(surveyGroupId) };
-        return database.rawQuery(queryString + whereClause + groupBy + orderByStr, whereValues);
-    }
-
-    // ======================================================= //
-    // =========== SurveyedLocales synchronization =========== //
-    // ======================================================= //
-
-    public void syncResponse(long surveyInstanceId,
-            ContentValues values, String questionId) {
-        Cursor cursor = database.query(Tables.RESPONSE,
-                new String[] { ResponseColumns.SURVEY_INSTANCE_ID, ResponseColumns.QUESTION_ID
-                },
-                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                        + ResponseColumns.QUESTION_ID + " = ?",
-                new String[] { String.valueOf(surveyInstanceId), questionId },
-                null, null, null);
-
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        if (exists) {
-            database.update(Tables.RESPONSE, values,
-                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                            + ResponseColumns.QUESTION_ID + " = ?",
-                    new String[] { String.valueOf(surveyInstanceId), questionId
-                    });
-        } else {
-            database.insert(Tables.RESPONSE, null, values);
-        }
-    }
-
-    public long syncSurveyInstance(ContentValues values,
-            String surveyInstanceUuid) {
-        Cursor cursor = database.query(Tables.SURVEY_INSTANCE, new String[] {
-                        SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID
-                },
-                SurveyInstanceColumns.UUID + " = ?",
-                new String[] { surveyInstanceUuid },
-                null, null, null);
-
-        long id = DOES_NOT_EXIST;
-        if (cursor.moveToFirst()) {
-            id = cursor.getLong(0);
-        }
-        cursor.close();
-        if (id != DOES_NOT_EXIST) {
-            database.update(Tables.SURVEY_INSTANCE, values, SurveyInstanceColumns.UUID
-                    + " = ?", new String[] { surveyInstanceUuid });
-        } else {
-            values.put(SurveyInstanceColumns.UUID, surveyInstanceUuid);
-            id = database.insert(Tables.SURVEY_INSTANCE, null, values);
-        }
-        return id;
-    }
-
-    public Cursor getTransmission(long surveyInstanceId) {
-        return database.query(Tables.TRANSMISSION,
-                new String[] {
-                        TransmissionColumns._ID,
-                },
-                TransmissionColumns.SURVEY_INSTANCE_ID + " = ? ",
-                new String[] { String.valueOf(surveyInstanceId)},
-                null, null, null);
-    }
-
-    public void updateTransmission(int transmissionID, ContentValues contentValues) {
-        database.update(Tables.TRANSMISSION, contentValues, TransmissionColumns._ID + " = ?",
-                new String[] {transmissionID + ""});
-    }
-
-    public void endTransaction() {
-        database.endTransaction();
-    }
-
-    public void successfulTransaction() {
-        database.setTransactionSuccessful();
-    }
-
-    public void insertRecord(ContentValues values) {
-        database.insert(Tables.RECORD, null, values);
-    }
-
-    public void beginTransaction() {
-        database.beginTransaction();
-    }
-
-    /**
-     * Get the synchronization time for a particular survey group.
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @return time if exists for this key, null otherwise
-     */
-    public String getSyncTime(long surveyGroupId) {
-        Cursor cursor = database.query(Tables.SYNC_TIME,
-                new String[] { SyncTimeColumns.SURVEY_GROUP_ID, SyncTimeColumns.TIME },
-                SyncTimeColumns.SURVEY_GROUP_ID + "=?",
-                new String[] { String.valueOf(surveyGroupId) },
-                null, null, null);
-
-        String time = null;
-        if (cursor.moveToFirst()) {
-            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
-        }
-        cursor.close();
-        return time;
     }
 
     /**

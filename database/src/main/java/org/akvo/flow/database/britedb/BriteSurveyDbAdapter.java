@@ -76,26 +76,14 @@ public class BriteSurveyDbAdapter {
                 break;
             case ORDER_BY_DISTANCE:
                 if (latitude != null && longitude != null) {
-                    // this is to correct the distance for the shortening at higher latitudes
-                    Double fudge = Math.pow(Math.cos(Math.toRadians(latitude)), 2);
-
-                    // this uses a simple planar approximation of distance. this should be good
-                    // enough for our purpose.
-                    String orderByTempl = " ORDER BY CASE WHEN " + RecordColumns.LATITUDE
-                            + " IS NULL THEN 1 ELSE 0 END,"
-                            + " ((%s - " + RecordColumns.LATITUDE + ") * (%s - "
-                            + RecordColumns.LATITUDE
-                            + ") + (%s - " + RecordColumns.LONGITUDE + ") * (%s - "
-                            + RecordColumns.LONGITUDE + ") * %s)";
-                    orderByStr = String
-                            .format(orderByTempl, latitude, latitude, longitude, longitude, fudge);
+                    orderByStr = getOrderByDistanceString(latitude, longitude);
                 }
                 break;
             case ORDER_BY_STATUS:
                 orderByStr = " ORDER BY " + " MIN(r." + SurveyInstanceColumns.STATUS + ")";
                 break;
             case ORDER_BY_NAME:
-                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";// By name
+                orderByStr = " ORDER BY " + RecordColumns.NAME + " COLLATE NOCASE ASC";
                 break;
         }
 

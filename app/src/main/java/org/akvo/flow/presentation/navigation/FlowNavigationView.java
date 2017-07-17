@@ -25,4 +25,6 @@ import java.util.List;
 public interface FlowNavigationView {
 
     void display(List<ViewSurvey> surveys, Long selectedSurveyId);
+
+    void notifySurveyDeleted(long surveyGroupId);
 }

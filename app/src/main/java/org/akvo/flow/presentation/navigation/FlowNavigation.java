@@ -194,8 +194,17 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         adapter.setSurveys(surveys, selectedSurveyId);
     }
 
+    @Override
+    public void notifySurveyDeleted(long surveyGroupId) {
+        if (surveyListener != null) {
+            surveyListener.onSurveyDeleted(surveyGroupId);
+        }
+    }
+
     public interface DrawerNavigationListener {
 
         void onSurveySelected(SurveyGroup surveyGroup);
+
+        void onSurveyDeleted(long surveyGroupId);
     }
 }

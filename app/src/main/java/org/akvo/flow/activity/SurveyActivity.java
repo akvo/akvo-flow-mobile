@@ -353,18 +353,23 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         setTitle(title);
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, selectedSurveyId);
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
                 DATA_POINTS_FRAGMENT_TAG);
         if (f != null) {
             f.refresh(mSurveyGroup);
         }
-            supportInvalidateOptionsMenu();
+        supportInvalidateOptionsMenu();
 
-//        mDrawer.load();
         mDrawerLayout.closeDrawers();
         updateAddDataPointFab();
+    }
+
+    @Override
+    public void onSurveyDeleted(long surveyGroupId) {
+        if (selectedSurveyId == surveyGroupId) {
+            onSurveySelected(null);
+        }
     }
 
     @Override

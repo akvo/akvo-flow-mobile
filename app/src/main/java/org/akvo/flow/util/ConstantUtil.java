@@ -268,6 +268,7 @@ public class ConstantUtil {
     //extras
     public static final String EXTRA_RECORD_ID = "record_id";
     public static final String EXTRA_SURVEY_GROUP = "survey_group";
+    public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
     public static final String EXTRA_DATAPOINT_SYNC_RESULT = "datapoint_sync_result";
     public static final String EXTRA_DATAPOINT_NUMBER = "datapoint_number";
 

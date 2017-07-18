@@ -34,7 +34,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.functions.Func2;
+import rx.functions.Func1;
 
 public class GetAllSurveys extends UseCase {
 
@@ -52,12 +52,20 @@ public class GetAllSurveys extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return Observable.zip(surveyRepository.getSurveys(), userRepository.getSelectedSurvey(),
-                new Func2<List<Survey>, Long, Pair<List<Survey>, Long>>() {
+        return surveyRepository.getSurveys()
+                .concatMap(new Func1<List<Survey>, Observable<Pair<List<Survey>, Long>>>() {
                     @Override
-                    public Pair<List<Survey>, Long> call(List<Survey> allSurveys,
-                            Long selectedSurveyId) {
-                        return new Pair<>(allSurveys, selectedSurveyId);
+                    public Observable<Pair<List<Survey>, Long>> call(final List<Survey> surveys) {
+                        return userRepository.getSelectedSurvey()
+                                .concatMap(
+                                        new Func1<Long, Observable<Pair<List<Survey>, Long>>>() {
+                                            @Override
+                                            public Observable<Pair<List<Survey>, Long>> call(
+                                                    Long selectedSurvey) {
+                                                return Observable
+                                                        .just(new Pair<>(surveys, selectedSurvey));
+                                            }
+                                        });
                     }
                 });
     }

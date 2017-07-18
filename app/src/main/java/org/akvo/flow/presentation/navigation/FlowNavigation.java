@@ -20,10 +20,11 @@
 
 package org.akvo.flow.presentation.navigation;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -52,14 +53,13 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private RecyclerView surveysRv;
     private RecyclerView usersRv;
     private DrawerNavigationListener surveyListener;
+    private SurveyAdapter adapter;
 
     @Inject
     FlowNavigationPresenter presenter;
 
     @Inject
     Navigator navigator;
-
-    private SurveyAdapter adapter;
 
     public FlowNavigation(Context context) {
         this(context, null);
@@ -74,6 +74,25 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         init();
     }
 
+    private void init() {
+        initialiseInjector();
+        initViews();
+        initCurrentUserText();
+        initUserList();
+        initSurveyList();
+        setNavigationItemListener();
+        presenter.setView(this);
+        presenter.load();
+    }
+
+    private void initViews() {
+        View headerView = getHeaderView(0);
+        currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
+        surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
+        surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
+        usersRv = ButterKnife.findById(headerView, R.id.users_rv);
+    }
+
     private void initialiseInjector() {
         ViewComponent viewComponent =
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
@@ -85,29 +104,32 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
-    private void init() {
-        initialiseInjector();
-        presenter.setView(this);
-        presenter.load();
-        View headerView = getHeaderView(0);
-        currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
-        surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
-        currentUserTv.setOnClickListener(new OnClickListener() {
+    private void initUserList() {
+       //TODO
+    }
+
+    private void setNavigationItemListener() {
+        final Context context = getContext();
+        setNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                if (surveysRv.getVisibility() == VISIBLE) {
-                    surveyTitleTv.setVisibility(GONE);
-                    surveysRv.setVisibility(GONE);
-                    usersRv.setVisibility(VISIBLE);
-                } else {
-                    surveyTitleTv.setVisibility(VISIBLE);
-                    surveysRv.setVisibility(VISIBLE);
-                    usersRv.setVisibility(GONE);
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.settings:
+                        navigator.navigateToAppSettings(context);
+                        return true;
+                    case R.id.about:
+                        navigator.navigateToAbout(context);
+                        return true;
+                    case R.id.help:
+                        navigator.navigateToHelp(context);
+                        return true;
                 }
+                return false;
             }
         });
-        surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
-        usersRv = ButterKnife.findById(headerView, R.id.users_rv);
+    }
+
+    private void initSurveyList() {
         final Context context = getContext();
         surveysRv.setLayoutManager(new LinearLayoutManager(context));
         adapter = new SurveyAdapter(context);
@@ -125,21 +147,21 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
                     }
                 })
         );
-        setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+    }
+
+    private void initCurrentUserText() {
+        currentUserTv.setOnClickListener(new OnClickListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.settings:
-                        navigator.navigateToAppSettings(context);
-                        return true;
-                    case R.id.about:
-                        navigator.navigateToAbout(context);
-                        return true;
-                    case R.id.help:
-                        navigator.navigateToHelp(context);
-                        return true;
+            public void onClick(View v) {
+                if (surveysRv.getVisibility() == VISIBLE) {
+                    surveyTitleTv.setVisibility(GONE);
+                    surveysRv.setVisibility(GONE);
+                    usersRv.setVisibility(VISIBLE);
+                } else {
+                    surveyTitleTv.setVisibility(VISIBLE);
+                    surveysRv.setVisibility(VISIBLE);
+                    usersRv.setVisibility(GONE);
                 }
-                return false;
             }
         });
     }
@@ -148,25 +170,10 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         ViewSurvey viewSurvey = adapter.getItem(position);
         if (viewSurvey != null) {
             final long surveyGroupId = viewSurvey.getId();
-            //TODO: make fragment?
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage(R.string.delete_project_text)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.okbutton,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog,
-                                        int id) {
-                                    presenter.onDeleteSurvey(surveyGroupId);
-                                }
-                            })
-                    .setNegativeButton(R.string.cancelbutton,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog,
-                                        int id) {
-                                    dialog.cancel();
-                                }
-                            });
-            builder.show();
+            DialogFragment dialogFragment = SurveyDeleteConfirmationDialog
+                    .newInstance(surveyGroupId);
+            dialogFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(),
+                    SurveyDeleteConfirmationDialog.TAG);
         }
     }
 
@@ -197,6 +204,17 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
             adapter.updateSelected(surveyGroup.getId());
         }
     }
+
+    public void onSurveyDeleteConfirmed(long surveyGroupId) {
+        presenter.onDeleteSurvey(surveyGroupId);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        presenter.destroy();
+        super.onDetachedFromWindow();
+    }
+
 
     public interface DrawerNavigationListener {
 

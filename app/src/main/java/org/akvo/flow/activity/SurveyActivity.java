@@ -59,6 +59,7 @@ import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.navigation.FlowNavigation;
+import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
@@ -85,7 +86,8 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener,
-        FlowNavigation.DrawerNavigationListener {
+        FlowNavigation.DrawerNavigationListener,
+        SurveyDeleteConfirmationDialog.SurveyDeleteListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
 //    private static final String DRAWER_FRAGMENT_TAG = "f";
@@ -369,6 +371,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (selectedSurveyId == surveyGroupId) {
             onSurveySelected(null);
         }
+    }
+
+    @Override
+    public void onSurveyDeleteConfirmed(long surveyGroupId) {
+        navigationView.onSurveyDeleteConfirmed(surveyGroupId);
     }
 
     @Override

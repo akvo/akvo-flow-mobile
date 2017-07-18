@@ -59,6 +59,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture
  */
@@ -350,6 +352,7 @@ public class SurveyDbDataSource {
         values.put(SurveyGroupColumns.NAME, surveyGroup.getName());
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
+        Timber.d("FlowNavigationPresenter: added surveygroup"+surveyGroup.toString());
         briteSurveyDbAdapter.addSurveyGroup(values);
     }
 

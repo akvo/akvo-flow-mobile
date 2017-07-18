@@ -42,7 +42,7 @@ public class SurveyInstaller {
 
     public SurveyInstaller(Context context) {
         this.context = context;
-        adapter = new SurveyDbDataSource(context);
+        adapter = new SurveyDbDataSource(context, null);
     }
 
     /**

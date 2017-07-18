@@ -53,7 +53,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private RecyclerView surveysRv;
     private RecyclerView usersRv;
     private DrawerNavigationListener surveyListener;
-    private SurveyAdapter adapter;
+    private SurveyAdapter surveyAdapter;
+    private UserAdapter usersAdapter;
 
     @Inject
     FlowNavigationPresenter presenter;
@@ -105,7 +106,10 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void initUserList() {
-       //TODO
+        final Context context = getContext();
+        usersRv.setLayoutManager(new LinearLayoutManager(context));
+        usersAdapter = new UserAdapter(context);
+        usersRv.setAdapter(usersAdapter);
     }
 
     private void setNavigationItemListener() {
@@ -132,8 +136,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private void initSurveyList() {
         final Context context = getContext();
         surveysRv.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new SurveyAdapter(context);
-        surveysRv.setAdapter(adapter);
+        surveyAdapter = new SurveyAdapter(context);
+        surveysRv.setAdapter(surveyAdapter);
         surveysRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -143,7 +147,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
                     @Override
                     public void onItemLongPress(View childView, int position) {
-                        onSurveyItemLongPress(position, adapter);
+                        onSurveyItemLongPress(position, surveyAdapter);
                     }
                 })
         );
@@ -178,7 +182,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void onSurveyItemTap(int position) {
-        presenter.onSurveyItemTap(adapter.getItem(position));
+        presenter.onSurveyItemTap(surveyAdapter.getItem(position));
     }
 
     public void setSurveyListener(DrawerNavigationListener surveyListener) {
@@ -187,7 +191,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     @Override
     public void display(List<ViewSurvey> surveys, Long selectedSurveyId) {
-        adapter.setSurveys(surveys, selectedSurveyId);
+        surveyAdapter.setSurveys(surveys, selectedSurveyId);
     }
 
     @Override
@@ -201,7 +205,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     public void onSurveySelected(SurveyGroup surveyGroup) {
         if (surveyListener != null) {
             surveyListener.onSurveySelected(surveyGroup);
-            adapter.updateSelected(surveyGroup.getId());
+            surveyAdapter.updateSelected(surveyGroup.getId());
         }
     }
 

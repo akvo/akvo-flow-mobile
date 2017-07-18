@@ -43,8 +43,6 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
 
     SurveyAdapter(Context context) {
         this.surveyList = new ArrayList<>();
-        surveyList.add(new ViewSurvey(0L, "name", false, ""));
-        surveyList.add(new ViewSurvey(1L, "name2", false, ""));
         this.selectedTextColor = ContextCompat.getColor(context, R.color.orange_main);
         this.textColor = ContextCompat.getColor(context, R.color.black_main);
     }
@@ -52,8 +50,8 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
     @Override
     public SurveyAdapter.SurveyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.navigation_item_survey, parent, false);
-        return new SurveyViewHolder(view, selectedTextColor, textColor);
+                .inflate(R.layout.navigation_item, parent, false);
+        return new SurveyViewHolder((TextView) view, selectedTextColor, textColor);
     }
 
     public void setSurveys(@Nullable List<ViewSurvey> surveys, long selectedSurveyId) {
@@ -91,9 +89,9 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
         private final int selectedTextColor;
         private final int textColor;
 
-        SurveyViewHolder(View view, int selectedTextColor, int textColor) {
+        SurveyViewHolder(TextView view, int selectedTextColor, int textColor) {
             super(view);
-            this.surveyTv = (TextView) view;
+            this.surveyTv = view;
             this.selectedTextColor = selectedTextColor;
             this.textColor = textColor;
         }

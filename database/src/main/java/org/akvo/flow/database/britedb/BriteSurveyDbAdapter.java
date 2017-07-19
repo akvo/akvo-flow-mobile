@@ -36,6 +36,7 @@ import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
+import org.akvo.flow.database.UserColumns;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -291,5 +292,18 @@ public class BriteSurveyDbAdapter {
 
     public void addSurveyGroup(ContentValues values) {
         briteDatabase.insert(Tables.SURVEY_GROUP, values);
+    }
+
+    public Observable<Cursor> getUsers() {
+        String sqlQuery =
+                "SELECT * FROM " + Tables.USER + " WHERE " + UserColumns.DELETED + " <> 1";
+        return briteDatabase
+                .createQuery(Tables.USER, sqlQuery)
+                .concatMap(new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
+                    @Override
+                    public Observable<? extends Cursor> call(SqlBrite.Query query) {
+                        return Observable.just(query.run());
+                    }
+                });
     }
 }

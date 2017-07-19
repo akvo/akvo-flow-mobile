@@ -20,8 +20,9 @@
 
 package org.akvo.flow.domain.repository;
 
-import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.User;
 
 import java.util.List;
 
@@ -37,4 +38,6 @@ public interface SurveyRepository {
     Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
 
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
+
+    Observable<List<User>> getUsers();
 }

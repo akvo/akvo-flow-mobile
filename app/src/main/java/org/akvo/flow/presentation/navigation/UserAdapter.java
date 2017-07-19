@@ -35,9 +35,11 @@ import java.util.List;
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
     private final List<ViewUser> users = new ArrayList<>();
+    private final ViewUser addUser;
 
     public UserAdapter(Context context) {
-        users.add(new ViewUser(ViewUser.ADD_USER_ID, context.getString(R.string.new_user)));
+        addUser = new ViewUser(ViewUser.ADD_USER_ID, context.getString(R.string.new_user));
+        users.add(addUser);
     }
 
     @Override
@@ -55,6 +57,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public int getItemCount() {
         return users.size();
+    }
+
+    public void setUsers(List<ViewUser> userList) {
+        users.clear();
+        if (userList != null && !userList.isEmpty()) {
+            users.addAll(userList);
+        }
+        users.add(addUser);
+        notifyDataSetChanged();
     }
 
     class UserViewHolder extends RecyclerView.ViewHolder {

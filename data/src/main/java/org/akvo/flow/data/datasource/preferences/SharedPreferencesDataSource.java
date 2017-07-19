@@ -29,10 +29,11 @@ import rx.Observable;
 public class SharedPreferencesDataSource {
 
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
-    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     private static final String KEY_BACKEND_SERVER = "backend.server";
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
-    private static final long NO_SURVEY_SELECTED = -1;
+    private static final String KEY_USER_ID = "userId";
+    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    private static final long INVALID_ID = -1;
 
     private final SharedPreferences preferences;
 
@@ -58,7 +59,7 @@ public class SharedPreferencesDataSource {
     }
 
     public Observable<Long> getSelectedSurvey() {
-        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, NO_SURVEY_SELECTED));
+        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, INVALID_ID));
     }
 
     public Observable<Boolean> setSelectedSurvey(long surveyId) {
@@ -67,7 +68,7 @@ public class SharedPreferencesDataSource {
     }
 
     public Observable<Boolean> clearSelectedSurvey() {
-        return setSelectedSurvey(NO_SURVEY_SELECTED);
+        return setSelectedSurvey(INVALID_ID);
     }
 
     private boolean getBoolean(String key, boolean defValue) {
@@ -96,5 +97,9 @@ public class SharedPreferencesDataSource {
 
     public void removePreference(String key) {
         preferences.edit().remove(key).apply();
+    }
+
+    public Observable<Long> getSelectedUser() {
+        return Observable.just(getLong(KEY_USER_ID, INVALID_ID));
     }
 }

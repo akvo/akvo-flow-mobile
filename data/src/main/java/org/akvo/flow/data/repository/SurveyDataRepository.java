@@ -29,9 +29,11 @@ import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
+import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
@@ -53,16 +55,18 @@ public class SurveyDataRepository implements SurveyRepository {
     private final SyncedTimeMapper syncedTimeMapper;
     private final FlowRestApi restApi;
     private final SurveyMapper surveyMapper;
+    private final UserMapper userMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper,
-            FlowRestApi restApi, SurveyMapper surveyMapper) {
+            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi,
+            SurveyMapper surveyMapper, UserMapper userMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
         this.restApi = restApi;
         this.surveyMapper = surveyMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -208,5 +212,16 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<Boolean> deleteSurvey(long surveyToDeleteId) {
         return dataSourceFactory.getDataBaseDataSource().deleteSurvey(surveyToDeleteId);
+    }
+
+    @Override
+    public Observable<List<User>> getUsers() {
+        return dataSourceFactory.getDataBaseDataSource().getUsers()
+                .map(new Func1<Cursor, List<User>>() {
+                    @Override
+                    public List<User> call(Cursor cursor) {
+                        return userMapper.getUsers(cursor);
+                    }
+                });
     }
 }

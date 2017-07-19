@@ -23,6 +23,7 @@ package org.akvo.flow.injector.module;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
+import org.akvo.flow.domain.interactor.GetUsers;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -63,5 +64,11 @@ public class ViewModule {
     @Named("saveSelectedSurvey")
     UseCase provideSaveSelectedSurvey(SaveSelectedSurvey saveSelectedSurvey) {
         return saveSelectedSurvey;
+    }
+
+    @Provides
+    @Named("getUsers")
+    UseCase provideGetUsers(GetUsers getUsers) {
+        return getUsers;
     }
 }

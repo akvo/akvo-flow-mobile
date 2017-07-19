@@ -20,17 +20,39 @@
 
 package org.akvo.flow.presentation.navigation;
 
-import org.akvo.flow.domain.SurveyGroup;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.akvo.flow.domain.entity.User;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public interface FlowNavigationView {
+import javax.inject.Inject;
 
-    void displaySurveys(List<ViewSurvey> surveys, Long selectedSurveyId);
+public class UserMapper {
 
-    void notifySurveyDeleted(long surveyGroupId);
+    @Inject
+    public UserMapper() {
+    }
 
-    void onSurveySelected(SurveyGroup viewSurveyId);
+    @Nullable
+    private ViewUser transform(@Nullable User user) {
+        if (user == null) {
+            return null;
+        }
+        return new ViewUser(user.getId(), user.getName());
+    }
 
-    void displayUser(String userName, List<ViewUser> viewUsers);
+    @NonNull
+    public List<ViewUser> transform(List<User> users) {
+        List<ViewUser> viewUsers = new ArrayList<>();
+        for (User u: users) {
+            ViewUser viewUser = transform(u);
+            if (viewUser != null) {
+                viewUsers.add(viewUser);
+            }
+        }
+        return viewUsers;
+    }
 }

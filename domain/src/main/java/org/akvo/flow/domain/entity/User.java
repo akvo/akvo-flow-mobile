@@ -18,19 +18,23 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.entity;
 
-import rx.Observable;
+public class User {
 
-public interface UserRepository {
+    private final long id;
+    private final String name;
 
-    Observable<Boolean> mobileSyncAllowed();
+    public User(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-    Observable<Long> getSelectedSurvey();
+    public long getId() {
+        return id;
+    }
 
-    Observable<Boolean> clearSelectedSurvey();
-
-    Observable<Boolean> setSelectedSurvey(long surveyGroupId);
-
-    Observable<Long> getSelectedUser();
+    public String getName() {
+        return name;
+    }
 }

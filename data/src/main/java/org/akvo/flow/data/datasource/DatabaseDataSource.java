@@ -187,4 +187,8 @@ public class DatabaseDataSource {
             briteSurveyDbAdapter.syncResponse(surveyInstanceId, values, response.getQuestionId());
         }
     }
+
+    public Observable<Cursor> getUsers() {
+        return briteSurveyDbAdapter.getUsers();
+    }
 }

@@ -37,6 +37,7 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -204,7 +205,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     @Override
-    public void display(List<ViewSurvey> surveys, Long selectedSurveyId) {
+    public void displaySurveys(List<ViewSurvey> surveys, Long selectedSurveyId) {
         surveyAdapter.setSurveys(surveys, selectedSurveyId);
     }
 
@@ -221,6 +222,12 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
             surveyListener.onSurveySelected(surveyGroup);
             surveyAdapter.updateSelected(surveyGroup.getId());
         }
+    }
+
+    @Override
+    public void displayUser(String userName, List<ViewUser> viewUsers) {
+        usersAdapter.setUsers(viewUsers);
+        currentUserTv.setText(userName);
     }
 
     public void onSurveyDeleteConfirmed(long surveyGroupId) {

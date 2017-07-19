@@ -23,6 +23,7 @@ package org.akvo.flow.presentation.navigation;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
@@ -43,8 +44,10 @@ public class FlowNavigationPresenter implements Presenter {
     private final UseCase getAllSurveys;
     private final UseCase deleteSurvey;
     private final UseCase saveSelectedSurvey;
+    private final UseCase getUsers;
 
     private final SurveyMapper surveyMapper;
+    private final UserMapper userMapper;
     private final SurveyGroupMapper surveyGroupMapper;
 
     private FlowNavigationView view;
@@ -53,12 +56,15 @@ public class FlowNavigationPresenter implements Presenter {
     public FlowNavigationPresenter(@Named("getAllSurveys") UseCase getAllSurveys,
             SurveyMapper surveyMapper, @Named("deleteSurvey") UseCase deleteSurvey,
             SurveyGroupMapper surveyGroupMapper,
-            @Named("saveSelectedSurvey") UseCase saveSelectedSurvey) {
+            @Named("saveSelectedSurvey") UseCase saveSelectedSurvey,
+            @Named("getUsers") UseCase getUsers, UserMapper userMapper) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
         this.deleteSurvey = deleteSurvey;
         this.surveyGroupMapper = surveyGroupMapper;
         this.saveSelectedSurvey = saveSelectedSurvey;
+        this.getUsers = getUsers;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -66,6 +72,7 @@ public class FlowNavigationPresenter implements Presenter {
         getAllSurveys.unSubscribe();
         deleteSurvey.unSubscribe();
         saveSelectedSurvey.unSubscribe();
+        getUsers.unSubscribe();
     }
 
     public void setView(FlowNavigationView view) {
@@ -84,7 +91,21 @@ public class FlowNavigationPresenter implements Presenter {
             public void onNext(Pair<List<Survey>, Long> result) {
                 int size = result.first == null ? 0 : result.first.size();
                 Timber.d("found new surveys: " + size);
-                view.display(surveyMapper.transform(result.first), result.second);
+                view.displaySurveys(surveyMapper.transform(result.first), result.second);
+            }
+        }, null);
+
+        getUsers.execute(new DefaultSubscriber<Pair<User, List<User>>>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e, "Error getting users");
+            }
+
+            @Override
+            public void onNext(Pair<User, List<User>> userListPair) {
+                User user = userListPair.first;
+                String name = user == null? "": user.getName();
+                view.displayUser(name, userMapper.transform(userListPair.second));
             }
         }, null);
     }

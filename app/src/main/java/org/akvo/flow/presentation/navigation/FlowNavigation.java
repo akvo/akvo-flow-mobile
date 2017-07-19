@@ -21,9 +21,11 @@
 package org.akvo.flow.presentation.navigation;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,6 +57,9 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private DrawerNavigationListener surveyListener;
     private SurveyAdapter surveyAdapter;
     private UserAdapter usersAdapter;
+    private Drawable hideUsersDrawable;
+    private Drawable showUsersDrawable;
+    private View headerView;
 
     @Inject
     FlowNavigationPresenter presenter;
@@ -87,7 +92,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void initViews() {
-        View headerView = getHeaderView(0);
+        headerView = getHeaderView(0);
         currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
         surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
         surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
@@ -101,7 +106,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         viewComponent.inject(this);
     }
 
-    protected ApplicationComponent getApplicationComponent() {
+    private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
@@ -154,20 +159,29 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void initCurrentUserText() {
-        currentUserTv.setOnClickListener(new OnClickListener() {
+        hideUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_less);
+        showUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_more);
+        headerView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (surveysRv.getVisibility() == VISIBLE) {
+                    updateTextViewDrawable(hideUsersDrawable);
                     surveyTitleTv.setVisibility(GONE);
                     surveysRv.setVisibility(GONE);
                     usersRv.setVisibility(VISIBLE);
                 } else {
+                    updateTextViewDrawable(showUsersDrawable);
                     surveyTitleTv.setVisibility(VISIBLE);
                     surveysRv.setVisibility(VISIBLE);
                     usersRv.setVisibility(GONE);
+
                 }
             }
         });
+    }
+
+    private void updateTextViewDrawable(Drawable drawable) {
+        currentUserTv.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
     }
 
     private void onSurveyItemLongPress(int position, SurveyAdapter adapter) {
@@ -218,7 +232,6 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         presenter.destroy();
         super.onDetachedFromWindow();
     }
-
 
     public interface DrawerNavigationListener {
 

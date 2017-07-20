@@ -26,6 +26,8 @@ import com.getsentry.raven.event.helper.EventBuilderHelper;
 
 import java.util.Map;
 
+import static org.akvo.flow.util.logging.TagsFactory.VERSION_NAME_TAG_KEY;
+
 public class RavenEventBuilderHelper implements EventBuilderHelper {
 
     private final Map<String, String> tags;
@@ -38,7 +40,11 @@ public class RavenEventBuilderHelper implements EventBuilderHelper {
     public void helpBuildingEvent(EventBuilder eventBuilder) {
         eventBuilder.withSdkName(RavenEnvironment.SDK_NAME + ":android");
         for (String key : tags.keySet()) {
-            eventBuilder.withTag(key, tags.get(key));
+            String value = tags.get(key);
+            if (VERSION_NAME_TAG_KEY.equals(key)) {
+                eventBuilder.withRelease(value);
+            }
+            eventBuilder.withTag(key, value);
         }
     }
 }

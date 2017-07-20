@@ -98,7 +98,7 @@ public class HelpActivity extends BackActivity implements HelpView {
     @Override
     public void displayError() {
         Snackbar.make(helpWv, R.string.error_loading_help, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.retry, new View.OnClickListener() {
+                .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         presenter.load();

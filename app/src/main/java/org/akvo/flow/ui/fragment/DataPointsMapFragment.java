@@ -52,7 +52,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.loader.SurveyedLocalesLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;

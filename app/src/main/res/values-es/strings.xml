@@ -246,7 +246,7 @@
   <string name="clearbutton">Borrar</string>
   <string name="yes">Sí</string>
   <string name="no">No</string>
-  <string name="retry">Reintentar</string>
+  <string name="action_retry">Reintentar</string>
   <string name="delete">Borrar</string>
   <string name="error_value_required">Este campo no puede ser dejado en blanco</string>
   <string name="drawer_open">Abrir menú</string>

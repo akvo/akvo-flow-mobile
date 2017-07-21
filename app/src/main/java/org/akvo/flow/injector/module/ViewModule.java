@@ -28,6 +28,7 @@ import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetUsers;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
+import org.akvo.flow.domain.interactor.SetSelectedUser;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -80,10 +81,15 @@ public class ViewModule {
         return editUser;
     }
 
-
     @Provides
     @Named("deleteUser")
     UseCase provideDeleteUser(DeleteUser deleteUser) {
         return deleteUser;
+    }
+
+    @Provides
+    @Named("setSelectedUser")
+    UseCase provideSelectedUser(SetSelectedUser selectedUser) {
+        return selectedUser;
     }
 }

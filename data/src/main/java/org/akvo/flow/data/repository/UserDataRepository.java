@@ -65,4 +65,9 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> clearSelectedUser() {
         return dataSourceFactory.getSharedPreferencesDataSource().clearSelectedUser();
     }
+
+    @Override
+    public Observable<Boolean> setSelectedUser(long userId) {
+        return dataSourceFactory.getSharedPreferencesDataSource().setSelectedUser(userId);
+    }
 }

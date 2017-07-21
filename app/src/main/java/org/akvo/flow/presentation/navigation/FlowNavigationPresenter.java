@@ -29,6 +29,7 @@ import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
 import org.akvo.flow.domain.interactor.EditUser;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
+import org.akvo.flow.domain.interactor.SetSelectedUser;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -49,6 +50,7 @@ public class FlowNavigationPresenter implements Presenter {
     private final UseCase getUsers;
     private final UseCase editUser;
     private final UseCase deleteUser;
+    private final UseCase setSelectedUser;
 
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
@@ -63,7 +65,8 @@ public class FlowNavigationPresenter implements Presenter {
             SurveyGroupMapper surveyGroupMapper,
             @Named("saveSelectedSurvey") UseCase saveSelectedSurvey,
             @Named("getUsers") UseCase getUsers, UserMapper userMapper,
-            @Named("editUser") UseCase editUser, @Named("deleteUser") UseCase deleteUser) {
+            @Named("editUser") UseCase editUser, @Named("deleteUser") UseCase deleteUser,
+            @Named("setSelectedUser") UseCase setSelectedUser) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
         this.deleteSurvey = deleteSurvey;
@@ -73,6 +76,7 @@ public class FlowNavigationPresenter implements Presenter {
         this.userMapper = userMapper;
         this.editUser = editUser;
         this.deleteUser = deleteUser;
+        this.setSelectedUser = setSelectedUser;
     }
 
     @Override
@@ -83,6 +87,7 @@ public class FlowNavigationPresenter implements Presenter {
         getUsers.unSubscribe();
         editUser.unSubscribe();
         deleteUser.unSubscribe();
+        setSelectedUser.unSubscribe();
     }
 
     public void setView(FlowNavigationView view) {
@@ -114,7 +119,7 @@ public class FlowNavigationPresenter implements Presenter {
             @Override
             public void onNext(Pair<User, List<User>> userListPair) {
                 currentUser = userMapper.transform(userListPair.first);
-                String name = currentUser == null? "": currentUser.getName();
+                String name = currentUser == null ? "" : currentUser.getName();
                 view.displayUser(name, userMapper.transform(userListPair.second));
             }
         }, null);
@@ -182,6 +187,22 @@ public class FlowNavigationPresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
+            }
+        }, params);
+    }
+
+    public void onUserSelected(ViewUser item) {
+        Map<String, Long> params = new HashMap<>(2);
+        params.put(SetSelectedUser.PARAM_USER_ID, item.getId());
+        setSelectedUser.execute(new DefaultSubscriber<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(Boolean aBoolean) {
+                load();
             }
         }, params);
     }

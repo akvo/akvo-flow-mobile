@@ -35,4 +35,6 @@ public interface UserRepository {
     Observable<Long> getSelectedUser();
 
     Observable<Boolean> clearSelectedUser();
+
+    Observable<Boolean> setSelectedUser(long userId);
 }

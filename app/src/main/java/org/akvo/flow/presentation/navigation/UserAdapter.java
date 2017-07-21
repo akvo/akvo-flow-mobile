@@ -68,6 +68,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         notifyDataSetChanged();
     }
 
+    public ViewUser getItem(int position) {
+        return users.get(position);
+    }
+
     class UserViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView userNameTv;

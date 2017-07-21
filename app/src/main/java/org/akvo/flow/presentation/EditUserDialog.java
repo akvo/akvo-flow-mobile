@@ -107,16 +107,6 @@ public class EditUserDialog extends DialogFragment {
                 if (listener != null) {
                     listener.editUser(new ViewUser(viewUser.getId(), name));
                 }
-//                uid = mDatabase.createOrUpdateUser(viewUser.getId(), name);
-//
-//                User loggedUser = FlowApp.getApp().getUser();
-//                if (newUser) {
-//                    // Automatically log in new users
-//                    mListener.onUserSelected(new User(uid, name));
-//                } else if (user.equals(loggedUser)) {
-//                    loggedUser.setName(name);
-//                }
-//                load();
             }
         });
 

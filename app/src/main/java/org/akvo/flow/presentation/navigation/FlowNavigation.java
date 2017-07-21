@@ -116,6 +116,19 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         usersRv.setLayoutManager(new LinearLayoutManager(context));
         usersAdapter = new UserAdapter(context);
         usersRv.setAdapter(usersAdapter);
+        usersRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View childView, int position) {
+                        presenter.onUserSelected(usersAdapter.getItem(position));
+                    }
+
+                    @Override
+                    public void onItemLongPress(View childView, int position) {
+                        onUserLongPress(usersAdapter.getItem(position));
+                    }
+                })
+        );
     }
 
     private void setNavigationItemListener() {

@@ -102,4 +102,13 @@ public class SharedPreferencesDataSource {
     public Observable<Long> getSelectedUser() {
         return Observable.just(getLong(KEY_USER_ID, INVALID_ID));
     }
+
+    public Observable<Boolean> clearSelectedUser() {
+        return setSelectedUser(INVALID_ID);
+    }
+
+    public Observable<Boolean> setSelectedUser(long userId) {
+        setLong(KEY_USER_ID, userId);
+        return Observable.just(true);
+    }
 }

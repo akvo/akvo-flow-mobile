@@ -500,12 +500,12 @@ public class SurveyDbAdapter {
      * @param id
      */
     public void deleteUser(Long id) {
-        ContentValues updatedValues = new ContentValues();
-        updatedValues.put(UserColumns.DELETED, 1);
-        database.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
-                new String[] {
-                        id.toString()
-                });
+            ContentValues updatedValues = new ContentValues();
+            updatedValues.put(UserColumns.DELETED, 1);
+            database.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
+                    new String[] {
+                            id.toString()
+                    });
     }
 
     public void addSurveyGroup(ContentValues values) {

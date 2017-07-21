@@ -40,4 +40,8 @@ public interface SurveyRepository {
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 
     Observable<List<User>> getUsers();
+
+    Observable<Boolean> editUser(User user);
+
+    Observable<Boolean> deleteUser(User user);
 }

@@ -33,4 +33,6 @@ public interface FlowNavigationView {
     void onSurveySelected(SurveyGroup viewSurveyId);
 
     void displayUser(String userName, List<ViewUser> viewUsers);
+
+    void onUserLongPress(ViewUser currentUser);
 }

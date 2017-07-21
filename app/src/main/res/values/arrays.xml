@@ -59,4 +59,9 @@
         <item>1280x960px</item>
     </string-array>
 
+    <string-array name="user_options">
+        <item>@string/edit_user</item>
+        <item>@string/delete_user</item>
+    </string-array>
+
 </resources>

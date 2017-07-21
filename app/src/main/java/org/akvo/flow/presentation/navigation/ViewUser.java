@@ -20,7 +20,10 @@
 
 package org.akvo.flow.presentation.navigation;
 
-public class ViewUser {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ViewUser implements Parcelable {
 
     public static final long ADD_USER_ID = -2;
 
@@ -32,11 +35,39 @@ public class ViewUser {
         this.name = name;
     }
 
+    protected ViewUser(Parcel in) {
+        id = in.readLong();
+        name = in.readString();
+    }
+
+    public static final Creator<ViewUser> CREATOR = new Creator<ViewUser>() {
+        @Override
+        public ViewUser createFromParcel(Parcel in) {
+            return new ViewUser(in);
+        }
+
+        @Override
+        public ViewUser[] newArray(int size) {
+            return new ViewUser[size];
+        }
+    };
+
     public long getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
     }
 }

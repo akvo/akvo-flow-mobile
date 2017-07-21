@@ -271,6 +271,7 @@ public class ConstantUtil {
     public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
     public static final String EXTRA_DATAPOINT_SYNC_RESULT = "datapoint_sync_result";
     public static final String EXTRA_DATAPOINT_NUMBER = "datapoint_number";
+    public static final String EXTRA_VIEW_USER = "view_user";
 
     //data point sync result codes
     public static final int DATA_SYNC_RESULT_SUCCESS = 0;

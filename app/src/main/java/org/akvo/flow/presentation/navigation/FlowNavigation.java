@@ -179,6 +179,13 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
                 }
             }
         });
+        headerView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                presenter.onCurrentUserLongPress();
+                return true;
+            }
+        });
     }
 
     private void updateTextViewDrawable(Drawable drawable) {
@@ -230,6 +237,14 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         currentUserTv.setText(userName);
     }
 
+    @Override
+    public void onUserLongPress(ViewUser currentUser) {
+        DialogFragment dialogFragment = UserOptionsDialog
+                .newInstance(currentUser);
+        dialogFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(),
+                UserOptionsDialog.TAG);
+    }
+
     public void onSurveyDeleteConfirmed(long surveyGroupId) {
         presenter.onDeleteSurvey(surveyGroupId);
     }
@@ -238,6 +253,14 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     protected void onDetachedFromWindow() {
         presenter.destroy();
         super.onDetachedFromWindow();
+    }
+
+    public void editUser(ViewUser viewUser) {
+        presenter.editUser(viewUser);
+    }
+
+    public void deleteUser(ViewUser viewUser) {
+        presenter.deleteUser(viewUser);
     }
 
     public interface DrawerNavigationListener {

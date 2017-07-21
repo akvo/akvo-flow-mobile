@@ -224,4 +224,14 @@ public class SurveyDataRepository implements SurveyRepository {
                     }
                 });
     }
+
+    @Override
+    public Observable<Boolean> editUser(User user) {
+        return dataSourceFactory.getDataBaseDataSource().editUser(user);
+    }
+
+    @Override
+    public Observable<Boolean> deleteUser(User user) {
+        return dataSourceFactory.getDataBaseDataSource().deleteUser(user);
+    }
 }

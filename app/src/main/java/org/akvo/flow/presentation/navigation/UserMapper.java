@@ -37,11 +37,19 @@ public class UserMapper {
     }
 
     @Nullable
-    private ViewUser transform(@Nullable User user) {
+    public ViewUser transform(@Nullable User user) {
         if (user == null) {
             return null;
         }
         return new ViewUser(user.getId(), user.getName());
+    }
+
+    @Nullable
+    public User transform(@Nullable ViewUser user) {
+        if (user == null) {
+            return null;
+        }
+        return new User(user.getId(), user.getName());
     }
 
     @NonNull

@@ -26,6 +26,8 @@ import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.DeleteUser;
+import org.akvo.flow.domain.interactor.EditUser;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
@@ -45,19 +47,23 @@ public class FlowNavigationPresenter implements Presenter {
     private final UseCase deleteSurvey;
     private final UseCase saveSelectedSurvey;
     private final UseCase getUsers;
+    private final UseCase editUser;
+    private final UseCase deleteUser;
 
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
     private final SurveyGroupMapper surveyGroupMapper;
 
     private FlowNavigationView view;
+    private ViewUser currentUser;
 
     @Inject
     public FlowNavigationPresenter(@Named("getAllSurveys") UseCase getAllSurveys,
             SurveyMapper surveyMapper, @Named("deleteSurvey") UseCase deleteSurvey,
             SurveyGroupMapper surveyGroupMapper,
             @Named("saveSelectedSurvey") UseCase saveSelectedSurvey,
-            @Named("getUsers") UseCase getUsers, UserMapper userMapper) {
+            @Named("getUsers") UseCase getUsers, UserMapper userMapper,
+            @Named("editUser") UseCase editUser, @Named("deleteUser") UseCase deleteUser) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
         this.deleteSurvey = deleteSurvey;
@@ -65,6 +71,8 @@ public class FlowNavigationPresenter implements Presenter {
         this.saveSelectedSurvey = saveSelectedSurvey;
         this.getUsers = getUsers;
         this.userMapper = userMapper;
+        this.editUser = editUser;
+        this.deleteUser = deleteUser;
     }
 
     @Override
@@ -73,6 +81,8 @@ public class FlowNavigationPresenter implements Presenter {
         deleteSurvey.unSubscribe();
         saveSelectedSurvey.unSubscribe();
         getUsers.unSubscribe();
+        editUser.unSubscribe();
+        deleteUser.unSubscribe();
     }
 
     public void setView(FlowNavigationView view) {
@@ -103,8 +113,8 @@ public class FlowNavigationPresenter implements Presenter {
 
             @Override
             public void onNext(Pair<User, List<User>> userListPair) {
-                User user = userListPair.first;
-                String name = user == null? "": user.getName();
+                currentUser = userMapper.transform(userListPair.first);
+                String name = currentUser == null? "": currentUser.getName();
                 view.displayUser(name, userMapper.transform(userListPair.second));
             }
         }, null);
@@ -117,7 +127,7 @@ public class FlowNavigationPresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                //TODO: notify user
+                //TODO: notify currentUser
                 load();
             }
 
@@ -146,6 +156,33 @@ public class FlowNavigationPresenter implements Presenter {
                 }
             }, params);
         }
+    }
 
+    public void onCurrentUserLongPress() {
+        if (currentUser != null) {
+            view.onUserLongPress(currentUser);
+        }
+    }
+
+    public void editUser(ViewUser viewUser) {
+        Map<String, User> params = new HashMap<>(2);
+        params.put(EditUser.PARAM_USER, userMapper.transform(viewUser));
+        editUser.execute(new DefaultSubscriber<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+        }, params);
+    }
+
+    public void deleteUser(ViewUser viewUser) {
+        Map<String, User> params = new HashMap<>(2);
+        params.put(DeleteUser.PARAM_USER, userMapper.transform(viewUser));
+        deleteUser.execute(new DefaultSubscriber<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+        }, params);
     }
 }

@@ -123,6 +123,7 @@ public class BriteSurveyDbAdapter {
 
     /**
      * correct the distance for the shortening at higher latitudes
+     *
      * @param latitude
      * @return
      */
@@ -268,14 +269,20 @@ public class BriteSurveyDbAdapter {
                 + " FROM " + Tables.SURVEY_INSTANCE + ")");
     }
 
-    public Observable<Boolean> deleteSurvey(long surveyGroupId) {
-        // First the group
-        briteDatabase.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
-        // Now the surveys
-        briteDatabase.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
+    public Observable<Boolean> deleteSurveyAndGroup(long surveyGroupId) {
+        deleteSurveyGroup(surveyGroupId);
+        deleteSurvey(surveyGroupId);
         return Observable.just(true);
+    }
+
+    private void deleteSurvey(long surveyGroupId) {
+        briteDatabase.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
+    }
+
+    private void deleteSurveyGroup(long surveyGroupId) {
+        briteDatabase.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
     }
 
     public Observable<Cursor> getSurveys() {
@@ -305,5 +312,18 @@ public class BriteSurveyDbAdapter {
                         return Observable.just(query.run());
                     }
                 });
+    }
+
+    public void updateUser(long id, String name) {
+        ContentValues values = new ContentValues();
+        values.put(UserColumns.NAME, name);
+        briteDatabase.update(Tables.USER, values, UserColumns._ID + "=?", String.valueOf(id));
+    }
+
+    public void deleteUser(long userId) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(UserColumns.DELETED, 1);
+        briteDatabase.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
+                String.valueOf(userId));
     }
 }

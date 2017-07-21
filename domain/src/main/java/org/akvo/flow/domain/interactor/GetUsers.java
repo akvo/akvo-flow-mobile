@@ -51,27 +51,28 @@ public class GetUsers extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return userRepository.getSelectedUser().concatMap(new Func1<Long, Observable<Pair<User, List<User>>>>() {
-            @Override
-            public Observable<Pair<User, List<User>>> call(final Long selectedUserId) {
-                return surveyRepository.getUsers()
-                        .map(new Func1<List<User>, Pair<User, List<User>>>() {
-                            @Override
-                            public Pair<User, List<User>> call(List<User> users) {
-                                User currentUser = null;
-                                for (User u : users) {
-                                    if (selectedUserId == u.getId()) {
-                                        currentUser = u;
-                                        break;
+        return surveyRepository.getUsers()
+                .concatMap(new Func1<List<User>, Observable<Pair<User, List<User>>>>() {
+                    @Override
+                    public Observable<Pair<User, List<User>>> call(final List<User> users) {
+                        return userRepository.getSelectedUser()
+                                .map(new Func1<Long, Pair<User, List<User>>>() {
+                                    @Override
+                                    public Pair<User, List<User>> call(final Long selectedUserId) {
+                                        User currentUser = null;
+                                        for (User u : users) {
+                                            if (selectedUserId == u.getId()) {
+                                                currentUser = u;
+                                                break;
+                                            }
+                                        }
+                                        if (currentUser != null) {
+                                            users.remove(currentUser);
+                                        }
+                                        return new Pair<>(currentUser, users);
                                     }
-                                }
-                                if (currentUser != null) {
-                                    users.remove(currentUser);
-                                }
-                                return new Pair<>(currentUser, users);
-                            }
-                        });
-            }
-        });
+                                });
+                    }
+                });
     }
 }

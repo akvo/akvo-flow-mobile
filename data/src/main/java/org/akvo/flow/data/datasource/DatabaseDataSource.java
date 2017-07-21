@@ -38,6 +38,7 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
+import org.akvo.flow.domain.entity.User;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +61,7 @@ public class DatabaseDataSource {
     }
 
     public Observable<Boolean> deleteSurvey(long surveyId) {
-        return briteSurveyDbAdapter.deleteSurvey(surveyId);
+        return briteSurveyDbAdapter.deleteSurveyAndGroup(surveyId);
     }
 
     public Observable<Cursor> getDataPoints(@NonNull Long surveyGroupId, @Nullable Double latitude,
@@ -190,5 +191,15 @@ public class DatabaseDataSource {
 
     public Observable<Cursor> getUsers() {
         return briteSurveyDbAdapter.getUsers();
+    }
+
+    public Observable<Boolean> editUser(User user) {
+        briteSurveyDbAdapter.updateUser(user.getId(), user.getName());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> deleteUser(User user) {
+        briteSurveyDbAdapter.deleteUser(user.getId());
+        return Observable.just(true);
     }
 }

@@ -59,7 +59,7 @@ public class UserOptionsDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        listener = (UserOptionListener)getActivity();
+        listener = (UserOptionListener) getActivity();
     }
 
     @Override
@@ -78,14 +78,15 @@ public class UserOptionsDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                           if (listener != null) {
-                               listener.onEditUser(viewUser);
-                           }
+                            if (listener != null) {
+                                listener.onEditUser(viewUser);
+                            }
                         } else {
                             if (listener != null) {
                                 listener.onDeleteUser(viewUser);
                             }
                         }
+                        dismiss();
                     }
                 })
                 .setCancelable(true);

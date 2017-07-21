@@ -107,6 +107,7 @@ public class EditUserDialog extends DialogFragment {
                 if (listener != null) {
                     listener.editUser(new ViewUser(viewUser.getId(), name));
                 }
+                dismiss();
             }
         });
 

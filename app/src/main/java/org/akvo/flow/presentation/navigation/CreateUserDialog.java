@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.presentation.navigation;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -26,45 +26,33 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
-import org.akvo.flow.presentation.navigation.ViewUser;
-import org.akvo.flow.util.ConstantUtil;
 
-public class EditUserDialog extends DialogFragment {
+//TODO: rotating dialog, the text gets lost
+public class CreateUserDialog extends DialogFragment {
 
-    public static final String TAG = "EditUserDialog";
+    public static final String TAG = "CreateUserDialog";
 
-    private ViewUser viewUser;
-    private EditUserListener listener;
+    private CreateUserListener listener;
+    private EditText userNameEt;
 
-    public EditUserDialog() {
-    }
-
-    public static EditUserDialog newInstance(ViewUser viewUser) {
-        EditUserDialog fragment = new EditUserDialog();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(ConstantUtil.EXTRA_VIEW_USER, viewUser);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        viewUser = getArguments().getParcelable(ConstantUtil.EXTRA_VIEW_USER);
+    public CreateUserDialog() {
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        listener = (EditUserListener)getActivity();
+        //TODO verify instanceof
+        listener = (CreateUserListener)getActivity();
     }
 
     @Override
@@ -83,30 +71,38 @@ public class EditUserDialog extends DialogFragment {
         main.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         main.setOrientation(LinearLayout.VERTICAL);
-        builder.setTitle(R.string.edit_user);
+        builder.setTitle(R.string.add_user);
         builder.setMessage(R.string.username);
-        final EditText userNameEt = new EditText(getActivity());
+        userNameEt = new EditText(getActivity());
         userNameEt.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         userNameEt.setSingleLine();
-        userNameEt.setText(viewUser.getName());
+        userNameEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                    int after) {
+                //EMPTY
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //EMPTY
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updatePositiveButton();
+            }
+        });
         main.addView(userNameEt);
         builder.setView(main);
+        builder.setCancelable(false);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String name = userNameEt.getText().toString();
-                if (TextUtils.isEmpty(name)) {
-                    userNameEt.setError(getActivity().getString(R.string.empty_user_warning));
-                    return;
-                }
-
-                if (name.equals(viewUser.getName())) {
-                    return;
-                }
-
                 if (listener != null) {
-                    listener.editUser(new ViewUser(viewUser.getId(), name));
+                    listener.createUser(name);
                 }
                 dismiss();
             }
@@ -116,17 +112,45 @@ public class EditUserDialog extends DialogFragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
+                       dismiss();
                     }
                 });
 
         return builder.create();
     }
 
-    public interface EditUserListener {
+    private void updatePositiveButton() {
+        String text = userNameEt.getText().toString();
+        if (TextUtils.isEmpty(text)) {
+            disablePositiveButton();
+        } else {
+            enablePositiveButton();
+        }
+    }
 
-        void editUser(ViewUser user);
+    @Override
+    public void onResume() {
+        super.onResume();
+        updatePositiveButton();
+    }
+
+    private void disablePositiveButton() {
+        Button button = getPositiveButton();
+        button.setEnabled(false);
+    }
+
+    private Button getPositiveButton() {
+        AlertDialog dialog = (AlertDialog) getDialog();
+        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+    }
+
+    private void enablePositiveButton() {
+        Button button = getPositiveButton();
+        button.setEnabled(true);
+    }
+
+    public interface CreateUserListener {
+
+        void createUser(String userName);
     }
 }

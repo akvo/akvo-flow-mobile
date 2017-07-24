@@ -326,4 +326,10 @@ public class BriteSurveyDbAdapter {
         briteDatabase.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
                 String.valueOf(userId));
     }
+
+    public long createUser(String userName) {
+        ContentValues values = new ContentValues();
+        values.put(UserColumns.NAME, userName);
+        return briteDatabase.insert(Tables.USER, values);
+    }
 }

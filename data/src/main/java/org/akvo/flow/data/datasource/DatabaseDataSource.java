@@ -202,4 +202,8 @@ public class DatabaseDataSource {
         briteSurveyDbAdapter.deleteUser(user.getId());
         return Observable.just(true);
     }
+
+    public Observable<Long> createUser(String userName) {
+        return Observable.just(briteSurveyDbAdapter.createUser(userName));
+    }
 }

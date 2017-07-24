@@ -61,6 +61,7 @@ import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.EditUserDialog;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.FlowNavigation;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
@@ -93,7 +94,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener,
         FlowNavigation.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
-        UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener {
+        UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
+        CreateUserDialog.CreateUserListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     //    private static final String DRAWER_FRAGMENT_TAG = "f";
@@ -404,6 +406,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onUserDeleteConfirmed(ViewUser viewUser) {
         navigationView.deleteUser(viewUser);
+    }
+
+    @Override
+    public void createUser(String userName) {
+        navigationView.createUser(userName);
     }
 
     @Override

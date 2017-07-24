@@ -20,36 +20,49 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.functions.Func1;
 
-public class EditUser extends UseCase {
+public class CreateUser extends UseCase {
 
-    public static final String PARAM_USER = "user";
+    public static final String PARAM_USER_NAME = "user";
+    private static final long INVALID_ID = -1L;
 
     private final SurveyRepository surveyRepository;
+    private final UserRepository userRepository;
 
     @Inject
-    protected EditUser(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
-            SurveyRepository surveyRepository) {
+    protected CreateUser(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
+            SurveyRepository surveyRepository, UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || parameters.get(PARAM_USER) == null) {
-            return Observable.error(new IllegalArgumentException("missing user"));
+        if (parameters == null || parameters.get(PARAM_USER_NAME) == null) {
+            return Observable.error(new IllegalArgumentException("missing user name"));
         }
-        User user = (User) parameters.get(PARAM_USER);
-        return surveyRepository.editUser(user);
+        String userName = (String) parameters.get(PARAM_USER_NAME);
+        return surveyRepository.createUser(userName)
+                .concatMap(new Func1<Long, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(final Long userId) {
+                        if (userId == INVALID_ID) {
+                            return Observable.error(new Exception("Error inserting user"));
+                        }
+                        return userRepository.setSelectedUser(userId);
+                    }
+                });
     }
 }

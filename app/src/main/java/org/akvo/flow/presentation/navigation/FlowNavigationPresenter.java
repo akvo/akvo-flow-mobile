@@ -24,6 +24,7 @@ import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.CreateUser;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
@@ -51,6 +52,7 @@ public class FlowNavigationPresenter implements Presenter {
     private final UseCase editUser;
     private final UseCase deleteUser;
     private final UseCase setSelectedUser;
+    private final UseCase createUser;
 
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
@@ -66,7 +68,8 @@ public class FlowNavigationPresenter implements Presenter {
             @Named("saveSelectedSurvey") UseCase saveSelectedSurvey,
             @Named("getUsers") UseCase getUsers, UserMapper userMapper,
             @Named("editUser") UseCase editUser, @Named("deleteUser") UseCase deleteUser,
-            @Named("setSelectedUser") UseCase setSelectedUser) {
+            @Named("setSelectedUser") UseCase setSelectedUser,
+            @Named("createUser") UseCase createUser) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
         this.deleteSurvey = deleteSurvey;
@@ -77,6 +80,7 @@ public class FlowNavigationPresenter implements Presenter {
         this.editUser = editUser;
         this.deleteUser = deleteUser;
         this.setSelectedUser = setSelectedUser;
+        this.createUser = createUser;
     }
 
     @Override
@@ -88,6 +92,7 @@ public class FlowNavigationPresenter implements Presenter {
         editUser.unSubscribe();
         deleteUser.unSubscribe();
         setSelectedUser.unSubscribe();
+        createUser.unSubscribe();
     }
 
     public void setView(FlowNavigationView view) {
@@ -95,6 +100,11 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void load() {
+        loadSurveys();
+        loadUsers();
+    }
+
+    private void loadSurveys() {
         getAllSurveys.execute(new DefaultSubscriber<Pair<List<Survey>, Long>>() {
             @Override
             public void onError(Throwable e) {
@@ -109,7 +119,9 @@ public class FlowNavigationPresenter implements Presenter {
                 view.displaySurveys(surveyMapper.transform(result.first), result.second);
             }
         }, null);
+    }
 
+    private void loadUsers() {
         getUsers.execute(new DefaultSubscriber<Pair<User, List<User>>>() {
             @Override
             public void onError(Throwable e) {
@@ -192,17 +204,37 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void onUserSelected(ViewUser item) {
-        Map<String, Long> params = new HashMap<>(2);
-        params.put(SetSelectedUser.PARAM_USER_ID, item.getId());
-        setSelectedUser.execute(new DefaultSubscriber<Boolean>() {
+        if (item.getId() == ViewUser.ADD_USER_ID) {
+            view.displayAddUser();
+        } else {
+            Map<String, Long> params = new HashMap<>(2);
+            params.put(SetSelectedUser.PARAM_USER_ID, item.getId());
+            setSelectedUser.execute(new DefaultSubscriber<Boolean>() {
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e);
+                }
+
+                @Override
+                public void onNext(Boolean aBoolean) {
+                    load();
+                }
+            }, params);
+        }
+    }
+
+    public void createUser(String userName) {
+        Map<String, String> params = new HashMap<>(2);
+        params.put(CreateUser.PARAM_USER_NAME, userName);
+        createUser.execute(new DefaultSubscriber<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
             }
 
             @Override
-            public void onNext(Boolean aBoolean) {
-                load();
+            public void onNext(Boolean ignored) {
+                loadUsers();
             }
         }, params);
     }

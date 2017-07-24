@@ -51,7 +51,7 @@ public class DeleteUser extends UseCase {
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         if (parameters == null || parameters.get(PARAM_USER) == null) {
-            throw new IllegalArgumentException("missing user");
+            return Observable.error(new IllegalArgumentException("missing user"));
         }
         final User user = (User) parameters.get(PARAM_USER);
         return userRepository.getSelectedUser()

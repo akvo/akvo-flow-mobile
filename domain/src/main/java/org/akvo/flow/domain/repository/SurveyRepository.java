@@ -44,4 +44,6 @@ public interface SurveyRepository {
     Observable<Boolean> editUser(User user);
 
     Observable<Boolean> deleteUser(User user);
+
+    Observable<Long> createUser(String userName);
 }

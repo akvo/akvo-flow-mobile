@@ -234,4 +234,9 @@ public class SurveyDataRepository implements SurveyRepository {
     public Observable<Boolean> deleteUser(User user) {
         return dataSourceFactory.getDataBaseDataSource().deleteUser(user);
     }
+
+    @Override
+    public Observable<Long> createUser(String userName) {
+        return dataSourceFactory.getDataBaseDataSource().createUser(userName);
+    }
 }

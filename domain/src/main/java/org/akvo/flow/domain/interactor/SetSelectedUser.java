@@ -46,7 +46,7 @@ public class SetSelectedUser extends UseCase {
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         if (parameters == null || parameters.get(PARAM_USER_ID) == null) {
-            throw new IllegalArgumentException("missing user id");
+            return Observable.error(new IllegalArgumentException("missing user id"));
         }
         return userRepository.setSelectedUser((Long)parameters.get(PARAM_USER_ID));
     }

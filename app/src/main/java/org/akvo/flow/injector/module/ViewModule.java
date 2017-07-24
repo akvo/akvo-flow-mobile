@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
 import org.akvo.flow.domain.interactor.EditUser;
@@ -91,5 +92,11 @@ public class ViewModule {
     @Named("setSelectedUser")
     UseCase provideSelectedUser(SetSelectedUser selectedUser) {
         return selectedUser;
+    }
+
+    @Provides
+    @Named("createUser")
+    UseCase provideCreateUser(CreateUser createUser) {
+        return createUser;
     }
 }

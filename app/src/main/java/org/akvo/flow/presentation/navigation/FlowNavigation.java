@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,7 +38,6 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -211,8 +211,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
             final long surveyGroupId = viewSurvey.getId();
             DialogFragment dialogFragment = SurveyDeleteConfirmationDialog
                     .newInstance(surveyGroupId);
-            dialogFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(),
-                    SurveyDeleteConfirmationDialog.TAG);
+            dialogFragment.show(getSupportFragmentManager(), SurveyDeleteConfirmationDialog.TAG);
         }
     }
 
@@ -251,11 +250,19 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     @Override
+    public void displayAddUser() {
+        CreateUserDialog dialog = new CreateUserDialog();
+        dialog.show(getSupportFragmentManager(), CreateUserDialog.TAG);
+    }
+
+    @Override
     public void onUserLongPress(ViewUser currentUser) {
-        DialogFragment dialogFragment = UserOptionsDialog
-                .newInstance(currentUser);
-        dialogFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(),
-                UserOptionsDialog.TAG);
+        DialogFragment dialogFragment = UserOptionsDialog.newInstance(currentUser);
+        dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);
+    }
+
+    private FragmentManager getSupportFragmentManager() {
+        return ((AppCompatActivity) getContext()).getSupportFragmentManager();
     }
 
     public void onSurveyDeleteConfirmed(long surveyGroupId) {
@@ -274,6 +281,10 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     public void deleteUser(ViewUser viewUser) {
         presenter.deleteUser(viewUser);
+    }
+
+    public void createUser(String userName) {
+        presenter.createUser(userName);
     }
 
     public interface DrawerNavigationListener {

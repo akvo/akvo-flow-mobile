@@ -21,17 +21,28 @@
 package org.akvo.flow.injector.module;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
+import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.ConnectivityStateManager;
@@ -47,6 +58,9 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import rx.schedulers.Schedulers;
 
 @Module
 public class ApplicationModule {
@@ -91,8 +105,48 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
+        return surveyDataRepository;
+    }
+
+    @Provides
+    @Singleton
     UserRepository provideUserRepository(UserDataRepository userDataRepository) {
         return userDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    SQLiteOpenHelper provideOpenHelper() {
+        return new DatabaseHelper(application, new LanguageTable(),
+                new FlowMigrationListener(new Prefs(application),
+                        new MigrationLanguageMapper(application)));
+    }
+
+    @Provides
+    @Singleton
+    SqlBrite provideSqlBrite() {
+        return new SqlBrite.Builder().build();
+    }
+
+    @Provides
+    @Singleton
+    BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
+        BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
+        db.setLoggingEnabled(false);
+        return db;
+    }
+
+    @Provides
+    @Singleton
+    RestServiceFactory provideServiceFactory() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        }
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+        return new RestServiceFactory(httpClient);
     }
 
     @Provides

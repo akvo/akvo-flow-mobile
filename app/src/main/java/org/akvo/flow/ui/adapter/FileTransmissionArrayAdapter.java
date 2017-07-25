@@ -28,18 +28,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.TransmissionStatus;
+import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.domain.FileTransmission;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-import org.akvo.flow.domain.FileTransmission;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.List;
 
 /**
  * Adapter that converts FileTransmission objects for display in a list view.

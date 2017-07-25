@@ -49,7 +49,7 @@ public class TransmissionHistoryActivity extends BackActivity {
         setupToolBar();
         transmissionsList = (ListView) findViewById(R.id.transmission_list);
         surveyInstanceId = getSurveyInstanceId(savedInstanceState);
-        databaseAdapter = new SurveyDbDataSource(this);
+        databaseAdapter = new SurveyDbDataSource(this, null);
     }
 
     private Long getSurveyInstanceId(Bundle savedInstanceState) {

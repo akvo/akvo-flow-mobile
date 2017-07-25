@@ -58,5 +58,4 @@ public class DataSourceFactory {
     public PropertiesDataSource getPropertiesDataSource() {
         return propertiesDataSource;
     }
-
 }

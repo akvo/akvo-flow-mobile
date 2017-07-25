@@ -96,6 +96,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Nullable
     private SurveyDbDataSource mDatabase;
     private SurveyGroup mSurveyGroup;
+
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
     private Navigator navigator = new Navigator();

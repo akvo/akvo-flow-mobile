@@ -104,18 +104,6 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
-        return jobExecutor;
-    }
-
-    @Provides
-    @Singleton
-    PostExecutionThread providePostExecutionThread(UIThread uiThread) {
-        return uiThread;
-    }
-
-    @Provides
-    @Singleton
     SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
         return surveyDataRepository;
     }
@@ -163,5 +151,17 @@ public class ApplicationModule {
     SharedPreferencesDataSource provideSharedPreferences() {
         return new SharedPreferencesDataSource(
                 application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
+    }
+
+    @Provides
+    @Singleton
+    ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
+        return jobExecutor;
+    }
+
+    @Provides
+    @Singleton
+    PostExecutionThread providePostExecutionThread(UIThread uiThread) {
+        return uiThread;
     }
 }

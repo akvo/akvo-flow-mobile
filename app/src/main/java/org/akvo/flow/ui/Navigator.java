@@ -41,19 +41,19 @@ import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.PreferencesActivity;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
 import javax.inject.Inject;
 
-import static org.akvo.flow.util.ConstantUtil.EXTRA_RECORD_ID;
-import static org.akvo.flow.util.ConstantUtil.EXTRA_SURVEY_GROUP;
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
@@ -226,6 +226,14 @@ public class Navigator {
 
     public void navigateToLegalInfo(@NonNull Context context) {
         context.startActivity(new Intent(context, LegalNoticesActivity.class));
+    }
+
+    public void navigateToAppSettings(@NonNull Context context) {
+        context.startActivity(new Intent(context, SettingsActivity.class));
+    }
+
+    public void navigateToHelp(@NonNull Context context) {
+        context.startActivity(new Intent(context, HelpActivity.class));
     }
 
     public void navigateToPreferences(@Nullable Context context) {

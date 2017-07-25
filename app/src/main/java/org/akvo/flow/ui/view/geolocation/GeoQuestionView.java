@@ -273,7 +273,7 @@ public class GeoQuestionView extends QuestionView
         View rootView = getRootView().findViewById(R.id.coordinator_layout);
         Snackbar snackbar = Snackbar
                 .make(rootView, R.string.location_timeout, ConstantUtil.SNACK_BAR_DURATION_IN_MS)
-                .setAction(R.string.retry, new OnClickListener() {
+                .setAction(R.string.action_retry, new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         resetResponseValues();

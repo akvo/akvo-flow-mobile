@@ -18,18 +18,29 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.presentation.datapoints.map;
 
-public class Constants {
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 
-    public static final int ORDER_BY_NONE = -1;
-    public static final int ORDER_BY_DATE = 0;
-    public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
+import java.util.List;
 
-    /**
-     * language codes
-     */
-    static final String ENGLISH_CODE = "en";
+interface DataPointsMapView {
+
+    void showProgress();
+
+    void hideProgress();
+
+    void displayData(List<MapDataPoint> surveyedLocales);
+
+    void displayMenu(boolean monitored);
+
+    void showSyncedResults(int numberOfSyncedItems);
+
+    void showErrorAssignmentMissing();
+
+    void showErrorSyncNotAllowed();
+
+    void showErrorNoNetwork();
+
+    void showErrorSync();
 }

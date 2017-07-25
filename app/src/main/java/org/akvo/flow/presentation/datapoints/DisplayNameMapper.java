@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,35 +18,31 @@
  *
  */
 
-package org.akvo.flow.util;
+package org.akvo.flow.presentation.datapoints;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.R;
 
-public class ServerManager {
+import javax.inject.Inject;
+
+public class DisplayNameMapper {
 
     private final Context context;
-    private Prefs prefs;
 
-    public ServerManager(Context context) {
+    @Inject
+    public DisplayNameMapper(Context context) {
         this.context = context;
-        this.prefs = new Prefs(context);
     }
 
-    /**
-     * Get the specified server URL. If no custom server has been set (debug),
-     * the default one will be returned.
-     *
-     * @return server URL string
-     */
-    public String getServerBase() {
-        String serverBase = prefs.getString(Prefs.KEY_BACKEND_SERVER, null);
-        if (TextUtils.isEmpty(serverBase)) {
-            serverBase = new PropertyUtil(context.getResources())
-                    .getProperty(ConstantUtil.SERVER_BASE);
+    @NonNull
+    public String createDisplayName(@Nullable String name) {
+        if (TextUtils.isEmpty(name)) {
+            return context.getString(R.string.unknown);
         }
-        return serverBase;
+        return name;
     }
 }

@@ -53,7 +53,6 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.data.loader.SurveyedLocalesLoader;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;

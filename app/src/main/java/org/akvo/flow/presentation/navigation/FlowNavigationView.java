@@ -34,7 +34,7 @@ public interface FlowNavigationView {
 
     void displayUser(String userName, List<ViewUser> viewUsers);
 
-    void onUserLongPress(ViewUser currentUser);
+    void onUserLongPress(ViewUser viewUser);
 
     void displayAddUser();
 }

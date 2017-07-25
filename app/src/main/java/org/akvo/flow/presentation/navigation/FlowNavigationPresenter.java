@@ -238,4 +238,12 @@ public class FlowNavigationPresenter implements Presenter {
             }
         }, params);
     }
+
+    public void onUserLongPress(ViewUser item) {
+        if (item.getId() == ViewUser.ADD_USER_ID) {
+            view.displayAddUser();
+        } else {
+            view.onUserLongPress(item);
+        }
+    }
 }

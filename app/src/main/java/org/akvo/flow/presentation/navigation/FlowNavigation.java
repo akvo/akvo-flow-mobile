@@ -125,7 +125,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
                     @Override
                     public void onItemLongPress(View childView, int position) {
-                        onUserLongPress(usersAdapter.getItem(position));
+                        presenter.onUserLongPress(usersAdapter.getItem(position));
                     }
                 })
         );
@@ -256,8 +256,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     @Override
-    public void onUserLongPress(ViewUser currentUser) {
-        DialogFragment dialogFragment = UserOptionsDialog.newInstance(currentUser);
+    public void onUserLongPress(ViewUser viewUser) {
+        DialogFragment dialogFragment = UserOptionsDialog.newInstance(viewUser);
         dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);
     }
 

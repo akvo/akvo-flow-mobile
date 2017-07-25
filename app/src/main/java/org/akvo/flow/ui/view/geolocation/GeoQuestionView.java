@@ -24,16 +24,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -65,6 +62,7 @@ public class GeoQuestionView extends QuestionView
 
     private final TimedLocationListener mLocationListener;
     private final LocationValidator locationValidator = new LocationValidator();
+    private final SnackBarManager snackBarManager = new SnackBarManager();
 
     private Button mGeoButton;
     private View geoLoading;
@@ -270,24 +268,17 @@ public class GeoQuestionView extends QuestionView
     @Override
     public void onTimeout() {
         showLocationListenerStopped();
-        View rootView = getRootView().findViewById(R.id.coordinator_layout);
-        Snackbar snackbar = Snackbar
-                .make(rootView, R.string.location_timeout, ConstantUtil.SNACK_BAR_DURATION_IN_MS)
-                .setAction(R.string.retry, new OnClickListener() {
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        snackBarManager.displaySnackBarWithAction(coordinatorLayout, R.string.location_timeout,
+                R.string.retry,
+                new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         resetResponseValues();
                         startLocation();
                         showLocationListenerStarted();
                     }
-                });
-        View snackBarView = snackbar.getView();
-        int snackBarTextId = android.support.design.R.id.snackbar_text;
-        TextView textView = (TextView) snackBarView.findViewById(snackBarTextId);
-        if (textView != null) {
-            textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-        }
-        snackbar.show();
+                }, getContext());
     }
 
     @Override

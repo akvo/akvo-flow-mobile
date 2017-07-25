@@ -42,6 +42,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.ui.view.geolocation.SnackBarManager;
 
 import java.util.List;
 
@@ -67,6 +68,9 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     public FlowNavigation(Context context) {
         this(context, null);
@@ -253,6 +257,39 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     public void displayAddUser() {
         CreateUserDialog dialog = new CreateUserDialog();
         dialog.show(getSupportFragmentManager(), CreateUserDialog.TAG);
+    }
+
+    @Override
+    public void displaySurveyError() {
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        snackBarManager.displaySnackBar(coordinatorLayout, R.string.surveys_error, getContext());
+    }
+
+    @Override
+    public void displayUsersError() {
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        snackBarManager.displaySnackBar(coordinatorLayout, R.string.users_error, getContext());
+    }
+
+    @Override
+    public void displayErrorDeleteSurvey() {
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        snackBarManager
+                .displaySnackBar(coordinatorLayout, R.string.survey_delete_error, getContext());
+    }
+
+    @Override
+    public void displayErrorSelectSurvey() {
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        snackBarManager
+                .displaySnackBar(coordinatorLayout, R.string.survey_select_error, getContext());
+    }
+
+    @Override
+    public void displayUserEditError() {
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        snackBarManager
+                .displaySnackBar(coordinatorLayout, R.string.user_edit_error, getContext());
     }
 
     @Override

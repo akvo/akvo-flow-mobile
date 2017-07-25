@@ -272,5 +272,10 @@
     <string name="help">Help</string>
     <string name="error_loading_help">Error loading help content</string>
     <string name="error_mobile_data_sync">Mobile data sync disabled</string>
+    <string name="surveys_error">Error loading surveys</string>
+    <string name="users_error">Error loading users</string>
+    <string name="survey_delete_error">Error deleting survey</string>
+    <string name="survey_select_error">Error selecting survey</string>
+    <string name="user_edit_error">Error editing user</string>
 
 </resources>

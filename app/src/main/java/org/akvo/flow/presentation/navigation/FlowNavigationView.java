@@ -37,4 +37,14 @@ public interface FlowNavigationView {
     void onUserLongPress(ViewUser viewUser);
 
     void displayAddUser();
+
+    void displaySurveyError();
+
+    void displayUsersError();
+
+    void displayErrorDeleteSurvey();
+
+    void displayErrorSelectSurvey();
+
+    void displayUserEditError();
 }

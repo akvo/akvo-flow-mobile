@@ -92,7 +92,7 @@ public class DeviceHelper {
         return number;
     }
 
-    public String getAndroidID() {
+    public String getAndroidId() {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

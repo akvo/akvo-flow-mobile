@@ -53,8 +53,8 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper,
-            SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi) {
+            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper,
+            FlowRestApi restApi) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -84,8 +84,7 @@ public class SurveyDataRepository implements SurveyRepository {
                                 .concatMap(new Func1<String, Observable<Integer>>() {
                                     @Override
                                     public Observable<Integer> call(String apiKey) {
-                                        return syncDataPoints(serverBaseUrl, apiKey,
-                                                surveyGroupId);
+                                        return syncDataPoints(serverBaseUrl, apiKey, surveyGroupId);
                                     }
                                 });
                     }
@@ -160,7 +159,7 @@ public class SurveyDataRepository implements SurveyRepository {
             final long surveyGroupId, final List<ApiDataPoint> lastBatch,
             final List<ApiDataPoint> allResults) {
         return loadNewDataPoints(baseUrl, apiKey, surveyGroupId)
-                .concatMap(new Func1<ApiLocaleResult, Observable<List<ApiDataPoint>>>() {
+                .flatMap(new Func1<ApiLocaleResult, Observable<List<ApiDataPoint>>>() {
                     @Override
                     public Observable<List<ApiDataPoint>> call(ApiLocaleResult apiLocaleResult) {
                         return saveToDataBase(apiLocaleResult, lastBatch, allResults);
@@ -175,20 +174,12 @@ public class SurveyDataRepository implements SurveyRepository {
         lastBatch.clear();
         lastBatch.addAll(dataPoints);
         allResults.addAll(dataPoints);
-        return dataSourceFactory.getDataBaseDataSource()
-                .syncSurveyedLocales(dataPoints);
+        return dataSourceFactory.getDataBaseDataSource().syncDataPoints(dataPoints);
     }
 
     private Observable<ApiLocaleResult> loadNewDataPoints(final String baseUrl, final String apiKey,
             final long surveyGroupId) {
-        return Observable.just(true).concatMap(new Func1<Object, Observable<ApiLocaleResult>>() {
-            @Override
-            public Observable<ApiLocaleResult> call(Object o) {
-                return restApi
-                        .loadNewDataPoints(baseUrl, apiKey, surveyGroupId,
-                                getSyncedTime(surveyGroupId));
-            }
-        });
+        return restApi
+                .loadNewDataPoints(baseUrl, apiKey, surveyGroupId, getSyncedTime(surveyGroupId));
     }
-
 }

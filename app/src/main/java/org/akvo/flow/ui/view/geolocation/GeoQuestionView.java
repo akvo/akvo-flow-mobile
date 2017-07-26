@@ -47,6 +47,8 @@ import org.akvo.flow.util.LocationValidator;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.SNACK_BAR_DURATION_IN_MS;
+
 /**
  * Question that can handle geographic location input. This question can also
  * listen to location updates from the GPS sensor on the device.
@@ -58,7 +60,6 @@ public class GeoQuestionView extends QuestionView
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
-    private static final int SNACK_BAR_DURATION_IN_MS = 4000;
     public static final int POSITION_LATITUDE = 0;
     public static final int POSITION_LONGITUDE = 1;
     private static final int POSITION_ALTITUDE = 2;

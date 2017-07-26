@@ -188,6 +188,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
     }
 
+    /**
+     * This is not ideal but due to our setup, using something other than getWritableDatabase
+     * produces errors.
+     * @return
+     */
+    @Override
+    public SQLiteDatabase getReadableDatabase() {
+        return getWritableDatabase();
+    }
+
+
     public void upgradeFromLanguages(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + Tables.RESPONSE
                 + " ADD COLUMN " + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
@@ -195,14 +206,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Map<Pair<String, String>, ContentValues> responseMigrationData = responseMigrationHelper
                 .obtainResponseMigrationData(db);
         responseMigrationHelper.migrateResponses(responseMigrationData, db);
-    }
-
-    //Using getReadableDatabase() returns
-    // android.database.sqlite.SQLiteDatabaseLockedException: database is locked (code 5):
-    // retrycount exceeded
-    @Override
-    public SQLiteDatabase getReadableDatabase() {
-        return getWritableDatabase();
     }
 
     @Override

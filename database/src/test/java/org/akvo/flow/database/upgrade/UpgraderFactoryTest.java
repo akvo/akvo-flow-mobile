@@ -35,7 +35,7 @@ import static junit.framework.Assert.assertTrue;
 public class UpgraderFactoryTest {
 
     @Test
-    public void createUpgrader_ShouldCreateCorrectUpgraderWhenBeforeLaunch() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenBeforeLaunch() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory.createUpgrader(77, null, null);
 
@@ -156,7 +156,7 @@ public class UpgraderFactoryTest {
     }
 
     @Test
-    public void createUpgrader_ShouldCreateNoUpgraderWhenResponseIteration() {
+    public void createUpgraderShouldCreateNoUpgraderWhenResponseIteration() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_RESPONSE_ITERATION, null, null);

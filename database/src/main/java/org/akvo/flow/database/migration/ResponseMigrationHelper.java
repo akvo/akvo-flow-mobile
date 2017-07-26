@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ResponseMigrationHelper {
+
     public ResponseMigrationHelper() {
     }
 
@@ -44,7 +45,7 @@ public class ResponseMigrationHelper {
             db.update(Tables.RESPONSE, responseMigrationData.get(key),
                     ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                             + " = ?",
-                    new String[] { key.first, key.second });
+                    new String[] {key.first, key.second});
         }
     }
 
@@ -73,12 +74,12 @@ public class ResponseMigrationHelper {
                     if (questionIdContent != null && questionIdContent.contains("|") && !TextUtils
                             .isEmpty(surveyInstanceId)) {
                         String[] questionIdAndIteration = questionIdContent.split("\\|", -1);
-                        if (questionIdAndIteration != null && questionIdAndIteration.length >= 2) {
+                        if (questionIdAndIteration.length >= 2) {
                             ContentValues contentValues = new ContentValues(2);
                             contentValues
                                     .put(ResponseColumns.QUESTION_ID, questionIdAndIteration[0]);
                             contentValues.put(ResponseColumns.ITERATION, questionIdAndIteration[1]);
-                            insertionMap.put(new Pair<String, String>(surveyInstanceId,
+                            insertionMap.put(new Pair<>(surveyInstanceId,
                                             questionIdContent),
                                     contentValues);
                         }

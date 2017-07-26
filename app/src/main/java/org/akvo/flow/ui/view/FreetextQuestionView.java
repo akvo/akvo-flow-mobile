@@ -21,9 +21,11 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
@@ -210,12 +212,24 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
         super.resetQuestion(fireEvent);
     }
 
+    /**
+     * Display the error within the EditText (instead of question text)
+     *
+     * @param error Error text
+     */
     @Override
-    public void displayError(String error) {
-        // Display the error within the EditText (instead of question text)
-        mEditText.setError(error);
-        if (isDoubleEntry()) {
-            mDoubleEntryText.setError(error);
+    public void displayError(@Nullable String error) {
+        if (TextUtils.isEmpty(error)) {
+            mEditText.setError(null);
+            if (isDoubleEntry()) {
+                mDoubleEntryText.setError(null);
+            }
+        } else {
+            SpannableStringBuilder errorSpannable = errorMessageFormatter.getErrorSpannable(error);
+            mEditText.setError(errorSpannable);
+            if (isDoubleEntry()) {
+                mDoubleEntryText.setError(errorSpannable);
+            }
         }
     }
 

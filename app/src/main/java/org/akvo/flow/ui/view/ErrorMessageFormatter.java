@@ -18,18 +18,24 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.ui.view;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Url;
-import rx.Observable;
+public class ErrorMessageFormatter {
 
-interface FlowApiService {
+    public ErrorMessageFormatter() {
+    }
 
-    @GET
-    @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Url String url);
+    @NonNull
+    public SpannableStringBuilder getErrorSpannable(@NonNull String error) {
+        int color = Color.RED;
+        ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(color);
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(error);
+        spannableStringBuilder.setSpan(foregroundColorSpan, 0, error.length(), 0);
+        return spannableStringBuilder;
+    }
 }

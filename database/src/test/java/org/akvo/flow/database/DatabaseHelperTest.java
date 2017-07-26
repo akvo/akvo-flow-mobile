@@ -178,7 +178,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgrade_ShouldUpgradeCorrectlyIfVersionLanguagesMigrate() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionLanguagesMigrate() throws Exception {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);

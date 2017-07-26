@@ -27,7 +27,6 @@ import android.support.annotation.Nullable;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
-import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
@@ -41,6 +40,11 @@ import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
+
+import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
+import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
+import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
+import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
 import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
 import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
@@ -71,7 +75,7 @@ public class BriteSurveyDbAdapter {
 
         String orderByStr = "";
         switch (orderBy) {
-            case Constants.ORDER_BY_DATE:
+            case ORDER_BY_DATE:
                 orderByStr = " ORDER BY " + RecordColumns.LAST_MODIFIED + " DESC";
                 break;
             case ORDER_BY_DISTANCE:

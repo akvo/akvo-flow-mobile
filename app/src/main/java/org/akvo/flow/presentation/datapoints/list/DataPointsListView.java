@@ -18,9 +18,37 @@
  *
  */
 
-package org.akvo.flow.ui.fragment;
+package org.akvo.flow.presentation.datapoints.list;
 
-public interface DataPointsSyncListener {
+import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 
-    void onNewDataAvailable();
+import java.util.List;
+
+interface DataPointsListView {
+
+    void showNoDataPoints();
+
+    void showLoading();
+
+    void hideLoading();
+
+    void showSyncedResults(int numberOfSyncedItems);
+
+    void showErrorSyncNotAllowed();
+
+    void showErrorNoNetwork();
+
+    void showErrorSync();
+
+    void displayData(List<ListDataPoint> mapDataPoints);
+
+    void displayMenu(boolean monitored);
+
+    void showErrorMissingLocation();
+
+    void showNoSurveySelected();
+
+    void showOrderByDialog(int orderBy);
+
+    void showErrorAssignmentMissing();
 }

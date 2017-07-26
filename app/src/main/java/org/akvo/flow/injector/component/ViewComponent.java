@@ -27,6 +27,8 @@ import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
+import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
+import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DrawerFragment;
@@ -58,4 +60,8 @@ public interface ViewComponent {
     void inject(DrawerFragment drawerFragment);
 
     void inject(HelpActivity activity);
+
+    void inject(DataPointsMapFragment dataPointsMapFragment);
+
+    void inject(DataPointsListFragment dataPointsListFragment);
 }

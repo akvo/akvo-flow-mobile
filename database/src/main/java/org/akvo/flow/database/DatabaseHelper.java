@@ -20,11 +20,17 @@
 
 package org.akvo.flow.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Pair;
 
+import org.akvo.flow.database.migration.MigrationListener;
+import org.akvo.flow.database.migration.ResponseMigrationHelper;
 import org.akvo.flow.database.upgrade.UpgraderFactory;
+
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -37,14 +43,15 @@ import timber.log.Timber;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "surveydata";
-    public static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
+    public static final int VER_LAUNCH = 78;
     public static final int VER_FORM_SUBMITTER = 79;
     public static final int VER_FORM_DEL_CHECK = 80;
     public static final int VER_FORM_VERSION = 81;
     public static final int VER_CADDISFLY_QN = 82;
     public static final int VER_PREFERENCES_MIGRATE = 83;
     public static final int VER_LANGUAGES_MIGRATE = 84;
-    static final int DATABASE_VERSION = VER_LANGUAGES_MIGRATE;
+    public static final int VER_RESPONSE_ITERATION = 85;
+    static final int DATABASE_VERSION = VER_RESPONSE_ITERATION;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -113,7 +120,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ResponseColumns.ANSWER + " TEXT NOT NULL,"
                 + ResponseColumns.TYPE + " TEXT NOT NULL,"
                 + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"
-                + ResponseColumns.FILENAME + " TEXT)");
+                + ResponseColumns.FILENAME + " TEXT,"
+                + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0)");
 
         db.execSQL("CREATE TABLE " + Tables.RECORD + " ("
                 + RecordColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -188,6 +196,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public SQLiteDatabase getReadableDatabase() {
         return getWritableDatabase();
+    }
+
+
+    public void upgradeFromLanguages(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.RESPONSE
+                + " ADD COLUMN " + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
+        ResponseMigrationHelper responseMigrationHelper = new ResponseMigrationHelper();
+        Map<Pair<String, String>, ContentValues> responseMigrationData = responseMigrationHelper
+                .obtainResponseMigrationData(db);
+        responseMigrationHelper.migrateResponses(responseMigrationData, db);
     }
 
     @Override

@@ -27,6 +27,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
+import org.akvo.flow.database.migration.MigrationListener;
+
 import java.util.ArrayList;
 import java.util.List;
 

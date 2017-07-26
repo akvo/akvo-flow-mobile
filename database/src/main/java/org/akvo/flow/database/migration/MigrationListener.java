@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,15 +18,13 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.database.migration;
 
-public class ResponseColumns {
-    public static final String _ID = "_id";
-    public static final String SURVEY_INSTANCE_ID = "survey_instance_id";
-    public static final String QUESTION_ID = "question_id";
-    public static final String ITERATION = "iteration";
-    public static final String ANSWER = "answer";
-    public static final String TYPE = "type";
-    public static final String INCLUDE = "include";
-    public static final String FILENAME = "filename";
+import android.database.sqlite.SQLiteDatabase;
+
+public interface MigrationListener {
+
+    void migrateLanguages(SQLiteDatabase db);
+
+    void migratePreferences(SQLiteDatabase db);
 }

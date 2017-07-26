@@ -23,6 +23,7 @@ package org.akvo.flow.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.akvo.flow.database.migration.MigrationListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -78,6 +79,7 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromFormVersion(mockDb);
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
+        verify(helper, times(1)).upgradeFromLanguages(mockDb);
     }
 
     private void configureDatabaseHelper(DatabaseHelper helper) {
@@ -87,6 +89,7 @@ public class DatabaseHelperTest {
         doNothing().when(helper).upgradeFromFormVersion(any(SQLiteDatabase.class));
         doNothing().when(helper).upgradeFromCaddisfly(any(SQLiteDatabase.class));
         doNothing().when(helper).upgradeFromPreferences(any(SQLiteDatabase.class));
+        doNothing().when(helper).upgradeFromLanguages(any(SQLiteDatabase.class));
     }
 
     @Test
@@ -103,6 +106,7 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromFormVersion(mockDb);
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
+        verify(helper, times(1)).upgradeFromLanguages(mockDb);
     }
 
     @Test
@@ -119,6 +123,7 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromFormVersion(mockDb);
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
+        verify(helper, times(1)).upgradeFromLanguages(mockDb);
     }
 
     @Test
@@ -135,6 +140,7 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromFormVersion(mockDb);
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
+        verify(helper, times(1)).upgradeFromLanguages(mockDb);
     }
 
     @Test
@@ -151,6 +157,7 @@ public class DatabaseHelperTest {
         verify(helper, times(0)).upgradeFromFormVersion(mockDb);
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
+        verify(helper, times(1)).upgradeFromLanguages(mockDb);
     }
 
     @Test
@@ -167,5 +174,23 @@ public class DatabaseHelperTest {
         verify(helper, times(0)).upgradeFromFormVersion(mockDb);
         verify(helper, times(0)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
+        verify(helper, times(1)).upgradeFromLanguages(mockDb);
+    }
+
+    @Test
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionLanguagesMigrate() throws Exception {
+        DatabaseHelper helper = spy(
+                new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
+        configureDatabaseHelper(helper);
+
+        helper.onUpgrade(mockDb, DatabaseHelper.VER_LANGUAGES_MIGRATE, DatabaseHelper.DATABASE_VERSION);
+
+        verify(helper, times(0)).upgradeFromLaunch(mockDb);
+        verify(helper, times(0)).upgradeFromFormSubmitter(mockDb);
+        verify(helper, times(0)).upgradeFromFormCheck(mockDb);
+        verify(helper, times(0)).upgradeFromFormVersion(mockDb);
+        verify(helper, times(0)).upgradeFromCaddisfly(mockDb);
+        verify(helper, times(0)).upgradeFromPreferences(mockDb);
+        verify(helper, times(1)).upgradeFromLanguages(mockDb);
     }
 }

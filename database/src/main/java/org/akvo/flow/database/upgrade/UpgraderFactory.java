@@ -47,6 +47,8 @@ public class UpgraderFactory {
                     databaseUpgrader.addUpgrader(new CaddisflyUpgrader(helper, db));
                 case DatabaseHelper.VER_PREFERENCES_MIGRATE:
                     databaseUpgrader.addUpgrader(new PreferencesUpgrader(helper, db));
+                case DatabaseHelper.VER_LANGUAGES_MIGRATE:
+                    databaseUpgrader.addUpgrader(new LanguagesUpgrader(helper, db));
             }
         }
         return databaseUpgrader;

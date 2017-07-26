@@ -46,6 +46,10 @@ import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
 import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
 import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
+import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
+import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
+import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
+
 public class BriteSurveyDbAdapter {
 
     private static final int DOES_NOT_EXIST = -1;

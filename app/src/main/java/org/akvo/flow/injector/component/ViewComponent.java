@@ -33,6 +33,7 @@ import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
+import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 
 import dagger.Component;
@@ -41,9 +42,13 @@ import dagger.Component;
 @Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
 public interface ViewComponent {
 
+    void inject(DatapointsFragment datapointsFragment);
+
     void inject(FormActivity formActivity);
 
-    void inject(DatapointsFragment datapointsFragment);
+    void inject(DataPointsMapFragment dataPointsMapFragment);
+
+    void inject(DataPointsListFragment dataPointsListFragment);
 
     void inject(RecordActivity recordActivity);
 
@@ -60,8 +65,4 @@ public interface ViewComponent {
     void inject(DrawerFragment drawerFragment);
 
     void inject(HelpActivity activity);
-
-    void inject(DataPointsMapFragment dataPointsMapFragment);
-
-    void inject(DataPointsListFragment dataPointsListFragment);
 }

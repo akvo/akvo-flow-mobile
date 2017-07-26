@@ -72,6 +72,7 @@ import org.akvo.flow.util.ViewUtil;
 import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
@@ -114,6 +115,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
+
+        ButterKnife.bind(this);
 
         initializeToolBar();
 

@@ -20,6 +20,7 @@
 
 package org.akvo.flow.injector.module;
 
+import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SaveImage;
@@ -51,7 +52,6 @@ public class ViewModule {
     UseCase provideSyncDataPointsUseCase(SyncDataPoints syncDataPoints) {
         return syncDataPoints;
     }
-
 
     @Provides
     @Named("allowedToConnect")

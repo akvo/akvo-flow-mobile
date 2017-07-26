@@ -118,8 +118,6 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
         if (!responsesOnly) {
             // Delete downloaded survey xml/zips
             FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.FORMS), false);
-            // Delete stacktrace files
-            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.STACKTRACE), false);
             // Delete bootstraps
             FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INBOX), false);
         }

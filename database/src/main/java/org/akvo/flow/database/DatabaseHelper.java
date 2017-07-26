@@ -180,9 +180,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
     }
 
-    //Using getReadableDatabase() returns
-    // android.database.sqlite.SQLiteDatabaseLockedException: database is locked (code 5):
-    // retrycount exceeded
+    /**
+     * This is not ideal but due to our setup, using something other than getWritableDatabase
+     * produces errors.
+     * @return
+     */
     @Override
     public SQLiteDatabase getReadableDatabase() {
         return getWritableDatabase();

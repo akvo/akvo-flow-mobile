@@ -33,7 +33,11 @@ import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
+import org.akvo.flow.presentation.help.HelpActivity;
+import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
+import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 
 import dagger.Component;

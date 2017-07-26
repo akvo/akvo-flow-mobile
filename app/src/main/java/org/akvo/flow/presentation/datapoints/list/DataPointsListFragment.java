@@ -79,7 +79,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     private DataPointListAdapter mAdapter;
     private RecordListListener mListener;
 
-    private TextView emptyTextView;
+    private TextView emptyTitleTv;
+    private TextView emptySubTitleTv;
     private ProgressBar progressBar;
 
     /**
@@ -140,8 +141,10 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 .getSystemService(Context.LOCATION_SERVICE);
         View view = getView();
         ListView listView = (ListView) view.findViewById(R.id.locales_lv);
-        emptyTextView = (TextView) view.findViewById(R.id.empty_tv);
-        listView.setEmptyView(emptyTextView);
+        View emptyView = view.findViewById(R.id.empty_view);
+        listView.setEmptyView(emptyView);
+        emptyTitleTv = (TextView) view.findViewById(R.id.empty_title_tv);
+        emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
         if (mAdapter == null) {
@@ -236,12 +239,17 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showNoSurveySelected() {
-        emptyTextView.setText(R.string.no_survey_selected_text);
+        emptyTitleTv.setText(R.string.no_survey_selected_text);
+        emptySubTitleTv.setText("");
     }
 
     @Override
-    public void showNoDataPoints() {
-        emptyTextView.setText(R.string.no_records_text);
+    public void showNoDataPoints(boolean monitored) {
+        emptyTitleTv.setText(R.string.no_datapoints_error_text);
+        int subtitleResource = monitored ?
+                R.string.no_records_subtitle_monitored :
+                R.string.no_records_subtitle_non_monitored;
+        emptySubTitleTv.setText(subtitleResource);
     }
 
     @Override

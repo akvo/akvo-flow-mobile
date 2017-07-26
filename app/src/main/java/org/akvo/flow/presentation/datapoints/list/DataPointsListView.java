@@ -26,7 +26,7 @@ import java.util.List;
 
 interface DataPointsListView {
 
-    void showNoDataPoints();
+    void showNoDataPoints(boolean monitored);
 
     void showLoading();
 

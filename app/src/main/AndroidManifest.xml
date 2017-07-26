@@ -90,7 +90,6 @@
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.UserRequestedApkUpdateService"/>
-        <service android:name=".service.SurveyedDataPointSyncService"/>
         <service android:name=".service.TimeCheckService"/>
         <service
                 android:name=".service.ApkUpdateService"
@@ -125,6 +124,10 @@
         <activity
                 android:name=".presentation.AboutActivity"
                 android:label="@string/about_activity_title">
+        </activity>
+        <activity
+                android:name=".presentation.help.HelpActivity"
+                android:label="@string/help">
         </activity>
         <activity
                 android:name=".presentation.legal.LegalNoticesActivity"

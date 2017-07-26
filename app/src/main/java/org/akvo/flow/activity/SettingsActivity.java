@@ -25,14 +25,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.SQLException;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -50,7 +48,6 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
-import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -60,8 +57,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -74,9 +69,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     private static final String LABEL = "label";
     private static final String DESC = "desc";
-
-    @Inject
-    Navigator navigator;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,8 +85,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 resources.getString(R.string.reloadsurveysdesc)));
         list.add(createMap(resources.getString(R.string.downloadsurveylabel),
                 resources.getString(R.string.downloadsurveydesc)));
-        list.add(createMap(resources.getString(R.string.poweroptlabel),
-                resources.getString(R.string.poweroptdesc)));
         list.add(createMap(resources.getString(R.string.gpsstatuslabel),
                 resources.getString(R.string.gpsstatusdesc)));
         list.add(createMap(resources.getString(R.string.reset_responses),
@@ -103,9 +93,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 resources.getString(R.string.resetalldesc)));
         list.add(createMap(resources.getString(R.string.checksd),
                 resources.getString(R.string.checksddesc)));
-        list.add(createMap(resources.getString(R.string.aboutlabel),
-                resources.getString(R.string.aboutdesc)));
-
         String[] fromKeys = {
                 LABEL, DESC
         };
@@ -146,12 +133,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
             Resources resources = getResources();
             if (resources.getString(R.string.prefoptlabel).equals(val)) {
                 onPreferencesOptionTap();
-            } else if (resources.getString(R.string.poweroptlabel).equals(val)) {
-                onPowerManagementOptionTap();
             } else if (resources.getString(R.string.gpsstatuslabel).equals(val)) {
                 onGpsStatusOptionTap();
-            } else if (resources.getString(R.string.aboutlabel).equals(val)) {
-                onAboutOptionTap();
             } else if (resources.getString(R.string.reloadsurveyslabel).equals(val)) {
                 onReloadAllSurveysOptionTap();
             } else if (resources.getString(R.string.downloadsurveylabel).equals(val)) {
@@ -171,7 +154,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     private void onSyncDataOptionTap(View view) {
         Intent i = new Intent(view.getContext(), DataSyncService.class);
         getApplicationContext().startService(i);
-        // terminate this activity
         finish();
     }
 
@@ -292,10 +274,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         });
     }
 
-    private void onAboutOptionTap() {
-        navigator.navigateToAbout(this);
-    }
-
     private void onGpsStatusOptionTap() {
         try {
             Intent i = new Intent(ConstantUtil.GPS_STATUS_INTENT);
@@ -309,15 +287,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 }
             });
             builder.show();
-        }
-    }
-
-    private void onPowerManagementOptionTap() {
-        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        if (!wm.isWifiEnabled()) {
-            wm.setWifiEnabled(true);
-        } else {
-            wm.setWifiEnabled(false);
         }
     }
 
@@ -380,17 +349,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
             Timber.e(e, e.getMessage());
             Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
-
-        return onOptionsItemSelected(item);
     }
 
     private static class SettingsAdapter extends SimpleAdapter {

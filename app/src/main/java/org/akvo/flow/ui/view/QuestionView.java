@@ -24,8 +24,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -54,6 +56,7 @@ import java.util.StringTokenizer;
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
     private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
+    final ErrorMessageFormatter errorMessageFormatter = new ErrorMessageFormatter();
 
     protected Question mQuestion;
     private QuestionResponse mResponse;
@@ -319,7 +322,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public void addQuestionInteractionListener(QuestionInteractionListener listener) {
         if (mListeners == null) {
-            mListeners = new ArrayList<QuestionInteractionListener>();
+            mListeners = new ArrayList<>();
         }
         if (listener != null && !mListeners.contains(listener) && listener != this) {
             mListeners.add(listener);
@@ -564,8 +567,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      *
      * @param error Error text
      */
-    public void displayError(String error) {
-        mQuestionText.setError(error);
+    public void displayError(@Nullable String error) {
+        if (TextUtils.isEmpty(error)) {
+            mQuestionText.setError(null);
+        } else {
+            mQuestionText.setError(errorMessageFormatter.getErrorSpannable(error));
+        }
     }
 
     public void checkMandatory() {
@@ -588,7 +595,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     public boolean isDoubleEntry() {
-        return mQuestion != null ? mQuestion.isDoubleEntry() : false;// Avoid NPE
+        return mQuestion != null && mQuestion.isDoubleEntry();
     }
 
     /**

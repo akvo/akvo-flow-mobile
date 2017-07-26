@@ -43,7 +43,7 @@ import timber.log.Timber;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "surveydata";
-    public static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
+    public static final int VER_LAUNCH = 78;
     public static final int VER_FORM_SUBMITTER = 79;
     public static final int VER_FORM_DEL_CHECK = 80;
     public static final int VER_FORM_VERSION = 81;

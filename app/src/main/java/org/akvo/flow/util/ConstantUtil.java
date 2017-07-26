@@ -268,6 +268,8 @@ public class ConstantUtil {
     public static final int RESPONDENT_ID_TAG_KEY = R.integer.respidkey;
     public static final int READ_ONLY_TAG_KEY = R.integer.finishedkey;
 
+    public static final int SNACK_BAR_DURATION_IN_MS = 4000;
+
     /**
      * prevent instantiation
      */

@@ -3,13 +3,6 @@
     xmlns:flowapp="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/new_datapoint"
-        android:icon="@drawable/ic_action_new"
-        android:orderInCategory="100"
-        android:title="@string/add_data_point"
-        flowapp:showAsAction="always" />
-
-    <item
         android:id="@+id/more_submenu"
         android:icon="@drawable/ic_more"
         android:orderInCategory="100"

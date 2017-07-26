@@ -67,7 +67,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private TextView mRepetitionsText;
 
     private final Map<Integer, RepetitionHeader> mHeaders;
-    private final RepeatableGroupIterations groupIterations;// Repetition IDs
+    private final RepeatableGroupIterations groupIterations;
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -248,18 +248,14 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void loadGroup(int index) {
-        final int repetitionId =
-                groupIterations.size() <= index ?
-                        groupIterations.next() :
-                        groupIterations.getRepetitionId(index);
-        final int position = index + 1;// Visual indicator.
+        final int repetitionId = getRepetitionId(index);
+        final int visualIndicator = index + 1;
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
             RepetitionHeader header =
                     new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
-                            position,
-                            mSurveyListener.isReadOnly() ? null : this);
+                            visualIndicator, mSurveyListener.isReadOnly() ? null : this);
             mHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -268,7 +264,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
                 q = Question
-                        .copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
+                        .copy(q, q.getId() + "|" + repetitionId);
             }
 
             QuestionView questionView;
@@ -310,6 +306,12 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             inflate(getContext(), R.layout.divider, questionView);
             mContainer.addView(questionView);
         }
+    }
+
+    private int getRepetitionId(int index) {
+        return groupIterations.size() <= index ?
+                groupIterations.next() :
+                groupIterations.getRepetitionId(index);
     }
 
     @Override
@@ -391,8 +393,6 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
          * The populated list will contain the IDs of existing repetitions.
          * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
-         * @param questions
-         * @param questionResponses
          */
         void loadIDs(Set<String> questions, Collection<QuestionResponse> questionResponses) {
             Set<Integer> reps = new HashSet<>();

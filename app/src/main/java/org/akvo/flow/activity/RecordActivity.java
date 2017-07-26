@@ -37,7 +37,6 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.BootstrapService;
@@ -83,10 +82,6 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
-    }
-
-    protected ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override

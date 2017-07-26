@@ -191,6 +191,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * This is not ideal but due to our setup, using something other than getWritableDatabase
+     * produces errors.
+     * @return
+     */
+    @Override
+    public SQLiteDatabase getReadableDatabase() {
+        return getWritableDatabase();
+    }
+
     @Override
     public SQLiteDatabase getWritableDatabase() {
         synchronized (LOCK_OBJ) {

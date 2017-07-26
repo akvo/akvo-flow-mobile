@@ -26,8 +26,13 @@ import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.ui.fragment.DrawerFragment;
+import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
@@ -41,9 +46,9 @@ import dagger.Component;
 @Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
 public interface ViewComponent {
 
-    void inject(FormActivity formActivity);
-
     void inject(DatapointsFragment datapointsFragment);
+
+    void inject(FormActivity formActivity);
 
     void inject(DataPointsMapFragment dataPointsMapFragment);
 

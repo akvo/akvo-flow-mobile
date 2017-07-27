@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,12 +18,24 @@
  *
  */
 
-package org.akvo.flow.data.database;
+package org.akvo.flow.database.upgrade;
 
-public class TransmissionStatus {
-    public static final int QUEUED = 0;
-    public static final int IN_PROGRESS = 1;
-    public static final int SYNCED = 2;
-    public static final int FAILED = 3;
-    public static final int FORM_DELETED = 4;
+import android.database.sqlite.SQLiteDatabase;
+
+import org.akvo.flow.database.DatabaseHelper;
+
+public class PreferencesUpgrader implements DatabaseUpgrader {
+
+    private final DatabaseHelper helper;
+    private final SQLiteDatabase db;
+
+    public PreferencesUpgrader(DatabaseHelper helper, SQLiteDatabase db) {
+        this.helper = helper;
+        this.db = db;
+    }
+
+    @Override
+    public void upgrade() {
+        helper.upgradeFromPreferences(db);
+    }
 }

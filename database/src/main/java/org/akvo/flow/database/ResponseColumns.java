@@ -24,6 +24,7 @@ public class ResponseColumns {
     public static final String _ID = "_id";
     public static final String SURVEY_INSTANCE_ID = "survey_instance_id";
     public static final String QUESTION_ID = "question_id";
+    public static final String ITERATION = "iteration";
     public static final String ANSWER = "answer";
     public static final String TYPE = "type";
     public static final String INCLUDE = "include";

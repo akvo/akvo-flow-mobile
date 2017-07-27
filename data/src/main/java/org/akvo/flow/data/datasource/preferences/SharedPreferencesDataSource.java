@@ -46,7 +46,7 @@ public class SharedPreferencesDataSource {
     }
 
     public Observable<String> getBaseUrl() {
-        return Observable.just(preferences.getString(KEY_BACKEND_SERVER, null));
+        return Observable.just(getString(KEY_BACKEND_SERVER, null));
     }
 
     public String getString(String key, String defValue) {

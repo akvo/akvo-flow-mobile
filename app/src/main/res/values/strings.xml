@@ -116,7 +116,7 @@
     <!--Empty Views-->
     <string name="no_records_text">You have no data points yet. Click \'+\' at the top of your screen to add a new data point</string>
     <string name="no_surveys_text">You have no surveys assigned. Surveys are assigned in the Flow dashboard</string>
-    <string name="no_datapoints_error_text">You have no data points yet. Click \'+\' to add a new data point</string>
+    <string name="no_datapoints_error_text">You have no data points</string>
     <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
     <!--ToolBar-->
     <string name="more">More</string>
@@ -233,7 +233,7 @@
     <string name="clearbutton">Clear</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="retry">Retry</string>
+    <string name="action_retry">Retry</string>
     <string name="delete">Delete</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
@@ -272,5 +272,15 @@
     <string name="help">Help</string>
     <string name="error_loading_help">Error loading help content</string>
     <string name="error_mobile_data_sync">Mobile data sync disabled</string>
+    <string name="data_points_sync_error_mobile_data_sync">Mobile data sync disabled</string>
+    <string name="action_settings">Settings</string>
+    <string name="no_records_subtitle_monitored">Use \'+\' to capture data or \'Sync\' to get existing data</string>
+    <string name="no_records_subtitle_non_monitored">Use \'+\' to capture data.</string>
+
+    <!--Verify if this works for transifex-->
+    <plurals name="data_points_sync_success_message">
+        <item quantity="one">%1$d data point synced</item>
+        <item quantity="other">%1$d data points synced</item>
+    </plurals>
 
 </resources>

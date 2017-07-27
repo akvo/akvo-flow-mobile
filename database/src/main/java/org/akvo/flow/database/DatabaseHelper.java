@@ -20,9 +20,17 @@
 
 package org.akvo.flow.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Pair;
+
+import org.akvo.flow.database.migration.MigrationListener;
+import org.akvo.flow.database.migration.ResponseMigrationHelper;
+import org.akvo.flow.database.upgrade.UpgraderFactory;
+
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -35,14 +43,15 @@ import timber.log.Timber;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "surveydata";
-    private static final int VER_LAUNCH = 78;// App refactor version. Start from scratch
-    private static final int VER_FORM_SUBMITTER = 79;
-    private static final int VER_FORM_DEL_CHECK = 80;
-    private static final int VER_FORM_VERSION = 81;
-    private static final int VER_CADDISFLY_QN = 82;
-    private static final int VER_PREFERENCES_MIGRATE = 83;
-    private static final int VER_LANGUAGES_MIGRATE = 84;
-    private static final int DATABASE_VERSION = VER_LANGUAGES_MIGRATE;
+    public static final int VER_LAUNCH = 78;
+    public static final int VER_FORM_SUBMITTER = 79;
+    public static final int VER_FORM_DEL_CHECK = 80;
+    public static final int VER_FORM_VERSION = 81;
+    public static final int VER_CADDISFLY_QN = 82;
+    public static final int VER_PREFERENCES_MIGRATE = 83;
+    public static final int VER_LANGUAGES_MIGRATE = 84;
+    public static final int VER_RESPONSE_ITERATION = 85;
+    static final int DATABASE_VERSION = VER_RESPONSE_ITERATION;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -111,7 +120,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ResponseColumns.ANSWER + " TEXT NOT NULL,"
                 + ResponseColumns.TYPE + " TEXT NOT NULL,"
                 + ResponseColumns.INCLUDE + " INTEGER NOT NULL DEFAULT 1,"
-                + ResponseColumns.FILENAME + " TEXT)");
+                + ResponseColumns.FILENAME + " TEXT,"
+                + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0)");
 
         db.execSQL("CREATE TABLE " + Tables.RECORD + " ("
                 + RecordColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -144,51 +154,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Timber.d("Upgrading database from version " + oldVersion + " to " + newVersion);
+        Timber.d("Upgrading database from version %d to %d", oldVersion, newVersion);
+        new UpgraderFactory().createUpgrader(oldVersion, this, db).upgrade();
+    }
 
-        // Apply database updates sequentially. It starts in the current
-        // version, hooking into the correspondent case block, and falls
-        // through to any future upgrade. If no break statement is found,
-        // the upgrade will end up in the current version.
-        switch (oldVersion) {
-            case VER_LAUNCH:
-                db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
-                        + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
-            case VER_FORM_SUBMITTER:
-                db.execSQL("ALTER TABLE " + Tables.TRANSMISSION
-                        + " ADD COLUMN " + TransmissionColumns.SURVEY_ID + " TEXT");
-            case VER_FORM_DEL_CHECK:
-                db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
-                        + " ADD COLUMN " + SurveyInstanceColumns.VERSION + " REAL");
-            case VER_FORM_VERSION:
-                db.execSQL("ALTER TABLE " + Tables.RESPONSE
-                        + " ADD COLUMN " + ResponseColumns.FILENAME + " TEXT");
-                oldVersion = VER_CADDISFLY_QN;
-        }
+    public void upgradeFromPreferences(SQLiteDatabase db) {
+        languageTable.onCreate(db);
+        migrationListener.migrateLanguages(db);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
+    }
 
-        if (oldVersion < VER_PREFERENCES_MIGRATE) {
-            migrationListener.migratePreferences(db);
-        }
+    public void upgradeFromCaddisfly(SQLiteDatabase db) {
+        migrationListener.migratePreferences(db);
+    }
 
-        if (oldVersion < VER_CADDISFLY_QN) {
-            Timber.d("onUpgrade() - Recreating the Database.");
+    public void upgradeFromFormVersion(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.RESPONSE
+                + " ADD COLUMN " + ResponseColumns.FILENAME + " TEXT");
+    }
 
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.SYNC_TIME);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.USER);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_GROUP);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
-            onCreate(db);
-        } else if (oldVersion < VER_LANGUAGES_MIGRATE) {
-            //add new languages table
-            languageTable.onCreate(db);
-            migrationListener.migrateLanguages(db);
-            db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
-        }
+    public void upgradeFromFormCheck(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
+                + " ADD COLUMN " + SurveyInstanceColumns.VERSION + " REAL");
+    }
+
+    public void upgradeFromFormSubmitter(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.TRANSMISSION
+                + " ADD COLUMN " + TransmissionColumns.SURVEY_ID + " TEXT");
+    }
+
+    public void upgradeFromLaunch(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
+                + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
+    }
+
+    /**
+     * This is not ideal but due to our setup, using something other than getWritableDatabase
+     * produces errors.
+     * @return
+     */
+    @Override
+    public SQLiteDatabase getReadableDatabase() {
+        return getWritableDatabase();
+    }
+
+
+    public void upgradeFromLanguages(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.RESPONSE
+                + " ADD COLUMN " + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
+        ResponseMigrationHelper responseMigrationHelper = new ResponseMigrationHelper();
+        Map<Pair<String, String>, ContentValues> responseMigrationData = responseMigrationHelper
+                .obtainResponseMigrationData(db);
+        responseMigrationHelper.migrateResponses(responseMigrationData, db);
     }
 
     @Override
@@ -233,5 +250,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "(" + SurveyInstanceColumns.STATUS + ")");
         db.execSQL("CREATE INDEX response_modified_idx ON " + Tables.SURVEY_INSTANCE
                 + "(" + SurveyInstanceColumns.SUBMITTED_DATE + ")");
+    }
+
+    public void dropAllTables(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.SYNC_TIME);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.USER);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_GROUP);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
     }
 }

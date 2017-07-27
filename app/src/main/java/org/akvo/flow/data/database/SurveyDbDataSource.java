@@ -41,12 +41,12 @@ import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
+import org.akvo.flow.database.TransmissionStatus;
+import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.SurveyInstance;
-import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -73,11 +73,12 @@ public class SurveyDbDataSource {
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(briteDatabase);
         this.surveyDbAdapter = new SurveyDbAdapter(context,
-                new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
+                new FlowMigrationListener(new Prefs(context),
+                        new MigrationLanguageMapper(context)));
     }
 
     /**
-     * Open or create the db
+     * Open or create the briteSurveyDbAdapter
      *
      * @throws SQLException if the database could be neither opened or created
      */
@@ -169,7 +170,6 @@ public class SurveyDbDataSource {
         } else {
             responseToSave = resp;
         }
-        long id = -1;
         ContentValues initialValues = new ContentValues();
         initialValues.put(ResponseColumns.ANSWER, responseToSave.getValue());
         initialValues.put(ResponseColumns.TYPE, responseToSave.getType());
@@ -177,7 +177,7 @@ public class SurveyDbDataSource {
         initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getRespondentId());
         initialValues.put(ResponseColumns.FILENAME, responseToSave.getFilename());
         initialValues.put(ResponseColumns.INCLUDE, resp.getIncludeFlag() ? 1 : 0);
-        id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), id, initialValues);
+        long id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), initialValues);
         responseToSave.setId(id);
         resp.setId(id);
         return responseToSave;
@@ -352,11 +352,10 @@ public class SurveyDbDataSource {
         values.put(SurveyGroupColumns.NAME, surveyGroup.getName());
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
-        Timber.d("FlowNavigationPresenter: added surveygroup"+surveyGroup.toString());
         briteSurveyDbAdapter.addSurveyGroup(values);
     }
 
-    // Attempt to fetch the registation form. If the form ID is explicitely set on the SurveyGroup,
+    // Attempt to fetch the registration form. If the form ID is explicitely set on the SurveyGroup,
     // we simply query by ID. Otherwise, assume is a non-monitored form, and query the first form
     // we find.
     public Survey getRegistrationForm(SurveyGroup sg) {
@@ -449,114 +448,10 @@ public class SurveyDbDataSource {
             }
 
             // Update the surveyed locale info
-            surveyDbAdapter.updateSurveyedLocale(surveyedLocaleId, surveyedLocaleValues);
+            briteSurveyDbAdapter.updateDataPoint(surveyedLocaleId, surveyedLocaleValues);
 
             // Store the META_NAME/META_GEO as a response
             createOrUpdateSurveyResponse(metaResponse);
-        }
-    }
-
-    private void syncResponses(List<QuestionResponse> responses, long surveyInstanceId) {
-        for (QuestionResponse response : responses) {
-
-            ContentValues values = new ContentValues();
-            values.put(ResponseColumns.ANSWER, response.getValue());
-            values.put(ResponseColumns.TYPE, response.getType());
-            values.put(ResponseColumns.QUESTION_ID, response.getQuestionId());
-            values.put(ResponseColumns.INCLUDE, response.getIncludeFlag());
-            values.put(ResponseColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-
-            surveyDbAdapter.syncResponse(surveyInstanceId, values, response.getQuestionId());
-        }
-    }
-
-    private void syncSurveyInstances(List<SurveyInstance> surveyInstances,
-            String surveyedLocaleId) {
-        for (SurveyInstance surveyInstance : surveyInstances) {
-
-            ContentValues surveyInstanceValues = new ContentValues();
-            surveyInstanceValues.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.getSurveyId());
-            surveyInstanceValues.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getDate());
-            surveyInstanceValues.put(SurveyInstanceColumns.RECORD_ID, surveyedLocaleId);
-            surveyInstanceValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
-            surveyInstanceValues.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
-            surveyInstanceValues.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
-
-            long id = surveyDbAdapter.syncSurveyInstance(surveyInstanceValues, surveyInstance.getUuid());
-
-            // Now the responses...
-            syncResponses(surveyInstance.getResponses(), id);
-            syncTransmission(surveyInstance, id);
-        }
-    }
-
-    private void syncTransmission(SurveyInstance surveyInstance, long surveyInstanceId) {
-        Cursor cursor = null;
-        if (surveyInstanceId != SurveyDbAdapter.DOES_NOT_EXIST) {
-            cursor = surveyDbAdapter.getTransmission(surveyInstanceId);
-        }
-        if (cursor != null && cursor.moveToFirst()) {
-            int columnIndex = cursor.getColumnIndex(TransmissionColumns._ID);
-            do {
-                updateTransmission(cursor.getInt(columnIndex));
-            } while (cursor.moveToNext());
-        } else {
-            createTransmission(surveyInstance, surveyInstanceId);
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
-    }
-
-    private void createTransmission(SurveyInstance surveyInstance, long id) {
-        // The filename is a unique column in the transmission table, and if we do not have
-        // a file to hold this data, we set the value to the instance UUID
-        ContentValues transmissionContentValues = new ContentValues();
-        transmissionContentValues.put(TransmissionColumns.SURVEY_INSTANCE_ID, id);
-        transmissionContentValues.put(TransmissionColumns.SURVEY_ID, surveyInstance.getSurveyId());
-        transmissionContentValues.put(TransmissionColumns.FILENAME, surveyInstance.getUuid());
-        transmissionContentValues.put(TransmissionColumns.STATUS, TransmissionStatus.SYNCED);
-        final String date = String.valueOf(System.currentTimeMillis());
-        transmissionContentValues.put(TransmissionColumns.START_DATE, date);
-        transmissionContentValues.put(TransmissionColumns.END_DATE, date);
-        surveyDbAdapter.createTransmission(transmissionContentValues);
-    }
-
-    private void updateTransmission(int transmissionID) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(TransmissionColumns.STATUS, TransmissionStatus.SYNCED);
-        final String date = String.valueOf(System.currentTimeMillis());
-        contentValues.put(TransmissionColumns.START_DATE, date);
-        contentValues.put(TransmissionColumns.END_DATE, date);
-        surveyDbAdapter.createTransmission(contentValues);
-    }
-
-    public void syncSurveyedLocale(SurveyedLocale surveyedLocale) {
-        final String id = surveyedLocale.getId();
-        try {
-
-            ContentValues values = new ContentValues();
-            values.put(RecordColumns.RECORD_ID, id);
-            values.put(RecordColumns.SURVEY_GROUP_ID, surveyedLocale.getSurveyGroupId());
-            values.put(RecordColumns.NAME, surveyedLocale.getName());
-            values.put(RecordColumns.LATITUDE, surveyedLocale.getLatitude());
-            values.put(RecordColumns.LONGITUDE, surveyedLocale.getLongitude());
-
-            //THIS is not so good but temporary
-            surveyDbAdapter.beginTransaction();
-            surveyDbAdapter.insertRecord(values);
-
-            syncSurveyInstances(surveyedLocale.getSurveyInstances(), id);
-
-            // Update the record last modification date, if necessary
-            surveyDbAdapter.updateRecordModifiedDate(id, surveyedLocale.getLastModified());
-
-            String syncTime = String.valueOf(surveyedLocale.getLastModified());
-            surveyDbAdapter.setSyncTime(surveyedLocale.getSurveyGroupId(), syncTime);
-
-            surveyDbAdapter.successfulTransaction();
-        } finally {
-            surveyDbAdapter.endTransaction();
         }
     }
 
@@ -574,10 +469,6 @@ public class SurveyDbDataSource {
 
     public void reinstallTestSurvey() {
         surveyDbAdapter.reinstallTestSurvey();
-    }
-
-    public String getSyncTime(long surveyGroupId) {
-        return surveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
     public void deleteEmptyRecords() {
@@ -608,8 +499,8 @@ public class SurveyDbDataSource {
         surveyDbAdapter.updateSurveyStatus(mSurveyInstanceId, saved);
     }
 
-    public void updateRecordModifiedDate(String mRecordId, long timestamp) {
-        surveyDbAdapter.updateRecordModifiedDate(mRecordId, timestamp);
+    public void updateRecordModifiedDate(String recordId, long timestamp) {
+        briteSurveyDbAdapter.updateRecordModifiedDate(recordId, timestamp);
     }
 
     public void deleteResponses(String surveyId) {
@@ -679,8 +570,8 @@ public class SurveyDbDataSource {
         surveyDbAdapter.deleteSurvey(id);
     }
 
-    public String createSurveyedLocale(long surveyGroupId) {
-        return surveyDbAdapter.createSurveyedLocale(surveyGroupId, PlatformUtil.recordUuid());
+    public String createSurveyedLocale(long id) {
+        return surveyDbAdapter.createSurveyedLocale(id, PlatformUtil.recordUuid());
     }
 
     public void clearSurveyedLocaleName(long surveyInstanceId) {

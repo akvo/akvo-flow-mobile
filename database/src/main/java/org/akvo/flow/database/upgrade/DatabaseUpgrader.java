@@ -18,9 +18,9 @@
  *
  */
 
-package org.akvo.flow.ui.fragment;
+package org.akvo.flow.database.upgrade;
 
-public interface DataPointsSyncListener {
+public interface DatabaseUpgrader {
 
-    void onNewDataAvailable();
+    void upgrade();
 }

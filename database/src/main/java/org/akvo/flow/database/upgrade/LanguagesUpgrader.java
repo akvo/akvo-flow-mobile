@@ -18,13 +18,24 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.database.upgrade;
 
 import android.database.sqlite.SQLiteDatabase;
 
-public interface MigrationListener {
+import org.akvo.flow.database.DatabaseHelper;
 
-    void migrateLanguages(SQLiteDatabase db);
+public class LanguagesUpgrader implements DatabaseUpgrader {
 
-    void migratePreferences(SQLiteDatabase db);
+    private final DatabaseHelper helper;
+    private final SQLiteDatabase db;
+
+    public LanguagesUpgrader(DatabaseHelper helper, SQLiteDatabase db) {
+        this.helper = helper;
+        this.db = db;
+    }
+
+    @Override
+    public void upgrade() {
+        helper.upgradeFromLanguages(db);
+    }
 }

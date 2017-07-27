@@ -249,7 +249,7 @@ Sem espaço para armazenamento
   <string name="clearbutton">Limpar</string>
   <string name="yes">Sim</string>
   <string name="no">Não</string>
-  <string name="retry">Tentar novamente</string>
+  <string name="action_retry">Tentar novamente</string>
   <string name="delete">Apagar</string>
   <string name="error_value_required">Este campo não pode ficar em branco</string>
   <string name="drawer_open">Desenhador aberto</string>

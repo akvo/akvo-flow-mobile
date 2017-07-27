@@ -26,6 +26,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
+import org.akvo.flow.database.migration.MigrationListener;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -76,7 +78,9 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
             //if nothing there, we add english
             languages.add(ENGLISH_CODE);
         }
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
         databaseHelper.close();
         return languages;
     }

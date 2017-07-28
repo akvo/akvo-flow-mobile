@@ -1,36 +1,33 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-package org.akvo.flow.ui.fragment;
+package org.akvo.flow.presentation.datapoints.map;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,26 +49,38 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.loader.SurveyedLocalesLoader;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
+import org.akvo.flow.presentation.datapoints.DataPointSyncView;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
+import javax.inject.Inject;
 
-public class DataPointsMapFragment extends SupportMapFragment
-        implements LoaderCallbacks<List<SurveyedLocale>>, OnInfoWindowClickListener,
-        OnMapReadyCallback, DataPointsSyncListener {
+public class DataPointsMapFragment extends SupportMapFragment implements OnInfoWindowClickListener,
+        OnMapReadyCallback, DataPointsMapView, DataPointSyncView {
 
-    public static final int MAP_ZOOM_LEVEL = 10;
-    public static final String MAP_OPTIONS = "MapOptions";
+    private static final int MAP_ZOOM_LEVEL = 10;
+    private static final String MAP_OPTIONS = "MapOptions";
 
-    private SurveyGroup mSurveyGroup;
+    @Nullable
     private RecordListListener mListener;
-    private List<SurveyedLocale> mItems;
+
+    private final DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
+            this);
+
+    private List<MapDataPoint> mItems;
+
+    private boolean displayMonitoredMenu;
 
     @Nullable
     private ProgressBar progressBar;
@@ -79,14 +88,13 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Nullable
     private GoogleMap mMap;
 
-    private ClusterManager<SurveyedLocale> mClusterManager;
+    @Inject
+    DataPointsMapPresenter presenter;
 
-    /**
-     * BroadcastReceiver to notify of records synchronisation. This should be
-     * fired from {@link org.akvo.flow.service.SurveyedDataPointSyncService}.
-     */
-    private final BroadcastReceiver dataPointSyncReceiver = new DataPointSyncBroadcastReceiver(
-            this);
+    @Inject
+    Navigator navigator;
+
+    private ClusterManager<MapDataPoint> mClusterManager;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -104,22 +112,19 @@ public class DataPointsMapFragment extends SupportMapFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mItems = new ArrayList<>();
-        mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
             mListener = (RecordListListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(
-                    activity.toString() + " must implement SurveyedLocalesFragmentListener");
+                    activity.toString() + " must implement RecordListListener");
         }
     }
 
@@ -138,14 +143,35 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initializeInjector();
+        presenter.setView(this);
+        SurveyGroup surveyGroup = (SurveyGroup) getArguments()
+                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+        presenter.onDataReady(surveyGroup);
         getMapAsync(this);
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         configMap();
-        refresh();
+        presenter.onViewReady();
     }
 
     private void configMap() {
@@ -171,7 +197,8 @@ public class DataPointsMapFragment extends SupportMapFragment
         }
 
         final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        LatLng ne = bounds.northeast, sw = bounds.southwest;
+        LatLng ne = bounds.northeast;
+        LatLng sw = bounds.southwest;
         double latDst = Math.abs(ne.latitude - sw.latitude);
         double lonDst = Math.abs(ne.longitude - sw.longitude);
 
@@ -187,7 +214,7 @@ public class DataPointsMapFragment extends SupportMapFragment
                                 sw.longitude - lonDst / scale));
 
         mClusterManager.clearItems();
-        for (SurveyedLocale item : mItems) {
+        for (MapDataPoint item : mItems) {
             if (item.getPosition() != null && newBounds.contains(item.getPosition())) {
                 mClusterManager.addItem(item);
             }
@@ -228,69 +255,58 @@ public class DataPointsMapFragment extends SupportMapFragment
         super.onResume();
         if (mItems.isEmpty()) {
             // Make sure we only fetch the data and center the map once
-            refresh();
+            presenter.refresh();
         }
-        LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(dataPointSyncReceiver,
-                        new IntentFilter(ConstantUtil.ACTION_LOCALE_SYNC_UPDATE));
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataPointSyncReceiver);
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
-    public void refresh(SurveyGroup surveyGroup) {
-        mSurveyGroup = surveyGroup;
+    @Override
+    public void onDestroy() {
+        presenter.destroy();
+        super.onDestroy();
+    }
+
+    public void refreshData(SurveyGroup surveyGroup) {
         getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        refresh();
-    }
-
-    /**
-     * Ideally, we should build a ContentProvider, so this notifications are handled
-     * automatically, and the loaders restarted without this explicit dependency.
-     */
-    public void refresh() {
-        if (isResumed()) {
-            showProgress();
-            getLoaderManager().restartLoader(0, null, this);
-        }
+        presenter.onDataReady(surveyGroup);
+        presenter.refresh();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (mSurveyGroup != null) {
-            if (mSurveyGroup.isMonitored()) {
-                inflater.inflate(R.menu.datapoints_map_monitored, menu);
-            } else {
-                inflater.inflate(R.menu.datapoints_map, menu);
-            }
+        if (displayMonitoredMenu) {
+            inflater.inflate(R.menu.datapoints_map_monitored, menu);
+        } else {
+            inflater.inflate(R.menu.datapoints_map, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.sync_records:
-                if (mListener != null && mSurveyGroup != null) {
-                    showProgress();
-                    mListener.onSyncRecordsRequested(mSurveyGroup.getId());
-                }
+                presenter.onSyncRecordsPressed();
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
-    private void showProgress() {
+    @Override
+    public void showProgress() {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
     }
 
-    private void hideProgress() {
+    @Override
+    public void hideProgress() {
         if (progressBar != null) {
             progressBar.setVisibility(View.INVISIBLE);
         }
@@ -299,39 +315,64 @@ public class DataPointsMapFragment extends SupportMapFragment
     @Override
     public void onInfoWindowClick(Marker marker) {
         final String surveyedLocaleId = marker.getSnippet();
-        mListener.onRecordSelected(surveyedLocaleId);
-    }
-
-    // ==================================== //
-    // ========= Loader Callbacks ========= //
-    // ==================================== //
-
-    @Override
-    public Loader<List<SurveyedLocale>> onCreateLoader(int id, Bundle args) {
-        long surveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        return new SurveyedLocalesLoader(getActivity(), surveyId, ConstantUtil.ORDER_BY_NONE);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<SurveyedLocale>> loader,
-            List<SurveyedLocale> surveyedLocales) {
-        hideProgress();
-        if (surveyedLocales == null) {
-            Timber.w("onFinished() - Loader returned no data");
-            return;
+        if (mListener != null) {
+            mListener.onRecordSelected(surveyedLocaleId);
         }
+    }
+
+    @Override
+    public void displayData(List<MapDataPoint> surveyedLocales) {
         mItems.clear();
         mItems.addAll(surveyedLocales);
         cluster();
     }
 
     @Override
-    public void onLoaderReset(Loader<List<SurveyedLocale>> loader) {
-        //EMPTY
+    public void displayMenu(boolean monitored) {
+        displayMonitoredMenu = monitored;
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            activity.supportInvalidateOptionsMenu();
+        }
     }
 
     @Override
-    public void onNewDataAvailable() {
-        refresh();
+    public void showSyncedResults(int numberOfSyncedItems) {
+        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems);
+    }
+
+    @Override
+    public void showErrorAssignmentMissing() {
+        dataPointSyncSnackBarManager.showErrorAssignmentMissing();
+    }
+
+    @Override
+    public void showErrorSyncNotAllowed() {
+        dataPointSyncSnackBarManager.showErrorSyncNotAllowed();
+    }
+
+    @Override
+    public void showErrorNoNetwork() {
+        dataPointSyncSnackBarManager.showErrorNoNetwork();
+    }
+
+    @Override
+    public void showErrorSync() {
+       dataPointSyncSnackBarManager.showErrorSync();
+    }
+
+    @Override
+    public void onRetryRequested() {
+        presenter.onSyncRecordsPressed();
+    }
+
+    @Override
+    public View getRootView() {
+        return getView();
+    }
+
+    @Override
+    public void onSettingsPressed() {
+        navigator.navigateToPreferences(getActivity());
     }
 }

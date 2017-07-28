@@ -20,7 +20,9 @@
 
 package org.akvo.flow.injector.module;
 
+import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
@@ -28,6 +30,7 @@ import org.akvo.flow.domain.interactor.EditUser;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetUsers;
 import org.akvo.flow.domain.interactor.SaveImage;
+import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.SetSelectedUser;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -44,6 +47,18 @@ public class ViewModule {
     @Named("saveImage")
     UseCase provideSaveImageUseCase(SaveImage saveImage) {
         return saveImage;
+    }
+
+    @Provides
+    @Named("getSavedDataPoints")
+    UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
+        return getSavedDataPoints;
+    }
+
+    @Provides
+    @Named("syncDataPoints")
+    UseCase provideSyncDataPointsUseCase(SyncDataPoints syncDataPoints) {
+        return syncDataPoints;
     }
 
     @Provides

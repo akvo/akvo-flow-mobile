@@ -61,6 +61,8 @@ import dagger.Provides;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.schedulers.Schedulers;
+import okhttp3.logging.HttpLoggingInterceptor;
+import rx.schedulers.Schedulers;
 
 @Module
 public class ApplicationModule {
@@ -105,15 +107,14 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    UserRepository provideUserRepository(UserDataRepository userDataRepository) {
-        return userDataRepository;
+    SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
+        return surveyDataRepository;
     }
 
     @Provides
     @Singleton
-    SharedPreferencesDataSource provideSharedPreferences() {
-        return new SharedPreferencesDataSource(
-                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
+    UserRepository provideUserRepository(UserDataRepository userDataRepository) {
+        return userDataRepository;
     }
 
     @Provides
@@ -132,14 +133,27 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
+        BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
+        db.setLoggingEnabled(false);
+        return db;
+    }
+
+    @Provides
+    @Singleton
     RestServiceFactory provideServiceFactory() {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         }
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
-        return new RestServiceFactory(httpClient);
+        return new RestServiceFactory(loggingInterceptor);
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferencesDataSource provideSharedPreferences() {
+        return new SharedPreferencesDataSource(
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
     }
 
     @Provides
@@ -153,19 +167,4 @@ public class ApplicationModule {
     PostExecutionThread providePostExecutionThread(UIThread uiThread) {
         return uiThread;
     }
-
-    @Provides
-    @Singleton
-    BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
-        BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
-        db.setLoggingEnabled(false);
-        return db;
-    }
-
-    @Provides
-    @Singleton
-    SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
-        return surveyDataRepository;
-    }
-
 }

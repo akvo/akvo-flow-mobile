@@ -44,6 +44,8 @@ import org.akvo.flow.util.LocationValidator;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.SNACK_BAR_DURATION_IN_MS;
+
 /**
  * Question that can handle geographic location input. This question can also
  * listen to location updates from the GPS sensor on the device.
@@ -270,7 +272,7 @@ public class GeoQuestionView extends QuestionView
         showLocationListenerStopped();
         View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
         snackBarManager.displaySnackBarWithAction(coordinatorLayout, R.string.location_timeout,
-                R.string.retry,
+                R.string.action_retry,
                 new OnClickListener() {
                     @Override
                     public void onClick(View v) {

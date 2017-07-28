@@ -14,14 +14,42 @@
         <ListView
                 android:id="@+id/locales_lv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-        <TextView
-                android:id="@+id/empty_tv"
-                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="@string/no_records_text"/>
+                tools:visibility="gone"/>
+
+        <RelativeLayout
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_above="@+id/empty_title_tv"
+                    android:src="@drawable/ic_format_list_bulleted"/>
+            <TextView
+                    android:id="@+id/empty_title_tv"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_datapoints_error_text"
+                    android:layout_above="@+id/empty_subtitle_tv"
+                    android:textColor="@color/black_disabled"
+                    android:textSize="14sp"/>
+            <TextView
+                    android:id="@+id/empty_subtitle_tv"
+                    android:layout_marginTop="16dp"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="@string/no_records_subtitle_monitored"
+                    android:textColor="@color/black_disabled"
+                    android:textSize="12sp"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
     <ProgressBar

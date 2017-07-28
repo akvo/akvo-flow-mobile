@@ -26,6 +26,7 @@ import android.net.NetworkInfo;
 
 import javax.inject.Inject;
 
+@Deprecated
 public class ConnectivityStateManager {
 
     private final Context context;

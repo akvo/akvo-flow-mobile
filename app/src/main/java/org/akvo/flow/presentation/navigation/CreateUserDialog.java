@@ -96,7 +96,6 @@ public class CreateUserDialog extends DialogFragment {
         });
         main.addView(userNameEt);
         builder.setView(main);
-        builder.setCancelable(false);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

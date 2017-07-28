@@ -47,4 +47,8 @@ public interface FlowNavigationView {
     void displayErrorSelectSurvey();
 
     void displayUserEditError();
+
+    void displayUserDeleteError();
+
+    void displayUserSelectError();
 }

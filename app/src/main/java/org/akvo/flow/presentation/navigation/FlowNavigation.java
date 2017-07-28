@@ -261,35 +261,37 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     @Override
     public void displaySurveyError() {
-        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-        snackBarManager.displaySnackBar(coordinatorLayout, R.string.surveys_error, getContext());
+        snackBarManager.displaySnackBar(this, R.string.surveys_error, getContext());
     }
 
     @Override
     public void displayUsersError() {
-        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-        snackBarManager.displaySnackBar(coordinatorLayout, R.string.users_error, getContext());
+        snackBarManager.displaySnackBar(this, R.string.users_error, getContext());
     }
 
     @Override
     public void displayErrorDeleteSurvey() {
-        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-        snackBarManager
-                .displaySnackBar(coordinatorLayout, R.string.survey_delete_error, getContext());
+        snackBarManager.displaySnackBar(this, R.string.survey_delete_error, getContext());
     }
 
     @Override
     public void displayErrorSelectSurvey() {
-        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-        snackBarManager
-                .displaySnackBar(coordinatorLayout, R.string.survey_select_error, getContext());
+        snackBarManager.displaySnackBar(this, R.string.survey_select_error, getContext());
     }
 
     @Override
     public void displayUserEditError() {
-        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-        snackBarManager
-                .displaySnackBar(coordinatorLayout, R.string.user_edit_error, getContext());
+        snackBarManager.displaySnackBar(this, R.string.user_edit_error, getContext());
+    }
+
+    @Override
+    public void displayUserDeleteError() {
+        snackBarManager.displaySnackBar(this, R.string.user_delete_error, getContext());
+    }
+
+    @Override
+    public void displayUserSelectError() {
+        snackBarManager.displaySnackBar(this, R.string.user_select_error, getContext());
     }
 
     @Override

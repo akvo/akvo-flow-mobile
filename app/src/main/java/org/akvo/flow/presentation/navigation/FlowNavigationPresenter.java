@@ -199,6 +199,7 @@ public class FlowNavigationPresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
+                view.displayUserDeleteError();
             }
         }, params);
     }
@@ -213,6 +214,7 @@ public class FlowNavigationPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
+                    view.displayUserSelectError();
                 }
 
                 @Override

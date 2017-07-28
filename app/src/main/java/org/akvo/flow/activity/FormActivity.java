@@ -648,7 +648,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         QuestionResponse questionResponse = mQuestionResponses.remove(questionId);
         if (questionResponse.isAnswerToRepeatableGroup()) {
             mDatabase.deleteResponse(mSurveyInstanceId, questionResponse.getQuestionId(),
-                    questionResponse.getIteration()+"");
+                    questionResponse.getIteration() + "");
         } else {
             mDatabase.deleteResponse(mSurveyInstanceId, questionId);
         }
@@ -733,7 +733,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         // Store the response if it contains a value. Otherwise, delete it
         if (eventResponse != null && eventResponse.hasValue()) {
             Long id = mQuestionResponses.containsKey(questionIdKey) ?
-                    mQuestionResponses.get(questionIdKey).getId(): null;
+                    mQuestionResponses.get(questionIdKey).getId() : null;
             QuestionResponse responseToSave = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(eventResponse.getValue())
                     .setType(eventResponse.getType())

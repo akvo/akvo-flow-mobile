@@ -434,7 +434,7 @@ public class Question {
 
     public String getQuestionId() {
         if (isRepeatable()) {
-            String [] questionIdAndIteration = id.split("\\|");
+            String[] questionIdAndIteration = id.split("\\|");
             return questionIdAndIteration[0];
         } else {
             return id;

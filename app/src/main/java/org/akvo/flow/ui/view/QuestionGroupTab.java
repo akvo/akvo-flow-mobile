@@ -67,7 +67,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
     private TextView mRepetitionsText;
 
     private final Map<Integer, QuestionGroupIterationHeader> groupIterationHeaders;
-    private final RepeatableGroupIterations groupIterations;// Repetition IDs
+    private final RepeatableGroupIterations groupIterations;
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -266,17 +266,14 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
     }
 
     private void loadGroup(int index) {
-        final int repetitionId =
-                groupIterations.size() <= index ?
-                        groupIterations.next() :
-                        groupIterations.getRepetitionId(index);
-        final int position = index + 1;// Visual indicator.
+        final int repetitionId = getRepetitionId(index);
+        final int visualIndicator = index + 1;
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
             QuestionGroupIterationHeader header =
                     new QuestionGroupIterationHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
-                            position, mSurveyListener.isReadOnly() ? null : this);
+                            visualIndicator, mSurveyListener.isReadOnly() ? null : this);
             groupIterationHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -285,7 +282,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
                 q = Question
-                        .copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
+                        .copy(q, q.getId() + "|" + repetitionId);
             }
 
             QuestionView questionView;
@@ -327,6 +324,12 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
             inflate(getContext(), R.layout.divider, questionView);
             mContainer.addView(questionView);
         }
+    }
+
+    private int getRepetitionId(int index) {
+        return groupIterations.size() <= index ?
+                groupIterations.next() :
+                groupIterations.getRepetitionId(index);
     }
 
     @Override

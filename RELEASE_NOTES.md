@@ -1,5 +1,20 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.6
+Date: 20 July 2017
+
+# New and noteworthy
+* **Remove Power management from Settings** - [#795](https://github.com/akvo/akvo-flow-mobile/issues/795) You can no longer turn off wifi using the app settings section.
+* **About page access** - [#771](https://github.com/akvo/akvo-flow-mobile/issues/771) The about page is now accessed from the hamburger side menu.
+* **SurveyActivity move "+" menu entry to FAB** - [#669](https://github.com/akvo/akvo-flow-mobile/issues/669) New floating action button to add a datapoint.
+
+# Resolved issues
+* **Release information missing in sentry after moving to the new SDK** - [#777](https://github.com/akvo/akvo-flow-mobile/issues/777) Fixed missing release information for crash reporting.
+* **On some old devices, error messages have white text over white background** - [#750](https://github.com/akvo/akvo-flow-mobile/issues/750) Fixed error messages background on phones with Android 2.3.
+* **GeoQuestion view: Fix crash related to SnackBar on some devices** - [#743](https://github.com/akvo/akvo-flow-mobile/issues/743) Fixed random crash related to SnackBar when displaying error messages.
+* **Code cleanup: remove old and/or unused code** - [#571](https://github.com/akvo/akvo-flow-mobile/issues/571) Cleaned up and removed unused code.
+
+---------------
 # ver 2.3.5
 Date: 29 June 2017
 

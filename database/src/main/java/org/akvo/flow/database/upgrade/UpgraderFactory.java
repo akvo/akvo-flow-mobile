@@ -49,6 +49,8 @@ public class UpgraderFactory {
                     databaseUpgrader.addUpgrader(new PreferencesUpgrader(helper, db));
                 case DatabaseHelper.VER_LANGUAGES_MIGRATE:
                     databaseUpgrader.addUpgrader(new LanguagesUpgrader(helper, db));
+                default:
+                    break;
             }
         }
         return databaseUpgrader;

@@ -27,9 +27,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,7 +36,8 @@ import android.widget.LinearLayout;
 import org.akvo.flow.R;
 
 //TODO: rotating dialog, the text gets lost
-public class CreateUserDialog extends DialogFragment {
+public class CreateUserDialog extends DialogFragment implements
+        UsernameInputTextWatcher.UsernameWatcherListener {
 
     public static final String TAG = "CreateUserDialog";
 
@@ -77,23 +76,7 @@ public class CreateUserDialog extends DialogFragment {
         userNameEt.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         userNameEt.setSingleLine();
-        userNameEt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-                //EMPTY
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //EMPTY
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updatePositiveButton();
-            }
-        });
+        userNameEt.addTextChangedListener(new UsernameInputTextWatcher(this));
         main.addView(userNameEt);
         builder.setView(main);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
@@ -118,7 +101,8 @@ public class CreateUserDialog extends DialogFragment {
         return builder.create();
     }
 
-    private void updatePositiveButton() {
+    @Override
+    public void updateTextChanged() {
         String text = userNameEt.getText().toString();
         if (TextUtils.isEmpty(text)) {
             disablePositiveButton();
@@ -130,7 +114,7 @@ public class CreateUserDialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-        updatePositiveButton();
+        updateTextChanged();
     }
 
     private void disablePositiveButton() {

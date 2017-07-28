@@ -26,10 +26,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -41,6 +43,7 @@ public class CreateUserDialog extends DialogFragment implements
 
     public static final String TAG = "CreateUserDialog";
 
+    private PositiveButtonHandler positiveButtonHandler;
     private CreateUserListener listener;
     private EditText userNameEt;
 
@@ -101,13 +104,21 @@ public class CreateUserDialog extends DialogFragment implements
         return builder.create();
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+        positiveButtonHandler = new PositiveButtonHandler(this);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
     @Override
     public void updateTextChanged() {
         String text = userNameEt.getText().toString();
         if (TextUtils.isEmpty(text)) {
-            disablePositiveButton();
+            positiveButtonHandler.disablePositiveButton();
         } else {
-            enablePositiveButton();
+            positiveButtonHandler.enablePositiveButton();
         }
     }
 
@@ -115,21 +126,6 @@ public class CreateUserDialog extends DialogFragment implements
     public void onResume() {
         super.onResume();
         updateTextChanged();
-    }
-
-    private void disablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(false);
-    }
-
-    private Button getPositiveButton() {
-        AlertDialog dialog = (AlertDialog) getDialog();
-        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-    }
-
-    private void enablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(true);
     }
 
     public interface CreateUserListener {

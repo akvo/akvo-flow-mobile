@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.presentation.navigation;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,13 +31,14 @@ import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
-import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.util.ConstantUtil;
 
-public class EditUserDialog extends DialogFragment {
+public class EditUserDialog extends DialogFragment implements
+        UsernameInputTextWatcher.UsernameWatcherListener {
 
     public static final String TAG = "EditUserDialog";
 
@@ -65,7 +66,7 @@ public class EditUserDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        listener = (EditUserListener)getActivity();
+        listener = (EditUserListener) getActivity();
     }
 
     @Override
@@ -84,6 +85,7 @@ public class EditUserDialog extends DialogFragment {
         builder.setTitle(R.string.edit_user);
         userNameEt = (EditText) main.findViewById(R.id.user_name_et);
         userNameEt.setText(viewUser.getName());
+        userNameEt.addTextChangedListener(new UsernameInputTextWatcher(this));
         builder.setView(main);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override
@@ -111,6 +113,37 @@ public class EditUserDialog extends DialogFragment {
                 });
 
         return builder.create();
+    }
+
+    @Override
+    public void updateTextChanged() {
+        String text = userNameEt.getText().toString();
+        if (TextUtils.isEmpty(text)) {
+            disablePositiveButton();
+        } else {
+            enablePositiveButton();
+        }
+    }
+
+    private void disablePositiveButton() {
+        Button button = getPositiveButton();
+        button.setEnabled(false);
+    }
+
+    private Button getPositiveButton() {
+        AlertDialog dialog = (AlertDialog) getDialog();
+        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+    }
+
+    private void enablePositiveButton() {
+        Button button = getPositiveButton();
+        button.setEnabled(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateTextChanged();
     }
 
     public interface EditUserListener {

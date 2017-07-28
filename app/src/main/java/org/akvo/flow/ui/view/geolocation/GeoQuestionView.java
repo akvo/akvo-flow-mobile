@@ -309,8 +309,7 @@ public class GeoQuestionView extends QuestionView
         final String lon = geoInputContainer.getLongitudeText();
         if (locationValidator.validCoordinates(lat, lon)) {
             updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
-            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+            setGeoQuestionResponse(lat, lon);
         } else {
             resetCode();
             setResponse(null);
@@ -324,9 +323,17 @@ public class GeoQuestionView extends QuestionView
         if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
             setResponse(null);
         } else {
-            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+            setGeoQuestionResponse(lat, lon);
         }
+    }
+
+    private void setGeoQuestionResponse(String lat, String lon) {
+        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(getResponse(lat, lon))
+                .setType(ConstantUtil.GEO_RESPONSE_TYPE)
+                .setQuestionId(getQuestion().getId())
+                .createQuestionResponse();
+        setResponse(questionResponse);
     }
 
     @NonNull

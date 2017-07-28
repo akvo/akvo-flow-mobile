@@ -28,7 +28,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -80,7 +79,7 @@ public class EditUserDialog extends DialogFragment {
         super.onCreateDialog(savedInstanceState);
         Context context = getContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View main = LayoutInflater.from(context).inflate(R.layout.edit_user_dialog, null);
+        View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);
         builder.setTitle(R.string.edit_user);
         userNameEt = (EditText) main.findViewById(R.id.user_name_et);
         userNameEt.setText(viewUser.getName());

@@ -30,10 +30,10 @@ import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.ViewGroup;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
 
@@ -66,17 +66,11 @@ public class CreateUserDialog extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         //TODO: use xml
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        LinearLayout main = new LinearLayout(getContext());
-        main.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-        main.setOrientation(LinearLayout.VERTICAL);
+        Context context = getContext();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);
         builder.setTitle(R.string.add_user);
-        builder.setMessage(R.string.username);
-        userNameEt = new EditText(getActivity());
-        userNameEt.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        userNameEt.setSingleLine();
+        userNameEt = (EditText) main.findViewById(R.id.user_name_et);
         userNameEt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
@@ -94,7 +88,6 @@ public class CreateUserDialog extends DialogFragment {
                 updatePositiveButton();
             }
         });
-        main.addView(userNameEt);
         builder.setView(main);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override

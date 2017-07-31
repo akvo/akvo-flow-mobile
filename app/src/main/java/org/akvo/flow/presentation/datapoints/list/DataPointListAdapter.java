@@ -24,6 +24,7 @@ import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,18 +49,27 @@ import java.util.List;
  */
 class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
 
-    private Double mLatitude;
-    private Double mLongitude;
-    private final SurveyGroup mSurveyGroup;
+    private Double latitude;
+    private Double longitude;
     private final LayoutInflater inflater;
+    private final String dataLabel;
 
-    DataPointListAdapter(Context context, @Nullable Double mLatitude,
-            @Nullable Double mLongitude, SurveyGroup mSurveyGroup) {
+    DataPointListAdapter(Context context, @Nullable Double latitude,
+            @Nullable Double longitude, SurveyGroup surveyGroup) {
         super(context, R.layout.surveyed_locale_item);
-        this.mLatitude = mLatitude;
-        this.mLongitude = mLongitude;
-        this.mSurveyGroup = mSurveyGroup;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.inflater = LayoutInflater.from(context);
+        this.dataLabel = context.getString(getDateLabel(surveyGroup));
+    }
+
+    @StringRes
+    private int getDateLabel(SurveyGroup surveyGroup) {
+        if (surveyGroup != null && surveyGroup.isMonitored()) {
+            return R.string.last_modified_monitored;
+        } else {
+            return R.string.last_modified_regular;
+        }
     }
 
     @NonNull
@@ -78,14 +88,14 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         TextView statusView = (TextView) view.findViewById(R.id.status);
         ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
 
-        final ListDataPoint surveyedLocale = getItem(position);
+        final ListDataPoint dataPoint = getItem(position);
         Context context = parent.getContext();
-        int status = surveyedLocale.getStatus();
-        nameView.setText(surveyedLocale.getDisplayName());
-        idView.setText(surveyedLocale.getId());
+        int status = dataPoint.getStatus();
+        nameView.setText(dataPoint.getDisplayName());
+        idView.setText(dataPoint.getId());
 
-        displayDistanceText(distanceView, getDistanceText(surveyedLocale, context));
-        displayDateText(dateView, surveyedLocale.getLastModified());
+        displayDistanceText(distanceView, getDistanceText(dataPoint, context));
+        displayDateText(dateView, dataPoint.getLastModified());
 
         int statusRes = 0;
         String statusText = null;
@@ -119,14 +129,14 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         return view;
     }
 
-    private String getDistanceText(@NonNull ListDataPoint surveyedLocale, Context context) {
+    private String getDistanceText(@NonNull ListDataPoint dataPoint, Context context) {
         StringBuilder builder = new StringBuilder(
                 context.getString(R.string.distance_label) + " ");
 
-        if (mLatitude != null && mLongitude != null && surveyedLocale.isLocationValid()) {
+        if (latitude != null && longitude != null && dataPoint.isLocationValid()) {
             float[] results = new float[1];
-            Location.distanceBetween(mLatitude, mLongitude, surveyedLocale.getLatitude(),
-                    surveyedLocale.getLongitude(), results);
+            Location.distanceBetween(latitude, longitude, dataPoint.getLatitude(),
+                    dataPoint.getLongitude(), results);
             final double distance = results[0];
 
             builder.append(GeoUtil.getDisplayLength(distance));
@@ -139,12 +149,7 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
     private void displayDateText(TextView tv, Long time) {
         if (time != null && time > 0) {
             tv.setVisibility(View.VISIBLE);
-            int labelRes = R.string.last_modified_regular;
-            if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-                labelRes = R.string.last_modified_monitored;
-            }
-            tv.setText(tv.getContext().getString(labelRes) + " " + new PrettyTime()
-                    .format(new Date(time)));
+            tv.setText(dataLabel + " " + new PrettyTime().format(new Date(time)));
         } else {
             tv.setVisibility(View.GONE);
         }
@@ -159,16 +164,16 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         }
     }
 
-    void setLocales(List<ListDataPoint> surveyedLocales) {
+    void setDataPoints(List<ListDataPoint> dataPoints) {
         clear();
-        for (ListDataPoint sl : surveyedLocales) {
+        for (ListDataPoint sl : dataPoints) {
             add(sl);
         }
         notifyDataSetChanged();
     }
 
     void updateLocation(double latitude, double longitude) {
-        this.mLatitude = latitude;
-        this.mLongitude = longitude;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }

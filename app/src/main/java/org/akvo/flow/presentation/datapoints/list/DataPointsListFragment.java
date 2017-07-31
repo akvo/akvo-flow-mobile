@@ -147,11 +147,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
-        if (mAdapter == null) {
-            mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude,
-                    surveyGroup);
-            listView.setAdapter(mAdapter);
-        }
+        mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
+        listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         progressBar = (ProgressBar) view.findViewById(R.id.progress);
         initializeInjector();
@@ -339,7 +336,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void displayData(List<ListDataPoint> listDataPoints) {
         if (mAdapter != null) {
-            mAdapter.setLocales(listDataPoints);
+            mAdapter.setDataPoints(listDataPoints);
         }
     }
 

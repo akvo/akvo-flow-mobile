@@ -646,7 +646,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void deleteResponse(String questionId) {
         QuestionResponse questionResponse = mQuestionResponses.remove(questionId);
-        if (questionResponse.isAnswerToRepeatableGroup()) {
+        if (questionResponse != null && questionResponse.isAnswerToRepeatableGroup()) {
             mDatabase.deleteResponse(mSurveyInstanceId, questionResponse.getQuestionId(),
                     questionResponse.getIteration() + "");
         } else {

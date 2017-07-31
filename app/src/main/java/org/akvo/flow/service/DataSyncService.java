@@ -321,6 +321,7 @@ public class DataSyncService extends IntentService {
             int answer_type_col = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
             int answer_col = data.getColumnIndexOrThrow(ResponseColumns.ANSWER);
             int filename_col = data.getColumnIndexOrThrow(ResponseColumns.FILENAME);
+            int iterationColumn = data.getColumnIndexOrThrow(ResponseColumns.ITERATION);
             int disp_name_col = data.getColumnIndexOrThrow(UserColumns.NAME);
             int email_col = data.getColumnIndexOrThrow(UserColumns.EMAIL);
             int submitted_date_col = data
@@ -371,17 +372,17 @@ public class DataSyncService extends IntentService {
                     }
                 }
 
-                int iteration = 0;
-                String qid = data.getString(question_fk_col);
-                String[] tokens = qid.split("\\|", -1);
+                String rawQuestionId = data.getString(question_fk_col);
+                int iteration = data.getInt(iterationColumn);
+                String[] tokens = rawQuestionId.split("\\|", -1);
                 if (tokens.length == 2) {
                     // This is a compound ID from a repeatable question
-                    qid = tokens[0];
+                    rawQuestionId = tokens[0];
                     iteration = Integer.parseInt(tokens[1]);
                 }
-
+                iteration = Math.max(iteration, 0);
                 Response response = new Response();
-                response.setQuestionId(qid);
+                response.setQuestionId(rawQuestionId);
                 response.setAnswerType(type);
                 response.setValue(value);
                 response.setIteration(iteration);

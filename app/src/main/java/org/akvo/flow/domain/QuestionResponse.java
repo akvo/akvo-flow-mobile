@@ -172,7 +172,7 @@ public class QuestionResponse {
         private Long surveyInstanceId;
         private String questionId;
         private String filename;
-        private boolean includeFlag;
+        private boolean includeFlag = true;
         private int iteration = NO_ITERATION;
 
         public QuestionResponseBuilder setValue(String value) {

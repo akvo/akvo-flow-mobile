@@ -37,14 +37,13 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LocationValidator;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.util.ConstantUtil.SNACK_BAR_DURATION_IN_MS;
 
 /**
  * Question that can handle geographic location input. This question can also

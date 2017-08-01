@@ -74,9 +74,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Nullable
     private RecordListListener mListener;
 
-    @Inject
-    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
-
     private List<MapDataPoint> mItems;
 
     private boolean displayMonitoredMenu;
@@ -86,6 +83,9 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Nullable
     private GoogleMap mMap;
+
+    @Inject
+    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
     @Inject
     DataPointsMapPresenter presenter;
@@ -99,7 +99,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         GoogleMapOptions options = new GoogleMapOptions();
         options.zOrderOnTop(true);
         args.putParcelable(MAP_OPTIONS, options);
@@ -145,7 +144,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         initializeInjector();
         presenter.setView(this);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         presenter.onDataReady(surveyGroup);
         getMapAsync(this);
     }
@@ -368,10 +367,10 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public void showErrorSync() {
         dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               presenter.onSyncRecordsPressed();
-           }
-       });
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 }

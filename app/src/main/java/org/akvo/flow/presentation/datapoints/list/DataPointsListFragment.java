@@ -102,7 +102,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -145,7 +145,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         emptyTitleTv = (TextView) view.findViewById(R.id.empty_title_tv);
         emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
@@ -221,6 +221,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     public void refresh(SurveyGroup surveyGroup) {
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         presenter.onDataReady(surveyGroup);
         presenter.refresh();
     }

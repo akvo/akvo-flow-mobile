@@ -54,7 +54,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
-import org.akvo.flow.presentation.datapoints.DataPointSyncView;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment;
@@ -70,7 +69,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 public class DataPointsListFragment extends Fragment implements LocationListener,
-        OnItemClickListener, OrderByDialogListener, DataPointsListView, DataPointSyncView {
+        OnItemClickListener, OrderByDialogListener, DataPointsListView {
 
     private LocationManager mLocationManager;
     private Double mLatitude = null;
@@ -89,8 +88,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
 
-    private final DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
-            this);
+    @Inject
+    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
     @Inject
     Navigator navigator;
@@ -358,42 +357,42 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showSyncedResults(int numberOfSyncedItems) {
-        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems);
+        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems, getView());
     }
 
     @Override
     public void showErrorAssignmentMissing() {
-        dataPointSyncSnackBarManager.showErrorAssignmentMissing();
+        dataPointSyncSnackBarManager.showErrorAssignmentMissing(getView());
     }
 
     @Override
     public void showErrorSyncNotAllowed() {
-        dataPointSyncSnackBarManager.showErrorSyncNotAllowed();
+        dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigator.navigateToPreferences(getActivity());
+            }
+        });
     }
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork();
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 
     @Override
     public void showErrorSync() {
-        dataPointSyncSnackBarManager.showErrorSync();
-    }
-
-    @Override
-    public void onRetryRequested() {
-        presenter.onSyncRecordsPressed();
-    }
-
-    @Override
-    public View getRootView() {
-        return getView();
-    }
-
-    @Override
-    public void onSettingsPressed() {
-        navigator.navigateToPreferences(getActivity());
+        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 
     //TODO: once we insert data using brite database this will no longer be necessary either

@@ -55,7 +55,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
-import org.akvo.flow.presentation.datapoints.DataPointSyncView;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -67,7 +66,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class DataPointsMapFragment extends SupportMapFragment implements OnInfoWindowClickListener,
-        OnMapReadyCallback, DataPointsMapView, DataPointSyncView {
+        OnMapReadyCallback, DataPointsMapView {
 
     private static final int MAP_ZOOM_LEVEL = 10;
     private static final String MAP_OPTIONS = "MapOptions";
@@ -75,8 +74,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Nullable
     private RecordListListener mListener;
 
-    private final DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
-            this);
+    @Inject
+    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
     private List<MapDataPoint> mItems;
 
@@ -338,41 +337,41 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Override
     public void showSyncedResults(int numberOfSyncedItems) {
-        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems);
+        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems, getView());
     }
 
     @Override
     public void showErrorAssignmentMissing() {
-        dataPointSyncSnackBarManager.showErrorAssignmentMissing();
+        dataPointSyncSnackBarManager.showErrorAssignmentMissing(getView());
     }
 
     @Override
     public void showErrorSyncNotAllowed() {
-        dataPointSyncSnackBarManager.showErrorSyncNotAllowed();
+        dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigator.navigateToPreferences(getActivity());
+            }
+        });
     }
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork();
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 
     @Override
     public void showErrorSync() {
-       dataPointSyncSnackBarManager.showErrorSync();
-    }
-
-    @Override
-    public void onRetryRequested() {
-        presenter.onSyncRecordsPressed();
-    }
-
-    @Override
-    public View getRootView() {
-        return getView();
-    }
-
-    @Override
-    public void onSettingsPressed() {
-        navigator.navigateToPreferences(getActivity());
+        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               presenter.onSyncRecordsPressed();
+           }
+       });
     }
 }

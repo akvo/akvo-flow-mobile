@@ -36,18 +36,22 @@ public class FlowRestApi {
     private final String imei;
     private final String phoneNumber;
     private final RestServiceFactory serviceFactory;
+    private final Encoder encoder;
 
     @Inject
-    public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
+    public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
+            Encoder encoder) {
         this.androidId = deviceHelper.getAndroidId();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
         this.serviceFactory = serviceFactory;
+        this.encoder = encoder;
     }
 
     public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
+        String phoneNumber = encoder.encodeParam(this.phoneNumber);
         return serviceFactory.createRetrofitService(baseUrl, DataPointSyncService.class, apiKey)
                 .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "");
     }

@@ -26,20 +26,15 @@ import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
-import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
-import org.akvo.flow.presentation.legal.LegalNoticesActivity;
-import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.ui.fragment.DrawerFragment;
-import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.navigation.FlowNavigation;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
-import org.akvo.flow.presentation.navigation.FlowNavigation;
 
 import dagger.Component;
 

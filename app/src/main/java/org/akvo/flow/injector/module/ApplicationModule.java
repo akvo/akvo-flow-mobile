@@ -58,9 +58,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import rx.schedulers.Schedulers;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.schedulers.Schedulers;
 

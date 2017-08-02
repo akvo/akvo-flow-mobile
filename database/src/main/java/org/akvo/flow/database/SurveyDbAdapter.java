@@ -58,8 +58,6 @@ public class SurveyDbAdapter {
             "survey LEFT OUTER JOIN survey_instance ON "
             + "survey.survey_id=survey_instance.survey_id";
 
-    public static final int DOES_NOT_EXIST = -1;
-
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
@@ -110,7 +108,8 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
                         SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.DURATION,
                         ResponseColumns.ANSWER, ResponseColumns.TYPE, ResponseColumns.QUESTION_ID,
-                        ResponseColumns.FILENAME, UserColumns.NAME, UserColumns.EMAIL
+                        ResponseColumns.FILENAME, UserColumns.NAME, UserColumns.EMAIL,
+                        ResponseColumns.ITERATION
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.INCLUDE + " = 1",
                 new String[] {

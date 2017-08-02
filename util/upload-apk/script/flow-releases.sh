@@ -64,6 +64,7 @@ for i in $(cat tmp/instances.txt); do
 
         echo "generating apk version" $version "for instance" $i "and build" $build
         cp $FLOW_SERVER_CONFIG/$i/survey.properties data/src/main/res/raw/survey.properties
+        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
         ./gradlew $build
         mkdir -p builds/$i/$version
         mv app/bin/flow.apk $filename

@@ -259,10 +259,6 @@ public class ConstantUtil {
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
 
-    //extras
-    public static final String EXTRA_RECORD_ID = "record_id";
-    public static final String EXTRA_SURVEY_GROUP = "survey_group";
-
     //view tags
     public static final int SURVEY_ID_TAG_KEY = R.integer.surveyidkey;
     public static final int RESPONDENT_ID_TAG_KEY = R.integer.respidkey;

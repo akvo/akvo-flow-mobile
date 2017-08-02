@@ -32,6 +32,7 @@ import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.FileDataRepository;
@@ -54,6 +55,10 @@ import org.akvo.flow.util.logging.RavenEventBuilderHelper;
 import org.akvo.flow.util.logging.ReleaseLoggingHelper;
 import org.akvo.flow.util.logging.TagsFactory;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -64,10 +69,12 @@ import rx.schedulers.Schedulers;
 @Module
 public class ApplicationModule {
 
-    private final FlowApp application;
-
+    public static final String DATA_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    public static final String TIMEZONE = "GMT";
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
+
+    private final FlowApp application;
 
     public ApplicationModule(FlowApp application) {
         this.application = application;
@@ -143,7 +150,9 @@ public class ApplicationModule {
         if (BuildConfig.DEBUG) {
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         }
-        return new RestServiceFactory(loggingInterceptor);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_PATTERN, Locale.US);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+        return new RestServiceFactory(loggingInterceptor, simpleDateFormat, new Encoder());
     }
 
     @Provides

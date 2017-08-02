@@ -40,7 +40,6 @@ import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionColumns;
-import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
@@ -58,8 +57,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-
-import timber.log.Timber;
 
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture

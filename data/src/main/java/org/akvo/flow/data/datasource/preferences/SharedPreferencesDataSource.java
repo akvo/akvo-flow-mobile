@@ -82,19 +82,19 @@ public class SharedPreferencesDataSource {
         preferences.edit().putLong(key, value).apply();
     }
 
-    public void setBoolean(String key, boolean value) {
+    private void setBoolean(String key, boolean value) {
         preferences.edit().putBoolean(key, value).apply();
     }
 
-    public int getInt(String key, int defValue) {
+    private int getInt(String key, int defValue) {
         return preferences.getInt(key, defValue);
     }
 
-    public void setInt(String key, int value) {
+    private void setInt(String key, int value) {
         preferences.edit().putInt(key, value).apply();
     }
 
-    public void removePreference(String key) {
+    private void removePreference(String key) {
         preferences.edit().remove(key).apply();
     }
 }

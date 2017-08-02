@@ -60,6 +60,10 @@ public class SnackBarManager {
     }
 
     public void displaySnackBar(@Nullable View rootView, @StringRes int message, Context context) {
+       displaySnackBar(rootView, context.getResources().getString(message), context);
+    }
+
+    public void displaySnackBar(@Nullable View rootView, String message, Context context) {
         if (rootView != null) {
             Snackbar snackbar = Snackbar
                     .make(rootView, message, ConstantUtil.SNACK_BAR_DURATION_IN_MS);

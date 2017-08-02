@@ -49,8 +49,8 @@ import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
 public class DataPointsListPresenter implements Presenter {
 
     private final UseCase getSavedDataPoints;
-    private final ListDataPointMapper mapper;
     private final UseCase syncDataPoints;
+    private final ListDataPointMapper mapper;
 
     private DataPointsListView view;
     private SurveyGroup surveyGroup;

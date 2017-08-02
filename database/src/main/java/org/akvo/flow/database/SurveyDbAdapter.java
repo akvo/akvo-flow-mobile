@@ -58,8 +58,6 @@ public class SurveyDbAdapter {
             "survey LEFT OUTER JOIN survey_instance ON "
             + "survey.survey_id=survey_instance.survey_id";
 
-    public static final int DOES_NOT_EXIST = -1;
-
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
@@ -110,7 +108,8 @@ public class SurveyDbAdapter {
                         SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
                         SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.DURATION,
                         ResponseColumns.ANSWER, ResponseColumns.TYPE, ResponseColumns.QUESTION_ID,
-                        ResponseColumns.FILENAME, UserColumns.NAME, UserColumns.EMAIL
+                        ResponseColumns.FILENAME, UserColumns.NAME, UserColumns.EMAIL,
+                        ResponseColumns.ITERATION
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.INCLUDE + " = 1",
                 new String[] {
@@ -236,7 +235,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
                         ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME
+                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
@@ -255,7 +254,7 @@ public class SurveyDbAdapter {
                 new String[] {
                         ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
                         ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME
+                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
                 },
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                         + " =?",
@@ -263,19 +262,46 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public long updateSurveyResponse(Long responseToSaveId, ContentValues initialValues) {
+    public Cursor getResponse(Long surveyInstanceId, String questionId, int iteration) {
+        return database.query(Tables.RESPONSE,
+                new String[] {
+                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
+                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
+                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
+                },
+                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
+                        + " =? AND " + "CAST(" + ResponseColumns.ITERATION + " as TEXT) = ? ",
+                new String[] { String.valueOf(surveyInstanceId), questionId,
+                        String.valueOf(iteration)
+                },
+                null, null, null);
+    }
+
+    public long updateSurveyResponse(Long responseToSaveId,
+            ContentValues initialValues) {
         long insertedResponseId = -1;
         if (responseToSaveId == null) {
-            insertedResponseId = database.insert(Tables.RESPONSE, null, initialValues);
+            insertedResponseId = insertResponse(initialValues);
         } else {
-            if (database.update(Tables.RESPONSE, initialValues, ResponseColumns._ID
-                    + "=?", new String[] {
-                    responseToSaveId.toString()
-            }) > 0) {
+            if (updateResponse(responseToSaveId, initialValues) > 0) {
                 insertedResponseId = responseToSaveId;
             }
         }
         return insertedResponseId;
+    }
+
+    /**
+     * Inserts new response
+     * @param initialValues
+     * @return the id of the inserted row
+     */
+    private long insertResponse(ContentValues initialValues) {
+        return database.insert(Tables.RESPONSE, null, initialValues);
+    }
+
+    private int updateResponse(long responseToSaveId, ContentValues initialValues) {
+        return database.update(Tables.RESPONSE, initialValues, ResponseColumns._ID + "=?",
+                new String[] { String.valueOf(responseToSaveId)});
     }
 
     /**
@@ -395,6 +421,44 @@ public class SurveyDbAdapter {
     }
 
     public void createTransmission(ContentValues values) {
+        database.insert(Tables.TRANSMISSION, null, values);
+    }
+
+    /**
+     * Delete response for a repeated question
+     * @param surveyInstanceId
+     * @param questionId
+     * @param iteration
+     */
+    public void deleteResponse(long surveyInstanceId, String questionId, String iteration) {
+        database.delete(Tables.RESPONSE,
+                ResponseColumns.SURVEY_INSTANCE_ID
+                        + "= ? AND "
+                        + ResponseColumns.QUESTION_ID
+                        + "= ? AND "
+                        + ResponseColumns.ITERATION
+                        + " = ? ",
+                new String[] {
+                        String.valueOf(surveyInstanceId), questionId, iteration
+                });
+    }
+
+    public void createTransmission(long surveyInstanceId, String formID, String filename) {
+        createTransmission(surveyInstanceId, formID, filename, TransmissionStatus.QUEUED);
+    }
+
+    private void createTransmission(long surveyInstanceId, String formID, String filename,
+            int status) {
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
+        values.put(TransmissionColumns.SURVEY_ID, formID);
+        values.put(TransmissionColumns.FILENAME, filename);
+        values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            final String date = String.valueOf(System.currentTimeMillis());
+            values.put(TransmissionColumns.START_DATE, date);
+            values.put(TransmissionColumns.END_DATE, date);
+        }
         database.insert(Tables.TRANSMISSION, null, values);
     }
 

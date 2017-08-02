@@ -172,6 +172,17 @@ public class DatabaseDataSource {
     }
 
     private void syncResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
+        deleteResponses(responses, surveyInstanceId);
+        insertResponses(responses, surveyInstanceId);
+    }
+
+    private void deleteResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
+        for (ApiQuestionAnswer response : responses) {
+            briteSurveyDbAdapter.deleteResponses(surveyInstanceId, response.getQuestionId());
+        }
+    }
+
+    private void insertResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
         for (ApiQuestionAnswer response : responses) {
 
             ContentValues values = new ContentValues();

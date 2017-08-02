@@ -150,8 +150,9 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
                     case R.id.help:
                         navigator.navigateToHelp(context);
                         return true;
+                    default:
+                        return false;
                 }
-                return false;
             }
         });
     }

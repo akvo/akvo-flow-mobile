@@ -18,15 +18,35 @@
  *
  */
 
-package org.akvo.flow.presentation.datapoints;
+package org.akvo.flow.data.net;
 
-import android.view.View;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
-public interface DataPointSyncView {
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
-    void onRetryRequested();
+import javax.inject.Inject;
 
-    View getRootView();
+import timber.log.Timber;
 
-    void onSettingsPressed();
+public class Encoder {
+
+    private static final String CHARSET_UTF8 = "UTF-8";
+
+    @Inject
+    public Encoder() {
+    }
+
+    String encodeParam(@Nullable String param) {
+        if (TextUtils.isEmpty(param)) {
+            return "";
+        }
+        try {
+            return URLEncoder.encode(param, CHARSET_UTF8);
+        } catch (UnsupportedEncodingException e) {
+            Timber.e(e.getMessage());
+            return "";
+        }
+    }
 }

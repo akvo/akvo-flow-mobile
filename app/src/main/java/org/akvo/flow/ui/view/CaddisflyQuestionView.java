@@ -78,9 +78,14 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        QuestionResponse r = new QuestionResponse(mValue, ConstantUtil.CADDISFLY_RESPONSE_TYPE,
-                getQuestion().getId());
-        r.setFilename(mImage);
+        Question question = getQuestion();
+        QuestionResponse r = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(mValue)
+                .setType(ConstantUtil.CADDISFLY_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .setFilename(mImage)
+                .createQuestionResponse();
         setResponse(r);
     }
 

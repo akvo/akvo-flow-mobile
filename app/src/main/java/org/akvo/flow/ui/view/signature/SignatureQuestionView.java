@@ -150,8 +150,12 @@ public class SignatureQuestionView extends QuestionView {
     @Override
     public void captureResponse(boolean suppressListeners) {
         String value = SignatureValue.serialize(mSignature);
-        setResponse(new QuestionResponse(value, ConstantUtil.SIGNATURE_RESPONSE_TYPE,
-                getQuestion().getId()));
+        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(ConstantUtil.SIGNATURE_RESPONSE_TYPE)
+                .setQuestionId(getQuestion().getId())
+                .createQuestionResponse();
+        setResponse(questionResponse);
     }
 
     private void displayResponse(String name, Bitmap imageBitmap) {

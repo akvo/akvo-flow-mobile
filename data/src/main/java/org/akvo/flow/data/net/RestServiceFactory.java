@@ -22,6 +22,7 @@ package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
 
+import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -43,10 +44,15 @@ public class RestServiceFactory {
     public static final int NO_TIMEOUT = 0;
 
     private final HttpLoggingInterceptor loggingInterceptor;
+    private final SimpleDateFormat dateFormat;
+    private final Encoder encoder;
 
     @Inject
-    public RestServiceFactory(HttpLoggingInterceptor loggingInterceptor) {
+    public RestServiceFactory(HttpLoggingInterceptor loggingInterceptor,
+            SimpleDateFormat simpleDateFormat, Encoder encoder) {
         this.loggingInterceptor = loggingInterceptor;
+        this.dateFormat = simpleDateFormat;
+        this.encoder = encoder;
     }
 
     public <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz, String key) {
@@ -54,7 +60,7 @@ public class RestServiceFactory {
         httpClient.addInterceptor(loggingInterceptor);
         httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
         httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
-        httpClient.addInterceptor(new HMACInterceptor(key));
+        httpClient.addInterceptor(new HMACInterceptor(key, dateFormat, encoder));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

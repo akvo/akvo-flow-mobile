@@ -26,6 +26,7 @@ import android.text.TextUtils;
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiLocaleResult;
+import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
@@ -184,12 +185,29 @@ public class SurveyDataRepository implements SurveyRepository {
 
     private Observable<List<ApiDataPoint>> saveToDataBase(ApiLocaleResult apiLocaleResult,
             List<ApiDataPoint> lastBatch, List<ApiDataPoint> allResults) {
-        List<ApiDataPoint> dataPoints = apiLocaleResult.getDataPoints();
+        List<ApiDataPoint> dataPoints = getNonEmptyDataPoints(apiLocaleResult);
         dataPoints.removeAll(lastBatch); //remove duplicates
         lastBatch.clear();
         lastBatch.addAll(dataPoints);
         allResults.addAll(dataPoints);
         return dataSourceFactory.getDataBaseDataSource().syncDataPoints(dataPoints);
+    }
+
+    /**
+     * Removes datapoints which have no survey instances (bug in backend)
+     */
+    private List<ApiDataPoint> getNonEmptyDataPoints(ApiLocaleResult apiLocaleResult) {
+        List<ApiDataPoint> allDataPoints = apiLocaleResult.getDataPoints();
+        List<ApiDataPoint> nonEmptyDataPoints = new ArrayList<>();
+        if (allDataPoints != null) {
+            for (ApiDataPoint dataPoint: allDataPoints) {
+                List<ApiSurveyInstance> surveyInstances = dataPoint.getSurveyInstances();
+                if (surveyInstances != null && !surveyInstances.isEmpty()) {
+                    nonEmptyDataPoints.add(dataPoint);
+                }
+            }
+        }
+        return nonEmptyDataPoints;
     }
 
     private Observable<ApiLocaleResult> loadNewDataPoints(final String baseUrl, final String apiKey,

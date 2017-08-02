@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.ui.view.geolocation;
+package org.akvo.flow.presentation;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

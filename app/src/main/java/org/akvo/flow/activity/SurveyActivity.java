@@ -64,7 +64,6 @@ import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -81,7 +80,7 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener,
+        DatapointsFragment.DatapointFragmentListener,
         FlowNavigation.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener {
 
@@ -319,13 +318,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             String surveyedLocaleId = intent.getDataString();
             onRecordSelected(surveyedLocaleId);
         }
-    }
-
-    @Override
-    public void onUserSelected(User user) {
-        FlowApp.getApp().setUser(user);
-        mDrawerLayout.closeDrawers();
-        displaySelectedUser();
     }
 
     @Override

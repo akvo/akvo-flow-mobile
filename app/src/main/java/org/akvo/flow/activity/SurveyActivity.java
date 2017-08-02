@@ -86,7 +86,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         SurveyDeleteConfirmationDialog.SurveyDeleteListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
-//    private static final String DRAWER_FRAGMENT_TAG = "f";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -105,7 +104,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-//    private DrawerFragment mDrawer;
     private Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
@@ -137,7 +135,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
         apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
 
-        // Init navigation drawer
         initNavigationDrawer();
 
         initDataPointsFragment(savedInstanceState);
@@ -169,8 +166,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initNavigationDrawer() {
-//        FragmentManager supportFragmentManager = getSupportFragmentManager();
-//        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
@@ -178,7 +173,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-//                mDrawer.onDrawerClosed();
                 supportInvalidateOptionsMenu();
             }
 
@@ -330,7 +324,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onUserSelected(User user) {
         FlowApp.getApp().setUser(user);
-//        mDrawer.load();
         mDrawerLayout.closeDrawers();
         displaySelectedUser();
     }
@@ -454,7 +447,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void reloadDrawer() {
-//        mDrawer.load();
+        // TODO:
     }
 
     @OnClick(R.id.add_data_point_fab)

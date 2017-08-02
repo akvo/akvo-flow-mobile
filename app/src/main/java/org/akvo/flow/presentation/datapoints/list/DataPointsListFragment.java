@@ -182,7 +182,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
-        presenter.refresh();
+        presenter.loadDataPoints();
     }
 
     private void updateLocation() {
@@ -220,10 +220,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         super.onDestroy();
     }
 
-    public void refresh(SurveyGroup surveyGroup) {
+    public void onNewSurveySelected(SurveyGroup surveyGroup) {
         getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        presenter.onDataReady(surveyGroup);
-        presenter.refresh();
+        presenter.onNewSurveySelected(surveyGroup);
     }
 
     @Override
@@ -330,7 +329,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     private void refreshLocalData() {
-        presenter.refresh();
+        presenter.loadDataPoints();
     }
 
     @Override

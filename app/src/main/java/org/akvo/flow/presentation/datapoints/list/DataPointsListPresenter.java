@@ -76,7 +76,7 @@ public class DataPointsListPresenter implements Presenter {
         view.displayMenu(monitored);
     }
 
-    void refresh() {
+    void loadDataPoints() {
         if (surveyGroup != null) {
             Map<String, Object> params = new HashMap<>(8);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
@@ -173,7 +173,7 @@ public class DataPointsListPresenter implements Presenter {
                 return;
             }
             this.orderBy = order;
-            refresh();
+            loadDataPoints();
         }
     }
 
@@ -184,5 +184,13 @@ public class DataPointsListPresenter implements Presenter {
 
     void onOrderByClicked() {
         view.showOrderByDialog(orderBy);
+    }
+
+    public void onNewSurveySelected(SurveyGroup surveyGroup) {
+        getSavedDataPoints.unSubscribe();
+        syncDataPoints.unSubscribe();
+        view.hideLoading();
+        onDataReady(surveyGroup);
+        loadDataPoints();
     }
 }

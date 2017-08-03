@@ -149,7 +149,8 @@ public class SurveyDataRepository implements SurveyRepository {
             final long surveyGroupId) {
         final List<ApiDataPoint> lastBatch = new ArrayList<>();
         final List<ApiDataPoint> allResults = new ArrayList<>();
-        return loadAndSave(baseUrl, apiKey, surveyGroupId, lastBatch, allResults)
+        String syncedTime = getSyncedTime(surveyGroupId);
+        return loadAndSave(baseUrl, apiKey, surveyGroupId, lastBatch, allResults, syncedTime)
                 .repeatWhen(new Func1<Observable<? extends Void>, Observable<?>>() {
                     @Override
                     public Observable<?> call(final Observable<? extends Void> observable) {
@@ -177,14 +178,25 @@ public class SurveyDataRepository implements SurveyRepository {
 
     private Observable<List<ApiDataPoint>> loadAndSave(final String baseUrl, final String apiKey,
             final long surveyGroupId, final List<ApiDataPoint> lastBatch,
-            final List<ApiDataPoint> allResults) {
-        return loadNewDataPoints(baseUrl, apiKey, surveyGroupId)
+            final List<ApiDataPoint> allResults, String syncedTime) {
+        return loadNewDataPoints(baseUrl, apiKey, surveyGroupId, syncedTime, lastBatch)
                 .flatMap(new Func1<ApiLocaleResult, Observable<List<ApiDataPoint>>>() {
                     @Override
                     public Observable<List<ApiDataPoint>> call(ApiLocaleResult apiLocaleResult) {
                         return saveToDataBase(apiLocaleResult, lastBatch, allResults);
                     }
                 });
+    }
+
+    private Observable<String> getLatestSyncedTime(String syncedTime,
+            List<ApiDataPoint> lastBatch) {
+        ApiDataPoint apiDataPoint = lastBatch.isEmpty() ?
+                null :
+                lastBatch.get(lastBatch.size() - 1);
+        if (apiDataPoint != null) {
+            syncedTime = String.valueOf(apiDataPoint.getLastModified());
+        }
+        return Observable.just(syncedTime);
     }
 
     private Observable<List<ApiDataPoint>> saveToDataBase(ApiLocaleResult apiLocaleResult,
@@ -215,9 +227,22 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     private Observable<ApiLocaleResult> loadNewDataPoints(final String baseUrl, final String apiKey,
-            final long surveyGroupId) {
-        return restApi
-                .loadNewDataPoints(baseUrl, apiKey, surveyGroupId, getSyncedTime(surveyGroupId));
+            final long surveyGroupId, final String syncedTime, final List<ApiDataPoint> lastBatch) {
+        return Observable.just(true) //necessary or the timestamp does not get updated
+                .concatMap(new Func1<Boolean, Observable<ApiLocaleResult>>() {
+                    @Override
+                    public Observable<ApiLocaleResult> call(Boolean aBoolean) {
+                        return getLatestSyncedTime(syncedTime, lastBatch)
+                                .flatMap(new Func1<String, Observable<ApiLocaleResult>>() {
+                                    @Override
+                                    public Observable<ApiLocaleResult> call(String time) {
+                                        return restApi
+                                                .loadNewDataPoints(baseUrl, apiKey, surveyGroupId,
+                                                        time);
+                                    }
+                                });
+                    }
+                });
     }
 
     @Override

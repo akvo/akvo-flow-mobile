@@ -253,7 +253,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         super.onResume();
         if (mItems.isEmpty()) {
             // Make sure we only fetch the data and center the map once
-            presenter.refresh();
+            presenter.loadDataPoints();
         }
     }
 
@@ -269,10 +269,9 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         super.onDestroy();
     }
 
-    public void refreshData(SurveyGroup surveyGroup) {
+    public void onNewSurveySelected(SurveyGroup surveyGroup) {
         getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        presenter.onDataReady(surveyGroup);
-        presenter.refresh();
+        presenter.onNewSurveySelected(surveyGroup);
     }
 
     @Override

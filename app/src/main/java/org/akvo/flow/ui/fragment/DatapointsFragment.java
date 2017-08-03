@@ -39,9 +39,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.injector.component.DaggerViewComponent;
-import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.util.ConstantUtil;
@@ -200,10 +197,10 @@ public class DatapointsFragment extends Fragment {
                     .get(POSITION_MAP);
 
             if (listFragment != null) {
-                listFragment.refresh(surveyGroup);
+                listFragment.onNewSurveySelected(surveyGroup);
             }
             if (mapFragment != null) {
-                mapFragment.refreshData(surveyGroup);
+                mapFragment.onNewSurveySelected(surveyGroup);
             }
         }
 

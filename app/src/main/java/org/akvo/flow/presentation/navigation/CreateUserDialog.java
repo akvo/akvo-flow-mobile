@@ -26,23 +26,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
 
 //TODO: rotating dialog, the text gets lost
-public class CreateUserDialog extends DialogFragment {
+public class CreateUserDialog extends DialogFragment implements
+        UsernameInputTextWatcher.UsernameWatcherListener {
 
     public static final String TAG = "CreateUserDialog";
 
+    private PositiveButtonHandler positiveButtonHandler;
     private CreateUserListener listener;
     private EditText userNameEt;
 
@@ -75,23 +76,7 @@ public class CreateUserDialog extends DialogFragment {
         View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);
         builder.setTitle(R.string.add_user);
         userNameEt = (EditText) main.findViewById(R.id.user_name_et);
-        userNameEt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-                //EMPTY
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //EMPTY
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updatePositiveButton();
-            }
-        });
+        userNameEt.addTextChangedListener(new UsernameInputTextWatcher(this));
         builder.setView(main);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override
@@ -115,34 +100,28 @@ public class CreateUserDialog extends DialogFragment {
         return builder.create();
     }
 
-    private void updatePositiveButton() {
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+        positiveButtonHandler = new PositiveButtonHandler(this);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void updateTextChanged() {
         String text = userNameEt.getText().toString();
         if (TextUtils.isEmpty(text)) {
-            disablePositiveButton();
+            positiveButtonHandler.disablePositiveButton();
         } else {
-            enablePositiveButton();
+            positiveButtonHandler.enablePositiveButton();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updatePositiveButton();
-    }
-
-    private void disablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(false);
-    }
-
-    private Button getPositiveButton() {
-        AlertDialog dialog = (AlertDialog) getDialog();
-        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-    }
-
-    private void enablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(true);
+        updateTextChanged();
     }
 
     public interface CreateUserListener {

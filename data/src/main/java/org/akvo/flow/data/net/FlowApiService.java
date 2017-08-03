@@ -20,7 +20,7 @@ package org.akvo.flow.data.net;
 import org.akvo.flow.data.entity.ApiApkData;
 import org.akvo.flow.data.util.Constants;
 
-import retrofit.http.GET;
+import retrofit2.http.GET;
 import rx.Observable;
 
 public interface FlowApiService {

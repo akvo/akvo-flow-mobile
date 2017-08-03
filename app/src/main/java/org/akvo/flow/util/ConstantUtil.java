@@ -133,6 +133,8 @@ public class ConstantUtil {
     public static final String SURVEY_GROUP_EXTRA = "survey_group";
     public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
     public static final String RECORD_ID_EXTRA = "record_id";
+    public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
+    public static final String VIEW_USER_EXTRA = "view_user";
 
     /**
      * settings keys
@@ -258,20 +260,6 @@ public class ConstantUtil {
     public static final int CADDISFLY_REQUEST = 5;
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
-
-    //extras
-    public static final String EXTRA_RECORD_ID = "record_id";
-    public static final String EXTRA_SURVEY_GROUP = "survey_group";
-    public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
-    public static final String EXTRA_DATAPOINT_SYNC_RESULT = "datapoint_sync_result";
-    public static final String EXTRA_DATAPOINT_NUMBER = "datapoint_number";
-    public static final String EXTRA_VIEW_USER = "view_user";
-
-    //data point sync result codes
-    public static final int DATA_SYNC_RESULT_SUCCESS = 0;
-    public static final int DATA_SYNC_RESULT_ERROR_UNKNOWN = 1;
-    public static final int DATA_SYNC_RESULT_ERROR_NETWORK = 2;
-    public static final int DATA_SYNC_RESULT_ERROR_MISSING_ASSIGNMENT = 3;
 
     //view tags
     public static final int SURVEY_ID_TAG_KEY = R.integer.surveyidkey;

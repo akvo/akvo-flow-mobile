@@ -55,7 +55,7 @@ public class UserMapper {
     @NonNull
     public List<ViewUser> transform(List<User> users) {
         List<ViewUser> viewUsers = new ArrayList<>();
-        for (User u: users) {
+        for (User u : users) {
             ViewUser viewUser = transform(u);
             if (viewUser != null) {
                 viewUsers.add(viewUser);

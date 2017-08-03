@@ -54,7 +54,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
-import org.akvo.flow.presentation.datapoints.DataPointSyncView;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment;
@@ -70,7 +69,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 public class DataPointsListFragment extends Fragment implements LocationListener,
-        OnItemClickListener, OrderByDialogListener, DataPointsListView, DataPointSyncView {
+        OnItemClickListener, OrderByDialogListener, DataPointsListView {
 
     private LocationManager mLocationManager;
     private Double mLatitude = null;
@@ -89,8 +88,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
 
-    private final DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
-            this);
+    @Inject
+    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
     @Inject
     Navigator navigator;
@@ -103,7 +102,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -146,12 +145,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         emptyTitleTv = (TextView) view.findViewById(R.id.empty_title_tv);
         emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
-        if (mAdapter == null) {
-            mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude,
-                    surveyGroup);
-            listView.setAdapter(mAdapter);
-        }
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
+        listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         progressBar = (ProgressBar) view.findViewById(R.id.progress);
         initializeInjector();
@@ -186,7 +182,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
-        presenter.refresh();
+        presenter.loadDataPoints();
     }
 
     private void updateLocation() {
@@ -224,9 +220,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         super.onDestroy();
     }
 
-    public void refresh(SurveyGroup surveyGroup) {
-        presenter.onDataReady(surveyGroup);
-        presenter.refresh();
+    public void onNewSurveySelected(SurveyGroup surveyGroup) {
+        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        presenter.onNewSurveySelected(surveyGroup);
     }
 
     @Override
@@ -287,7 +283,6 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.order_by:
                 presenter.onOrderByClicked();
@@ -334,13 +329,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     private void refreshLocalData() {
-        presenter.refresh();
+        presenter.loadDataPoints();
     }
 
     @Override
     public void displayData(List<ListDataPoint> listDataPoints) {
         if (mAdapter != null) {
-            mAdapter.setLocales(listDataPoints);
+            mAdapter.setDataPoints(listDataPoints);
         }
     }
 
@@ -362,42 +357,42 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showSyncedResults(int numberOfSyncedItems) {
-        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems);
+        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems, getView());
     }
 
     @Override
     public void showErrorAssignmentMissing() {
-        dataPointSyncSnackBarManager.showErrorAssignmentMissing();
+        dataPointSyncSnackBarManager.showErrorAssignmentMissing(getView());
     }
 
     @Override
     public void showErrorSyncNotAllowed() {
-        dataPointSyncSnackBarManager.showErrorSyncNotAllowed();
+        dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigator.navigateToPreferences(getActivity());
+            }
+        });
     }
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork();
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 
     @Override
     public void showErrorSync() {
-        dataPointSyncSnackBarManager.showErrorSync();
-    }
-
-    @Override
-    public void onRetryRequested() {
-        presenter.onSyncRecordsPressed();
-    }
-
-    @Override
-    public View getRootView() {
-        return getView();
-    }
-
-    @Override
-    public void onSettingsPressed() {
-        navigator.navigateToPreferences(getActivity());
+        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 
     //TODO: once we insert data using brite database this will no longer be necessary either

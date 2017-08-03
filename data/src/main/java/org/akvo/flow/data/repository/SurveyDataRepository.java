@@ -204,7 +204,7 @@ public class SurveyDataRepository implements SurveyRepository {
         List<ApiDataPoint> allDataPoints = apiLocaleResult.getDataPoints();
         List<ApiDataPoint> nonEmptyDataPoints = new ArrayList<>();
         if (allDataPoints != null) {
-            for (ApiDataPoint dataPoint: allDataPoints) {
+            for (ApiDataPoint dataPoint : allDataPoints) {
                 List<ApiSurveyInstance> surveyInstances = dataPoint.getSurveyInstances();
                 if (surveyInstances != null && !surveyInstances.isEmpty()) {
                     nonEmptyDataPoints.add(dataPoint);

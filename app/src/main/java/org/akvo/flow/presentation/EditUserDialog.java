@@ -64,7 +64,7 @@ public class EditUserDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        listener = (EditUserListener)getActivity();
+        listener = (EditUserListener) getActivity();
     }
 
     @Override

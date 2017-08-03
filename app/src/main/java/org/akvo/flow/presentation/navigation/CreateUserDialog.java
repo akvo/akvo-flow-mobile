@@ -52,7 +52,7 @@ public class CreateUserDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         //TODO verify instanceof
-        listener = (CreateUserListener)getActivity();
+        listener = (CreateUserListener) getActivity();
     }
 
     @Override
@@ -112,7 +112,7 @@ public class CreateUserDialog extends DialogFragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                       dismiss();
+                        dismiss();
                     }
                 });
 

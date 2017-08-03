@@ -73,10 +73,10 @@ public class DataPointsMapPresenter implements Presenter {
     }
 
     void onViewReady() {
-        refresh();
+        loadDataPoints();
     }
 
-    void refresh() {
+    void loadDataPoints() {
         if (surveyGroup != null) {
             Map<String, Long> params = new HashMap<>(2);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
@@ -151,5 +151,13 @@ public class DataPointsMapPresenter implements Presenter {
                 }
             }
         }, params);
+    }
+
+    public void onNewSurveySelected(SurveyGroup surveyGroup) {
+        getSavedDataPoints.unSubscribe();
+        syncDataPoints.unSubscribe();
+        view.hideProgress();
+        onDataReady(surveyGroup);
+        loadDataPoints();
     }
 }

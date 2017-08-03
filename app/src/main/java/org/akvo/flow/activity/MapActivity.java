@@ -19,14 +19,14 @@
 
 package org.akvo.flow.activity;
 
+import android.support.v4.app.LoaderManager;
 import android.content.Context;
+import android.support.v4.content.Loader;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

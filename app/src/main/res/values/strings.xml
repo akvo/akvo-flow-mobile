@@ -289,5 +289,6 @@
     <string name="user_edit_error">Error editing user</string>
     <string name="user_delete_error">Error deleting user</string>
     <string name="user_select_error">Error selecting user</string>
+    <string name="add_user_message">The new user will automatically be selected</string>
 
 </resources>

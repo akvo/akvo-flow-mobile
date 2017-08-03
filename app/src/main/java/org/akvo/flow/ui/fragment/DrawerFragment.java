@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -48,19 +47,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyGroupLoader;
 import org.akvo.flow.data.loader.UserLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.UserColumns;
+import org.akvo.flow.data.loader.SurveyGroupLoader;
+import org.akvo.flow.data.loader.UserLoader;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+
+import static org.akvo.flow.data.preference.Prefs.KEY_SURVEY_GROUP_ID;
 
 public class DrawerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final float ITEM_TEXT_SIZE = 14;
@@ -74,16 +87,14 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int GROUP_USERS = 0;
     private static final int GROUP_SURVEYS = 1;
     private static final int GROUP_SETTINGS = 2;
+    private static final int GROUP_ABOUT = 3;
+    private static final int GROUP_HELP = 4;
 
     // Loader IDs
     private static final int LOADER_SURVEYS = 0;
     private static final int LOADER_USERS = 1;
 
-    public interface DrawerListener {
-        void onSurveySelected(SurveyGroup surveyGroup);
-
-        void onUserSelected(User user);
-    }
+    private long selectedSurveyId;
 
     private ExpandableListView mListView;
     private DrawerAdapter mAdapter;
@@ -93,6 +104,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private List<User> mUsers = new ArrayList<>();
     private List<SurveyGroup> mSurveys = new ArrayList<>();
+
+    @Inject
+    Navigator navigator;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -107,8 +121,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        selectedSurveyId = new Prefs(getContext())
+                .getLong(KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
         if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
+            Context context = getActivity().getApplicationContext();
+            mDatabase = new SurveyDbAdapter(context,
+                    new FlowMigrationListener(new Prefs(context),
+                            new MigrationLanguageMapper(context)));
             mDatabase.open();
         }
         if (mAdapter == null) {
@@ -119,6 +138,23 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mListView.setOnChildClickListener(mAdapter);
             registerForContextMenu(mListView);
         }
+        initializeInjector();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override
@@ -182,7 +218,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mSurveys.clear();
                     if (cursor.moveToFirst()) {
                         do {
-                            mSurveys.add(SurveyDbAdapter.getSurveyGroup(cursor));
+                            mSurveys.add(SurveyDbDataSource.getSurveyGroup(cursor));
                         } while (cursor.moveToNext());
                         cursor.close();
                     }
@@ -214,6 +250,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        //EMPTY
     }
 
     private void addUser() {
@@ -350,7 +387,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     mDatabase.deleteSurveyGroup(surveyGroupId);
-                                    if (FlowApp.getApp().getSurveyGroupId() == surveyGroupId) {
+                                    if (selectedSurveyId == surveyGroupId) {
+                                        selectedSurveyId = SurveyGroup.ID_NONE;
                                         mListener.onSurveySelected(null);
                                     }
                                     load();
@@ -383,23 +421,32 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         return false;
     }
 
+    //TODO: make static to avoid memory leaks
     class DrawerAdapter extends BaseExpandableListAdapter implements
             ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
-        LayoutInflater mInflater;
+
+        private static final int PADDING_LEFT_IN_DPS = 30;
+        private static final int PADDING_RIGHT_IN_DPS = 16;
+
+        private final LayoutInflater mInflater;
 
         @ColorInt
         private final int mHighlightColor;
+        private final int leftPadding;
+        private final int rightPadding;
 
         public DrawerAdapter(Context context) {
             mInflater = LayoutInflater.from(context);
             mUsers = new ArrayList<>();
             mSurveys = new ArrayList<>();
             mHighlightColor = ContextCompat.getColor(context, R.color.orange_main);
+            leftPadding = (int) PlatformUtil.dp2Pixel(getActivity(), PADDING_LEFT_IN_DPS);
+            rightPadding = (int) PlatformUtil.dp2Pixel(getActivity(), PADDING_RIGHT_IN_DPS);
         }
 
         @Override
         public int getGroupCount() {
-            return 3;
+            return 5;
         }
 
         @Override
@@ -444,7 +491,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                v = mInflater.inflate(R.layout.drawer_item, null);
+                v = mInflater.inflate(R.layout.drawer_item, parent, false);
             }
             View divider = v.findViewById(R.id.divider);
             TextView tv = (TextView) v.findViewById(R.id.item_txt);
@@ -484,6 +531,22 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;
+                case GROUP_HELP:
+                    divider.setVisibility(View.GONE);
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
+                    tv.setText(getString(R.string.help));
+                    img.setVisibility(View.GONE);
+                    dropdown.setVisibility(View.GONE);
+                    break;
+                case GROUP_ABOUT:
+                    divider.setVisibility(View.GONE);
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
+                    tv.setText(getString(R.string.aboutlabel));
+                    img.setVisibility(View.GONE);
+                    dropdown.setVisibility(View.GONE);
+                    break;
             }
 
             return v;
@@ -494,14 +557,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 View convertView, ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                v = mInflater.inflate(android.R.layout.simple_list_item_1, null);
+                v = mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             }
             TextView tv = (TextView) v.findViewById(android.R.id.text1);
-            v.setPadding((int) PlatformUtil.dp2Pixel(getActivity(), 30), 0, 0, 0);
+            v.setPadding(leftPadding, 0, rightPadding, 0);
 
             tv.setTextSize(ITEM_TEXT_SIZE);
             tv.setTextColor(Color.BLACK);
-            v.setBackgroundColor(Color.TRANSPARENT);
 
             switch (groupPosition) {
                 case GROUP_USERS:
@@ -514,11 +576,12 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     SurveyGroup sg = mSurveys.get(childPosition);
                     tv.setText(sg.getName());
-                    if (sg.getId() == FlowApp.getApp().getSurveyGroupId()) {
+                    if (sg.getId() == selectedSurveyId) {
                         tv.setTextColor(mHighlightColor);
-                        v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_alternate));
                     }
                     v.setTag(sg);
+                    break;
+                default:
                     break;
             }
 
@@ -536,7 +599,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     return true; // This way the expander cannot be collapsed
                 case GROUP_SETTINGS:
-                    startActivity(new Intent(getActivity(), SettingsActivity.class));
+                    navigator.navigateToAppSettings(getActivity());
+                    return true;
+                case GROUP_ABOUT:
+                    navigator.navigateToAbout(getActivity());
+                    return true;
+                case GROUP_HELP:
+                    navigator.navigateToHelp(getContext());
                     return true;
                 default:
                     return false;
@@ -557,6 +626,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     return true;
                 case GROUP_SURVEYS:
                     SurveyGroup sg = (SurveyGroup) v.getTag();
+                    selectedSurveyId = sg.getId();
+                    notifyDataSetChanged();
                     mListener.onSurveySelected(sg);
                     return true;
             }
@@ -564,4 +635,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
+    public interface DrawerListener {
+
+        void onSurveySelected(SurveyGroup surveyGroup);
+
+        void onUserSelected(User user);
+    }
 }

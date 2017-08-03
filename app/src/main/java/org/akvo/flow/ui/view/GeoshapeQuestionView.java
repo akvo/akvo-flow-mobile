@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -68,7 +68,7 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POLYGON, getQuestion().isAllowPolygon());
                 data.putBoolean(ConstantUtil.EXTRA_MANUAL_INPUT, !getQuestion().isLocked());
-                data.putBoolean(ConstantUtil.READONLY_KEY, isReadOnly());
+                data.putBoolean(ConstantUtil.READ_ONLY_EXTRA, isReadOnly());
                 if (!TextUtils.isEmpty(mValue)) {
                     data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
                 }
@@ -109,8 +109,12 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        setResponse(new QuestionResponse(mValue, ConstantUtil.VALUE_RESPONSE_TYPE,
-                getQuestion().getId()), suppressListeners);
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder().setValue(mValue)
+                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse(), suppressListeners);
     }
 
 }

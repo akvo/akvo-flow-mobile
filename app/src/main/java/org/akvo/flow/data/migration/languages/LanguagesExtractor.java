@@ -22,7 +22,7 @@ package org.akvo.flow.data.migration.languages;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import org.akvo.flow.data.database.PreferenceHandler;
+import org.akvo.flow.database.PreferenceHandler;
 import org.akvo.flow.util.ConstantUtil;
 
 public class LanguagesExtractor {

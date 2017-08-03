@@ -20,17 +20,17 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.data.dao.SurveyDao;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
@@ -57,6 +57,8 @@ import java.util.zip.ZipInputStream;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
+
 /**
  * This activity will check for new surveys on the device and install as needed
  *
@@ -75,7 +77,7 @@ public class SurveyDownloadService extends IntentService {
     private static final String DEFAULT_TYPE = "Survey";
     public static final String TEST_SURVEY_ID = "0";
 
-    private SurveyDbAdapter databaseAdaptor;
+    private SurveyDbDataSource databaseAdaptor;
     private Prefs prefs;
     private ConnectivityStateManager connectivityStateManager;
 
@@ -85,7 +87,7 @@ public class SurveyDownloadService extends IntentService {
 
     public void onHandleIntent(@Nullable Intent intent) {
         try {
-            databaseAdaptor = new SurveyDbAdapter(this);
+            databaseAdaptor = new SurveyDbDataSource(this, null);
             databaseAdaptor.open();
             prefs = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
@@ -100,7 +102,7 @@ public class SurveyDownloadService extends IntentService {
             Timber.e(e, e.getMessage());
         } finally {
             databaseAdaptor.close();
-            sendBroadcastNotification(this);
+            sendBroadcastNotification();
         }
     }
 
@@ -332,7 +334,7 @@ public class SurveyDownloadService extends IntentService {
                 surveys.addAll(flowApi.getSurveyHeader(id));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
-                    Timber.e(e, e.getMessage());
+                    Timber.e(e);
                 }
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         getString(R.string.error_form_header, id));
@@ -386,9 +388,9 @@ public class SurveyDownloadService extends IntentService {
      * This notification will be received in SurveyHomeActivity, in order to
      * refresh its data
      */
-    private void sendBroadcastNotification(@NonNull Context context) {
-        Intent intentBroadcast = new Intent(context.getString(R.string.action_surveys_sync));
-        context.sendBroadcast(intentBroadcast);
+    private void sendBroadcastNotification() {
+        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 
 }

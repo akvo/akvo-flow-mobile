@@ -26,7 +26,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,7 +64,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class GeoshapeActivity extends AppCompatActivity
+public class GeoshapeActivity extends BackActivity
         implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener,
         OnMyLocationChangeListener, OnMapReadyCallback {
 
@@ -100,7 +100,7 @@ public class GeoshapeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.geoshape_activity);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolBar();
 
         mFeatures = new ArrayList<>();
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
@@ -117,7 +117,7 @@ public class GeoshapeActivity extends AppCompatActivity
         mAllowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
         mAllowPolygon = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POLYGON, true);
         mManualInput = getIntent().getBooleanExtra(ConstantUtil.EXTRA_MANUAL_INPUT, true);
-        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READONLY_KEY, false);
+        mReadOnly = getIntent().getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
 
         if (!mReadOnly) {
             mClearPointBtn.setOnClickListener(mFeatureMenuListener);
@@ -477,12 +477,12 @@ public class GeoshapeActivity extends AppCompatActivity
 
     @Override
     public void onMyLocationChange(Location location) {
-        Timber.i("onMyLocationChange() - " + location);
+        Timber.i("onMyLocationChange() - %s", location);
         if (location != null && location.hasAccuracy()) {
-            mAccuracy.setText(
-                getString(R.string.accuracy) + ": " + new DecimalFormat("#").format(location.getAccuracy()) + "m");
+            String formattedAccuracy = new DecimalFormat("#").format(location.getAccuracy());
+            mAccuracy.setText(getString(R.string.geo_location_accuracy, formattedAccuracy));
             if (location.getAccuracy() <= ACCURACY_THRESHOLD) {
-                mAccuracy.setTextColor(getResources().getColor(R.color.button_green));
+                mAccuracy.setTextColor(ContextCompat.getColor(this, R.color.button_green));
             } else {
                 mAccuracy.setTextColor(Color.RED);
             }

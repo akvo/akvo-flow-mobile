@@ -64,8 +64,8 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.preferences);
-
+        setContentView(R.layout.activity_preferences);
+        setupToolBar();
         screenOnCheckbox = (CheckBox) findViewById(R.id.screenoptcheckbox);
         mobileDataCheckbox = (CheckBox) findViewById(R.id.uploadoptioncheckbox);
         serverTextView = (TextView) findViewById(R.id.servervalue);
@@ -111,8 +111,8 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
 
         int maxImgSize = prefs.getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
         maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
-        identTextView.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER,
-                Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER));
+            identTextView.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER,
+                    Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER));
     }
 
     /**

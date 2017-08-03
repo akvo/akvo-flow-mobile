@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <string name="accuracy">Akurasi</string>
-  <string name="searching">Sedang mencari...</string>
-  <string name="ready">Siap digunakan</string>
-  <string name="timeout">Waktu habis</string>
   <string name="nocardspacetitle">Media Penyimpanan Penuh</string>
   <string name="lowcardspacetitle">Media Penyimpanan Hampir Penuh</string>
   <string name="nocardspacedialog">Memori SD card penuh dan tidak bisa digunakan untuk menyimpan data. Untuk melanjutkan, hapus atau kosongi memori tersebut.</string>
@@ -15,7 +11,6 @@
   <string name="lon">Garis Bujur</string>
   <string name="elevation">Ketinggian</string>
   <string name="submitbutton">Kirim</string>
-  <string name="geodialog">Aktifkan GPS. Pilih OK untuk ke halaman pengaturan. Pilih \"Gunakan Satelit GPS\" lalu tekan tombol kembali. Setelah GPS aktifk, klik \"Periksa Koordinat GPS\" lagi utuk mendapatkan posisi.</string>
   <string name="resize_large_images">Sesuaikan resolusi gambar</string>
   <string name="settingslabel">Pengaturan</string>
   <string name="nouser">Tidak ada pengguna!</string>
@@ -30,8 +25,6 @@
   <string name="screenoptdesc">Mencegah layar ponsel mati saat mode mengoleksi survei. Pastikan untuk mematikan layar secara manual (atau keluar dari aplikasi) saat tidak digunakan untuk menghemat daya.</string>
   <string name="aboutlabel">Tentang</string>
   <string name="aboutdesc">Informasi tentang versi.</string>
-  <string name="abouttitle">Tentang - Aplikasi Akvo Flow</string>
-  <string name="about_text" tools:ignore="PluralsCandidate">Aplikasi Akvo Flow app\nDikembangkan oleh: Akvo Foundation\nHak Cipta © 2010-%1$s Stichting Akvo\nVersi %2$s</string>
   <string name="gpsstatuslabel">GPS Status</string>
   <string name="gpsstatusdesc">Nyalakan aplikasi GPS Status jika Anda telah menginstallnya dalam perangkat ini.</string>
   <string name="nogpsstatus">Aplikasi GPS Status belum terpasang dalam perangkat ini. Mohon pasang melalui Google Play Store</string>
@@ -46,7 +39,6 @@
   <string name="uploadoptionlabel">Sinkronisasi data melalui jaringan koneksi GSM</string>
   <string name="surveylanglabel">Bahasa Survey</string>
   <string name="scanbarcode">Pindai Kode Batang</string>
-  <string name="barcodeerror">Aplikasi pemindai belum terpasang. Mohon pasang aplikasi Barcode Scanner melalui Android Market.</string>
   <string name="toosmallerr">Nilai terlalu kecil. Nilai paling kecil:</string>
   <string name="toolargeerr">Nilai terlalu besar. Nilai paling besar:</string>
   <string name="baddatatypeerr">Jawaban harus numerik</string>
@@ -84,7 +76,6 @@
   <string name="bootstrapstart">Memuat data survei dari kartu Memori/SD card</string>
   <string name="bootstrapcomplete">Selesai memuat data dari kartu memori/SD card</string>
   <string name="bootstraperror">Ada kesalahan dalam memproses file zip bootsrap</string>
-  <string name="bootstrap_invalid_app">Kesalahan: Formulir bukan terkait dengan Flow ini</string>
   <string name="transmissionhist">Riwayat Transmisi</string>
   <string name="transstartdate">Dimulai:</string>
   <string name="transenddate">Selesai:</string>
@@ -126,7 +117,6 @@
   <string name="app_language">Bahasa Aplikasi</string>
   <string name="please_restart">Mohon memulai ulang aplikasi</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">Anda belum mempunyai survei yang ditugaskan. Survei ditugaskan melalui dasbor Flow</string>
   <string name="no_records_text">Anda belum mempunyai data. Klik simbol \'+\' diatas untuk menambahkan data.</string>
   <string name="no_survey_selected_text">Anda belum memilih Survei. Buka menu samping untuk memilih Survei.</string>
   <!--Activity Labels-->
@@ -146,7 +136,6 @@
   <string name="error_img_preview">Tidak dapat memuat gambar pratayang</string>
   <string name="use_external_source">Gunakan sumber dari luar</string>
   <string name="caddisfly_test">Pindah ke halaman test</string>
-  <string name="caddisfly_response">Sukses mendapatkan test</string>
   <string name="error_empty_form">Tidak dapat mengirim formulir kosong. Mohon jawab pertanyaan terlebih dulu.</string>
   <string name="select">mohon pilih</string>
   <string name="clear_value_msg">Apakah Anda ingin menghapus isian ini?</string>
@@ -201,11 +190,8 @@
   <string name="status_exported">Terekspor</string>
   <!--APK update-->
   <string name="app_update_activity">Pembaruan Akvo Flow</string>
-  <string name="app_update">Versi terbaru aplikasi Flow telah tersedia. Klik \'Perbarui\' untuk mengunduh dan memasang versi baru.</string>
   <string name="update">Perbarui</string>
   <string name="not_now">Lain waktu</string>
-  <string name="clicktoinstall">Versi Flow terbaru telah terunduh. Apakah Anda ingin memasangnya sekarang?</string>
-  <string name="apk_upgrade_error">Ada kesalahan dalam mengunduh Flow terbaru.</string>
   <!--Time check-->
   <string name="time_check_activity">Tanggal dan Waktu</string>
   <string name="time_warning">Pengaturan waktu pada perangkat Anda tidak akurat! Atur ulang waktunya dan coba lagi. Tanggal dan waktu di perangkat Anda adalah:</string>
@@ -213,8 +199,6 @@
   <!--Form sync-->
   <string name="downloading_forms">Mengunduh formulir</string>
   <string name="error_form_sync_title">Ada kesalahan dalam menyingkronisasi formulir</string>
-  <string name="error_assignment_read">Penugasan formulir tidak dapat dibaca dari dasbor Flow</string>
-  <string name="error_form_header">Formulir %1$s tidak dapat dibaca oleh dasbor Flow</string>
   <string name="error_form_download">Pastikan formulir ini sudah diterbitkan, dan pengaturan waktu Anda sudah benar</string>
   <string name="form_deleted">Formulir tersebut telah dihapus</string>
   <!--File sync-->
@@ -246,11 +230,10 @@
   <string name="clearbutton">Bersihkan</string>
   <string name="yes">Ya</string>
   <string name="no">Tidak</string>
-  <string name="retry">Coba kembali</string>
+  <string name="action_retry">Coba kembali</string>
   <string name="delete">Hapus</string>
   <string name="error_value_required">Bagian ini tidak boleh kosong</string>
   <string name="drawer_open">Laci terbuka</string>
   <string name="drawer_close">Laci tertutup</string>
-  <!--settings activity-->
   <!--app update service-->
 </resources>

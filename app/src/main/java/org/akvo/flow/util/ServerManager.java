@@ -52,10 +52,4 @@ public class ServerManager {
         }
         return serverBase;
     }
-
-
-    public String getApiKey() {
-        PropertyUtil props = new PropertyUtil(context.getResources());
-        return props.getProperty(ConstantUtil.API_KEY);
-    }
 }

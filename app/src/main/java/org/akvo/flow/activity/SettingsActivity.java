@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,14 +25,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.SQLException;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -42,21 +40,14 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.akvo.flow.BuildConfig;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
-import org.akvo.flow.service.UserRequestedApkUpdateService;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -79,13 +70,11 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     private static final String LABEL = "label";
     private static final String DESC = "desc";
 
-    //TODO: this will be replaced by a year placed in a properties file
-    private static final String CURRENT_YEAR = "2017";
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settingsmenu);
-
+        setContentView(R.layout.activity_settings);
+        initializeInjector();
+        setupToolBar();
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
         Resources resources = getResources();
         list.add(createMap(resources.getString(R.string.prefoptlabel),
@@ -96,8 +85,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 resources.getString(R.string.reloadsurveysdesc)));
         list.add(createMap(resources.getString(R.string.downloadsurveylabel),
                 resources.getString(R.string.downloadsurveydesc)));
-        list.add(createMap(resources.getString(R.string.poweroptlabel),
-                resources.getString(R.string.poweroptdesc)));
         list.add(createMap(resources.getString(R.string.gpsstatuslabel),
                 resources.getString(R.string.gpsstatusdesc)));
         list.add(createMap(resources.getString(R.string.reset_responses),
@@ -106,11 +93,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 resources.getString(R.string.resetalldesc)));
         list.add(createMap(resources.getString(R.string.checksd),
                 resources.getString(R.string.checksddesc)));
-        list.add(createMap(resources.getString(R.string.settings_app_update_title),
-                resources.getString(R.string.settings_app_update_description)));
-        list.add(createMap(resources.getString(R.string.aboutlabel),
-                resources.getString(R.string.aboutdesc)));
-
         String[] fromKeys = {
                 LABEL, DESC
         };
@@ -121,6 +103,12 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         ListView lv = (ListView) findViewById(android.R.id.list);
         lv.setAdapter(new SettingsAdapter(this, list, R.layout.settingsdetail, fromKeys, toIds));
         lv.setOnItemClickListener(this);
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent()).build();
+        viewComponent.inject(this);
     }
 
     /**
@@ -145,12 +133,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
             Resources resources = getResources();
             if (resources.getString(R.string.prefoptlabel).equals(val)) {
                 onPreferencesOptionTap();
-            } else if (resources.getString(R.string.poweroptlabel).equals(val)) {
-                onPowerManagementOptionTap();
             } else if (resources.getString(R.string.gpsstatuslabel).equals(val)) {
                 onGpsStatusOptionTap();
-            } else if (resources.getString(R.string.aboutlabel).equals(val)) {
-                onAboutOptionTap(resources);
             } else if (resources.getString(R.string.reloadsurveyslabel).equals(val)) {
                 onReloadAllSurveysOptionTap();
             } else if (resources.getString(R.string.downloadsurveylabel).equals(val)) {
@@ -163,20 +147,13 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 onCheckSdCardStateOptionTap(resources);
             } else if (resources.getString(R.string.sendoptlabel).equals(val)) {
                 onSyncDataOptionTap(view);
-            } else if (resources.getString(R.string.settings_app_update_title).equals(val)) {
-                onUpdateAppOptionTap();
             }
         }
-    }
-
-    private void onUpdateAppOptionTap() {
-        startService(new Intent(this, UserRequestedApkUpdateService.class));
     }
 
     private void onSyncDataOptionTap(View view) {
         Intent i = new Intent(view.getContext(), DataSyncService.class);
         getApplicationContext().startService(i);
-        // terminate this activity
         finish();
     }
 
@@ -297,20 +274,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         });
     }
 
-    private void onAboutOptionTap(Resources resources) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String txt = resources
-                .getString(R.string.about_text, CURRENT_YEAR, BuildConfig.VERSION_NAME);
-        builder.setTitle(R.string.abouttitle);
-        builder.setMessage(txt);
-        builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-    }
-
     private void onGpsStatusOptionTap() {
         try {
             Intent i = new Intent(ConstantUtil.GPS_STATUS_INTENT);
@@ -327,25 +290,16 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         }
     }
 
-    private void onPowerManagementOptionTap() {
-        WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
-        if (!wm.isWifiEnabled()) {
-            wm.setWifiEnabled(true);
-        } else {
-            wm.setWifiEnabled(false);
-        }
-    }
-
     private void onPreferencesOptionTap() {
         Intent i = new Intent(this, PreferencesActivity.class);
         startActivity(i);
     }
 
     private boolean unsentData() throws SQLException {
-        SurveyDbAdapter db = new SurveyDbAdapter(this);
+        SurveyDbDataSource db = new SurveyDbDataSource(this, null);
         try {
             db.open();
-            return db.getUnsyncedTransmissions().size() > 0;
+            return db.getUnSyncedTransmissions().size() > 0;
         } finally {
             if (db != null) {
                 db.close();
@@ -395,17 +349,6 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
             Timber.e(e, e.getMessage());
             Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
-
-        return onOptionsItemSelected(item);
     }
 
     private static class SettingsAdapter extends SimpleAdapter {

@@ -7,8 +7,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     def versionPropsFile = file('version.properties')
 
     if (versionPropsFile.canRead()) {
@@ -16,21 +16,22 @@ android {
 
         versionProps.load(new FileInputStream(versionPropsFile))
 
-        def versionMajor = versionProps['VERSION_MAJOR'].toInteger()
-        def versionMinor = versionProps['VERSION_MINOR'].toInteger()
-        def versionPatch = versionProps['VERSION_PATCH'].toInteger()
+        def versionMajor = versionProps['VERSION_MAJOR'].toString()
+        def versionMinor = versionProps['VERSION_MINOR'].toString()
+        def versionPatch = versionProps['VERSION_PATCH'].toString()
         def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
 
         defaultConfig {
             versionCode versionCodeProperty
             versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-            minSdkVersion 10
-            targetSdkVersion 21
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
             applicationId "org.akvo.flow"
             testApplicationId "org.akvo.flow.tests"
-            testInstrumentationRunner "android.test.InstrumentationTestRunner"
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
             testHandleProfiling true
             testFunctionalTest true
+            vectorDrawables.useSupportLibrary = true
         }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
@@ -66,7 +67,6 @@ android {
             exclude 'META-INF/NOTICE.txt'
             exclude 'META-INF/notice.txt'
             exclude 'META-INF/ASL2.0'
-            exclude 'META-INF/services/javax.annotation.processing.Processor'
             exclude '.readme'
         }
 
@@ -78,6 +78,8 @@ android {
             cookstoves {
             }
         }
+
+
 
         testOptions {
             unitTests.returnDefaultValues = true
@@ -95,6 +97,11 @@ android {
     } else {
         throw new GradleException("Could not read version.properties!")
     }
+
+    sourceSets {
+        biogas.res.srcDirs = ['src/snv/res', 'src/biogas/res']
+        cookstoves.res.srcDirs = ['src/snv/res', 'src/cookstoves/res']
+    }
 }
 
 android.applicationVariants.all { variant ->
@@ -105,20 +112,25 @@ android.applicationVariants.all { variant ->
 
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:support-annotations:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:support-annotations:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.google.android.gms:play-services-base:7.5.0'
     compile 'com.google.android.gms:play-services-maps:7.5.0'
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
     compile 'com.google.maps.android:android-maps-utils:0.4'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
-    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.jakewharton.timber:timber:4.3.1'
-    apt 'com.google.dagger:dagger-compiler:2.4'
     compile 'com.google.dagger:dagger:2.4'
-    compile 'io.reactivex:rxandroid:1.0.1'
+    apt 'com.google.dagger:dagger-compiler:2.4'
+    compile 'com.jakewharton:butterknife:8.5.1'
+    apt 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.getsentry.raven:raven-android:8.0.2'
+    compile 'com.github.bumptech.glide:glide:3.8.0'
+    compile 'com.squareup.sqlbrite:sqlbrite:1.1.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -126,9 +138,29 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
     testCompile 'org.powermock:powermock-api-mockito:1.6.2'
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
+
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestCompile ('com.android.support.test:rules:0.5') {
+        exclude module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2') {
+        exclude module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
+    androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.1') {
+        exclude module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
 
     compile project(':domain')
     compile project(':data')
+    compile project(path: ':database')
 }

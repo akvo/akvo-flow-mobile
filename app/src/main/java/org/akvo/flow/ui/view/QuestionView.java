@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,8 +24,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -54,6 +56,7 @@ import java.util.StringTokenizer;
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
     private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
+    final ErrorMessageFormatter errorMessageFormatter = new ErrorMessageFormatter();
 
     protected Question mQuestion;
     private QuestionResponse mResponse;
@@ -319,7 +322,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public void addQuestionInteractionListener(QuestionInteractionListener listener) {
         if (mListeners == null) {
-            mListeners = new ArrayList<QuestionInteractionListener>();
+            mListeners = new ArrayList<>();
         }
         if (listener != null && !mListeners.contains(listener) && listener != this) {
             mListeners.add(listener);
@@ -406,17 +409,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public boolean handleDependencyParentResponse(Dependency dep, QuestionResponse resp) {
         boolean isMatch = false;
-        if (dep.getAnswer() != null
-                && resp != null
-                && dep.isMatch(resp.getValue())
-                && resp.getIncludeFlag()) {
+        if (dep.getAnswer() != null && resp != null && dep.isMatch(resp.getValue()) && resp
+                .getIncludeFlag()) {
             isMatch = true;
-        } else if (dep.getAnswer() != null
-                && resp != null
-                && resp.getIncludeFlag()) {
+        } else if (dep.getAnswer() != null && resp != null && resp.getIncludeFlag()) {
             if (resp.getValue() != null) {
-                StringTokenizer strTok = new StringTokenizer(resp.getValue(),
-                        "|");
+                StringTokenizer strTok = new StringTokenizer(resp.getValue(), "|");
                 while (strTok.hasMoreTokens()) {
                     if (dep.isMatch(strTok.nextToken().trim())) {
                         isMatch = true;
@@ -429,18 +427,16 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         // if we're here, then the question on which we depend
         // has been answered. Check the value to see if it's the
         // one we are looking for
+        boolean includeFlag = true;
         if (isMatch) {
             setVisibility(View.VISIBLE);
-            if (mResponse != null) {
-                mResponse.setIncludeFlag(true);
-            }
             setVisible = true;
         } else {
-            if (mResponse != null) {
-                mResponse.setIncludeFlag(false);
-            }
+            includeFlag = false;
             setVisibility(View.GONE);
         }
+        mResponse = new QuestionResponse.QuestionResponseBuilder()
+                .createFromQuestionResponse(mResponse, includeFlag);
 
         // now notify our own listeners to make sure we correctly toggle
         // nested dependencies (i.e. if A -> B -> C and C changes, A needs to
@@ -505,18 +501,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     public void setResponse(QuestionResponse response, boolean suppressListeners) {
-        if (response != null) {
-            if (this.mResponse == null) {
-                this.mResponse = response;
-            } else {
-                // we need to preserve the ID so we don't get duplicates in the db
-                this.mResponse.setType(response.getType());
-                this.mResponse.setValue(response.getValue());
-                this.mResponse.setFilename(response.getFilename());
-            }
-        } else {
-            this.mResponse = response;
-        }
+        this.mResponse = new QuestionResponse.QuestionResponseBuilder()
+                .createFromQuestionResponse(this.mResponse, response);
         if (!suppressListeners) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
         }
@@ -564,8 +550,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      *
      * @param error Error text
      */
-    public void displayError(String error) {
-        mQuestionText.setError(error);
+    public void displayError(@Nullable String error) {
+        if (TextUtils.isEmpty(error)) {
+            mQuestionText.setError(null);
+        } else {
+            mQuestionText.setError(errorMessageFormatter.getErrorSpannable(error));
+        }
     }
 
     public void checkMandatory() {
@@ -588,7 +578,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     public boolean isDoubleEntry() {
-        return mQuestion != null ? mQuestion.isDoubleEntry() : false;// Avoid NPE
+        return mQuestion != null && mQuestion.isDoubleEntry();
     }
 
     /**

@@ -20,37 +20,86 @@
 
 package org.akvo.flow.data.datasource.preferences;
 
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
 import org.akvo.flow.data.util.GsonMapper;
 import org.akvo.flow.domain.entity.ApkData;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import rx.Observable;
 
+@Singleton
 public class SharedPreferencesDataSource {
 
-    public static final String KEY_APK_DATA = "apk_data";
-    public static final String KEY_APP_UPDATE_LAST_NOTIFIED = "update_notified_last_time";
-    public static final long NOT_NOTIFIED = -1;
+    private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    private static final String KEY_BACKEND_SERVER = "backend.server";
+    private static final String KEY_APK_DATA = "apk_data";
+    private static final String KEY_APP_UPDATE_LAST_NOTIFIED = "update_notified_last_time";
 
     private final GsonMapper gsonMapper;
-    private final Prefs preferences;
+    private final SharedPreferences preferences;
 
     @Inject
-    public SharedPreferencesDataSource(GsonMapper gsonMapper, Prefs prefs) {
-        this.gsonMapper = gsonMapper;
+    public SharedPreferencesDataSource(SharedPreferences prefs, GsonMapper gsonMapper) {
         this.preferences = prefs;
+        this.gsonMapper = gsonMapper;
+    }
+
+    public Observable<Boolean> mobileSyncEnabled() {
+        return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
+    }
+
+    public Observable<String> getBaseUrl() {
+        return Observable.just(getString(KEY_BACKEND_SERVER, null));
+    }
+
+    public String getString(String key, String defValue) {
+        return preferences.getString(key, defValue);
+    }
+
+    private void setString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
+    }
+
+    public boolean getBoolean(String key, boolean defValue) {
+        return preferences.getBoolean(key, defValue);
+    }
+
+    public void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
+    }
+
+    public long getLong(String key, long defValue) {
+        return preferences.getLong(key, defValue);
+    }
+
+    private void setLong(String key, long value) {
+        preferences.edit().putLong(key, value).apply();
+    }
+
+    public int getInt(String key, int defValue) {
+        return preferences.getInt(key, defValue);
+    }
+
+    public void setInt(String key, int value) {
+        preferences.edit().putInt(key, value).apply();
+    }
+
+    private void removePreference(String key) {
+        preferences.edit().remove(key).apply();
     }
 
     public Observable<Boolean> saveApkData(ApkData apkData) {
-        preferences.setString(KEY_APK_DATA, gsonMapper.write(apkData, ApkData.class));
+        setString(KEY_APK_DATA, gsonMapper.write(apkData, ApkData.class));
         return Observable.just(true);
     }
 
     public Observable<Boolean> clearAppUpdateNotified() {
-        preferences.removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
+        removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
         return Observable.just(true);
     }
 
@@ -64,7 +113,7 @@ public class SharedPreferencesDataSource {
     }
 
     public Observable<Boolean> saveAppUpdateNotifiedTime() {
-        preferences.setLong(KEY_APP_UPDATE_LAST_NOTIFIED, System.currentTimeMillis());
+        setLong(KEY_APP_UPDATE_LAST_NOTIFIED, System.currentTimeMillis());
         return Observable.just(true);
     }
 }

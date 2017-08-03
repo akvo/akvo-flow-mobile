@@ -62,14 +62,13 @@ public class FileUtil {
 
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
     private static final String DIR_FORMS = "forms"; // Form definitions
-    private static final String DIR_STACKTRACE = "stacktrace"; // Crash reports
     private static final String DIR_TMP = "tmp"; // Temporary files
     private static final String DIR_APK = "apk"; // App upgrades
     private static final String DIR_RES = "res"; // Survey resources (i.e. cascading DB)
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, FORMS, STACKTRACE, TMP, APK, RES}
+    public enum FileType {DATA, MEDIA, INBOX, FORMS, TMP, APK, RES}
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -93,9 +92,6 @@ public class FileUtil {
                 break;
             case FORMS:
                 path = getFilesStorageDir(true) + File.separator + DIR_FORMS;
-                break;
-            case STACKTRACE:
-                path = getFilesStorageDir(true) + File.separator + DIR_STACKTRACE;
                 break;
             case TMP:
                 path = getFilesStorageDir(true) + File.separator + DIR_TMP;

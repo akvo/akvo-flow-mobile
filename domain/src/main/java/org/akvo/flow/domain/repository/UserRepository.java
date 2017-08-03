@@ -24,5 +24,7 @@ import rx.Observable;
 
 public interface UserRepository {
 
+    Observable<Boolean> mobileSyncAllowed();
+
     Observable<Boolean> clearAppUpdateNotified();
 }

@@ -19,6 +19,8 @@
 
 package org.akvo.flow.util;
 
+import org.akvo.flow.R;
+
 /**
  * Class to hold all public constants used in the application
  *
@@ -38,8 +40,6 @@ public class ConstantUtil {
     public static final String PROCESSED_OK_SUFFIX = ".processed";
     public static final String PROCESSED_ERROR_SUFFIX = ".error";
     public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
-    public static final String STACKTRACE_FILENAME = "err-";
-    public static final String STACKTRACE_SUFFIX = ".stacktrace";
     public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
     public static final String DOT_SEPARATOR = ".";
 
@@ -94,7 +94,6 @@ public class ConstantUtil {
      * validation types
      */
     public static final String NUMERIC_VALIDATION_TYPE = "numeric";
-    public static final String NAME_VALIDATION_TYPE = "name";
 
     /**
      * scoring types
@@ -112,10 +111,9 @@ public class ConstantUtil {
      */
     public static final String MEDIA_FILE_KEY = "filename";
 
-    /**
-     * Signature result data
-     */
-    public static final String SIGNATURE_IMAGE = "signature_image";
+    public static final String SIGNATURE_NAME_EXTRA = "signature_name";
+    public static final String SIGNATURE_QUESTION_ID_EXTRA = "signature_question_id";
+    public static final String SIGNATURE_DATAPOINT_ID_EXTRA = "signature_datapoint_id";
 
     /**
      * Plot measurement result data
@@ -129,24 +127,22 @@ public class ConstantUtil {
     /**
      * keys for saved state and bundle extras
      */
-    public static final String USER_ID_KEY = "UID";
-    public static final String SURVEY_ID_KEY = "SID";
-    public static final String RESPONDENT_ID_KEY = "survey_respondent_id";
-    public static final String READONLY_KEY = "readonly";
-    public static final String SINGLE_SURVEY_KEY = "single_survey";
-    public static final String SURVEY_GROUP = "survey_group";
-    public static final String SURVEYED_LOCALE_ID = "surveyed_locale_id";
+    public static final String FORM_ID_EXTRA = "SID";
+    public static final String RESPONDENT_ID_EXTRA = "survey_respondent_id";
+    public static final String READ_ONLY_EXTRA = "readonly";
+    public static final String SURVEY_GROUP_EXTRA = "survey_group";
+    public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
+    public static final String RECORD_ID_EXTRA = "record_id";
 
     /**
      * settings keys
      */
     public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
-    public static final String SURVEY_LANG_PRESENT_KEY = "survey.languagespresent";
     public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
-    
+
     /**
      * intents
      */
@@ -173,11 +169,9 @@ public class ConstantUtil {
      * property file keys
      */
     public static final String SERVER_BASE = "serverBase";
-    public static final String API_KEY = "apiKey";
     public static final String S3_BUCKET = "awsBucket";
     public static final String S3_ACCESSKEY = "awsAccessKeyId";
     public static final String S3_SECRET = "awsSecretKey";
-    public static final String SENTRY_DSN = "sentryDsn";
 
     /**
      * S3 bucket directories (object prefixes)
@@ -203,11 +197,8 @@ public class ConstantUtil {
     /**
      * Order By
      */
-    public static final int ORDER_BY_NONE = -1;
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
 
     /**
      * Max picture size
@@ -217,8 +208,6 @@ public class ConstantUtil {
     public static final int IMAGE_SIZE_320_240 = 0;
     public static final int IMAGE_SIZE_640_480 = 1;
     public static final int IMAGE_SIZE_1280_960 = 2;
-
-    public static final int NOTIFICATION_RECORD_SYNC = 100;
 
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
@@ -244,8 +233,8 @@ public class ConstantUtil {
     public static final String CADDISFLY_MIME = "text/plain";
 
     //broadcasts
-    public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
+    public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
@@ -269,6 +258,13 @@ public class ConstantUtil {
     public static final int CADDISFLY_REQUEST = 5;
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
+
+    //view tags
+    public static final int SURVEY_ID_TAG_KEY = R.integer.surveyidkey;
+    public static final int RESPONDENT_ID_TAG_KEY = R.integer.respidkey;
+    public static final int READ_ONLY_TAG_KEY = R.integer.finishedkey;
+
+    public static final int SNACK_BAR_DURATION_IN_MS = 4000;
 
     /**
      * prevent instantiation

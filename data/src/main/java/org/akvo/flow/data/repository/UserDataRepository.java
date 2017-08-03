@@ -37,6 +37,11 @@ public class UserDataRepository implements UserRepository {
     }
 
     @Override
+    public Observable<Boolean> mobileSyncAllowed() {
+        return dataSourceFactory.getSharedPreferencesDataSource().mobileSyncEnabled();
+    }
+
+    @Override
     public Observable<Boolean> clearAppUpdateNotified() {
         return dataSourceFactory.getSharedPreferencesDataSource().clearAppUpdateNotified();
     }

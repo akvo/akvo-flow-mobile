@@ -1,37 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-           xmlns:tools="http://schemas.android.com/tools">
-
-    <style name="Flow.ActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
-        <item name="android:backgroundStacked" tools:targetApi="14">@drawable/ab_stacked_solid_flow</item>
-        <item name="backgroundStacked">@drawable/ab_stacked_solid_flow</item>
-
-        <item name="android:background" tools:targetApi="14">@drawable/ab_solid_flow</item>
-        <item name="background">@drawable/ab_solid_flow</item>
-
-        <item name="android:titleTextStyle" tools:targetApi="11">@style/Flow.ActionBar.Text</item>
-        <item name="titleTextStyle">@style/Flow.ActionBar.Text</item>
-
-        <item name="android:subtitleTextStyle" tools:targetApi="11">@style/Flow.ActionBar.Text</item>
-        <item name="subtitleTextStyle">@style/Flow.ActionBar.Text</item>
-    </style>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Flow.PopupMenuListView" parent="@style/Widget.AppCompat.ListView.DropDown">
         <item name="android:divider">@color/black_transparent</item>
         <item name="android:dividerHeight">1dp</item>
-    </style>
-
-    <style name="Flow.ActionBar.Tabs" parent="@style/Widget.AppCompat.ActionBar.TabView">
-        <item name="android:background">@drawable/tab_indicator_ab</item>
-        <item name="background">@drawable/tab_indicator_ab</item>
-    </style>
-
-    <style name="Flow.ActionBar.Text" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/action_bar_text</item>
-    </style>
-
-    <style name="Flow.ActionBar.TabText" parent="@style/Widget.AppCompat.ActionBar.TabText">
-        <item name="android:textColor">@color/tab_text_color</item>
     </style>
 
     <style name="Flow.ListView" parent="@style/Widget.AppCompat.ListView">
@@ -68,6 +40,24 @@
         <item name="android:layout_marginEnd">4dp</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextAppearance.Tabs" parent="TextAppearance.Design.Tab">
+        <item name="android:textStyle">bold</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="LinkTextViewStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/text_color_links</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
 </resources>

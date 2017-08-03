@@ -23,6 +23,7 @@ package org.akvo.flow.data;
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,11 +31,16 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.DatabaseHelper;
-import org.akvo.flow.data.database.LanguageTable;
-import org.akvo.flow.data.database.RecordColumns;
-import org.akvo.flow.data.database.Tables;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.database.RecordColumns;
+import org.akvo.flow.database.Tables;
+import org.akvo.flow.domain.SurveyGroup;
+
+import static org.akvo.flow.data.preference.Prefs.KEY_SURVEY_GROUP_ID;
 
 public class DataProvider extends ContentProvider {
     
@@ -57,7 +63,10 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mDatabaseHelper = new DatabaseHelper(getContext(), new LanguageTable());
+        Context context = getContext();
+        mDatabaseHelper = new DatabaseHelper(context, new LanguageTable(),
+                new FlowMigrationListener(new Prefs(context),
+                        new MigrationLanguageMapper(context)));
         return false;
     }
 
@@ -66,13 +75,14 @@ public class DataProvider extends ContentProvider {
             String sortOrder) {
         // Do the query against a read-only version of the database
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+        Prefs prefs = new Prefs(getContext().getApplicationContext());
         Cursor cursor = null;
         // Decodes the content URI and maps it to a code
         switch (sUriMatcher.match(uri)) {
             case SEARCH_SUGGEST:
                 // Suggestions search
                 // Adjust incoming query to become SQL text match
-                long surveyGroupId = FlowApp.getApp().getSurveyGroupId();
+                long surveyGroupId = prefs.getLong(KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
 
                 String nameSearchTerm = createNameSearchTerm(selectionArgs);
                 String idSearchTerm = createIdSearchTerm(selectionArgs);

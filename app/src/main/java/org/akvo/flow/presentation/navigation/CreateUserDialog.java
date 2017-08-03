@@ -27,6 +27,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -51,8 +52,12 @@ public class CreateUserDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        //TODO verify instanceof
-        listener = (CreateUserListener)getActivity();
+        FragmentActivity activity = getActivity();
+        if (activity instanceof CreateUserListener) {
+            listener = (CreateUserListener) activity;
+        } else {
+            throw new IllegalArgumentException("Activity must implement CreateUserListener");
+        }
     }
 
     @Override
@@ -65,7 +70,6 @@ public class CreateUserDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
-        //TODO: use xml
         Context context = getContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);

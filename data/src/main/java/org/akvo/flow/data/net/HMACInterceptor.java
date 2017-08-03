@@ -22,18 +22,13 @@ package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -50,12 +45,15 @@ import static org.akvo.flow.data.util.Constants.TIMESTAMP;
 public class HMACInterceptor implements Interceptor {
 
     private static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
-    private static final String CHARSET_UTF8 = "UTF-8";
 
     private final String key;
+    private final SimpleDateFormat dateFormat;
+    private final Encoder encoder;
 
-    public HMACInterceptor(String key) {
+    public HMACInterceptor(String key, SimpleDateFormat dateFormat, Encoder encoder) {
+        this.dateFormat = dateFormat;
         this.key = key;
+        this.encoder = encoder;
     }
 
     @Override
@@ -63,39 +61,26 @@ public class HMACInterceptor implements Interceptor {
         Request request = chain.request();
         HttpUrl url = request.url();
         String uriString = url.toString();
-        String query = url.query();
-        String urlBeginning = uriString.replace(query, "");
+        int separator = uriString.indexOf('?') + 1;
+        String query = uriString.substring(separator);
+        String urlBeginning = uriString.substring(0, separator);
 
-        query = appendNonEncodedQueryParam(query, TIMESTAMP, getTimestamp());
+        query = appendQueryParam(query, TIMESTAMP, getTimestamp());
         String auth = getAuthorization(query, key);
-        query = appendNonEncodedQueryParam(query, HMAC, auth);
+        query = appendQueryParam(query, HMAC, auth);
 
-        request = request.newBuilder().url(urlBeginning + query).build();
-        Response response = chain.proceed(request);
-        return response;
+        String reconstructedUrl = urlBeginning + query;
+        request = request.newBuilder().url(HttpUrl.parse(reconstructedUrl)).build();
+        return chain.proceed(request);
     }
 
     @NonNull
-    private String appendNonEncodedQueryParam(String query, String name, String value) {
+    private String appendQueryParam(String query, String name, String value) {
         return query + "&" + name + "=" + value;
     }
 
     private String getTimestamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return encodeParam(dateFormat.format(new Date()));
-    }
-
-    private String encodeParam(@Nullable String param) {
-        if (TextUtils.isEmpty(param)) {
-            return "";
-        }
-        try {
-            return URLEncoder.encode(param, CHARSET_UTF8);
-        } catch (UnsupportedEncodingException e) {
-            Timber.e(e.getMessage());
-            return "";
-        }
+        return encoder.encodeParam(dateFormat.format(new Date()));
     }
 
     @Nullable

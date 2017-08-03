@@ -21,78 +21,67 @@
 package org.akvo.flow.presentation.datapoints;
 
 import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 
 import org.akvo.flow.R;
+import org.akvo.flow.presentation.SnackBarManager;
+
+import javax.inject.Inject;
 
 public class DataPointSyncSnackBarManager {
 
-    private final DataPointSyncView dataPointSyncView;
+    private final SnackBarManager snackBarManager;
 
-    public DataPointSyncSnackBarManager(DataPointSyncView dataPointSyncView) {
-        this.dataPointSyncView = dataPointSyncView;
+    @Inject
+    public DataPointSyncSnackBarManager(SnackBarManager snackBarManager) {
+        this.snackBarManager = snackBarManager;
     }
 
-    public void showSyncedResults(int numberOfSyncedItems) {
-        View rootView = dataPointSyncView.getRootView();
+    public void showSyncedResults(int numberOfSyncedItems, View rootView) {
         if (rootView != null) {
-            displaySnackBar(
-                    rootView.getResources()
-                            .getQuantityString(R.plurals.data_points_sync_success_message,
-                                    numberOfSyncedItems, numberOfSyncedItems));
+            String message = rootView.getResources()
+                    .getQuantityString(R.plurals.data_points_sync_success_message,
+                            numberOfSyncedItems, numberOfSyncedItems);
+            snackBarManager.displaySnackBar(rootView, message, rootView.getContext());
         }
     }
 
-    public void showErrorSyncNotAllowed() {
-        View rootView = dataPointSyncView.getRootView();
+    public void showErrorSyncNotAllowed(View rootView, View.OnClickListener onClickListener) {
         if (rootView != null) {
-            Snackbar.make(rootView, R.string.data_points_sync_error_mobile_data_sync,
-                    Snackbar.LENGTH_LONG)
-                    .setAction(R.string.action_settings, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dataPointSyncView.onSettingsPressed();
-                        }
-                    })
-                    .show();
+            snackBarManager.displaySnackBarWithAction(rootView,
+                    R.string.data_points_sync_error_mobile_data_sync, R.string.action_settings,
+                    onClickListener, rootView.getContext());
         }
     }
 
-    public void showErrorNoNetwork() {
-        displaySnackBarWithRetry(R.string.data_points_sync_error_message_network);
+    public void showErrorNoNetwork(View rootView, View.OnClickListener onClickListener) {
+        displaySnackBarWithRetry(R.string.data_points_sync_error_message_network, rootView,
+                onClickListener);
     }
 
-    public void showErrorSync() {
-        displaySnackBarWithRetry(R.string.data_points_sync_error_message_default);
+    public void showErrorSync(View rootView, View.OnClickListener onClickListener) {
+        displaySnackBarWithRetry(R.string.data_points_sync_error_message_default, rootView,
+                onClickListener);
     }
 
-    public void showErrorAssignmentMissing() {
-        View rootView = dataPointSyncView.getRootView();
+    public void showErrorAssignmentMissing(View rootView) {
         if (rootView != null) {
             displaySnackBar(rootView.getContext()
-                    .getString(R.string.data_points_sync_error_message_assignment));
+                    .getString(R.string.data_points_sync_error_message_assignment), rootView);
         }
     }
 
-    private void displaySnackBar(String message) {
-        View rootView = dataPointSyncView.getRootView();
+    private void displaySnackBar(String message, View rootView) {
         if (rootView != null) {
-            Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
+            snackBarManager.displaySnackBar(rootView, message, rootView.getContext());
         }
     }
 
-    private void displaySnackBarWithRetry(@StringRes int errorMessage) {
-        View rootView = dataPointSyncView.getRootView();
+    private void displaySnackBarWithRetry(@StringRes int errorMessage, View rootView,
+            View.OnClickListener onClickListener) {
         if (rootView != null) {
-            Snackbar.make(rootView, errorMessage, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.action_retry, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dataPointSyncView.onRetryRequested();
-                        }
-                    })
-                    .show();
+            snackBarManager.displaySnackBarWithAction(rootView, errorMessage, R.string.action_retry,
+                    onClickListener, rootView.getContext());
         }
     }
 }

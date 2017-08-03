@@ -100,7 +100,7 @@ public class CreateUserDialog extends DialogFragment implements
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                       dismiss();
+                        dismiss();
                     }
                 });
 

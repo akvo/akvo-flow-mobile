@@ -55,7 +55,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
-import org.akvo.flow.presentation.datapoints.DataPointSyncView;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -67,16 +66,13 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class DataPointsMapFragment extends SupportMapFragment implements OnInfoWindowClickListener,
-        OnMapReadyCallback, DataPointsMapView, DataPointSyncView {
+        OnMapReadyCallback, DataPointsMapView {
 
     private static final int MAP_ZOOM_LEVEL = 10;
     private static final String MAP_OPTIONS = "MapOptions";
 
     @Nullable
     private RecordListListener mListener;
-
-    private final DataPointSyncSnackBarManager dataPointSyncSnackBarManager = new DataPointSyncSnackBarManager(
-            this);
 
     private List<MapDataPoint> mItems;
 
@@ -87,6 +83,9 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Nullable
     private GoogleMap mMap;
+
+    @Inject
+    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
     @Inject
     DataPointsMapPresenter presenter;
@@ -100,7 +99,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        args.putSerializable(ConstantUtil.EXTRA_SURVEY_GROUP, surveyGroup);
         GoogleMapOptions options = new GoogleMapOptions();
         options.zOrderOnTop(true);
         args.putParcelable(MAP_OPTIONS, options);
@@ -146,7 +144,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         initializeInjector();
         presenter.setView(this);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.EXTRA_SURVEY_GROUP);
+                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         presenter.onDataReady(surveyGroup);
         getMapAsync(this);
     }
@@ -255,7 +253,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         super.onResume();
         if (mItems.isEmpty()) {
             // Make sure we only fetch the data and center the map once
-            presenter.refresh();
+            presenter.loadDataPoints();
         }
     }
 
@@ -271,10 +269,9 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         super.onDestroy();
     }
 
-    public void refreshData(SurveyGroup surveyGroup) {
+    public void onNewSurveySelected(SurveyGroup surveyGroup) {
         getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        presenter.onDataReady(surveyGroup);
-        presenter.refresh();
+        presenter.onNewSurveySelected(surveyGroup);
     }
 
     @Override
@@ -338,41 +335,41 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Override
     public void showSyncedResults(int numberOfSyncedItems) {
-        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems);
+        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems, getView());
     }
 
     @Override
     public void showErrorAssignmentMissing() {
-        dataPointSyncSnackBarManager.showErrorAssignmentMissing();
+        dataPointSyncSnackBarManager.showErrorAssignmentMissing(getView());
     }
 
     @Override
     public void showErrorSyncNotAllowed() {
-        dataPointSyncSnackBarManager.showErrorSyncNotAllowed();
+        dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigator.navigateToPreferences(getActivity());
+            }
+        });
     }
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork();
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 
     @Override
     public void showErrorSync() {
-       dataPointSyncSnackBarManager.showErrorSync();
-    }
-
-    @Override
-    public void onRetryRequested() {
-        presenter.onSyncRecordsPressed();
-    }
-
-    @Override
-    public View getRootView() {
-        return getView();
-    }
-
-    @Override
-    public void onSettingsPressed() {
-        navigator.navigateToPreferences(getActivity());
+        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSyncRecordsPressed();
+            }
+        });
     }
 }

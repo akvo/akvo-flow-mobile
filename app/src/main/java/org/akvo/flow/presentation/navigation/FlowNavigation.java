@@ -42,7 +42,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.ui.view.geolocation.SnackBarManager;
+import org.akvo.flow.presentation.SnackBarManager;
 
 import java.util.List;
 
@@ -150,8 +150,9 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
                     case R.id.help:
                         navigator.navigateToHelp(context);
                         return true;
+                    default:
+                        return false;
                 }
-                return false;
             }
         });
     }

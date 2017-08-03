@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.ui.view.geolocation;
+package org.akvo.flow.presentation;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -60,6 +60,10 @@ public class SnackBarManager {
     }
 
     public void displaySnackBar(@Nullable View rootView, @StringRes int message, Context context) {
+       displaySnackBar(rootView, context.getResources().getString(message), context);
+    }
+
+    public void displaySnackBar(@Nullable View rootView, String message, Context context) {
         if (rootView != null) {
             Snackbar snackbar = Snackbar
                     .make(rootView, message, ConstantUtil.SNACK_BAR_DURATION_IN_MS);

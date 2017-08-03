@@ -45,7 +45,7 @@ public class UserOptionsDialog extends DialogFragment {
     public static UserOptionsDialog newInstance(ViewUser viewUser) {
         UserOptionsDialog fragment = new UserOptionsDialog();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(ConstantUtil.EXTRA_VIEW_USER, viewUser);
+        bundle.putParcelable(ConstantUtil.VIEW_USER_EXTRA, viewUser);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -53,7 +53,7 @@ public class UserOptionsDialog extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewUser = getArguments().getParcelable(ConstantUtil.EXTRA_VIEW_USER);
+        viewUser = getArguments().getParcelable(ConstantUtil.VIEW_USER_EXTRA);
     }
 
     @Override

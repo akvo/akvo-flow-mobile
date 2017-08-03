@@ -29,7 +29,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -71,7 +70,6 @@ import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -88,14 +86,13 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener,
+        DatapointsFragment.DatapointFragmentListener,
         FlowNavigation.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
-    //    private static final String DRAWER_FRAGMENT_TAG = "f";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -114,7 +111,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    //    private DrawerFragment mDrawer;
     private Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
@@ -146,7 +142,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
         apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
 
-        // Init navigation drawer
         initNavigationDrawer();
 
         initDataPointsFragment(savedInstanceState);
@@ -178,8 +173,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initNavigationDrawer() {
-        //        FragmentManager supportFragmentManager = getSupportFragmentManager();
-        //        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
@@ -187,7 +180,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                //                mDrawer.onDrawerClosed();
                 supportInvalidateOptionsMenu();
             }
 
@@ -337,14 +329,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onUserSelected(User user) {
-        FlowApp.getApp().setUser(user);
-        //        mDrawer.load();
-        mDrawerLayout.closeDrawers();
-        displaySelectedUser();
-    }
-
-    @Override
     public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
 
@@ -490,7 +474,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void reloadDrawer() {
-        //        mDrawer.load();
+        // TODO:
     }
 
     @OnClick(R.id.add_data_point_fab)

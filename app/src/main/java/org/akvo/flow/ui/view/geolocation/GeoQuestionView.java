@@ -37,14 +37,13 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LocationValidator;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.util.ConstantUtil.SNACK_BAR_DURATION_IN_MS;
 
 /**
  * Question that can handle geographic location input. This question can also
@@ -300,8 +299,7 @@ public class GeoQuestionView extends QuestionView
         final String lon = geoInputContainer.getLongitudeText();
         if (locationValidator.validCoordinates(lat, lon)) {
             updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
-            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+            setGeoQuestionResponse(lat, lon);
         } else {
             resetCode();
             setResponse(null);
@@ -315,9 +313,17 @@ public class GeoQuestionView extends QuestionView
         if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
             setResponse(null);
         } else {
-            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+            setGeoQuestionResponse(lat, lon);
         }
+    }
+
+    private void setGeoQuestionResponse(String lat, String lon) {
+        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(getResponse(lat, lon))
+                .setType(ConstantUtil.GEO_RESPONSE_TYPE)
+                .setQuestionId(getQuestion().getId())
+                .createQuestionResponse();
+        setResponse(questionResponse);
     }
 
     @NonNull

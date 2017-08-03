@@ -219,35 +219,58 @@ public class BriteSurveyDbAdapter {
     }
 
     public void syncResponse(long surveyInstanceId, ContentValues values, String questionId) {
-        boolean exists = responseExists(surveyInstanceId, questionId);
-        if (exists) {
-            briteDatabase.update(Tables.RESPONSE, values,
-                    ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                            + ResponseColumns.QUESTION_ID + " = ?",
-                    String.valueOf(surveyInstanceId), questionId);
+        Cursor cursor = getLastExistingResponse(surveyInstanceId, questionId);
+        boolean anotherIterationExists = cursor != null && cursor.moveToFirst();
+        if (anotherIterationExists) {
+            int iteration = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION));
+            boolean isFirstIterationFound = iteration == -1;
+            if (isFirstIterationFound) {
+                updateIterationOfFirstResponse(surveyInstanceId, questionId);
+                iteration = 0;
+            }
+            values.put(ResponseColumns.ITERATION, iteration + 1);
+            briteDatabase.insert(Tables.RESPONSE, values);
         } else {
             briteDatabase.insert(Tables.RESPONSE, values);
         }
-    }
-
-    private boolean responseExists(long surveyInstanceId, @Nullable String questionId) {
-        if (questionId == null) {
-            return false;
-        }
-        String sql =
-                "SELECT " + ResponseColumns.SURVEY_INSTANCE_ID + "," + ResponseColumns.QUESTION_ID
-                        + " FROM " + Tables.RESPONSE + " WHERE "
-                        + ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
-                        + ResponseColumns.QUESTION_ID + " = ?";
-        Cursor cursor = briteDatabase
-                .query(sql, String.valueOf(surveyInstanceId), questionId);
-
-        boolean exists = false;
         if (cursor != null) {
-            exists = cursor.getCount() > 0;
             cursor.close();
         }
-        return exists;
+    }
+
+    private void updateIterationOfFirstResponse(long surveyInstanceId, String questionId) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ResponseColumns.ITERATION, 0);
+        briteDatabase.update(Tables.RESPONSE, contentValues,
+                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                        + ResponseColumns.QUESTION_ID + " = ?",
+                String.valueOf(surveyInstanceId), questionId);
+    }
+
+    public void deleteResponses(long surveyInstanceId, String questionId) {
+        briteDatabase.delete(Tables.RESPONSE,
+                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
+                        + " = ?", new String[] { surveyInstanceId + "", questionId });
+    }
+
+    private Cursor getLastExistingResponse(long surveyInstanceId, @Nullable String questionId) {
+        if (questionId == null) {
+            return null;
+        }
+        String sql =
+                "SELECT " + ResponseColumns.SURVEY_INSTANCE_ID
+                        + ","
+                        + ResponseColumns.QUESTION_ID
+                        + ","
+                        + ResponseColumns.ITERATION
+                        + " FROM " + Tables.RESPONSE + " WHERE "
+                        + ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                        + ResponseColumns.QUESTION_ID + " = ? ORDER BY "
+                        + ResponseColumns.ITERATION
+                        + " DESC LIMIT 1";
+        Cursor cursor = briteDatabase
+                .query(sql, String.valueOf(surveyInstanceId), questionId);
+        return cursor;
     }
 
     public void createTransmission(long surveyInstanceId, String formID, String filename,

@@ -50,7 +50,7 @@ public class EditUserDialog extends DialogFragment {
     public static EditUserDialog newInstance(ViewUser viewUser) {
         EditUserDialog fragment = new EditUserDialog();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(ConstantUtil.EXTRA_VIEW_USER, viewUser);
+        bundle.putParcelable(ConstantUtil.VIEW_USER_EXTRA, viewUser);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -58,13 +58,13 @@ public class EditUserDialog extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewUser = getArguments().getParcelable(ConstantUtil.EXTRA_VIEW_USER);
+        viewUser = getArguments().getParcelable(ConstantUtil.VIEW_USER_EXTRA);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        listener = (EditUserListener)getActivity();
+        listener = (EditUserListener) getActivity();
     }
 
     @Override

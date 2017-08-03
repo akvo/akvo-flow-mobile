@@ -31,7 +31,7 @@ import android.support.v4.app.DialogFragment;
 import org.akvo.flow.R;
 import org.akvo.flow.presentation.navigation.ViewUser;
 
-import static org.akvo.flow.util.ConstantUtil.EXTRA_VIEW_USER;
+import static org.akvo.flow.util.ConstantUtil.VIEW_USER_EXTRA;
 
 public class UserDeleteConfirmationDialog extends DialogFragment {
 
@@ -46,7 +46,7 @@ public class UserDeleteConfirmationDialog extends DialogFragment {
     public static UserDeleteConfirmationDialog newInstance(ViewUser viewUser) {
         UserDeleteConfirmationDialog fragment = new UserDeleteConfirmationDialog();
         Bundle args = new Bundle();
-        args.putParcelable(EXTRA_VIEW_USER, viewUser);
+        args.putParcelable(VIEW_USER_EXTRA, viewUser);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,7 +54,7 @@ public class UserDeleteConfirmationDialog extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewUser = getArguments().getParcelable(EXTRA_VIEW_USER);
+        viewUser = getArguments().getParcelable(VIEW_USER_EXTRA);
     }
 
     @Override

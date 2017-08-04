@@ -44,6 +44,7 @@ public class EditUserDialog extends DialogFragment implements
         UsernameInputTextWatcher.UsernameWatcherListener {
 
     public static final String TAG = "EditUserDialog";
+    private static final String USER_NAME_PARAM = "user_name";
 
     private ViewUser viewUser;
     private EditUserListener listener;
@@ -134,6 +135,20 @@ public class EditUserDialog extends DialogFragment implements
             @Nullable Bundle savedInstanceState) {
         positiveButtonHandler = new PositiveButtonHandler(this);
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(USER_NAME_PARAM, userNameEt.getText().toString());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            userNameEt.setText(savedInstanceState.getString(USER_NAME_PARAM));
+        }
     }
 
     @Override

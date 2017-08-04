@@ -176,7 +176,7 @@ public class FlowNavigationPresenter implements Presenter {
 
     public void onCurrentUserLongPress() {
         if (currentUser != null) {
-            view.onUserLongPress(currentUser);
+            view.displayEditUser(currentUser);
         }
     }
 

@@ -296,6 +296,12 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     @Override
+    public void displayEditUser(ViewUser currentUser) {
+        DialogFragment fragment = EditUserDialog.newInstance(currentUser);
+        fragment.show(getSupportFragmentManager(), EditUserDialog.TAG);
+    }
+
+    @Override
     public void onUserLongPress(ViewUser viewUser) {
         DialogFragment dialogFragment = UserOptionsDialog.newInstance(viewUser);
         dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);

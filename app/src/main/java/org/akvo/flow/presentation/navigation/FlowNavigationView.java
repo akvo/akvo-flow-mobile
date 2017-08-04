@@ -51,4 +51,6 @@ public interface FlowNavigationView {
     void displayUserDeleteError();
 
     void displayUserSelectError();
+
+    void displayEditUser(ViewUser currentUser);
 }

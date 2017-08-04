@@ -48,6 +48,6 @@ public class SetSelectedUser extends UseCase {
         if (parameters == null || parameters.get(PARAM_USER_ID) == null) {
             return Observable.error(new IllegalArgumentException("missing user id"));
         }
-        return userRepository.setSelectedUser((Long)parameters.get(PARAM_USER_ID));
+        return userRepository.setSelectedUser((Long) parameters.get(PARAM_USER_ID));
     }
 }

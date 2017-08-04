@@ -58,7 +58,6 @@ import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
 
-    @Inject
     private static final String TERMS_URL = "http://akvo.org/help/akvo-policies-and-terms-2/akvo-flow-terms-of-use/";
     private static final String RELEASE_NOTES_URL = "https://github.com/akvo/akvo-flow-mobile/releases";
 

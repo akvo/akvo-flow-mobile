@@ -60,6 +60,7 @@ public class ViewModule {
         return allowedToConnect;
     }
 
+    @Provides
     @Named("getApkData")
     UseCase provideGetApkDataUseCase(GetApkData getApkData) {
         return getApkData;

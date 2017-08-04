@@ -31,8 +31,6 @@ import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.service.UserRequestedApkUpdateService;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
@@ -66,8 +64,4 @@ public interface ViewComponent {
     void inject(DrawerFragment drawerFragment);
 
     void inject(HelpActivity activity);
-
-    void inject(UserRequestedApkUpdateService userRequestedApkUpdateService);
-
-    void inject(ApkUpdateService apkUpdateService);
 }

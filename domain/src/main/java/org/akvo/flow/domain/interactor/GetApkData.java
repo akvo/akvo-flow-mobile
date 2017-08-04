@@ -34,7 +34,8 @@ public class GetApkData extends UseCase {
     public static final String BASE_URL_KEY = "base_url_key";
 
     @Inject
-    public GetApkData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread, ApkRepository apkRepository) {
+    public GetApkData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
+            ApkRepository apkRepository) {
         super(threadExecutor, postExecutionThread);
         this.apkRepository = apkRepository;
     }

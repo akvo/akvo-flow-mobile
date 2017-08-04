@@ -29,6 +29,8 @@ import com.squareup.sqlbrite.SqlBrite;
 
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.database.SurveyColumns;
+import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
@@ -42,10 +44,6 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
-
 import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
 import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
 import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
@@ -292,5 +290,31 @@ public class BriteSurveyDbAdapter {
                 + " WHERE " + RecordColumns.RECORD_ID + " NOT IN "
                 + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
                 + " FROM " + Tables.SURVEY_INSTANCE + ")");
+    }
+
+    public Observable<Boolean> deleteSurvey(long surveyGroupId) {
+        // First the group
+        briteDatabase.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
+        // Now the surveys
+        briteDatabase.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getSurveys() {
+        String sqlQuery = "SELECT * FROM " + Tables.SURVEY_GROUP;
+        return briteDatabase
+                .createQuery(Tables.SURVEY_GROUP, sqlQuery)
+                .concatMap(new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
+                    @Override
+                    public Observable<? extends Cursor> call(SqlBrite.Query query) {
+                        return Observable.just(query.run());
+                    }
+                });
+    }
+
+    public void addSurveyGroup(ContentValues values) {
+        briteDatabase.insert(Tables.SURVEY_GROUP, values);
     }
 }

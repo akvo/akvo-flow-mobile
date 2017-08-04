@@ -25,4 +25,10 @@ import rx.Observable;
 public interface UserRepository {
 
     Observable<Boolean> mobileSyncAllowed();
+
+    Observable<Long> getSelectedSurvey();
+
+    Observable<Boolean> clearSelectedSurvey();
+
+    Observable<Boolean> setSelectedSurvey(long surveyGroupId);
 }

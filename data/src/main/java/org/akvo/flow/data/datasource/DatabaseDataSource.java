@@ -55,6 +55,14 @@ public class DatabaseDataSource {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
     }
 
+    public Observable<Cursor> getSurveys() {
+        return briteSurveyDbAdapter.getSurveys();
+    }
+
+    public Observable<Boolean> deleteSurvey(long surveyId) {
+        return briteSurveyDbAdapter.deleteSurvey(surveyId);
+    }
+
     public Observable<Cursor> getDataPoints(@NonNull Long surveyGroupId, @Nullable Double latitude,
             @Nullable Double longitude, @Nullable Integer orderBy) {
         if (isRequestFiltered(orderBy)) {

@@ -36,7 +36,7 @@ public class SurveyMapper {
     public List<ViewSurvey> transform(List<Survey> surveys) {
         List<ViewSurvey> viewSurveys = new ArrayList<>();
         if (surveys != null) {
-            for (Survey s: surveys) {
+            for (Survey s : surveys) {
                 viewSurveys.add(transform(s));
             }
         }

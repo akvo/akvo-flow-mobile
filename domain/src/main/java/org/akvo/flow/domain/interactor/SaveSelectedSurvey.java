@@ -48,6 +48,6 @@ public class SaveSelectedSurvey extends UseCase {
         if (parameters == null || parameters.get(KEY_SURVEY_GROUP_ID) == null) {
             return Observable.error(new IllegalArgumentException("Missing survey group id"));
         }
-        return userRepository.setSelectedSurvey((Long)parameters.get(KEY_SURVEY_GROUP_ID));
+        return userRepository.setSelectedSurvey((Long) parameters.get(KEY_SURVEY_GROUP_ID));
     }
 }

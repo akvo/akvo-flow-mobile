@@ -48,10 +48,6 @@ import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
 import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
 import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
-
 public class BriteSurveyDbAdapter {
 
     private static final int DOES_NOT_EXIST = -1;
@@ -299,10 +295,10 @@ public class BriteSurveyDbAdapter {
     public Observable<Boolean> deleteSurvey(long surveyGroupId) {
         // First the group
         briteDatabase.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
+                String.valueOf(surveyGroupId));
         // Now the surveys
         briteDatabase.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
+                String.valueOf(surveyGroupId));
         return Observable.just(true);
     }
 

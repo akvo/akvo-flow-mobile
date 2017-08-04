@@ -100,7 +100,7 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
 
         void setViews(ViewSurvey navigationItem, boolean isSelected) {
             surveyTv.setText(navigationItem.getName());
-            surveyTv.setTextColor(isSelected? selectedTextColor: textColor);
+            surveyTv.setTextColor(isSelected ? selectedTextColor : textColor);
         }
     }
 }

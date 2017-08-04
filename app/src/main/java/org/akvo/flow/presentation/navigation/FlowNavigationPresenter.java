@@ -23,9 +23,14 @@ package org.akvo.flow.presentation.navigation;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.CreateUser;
 import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.DeleteUser;
+import org.akvo.flow.domain.interactor.EditUser;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
+import org.akvo.flow.domain.interactor.SetSelectedUser;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -43,22 +48,39 @@ public class FlowNavigationPresenter implements Presenter {
     private final UseCase getAllSurveys;
     private final UseCase deleteSurvey;
     private final UseCase saveSelectedSurvey;
+    private final UseCase getUsers;
+    private final UseCase editUser;
+    private final UseCase deleteUser;
+    private final UseCase setSelectedUser;
+    private final UseCase createUser;
 
     private final SurveyMapper surveyMapper;
+    private final UserMapper userMapper;
     private final SurveyGroupMapper surveyGroupMapper;
 
     private FlowNavigationView view;
+    private ViewUser currentUser;
 
     @Inject
     public FlowNavigationPresenter(@Named("getAllSurveys") UseCase getAllSurveys,
             SurveyMapper surveyMapper, @Named("deleteSurvey") UseCase deleteSurvey,
             SurveyGroupMapper surveyGroupMapper,
-            @Named("saveSelectedSurvey") UseCase saveSelectedSurvey) {
+            @Named("saveSelectedSurvey") UseCase saveSelectedSurvey,
+            @Named("getUsers") UseCase getUsers, UserMapper userMapper,
+            @Named("editUser") UseCase editUser, @Named("deleteUser") UseCase deleteUser,
+            @Named("setSelectedUser") UseCase setSelectedUser,
+            @Named("createUser") UseCase createUser) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
         this.deleteSurvey = deleteSurvey;
         this.surveyGroupMapper = surveyGroupMapper;
         this.saveSelectedSurvey = saveSelectedSurvey;
+        this.getUsers = getUsers;
+        this.userMapper = userMapper;
+        this.editUser = editUser;
+        this.deleteUser = deleteUser;
+        this.setSelectedUser = setSelectedUser;
+        this.createUser = createUser;
     }
 
     @Override
@@ -66,6 +88,11 @@ public class FlowNavigationPresenter implements Presenter {
         getAllSurveys.unSubscribe();
         deleteSurvey.unSubscribe();
         saveSelectedSurvey.unSubscribe();
+        getUsers.unSubscribe();
+        editUser.unSubscribe();
+        deleteUser.unSubscribe();
+        setSelectedUser.unSubscribe();
+        createUser.unSubscribe();
     }
 
     public void setView(FlowNavigationView view) {
@@ -73,18 +100,38 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void load() {
+        loadSurveys();
+        loadUsers();
+    }
+
+    private void loadSurveys() {
         getAllSurveys.execute(new DefaultSubscriber<Pair<List<Survey>, Long>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error getting all surveys");
-                //what error to display here and how?
+                view.displaySurveyError();
             }
 
             @Override
             public void onNext(Pair<List<Survey>, Long> result) {
-                int size = result.first == null ? 0 : result.first.size();
-                Timber.d("found new surveys: " + size);
-                view.display(surveyMapper.transform(result.first), result.second);
+                view.displaySurveys(surveyMapper.transform(result.first), result.second);
+            }
+        }, null);
+    }
+
+    private void loadUsers() {
+        getUsers.execute(new DefaultSubscriber<Pair<User, List<User>>>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e, "Error getting users");
+                view.displayUsersError();
+            }
+
+            @Override
+            public void onNext(Pair<User, List<User>> userListPair) {
+                currentUser = userMapper.transform(userListPair.first);
+                String name = currentUser == null ? "" : currentUser.getName();
+                view.displayUser(name, userMapper.transform(userListPair.second));
             }
         }, null);
     }
@@ -96,7 +143,7 @@ public class FlowNavigationPresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                //TODO: notify user
+                view.displayErrorDeleteSurvey();
                 load();
             }
 
@@ -116,15 +163,89 @@ public class FlowNavigationPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
-                    //TODO: error
+                    view.displayErrorSelectSurvey();
                 }
 
                 @Override
-                public void onNext(Boolean aBoolean) {
+                public void onNext(Boolean ignored) {
                     view.onSurveySelected(surveyGroupMapper.transform(viewSurvey));
                 }
             }, params);
         }
+    }
 
+    public void onCurrentUserLongPress() {
+        if (currentUser != null) {
+            view.onUserLongPress(currentUser);
+        }
+    }
+
+    public void editUser(ViewUser viewUser) {
+        Map<String, User> params = new HashMap<>(2);
+        params.put(EditUser.PARAM_USER, userMapper.transform(viewUser));
+        editUser.execute(new DefaultSubscriber<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.displayUserEditError();
+            }
+        }, params);
+    }
+
+    public void deleteUser(ViewUser viewUser) {
+        Map<String, User> params = new HashMap<>(2);
+        params.put(DeleteUser.PARAM_USER, userMapper.transform(viewUser));
+        deleteUser.execute(new DefaultSubscriber<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.displayUserDeleteError();
+            }
+        }, params);
+    }
+
+    public void onUserSelected(ViewUser item) {
+        if (item.getId() == ViewUser.ADD_USER_ID) {
+            view.displayAddUser();
+        } else {
+            Map<String, Long> params = new HashMap<>(2);
+            params.put(SetSelectedUser.PARAM_USER_ID, item.getId());
+            setSelectedUser.execute(new DefaultSubscriber<Boolean>() {
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e);
+                    view.displayUserSelectError();
+                }
+
+                @Override
+                public void onNext(Boolean aBoolean) {
+                    load();
+                }
+            }, params);
+        }
+    }
+
+    public void createUser(String userName) {
+        Map<String, String> params = new HashMap<>(2);
+        params.put(CreateUser.PARAM_USER_NAME, userName);
+        createUser.execute(new DefaultSubscriber<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(Boolean ignored) {
+                loadUsers();
+            }
+        }, params);
+    }
+
+    public void onUserLongPress(ViewUser item) {
+        if (item.getId() == ViewUser.ADD_USER_ID) {
+            view.displayAddUser();
+        } else {
+            view.onUserLongPress(item);
+        }
     }
 }

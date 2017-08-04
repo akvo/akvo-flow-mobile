@@ -21,9 +21,12 @@
 package org.akvo.flow.presentation.navigation;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +42,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.presentation.SnackBarManager;
 
 import java.util.List;
 
@@ -53,13 +57,20 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private RecyclerView surveysRv;
     private RecyclerView usersRv;
     private DrawerNavigationListener surveyListener;
-    private SurveyAdapter adapter;
+    private SurveyAdapter surveyAdapter;
+    private UserAdapter usersAdapter;
+    private Drawable hideUsersDrawable;
+    private Drawable showUsersDrawable;
+    private View headerView;
 
     @Inject
     FlowNavigationPresenter presenter;
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     public FlowNavigation(Context context) {
         this(context, null);
@@ -86,7 +97,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void initViews() {
-        View headerView = getHeaderView(0);
+        headerView = getHeaderView(0);
         currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
         surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
         surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
@@ -100,12 +111,28 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         viewComponent.inject(this);
     }
 
-    protected ApplicationComponent getApplicationComponent() {
+    private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
     private void initUserList() {
-       //TODO
+        final Context context = getContext();
+        usersRv.setLayoutManager(new LinearLayoutManager(context));
+        usersAdapter = new UserAdapter(context);
+        usersRv.setAdapter(usersAdapter);
+        usersRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View childView, int position) {
+                        presenter.onUserSelected(usersAdapter.getItem(position));
+                    }
+
+                    @Override
+                    public void onItemLongPress(View childView, int position) {
+                        presenter.onUserLongPress(usersAdapter.getItem(position));
+                    }
+                })
+        );
     }
 
     private void setNavigationItemListener() {
@@ -133,8 +160,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private void initSurveyList() {
         final Context context = getContext();
         surveysRv.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new SurveyAdapter(context);
-        surveysRv.setAdapter(adapter);
+        surveyAdapter = new SurveyAdapter(context);
+        surveysRv.setAdapter(surveyAdapter);
         surveysRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -144,27 +171,43 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
                     @Override
                     public void onItemLongPress(View childView, int position) {
-                        onSurveyItemLongPress(position, adapter);
+                        onSurveyItemLongPress(position, surveyAdapter);
                     }
                 })
         );
     }
 
     private void initCurrentUserText() {
-        currentUserTv.setOnClickListener(new OnClickListener() {
+        hideUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_less);
+        showUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_more);
+        headerView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (surveysRv.getVisibility() == VISIBLE) {
+                    updateTextViewDrawable(hideUsersDrawable);
                     surveyTitleTv.setVisibility(GONE);
                     surveysRv.setVisibility(GONE);
                     usersRv.setVisibility(VISIBLE);
                 } else {
+                    updateTextViewDrawable(showUsersDrawable);
                     surveyTitleTv.setVisibility(VISIBLE);
                     surveysRv.setVisibility(VISIBLE);
                     usersRv.setVisibility(GONE);
+
                 }
             }
         });
+        headerView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                presenter.onCurrentUserLongPress();
+                return true;
+            }
+        });
+    }
+
+    private void updateTextViewDrawable(Drawable drawable) {
+        currentUserTv.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
     }
 
     private void onSurveyItemLongPress(int position, SurveyAdapter adapter) {
@@ -173,13 +216,12 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
             final long surveyGroupId = viewSurvey.getId();
             DialogFragment dialogFragment = SurveyDeleteConfirmationDialog
                     .newInstance(surveyGroupId);
-            dialogFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(),
-                    SurveyDeleteConfirmationDialog.TAG);
+            dialogFragment.show(getSupportFragmentManager(), SurveyDeleteConfirmationDialog.TAG);
         }
     }
 
     private void onSurveyItemTap(int position) {
-        presenter.onSurveyItemTap(adapter.getItem(position));
+        presenter.onSurveyItemTap(surveyAdapter.getItem(position));
     }
 
     public void setSurveyListener(DrawerNavigationListener surveyListener) {
@@ -187,8 +229,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     @Override
-    public void display(List<ViewSurvey> surveys, Long selectedSurveyId) {
-        adapter.setSurveys(surveys, selectedSurveyId);
+    public void displaySurveys(List<ViewSurvey> surveys, Long selectedSurveyId) {
+        surveyAdapter.setSurveys(surveys, selectedSurveyId);
     }
 
     @Override
@@ -202,8 +244,65 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     public void onSurveySelected(SurveyGroup surveyGroup) {
         if (surveyListener != null) {
             surveyListener.onSurveySelected(surveyGroup);
-            adapter.updateSelected(surveyGroup.getId());
+            surveyAdapter.updateSelected(surveyGroup.getId());
         }
+    }
+
+    @Override
+    public void displayUser(String userName, List<ViewUser> viewUsers) {
+        usersAdapter.setUsers(viewUsers);
+        currentUserTv.setText(userName);
+    }
+
+    @Override
+    public void displayAddUser() {
+        CreateUserDialog dialog = new CreateUserDialog();
+        dialog.show(getSupportFragmentManager(), CreateUserDialog.TAG);
+    }
+
+    @Override
+    public void displaySurveyError() {
+        snackBarManager.displaySnackBar(this, R.string.surveys_error, getContext());
+    }
+
+    @Override
+    public void displayUsersError() {
+        snackBarManager.displaySnackBar(this, R.string.users_error, getContext());
+    }
+
+    @Override
+    public void displayErrorDeleteSurvey() {
+        snackBarManager.displaySnackBar(this, R.string.survey_delete_error, getContext());
+    }
+
+    @Override
+    public void displayErrorSelectSurvey() {
+        snackBarManager.displaySnackBar(this, R.string.survey_select_error, getContext());
+    }
+
+    @Override
+    public void displayUserEditError() {
+        snackBarManager.displaySnackBar(this, R.string.user_edit_error, getContext());
+    }
+
+    @Override
+    public void displayUserDeleteError() {
+        snackBarManager.displaySnackBar(this, R.string.user_delete_error, getContext());
+    }
+
+    @Override
+    public void displayUserSelectError() {
+        snackBarManager.displaySnackBar(this, R.string.user_select_error, getContext());
+    }
+
+    @Override
+    public void onUserLongPress(ViewUser viewUser) {
+        DialogFragment dialogFragment = UserOptionsDialog.newInstance(viewUser);
+        dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);
+    }
+
+    private FragmentManager getSupportFragmentManager() {
+        return ((AppCompatActivity) getContext()).getSupportFragmentManager();
     }
 
     public void onSurveyDeleteConfirmed(long surveyGroupId) {
@@ -216,6 +315,17 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         super.onDetachedFromWindow();
     }
 
+    public void editUser(ViewUser viewUser) {
+        presenter.editUser(viewUser);
+    }
+
+    public void deleteUser(ViewUser viewUser) {
+        presenter.deleteUser(viewUser);
+    }
+
+    public void createUser(String userName) {
+        presenter.createUser(userName);
+    }
 
     public interface DrawerNavigationListener {
 

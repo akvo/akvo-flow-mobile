@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -56,8 +57,13 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.EditUserDialog;
+import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.FlowNavigation;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.UserOptionsDialog;
+import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
@@ -82,7 +88,9 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DatapointsFragment.DatapointFragmentListener,
         FlowNavigation.DrawerNavigationListener,
-        SurveyDeleteConfirmationDialog.SurveyDeleteListener {
+        SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
+        UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
+        CreateUserDialog.CreateUserListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
 
@@ -351,6 +359,33 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onSurveyDeleteConfirmed(long surveyGroupId) {
         navigationView.onSurveyDeleteConfirmed(surveyGroupId);
+    }
+
+    @Override
+    public void onEditUser(ViewUser viewUser) {
+        DialogFragment fragment = EditUserDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), EditUserDialog.TAG);
+    }
+
+    @Override
+    public void editUser(ViewUser viewUser) {
+        navigationView.editUser(viewUser);
+    }
+
+    @Override
+    public void onDeleteUser(ViewUser viewUser) {
+        DialogFragment fragment = UserDeleteConfirmationDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), UserDeleteConfirmationDialog.TAG);
+    }
+
+    @Override
+    public void onUserDeleteConfirmed(ViewUser viewUser) {
+        navigationView.deleteUser(viewUser);
+    }
+
+    @Override
+    public void createUser(String userName) {
+        navigationView.createUser(userName);
     }
 
     @Override

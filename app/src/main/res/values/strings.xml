@@ -282,5 +282,12 @@
         <item quantity="one">%1$d data point synced</item>
         <item quantity="other">%1$d data points synced</item>
     </plurals>
+    <string name="surveys_error">Error loading surveys</string>
+    <string name="users_error">Error loading users</string>
+    <string name="survey_delete_error">Error deleting survey</string>
+    <string name="survey_select_error">Error selecting survey</string>
+    <string name="user_edit_error">Error editing user</string>
+    <string name="user_delete_error">Error deleting user</string>
+    <string name="user_select_error">Error selecting user</string>
 
 </resources>

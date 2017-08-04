@@ -20,10 +20,17 @@
 
 package org.akvo.flow.injector.module;
 
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.CreateUser;
+import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.DeleteUser;
+import org.akvo.flow.domain.interactor.EditUser;
+import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.GetUsers;
 import org.akvo.flow.domain.interactor.SaveImage;
+import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
+import org.akvo.flow.domain.interactor.SetSelectedUser;
 import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 
@@ -57,5 +64,53 @@ public class ViewModule {
     @Named("allowedToConnect")
     UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
         return allowedToConnect;
+    }
+
+    @Provides
+    @Named("getAllSurveys")
+    UseCase provideGetAllSurveys(GetAllSurveys getAllSurveys) {
+        return getAllSurveys;
+    }
+
+    @Provides
+    @Named("deleteSurvey")
+    UseCase provideDeleteSurvey(DeleteSurvey deleteSurvey) {
+        return deleteSurvey;
+    }
+
+    @Provides
+    @Named("saveSelectedSurvey")
+    UseCase provideSaveSelectedSurvey(SaveSelectedSurvey saveSelectedSurvey) {
+        return saveSelectedSurvey;
+    }
+
+    @Provides
+    @Named("getUsers")
+    UseCase provideGetUsers(GetUsers getUsers) {
+        return getUsers;
+    }
+
+    @Provides
+    @Named("editUser")
+    UseCase provideEditUser(EditUser editUser) {
+        return editUser;
+    }
+
+    @Provides
+    @Named("deleteUser")
+    UseCase provideDeleteUser(DeleteUser deleteUser) {
+        return deleteUser;
+    }
+
+    @Provides
+    @Named("setSelectedUser")
+    UseCase provideSelectedUser(SetSelectedUser selectedUser) {
+        return selectedUser;
+    }
+
+    @Provides
+    @Named("createUser")
+    UseCase provideCreateUser(CreateUser createUser) {
+        return createUser;
     }
 }

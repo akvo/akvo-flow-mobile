@@ -23,16 +23,17 @@ package org.akvo.flow.data.datasource.preferences;
 import android.content.SharedPreferences;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import rx.Observable;
 
-@Singleton
 public class SharedPreferencesDataSource {
 
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
-    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     private static final String KEY_BACKEND_SERVER = "backend.server";
+    private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
+    private static final String KEY_USER_ID = "userId";
+    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    private static final long INVALID_ID = -1;
 
     private final SharedPreferences preferences;
 
@@ -57,31 +58,57 @@ public class SharedPreferencesDataSource {
         preferences.edit().putString(key, value).apply();
     }
 
-    public boolean getBoolean(String key, boolean defValue) {
+    public Observable<Long> getSelectedSurvey() {
+        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, INVALID_ID));
+    }
+
+    public Observable<Boolean> setSelectedSurvey(long surveyId) {
+        setLong(KEY_SURVEY_GROUP_ID, surveyId);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearSelectedSurvey() {
+        return setSelectedSurvey(INVALID_ID);
+    }
+
+    private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
     }
 
-    public void setBoolean(String key, boolean value) {
-        preferences.edit().putBoolean(key, value).apply();
-    }
-
-    public long getLong(String key, long defValue) {
+    private long getLong(String key, long defValue) {
         return preferences.getLong(key, defValue);
     }
 
-    public void setLong(String key, long value) {
+    private void setLong(String key, long value) {
         preferences.edit().putLong(key, value).apply();
     }
 
-    public int getInt(String key, int defValue) {
+    private void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
+    }
+
+    private int getInt(String key, int defValue) {
         return preferences.getInt(key, defValue);
     }
 
-    public void setInt(String key, int value) {
+    private void setInt(String key, int value) {
         preferences.edit().putInt(key, value).apply();
     }
 
-    public void removePreference(String key) {
+    private void removePreference(String key) {
         preferences.edit().remove(key).apply();
+    }
+
+    public Observable<Long> getSelectedUser() {
+        return Observable.just(getLong(KEY_USER_ID, INVALID_ID));
+    }
+
+    public Observable<Boolean> clearSelectedUser() {
+        return setSelectedUser(INVALID_ID);
+    }
+
+    public Observable<Boolean> setSelectedUser(long userId) {
+        setLong(KEY_USER_ID, userId);
+        return Observable.just(true);
     }
 }

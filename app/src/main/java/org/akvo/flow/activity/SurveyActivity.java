@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -56,13 +57,19 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.EditUserDialog;
+import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.CreateUserDialog;
+import org.akvo.flow.presentation.navigation.FlowNavigation;
+import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.UserOptionsDialog;
+import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -79,10 +86,13 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
+        DatapointsFragment.DatapointFragmentListener,
+        FlowNavigation.DrawerNavigationListener,
+        SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
+        UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
+        CreateUserDialog.CreateUserListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
-    private static final String DRAWER_FRAGMENT_TAG = "f";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -93,12 +103,14 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @BindView(R.id.add_data_point_fab)
     FloatingActionButton addDataPointFab;
 
+    @BindView(R.id.nav_view)
+    FlowNavigation navigationView;
+
     @Nullable
     private SurveyDbDataSource mDatabase;
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerFragment mDrawer;
     private Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
@@ -130,7 +142,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
         apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
 
-        // Init navigation drawer
         initNavigationDrawer();
 
         initDataPointsFragment(savedInstanceState);
@@ -150,7 +161,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
-
+        navigationView.setSurveyListener(this);
     }
 
     private void initializeToolBar() {
@@ -162,8 +173,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initNavigationDrawer() {
-        FragmentManager supportFragmentManager = getSupportFragmentManager();
-        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
@@ -171,7 +180,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                mDrawer.onDrawerClosed();
                 supportInvalidateOptionsMenu();
             }
 
@@ -321,14 +329,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onUserSelected(User user) {
-        FlowApp.getApp().setUser(user);
-        mDrawer.load();
-        mDrawerLayout.closeDrawers();
-        displaySelectedUser();
-    }
-
-    @Override
     public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
 
@@ -337,7 +337,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         setTitle(title);
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, selectedSurveyId);
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
                 DATA_POINTS_FRAGMENT_TAG);
@@ -345,9 +344,48 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             f.refresh(mSurveyGroup);
         }
         supportInvalidateOptionsMenu();
-        mDrawer.load();
+
         mDrawerLayout.closeDrawers();
         updateAddDataPointFab();
+    }
+
+    @Override
+    public void onSurveyDeleted(long surveyGroupId) {
+        if (selectedSurveyId == surveyGroupId) {
+            onSurveySelected(null);
+        }
+    }
+
+    @Override
+    public void onSurveyDeleteConfirmed(long surveyGroupId) {
+        navigationView.onSurveyDeleteConfirmed(surveyGroupId);
+    }
+
+    @Override
+    public void onEditUser(ViewUser viewUser) {
+        DialogFragment fragment = EditUserDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), EditUserDialog.TAG);
+    }
+
+    @Override
+    public void editUser(ViewUser viewUser) {
+        navigationView.editUser(viewUser);
+    }
+
+    @Override
+    public void onDeleteUser(ViewUser viewUser) {
+        DialogFragment fragment = UserDeleteConfirmationDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), UserDeleteConfirmationDialog.TAG);
+    }
+
+    @Override
+    public void onUserDeleteConfirmed(ViewUser viewUser) {
+        navigationView.deleteUser(viewUser);
+    }
+
+    @Override
+    public void createUser(String userName) {
+        navigationView.createUser(userName);
     }
 
     @Override
@@ -436,7 +474,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void reloadDrawer() {
-        mDrawer.load();
+        // TODO:
     }
 
     @OnClick(R.id.add_data_point_fab)

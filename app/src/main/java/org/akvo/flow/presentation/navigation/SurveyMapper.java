@@ -18,23 +18,33 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.presentation.navigation;
 
 import org.akvo.flow.domain.entity.Survey;
-import org.akvo.flow.domain.entity.DataPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
+import javax.inject.Inject;
 
-public interface SurveyRepository {
+public class SurveyMapper {
 
-    Observable<List<Survey>> getSurveys();
+    @Inject
+    public SurveyMapper() {
+    }
 
-    Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
-            Double longitude, Integer orderBy);
+    public List<ViewSurvey> transform(List<Survey> surveys) {
+        List<ViewSurvey> viewSurveys = new ArrayList<>();
+        if (surveys != null) {
+            for (Survey s : surveys) {
+                viewSurveys.add(transform(s));
+            }
+        }
+        return viewSurveys;
+    }
 
-    Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
-
-    Observable<Boolean> deleteSurvey(long surveyToDeleteId);
+    private ViewSurvey transform(Survey survey) {
+        return new ViewSurvey(survey.getId(), survey.getName(), survey.isMonitored(),
+                survey.getRegistrationSurveyId());
+    }
 }

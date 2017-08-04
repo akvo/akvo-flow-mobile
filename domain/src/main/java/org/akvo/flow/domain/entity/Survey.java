@@ -18,23 +18,34 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.entity;
 
-import org.akvo.flow.domain.entity.Survey;
-import org.akvo.flow.domain.entity.DataPoint;
+public class Survey {
+    private final long id;
+    private final String name;
+    private final boolean isMonitored;
+    private final String registrationSurveyId;
 
-import java.util.List;
+    public Survey(long id, String name, boolean isMonitored, String registrationSurveyId) {
+        this.id = id;
+        this.name = name;
+        this.isMonitored = isMonitored;
+        this.registrationSurveyId = registrationSurveyId;
+    }
 
-import rx.Observable;
+    public long getId() {
+        return id;
+    }
 
-public interface SurveyRepository {
+    public String getName() {
+        return name;
+    }
 
-    Observable<List<Survey>> getSurveys();
+    public boolean isMonitored() {
+        return isMonitored;
+    }
 
-    Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
-            Double longitude, Integer orderBy);
-
-    Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
-
-    Observable<Boolean> deleteSurvey(long surveyToDeleteId);
+    public String getRegistrationSurveyId() {
+        return registrationSurveyId;
+    }
 }

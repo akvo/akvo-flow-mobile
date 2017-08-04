@@ -18,23 +18,17 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.presentation.navigation;
 
-import org.akvo.flow.domain.entity.Survey;
-import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.SurveyGroup;
 
 import java.util.List;
 
-import rx.Observable;
+public interface FlowNavigationView {
 
-public interface SurveyRepository {
+    void display(List<ViewSurvey> surveys, Long selectedSurveyId);
 
-    Observable<List<Survey>> getSurveys();
+    void notifySurveyDeleted(long surveyGroupId);
 
-    Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
-            Double longitude, Integer orderBy);
-
-    Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
-
-    Observable<Boolean> deleteSurvey(long surveyToDeleteId);
+    void onSurveySelected(SurveyGroup viewSurveyId);
 }

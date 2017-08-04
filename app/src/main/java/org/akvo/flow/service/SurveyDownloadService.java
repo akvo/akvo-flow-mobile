@@ -29,6 +29,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
@@ -55,6 +56,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
@@ -66,31 +69,39 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
  */
 public class SurveyDownloadService extends IntentService {
 
-    private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
-
     /**
      * Intent parameter to specify which survey needs to be downloaded
      */
     public static final String EXTRA_SURVEY_ID = "survey";
     public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
-
-    private static final String DEFAULT_TYPE = "Survey";
     public static final String TEST_SURVEY_ID = "0";
 
-    private SurveyDbDataSource databaseAdaptor;
-    private Prefs prefs;
-    private ConnectivityStateManager connectivityStateManager;
+    private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
+    private static final String DEFAULT_TYPE = "Survey";
+
+    @Inject
+    SurveyDbDataSource databaseAdaptor;
+
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    ConnectivityStateManager connectivityStateManager;
 
     public SurveyDownloadService() {
         super(TAG);
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
+    }
+
     public void onHandleIntent(@Nullable Intent intent) {
         try {
-            databaseAdaptor = new SurveyDbDataSource(this, null);
             databaseAdaptor.open();
-            prefs = new Prefs(getApplicationContext());
-            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
                 downloadSurvey(intent);
             } else if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {

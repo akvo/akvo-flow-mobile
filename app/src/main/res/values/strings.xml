@@ -221,13 +221,14 @@
     <string name="edit_user">Edit username</string>
     <string name="delete_user">Delete user</string>
     <string name="empty_user_warning">Username cannot be empty</string>
-    <string name="delete_user_confirmation">Are you sure you want to delete this user?</string>
+    <string name="delete_user_confirmation">Delete user?</string>
     <string name="username">Username</string>
     <string name="mustselectuser">Please select a user before continuing</string>
     <string name="surveys">Surveys</string>
     <string name="logged_in_as">Logged in as</string>
     <!--Misc-->
     <string name="okbutton">OK</string>
+    <string name="delete_button">Delete</string>
     <string name="cancelbutton">Cancel</string>
     <string name="savebutton">Save</string>
     <string name="clearbutton">Clear</string>

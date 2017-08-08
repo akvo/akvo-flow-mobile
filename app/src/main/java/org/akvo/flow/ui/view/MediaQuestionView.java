@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -156,7 +156,6 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     }
 
     private void displayImage(String filename, ImageView imageView) {
-//        ImageUtil.displayImage(imageView, filename);
         imageLoader.loadFromFile(new File(filename), imageView);
     }
 

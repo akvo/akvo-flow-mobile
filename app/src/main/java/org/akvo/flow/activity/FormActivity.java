@@ -26,9 +26,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -77,6 +77,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import timber.log.Timber;
 
 import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
@@ -95,7 +97,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
      */
     private String mRequestQuestionId;
 
-    private ViewPager mPager;
     private SurveyTabAdapter mAdapter;
 
     private boolean mReadOnly;//flag to represent whether the Survey can be edited or not
@@ -114,11 +115,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
     private String surveyId;
 
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_activity);
-
+        ButterKnife.bind(this);
         // Read all the params. Note that the survey instance id is now mandatory
         Intent intent = getIntent();
         surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
@@ -150,12 +154,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
             // Set the survey name as Activity title
             getSupportActionBar().setTitle(mSurvey.getName());
             getSupportActionBar().setSubtitle("v " + getVersion());
-
-            mPager = (ViewPager) findViewById(R.id.pager);
-            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-            tabLayout.setupWithViewPager(mPager);
-            mAdapter = new SurveyTabAdapter(this, mPager, this, this);
-            mPager.setAdapter(mAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+            mAdapter = new SurveyTabAdapter(this, this, this);
+            recyclerView.setAdapter(mAdapter);
 
             // Initialize new survey or load previous responses
             Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
@@ -256,7 +257,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
      */
     private void displayResponses(Map<String, QuestionResponse> responses) {
         mQuestionResponses = responses;
-        mAdapter.reset();// Propagate the change
+//        mAdapter.reset();// Propagate the change
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -359,14 +361,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
         super.onResume();
         mAdapter.onResume();
         recordDuration(true);// Keep track of this session's duration.
-        mPager.setKeepScreenOn(
-                prefs.getBoolean(Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
+//        mPager.setKeepScreenOn(
+//                prefs.getBoolean(Prefs.KEY_SCREEN_ON, Prefs.DEFAULT_VALUE_SCREEN_ON));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mPager.setKeepScreenOn(false);
+//        mPager.setKeepScreenOn(false);
         mAdapter.onPause();
         recordDuration(false);
         saveState();
@@ -604,15 +606,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void nextTab() {
-        mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
+//        mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
     }
 
     @Override
     public void openQuestion(String questionId) {
         int tab = mAdapter.displayQuestion(questionId);
-        if (tab != -1) {
-            mPager.setCurrentItem(tab, true);
-        }
+//        if (tab != -1) {
+//            mPager.setCurrentItem(tab, true);
+//        }
     }
 
     @Override

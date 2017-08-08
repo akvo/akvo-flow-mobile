@@ -26,7 +26,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -37,7 +37,7 @@ import org.akvo.flow.util.PlatformUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubmitTab extends ListView implements OnClickListener {
+public class SubmitTab extends LinearLayout implements OnClickListener {
     private SurveyListener mListener;
 
     private TextView mHeaderView;
@@ -45,7 +45,7 @@ public class SubmitTab extends ListView implements OnClickListener {
 
     public SubmitTab(Context context, SurveyListener listener) {
         super(context);
-
+        setOrientation(VERTICAL);
         mListener = listener;
 
         mHeaderView = new TextView(context);
@@ -63,15 +63,15 @@ public class SubmitTab extends ListView implements OnClickListener {
         mSubmitButton.setText(context.getString(R.string.submitbutton));
         mSubmitButton.setOnClickListener(this);
 
-        addHeaderView(mHeaderView);
-        addFooterView(mSubmitButton);
+        addView(mHeaderView);
+        addView(mSubmitButton);
 
         refresh(new ArrayList<Question>());
     }
 
     public void refresh(List<Question> invalidQuestions) {
-        QuestionListAdapter adapter = new QuestionListAdapter(invalidQuestions);
-        setAdapter(adapter);
+//        QuestionListAdapter adapter = new QuestionListAdapter(invalidQuestions);
+//        setAdapter(adapter);
 
         if (!invalidQuestions.isEmpty()) {
             mHeaderView.setText(R.string.error_responses);

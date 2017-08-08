@@ -25,7 +25,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -52,14 +51,14 @@ import java.util.Set;
 
 public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.OnDeleteListener {
 
-    private final QuestionGroup mQuestionGroup;
+    private QuestionGroup mQuestionGroup;
     private final QuestionInteractionListener mQuestionListener;
     private final SurveyListener mSurveyListener;
 
     private final Map<String, QuestionView> mQuestionViews;
     private final Set<String> mQuestions;// Map group's questions for a quick look-up
     private LinearLayout mContainer;
-    private ScrollView mScroller;
+    private LinearLayout mScroller;
     private boolean mLoaded;
 
     private TextView mRepetitionsText;
@@ -67,10 +66,9 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private final Map<Integer, RepetitionHeader> mHeaders;
     private final Repetitions mRepetitionsIds;
 
-    public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
+    public QuestionGroupTab(Context context, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
         super(context);
-        mQuestionGroup = group;
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
         mQuestionViews = new HashMap<>();
@@ -78,9 +76,6 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         mRepetitionsIds = new Repetitions();
         mLoaded = false;
         mQuestions = new HashSet<>();
-        for (Question q : mQuestionGroup.getQuestions()) {
-            mQuestions.add(q.getId());
-        }
         init();
     }
 
@@ -91,7 +86,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         setFocusableInTouchMode(true);
 
         inflate(getContext(), R.layout.question_group_tab, this);
-        mScroller = (ScrollView) findViewById(R.id.scroller);
+        mScroller = (LinearLayout) findViewById(R.id.scroller);
         mContainer = (LinearLayout) findViewById(R.id.question_list);
         mRepetitionsText = (TextView) findViewById(R.id.repeat_header);
 
@@ -100,16 +95,11 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             mContainer.setLayoutTransition(new LayoutTransition());
         }
 
-        View next = findViewById(R.id.next_btn);
-        next.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSurveyListener.nextTab();
-            }
-        });
-        next.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
+        updateRepeatable();
+    }
 
-        if (mQuestionGroup.isRepeatable()) {
+    public void updateRepeatable() {
+        if (mQuestionGroup!= null && mQuestionGroup.isRepeatable()) {
             findViewById(R.id.repeat_header).setVisibility(VISIBLE);
             View repeatBtn = findViewById(R.id.repeat_btn);
             repeatBtn.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
@@ -377,6 +367,13 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             return Integer.parseInt(qid[1]);
         }
         return -1;
+    }
+
+    public void setQuestionGroup(QuestionGroup questionGroup) {
+        mQuestionGroup = questionGroup;
+        for (Question q : mQuestionGroup.getQuestions()) {
+            mQuestions.add(q.getId());
+        }
     }
 
     class Repetitions implements Iterable<Integer> {

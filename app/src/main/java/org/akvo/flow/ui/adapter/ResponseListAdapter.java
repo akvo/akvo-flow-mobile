@@ -40,11 +40,13 @@ import java.util.Date;
 public class ResponseListAdapter extends CursorAdapter {
 
     private final int[] backgrounds = new int[2];
+    private final String defaultUserName;
 
     public ResponseListAdapter(Context activityContext) {
         super(activityContext.getApplicationContext(), null, false);
         backgrounds[0] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg1);
         backgrounds[1] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg2);
+        defaultUserName = activityContext.getString(R.string.default_submitter_username);
     }
 
     @Override
@@ -77,11 +79,10 @@ public class ResponseListAdapter extends CursorAdapter {
 
         String username = cursor.getString(SurveyDbAdapter.FormInstanceQuery.SUBMITTER);
         if (TextUtils.isEmpty(username)) {
-            userView.setVisibility(View.GONE);
-        } else {
-            userView.setVisibility(View.VISIBLE);
-            userView.setText(username);
+            username = defaultUserName;
         }
+        userView.setVisibility(View.VISIBLE);
+        userView.setText(username);
 
         // Format the date string
         Date date = new Date(displayDate);

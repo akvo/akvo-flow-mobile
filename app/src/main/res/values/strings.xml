@@ -276,6 +276,7 @@
     <string name="action_settings">Settings</string>
     <string name="no_records_subtitle_monitored">Use \'+\' to capture data or \'Sync\' to get existing data</string>
     <string name="no_records_subtitle_non_monitored">Use \'+\' to capture data.</string>
+    <string name="default_submitter_username">IMPORTER</string>
 
     <!--Verify if this works for transifex-->
     <plurals name="data_points_sync_success_message">

@@ -80,7 +80,7 @@ public class SurveyDeleteConfirmationDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         String name = viewSurvey == null ? getString(R.string.survey) : viewSurvey.getName();
         builder.setMessage(getString(R.string.delete_survey_dialog_message, name))
-                .setPositiveButton(R.string.okbutton,
+                .setPositiveButton(R.string.delete_button,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 if (listener != null && viewSurvey != null) {

@@ -1,34 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/repeat_header"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="start|center_vertical"
-        android:background="@color/record_name_background"
-        android:padding="6dp"
-        android:textSize="16sp"
-        android:visibility="gone" />
-    <LinearLayout
-        android:id="@+id/scroller"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            android:id="@+id/repeat_header"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="start|center_vertical"
+            android:background="@color/record_name_background"
+            android:padding="6dp"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
-        <LinearLayout
+    <LinearLayout
+            android:id="@+id/scroller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+        <TextView
+                tools:text="Group title"
+                android:background="@color/colorAccent"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/group_title_tv"/>
+
+        <LinearLayout
                 android:id="@+id/question_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"/>
 
-            <Button
+        <Button
                 android:id="@+id/repeat_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,8 +49,5 @@
                 android:text="@string/repeat_group"
                 style="@style/button_secondary"/>
 
-        </LinearLayout>
-
     </LinearLayout>
-
 </merge>

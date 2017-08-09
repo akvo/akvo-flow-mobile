@@ -62,6 +62,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     private boolean mLoaded;
 
     private TextView mRepetitionsText;
+    private TextView groupTitle;
 
     private final Map<Integer, RepetitionHeader> mHeaders;
     private final Repetitions mRepetitionsIds;
@@ -89,6 +90,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         mScroller = (LinearLayout) findViewById(R.id.scroller);
         mContainer = (LinearLayout) findViewById(R.id.question_list);
         mRepetitionsText = (TextView) findViewById(R.id.repeat_header);
+        groupTitle = (TextView) findViewById(R.id.group_title_tv);
 
         // Animate view additions/removals if possible
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -169,7 +171,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
                 loadGroup(i);
             }
         }
-
+        groupTitle.setText(mQuestionGroup.getHeading());
         displayResponses();
     }
 

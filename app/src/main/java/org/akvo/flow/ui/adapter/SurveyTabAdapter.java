@@ -58,6 +58,7 @@ public class SurveyTabAdapter extends RecyclerView.Adapter<SurveyTabAdapter.Surv
 //        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
 //            questionGroupTab.notifyOptionsChanged();// Spread the word
 //        }
+        notifyDataSetChanged();
     }
 
 //    public void reset() {

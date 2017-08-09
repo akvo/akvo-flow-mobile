@@ -33,13 +33,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.data.database.ResponseColumns;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceColumns;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
-import org.akvo.flow.data.database.TransmissionStatus;
-import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.database.SurveyInstanceColumns;
+import org.akvo.flow.database.SurveyInstanceStatus;
+import org.akvo.flow.database.TransmissionStatus;
+import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.FormInstance;
@@ -119,7 +119,7 @@ public class DataSyncService extends IntentService {
     private static final int FILE_UPLOAD_RETRIES = 2;
 
     private PropertyUtil mProps;
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
     private Prefs preferences;
     private ConnectivityStateManager connectivityStateManager;
 
@@ -131,7 +131,7 @@ public class DataSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         try {
             mProps = new PropertyUtil(getResources());
-            mDatabase = new SurveyDbAdapter(this);
+            mDatabase = new SurveyDbDataSource(this, null);
             mDatabase.open();
             preferences = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
@@ -321,6 +321,7 @@ public class DataSyncService extends IntentService {
             int answer_type_col = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
             int answer_col = data.getColumnIndexOrThrow(ResponseColumns.ANSWER);
             int filename_col = data.getColumnIndexOrThrow(ResponseColumns.FILENAME);
+            int iterationColumn = data.getColumnIndexOrThrow(ResponseColumns.ITERATION);
             int disp_name_col = data.getColumnIndexOrThrow(UserColumns.NAME);
             int email_col = data.getColumnIndexOrThrow(UserColumns.EMAIL);
             int submitted_date_col = data
@@ -371,17 +372,17 @@ public class DataSyncService extends IntentService {
                     }
                 }
 
-                int iteration = 0;
-                String qid = data.getString(question_fk_col);
-                String[] tokens = qid.split("\\|", -1);
+                String rawQuestionId = data.getString(question_fk_col);
+                int iteration = data.getInt(iterationColumn);
+                String[] tokens = rawQuestionId.split("\\|", -1);
                 if (tokens.length == 2) {
                     // This is a compound ID from a repeatable question
-                    qid = tokens[0];
+                    rawQuestionId = tokens[0];
                     iteration = Integer.parseInt(tokens[1]);
                 }
-
+                iteration = Math.max(iteration, 0);
                 Response response = new Response();
-                response.setQuestionId(qid);
+                response.setQuestionId(rawQuestionId);
                 response.setAnswerType(type);
                 response.setValue(value);
                 response.setIteration(iteration);
@@ -431,7 +432,7 @@ public class DataSyncService extends IntentService {
         // if necessary, or mark form as deleted.
         checkDeviceNotifications();
 
-        List<FileTransmission> transmissions = mDatabase.getUnsyncedTransmissions();
+        List<FileTransmission> transmissions = mDatabase.getUnSyncedTransmissions();
 
         if (transmissions.isEmpty()) {
             return;
@@ -573,7 +574,7 @@ public class DataSyncService extends IntentService {
                 // be handled and retried in the next sync attempt.
                 for (String filename : files) {
                     if (new File(filename).exists()) {
-                        setFileTransmissionFailed(filename);
+                        mDatabase.setFileTransmissionFailed(filename);
                     }
                 }
 
@@ -616,14 +617,6 @@ public class DataSyncService extends IntentService {
             }
         }
         return files;
-    }
-
-    private void setFileTransmissionFailed(String filename) {
-        int rows = mDatabase.updateTransmissionHistory(filename, TransmissionStatus.FAILED);
-        if (rows == 0) {
-            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            mDatabase.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
-        }
     }
 
     @NonNull

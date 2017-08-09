@@ -36,9 +36,9 @@ import org.akvo.flow.data.loader.StatsLoader;
 
 import timber.log.Timber;
 
-public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
+import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_ID_EXTRA;
 
-    public static final String SURVEY_GROUP_ID_EXTRA = "surveyGroupId";
+public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
 
     private long mSurveyGroupId;
 

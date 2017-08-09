@@ -27,6 +27,8 @@ import org.akvo.flow.presentation.Presenter;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import timber.log.Timber;
+
 public class HelpPresenter implements Presenter {
 
     private final UseCase allowedToConnect;
@@ -52,6 +54,7 @@ public class HelpPresenter implements Presenter {
 
             @Override
             public void onError(Throwable e) {
+                Timber.e(e);
                 view.hideProgress();
                 view.displayError();
             }

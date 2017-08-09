@@ -44,15 +44,17 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     private Double mLongitude;
     private transient LatLng mLatLng;// This var won't be serialized, just recreated with the lat/lon values
     private List<SurveyInstance> mSurveyInstances = null;
+    private int status;
 
     public SurveyedLocale(String id, String name, long lastModified, long surveyGroupId,
-            Double latitude, Double longitude) {
+            Double latitude, Double longitude, int status) {
         mId = id;
         mName = name;
         mLastModified = lastModified;
         mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
+        this.status = status;
         if (latitude != null && longitude != null) {
             mLatLng = new LatLng(latitude, longitude);
         }
@@ -93,6 +95,14 @@ public class SurveyedLocale implements Serializable, ClusterItem {
 
     public String getName() {
         return mName;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     /**

@@ -268,7 +268,6 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void showLoading() {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
-            updateProgressDrawable();
         }
     }
 

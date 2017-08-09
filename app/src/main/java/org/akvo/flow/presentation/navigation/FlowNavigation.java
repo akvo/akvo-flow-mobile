@@ -213,9 +213,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private void onSurveyItemLongPress(int position, SurveyAdapter adapter) {
         ViewSurvey viewSurvey = adapter.getItem(position);
         if (viewSurvey != null) {
-            final long surveyGroupId = viewSurvey.getId();
             DialogFragment dialogFragment = SurveyDeleteConfirmationDialog
-                    .newInstance(surveyGroupId);
+                    .newInstance(viewSurvey);
             dialogFragment.show(getSupportFragmentManager(), SurveyDeleteConfirmationDialog.TAG);
         }
     }

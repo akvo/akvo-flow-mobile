@@ -123,7 +123,7 @@
     <!--Search-->
     <string name="search_hint">Search Data Point</string>
     <!--Project List (Survey Group) Activity-->
-    <string name="delete_project_text">Delete survey?</string>
+    <string name="delete_survey_dialog_message">Delete %1$s?</string>
     <!--Survey Activity-->
     <string name="error_responses">Some responses contain errors. You must review the following questions before you can submit:</string>
     <string name="error_question_mandatory">This response is required</string>
@@ -291,5 +291,6 @@
     <string name="user_delete_error">Error deleting user</string>
     <string name="user_select_error">Error selecting user</string>
     <string name="add_user_message">The new user will automatically be selected</string>
+    <string name="survey">survey</string>
 
 </resources>

@@ -120,7 +120,7 @@
     <!--Search-->
     <string name="search_hint">Search Data Point</string>
     <!--Project List (Survey Group) Activity-->
-    <string name="delete_project_text">This will permanently delete this Survey. Click OK to proceed or cancel to abort.</string>
+    <string name="delete_project_text">Delete survey?</string>
     <!--Survey Activity-->
     <string name="error_responses">Some responses contain errors. You must review the following questions before you can submit:</string>
     <string name="error_question_mandatory">This response is required</string>

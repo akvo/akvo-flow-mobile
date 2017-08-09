@@ -25,14 +25,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -150,9 +154,21 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         progressBar = (ProgressBar) view.findViewById(R.id.progress);
+        updateProgressDrawable();
         initializeInjector();
         presenter.setView(this);
         presenter.onDataReady(surveyGroup);
+    }
+
+    private void updateProgressDrawable() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            Drawable progressDrawable = progressBar.getIndeterminateDrawable();
+            if (progressDrawable != null) {
+                progressDrawable
+                        .setColorFilter(ContextCompat.getColor(getActivity(), R.color.colorAccent),
+                                PorterDuff.Mode.MULTIPLY);
+            }
+        }
     }
 
     private void initializeInjector() {
@@ -252,6 +268,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void showLoading() {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
+            updateProgressDrawable();
         }
     }
 

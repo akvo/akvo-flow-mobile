@@ -32,6 +32,7 @@ rm -rf tmp
 rm -rf builds
 mkdir tmp
 mkdir builds
+mkdir -p data/src/main/res/
 
 build_name() {
     if [[ "$1" == "akvoflow-89" ]]; then

@@ -101,6 +101,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private ApkUpdateStore apkUpdateStore;
 
     private long selectedSurveyId;
+    private boolean activityJustCreated;
 
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be
@@ -132,20 +133,23 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initDataPointsFragment(savedInstanceState);
 
-        // Start the setup Activity if necessary.
-        boolean noDevIdYet = false;
-        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            noDevIdYet = true;
-            navigator.navigateToAddUser(this);
-        }
+        navigateToSetupIfNeeded();
 
-        startServices(noDevIdYet);
+        startServices();
 
         //When the app is restarted we need to display the current user
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
+        activityJustCreated = true;
 
+    }
+
+    private void navigateToSetupIfNeeded() {
+        boolean deviceSetCorrectly = prefs.getBoolean(Prefs.KEY_SETUP, false);
+        if (!deviceSetCorrectly) {
+            navigator.navigateToAddUser(this);
+        }
     }
 
     private void initializeToolBar() {
@@ -232,6 +236,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onResume() {
         super.onResume();
+        if (!activityJustCreated) {
+            navigateToSetupIfNeeded();
+        }
+        activityJustCreated = false;
         // Delete empty responses, if any
         mDatabase.deleteEmptySurveyInstances();
         mDatabase.deleteEmptyRecords();
@@ -285,7 +293,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDrawerToggle.syncState();
     }
 
-    private void startServices(boolean waitForDeviceId) {
+    private void startServices() {
         if (!StatusUtil.hasExternalStorage()) {
             ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                     false,
@@ -297,7 +305,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     },
                     null);
         } else {
-            if (!waitForDeviceId) {
+            boolean deviceSetUpCompleted = prefs.getBoolean(Prefs.KEY_SETUP, false);
+            if (deviceSetUpCompleted) {
                 startService(new Intent(this, SurveyDownloadService.class));
                 startService(new Intent(this, DataSyncService.class));
             }

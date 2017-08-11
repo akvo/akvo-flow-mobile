@@ -275,10 +275,12 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     }
 
     private void onGpsStatusOptionTap() {
-        try {
-            Intent i = new Intent(ConstantUtil.GPS_STATUS_INTENT);
-            startActivity(i);
-        } catch (Exception e) {
+        Intent intent = getPackageManager()
+                .getLaunchIntentForPackage(ConstantUtil.GPS_STATUS_PACKAGE);
+        if (intent != null) {
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            startActivity(intent);
+        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(R.string.nogpsstatus);
             builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
@@ -301,9 +303,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
             db.open();
             return db.getUnsyncedTransmissions().size() > 0;
         } finally {
-            if (db != null) {
-                db.close();
-            }
+            db.close();
         }
     }
 

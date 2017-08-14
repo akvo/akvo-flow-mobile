@@ -46,10 +46,6 @@ import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
 import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
 import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
-
 public class BriteSurveyDbAdapter {
 
     private static final int DOES_NOT_EXIST = -1;
@@ -137,14 +133,13 @@ public class BriteSurveyDbAdapter {
         String sqlQuery =
                 "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
                         + " = ?";
-        return briteDatabase.createQuery(Tables.RECORD, sqlQuery,
-                String.valueOf(surveyGroupId)).concatMap(
-                new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
-                    @Override
-                    public Observable<? extends Cursor> call(SqlBrite.Query query) {
-                        return Observable.just(query.run());
-                    }
-                });
+        return briteDatabase.createQuery(Tables.RECORD, sqlQuery, String.valueOf(surveyGroupId))
+                .concatMap(new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
+                            @Override
+                            public Observable<? extends Cursor> call(SqlBrite.Query query) {
+                                return Observable.just(query.run());
+                            }
+                        });
     }
 
     /**

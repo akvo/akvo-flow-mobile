@@ -30,5 +30,5 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.4'
     compile 'com.google.dagger:dagger:2.4'
     compile 'io.reactivex:rxandroid:1.0.1'
-    compile 'com.android.support:support-annotations:25.3.0'
+    compile 'com.android.support:support-annotations:25.3.1'
 }

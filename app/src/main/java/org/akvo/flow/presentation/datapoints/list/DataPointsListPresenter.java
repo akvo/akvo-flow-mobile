@@ -93,10 +93,19 @@ public class DataPointsListPresenter implements Presenter {
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
+                    Timber.d("loadDataPoints "+dataPoints.size()+" datapoints");
                     List<ListDataPoint> mapDataPoints = mapper.transform(dataPoints);
                     view.displayData(mapDataPoints);
                     if (mapDataPoints.isEmpty()) {
                         view.showNoDataPoints(surveyGroup.isMonitored());
+                    } else {
+                        long surveyGroupId = dataPoints.get(0).getSurveyGroupId();
+                        long surveyGroupId1 = surveyGroup.getId();
+                        Timber.d("loadDataPoints from surveyGroup " + surveyGroupId
+                                + " current survey group : " + surveyGroupId1);
+                        if (surveyGroupId != surveyGroupId1) {
+                            throw new RuntimeException("datapoints from wrong survey group loaded");
+                        }
                     }
                 }
             }, params);
@@ -115,6 +124,7 @@ public class DataPointsListPresenter implements Presenter {
 
     void onSyncRecordsPressed() {
         if (surveyGroup != null) {
+            Timber.d("onSyncRecordsPressed: "+surveyGroup.toString());
             view.showLoading();
             syncRecords(surveyGroup.getId());
         }
@@ -123,10 +133,12 @@ public class DataPointsListPresenter implements Presenter {
     private void syncRecords(final long surveyGroupId) {
         Map<String, Long> params = new HashMap<>(2);
         params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        Timber.d("syncRecords: "+surveyGroupId);
         syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {
 
             @Override
             public void onCompleted() {
+                Timber.d("syncRecords onCompleted: "+surveyGroupId);
                 view.hideLoading();
             }
 
@@ -167,7 +179,8 @@ public class DataPointsListPresenter implements Presenter {
 
     void onOrderByClick(int order) {
         if (orderBy != order) {
-            if (order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null || longitude == null)) {
+            if (order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null
+                    || longitude == null)) {
                 // Warn user that the location is unknown
                 view.showErrorMissingLocation();
                 return;

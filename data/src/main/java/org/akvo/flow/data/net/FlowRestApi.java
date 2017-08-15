@@ -28,7 +28,7 @@ import org.akvo.flow.data.entity.ApiLocaleResult;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 @Singleton
 public class FlowRestApi {

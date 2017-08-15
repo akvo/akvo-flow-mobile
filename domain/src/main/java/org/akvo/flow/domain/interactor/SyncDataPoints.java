@@ -32,8 +32,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class SyncDataPoints extends UseCase {
 
@@ -61,10 +61,10 @@ public class SyncDataPoints extends UseCase {
         if (!connectivityStateManager.isConnectionAvailable()) {
             return Observable.just(new SyncResult(SyncResult.ResultCode.ERROR_NO_NETWORK, 0));
         }
-        return userRepository.mobileSyncAllowed().concatMap(new Func1<Boolean,
-                Observable<SyncResult>>() {
+        return userRepository.mobileSyncAllowed().concatMap(new Function<Boolean,
+                        Observable<SyncResult>>() {
             @Override
-            public Observable<SyncResult> call(Boolean syncAllowed) {
+            public Observable<SyncResult> apply(Boolean syncAllowed) {
                 if (!syncAllowed && !connectivityStateManager.isWifiConnected()) {
                     return Observable.just(new SyncResult(
                             SyncResult.ResultCode.ERROR_SYNC_NOT_ALLOWED_OVER_3G, 0));
@@ -77,15 +77,15 @@ public class SyncDataPoints extends UseCase {
 
     private <T> Observable<SyncResult> syncDataPoints(Map<String, T> parameters) {
         return surveyRepository.syncRemoteDataPoints((Long) parameters.get(KEY_SURVEY_GROUP_ID))
-                .map(new Func1<Integer, SyncResult>() {
+                .map(new Function<Integer, SyncResult>() {
                     @Override
-                    public SyncResult call(Integer integer) {
+                    public SyncResult apply(Integer integer) {
                         return new SyncResult(SyncResult.ResultCode.SUCCESS, integer);
                     }
                 })
-                .onErrorResumeNext(new Func1<Throwable, Observable<SyncResult>>() {
+                .onErrorResumeNext(new Function<Throwable, Observable<SyncResult>>() {
                     @Override
-                    public Observable<SyncResult> call(Throwable throwable) {
+                    public Observable<SyncResult> apply(Throwable throwable) {
                         if (throwable instanceof AssignmentRequiredException) {
                             return Observable.just(new SyncResult(
                                     SyncResult.ResultCode.ERROR_ASSIGNMENT_MISSING, 0));

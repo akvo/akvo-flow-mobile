@@ -24,7 +24,7 @@ import org.akvo.flow.domain.entity.DataPoint;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public interface SurveyRepository {
 

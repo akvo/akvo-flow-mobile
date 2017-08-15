@@ -25,7 +25,7 @@ import org.akvo.flow.data.entity.ApiLocaleResult;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
-import rx.Observable;
+import io.reactivex.Flowable;
 
 import static org.akvo.flow.data.util.Constants.ANDROID_ID;
 import static org.akvo.flow.data.util.Constants.IMEI;

@@ -23,8 +23,8 @@ package org.akvo.flow.injector.module;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
+import com.squareup.sqlbrite2.BriteDatabase;
+import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;

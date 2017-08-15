@@ -22,13 +22,13 @@ package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.reactivestreams.Subscriber;
 
 import java.util.Map;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subscribers.ResourceSubscriber;
 
 /**
  * Abstract class for a Use Case (Interactor in terms of Clean Architecture).
@@ -42,8 +42,6 @@ public abstract class UseCase {
 
     private final ThreadExecutor threadExecutor;
     private final PostExecutionThread postExecutionThread;
-
-    private Subscription subscription = null;
 
     protected UseCase(ThreadExecutor threadExecutor,
                       PostExecutionThread postExecutionThread) {
@@ -59,23 +57,13 @@ public abstract class UseCase {
     /**
      * Executes the current use case.
      *
-     * @param UseCaseSubscriber Will be listen to the observable built with buildUseCaseObservable.
+     * @param disposableSubscriber Will be listen to the observable built with buildUseCaseObservable.
      */
     @SuppressWarnings("unchecked")
-    public <T> void execute(Subscriber UseCaseSubscriber, Map<String, T> parameters) {
-        this.subscription = this.buildUseCaseObservable(parameters)
+    public <T> void execute(DefaultSubscriber<Observable> disposableSubscriber, Map<String, T> parameters) {
+        buildUseCaseObservable(parameters)
                 .subscribeOn(Schedulers.from(threadExecutor))
                 .observeOn(postExecutionThread.getScheduler())
-                .subscribe(UseCaseSubscriber);
-    }
-
-    /**
-     * UnSubscribes from current {@link Subscription}.
-     */
-    public void unSubscribe() {
-        if (subscription != null && !subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
+                .subscribeWith(disposableSubscriber);
     }
 }

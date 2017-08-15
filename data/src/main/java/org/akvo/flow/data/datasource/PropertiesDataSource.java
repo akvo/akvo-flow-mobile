@@ -31,7 +31,7 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 import timber.log.Timber;
 
 @Singleton

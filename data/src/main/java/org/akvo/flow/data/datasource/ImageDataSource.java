@@ -32,7 +32,7 @@ import java.io.OutputStream;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 import rx.functions.Func2;
 import timber.log.Timber;
 

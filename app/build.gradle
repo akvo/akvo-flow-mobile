@@ -133,7 +133,7 @@ dependencies {
     compile "com.squareup.sqlbrite2:sqlbrite:$rootProject.ext.sqlbriteVersion"
 
     testCompile "junit:junit:$rootProject.ext.junitVersion"
-    testCompile "org.mockito:mockito-core:$rootProject.ext.mockitoCoreVersoin"
+    testCompile "org.mockito:mockito-core:$rootProject.ext.mockitoCoreVersion"
     testCompile "org.powermock:powermock-module-junit4:$rootProject.ext.powerMockVersion"
     testCompile "org.powermock:powermock-module-junit4-rule:$rootProject.ext.powerMockVersion"
     testCompile "org.powermock:powermock-api-mockito:$rootProject.ext.powerMockVersion"

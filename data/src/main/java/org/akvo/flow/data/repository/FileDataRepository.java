@@ -27,7 +27,7 @@ import org.akvo.flow.domain.repository.FileRepository;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 public class FileDataRepository implements FileRepository {
 

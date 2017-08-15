@@ -20,28 +20,13 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import io.reactivex.Observer;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 /**
  * Default subscriber base class to be used whenever you want to avoid having to implement all
  * 3 methods.
  */
-public class DefaultSubscriber<T> implements Disposable, Subscriber<T>, Observer {
-
-    private Subscription subscription;
-
-    @Override public void onSubscribe(@NonNull Disposable d) {
-        
-    }
-
-    @Override public void onNext(@NonNull Object o) {
-
-    }
+public class DefaultObserver<T> extends DisposableObserver<T> {
 
     @Override
     public void onError(Throwable e) {
@@ -54,25 +39,8 @@ public class DefaultSubscriber<T> implements Disposable, Subscriber<T>, Observer
     }
 
     @Override
-    public void onSubscribe(Subscription s) {
-        this.subscription = s;
-    }
-
-    @Override
     public void onNext(T t) {
         // no-op by default.
     }
 
-    @Override
-    public void dispose() {
-        if (!isDisposed()) {
-            subscription.cancel();
-            subscription = null;
-        }
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return subscription != null;
-    }
 }

@@ -25,7 +25,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
@@ -44,7 +44,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 public class DatabaseDataSource {
 

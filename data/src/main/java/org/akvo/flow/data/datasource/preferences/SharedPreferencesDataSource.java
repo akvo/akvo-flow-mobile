@@ -25,7 +25,7 @@ import android.content.SharedPreferences;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 @Singleton
 public class SharedPreferencesDataSource {

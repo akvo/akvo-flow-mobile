@@ -32,7 +32,6 @@ dependencies {
     compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
     apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
     compile "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxAndroidVersion"
-    compile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxJavaVersion"
     compile "com.android.support:support-annotations:$rootProject.ext.supportLibraryVersion"
     compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.loggingInterceptorVersion"
     compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofitGsonConverterVersion"

@@ -63,8 +63,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.logging.HttpLoggingInterceptor;
-import rx.schedulers.Schedulers;
 
 @Module
 public class ApplicationModule {

@@ -25,7 +25,7 @@ import android.support.annotation.NonNull;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.SyncResult;
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -58,8 +58,7 @@ public class DataPointsListPresenter implements Presenter {
     private Double latitude;
     private Double longitude;
 
-    @Inject
-    DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+    @Inject DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             ListDataPointMapper mapper, @Named("syncDataPoints") UseCase syncDataPoints) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
@@ -83,7 +82,8 @@ public class DataPointsListPresenter implements Presenter {
             params.put(GetSavedDataPoints.KEY_ORDER_BY, orderBy);
             params.put(GetSavedDataPoints.KEY_LATITUDE, latitude);
             params.put(GetSavedDataPoints.KEY_LONGITUDE, longitude);
-            getSavedDataPoints.execute(new DefaultSubscriber<List<DataPoint>>() {
+            getSavedDataPoints.execute(new DefaultObserver<List<DataPoint>>() {
+
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
@@ -109,8 +109,8 @@ public class DataPointsListPresenter implements Presenter {
 
     @Override
     public void destroy() {
-        getSavedDataPoints.unSubscribe();
-        syncDataPoints.unSubscribe();
+        getSavedDataPoints.dispose();
+        syncDataPoints.dispose();
     }
 
     void onSyncRecordsPressed() {
@@ -121,12 +121,12 @@ public class DataPointsListPresenter implements Presenter {
     }
 
     private void syncRecords(final long surveyGroupId) {
-        Map<String, Long> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {
+        syncDataPoints.execute(new DefaultObserver<SyncResult>() {
 
             @Override
-            public void onCompleted() {
+            public void onComplete() {
                 view.hideLoading();
             }
 
@@ -167,7 +167,8 @@ public class DataPointsListPresenter implements Presenter {
 
     void onOrderByClick(int order) {
         if (orderBy != order) {
-            if (order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null || longitude == null)) {
+            if (order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null
+                    || longitude == null)) {
                 // Warn user that the location is unknown
                 view.showErrorMissingLocation();
                 return;
@@ -187,8 +188,8 @@ public class DataPointsListPresenter implements Presenter {
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
-        getSavedDataPoints.unSubscribe();
-        syncDataPoints.unSubscribe();
+        getSavedDataPoints.dispose();
+        syncDataPoints.dispose();
         view.hideLoading();
         onDataReady(surveyGroup);
         loadDataPoints();

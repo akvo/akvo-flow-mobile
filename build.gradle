@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
@@ -20,7 +20,6 @@ ext {
     playServicesVersion = '7.5.0'
     daggerVersion = '2.4'
     timberVersion = '4.3.1'
-    rxJavaVersion = '2.1.2'
     rxAndroidVersion = '2.0.1'
     butterKnifeVersion = '8.5.1'
     sqlbriteVersion = '2.0.0'
@@ -35,7 +34,7 @@ ext {
     junitVersion = '4.12'
     powerMockVersion = '1.6.2'
     dexMakerVersion = '1.2'
-    mockitoCoreVersoin = '1.10.19'
+    mockitoCoreVersion = '1.10.19'
 
     rulesVersion = '0.5'
     espressoCoreVersion = '2.2.2'

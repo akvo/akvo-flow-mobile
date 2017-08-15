@@ -29,16 +29,16 @@ dependencies {
     compile project(path: ':domain')
     compile project(path: ':database')
 
-    apt 'com.google.dagger:dagger-compiler:2.4'
-    compile 'com.google.dagger:dagger:2.4'
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.2'
-    compile 'com.android.support:support-annotations:25.3.1'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
-    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    compile 'com.jakewharton.timber:timber:4.3.1'
-    compile 'com.squareup.sqlbrite2:sqlbrite:2.0.0'
+    compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
+    apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
+    compile "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxAndroidVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxJavaVersion"
+    compile "com.android.support:support-annotations:$rootProject.ext.supportLibraryVersion"
+    compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.loggingInterceptorVersion"
+    compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofitGsonConverterVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofitRxJavaAdapterVersion"
+    compile "com.jakewharton.timber:timber:$rootProject.ext.timberVersion"
+    compile "com.squareup.sqlbrite2:sqlbrite:$rootProject.ext.sqlbriteVersion"
 
-    testCompile 'junit:junit:4.12'
+    testCompile "junit:junit:$rootProject.ext.junitVersion"
 }

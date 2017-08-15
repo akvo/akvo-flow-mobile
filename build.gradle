@@ -15,6 +15,35 @@ ext {
     buildToolsVersion = "25.0.1"
     minSdkVersion = 10
     targetSdkVersion = 21
+
+    supportLibraryVersion = '25.3.1'
+    playServicesVersion = '7.5.0'
+    daggerVersion = '2.4'
+    timberVersion = '4.3.1'
+    rxJavaVersion = '2.1.2'
+    rxAndroidVersion = '2.0.1'
+    butterKnifeVersion = '8.5.1'
+    sqlbriteVersion = '2.0.0'
+
+    prettyTimeVersion = '3.2.4.Final'
+    mapsUtilsVersion = '0.4'
+    jacksonDataBindVersion = '2.4.4'
+    gsonVersion = '2.3'
+    ravenVersion = '8.0.2'
+    glideVersion = '3.8.0'
+
+    junitVersion = '4.12'
+    powerMockVersion = '1.6.2'
+    dexMakerVersion = '1.2'
+    mockitoCoreVersoin = '1.10.19'
+
+    rulesVersion = '0.5'
+    espressoCoreVersion = '2.2.2'
+    espressoContribVersion = '2.2.1'
+
+    loggingInterceptorVersion = '3.4.1'
+    retrofitGsonConverterVersion = '2.2.0'
+    retrofitRxJavaAdapterVersion = '2.3.0'
 }
 
 allprojects {

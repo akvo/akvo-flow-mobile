@@ -26,10 +26,11 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    apt 'com.google.dagger:dagger-compiler:2.4'
-    compile 'com.google.dagger:dagger:2.4'
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.2'
-    compile 'com.android.support:support-annotations:25.3.1'
+    compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
+    apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
+    compile "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxAndroidVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxJavaVersion"
+    compile "com.android.support:support-annotations:$rootProject.ext.supportLibraryVersion"
+
+    testCompile "junit:junit:$rootProject.ext.junitVersion"
 }

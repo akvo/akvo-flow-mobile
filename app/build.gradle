@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'com.getkeepsafe.dexcount'
 
 repositories {
     mavenCentral()
@@ -33,6 +32,7 @@ android {
             testHandleProfiling true
             testFunctionalTest true
             vectorDrawables.useSupportLibrary = true
+            multiDexEnabled true
         }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
@@ -55,6 +55,7 @@ android {
             }
             buildTypes {
                 release {
+                    minifyEnabled false
                     signingConfig signingConfigs.flowRelease
                 }
             }
@@ -80,8 +81,6 @@ android {
             }
         }
 
-
-
         testOptions {
             unitTests.returnDefaultValues = true
         }
@@ -94,6 +93,7 @@ android {
             // if true, only report errors
             ignoreWarnings false
             lintConfig file('lint.xml')
+            ignore 'InvalidPackage'
         }
     } else {
         throw new GradleException("Could not read version.properties!")
@@ -113,48 +113,48 @@ android.applicationVariants.all { variant ->
 
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
-    compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-    compile "com.android.support:recyclerview-v7:$rootProject.ext.supportLibraryVersion"
-    compile "com.android.support:support-annotations:$rootProject.ext.supportLibraryVersion"
-    compile "com.android.support:design:$rootProject.ext.supportLibraryVersion"
-    compile "com.google.android.gms:play-services-base:$rootProject.ext.playServicesVersion"
-    compile "com.google.android.gms:play-services-maps:$rootProject.ext.playServicesVersion"
-    compile "com.google.android.gms:play-services-gcm:$rootProject.ext.playServicesVersion"
-    compile "org.ocpsoft.prettytime:prettytime:$rootProject.ext.prettyTimeVersion"
-    compile "com.google.maps.android:android-maps-utils:$rootProject.ext.mapsUtilsVersion"
-    compile "com.fasterxml.jackson.core:jackson-databind:$rootProject.ext.jacksonDataBindVersion"
-    compile "com.google.code.gson:gson:$rootProject.ext.gsonVersion"
-    compile "com.jakewharton.timber:timber:$rootProject.ext.timberVersion"
-    compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
-    apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
-    compile "com.jakewharton:butterknife:$rootProject.ext.butterKnifeVersion"
-    apt "com.jakewharton:butterknife-compiler:$rootProject.ext.butterKnifeVersion"
-    compile "com.getsentry.raven:raven-android:$rootProject.ext.ravenVersion"
-    compile "com.github.bumptech.glide:glide:$rootProject.ext.glideVersion"
-    compile "com.squareup.sqlbrite2:sqlbrite:$rootProject.ext.sqlbriteVersion"
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:support-annotations:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.google.android.gms:play-services-base:7.5.0'
+    compile 'com.google.android.gms:play-services-maps:7.5.0'
+    compile 'com.google.android.gms:play-services-gcm:7.5.0'
+    compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
+    compile 'com.google.code.gson:gson:2.3'
+    compile 'com.jakewharton.timber:timber:4.3.1'
+    compile 'com.google.dagger:dagger:2.8'
+    apt 'com.google.dagger:dagger-compiler:2.8'
+    compile 'com.jakewharton:butterknife:8.5.1'
+    apt 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.getsentry.raven:raven-android:8.0.2'
+    compile 'com.github.bumptech.glide:glide:3.8.0'
+    compile 'com.squareup.sqlbrite2:sqlbrite:2.0.0'
 
-    testCompile "junit:junit:$rootProject.ext.junitVersion"
-    testCompile "org.mockito:mockito-core:$rootProject.ext.mockitoCoreVersion"
-    testCompile "org.powermock:powermock-module-junit4:$rootProject.ext.powerMockVersion"
-    testCompile "org.powermock:powermock-module-junit4-rule:$rootProject.ext.powerMockVersion"
-    testCompile "org.powermock:powermock-api-mockito:$rootProject.ext.powerMockVersion"
-    testCompile "org.powermock:powermock-classloading-xstream:$rootProject.ext.powerMockVersion"
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.powermock:powermock-module-junit4:1.6.2'
+    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.2'
+    testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
 
-    androidTestCompile "com.google.dexmaker:dexmaker:$rootProject.ext.dexMakerVersion"
-    androidTestCompile "com.google.dexmaker:dexmaker-mockito:$rootProject.ext.dexMakerVersion"
-    androidTestCompile ("com.android.support.test:rules:$rootProject.ext.rulesVersion") {
+    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestCompile ('com.android.support.test:rules:0.5') {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     }
-    androidTestCompile ("com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoCoreVersion") {
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2') {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     }
-    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoContribVersion") {
+    androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.1') {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
@@ -163,5 +163,5 @@ dependencies {
 
     compile project(':domain')
     compile project(':data')
-    compile project(path: ':database')
+    compile project(':database')
 }

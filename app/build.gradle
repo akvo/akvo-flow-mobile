@@ -31,7 +31,6 @@ android {
             testHandleProfiling true
             testFunctionalTest true
             vectorDrawables.useSupportLibrary = true
-            multiDexEnabled true
         }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7

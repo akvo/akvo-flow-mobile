@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenCentral()
@@ -126,9 +125,9 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.jakewharton.timber:timber:4.3.1'
     compile 'com.google.dagger:dagger:2.8'
-    apt 'com.google.dagger:dagger-compiler:2.8'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
     compile 'com.jakewharton:butterknife:8.5.1'
-    apt 'com.jakewharton:butterknife-compiler:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile 'com.getsentry.raven:raven-android:8.0.2'
     compile 'com.github.bumptech.glide:glide:3.8.0'
     compile 'com.squareup.sqlbrite2:sqlbrite:2.0.0'

@@ -136,22 +136,29 @@ public class SurveyDataRepository implements SurveyRepository {
         String syncedTime = getSyncedTime(surveyGroupId);
         return loadAndSave(baseUrl, apiKey, surveyGroupId, lastBatch, allResults, syncedTime)
                 .repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
+                    @Override public ObservableSource<?> apply(
+                            @NonNull Observable<Object> objectObservable)
+                            throws Exception {
+                        return null;
+                    }
+                })
+                .repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
                     @Override
-                    public ObservableSource<?> apply(@NonNull Observable<Object> objectObservable)
+                    public ObservableSource<?> apply(Observable<Object> objectObservable)
                             throws Exception {
                         return objectObservable.delay(5, TimeUnit.SECONDS);
                     }
                 })
                 .takeUntil(new Predicate<List<ApiDataPoint>>() {
                     @Override
-                    public boolean test(@NonNull List<ApiDataPoint> apiDataPoints)
+                    public boolean test(List<ApiDataPoint> apiDataPoints)
                             throws Exception {
                         return apiDataPoints.isEmpty();
                     }
                 })
                 .filter(new Predicate<List<ApiDataPoint>>() {
                     @Override
-                    public boolean test(@NonNull List<ApiDataPoint> apiDataPoints)
+                    public boolean test(List<ApiDataPoint> apiDataPoints)
                             throws Exception {
                         return apiDataPoints.isEmpty();
                     }

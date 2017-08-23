@@ -18,6 +18,8 @@
  */
 package org.akvo.flow.serialization.response.value;
 
+import android.text.TextUtils;
+
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
@@ -41,11 +43,13 @@ public class SignatureValue {
     }
 
     public static Signature deserialize(String data) {
-        try {
-            GsonMapper mapper = new GsonMapper();
-            return mapper.read(data, Signature.class);
-        } catch (JsonSyntaxException e) {
-            Timber.e("Value is not a valid JSON response: %s", data);
+        if (!TextUtils.isEmpty(data)) {
+            try {
+                GsonMapper mapper = new GsonMapper();
+                return mapper.read(data, Signature.class);
+            } catch (JsonSyntaxException e) {
+                Timber.e("Value is not a valid JSON response: %s", data);
+            }
         }
         return new Signature();
     }

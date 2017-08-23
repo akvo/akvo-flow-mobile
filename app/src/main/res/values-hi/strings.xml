@@ -46,8 +46,7 @@
   <string name="langoption">भाषाएं </string>
   <string name="langmandatorytitle">फॉर्म डाउनलोड करें </string>
   <string name="langmandatorytext">किसी भी  एक भाषा का चनाव करें </string>
-  <string name="pleasewait">कृपया प्रतीक्षा करें </string>
-  <string name="downloadsurveylabel">फॉर्म को डाउनलोड करें </string>
+    <string name="downloadsurveylabel">फॉर्म को डाउनलोड करें </string>
   <string name="downloadsurveydesc">स्वेच्छित सर्वे डाउनलोड करें (निर्देशित करने पर ही करें )</string>
   <string name="downloadsurveyinstr">वह फॉर्म आईडी  डालें जिसे डाउनलोड करना है </string>
   <string name="deletealldatawarning">ऐसा करने पर सभी डेटा स्थाईरुप से हट जायेगा (सर्वे प्रतिउत्तर , चित्र आदि ) I यह प्रतिक्रिया उलटनीय  नहीं है  आगे बढ़ने के लिए OK तथा समाप्त करने के लिए कैंसिल दबाएं I</string>
@@ -89,14 +88,9 @@
   <string name="sync">सिंक </string>
   <string name="sort">छाँटिएन </string>
   <string name="stats">आंकड़े</string>
-  <string name="syncing_records">डेटा पॉइंट्स सिंक हो रहे हैं </string>
-  <string name="synced_records">%1$d डेटा पॉइंट्स सिंक हो चुके हैं </string>
-  <string name="sync_error"> डेटा पॉइंट्स सिंकिंग असफल </string>
-  <string name="network_error">नेटवर्क में त्रुटि  </string>
-  <string name="prefill_title">पूर्व दिए उत्तर </string>
+    <string name="prefill_title">पूर्व दिए उत्तर </string>
   <string name="prefill_text">पूर्व भरे फॉर्म, पिछले दिए गय उत्तरों के साथ ?</string>
-  <string name="error_assignment_text">कृपया डैशबोर्ड में असाइनमेंट बनाये </string>
-  <!--Data sync-->
+    <!--Data sync-->
   <string name="data_sync_all">सिंक हुआ फॉर्म: %1$d-  असफल %2$d</string>
   <string name="data_sync_synced">सिंक हुआ फॉर्म: %1$d</string>
   <!--Localization-->
@@ -141,8 +135,7 @@
   <string name="image_location_reading">भौगोलिक स्थिति की जांच जारी</string>
   <string name="image_location_saved">भौगोलिक स्थिति अभिलिखित</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">नया डेटा पॉइंट बनाएं</string>
-  <string name="stats_total">कुल डेटा पॉइंट्स </string>
+    <string name="stats_total">कुल डेटा पॉइंट्स </string>
   <string name="stats_week">पिछले सात, 7, दिन </string>
   <string name="stats_today">आज </string>
   <string name="distance_label">दूरी:</string>

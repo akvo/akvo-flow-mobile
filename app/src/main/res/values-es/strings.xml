@@ -50,7 +50,6 @@
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selección no válida</string>
   <string name="langmandatorytext">Debe elegir al menos un idioma</string>
-  <string name="pleasewait">Por favor, espere</string>
   <string name="downloadsurveylabel">Descargar formulario</string>
   <string name="downloadsurveydesc">Descargar una encuesta particular (sólo en caso de instrucción)</string>
   <string name="downloadsurveyinstr">Introduzca el ID del formulario que desea descargar</string>
@@ -94,14 +93,8 @@
   <string name="sync">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estadísticas</string>
-  <string name="syncing_records">Sincronizando Puntos de Datos...</string>
-  <string name="synced_records">%1$d Puntos de Datos sincronizados</string>
-  <string name="sync_error">Sincronización de Puntos de Datos fallida</string>
-  <string name="syncing_corrupted_data_points_error">Vuelva a sincronizar.</string>
-  <string name="network_error">Error de conexión</string>
   <string name="prefill_title">Pre-llenar respuestas</string>
   <string name="prefill_text">Pre-llenar respuestas con previos valores de las mismas preguntas</string>
-  <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control Flow</string>
   <!--Data sync-->
   <string name="data_sync_all">Formularios sincronizados: %1$d - Fallidos: %2$d</string>
   <string name="data_sync_synced">Formularios sincronizados: %1$d</string>
@@ -111,7 +104,6 @@
   <string name="app_language">Idioma de la aplicación</string>
   <string name="please_restart">Por favor, reinicie la aplicación</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">No tiene encuestas asignadas. Las encuestas han de ser asignadas en el Panel de Control Flow</string>
   <string name="no_survey_selected_text">No ha seleccionado ninguna Encuesta. Abra el menú lateral para seleccionar una.</string>
   <!--ToolBar-->
   <string name="more">Más</string>
@@ -150,7 +142,6 @@
   <string name="image_location_reading">Leyendo geolocalización</string>
   <string name="image_location_saved">Geolocalización guardada</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">Añadir punto de datos</string>
   <string name="stats_total">Número total de puntos de datos:</string>
   <string name="stats_week">Últimos 7 días:</string>
   <string name="stats_today">Hoy:</string>

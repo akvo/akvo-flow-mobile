@@ -28,8 +28,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
@@ -42,6 +40,7 @@ import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
 import org.akvo.flow.exception.HttpException;
@@ -233,7 +232,7 @@ public class DataSyncService extends IntentService {
                     zipFileData.imagePaths);
 
             // Serialize form instance as JSON
-            zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
+            zipFileData.data = new GsonMapper().write(formInstance, FormInstance.class);
             zipFileData.uuid = formInstance.getUUID();
             zipFileData.formId = formInstance.getFormId();
             if (TextUtils.isEmpty(zipFileData.formId)) {

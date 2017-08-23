@@ -18,25 +18,23 @@
  */
 package org.akvo.flow.serialization.response.value;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
+import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.response.value.Signature;
-
-import java.io.IOException;
 
 import timber.log.Timber;
 
 public class SignatureValue {
 
     public static String serialize(Signature signature) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        GsonMapper mapper = new GsonMapper();
+//        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+//        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
-            return mapper.writeValueAsString(signature);
-        } catch (IOException e) {
+            return mapper.write(signature, Signature.class);
+        } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e(e.getMessage());
         }
         return "";
@@ -44,9 +42,9 @@ public class SignatureValue {
 
     public static Signature deserialize(String data) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(data, Signature.class);
-        } catch (IOException e) {
+            GsonMapper mapper = new GsonMapper();
+            return mapper.read(data, Signature.class);
+        } catch (JsonSyntaxException e) {
             Timber.e("Value is not a valid JSON response: %s", data);
         }
         return new Signature();

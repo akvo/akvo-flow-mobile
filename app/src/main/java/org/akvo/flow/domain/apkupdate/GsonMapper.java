@@ -68,6 +68,15 @@ public class GsonMapper {
         }
     }
 
+    public <T> String write(final T content) {
+        try {
+            return this.mapper.toJson(content);
+        } catch (JsonIOException | JsonSyntaxException e) {
+            Timber.e(e, "Error mapping class to json with contents: '" + content + "'");
+            throw e;
+        }
+    }
+
     public <T> String write(final T content, final Class<T> type) {
         try {
             return this.mapper.toJson(content, type);

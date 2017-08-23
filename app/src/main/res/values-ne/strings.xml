@@ -13,18 +13,13 @@
   <string name="submitbutton">बुझाउनुहोस्।</string>
   <string name="resize_large_images">ठुलो तस्बिरहरुको नाप मिलाउनुहोस्</string>
   <string name="settingslabel">सेटीङ्स्</string>
-  <string name="nouser">प्रयोगकर्ता छैन!</string>
-  <string name="exportcomplete">एस डि कार्डमा डाटा पठाइयो।</string>
   <string name="prefoptlabel">छनौट</string>
   <string name="prefoptdesc">पुर्व निर्धारित सर्भे भाषा तथा छनौटहरु राख्नुहोस्। </string>
   <string name="sendoptlabel">डाटा सिन्क गर्नुहोस्</string>
   <string name="sendoptdesc">सर्भे डाटा सिँक गर्दछ। यसका लागि तपाईंसँग इन्टरनेट (मोबाइल वा वाइ-फाइ) सुबिधा हुन पर्छ।</string>
-  <string name="poweroptlabel">उर्जा व्यवस्थापन</string>
-  <string name="poweroptdesc">ब्याट्रीको आयु राम्ररी व्यवस्थापन गर्न वाइ-फाइको फेरबदल गर्नुहोस्</string>
   <string name="screenoptlabel">सर्भेमा डाटा भर्दा स्क्रिन अन राख्नुहोस्</string>
   <string name="screenoptdesc">सर्भेको उतर दिँदा उपकरणको स्क्रिनलाई बन्द हुन बाट रोक्दछ। ब्याट्री खपतलाई जोगाउन सर्भे प्रयोगमा नभएको बेला आफैले स्क्रिन बन्द गर्न (वा एप्पबाट बहिर निस्कन) नबिर्सनु होला।</string>
   <string name="aboutlabel">हाम्रो बारेमा</string>
-  <string name="aboutdesc">भर्सनको बारेमा देखाउँछ</string>
   <string name="gpsstatuslabel">जि पि एस् को स्थिति </string>
   <string name="gpsstatusdesc">उपकरणमा GPS Status एप्प राख्नु भएको छ भने चालु गराउँदछ।</string>
   <string name="nogpsstatus">GPS Status राखिएको छैन। कृपया गुगलको Play Store मा गएर डाउन्लोड ग रि राख्नु होला।</string>
@@ -35,7 +30,6 @@
   <string name="helpheading">सहयोगका विकल्पहरु</string>
   <string name="deleteresponse">उतर हटाउनुहोस्।</string>
   <string name="othertext">अरु...</string>
-  <string name="savelastuserlabel">सत्रहरुको बिचमा अन्तिमकै प्रयोगकर्तालाई सक्रिय राख्नुहोस्।</string>
   <string name="uploadoptionlabel">मोबाइल नेटवर्क प्रयोग गरेर डाटा सिँक गर्नुहोस्।</string>
   <string name="surveylanglabel">सर्भे भाषाहरु</string>
   <string name="scanbarcode">बारकोड स्क्यान गर्नुहोस्।</string>
@@ -49,7 +43,6 @@
   <string name="reloadconftext">के तपाईं सबै सर्भेहरु बलपुर्वक हटाएर फेरि डाउन्लोड गर्न चाहनुहुन्छ? </string>
   <string name="submitcompletetitle">सर्भे बुझाईयो।</string>
   <string name="submitcompletetext">सर्भे उतरहरु सरभरमा पठाइनेछ।</string>
-  <string name="optiontext">विकल्प</string>
   <string name="langoption">भाषाहरु</string>
   <string name="langmandatorytitle">गलत छनौट</string>
   <string name="langmandatorytext">तपाईंले कम्तीमा एउटा भाषा छान्नुपर्ने हुन्छ।</string>
@@ -80,8 +73,6 @@
   <string name="transmissionhist">डाटा प्रसारण हिस्ट्री</string>
   <string name="transstartdate">शुरु भयो</string>
   <string name="transenddate">सकियो</string>
-  <string name="confirmchangetitle">उतर बद्लिने?</string>
-  <string name="confirmchangetext">के तपाईं आफ्नो उतर बदल्न चाहनुहुन्छ?</string>
   <string name="resetall">सबै हटाउँछ। (प्रयोगकर्ताहरु, सर्भेहरु, र संकलन गरिएका डाटाहरु)</string>
   <string name="resetalldesc">सबै सर्भेहरु, सर्भे उतरहरु (तस्बिर र पठाईएका zip फाइलहरु सहित) र प्रयोगकर्ताहरु स्थाई रूपमा हटाउँछ।</string>
   <string name="reset_responses">संकलन गरिएका डाटा र तस्बिरहरु हटाउँछ।</string>
@@ -95,24 +86,19 @@
   <string name="pleasewaitforbootstrap">कृपया बुट स्ट्र्याप फाइल process हुँदासम्म पर्खनुहोस्।</string>
   <string name="clear_data_success">डिभाइसबाट डाटा सफलतापुर्वक हटाइयो।</string>
   <string name="clear_data_error">डिभाइसबाट डाटा हटाउन त्रुटि भएको छ। </string>
-  <string name="configuring_languages">सर्भे भाषाहरु कन्फिगर हुँदैछन्...</string>
   <string name="search">खोजी गर्नुहोस्</string>
   <string name="sync">सिन्क गर्नुहोस्</string>
   <string name="sort">क्रममा मिलाउनुहोस्</string>
   <string name="stats">तथ्यान्क</string>
   <string name="syncing_records">डाटा पोइन्टहरु सिँक हुँदैछन्...</string>
-  <string name="sync_finished">डाटा पोइन्टहरु सिँक भई सके।</string>
   <string name="synced_records">सिँक भएका %1$d डाटा पोइन्टहरु</string>
   <string name="sync_error">डाटा पोइन्टहरु सिँक भएनन्।</string>
   <string name="syncing_corrupted_data_points_error">कृपया फेरि सिन्क गर्नुहोस्।</string>
   <string name="network_error">नेटवर्क त्रुटि</string>
-  <string name="loading">लोड हुँदैछ...</string>
   <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
   <string name="prefill_text">पहिलेको उतरहरुले फारम भर्न चाहनुहुन्छ?</string>
   <string name="error_assignment_text">Akvo Flow ड्यास्बोर्डमा assignment हरु चाहियो।</string>
   <!--Data sync-->
-  <string name="data_sync_title">डाटा सिँक्रोनाइजेसन</string>
-  <string name="data_sync_text">डाटा अपलोड हुँदैछ, कृपया पर्खनुहोस्।</string>
   <string name="data_sync_all">सिँक भएका फारमहरु %1$d - सिँक नभएका फारमहरु %2$d</string>
   <string name="data_sync_synced">सिँक भएका फारमहरु %1$d</string>
   <string name="data_sync_error_form_deleted_title">फारम हटाइयो।</string>
@@ -122,12 +108,8 @@
   <string name="please_restart">कृपया एप्पलाई पुन: शुरु गर्नुहोस्।</string>
   <!--Empty Views-->
   <string name="no_surveys_text">तपाईंलाई कुनै सर्भे तोकिएको छैन। सर्भेहरु ड्यास्बोर्डमा तोकिएको छ।</string>
-  <string name="no_records_text">तपाईंको अहिले कुनै डाटा प्वाईन्ट छैन। नयाँ डाटा प्वाईन्ट थप्नको लागि स्क्रिन माथिको \'+\' चिन्हमा थिच्नुहोस्।</string>
   <string name="no_survey_selected_text">तपाईंको कुनै सर्भे छानिएको छैन। कुनै एक सर्भे छान्नको लागि साइडको मेनु खोल्नुहोस्।</string>
-  <!--Activity Labels-->
-  <string name="survey_groups_activity">सर्भेहरु </string>
-  <string name="record_list_activity">डाटा प्वाइन्ट छान्नुहोस्</string>
-  <!--ActionBar-->
+  <!--ToolBar-->
   <string name="more">अझै</string>
   <!--Search-->
   <string name="search_hint">डाटा प्वाइन्ट खोज्नुहोस् </string>
@@ -154,7 +136,6 @@
   <string name="clear_feature_text">के तपाईं यो फिचर हटाउन चाहनुहुन्छ?</string>
   <string name="repeat_group">समुह दोहोर्याउनुहोस्</string>
   <string name="repetitions">दोहोरिएको</string>
-  <string name="view_responses">प्रतिकृयाहरु हेर्नुहोस्</string>
   <string name="view_map">नक्सा/मानचित्र हेर्नुहोस्</string>
   <string name="delete_group_title">समुह हटाउनुहोस्</string>
   <string name="delete_group_text">के तपाईं यो समुह हटाउन चाहनुहुन्छ?</string>
@@ -244,7 +225,6 @@
   <string name="no">हैन</string>
   <string name="action_retry">फेरि प्रयास गर्नुहोस्</string>
   <string name="delete">डिलिट गर्नुहोस्</string>
-  <string name="error_value_required">यो कोठा खाली हुन सक्दैन।</string>
   <string name="drawer_open">ड्रअर खुला छ</string>
   <string name="drawer_close">ड्रअर बन्द छ</string>
   <!--app update service-->

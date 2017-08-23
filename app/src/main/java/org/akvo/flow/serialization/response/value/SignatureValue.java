@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.response.value.Signature;
 
 import timber.log.Timber;
@@ -32,8 +32,6 @@ public class SignatureValue {
 
     public static String serialize(Signature signature) {
         GsonMapper mapper = new GsonMapper();
-//        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-//        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
             return mapper.write(signature, Signature.class);
         } catch (JsonIOException | JsonSyntaxException e) {

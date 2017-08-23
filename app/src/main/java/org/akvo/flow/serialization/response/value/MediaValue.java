@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -16,6 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.akvo.flow.serialization.response.value;
 
 import android.text.TextUtils;
@@ -23,8 +24,8 @@ import android.text.TextUtils;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.response.value.Media;
+import org.akvo.flow.util.GsonMapper;
 
 import timber.log.Timber;
 
@@ -32,10 +33,8 @@ public class MediaValue {
 
     public static String serialize(Media media) {
         GsonMapper mapper = new GsonMapper();
-//        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-//        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
-        return mapper.write(media, Media.class);
+            return mapper.write(media, Media.class);
         } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e(e.getMessage());
         }

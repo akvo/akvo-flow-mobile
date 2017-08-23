@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,7 +24,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.response.value.CascadeNode;
 
 import java.lang.reflect.Type;
@@ -68,7 +68,8 @@ public class CascadeValue {
     public static String getDatapointName(String value) {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
-        for (CascadeNode cv : deserialize(value)) {
+        List<CascadeNode> cascadeNodes = deserialize(value);
+        for (CascadeNode cv : cascadeNodes) {
             if (!first) {
                 builder.append(" - ");
             }

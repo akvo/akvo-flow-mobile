@@ -40,7 +40,7 @@ import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
 import org.akvo.flow.exception.HttpException;

@@ -43,7 +43,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import retrofit2.HttpException;
@@ -135,13 +134,6 @@ public class SurveyDataRepository implements SurveyRepository {
         final List<ApiDataPoint> allResults = new ArrayList<>();
         String syncedTime = getSyncedTime(surveyGroupId);
         return loadAndSave(baseUrl, apiKey, surveyGroupId, lastBatch, allResults, syncedTime)
-                .repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
-                    @Override public ObservableSource<?> apply(
-                            @NonNull Observable<Object> objectObservable)
-                            throws Exception {
-                        return null;
-                    }
-                })
                 .repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
                     @Override
                     public ObservableSource<?> apply(Observable<Object> objectObservable)

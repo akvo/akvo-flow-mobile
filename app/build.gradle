@@ -54,8 +54,17 @@ android {
             buildTypes {
                 release {
                     minifyEnabled true
-                    proguardFiles getDefaultProguardFile('proguard-android.txt'),
-                            'proguard-rules.pro'
+                    proguardFile 'proguard-files/proguard-rules.pro'
+                    proguardFile 'proguard-files/proguard-butterknife.pro'
+                    proguardFile 'proguard-files/proguard-glide.pro'
+                    proguardFile 'proguard-files/proguard-google-play-services.pro'
+                    proguardFile 'proguard-files/proguard-gson.pro'
+                    proguardFile 'proguard-files/proguard-jackson.pro'
+                    proguardFile 'proguard-files/proguard-sentry.pro'
+                    proguardFile 'proguard-files/proguard-square-retrofit.pro'
+                    proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+                    proguardFile 'proguard-files/proguard-rxjava.pro'
+                    proguardFile getDefaultProguardFile('proguard-android.txt')
                     signingConfig signingConfigs.flowRelease
                 }
             }

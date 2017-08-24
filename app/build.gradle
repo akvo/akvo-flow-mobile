@@ -60,6 +60,7 @@ android {
                     proguardFile 'proguard-files/proguard-google-play-services.pro'
                     proguardFile 'proguard-files/proguard-gson.pro'
                     proguardFile 'proguard-files/proguard-jackson.pro'
+                    proguardFile 'proguard-files/proguard-prettytime.pro'
                     proguardFile 'proguard-files/proguard-sentry.pro'
                     proguardFile 'proguard-files/proguard-square-retrofit.pro'
                     proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'

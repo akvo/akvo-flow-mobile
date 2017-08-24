@@ -19,6 +19,8 @@
 
 package org.akvo.flow.serialization.response.value;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.gson.JsonIOException;
@@ -31,6 +33,7 @@ import timber.log.Timber;
 
 public class MediaValue {
 
+    @NonNull
     public static String serialize(Media media) {
         GsonMapper mapper = new GsonMapper();
         try {
@@ -41,6 +44,7 @@ public class MediaValue {
         return "";
     }
 
+    @Nullable
     public static Media deserialize(String data) {
         if (TextUtils.isEmpty(data)) {
             return null;

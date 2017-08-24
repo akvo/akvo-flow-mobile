@@ -66,7 +66,7 @@ public abstract class UseCase {
 
     public void dispose() {
         if (!disposables.isDisposed()) {
-            disposables.dispose();
+            disposables.clear();
         }
     }
 

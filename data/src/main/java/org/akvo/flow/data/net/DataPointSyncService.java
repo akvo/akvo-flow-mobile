@@ -22,7 +22,7 @@ package org.akvo.flow.data.net;
 
 import org.akvo.flow.data.entity.ApiLocaleResult;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
@@ -38,7 +38,7 @@ interface DataPointSyncService {
 
     @GET(SURVEYED_LOCALE)
     @Headers("Cache-Control: no-cache")
-    Observable<ApiLocaleResult> loadNewDataPoints(@Query(ANDROID_ID) String androidId,
+    Flowable<ApiLocaleResult> loadNewDataPoints(@Query(ANDROID_ID) String androidId,
             @Query(IMEI) String imei, @Query(LAST_UPDATED) String lastUpdated,
             @Query(PHONE_NUMBER) String phoneNumber, @Query(SURVEY_GROUP) String surveyGroup);
 }

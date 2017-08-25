@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 @Singleton
@@ -45,8 +46,8 @@ public class SharedPreferencesDataSource {
         return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
     }
 
-    public Observable<String> getBaseUrl() {
-        return Observable.just(getString(KEY_BACKEND_SERVER, ""));
+    public Flowable<String> getBaseUrl() {
+        return Flowable.just(getString(KEY_BACKEND_SERVER, ""));
     }
 
     public String getString(String key, String defValue) {

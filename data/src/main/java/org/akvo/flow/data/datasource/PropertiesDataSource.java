@@ -31,7 +31,7 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 import timber.log.Timber;
 
 @Singleton
@@ -73,11 +73,11 @@ public class PropertiesDataSource {
         }
     }
 
-    public Observable<String> getBaseUrl() {
-        return Observable.just(getProperty(SERVER_BASE));
+    public Flowable<String> getBaseUrl() {
+        return Flowable.just(getProperty(SERVER_BASE));
     }
 
-    public Observable<String> getApiKey() {
-        return Observable.just(getProperty(API_KEY));
+    public Flowable<String> getApiKey() {
+        return Flowable.just(getProperty(API_KEY));
     }
 }

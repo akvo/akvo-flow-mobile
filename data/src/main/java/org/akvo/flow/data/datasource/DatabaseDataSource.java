@@ -44,6 +44,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 public class DatabaseDataSource {
@@ -77,12 +78,12 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
-    public Observable<List<ApiDataPoint>> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
+    public Flowable<List<ApiDataPoint>> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
-            return Observable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
+            return Flowable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
         }
         syncDataPointsWithDataBase(apiDataPoints);
-        return Observable.just(apiDataPoints);
+        return Flowable.just(apiDataPoints);
     }
 
     private void syncDataPointsWithDataBase(@Nullable List<ApiDataPoint> apiDataPoints) {

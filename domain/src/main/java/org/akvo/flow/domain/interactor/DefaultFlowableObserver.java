@@ -18,29 +18,33 @@
  *
  */
 
-package org.akvo.flow.domain.entity;
+package org.akvo.flow.domain.interactor;
 
-public class SyncResult {
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
-    private final ResultCode resultCode;
-    private final int numberOfSyncedItems;
+/**
+ * Default subscriber base class to be used whenever you want to avoid having to implement all
+ * 3 methods.
+ */
+public class DefaultFlowableObserver<T> implements Consumer<T>, Action {
 
-    public SyncResult(ResultCode resultCode, int numberOfSyncedItems) {
-        this.resultCode = resultCode;
-        this.numberOfSyncedItems = numberOfSyncedItems;
+    public void onComplete() {
+        // no-op by default.
     }
 
-    public ResultCode getResultCode() {
-        return resultCode;
+    public void onNext(T t) {
+        // no-op by default.
     }
 
-    public int getNumberOfSyncedItems() {
-        return numberOfSyncedItems;
+    @Override
+    public void run() throws Exception {
+        onComplete();
     }
 
-    public enum ResultCode {
-        SUCCESS,
-        ERROR_NO_NETWORK,
-        ERROR_ASSIGNMENT_MISSING
+    @Override
+    public void accept(@NonNull T t) throws Exception {
+        onNext(t);
     }
 }

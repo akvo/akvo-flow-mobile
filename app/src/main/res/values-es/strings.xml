@@ -17,18 +17,13 @@
   <string name="settings">Ajustes</string>
   <string name="resize_large_images">Reducir imágenes grandes</string>
   <string name="settingslabel">Ajustes</string>
-  <string name="nouser">¡No hay usuarios!</string>
-  <string name="exportcomplete">Los datos han sido exportados a la tarjeta SD</string>
   <string name="prefoptlabel">Ajustes</string>
   <string name="prefoptdesc">Seleccionar el idioma predeterminado y otras opciones</string>
   <string name="sendoptlabel">Sincronizar datos</string>
   <string name="sendoptdesc">Sincronizar los datos recopilados. Debe tener conexión a internet (datos o Wi-Fi) para realizar esta operacición.</string>
-  <string name="poweroptlabel">Controlar batería</string>
-  <string name="poweroptdesc">Activar/Desactivar la señal Wi-Fi para una batería más duradera.</string>
   <string name="screenoptlabel">Mantener la pantalla activa durante la recopilación de datos</string>
   <string name="screenoptdesc">Evitar que la pantalla se apague durante la introducción de datos. Asegúrese de apagar la pantalla (o cerrar la aplicación) cuando no esté en uso, para reducir el consumo de batería.</string>
   <string name="aboutlabel">Acerca de</string>
-  <string name="aboutdesc">Muestra información sobre la versión actual</string>
   <string name="gpsstatuslabel">Estado del GPS</string>
   <string name="gpsstatusdesc">Abrir la aplicación GPS Status si la tiene instalada en este dispositivo.</string>
   <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instale la aplicación a través de Google Play Store.</string>
@@ -39,7 +34,6 @@
   <string name="helpheading">Opciones de ayuda</string>
   <string name="deleteresponse">Eliminar respuesta</string>
   <string name="othertext">Otros...</string>
-  <string name="savelastuserlabel">Mantener entre sesiones el último usuario activo </string>
   <string name="uploadoptionlabel">Enviar datos mediante red móvil</string>
   <string name="surveylanglabel">Idiomas de la encuesta</string>
   <string name="scanbarcode">Escanear código de barras</string>
@@ -53,7 +47,6 @@
   <string name="reloadconftext">¿Está seguro de querer borrar y descargar todo de nuevo?</string>
   <string name="submitcompletetitle">Encuesta enviada</string>
   <string name="submitcompletetext">Las respuestas de la encuesta serán enviadas al servidor.</string>
-  <string name="optiontext">Opción</string>
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selección no válida</string>
   <string name="langmandatorytext">Debe elegir al menos un idioma</string>
@@ -84,8 +77,6 @@
   <string name="transmissionhist">Historial de transmisión</string>
   <string name="transstartdate">Inicio:</string>
   <string name="transenddate">Fin:</string>
-  <string name="confirmchangetitle">¿Cambiar respuesta?</string>
-  <string name="confirmchangetext">¿Quiere cambiar su respuesta?</string>
   <string name="resetall">Borrar todo (usuarios, encuestas, y todos los datos recolectados)</string>
   <string name="resetalldesc">Borrar permanentemente todas las encuentas, respuestas (incluyendo imágenes y archivos zip exportados) y usuarios</string>
   <string name="reset_responses">Borrar datos recolectados e imágenes</string>
@@ -99,24 +90,19 @@
   <string name="pleasewaitforbootstrap">Por favor, espere a que el archivo bootstrap haya sido procesado.</string>
   <string name="clear_data_success">Los datos han sido correctamente eliminados del dispositivo</string>
   <string name="clear_data_error">Ha ocurrido un error borrando los datos</string>
-  <string name="configuring_languages">Configurando los idiomas de las encuestas...</string>
   <string name="search">Buscar</string>
   <string name="sync">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estadísticas</string>
   <string name="syncing_records">Sincronizando Puntos de Datos...</string>
-  <string name="sync_finished">Los Puntos de Datos han sido sincronizados</string>
   <string name="synced_records">%1$d Puntos de Datos sincronizados</string>
   <string name="sync_error">Sincronización de Puntos de Datos fallida</string>
   <string name="syncing_corrupted_data_points_error">Vuelva a sincronizar.</string>
   <string name="network_error">Error de conexión</string>
-  <string name="loading">Cargando...</string>
   <string name="prefill_title">Pre-llenar respuestas</string>
   <string name="prefill_text">Pre-llenar respuestas con previos valores de las mismas preguntas</string>
   <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control Flow</string>
   <!--Data sync-->
-  <string name="data_sync_title">Sincronización de datos</string>
-  <string name="data_sync_text">Sincronizando datos. Por favor, espere...</string>
   <string name="data_sync_all">Formularios sincronizados: %1$d - Fallidos: %2$d</string>
   <string name="data_sync_synced">Formularios sincronizados: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulario borrado</string>
@@ -126,12 +112,8 @@
   <string name="please_restart">Por favor, reinicie la aplicación</string>
   <!--Empty Views-->
   <string name="no_surveys_text">No tiene encuestas asignadas. Las encuestas han de ser asignadas en el Panel de Control Flow</string>
-  <string name="no_records_text">Aún no dispone de puntos de datos. Clique \'+\' en el menú de arriba para añadir un nuevo punto de datos</string>
   <string name="no_survey_selected_text">No ha seleccionado ninguna Encuesta. Abra el menú lateral para seleccionar una.</string>
-  <!--Activity Labels-->
-  <string name="survey_groups_activity">Encuestas</string>
-  <string name="record_list_activity">Seleccionar Punto de Datos</string>
-  <!--ActionBar-->
+  <!--ToolBar-->
   <string name="more">Más</string>
   <!--Search-->
   <string name="search_hint">Buscar Punto de Datos</string>
@@ -158,7 +140,6 @@
   <string name="clear_feature_text">¿Quiere borrar esta figura?</string>
   <string name="repeat_group">Repetir grupo</string>
   <string name="repetitions">Repeticiones:</string>
-  <string name="view_responses">Ver respuestas</string>
   <string name="view_map">Ver mapa</string>
   <string name="delete_group_title">Eliminar grupo</string>
   <string name="delete_group_text">¿Está seguro de que desea eliminar este grupo?</string>
@@ -248,7 +229,6 @@
   <string name="no">No</string>
   <string name="action_retry">Reintentar</string>
   <string name="delete">Borrar</string>
-  <string name="error_value_required">Este campo no puede ser dejado en blanco</string>
   <string name="drawer_open">Abrir menú</string>
   <string name="drawer_close">Cerrar menú</string>
   <!--app update service-->

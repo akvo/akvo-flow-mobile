@@ -17,18 +17,13 @@
   <string name="settings">Paramètres</string>
   <string name="resize_large_images">Redimensionner les images trop grandes</string>
   <string name="settingslabel">Paramètres</string>
-  <string name="nouser">Il n\'y a pas d\'utilisateurs!</string>
-  <string name="exportcomplete">Les données ont été exportés sur la carte SD</string>
   <string name="prefoptlabel">Préférences</string>
   <string name="prefoptdesc">Choisir la langue par défaut de l\'enquête et autres préférences</string>
   <string name="sendoptlabel">Synchroniser les données</string>
   <string name="sendoptdesc">Synchroniser les données de l\'enquête. Vous devez avoir une connexion Internet (mobile ou wi-fi) pour réaliser cette commande.</string>
-  <string name="poweroptlabel">Gestion de la batterie</string>
-  <string name="poweroptdesc">Activer/désactiver le Wi-Fi pour une meilleure gestion de la batterie.</string>
   <string name="screenoptlabel">Garder l\'écran activé pendant l\'entrée des données</string>
   <string name="screenoptdesc">Empêcher l\'écran de s\'éteindre pendant que vous remplissez les données. Assurez-vous d\'éteindre l\'écran manuellement (ou de quitter l\'application) lorsque vous avez terminé afin d\'économiser la batterie.</string>
   <string name="aboutlabel">A propos</string>
-  <string name="aboutdesc">Information sur les versions.</string>
   <string name="gpsstatuslabel">Etat du GPS</string>
   <string name="gpsstatusdesc">Démarre l\'application GPS Status si elle est installée sur cet appareil.</string>
   <string name="nogpsstatus">GPS Status n\'est pas installée sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
@@ -39,7 +34,6 @@
   <string name="helpheading">Options d\'aide</string>
   <string name="deleteresponse">Effacer les réponses</string>
   <string name="othertext">Autre...</string>
-  <string name="savelastuserlabel">Garde le dernier utilisateur connecté entre les sessions</string>
   <string name="uploadoptionlabel">Envoyer les données avec le réseau mobile</string>
   <string name="surveylanglabel">Langues de l\'enquête</string>
   <string name="scanbarcode">Scanner le code barre</string>
@@ -53,7 +47,6 @@
   <string name="reloadconftext">Etes-vous sûr de vouloir effacer et recharger toutes les enquêtes?</string>
   <string name="submitcompletetitle">Enquête envoyée</string>
   <string name="submitcompletetext">Les données de l\'enquêtes vont être envoyées au serveur.</string>
-  <string name="optiontext">Option</string>
   <string name="langoption">Langues</string>
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
@@ -84,8 +77,6 @@
   <string name="transmissionhist">Historique des transmissions</string>
   <string name="transstartdate">Commencé:</string>
   <string name="transenddate">Fini:</string>
-  <string name="confirmchangetitle">Modifier la réponse?</string>
-  <string name="confirmchangetext">Voulez-vous modifier votre réponse?</string>
   <string name="resetall">Tout effacer (utilisateurs, enquêtes, et toutes les données collectées)</string>
   <string name="resetalldesc">Effacer définitivement toutes les enquêtes, données (y compris les images et fichiers .zip exportés) et utilisateurs</string>
   <string name="reset_responses">Effacer les données collectées et les images</string>
@@ -99,24 +90,19 @@
   <string name="pleasewaitforbootstrap">Veuillez attendre jusqu\'à ce que le fichier soit prêt.</string>
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
-  <string name="configuring_languages">Paramètrer la langue de l\'enquête...</string>
   <string name="search">Recherche</string>
   <string name="sync">Sync</string>
   <string name="sort">Trier</string>
   <string name="stats">Stats</string>
   <string name="syncing_records">Synchronisation des enregistrements en cours...</string>
-  <string name="sync_finished">La synchronisation des enregistrements est terminée</string>
   <string name="synced_records">%1$d enregistrements synchronisés</string>
   <string name="sync_error">La synchronisation des enregistrements à échoué</string>
   <string name="syncing_corrupted_data_points_error">Veuillez synchroniser de nouveau.</string>
   <string name="network_error">Erreur de réseau</string>
-  <string name="loading">Chargement...</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
   <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo Flow</string>
   <!--Data sync-->
-  <string name="data_sync_title">Synchronisation des données</string>
-  <string name="data_sync_text">Transfèrt en cours. Veuillez patienter</string>
   <string name="data_sync_all">Formulaires synchronisés: %1$d - Echoués: %2$d</string>
   <string name="data_sync_synced">Formulaires synchronisés: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Ce formulaire a été supprimé.</string>
@@ -126,12 +112,8 @@
   <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
   <string name="no_surveys_text">Aucune enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord Flow</string>
-  <string name="no_records_text">Vous n\'avez pas encore de données. Cliquez \"+\" en haut de l\'écran pour en ajouter.</string>
   <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
-  <!--Activity Labels-->
-  <string name="survey_groups_activity">Enquêtes</string>
-  <string name="record_list_activity">Sélectionner un enregistrement</string>
-  <!--ActionBar-->
+  <!--ToolBar-->
   <string name="more">Plus</string>
   <!--Search-->
   <string name="search_hint">Chercher un enregistrement</string>
@@ -158,12 +140,10 @@
   <string name="clear_feature_text">Voulez vous supprimer cette fonction?</string>
   <string name="repeat_group">Répéter le groupe</string>
   <string name="repetitions">Répétitions:</string>
-  <string name="view_responses">Voir les réponses.</string>
   <string name="view_map">Voir carte.</string>
   <string name="delete_group_title">Supprimer le groupe</string>
   <string name="delete_group_text">Voulez-vous supprimer ce groupe?</string>
   <string name="add_signature">Ajouter une signature</string>
-  <string name="modify_signature">Modifier la signature</string>
   <string name="signed_by">Signé par:</string>
   <string name="signature_terms">Je comprends que ceci est une image éléctronique représentant ma signature</string>
   <string name="image_location_unknown">Géolocalisation inconnue</string>
@@ -249,7 +229,6 @@
   <string name="no">Non</string>
   <string name="retry">Réessayer</string>
   <string name="delete">Supprimer</string>
-  <string name="error_value_required">Ce champ ne peut être vide</string>
   <string name="drawer_open">Menu ouvert</string>
   <string name="drawer_close">Menu fermé</string>
   <!--app update service-->

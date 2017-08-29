@@ -123,6 +123,7 @@ public class DataPointsMapPresenter implements Presenter {
             @Override
             public void onNext(Boolean aBoolean) {
                 if (aBoolean == null || !aBoolean) {
+                    view.hideProgress();
                     view.showErrorSyncNotAllowed();
                 } else {
                     sync(surveyGroupId);

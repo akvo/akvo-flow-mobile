@@ -136,6 +136,7 @@ public class DataPointsListPresenter implements Presenter {
             @Override
             public void onNext(Boolean aBoolean) {
                 if (aBoolean == null || !aBoolean) {
+                    view.hideLoading();
                     view.showErrorSyncNotAllowed();
                 } else {
                     sync(surveyGroupId);

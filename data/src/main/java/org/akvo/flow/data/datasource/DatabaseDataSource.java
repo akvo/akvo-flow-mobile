@@ -39,12 +39,10 @@ import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 public class DatabaseDataSource {
@@ -78,15 +76,7 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
-    public Flowable<List<ApiDataPoint>> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
-        if (apiDataPoints == null) {
-            return Flowable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
-        }
-        syncDataPointsWithDataBase(apiDataPoints);
-        return Flowable.just(apiDataPoints);
-    }
-
-    private void syncDataPointsWithDataBase(@Nullable List<ApiDataPoint> apiDataPoints) {
+    public void syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null || apiDataPoints.size() == 0) {
             return;
         }

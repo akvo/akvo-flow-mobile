@@ -76,6 +76,7 @@ public class DataPointsListPresenter implements Presenter {
     }
 
     void loadDataPoints() {
+        getSavedDataPoints.unSubscribe();
         if (surveyGroup != null) {
             Map<String, Object> params = new HashMap<>(8);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
@@ -97,6 +98,16 @@ public class DataPointsListPresenter implements Presenter {
                     view.displayData(mapDataPoints);
                     if (mapDataPoints.isEmpty()) {
                         view.showNoDataPoints(surveyGroup.isMonitored());
+                    } else {
+                        long receivedDataPointsSurveyGroupId = dataPoints.get(0).getSurveyGroupId();
+                        long currentDataPointsSurveyGroupId = surveyGroup.getId();
+                        if (receivedDataPointsSurveyGroupId != currentDataPointsSurveyGroupId) {
+                            Timber.e(new IllegalArgumentException(
+                                    "Datapoints from wrong survey: expected from surveyId: "
+                                            + currentDataPointsSurveyGroupId
+                                            + " got from surveyId: "
+                                            + receivedDataPointsSurveyGroupId));
+                        }
                     }
                 }
             }, params);
@@ -139,8 +150,6 @@ public class DataPointsListPresenter implements Presenter {
 
             @Override
             public void onNext(SyncResult result) {
-                Timber.d("onNext datapoint sync: synced : %d", result.getNumberOfSyncedItems());
-
                 if (result.getResultCode() == SUCCESS) {
                     if (result.getNumberOfSyncedItems() > 0) {
                         view.showSyncedResults(result.getNumberOfSyncedItems());

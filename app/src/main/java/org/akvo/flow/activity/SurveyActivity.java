@@ -54,7 +54,7 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;

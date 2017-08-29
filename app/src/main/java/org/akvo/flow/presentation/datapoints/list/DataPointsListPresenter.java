@@ -76,7 +76,7 @@ public class DataPointsListPresenter implements Presenter {
     }
 
     void loadDataPoints() {
-        getSavedDataPoints.unSubscribe();
+        getSavedDataPoints.dispose();
         if (surveyGroup != null) {
             Map<String, Object> params = new HashMap<>(8);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());

@@ -93,9 +93,16 @@
   <string name="sync">Sync</string>
   <string name="sort">Trier</string>
   <string name="stats">Stats</string>
-    <string name="prefill_title">Pré-remplir les réponses</string>
+  <string name="syncing_records">Synchronisation des enregistrements en cours...</string>
+  <string name="synced_records">%1$d enregistrements synchronisés</string>
+  <string name="sync_error">La synchronisation des enregistrements à échoué</string>
+  <string name="syncing_corrupted_data_points_error">Veuillez synchroniser de nouveau.</string>
+  <string name="network_error">Erreur de réseau</string>
+  <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
     <!--Data sync-->
+  <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo Flow</string>
+  <!--Data sync-->
   <string name="data_sync_all">Formulaires synchronisés: %1$d - Echoués: %2$d</string>
   <string name="data_sync_synced">Formulaires synchronisés: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Ce formulaire a été supprimé.</string>
@@ -104,7 +111,9 @@
   <string name="app_language">Langue de l\'application</string>
   <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
-    <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
+  <!--ToolBar-->
+  <string name="no_surveys_text">Aucune enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord Flow</string>
+  <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
   <!--ToolBar-->
   <string name="more">Plus</string>
   <!--Search-->

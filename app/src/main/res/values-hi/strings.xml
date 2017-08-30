@@ -89,8 +89,14 @@
   <string name="sort">छाँटिएन </string>
   <string name="stats">आंकड़े</string>
     <string name="prefill_title">पूर्व दिए उत्तर </string>
+  <string name="syncing_records">डेटा पॉइंट्स सिंक हो रहे हैं </string>
+  <string name="synced_records">%1$d डेटा पॉइंट्स सिंक हो चुके हैं </string>
+  <string name="sync_error"> डेटा पॉइंट्स सिंकिंग असफल </string>
+  <string name="network_error">नेटवर्क में त्रुटि  </string>
   <string name="prefill_text">पूर्व भरे फॉर्म, पिछले दिए गय उत्तरों के साथ ?</string>
     <!--Data sync-->
+  <string name="error_assignment_text">कृपया डैशबोर्ड में असाइनमेंट बनाये </string>
+  <!--Data sync-->
   <string name="data_sync_all">सिंक हुआ फॉर्म: %1$d-  असफल %2$d</string>
   <string name="data_sync_synced">सिंक हुआ फॉर्म: %1$d</string>
   <!--Localization-->

@@ -51,6 +51,7 @@
   <string name="langmandatorytitle">Ongeldige selectie</string>
   <string name="langmandatorytext">U dient ten minste een taal te selecteren</string>
     <string name="downloadsurveylabel">Download formulier</string>
+  <string name="pleasewait">Wacht s.v.p.</string>
   <string name="downloadsurveydesc">Downloadt willekeurige vragenlijsten (voer alleen uit als u hier instructies voor ontvangen hebt)</string>
   <string name="downloadsurveyinstr">Vul het id van het formulier in dat u wenst te downloaden</string>
   <string name="deletealldatawarning">Hierdoor wordt alle data (vragenlijsten, antwoorden, beelden en gebruikers) definitief verwijderd van dit apparaat. Deze bewerking is onomkeerbaar. Klik OK om verder te gaan of cancel om af te breken.</string>
@@ -96,6 +97,13 @@
     <string name="prefill_title">Vooraf invullen antwoorden</string>
   <string name="prefill_text">Vul het formulier in met eerder gegeven antwoorden?</string>
     <!--Data sync-->
+  <string name="syncing_records">Bezig met synchroniseren datapunten…</string>
+  <string name="synced_records">%1$d datapunten gesynchroniseerd</string>
+  <string name="sync_error">Synchronisatie data punten mislukt</string>
+  <string name="syncing_corrupted_data_points_error">Synchroniseer s.v.p. opnieuw</string>
+  <string name="network_error">Netwerkfout</string>
+  <string name="error_assignment_text">Flow dashboard toewijzing nodig</string>
+  <!--Data sync-->
   <string name="data_sync_all">Gesynchroniseerde formulieren: %1$d - Mislukt: %2$d</string>
   <string name="data_sync_synced">Gesynchroniseerde formulieren: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulier verwijderd</string>
@@ -105,6 +113,8 @@
   <string name="please_restart">Herstart s.v.p. de app</string>
   <!--Empty Views-->
     <string name="no_datapoints_error_text">U heeft nog geen datapunten. Klik \'+\' om een nieuw datapunt toe te voegen</string>
+  <string name="no_records_text">U heeft nog geen datapunten. Klik \'+\' bovenaan het scherm om een nieuw datapunt toe te voegen</string>
+  <string name="no_surveys_text">Er zijn nog geen vragenlijsten aan u toegewezen. Vragenlijsten worden toegewezen in het Flow dashboard.</string>
   <string name="no_survey_selected_text">U heeft nog geen vragenlijst geselecteerd. Open het zij-menu om een vragenlijst te selecteren.</string>
   <!--ToolBar-->
   <string name="more">Meer</string>
@@ -145,6 +155,7 @@
   <string name="image_location_saved">Geolocatie opgeslagen</string>
   <!--RecordList Activity-->
     <string name="stats_total">Totaal datapunten:</string>
+  <string name="add_data_point">Voeg datapunt toe</string>
   <string name="stats_week">Laatste 7 dagen</string>
   <string name="stats_today">Vandaag:</string>
   <string name="distance_label">Afstand:</string>
@@ -221,6 +232,7 @@
   <string name="yes">Ja</string>
   <string name="no">Nee</string>
     <string name="delete">Verwijder</string>
+  <string name="retry">Probeer opnieuw</string>
   <string name="drawer_open">Lade open</string>
   <string name="drawer_close">Lade dicht</string>
   <!--app update service-->

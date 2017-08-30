@@ -90,8 +90,15 @@
   <string name="sort">क्रममा मिलाउनुहोस्</string>
   <string name="stats">तथ्यान्क</string>
     <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
+  <string name="syncing_records">डाटा पोइन्टहरु सिँक हुँदैछन्...</string>
+  <string name="synced_records">सिँक भएका %1$d डाटा पोइन्टहरु</string>
+  <string name="sync_error">डाटा पोइन्टहरु सिँक भएनन्।</string>
+  <string name="syncing_corrupted_data_points_error">कृपया फेरि सिन्क गर्नुहोस्।</string>
+  <string name="network_error">नेटवर्क त्रुटि</string>
   <string name="prefill_text">पहिलेको उतरहरुले फारम भर्न चाहनुहुन्छ?</string>
     <!--Data sync-->
+  <string name="error_assignment_text">Akvo Flow ड्यास्बोर्डमा assignment हरु चाहियो।</string>
+  <!--Data sync-->
   <string name="data_sync_all">सिँक भएका फारमहरु %1$d - सिँक नभएका फारमहरु %2$d</string>
   <string name="data_sync_synced">सिँक भएका फारमहरु %1$d</string>
   <string name="data_sync_error_form_deleted_title">फारम हटाइयो।</string>
@@ -100,7 +107,9 @@
   <string name="app_language">एप्प्को भाषा</string>
   <string name="please_restart">कृपया एप्पलाई पुन: शुरु गर्नुहोस्।</string>
   <!--Empty Views-->
-    <string name="no_survey_selected_text">तपाईंको कुनै सर्भे छानिएको छैन। कुनै एक सर्भे छान्नको लागि साइडको मेनु खोल्नुहोस्।</string>
+  <!--ToolBar-->
+  <string name="no_surveys_text">तपाईंलाई कुनै सर्भे तोकिएको छैन। सर्भेहरु ड्यास्बोर्डमा तोकिएको छ।</string>
+  <string name="no_survey_selected_text">तपाईंको कुनै सर्भे छानिएको छैन। कुनै एक सर्भे छान्नको लागि साइडको मेनु खोल्नुहोस्।</string>
   <!--ToolBar-->
   <string name="more">अझै</string>
   <!--Search-->

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,29 +18,8 @@
  *
  */
 
-package org.akvo.flow.injector.module;
+package org.akvo.flow.activity;
 
-import org.akvo.flow.domain.interactor.AllowedToConnect;
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.UseCase;
-
-import javax.inject.Named;
-
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public class ViewModule {
-
-    @Provides
-    @Named("saveImage")
-    UseCase provideSaveImageUseCase(SaveImage saveImage) {
-        return saveImage;
-    }
-
-    @Provides
-    @Named("allowedToConnect")
-    UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
-        return allowedToConnect;
-    }
+public class Constants {
+    public static final String TEST_FORM_SURVEY_INSTANCE_ID = "0";
 }

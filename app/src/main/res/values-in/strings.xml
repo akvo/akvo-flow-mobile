@@ -13,18 +13,13 @@
   <string name="submitbutton">Kirim</string>
   <string name="resize_large_images">Sesuaikan resolusi gambar</string>
   <string name="settingslabel">Pengaturan</string>
-  <string name="nouser">Tidak ada pengguna!</string>
-  <string name="exportcomplete">Data telah di ekspor ke SD card</string>
   <string name="prefoptlabel">Preferensi</string>
   <string name="prefoptdesc">Atur bahasa survei dan preferensi lainnya</string>
   <string name="sendoptlabel">Sinkronisasi data</string>
   <string name="sendoptdesc">Sinkronisasi data survei. Anda harus mempunyai koneksi internet (koneksi GSM atau Wi-Fi) untuk melakukan langkah ini.</string>
-  <string name="poweroptlabel">Pengaturan daya</string>
-  <string name="poweroptdesc">Matikan Wi-Fi untuk menghemat baterai.</string>
   <string name="screenoptlabel">Jaga layar tetap menyala selama pengumpulan data berlangsung</string>
   <string name="screenoptdesc">Mencegah layar ponsel mati saat mode mengoleksi survei. Pastikan untuk mematikan layar secara manual (atau keluar dari aplikasi) saat tidak digunakan untuk menghemat daya.</string>
   <string name="aboutlabel">Tentang</string>
-  <string name="aboutdesc">Informasi tentang versi.</string>
   <string name="gpsstatuslabel">GPS Status</string>
   <string name="gpsstatusdesc">Nyalakan aplikasi GPS Status jika Anda telah menginstallnya dalam perangkat ini.</string>
   <string name="nogpsstatus">Aplikasi GPS Status belum terpasang dalam perangkat ini. Mohon pasang melalui Google Play Store</string>
@@ -35,7 +30,6 @@
   <string name="helpheading">Pilihan Bantuan</string>
   <string name="deleteresponse">Hapus Jawaban</string>
   <string name="othertext">Lainnya...</string>
-  <string name="savelastuserlabel">Tetapkan pengguna terakhir supaya aktif di waktu pengisian</string>
   <string name="uploadoptionlabel">Sinkronisasi data melalui jaringan koneksi GSM</string>
   <string name="surveylanglabel">Bahasa Survey</string>
   <string name="scanbarcode">Pindai Kode Batang</string>
@@ -49,7 +43,6 @@
   <string name="reloadconftext">Apakah Anda ingin menghapus dan mengunduh ulang survey?</string>
   <string name="submitcompletetitle">Survey telah terkirim</string>
   <string name="submitcompletetext">Jawaban survei anda akan dikirim ke server </string>
-  <string name="optiontext">Pilihan</string>
   <string name="langoption">Bahasa</string>
   <string name="langmandatorytitle">Pilihan Invalid</string>
   <string name="langmandatorytext">Anda harus memilih sedikitnya satu bahasa</string>
@@ -79,8 +72,6 @@
   <string name="transmissionhist">Riwayat Transmisi</string>
   <string name="transstartdate">Dimulai:</string>
   <string name="transenddate">Selesai:</string>
-  <string name="confirmchangetitle">Ubah respon?</string>
-  <string name="confirmchangetext">Apakah Anda ingin mengubah respon?</string>
   <string name="resetall">Hapus Semua (pengguna, survei, dan semua data yang telah dikumpulkan)</string>
   <string name="resetalldesc">Menghapus semua suvey, respon (termasuk gambar dan file zip) dan pengguna, secara permanen</string>
   <string name="reset_responses">Hapus Data dan Gambar yang telah dikumpulkan.</string>
@@ -94,35 +85,26 @@
   <string name="pleasewaitforbootstrap">Mohon tunggu sampai file bootstrap selesai diproses.</string>
   <string name="clear_data_success">Data telah dihapus dari perangkat secara sukses.</string>
   <string name="clear_data_error">Ada kesalahan dalam menghapus data dari perangkat</string>
-  <string name="configuring_languages">Mengatur fitur bahasa...</string>
   <string name="search">Cari</string>
   <string name="sync">Sinkronisasi</string>
   <string name="sort">Sortir</string>
   <string name="stats">Statistik</string>
   <string name="syncing_records">Sinkronisasi Data Point...</string>
-  <string name="sync_finished">Sinkronisasi Data Point selesai</string>
   <string name="synced_records">Menyinkronisasi %1$d Data Point</string>
   <string name="sync_error">Sinkronisasi Data Point gagal</string>
   <string name="network_error">Kesalahan Jaringan</string>
-  <string name="loading">Memuat...</string>
   <string name="prefill_title">Mengisi respons awal</string>
   <string name="prefill_text">Mengisi formulir dengan jawaban sebelumnya?</string>
   <string name="error_assignment_text">Membutuhkan penugasan dalam dasbor Akvo Flow.</string>
   <!--Data sync-->
-  <string name="data_sync_title">Sinkronisasi Data</string>
-  <string name="data_sync_text">Mengunggah data. Mohon menunggu...</string>
   <string name="data_sync_all">Sinkronisasi formulir: %1$d - Gagal: %2$d</string>
   <string name="data_sync_synced">Sinkronisasi Formulir: %1$d</string>
   <!--Localization-->
   <string name="app_language">Bahasa Aplikasi</string>
   <string name="please_restart">Mohon memulai ulang aplikasi</string>
   <!--Empty Views-->
-  <string name="no_records_text">Anda belum mempunyai data. Klik simbol \'+\' diatas untuk menambahkan data.</string>
   <string name="no_survey_selected_text">Anda belum memilih Survei. Buka menu samping untuk memilih Survei.</string>
-  <!--Activity Labels-->
-  <string name="survey_groups_activity">Survei</string>
-  <string name="record_list_activity">Pilih Data</string>
-  <!--ActionBar-->
+  <!--ToolBar-->
   <string name="more">Selanjutnya</string>
   <!--Search-->
   <string name="search_hint">Cari Data</string>
@@ -149,7 +131,6 @@
   <string name="clear_feature_text">Apakah Anda ingin menghapus fitur ini?</string>
   <string name="repeat_group">Ulang grup</string>
   <string name="repetitions">Pengulangan:</string>
-  <string name="view_responses">Lihat jawaban</string>
   <string name="view_map">Lihat peta</string>
   <string name="delete_group_title">Hapus grup</string>
   <string name="delete_group_text">Apakah Anda ingin menghapus grup ini?</string>
@@ -232,7 +213,6 @@
   <string name="no">Tidak</string>
   <string name="retry">Coba kembali</string>
   <string name="delete">Hapus</string>
-  <string name="error_value_required">Bagian ini tidak boleh kosong</string>
   <string name="drawer_open">Laci terbuka</string>
   <string name="drawer_close">Laci tertutup</string>
   <!--app update service-->

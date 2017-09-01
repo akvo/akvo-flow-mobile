@@ -657,4 +657,12 @@ public class SurveyDbDataSource {
     public void clearCollectedData() {
         surveyDbAdapter.clearCollectedData();
     }
+
+    public void clearAllData() {
+        surveyDbAdapter.clearAllData();
+    }
+
+    public long createOrUpdateUser(Long id, String username) {
+        return surveyDbAdapter.createOrUpdateUser(id, username);
+    }
 }

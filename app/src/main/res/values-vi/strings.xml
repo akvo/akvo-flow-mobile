@@ -13,18 +13,13 @@
   <string name="submitbutton">Đệ trình</string>
   <string name="resize_large_images">Thay đổi kích thước của những ảnh cỡ lớn</string>
   <string name="settingslabel">Cài đặt</string>
-  <string name="nouser">Chưa có người sử dụng</string>
-  <string name="exportcomplete">Dữ liệu đã được chuyển sang thẻ nhớ SD</string>
   <string name="prefoptlabel">Sự ưu tiên</string>
   <string name="prefoptdesc">Cài đặt ngôn ngữ khảo sát mặc định và dữ liệu ưu tiên khác</string>
   <string name="sendoptlabel">Đồng bộ hóa dữ liệu</string>
   <string name="sendoptdesc">Đồng bộ hóa dữ liệu khảo sát. Bạn phải có kết nối mạng (điện thoại di động hoặc wifi) để thực hiện thao tác này</string>
-  <string name="poweroptlabel">Quản lý năng lượng</string>
-  <string name="poweroptdesc">Bật tắt Wi-Fi để quản lý tốt hơn tuổi thọ pin.</string>
   <string name="screenoptlabel">Giữ màn hình hoạt động trong quá trình nhập dữ liệu khảo sát</string>
   <string name="screenoptdesc">Tránh để màn hình bị tắt khi đang ở chế độ nhập dữ liệu. Chắc chắn rằng tắt màn hình hoặc thoát khỏi ứng dụng bằng tay khi không sử dụng để tránh bị hao pin</string>
   <string name="aboutlabel">Phiên bản</string>
-  <string name="aboutdesc">Hiển thị thông tin của phiên bản</string>
   <string name="gpsstatuslabel">Trạng thái định vị tọa độ</string>
   <string name="gpsstatusdesc">Khởi động ứng dụng định vị tọa độ nếu bạn đã cài đặt nó trên thiết bị này</string>
   <string name="nogpsstatus">Ứng dụng định vị tọa độ chưa được cài đặt trên thiết bị này. Vui lòng cài đặt nó bằng sử dụng kho dữ liệu của Google Play</string>
@@ -35,7 +30,6 @@
   <string name="helpheading">Lựa chọn trợ giúp</string>
   <string name="deleteresponse">Xóa câu trả lời</string>
   <string name="othertext">Khác…</string>
-  <string name="savelastuserlabel">Giữ người sử dụng được chọn cuối cùng ở chế độ đăng nhập trong những lần tiếp theo</string>
   <string name="uploadoptionlabel">Đồng bộ hóa dữ liệu qua mạng di động </string>
   <string name="surveylanglabel">Những ngôn ngữ của đợt khảo sát</string>
   <string name="scanbarcode">Quét mã vạch</string>
@@ -49,7 +43,6 @@
   <string name="reloadconftext">Bạn có chắc chắn rằng bạn muốn làm sạch và tải lại những đợt khảo sát không?</string>
   <string name="submitcompletetitle">Khảo sát đã được đệ trình</string>
   <string name="submitcompletetext">Những câu trả lời sẽ được gửi đến máy chủ</string>
-  <string name="optiontext">Tùy chọn</string>
   <string name="langoption">Ngôn ngữ</string>
   <string name="langmandatorytitle">Lựa chọn sai</string>
   <string name="langmandatorytext">Bạn phải lựa chọn tối thiểu 1 ngôn ngữ</string>
@@ -79,8 +72,6 @@
   <string name="transmissionhist">Lịch sử truyền dữ liệu</string>
   <string name="transstartdate">Quá trình truyền dữ liệu đã bắt đầu</string>
   <string name="transenddate">Quá trình truyền dữ liệu đã kết thúc</string>
-  <string name="confirmchangetitle">Thay đổi câu trả lời?</string>
-  <string name="confirmchangetext">Bạn có muốn thay đổi câu trả lời của bạn?</string>
   <string name="resetall">Xóa toàn bộ dữ liệu (người sử dụng, những câu hỏi và toàn bộ dữ liệu thu thập)</string>
   <string name="resetalldesc">Xóa vĩnh viễn toàn bộ những câu hỏi, trả lời (bao gồm những hình ảnh và file nén được xuất) và những người sử dụng</string>
   <string name="reset_responses">Xóa dữ liệu và những hình ảnh đã thu thập</string>
@@ -94,35 +85,26 @@
   <string name="pleasewaitforbootstrap">Vui lòng đợi đến khi file hoàn tất quá trình xử lý</string>
   <string name="clear_data_success">Dữ liệu đã được xóa khỏi thiết bị</string>
   <string name="clear_data_error">Lỗi xảy ra trong quá trình xóa dữ liệu khỏi thiết bị</string>
-  <string name="configuring_languages">Đang thiết lập ngôn ngữ khảo sát…</string>
   <string name="search">Search</string>
   <string name="sync">Đồng bộ hóa dữ liệu</string>
   <string name="sort">Sắp xếp theo</string>
   <string name="stats">Thống kê điều tra</string>
   <string name="syncing_records">Đang đồng bộ hóa dữ liệu...</string>
-  <string name="sync_finished">Hoàn thành quá trình đồng bộ hóa dữ liệu</string>
   <string name="synced_records">Đã đồng bộ được %1$d dữ liệu</string>
   <string name="sync_error">Quá trình đồng bộ hóa dữ liệu bị lỗi</string>
   <string name="network_error">Lỗi kết nối mạng</string>
-  <string name="loading">Đang tải...</string>
   <string name="prefill_title">Những câu trả lời trước đây</string>
   <string name="prefill_text">Biểu mẫu với những câu trả lời trước đây?</string>
   <string name="error_assignment_text">Nhiệm vụ được yêu cầu trong bảng điều khiển Akvo Flow</string>
   <!--Data sync-->
-  <string name="data_sync_title">Đồng bộ hóa dữ liệu</string>
-  <string name="data_sync_text">Đang tải dữ liệu lên. Vui lòng đợi…</string>
   <string name="data_sync_all">Dữ liệu đã được đồng bộ hóa %1$d - Bị lỗi %2$d</string>
   <string name="data_sync_synced">Dữ liệu đã được đồng bộ hóa: %1$d</string>
   <!--Localization-->
   <string name="app_language">Ngôn ngữ của ứng dụng</string>
   <string name="please_restart">Vui lòng, khởi động lại ứng dụng</string>
   <!--Empty Views-->
-  <string name="no_records_text">Bạn chưa có dữ liệu. Ấn nút \'\+\' để bắt đầu</string>
   <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
-  <!--Activity Labels-->
-  <string name="survey_groups_activity">Khảo sát</string>
-  <string name="record_list_activity">Chọn điểm dữ liệu</string>
-  <!--ActionBar-->
+  <!--ToolBar-->
   <string name="more">Thêm điểm</string>
   <!--Search-->
   <string name="search_hint">Tìm kiếm điểm dữ liệu</string>
@@ -149,7 +131,6 @@
   <string name="clear_feature_text">Bạn có muôn xóa thông số này?</string>
   <string name="repeat_group">Lặp lại nhóm câu hỏi này</string>
   <string name="repetitions">Sự lặp lại:</string>
-  <string name="view_responses">View responses</string>
   <string name="view_map">View map</string>
   <string name="delete_group_title">Xóa nhóm câu hỏi</string>
   <string name="delete_group_text">Bạn có muốn xóa nhóm câu hỏi này?</string>
@@ -232,7 +213,6 @@
   <string name="no">Không</string>
   <string name="retry">Làm lại</string>
   <string name="delete">Xóa</string>
-  <string name="error_value_required">Trường dữ liệu này không thể bỏ trống</string>
   <string name="drawer_open">Drawer open</string>
   <string name="drawer_close">Drawer close</string>
   <!--app update service-->

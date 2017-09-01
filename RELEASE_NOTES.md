@@ -1,5 +1,17 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.7
+Date: 31 August 2017
+
+# New and noteworthy
+* **Add Dutch as a new language for the app** - [#812](https://github.com/akvo/akvo-flow-mobile/issues/812) From now on, the app is also available in Dutch.
+* **Add help section** - [#798](https://github.com/akvo/akvo-flow-mobile/issues/798) Direct access to the support website from the navigation drawer.
+* **Basic survey question test** - [#613](https://github.com/akvo/akvo-flow-mobile/issues/613) Basic question type surveys are now tested.
+
+# Resolved issues
+* **Portrait photo shown in app UI as landscape** - [#832](https://github.com/akvo/akvo-flow-mobile/issues/832) Photos are now displayed correctly for both portrait and landscape images.
+
+---------------
 # ver 2.3.6
 Date: 20 July 2017
 

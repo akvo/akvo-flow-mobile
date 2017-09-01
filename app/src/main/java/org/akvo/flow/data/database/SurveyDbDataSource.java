@@ -653,4 +653,8 @@ public class SurveyDbDataSource {
     public void clearSurveyedLocaleName(long surveyInstanceId) {
         surveyDbAdapter.clearSurveyedLocaleName(surveyInstanceId);
     }
+
+    public void clearCollectedData() {
+        surveyDbAdapter.clearCollectedData();
+    }
 }

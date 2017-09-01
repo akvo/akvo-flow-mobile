@@ -18,17 +18,8 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.activity;
 
-import android.widget.ImageView;
-
-import java.io.File;
-
-public interface ImageLoader {
-
-    void loadFromFile(File file, ImageLoaderListener listener);
-
-    void loadFromFile(File file, ImageView imageView);
-
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+public class Constants {
+    public static final String TEST_FORM_SURVEY_INSTANCE_ID = "0";
 }

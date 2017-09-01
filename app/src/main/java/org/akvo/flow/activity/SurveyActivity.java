@@ -217,19 +217,17 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case ConstantUtil.REQUEST_ADD_USER:
-                if (resultCode == RESULT_OK) {
-                    displaySelectedUser();
-                    prefs.setBoolean(Prefs.KEY_SETUP, true);
-                    // Trigger the delayed services, so the first
-                    // backend connections uses the new Device ID
-                    startService(new Intent(this, SurveyDownloadService.class));
-                    startService(new Intent(this, DataSyncService.class));
-                } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-                    finish();
-                }
-                break;
+        if (requestCode == ConstantUtil.REQUEST_ADD_USER) {
+            if (resultCode == RESULT_OK) {
+                displaySelectedUser();
+                prefs.setBoolean(Prefs.KEY_SETUP, true);
+                // Trigger the delayed services, so the first
+                // backend connections uses the new Device ID
+                startService(new Intent(this, SurveyDownloadService.class));
+                startService(new Intent(this, DataSyncService.class));
+            } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
+                finish();
+            }
         }
     }
 

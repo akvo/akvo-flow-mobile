@@ -93,9 +93,8 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
     /**
      * Permanently deletes data from the internal database.
-     * 
-     * @param responsesOnly Flag to specify a partial deletion (user generated
-     *            data).
+     *
+     * @param responsesOnly Flag to specify a partial deletion (user generated data).
      */
     private void clearDatabase(boolean responsesOnly) throws SQLException {
         try {

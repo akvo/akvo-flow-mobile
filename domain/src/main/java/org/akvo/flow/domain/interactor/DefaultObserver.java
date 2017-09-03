@@ -20,16 +20,13 @@
 
 package org.akvo.flow.domain.interactor;
 
+import io.reactivex.observers.DisposableObserver;
+
 /**
  * Default subscriber base class to be used whenever you want to avoid having to implement all
  * 3 methods.
  */
-public class DefaultSubscriber<T> extends rx.Subscriber<T> {
-
-    @Override
-    public void onCompleted() {
-        // no-op by default.
-    }
+public class DefaultObserver<T> extends DisposableObserver<T> {
 
     @Override
     public void onError(Throwable e) {
@@ -37,7 +34,13 @@ public class DefaultSubscriber<T> extends rx.Subscriber<T> {
     }
 
     @Override
+    public void onComplete() {
+        // no-op by default.
+    }
+
+    @Override
     public void onNext(T t) {
         // no-op by default.
     }
+
 }

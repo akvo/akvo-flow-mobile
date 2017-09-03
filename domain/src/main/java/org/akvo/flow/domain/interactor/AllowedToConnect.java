@@ -29,7 +29,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public class AllowedToConnect extends UseCase {
 

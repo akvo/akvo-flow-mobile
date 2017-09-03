@@ -22,10 +22,10 @@ package org.akvo.flow.data.net;
 
 import org.akvo.flow.data.entity.ApiLocaleResult;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
-import rx.Observable;
 
 import static org.akvo.flow.data.util.Constants.ANDROID_ID;
 import static org.akvo.flow.data.util.Constants.IMEI;

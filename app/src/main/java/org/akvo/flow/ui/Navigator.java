@@ -84,12 +84,13 @@ public class Navigator {
     }
 
     public void navigateToRecordActivity(Context context, String surveyedLocaleId,
-            SurveyGroup mSurveyGroup) {
+            SurveyGroup mSurveyGroup, boolean existingDataPoint) {
         // Display form list and history
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
         extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
         extras.putString(ConstantUtil.RECORD_ID_EXTRA, surveyedLocaleId);
+        extras.putBoolean(ConstantUtil.EXISTING_DATA_POINT_EXTRA, existingDataPoint);
         intent.putExtras(extras);
         context.startActivity(intent);
     }

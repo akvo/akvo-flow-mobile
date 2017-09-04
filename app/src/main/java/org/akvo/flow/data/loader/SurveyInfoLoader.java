@@ -35,6 +35,8 @@ import org.akvo.flow.domain.SurveyGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Loader to query the database and return the list of surveys. This Loader will
  * include the latest submission date for each survey, if exists.
@@ -79,12 +81,17 @@ public class SurveyInfoLoader extends AsyncLoader<Pair<List<SurveyInfo>, Boolean
                 String name = cursor.getString(SurveyQuery.NAME);
                 String version = String.valueOf(cursor.getFloat(SurveyQuery.VERSION));
                 Long lastSubmission = null;
+                boolean registrationSurvey = isRegistrationForm(id);
                 if (!cursor.isNull(SurveyQuery.SUBMITTED)) {
                     lastSubmission = cursor.getLong(SurveyQuery.SUBMITTED);
                     registered = true;
+                    Timber.d("Form id: %s, is registration form: %s, is registered: %s", id,
+                            String.valueOf(registrationSurvey), String.valueOf(registered));
+                } else {
+                    Timber.d("Form id: %s, is registration form: %s, is registered: %s", id,
+                            String.valueOf(registrationSurvey), String.valueOf(false));
                 }
                 boolean deleted = cursor.getInt(SurveyQuery.DELETED) == 1;
-                boolean registrationSurvey = isRegistrationSurvey(id);
                 SurveyInfo s = new SurveyInfo(id, name, version, lastSubmission, deleted,
                         registrationSurvey);
                 if (mSurveyGroup.isMonitored() && registrationSurvey) {
@@ -97,7 +104,7 @@ public class SurveyInfoLoader extends AsyncLoader<Pair<List<SurveyInfo>, Boolean
         return new Pair<>(surveys, registered);
     }
 
-    private boolean isRegistrationSurvey(String surveyId) {
+    private boolean isRegistrationForm(String surveyId) {
         return surveyId.equals(mSurveyGroup.getRegisterSurveyId());
     }
 

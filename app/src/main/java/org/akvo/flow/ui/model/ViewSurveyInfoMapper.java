@@ -35,7 +35,7 @@ import java.util.List;
 public class ViewSurveyInfoMapper {
 
     public ViewSurveyInfo transform(@NonNull SurveyInfo surveyInfo, SurveyGroup mSurveyGroup,
-            boolean mRegistered, String deletedString) {
+            boolean registered, String deletedString, boolean existingDataPoint) {
         String surveyExtraInfo;
         String time = null;
         boolean enabled;
@@ -44,7 +44,7 @@ public class ViewSurveyInfoMapper {
         if (!TextUtils.isEmpty(version)) {
             surveyExtraInfoBuilder.append(" v").append(version);
         }
-        enabled = isSurveyEnabled(surveyInfo, mSurveyGroup, mRegistered);
+        enabled = isFormEnabled(mSurveyGroup, registered, existingDataPoint);
         if (surveyInfo.isDeleted()) {
             enabled = false;
             surveyExtraInfoBuilder.append(" - ").append(deletedString);
@@ -58,28 +58,29 @@ public class ViewSurveyInfoMapper {
     }
 
     @NonNull
-    public List<ViewSurveyInfo> transform(@Nullable List<SurveyInfo> surveyInfos,
-            SurveyGroup mSurveyGroup, boolean mRegistered, String deletedString) {
-        int capacity = surveyInfos == null ? 0 : surveyInfos.size();
+    public List<ViewSurveyInfo> transform(@Nullable List<SurveyInfo> forms,
+            SurveyGroup mSurveyGroup, boolean registered, String deletedString,
+            boolean existingDataPoint) {
+        int capacity = forms == null ? 0 : forms.size();
         List<ViewSurveyInfo> viewSurveyInfos = new ArrayList<>(capacity);
-        if (surveyInfos == null) {
+        if (forms == null) {
             return viewSurveyInfos;
         }
-        for (SurveyInfo surveyInfo : surveyInfos) {
+        for (SurveyInfo surveyInfo : forms) {
             if (surveyInfo != null) {
-                viewSurveyInfos.add(transform(surveyInfo, mSurveyGroup, mRegistered,
-                        deletedString));
+                viewSurveyInfos.add(transform(surveyInfo, mSurveyGroup, registered, deletedString,
+                        existingDataPoint));
             }
         }
         return viewSurveyInfos;
     }
 
-    //TODO: this is a bit confusing
-    private boolean isSurveyEnabled(SurveyInfo surveyInfo, SurveyGroup surveyGroup,
-            boolean registered) {
+    private boolean isFormEnabled(SurveyGroup surveyGroup, boolean registered,
+            boolean existingDataPoint) {
         if (surveyGroup.isMonitored()) {
-            return surveyInfo.isRegistrationSurvey() != registered;
+            return existingDataPoint;
+        } else {
+            return !registered;
         }
-        return !registered;// Not monitored. Only one response allowed
     }
 }

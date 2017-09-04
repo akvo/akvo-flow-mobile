@@ -54,6 +54,7 @@ import java.util.List;
 import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
+import static org.akvo.flow.util.ConstantUtil.EXISTING_DATA_POINT_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 
 public class FormListFragment extends ListFragment
@@ -64,6 +65,7 @@ public class FormListFragment extends ListFragment
     private SurveyListListener mListener;
     private final ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
     private String recordId;
+    private boolean existingDataPoint;
 
     public FormListFragment() {
     }
@@ -93,6 +95,7 @@ public class FormListFragment extends ListFragment
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
         recordId = intent.getStringExtra(RECORD_ID_EXTRA);
+        existingDataPoint = intent.getBooleanExtra(EXISTING_DATA_POINT_EXTRA, false);
         setHasOptionsMenu(true);
         if (mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity());
@@ -179,7 +182,8 @@ public class FormListFragment extends ListFragment
         mAdapter.clear();
         boolean registered = data.second;
         List<ViewSurveyInfo> surveys = mapper
-                .transform(data.first, mSurveyGroup, registered, getString(R.string.form_deleted));
+                .transform(data.first, mSurveyGroup, registered, getString(R.string.form_deleted),
+                        existingDataPoint);
         for (ViewSurveyInfo s : surveys) {
             mAdapter.add(s);
         }

@@ -62,4 +62,8 @@ public class SurveyInfo {
     public boolean isRegistrationSurvey() {
         return isRegistrationSurvey;
     }
+
+    public boolean hasBeenSubmitted() {
+        return lastSubmission != null && lastSubmission != 0L;
+    }
 }

@@ -74,7 +74,8 @@ public class ViewSurveyInfoMapperTest {
         ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
         List<SurveyInfo> original = null;
 
-        List<ViewSurveyInfo> mapped = mapper.transform(original, mockSurveyGroup, true, "deleted");
+        List<ViewSurveyInfo> mapped = mapper.transform(original, mockSurveyGroup, true, "deleted",
+                existingDataPoint);
 
         assertNotNull(mapped);
         assertTrue(mapped.isEmpty());
@@ -87,7 +88,8 @@ public class ViewSurveyInfoMapperTest {
         original.add(null);
         original.add(mockSurveyItem);
 
-        List<ViewSurveyInfo> mapped = mapper.transform(original, mockSurveyGroup, true, "deleted");
+        List<ViewSurveyInfo> mapped = mapper.transform(original, mockSurveyGroup, true, "deleted",
+                existingDataPoint);
 
         assertNotNull(mapped);
         assertEquals(1, mapped.size());
@@ -100,7 +102,8 @@ public class ViewSurveyInfoMapperTest {
         given(mockSurveyItem.isDeleted()).willReturn(true);
         given(mockSurveyItem.getVersion()).willReturn("1.0");
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted");
+        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted",
+                existingDataPoint);
 
         assertFalse(mapped.isEnabled());
         assertEquals(" v1.0 - deleted", mapped.getSurveyExtraInfo());
@@ -114,7 +117,8 @@ public class ViewSurveyInfoMapperTest {
         given(mockSurveyItem.getVersion()).willReturn("1.0");
         given(mockSurveyItem.getLastSubmission()).willReturn(null);
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted");
+        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted",
+                existingDataPoint);
 
         assertEquals(null, mapped.getTime());
     }
@@ -129,7 +133,8 @@ public class ViewSurveyInfoMapperTest {
         given(mockSurveyItem.isRegistrationSurvey()).willReturn(false);
         given(mockSurveyGroup.isMonitored()).willReturn(true);
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, false, "deleted");
+        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, false, "deleted",
+                existingDataPoint);
 
         assertNotNull(mapped.getTime());
         assertFalse(mapped.isEnabled());
@@ -147,7 +152,8 @@ public class ViewSurveyInfoMapperTest {
         given(mockSurveyItem.getName()).willReturn("name");
         given(mockSurveyGroup.isMonitored()).willReturn(true);
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted");
+        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted",
+                existingDataPoint);
 
         assertEquals("123", mapped.getId());
         assertEquals("name", mapped.getSurveyName());

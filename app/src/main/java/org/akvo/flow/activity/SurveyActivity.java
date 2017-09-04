@@ -369,6 +369,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onRecordSelected(String surveyedLocaleId) {
+        displayRecord(surveyedLocaleId, true);
+    }
+
+    private void displayRecord(String surveyedLocaleId, boolean existingDataPoint) {
         final User user = FlowApp.getApp().getUser();
         // Ensure user is logged in
         if (user == null) {
@@ -378,17 +382,17 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
 
         if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            displayRecord(surveyedLocaleId);
+            displayRecordActivity(surveyedLocaleId, existingDataPoint);
         } else {
-            displayForm(surveyedLocaleId, user);
+            displayFormActivity(surveyedLocaleId, user);
         }
     }
 
-    private void displayRecord(String surveyedLocaleId) {
-        navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
+    private void displayRecordActivity(String surveyedLocaleId, boolean existingDataPoint) {
+        navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup, existingDataPoint);
     }
 
-    private void displayForm(String surveyedLocaleId, User user) {
+    private void displayFormActivity(String surveyedLocaleId, User user) {
         Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
         if (registrationForm == null) {
             Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
@@ -452,7 +456,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     void onAddDataPointTap() {
         addDataPointFab.setEnabled(false);
         String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-        onRecordSelected(newLocaleId);
+        displayRecord(newLocaleId, false);
     }
 
     private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {

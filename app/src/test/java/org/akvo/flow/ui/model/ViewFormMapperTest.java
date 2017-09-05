@@ -49,7 +49,7 @@ import static org.mockito.Matchers.any;
 @SmallTest
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
-public class ViewSurveyInfoMapperTest {
+public class ViewFormMapperTest {
 
     @Mock
     private SurveyGroup mockSurveyGroup;
@@ -71,11 +71,11 @@ public class ViewSurveyInfoMapperTest {
 
     @Test
     public void transform_ShouldReturnEmptyArrayIfNull() {
-        ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+        ViewFormMapper mapper = new ViewFormMapper();
         List<SurveyInfo> original = null;
 
-        List<ViewSurveyInfo> mapped = mapper.transform(original, mockSurveyGroup, true, "deleted",
-                existingDataPoint);
+        List<ViewForm> mapped = mapper.transform(original, mockSurveyGroup, "deleted",
+                datapointExported);
 
         assertNotNull(mapped);
         assertTrue(mapped.isEmpty());
@@ -83,13 +83,13 @@ public class ViewSurveyInfoMapperTest {
 
     @Test
     public void transform_ShouldIgnoreNullItems() {
-        ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+        ViewFormMapper mapper = new ViewFormMapper();
         List<SurveyInfo> original = new ArrayList<>();
         original.add(null);
         original.add(mockSurveyItem);
 
-        List<ViewSurveyInfo> mapped = mapper.transform(original, mockSurveyGroup, true, "deleted",
-                existingDataPoint);
+        List<ViewForm> mapped = mapper.transform(original, mockSurveyGroup, "deleted",
+                datapointExported);
 
         assertNotNull(mapped);
         assertEquals(1, mapped.size());
@@ -97,13 +97,12 @@ public class ViewSurveyInfoMapperTest {
 
     @Test
     public void transform_ShouldTransformCorrectlyDeletedSurvey() {
-        ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+        ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(true);
         given(mockSurveyItem.getVersion()).willReturn("1.0");
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted",
-                existingDataPoint);
+        ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");
 
         assertFalse(mapped.isEnabled());
         assertEquals(" v1.0 - deleted", mapped.getSurveyExtraInfo());
@@ -111,21 +110,20 @@ public class ViewSurveyInfoMapperTest {
 
     @Test
     public void transform_ShouldTransformCorrectlyNonSubmittedSurvey() {
-        ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+        ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(false);
         given(mockSurveyItem.getVersion()).willReturn("1.0");
         given(mockSurveyItem.getLastSubmission()).willReturn(null);
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted",
-                existingDataPoint);
+        ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");
 
         assertEquals(null, mapped.getTime());
     }
 
     @Test
     public void transform_ShouldTransformCorrectlyNonRegistrationMonitoredSurvey() {
-        ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+        ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(false);
         given(mockSurveyItem.getVersion()).willReturn("1.0");
@@ -133,8 +131,7 @@ public class ViewSurveyInfoMapperTest {
         given(mockSurveyItem.isRegistrationSurvey()).willReturn(false);
         given(mockSurveyGroup.isMonitored()).willReturn(true);
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, false, "deleted",
-                existingDataPoint);
+        ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");
 
         assertNotNull(mapped.getTime());
         assertFalse(mapped.isEnabled());
@@ -142,7 +139,7 @@ public class ViewSurveyInfoMapperTest {
 
     @Test
     public void transform_ShouldTransformCorrectlyAllSurveyFields() {
-        ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+        ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(false);
         given(mockSurveyItem.getVersion()).willReturn("1.0");
@@ -152,8 +149,7 @@ public class ViewSurveyInfoMapperTest {
         given(mockSurveyItem.getName()).willReturn("name");
         given(mockSurveyGroup.isMonitored()).willReturn(true);
 
-        ViewSurveyInfo mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, true, "deleted",
-                existingDataPoint);
+        ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");
 
         assertEquals("123", mapped.getId());
         assertEquals("name", mapped.getSurveyName());

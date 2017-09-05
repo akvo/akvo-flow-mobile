@@ -29,14 +29,21 @@ public class SurveyInfo {
     private final boolean deleted;
     private final boolean isRegistrationSurvey;
 
+    public boolean isSubmittedDataPoint() {
+        return submittedDataPoint;
+    }
+
+    private final boolean submittedDataPoint;
+
     public SurveyInfo(String id, String name, String version, Long lastSubmission,
-            boolean deleted, boolean isRegistrationSurvey) {
+            boolean deleted, boolean isRegistrationSurvey, boolean submittedDataPoint) {
         this.id = id;
         this.name = name;
         this.version = version;
         this.lastSubmission = lastSubmission;
         this.deleted = deleted;
         this.isRegistrationSurvey = isRegistrationSurvey;
+        this.submittedDataPoint = submittedDataPoint;
     }
 
     public String getId() {

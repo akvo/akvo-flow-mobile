@@ -20,7 +20,7 @@
 
 package org.akvo.flow.ui.model;
 
-public class ViewSurveyInfo {
+public class ViewForm {
 
     private final String id;
     private final String surveyName;
@@ -28,7 +28,7 @@ public class ViewSurveyInfo {
     private final String time;
     private final boolean enabled;
 
-    public ViewSurveyInfo(String id, String surveyName, String surveyExtraInfo, String time,
+    ViewForm(String id, String surveyName, String surveyExtraInfo, String time,
             boolean enabled) {
         this.id = id;
         this.surveyName = surveyName;

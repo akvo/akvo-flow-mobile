@@ -133,7 +133,6 @@ public class ConstantUtil {
     public static final String SURVEY_GROUP_EXTRA = "survey_group";
     public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
     public static final String RECORD_ID_EXTRA = "record_id";
-    public static final String EXISTING_DATA_POINT_EXTRA = "existing_data_point";
 
     /**
      * settings keys

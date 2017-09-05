@@ -22,11 +22,11 @@ package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.util.Pair;
 
 import org.akvo.flow.data.database.SurveyColumns;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyInstanceColumns;
+import org.akvo.flow.data.database.SurveyInstanceStatus;
 import org.akvo.flow.data.database.Tables;
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.SurveyInfo;
@@ -35,45 +35,34 @@ import org.akvo.flow.domain.SurveyGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Loader to query the database and return the list of surveys. This Loader will
  * include the latest submission date for each survey, if exists.
  */
-public class SurveyInfoLoader extends AsyncLoader<Pair<List<SurveyInfo>, Boolean>> {
+public class SurveyInfoLoader extends AsyncLoader<List<SurveyInfo>> {
 
-    private final long mSurveyGroupId;
-    private final String mRecordId;
-    private final SurveyGroup mSurveyGroup;
+    private final long surveyGroupId;
+    private final String recordId;
+    private final SurveyGroup surveyGroup;
 
-    public SurveyInfoLoader(Context context, String recordId, SurveyGroup mSurveyGroup) {
+    public SurveyInfoLoader(Context context, String recordId, SurveyGroup surveyGroup) {
         super(context);
-        this.mSurveyGroup = mSurveyGroup;
-        this.mSurveyGroupId = mSurveyGroup.getId();
-        this.mRecordId = recordId;
+        this.surveyGroup = surveyGroup;
+        this.surveyGroupId = surveyGroup.getId();
+        this.recordId = recordId;
     }
 
     @Override
-    public Pair<List<SurveyInfo>, Boolean> loadInBackground() {
-        String table = SurveyDbAdapter.SURVEY_JOIN_SURVEY_INSTANCE;
-        if (mRecordId != null) {
-            // Add record id to the join condition. If put in the where, the left join won't work
-            table +=  " AND " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID
-                    + "='" + mRecordId + "'";
-        }
+    public List<SurveyInfo> loadInBackground() {
+
         SurveyDbAdapter database = new SurveyDbAdapter(getContext());
         database.open();
-        Cursor cursor = database.query(table,
-                SurveyQuery.PROJECTION,
-                SurveyColumns.SURVEY_GROUP_ID + " = ?",
-                new String[] { String.valueOf(mSurveyGroupId) },
-                Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
-                null,
-                SurveyColumns.NAME);
+
+        Cursor cursor = getDataPointForms(database, surveyGroupId, recordId);
+
+        boolean submittedDataPoint = isDataPointSubmitted(database);
         database.close();
-        List<SurveyInfo> surveys = new ArrayList<>();// Buffer items before adapter addition
-        boolean registered = false; // Calculate if this record is registered yet
+        List<SurveyInfo> surveys = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
 
@@ -82,39 +71,65 @@ public class SurveyInfoLoader extends AsyncLoader<Pair<List<SurveyInfo>, Boolean
                 String version = String.valueOf(cursor.getFloat(SurveyQuery.VERSION));
                 Long lastSubmission = null;
                 boolean registrationSurvey = isRegistrationForm(id);
+
                 if (!cursor.isNull(SurveyQuery.SUBMITTED)) {
                     lastSubmission = cursor.getLong(SurveyQuery.SUBMITTED);
-                    registered = true;
-                    Timber.d("Form id: %s, is registration form: %s, is registered: %s", id,
-                            String.valueOf(registrationSurvey), String.valueOf(registered));
-                } else {
-                    Timber.d("Form id: %s, is registration form: %s, is registered: %s", id,
-                            String.valueOf(registrationSurvey), String.valueOf(false));
                 }
                 boolean deleted = cursor.getInt(SurveyQuery.DELETED) == 1;
                 SurveyInfo s = new SurveyInfo(id, name, version, lastSubmission, deleted,
-                        registrationSurvey);
-                if (mSurveyGroup.isMonitored() && registrationSurvey) {
+                        registrationSurvey, submittedDataPoint);
+                if (surveyGroup.isMonitored() && registrationSurvey) {
                     surveys.add(0, s);// Make sure registration survey is at the top
                 } else {
                     surveys.add(s);
                 }
             } while (cursor.moveToNext());
         }
-        return new Pair<>(surveys, registered);
+        return surveys;
+    }
+
+        //TODO: move this code to survyedb adapter
+    private Cursor getDataPointForms(SurveyDbAdapter database, long surveyGroupId, String recordId) {
+        String table = SurveyDbAdapter.SURVEY_JOIN_SURVEY_INSTANCE +"";
+        if (recordId != null) {
+            // Add record id to the join condition. If put in the where, the left join won't work
+            table +=  " AND " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID
+                    + "='" + recordId + "'";
+        }
+        return database.query(table,
+                SurveyQuery.PROJECTION,
+                SurveyColumns.SURVEY_GROUP_ID + " = ?",
+                new String[] { String.valueOf(surveyGroupId) },
+                Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
+                null,
+                SurveyColumns.NAME);
+    }
+
+    private boolean isDataPointSubmitted(SurveyDbAdapter database) {
+        boolean submittedDataPoint = false;
+        Cursor c = database.getDatapointStatus(recordId);
+        if (c.moveToFirst()) {
+            int status = c.getInt(0); //TODO fix
+            submittedDataPoint = status == SurveyInstanceStatus.SUBMITTED
+                    || status == SurveyInstanceStatus.EXPORTED
+                    || status == SurveyInstanceStatus.SYNCED
+                    || status == SurveyInstanceStatus.DOWNLOADED;
+        }
+        c.close();
+        return submittedDataPoint;
     }
 
     private boolean isRegistrationForm(String surveyId) {
-        return surveyId.equals(mSurveyGroup.getRegisterSurveyId());
+        return surveyId.equals(surveyGroup.getRegisterSurveyId());
     }
 
-    public interface SurveyQuery {
+    interface SurveyQuery {
         String[] PROJECTION = {
                 Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
                 Tables.SURVEY + "." + SurveyColumns.NAME,
                 Tables.SURVEY + "." + SurveyColumns.VERSION,
                 Tables.SURVEY + "." + SurveyColumns.DELETED,
-                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SUBMITTED_DATE
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SUBMITTED_DATE,
         };
 
         int SURVEY_ID = 0;

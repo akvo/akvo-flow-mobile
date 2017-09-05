@@ -27,7 +27,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.util.Pair;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
@@ -43,8 +42,8 @@ import org.akvo.flow.R;
 import org.akvo.flow.data.loader.SurveyInfoLoader;
 import org.akvo.flow.data.loader.models.SurveyInfo;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.ui.model.ViewSurveyInfo;
-import org.akvo.flow.ui.model.ViewSurveyInfoMapper;
+import org.akvo.flow.ui.model.ViewForm;
+import org.akvo.flow.ui.model.ViewFormMapper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
@@ -54,18 +53,16 @@ import java.util.List;
 import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
-import static org.akvo.flow.util.ConstantUtil.EXISTING_DATA_POINT_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 
 public class FormListFragment extends ListFragment
-        implements LoaderCallbacks<Pair<List<SurveyInfo>, Boolean>>, OnItemClickListener {
+        implements LoaderCallbacks<List<SurveyInfo>>, OnItemClickListener {
 
     private SurveyGroup mSurveyGroup;
     private SurveyAdapter mAdapter;
     private SurveyListListener mListener;
-    private final ViewSurveyInfoMapper mapper = new ViewSurveyInfoMapper();
+    private final ViewFormMapper mapper = new ViewFormMapper();
     private String recordId;
-    private boolean existingDataPoint;
 
     public FormListFragment() {
     }
@@ -95,7 +92,6 @@ public class FormListFragment extends ListFragment
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
         recordId = intent.getStringExtra(RECORD_ID_EXTRA);
-        existingDataPoint = intent.getBooleanExtra(EXISTING_DATA_POINT_EXTRA, false);
         setHasOptionsMenu(true);
         if (mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity());
@@ -116,15 +112,15 @@ public class FormListFragment extends ListFragment
         mListener.onSurveyClick(surveyId);
     }
 
-    static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
+    static class SurveyAdapter extends ArrayAdapter<ViewForm> {
 
         private static final int LAYOUT_RES = R.layout.survey_item;
         private final int[] backgrounds;
         private final int versionTextSize;
         private final int titleTextSize;
 
-        public SurveyAdapter(Context context) {
-            super(context, LAYOUT_RES, new ArrayList<ViewSurveyInfo>());
+        SurveyAdapter(Context context) {
+            super(context, LAYOUT_RES, new ArrayList<ViewForm>());
             this.backgrounds = new int[2];
             backgrounds[0] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg1);
             backgrounds[1] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg2);
@@ -141,7 +137,7 @@ public class FormListFragment extends ListFragment
 
         @Override
         public boolean isEnabled(int position) {
-            ViewSurveyInfo surveyInfo = getItem(position);
+            ViewForm surveyInfo = getItem(position);
             return surveyInfo.isEnabled();
         }
 
@@ -157,7 +153,7 @@ public class FormListFragment extends ListFragment
                 surveyInfoViewHolder = (SurveyInfoViewHolder) listItem.getTag();
             }
 
-            final ViewSurveyInfo surveyInfo = getItem(position);
+            final ViewForm surveyInfo = getItem(position);
 
             surveyInfoViewHolder.updateViews(surveyInfo, versionTextSize, titleTextSize);
 
@@ -165,55 +161,58 @@ public class FormListFragment extends ListFragment
             listItem.setBackgroundResource(backgrounds[position % 2 == 0 ? 0 : 1]);
             return listItem;
         }
+
+        public void addAll(List<ViewForm> forms) {
+            for (ViewForm s : forms) {
+                add(s);
+            }
+        }
     }
 
     @Override
-    public Loader<Pair<List<SurveyInfo>, Boolean>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<SurveyInfo>> onCreateLoader(int id, Bundle args) {
         return new SurveyInfoLoader(getActivity(), recordId, mSurveyGroup);
     }
 
     @Override
-    public void onLoadFinished(Loader<Pair<List<SurveyInfo>, Boolean>> loader,
-            Pair<List<SurveyInfo>, Boolean> data) {
+    public void onLoadFinished(Loader<List<SurveyInfo>> loader,
+            List<SurveyInfo> data) {
         if (loader == null) {
             Timber.e("onLoadFinished() - Loader returned no data");
             return;
         }
         mAdapter.clear();
-        boolean registered = data.second;
-        List<ViewSurveyInfo> surveys = mapper
-                .transform(data.first, mSurveyGroup, registered, getString(R.string.form_deleted),
-                        existingDataPoint);
-        for (ViewSurveyInfo s : surveys) {
-            mAdapter.add(s);
-        }
+        List<ViewForm> surveys = mapper
+                .transform(data, mSurveyGroup, getString(R.string.form_deleted));
+        mAdapter.addAll(surveys);
     }
 
     @Override
-    public void onLoaderReset(Loader<Pair<List<SurveyInfo>, Boolean>> loader) {
+    public void onLoaderReset(Loader<List<SurveyInfo>> loader) {
         //EMPTY
     }
+
 
     public interface SurveyListListener {
 
         void onSurveyClick(String surveyId);
     }
 
-    public static class SurveyInfoViewHolder {
+    static class SurveyInfoViewHolder {
 
         private final View view;
         private final TextView surveyNameView;
         private final TextView lastSubmissionTitle;
         private final TextView lastSubmissionView;
 
-        public SurveyInfoViewHolder(View view) {
+        SurveyInfoViewHolder(View view) {
             this.view = view;
             this.surveyNameView = (TextView) view.findViewById(R.id.survey_name_tv);
             this.lastSubmissionTitle = (TextView) view.findViewById(R.id.date_label);
             this.lastSubmissionView = (TextView) view.findViewById(R.id.date);
         }
 
-        public void updateViews(ViewSurveyInfo surveyInfo, int versionTextSize, int titleTextSize) {
+        void updateViews(ViewForm surveyInfo, int versionTextSize, int titleTextSize) {
             SpannableString versionSpannable = getSpannableString(versionTextSize,
                     surveyInfo.getSurveyExtraInfo());
             SpannableString titleSpannable = getSpannableString(titleTextSize,

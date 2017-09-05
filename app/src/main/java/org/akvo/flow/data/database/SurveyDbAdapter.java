@@ -1068,6 +1068,17 @@ public class SurveyDbAdapter {
                 new String[] { surveyedLocaleId });
     }
 
+    public Cursor getDatapointStatus(String recordId) {
+        Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
+                new String[] {
+                        SurveyInstanceColumns.STATUS
+                },
+                SurveyInstanceColumns.RECORD_ID + "= ?",
+                new String[] { String.valueOf(recordId) },
+                null, null, null);
+        return cursor;
+    }
+
     /**
      * Flag to indicate the type of locale update from a given response
      */

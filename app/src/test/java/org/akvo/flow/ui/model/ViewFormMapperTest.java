@@ -74,8 +74,7 @@ public class ViewFormMapperTest {
         ViewFormMapper mapper = new ViewFormMapper();
         List<FormInfo> original = null;
 
-        List<ViewForm> mapped = mapper.transform(original, mockSurveyGroup, "deleted",
-                datapointExported);
+        List<ViewForm> mapped = mapper.transform(original, mockSurveyGroup, "deleted");
 
         assertNotNull(mapped);
         assertTrue(mapped.isEmpty());
@@ -88,8 +87,7 @@ public class ViewFormMapperTest {
         original.add(null);
         original.add(mockSurveyItem);
 
-        List<ViewForm> mapped = mapper.transform(original, mockSurveyGroup, "deleted",
-                datapointExported);
+        List<ViewForm> mapped = mapper.transform(original, mockSurveyGroup, "deleted");
 
         assertNotNull(mapped);
         assertEquals(1, mapped.size());
@@ -147,6 +145,7 @@ public class ViewFormMapperTest {
         given(mockSurveyItem.isRegistrationForm()).willReturn(true);
         given(mockSurveyItem.getId()).willReturn("123");
         given(mockSurveyItem.getName()).willReturn("name");
+        given(mockSurveyItem.isSubmittedDataPoint()).willReturn(true);
         given(mockSurveyGroup.isMonitored()).willReturn(true);
 
         ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");
@@ -155,8 +154,6 @@ public class ViewFormMapperTest {
         assertEquals("name", mapped.getSurveyName());
         assertEquals(" v1.0", mapped.getSurveyExtraInfo());
         assertNull(mapped.getTime());
-        assertFalse(mapped.isEnabled());
+        assertTrue(mapped.isEnabled());
     }
-
-
 }

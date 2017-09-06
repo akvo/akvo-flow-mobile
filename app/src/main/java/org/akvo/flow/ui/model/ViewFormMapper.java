@@ -22,6 +22,7 @@ package org.akvo.flow.ui.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.loader.models.FormInfo;
@@ -50,7 +51,8 @@ public class ViewFormMapper {
         return viewForms;
     }
 
-    private ViewForm transform(@NonNull FormInfo formInfo, SurveyGroup mSurveyGroup,
+    @VisibleForTesting
+    ViewForm transform(@NonNull FormInfo formInfo, SurveyGroup mSurveyGroup,
             String deletedString) {
         String surveyExtraInfo = getExtraInfo(formInfo, deletedString);
         String time = getTime(formInfo);

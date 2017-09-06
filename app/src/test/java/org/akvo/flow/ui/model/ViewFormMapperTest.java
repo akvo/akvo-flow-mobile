@@ -58,7 +58,7 @@ public class ViewFormMapperTest {
     private FormInfo mockSurveyItem;
 
     @Before
-    public void setup() {
+    public void setUp() {
         PowerMockito.mockStatic(TextUtils.class);
         PowerMockito.when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
             @Override
@@ -70,7 +70,7 @@ public class ViewFormMapperTest {
     }
 
     @Test
-    public void transform_ShouldReturnEmptyArrayIfNull() {
+    public void transformShouldReturnEmptyArrayIfNull() {
         ViewFormMapper mapper = new ViewFormMapper();
         List<FormInfo> original = null;
 
@@ -81,7 +81,7 @@ public class ViewFormMapperTest {
     }
 
     @Test
-    public void transform_ShouldIgnoreNullItems() {
+    public void transformShouldIgnoreNullItems() {
         ViewFormMapper mapper = new ViewFormMapper();
         List<FormInfo> original = new ArrayList<>();
         original.add(null);
@@ -94,7 +94,7 @@ public class ViewFormMapperTest {
     }
 
     @Test
-    public void transform_ShouldTransformCorrectlyDeletedSurvey() {
+    public void transformShouldTransformCorrectlyDeletedSurvey() {
         ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(true);
@@ -107,7 +107,7 @@ public class ViewFormMapperTest {
     }
 
     @Test
-    public void transform_ShouldTransformCorrectlyNonSubmittedSurvey() {
+    public void transformShouldTransformCorrectlyNonSubmittedSurvey() {
         ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(false);
@@ -120,7 +120,7 @@ public class ViewFormMapperTest {
     }
 
     @Test
-    public void transform_ShouldTransformCorrectlyNonRegistrationMonitoredSurvey() {
+    public void transformShouldTransformCorrectlyNonRegistrationMonitoredSurvey() {
         ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(false);
@@ -136,7 +136,7 @@ public class ViewFormMapperTest {
     }
 
     @Test
-    public void transform_ShouldTransformCorrectlyAllSurveyFields() {
+    public void transformShouldTransformCorrectlyAllSurveyFields() {
         ViewFormMapper mapper = new ViewFormMapper();
 
         given(mockSurveyItem.isDeleted()).willReturn(false);

@@ -28,11 +28,6 @@ public class FormInfo {
     private final Long lastSubmission;
     private final boolean deleted;
     private final boolean isRegistrationSurvey;
-
-    public boolean isSubmittedDataPoint() {
-        return submittedDataPoint;
-    }
-
     private final boolean submittedDataPoint;
 
     public FormInfo(String id, String name, String version, Long lastSubmission,
@@ -70,7 +65,12 @@ public class FormInfo {
         return isRegistrationSurvey;
     }
 
+    public boolean isSubmittedDataPoint() {
+        return submittedDataPoint;
+    }
+
     public boolean hasBeenSubmitted() {
         return lastSubmission != null && lastSubmission != 0L;
     }
+
 }

@@ -39,8 +39,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.loader.SurveyInfoLoader;
-import org.akvo.flow.data.loader.models.SurveyInfo;
+import org.akvo.flow.data.loader.FormInfoLoader;
+import org.akvo.flow.data.loader.models.FormInfo;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.model.ViewForm;
 import org.akvo.flow.ui.model.ViewFormMapper;
@@ -56,7 +56,7 @@ import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 
 public class FormListFragment extends ListFragment
-        implements LoaderCallbacks<List<SurveyInfo>>, OnItemClickListener {
+        implements LoaderCallbacks<List<FormInfo>>, OnItemClickListener {
 
     private SurveyGroup mSurveyGroup;
     private SurveyAdapter mAdapter;
@@ -137,25 +137,25 @@ public class FormListFragment extends ListFragment
 
         @Override
         public boolean isEnabled(int position) {
-            ViewForm surveyInfo = getItem(position);
-            return surveyInfo.isEnabled();
+            ViewForm viewForm = getItem(position);
+            return viewForm.isEnabled();
         }
 
         @NonNull @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
             View listItem = convertView;
-            SurveyInfoViewHolder surveyInfoViewHolder;
+            FormViewHolder formViewHolder;
             if (listItem == null) {
                 listItem = LayoutInflater.from(getContext()).inflate(LAYOUT_RES, null);
-                surveyInfoViewHolder = new SurveyInfoViewHolder(listItem);
-                listItem.setTag(surveyInfoViewHolder);
+                formViewHolder = new FormViewHolder(listItem);
+                listItem.setTag(formViewHolder);
             } else {
-                surveyInfoViewHolder = (SurveyInfoViewHolder) listItem.getTag();
+                formViewHolder = (FormViewHolder) listItem.getTag();
             }
 
-            final ViewForm surveyInfo = getItem(position);
+            final ViewForm viewForm = getItem(position);
 
-            surveyInfoViewHolder.updateViews(surveyInfo, versionTextSize, titleTextSize);
+            formViewHolder.updateViews(viewForm, versionTextSize, titleTextSize);
 
             // Alternate background
             listItem.setBackgroundResource(backgrounds[position % 2 == 0 ? 0 : 1]);
@@ -170,25 +170,25 @@ public class FormListFragment extends ListFragment
     }
 
     @Override
-    public Loader<List<SurveyInfo>> onCreateLoader(int id, Bundle args) {
-        return new SurveyInfoLoader(getActivity(), recordId, mSurveyGroup);
+    public Loader<List<FormInfo>> onCreateLoader(int id, Bundle args) {
+        return new FormInfoLoader(getActivity(), recordId, mSurveyGroup);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<SurveyInfo>> loader,
-            List<SurveyInfo> data) {
+    public void onLoadFinished(Loader<List<FormInfo>> loader,
+            List<FormInfo> data) {
         if (loader == null) {
             Timber.e("onLoadFinished() - Loader returned no data");
             return;
         }
         mAdapter.clear();
-        List<ViewForm> surveys = mapper
+        List<ViewForm> forms = mapper
                 .transform(data, mSurveyGroup, getString(R.string.form_deleted));
-        mAdapter.addAll(surveys);
+        mAdapter.addAll(forms);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<SurveyInfo>> loader) {
+    public void onLoaderReset(Loader<List<FormInfo>> loader) {
         //EMPTY
     }
 
@@ -198,16 +198,16 @@ public class FormListFragment extends ListFragment
         void onSurveyClick(String surveyId);
     }
 
-    static class SurveyInfoViewHolder {
+    static class FormViewHolder {
 
         private final View view;
-        private final TextView surveyNameView;
+        private final TextView formNameView;
         private final TextView lastSubmissionTitle;
         private final TextView lastSubmissionView;
 
-        SurveyInfoViewHolder(View view) {
+        FormViewHolder(View view) {
             this.view = view;
-            this.surveyNameView = (TextView) view.findViewById(R.id.survey_name_tv);
+            this.formNameView = (TextView) view.findViewById(R.id.survey_name_tv);
             this.lastSubmissionTitle = (TextView) view.findViewById(R.id.date_label);
             this.lastSubmissionView = (TextView) view.findViewById(R.id.date);
         }
@@ -217,9 +217,9 @@ public class FormListFragment extends ListFragment
                     surveyInfo.getSurveyExtraInfo());
             SpannableString titleSpannable = getSpannableString(titleTextSize,
                     surveyInfo.getSurveyName());
-            surveyNameView.setText(TextUtils.concat(titleSpannable, versionSpannable));
+            formNameView.setText(TextUtils.concat(titleSpannable, versionSpannable));
             view.setEnabled(surveyInfo.isEnabled());
-            surveyNameView.setEnabled(surveyInfo.isEnabled());
+            formNameView.setEnabled(surveyInfo.isEnabled());
 
             if (surveyInfo.getTime() != null) {
                 lastSubmissionView.setText(surveyInfo.getTime());

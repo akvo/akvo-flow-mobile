@@ -28,7 +28,7 @@ import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.SurveyInstanceColumns;
 import org.akvo.flow.data.database.SurveyInstanceStatus;
 import org.akvo.flow.data.loader.base.AsyncLoader;
-import org.akvo.flow.data.loader.models.SurveyInfo;
+import org.akvo.flow.data.loader.models.FormInfo;
 import org.akvo.flow.domain.SurveyGroup;
 
 import java.util.ArrayList;
@@ -38,13 +38,13 @@ import java.util.List;
  * Loader to query the database and return the list of surveys. This Loader will
  * include the latest submission date for each survey, if exists.
  */
-public class SurveyInfoLoader extends AsyncLoader<List<SurveyInfo>> {
+public class FormInfoLoader extends AsyncLoader<List<FormInfo>> {
 
     private final long surveyGroupId;
     private final String recordId;
     private final SurveyGroup surveyGroup;
 
-    public SurveyInfoLoader(Context context, String recordId, SurveyGroup surveyGroup) {
+    public FormInfoLoader(Context context, String recordId, SurveyGroup surveyGroup) {
         super(context);
         this.surveyGroup = surveyGroup;
         this.surveyGroupId = surveyGroup.getId();
@@ -52,20 +52,20 @@ public class SurveyInfoLoader extends AsyncLoader<List<SurveyInfo>> {
     }
 
     @Override
-    public List<SurveyInfo> loadInBackground() {
+    public List<FormInfo> loadInBackground() {
         SurveyDbAdapter database = new SurveyDbAdapter(getContext());
         database.open();
 
         boolean submittedDataPoint = isDataPointSubmitted(database);
-        List<SurveyInfo> surveys = retrieveForms(database, submittedDataPoint);
+        List<FormInfo> forms = retrieveForms(database, submittedDataPoint);
 
         database.close();
-        return surveys;
+        return forms;
     }
 
     @NonNull
-    private List<SurveyInfo> retrieveForms(SurveyDbAdapter database, boolean submittedDataPoint) {
-        List<SurveyInfo> surveys = new ArrayList<>();
+    private List<FormInfo> retrieveForms(SurveyDbAdapter database, boolean submittedDataPoint) {
+        List<FormInfo> surveys = new ArrayList<>();
         Cursor cursor = database.getDataPointForms(surveyGroupId, recordId);
         if (cursor.moveToFirst()) {
             do {
@@ -82,7 +82,7 @@ public class SurveyInfoLoader extends AsyncLoader<List<SurveyInfo>> {
                 }
                 boolean deleted = cursor.getInt(SurveyDbAdapter.SurveyQuery.DELETED) == 1;
 
-                SurveyInfo s = new SurveyInfo(id, name, version, lastSubmission, deleted,
+                FormInfo s = new FormInfo(id, name, version, lastSubmission, deleted,
                         registrationSurvey, submittedDataPoint);
                 if (surveyGroup.isMonitored() && registrationSurvey) {
                     surveys.add(0, s);// Make sure registration survey is at the top

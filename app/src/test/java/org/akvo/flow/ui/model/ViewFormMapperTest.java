@@ -23,7 +23,7 @@ package org.akvo.flow.ui.model;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.loader.models.SurveyInfo;
+import org.akvo.flow.data.loader.models.FormInfo;
 import org.akvo.flow.domain.SurveyGroup;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class ViewFormMapperTest {
     private SurveyGroup mockSurveyGroup;
 
     @Mock
-    private SurveyInfo mockSurveyItem;
+    private FormInfo mockSurveyItem;
 
     @Before
     public void setup() {
@@ -72,7 +72,7 @@ public class ViewFormMapperTest {
     @Test
     public void transform_ShouldReturnEmptyArrayIfNull() {
         ViewFormMapper mapper = new ViewFormMapper();
-        List<SurveyInfo> original = null;
+        List<FormInfo> original = null;
 
         List<ViewForm> mapped = mapper.transform(original, mockSurveyGroup, "deleted",
                 datapointExported);
@@ -84,7 +84,7 @@ public class ViewFormMapperTest {
     @Test
     public void transform_ShouldIgnoreNullItems() {
         ViewFormMapper mapper = new ViewFormMapper();
-        List<SurveyInfo> original = new ArrayList<>();
+        List<FormInfo> original = new ArrayList<>();
         original.add(null);
         original.add(mockSurveyItem);
 
@@ -128,7 +128,7 @@ public class ViewFormMapperTest {
         given(mockSurveyItem.isDeleted()).willReturn(false);
         given(mockSurveyItem.getVersion()).willReturn("1.0");
         given(mockSurveyItem.getLastSubmission()).willReturn(1L);
-        given(mockSurveyItem.isRegistrationSurvey()).willReturn(false);
+        given(mockSurveyItem.isRegistrationForm()).willReturn(false);
         given(mockSurveyGroup.isMonitored()).willReturn(true);
 
         ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");
@@ -144,7 +144,7 @@ public class ViewFormMapperTest {
         given(mockSurveyItem.isDeleted()).willReturn(false);
         given(mockSurveyItem.getVersion()).willReturn("1.0");
         given(mockSurveyItem.getLastSubmission()).willReturn(System.currentTimeMillis());
-        given(mockSurveyItem.isRegistrationSurvey()).willReturn(true);
+        given(mockSurveyItem.isRegistrationForm()).willReturn(true);
         given(mockSurveyItem.getId()).willReturn("123");
         given(mockSurveyItem.getName()).willReturn("name");
         given(mockSurveyGroup.isMonitored()).willReturn(true);

@@ -303,7 +303,7 @@ public class BootstrapService extends IntentService {
      * @param loadedSurvey survey to verify
      */
     private void verifyAppId(@NonNull SurveyMetadata loadedSurvey) {
-        final String app = StatusUtil.getApplicationId(this);
+        final String app = StatusUtil.getApplicationId();
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
             ViewUtil.displayToastFromService(getString(R.string.bootstrap_invalid_app), mHandler,

@@ -38,7 +38,6 @@ public class Prefs {
     public static final String KEY_SETUP = "setup";
     public static final String KEY_LOCALE = "pref.locale";
     public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
-    public static final String KEY_BACKEND_SERVER = "backend.server";
     public static final String KEY_SCREEN_ON = "screen.keepon";
     public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";

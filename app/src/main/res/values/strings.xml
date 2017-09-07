@@ -40,7 +40,7 @@
     <string name="toosmallerr">Value is too small. Minimum value: </string>
     <string name="toolargeerr">Value is too large. Maximum value: </string>
     <string name="baddatatypeerr">Answer must be numeric</string>
-    <string name="serverlabel">Data Server (only change if instructed)</string>
+    <string name="preference_dashboard_url_description">Dashboard url</string>
     <string name="reloadsurveyslabel">Reload all surveys</string>
     <string name="reloadsurveysdesc">Deletes and re-downloads assigned surveys (only run if instructed)</string>
     <string name="conftitle">Please Confirm</string>

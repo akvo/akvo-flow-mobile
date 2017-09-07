@@ -81,11 +81,8 @@
     <string name="resetalldesc">Permanently deletes all surveys, responses (including images and exported zip files) and users</string>
     <string name="reset_responses">Delete Collected Data and Images</string>
     <string name="reset_responses_desc">Permanently deletes all survey responses (including images and exported zip files)</string>
-    <string name="checksd">Check SD Card State</string>
-    <string name="checksddesc">Checks to see that the SD card is mounted and displays the free space remaining on the card.</string>
+    <string name="checksd">Available storage</string>
     <string name="sdmissing">SD card missing or unmounted. Ensure that you have turned off \"USB File Copying\"</string>
-    <string name="sdmounted">SD card is mounted properly.</string>
-    <string name="sdcardspace">Free Space (MB):</string>
     <string name="pickdate">Select Date</string>
     <string name="pleasewaitforbootstrap">Please wait until the bootstrap file has finished processing.</string>
     <string name="clear_data_success">Data successfully deleted from the device</string>

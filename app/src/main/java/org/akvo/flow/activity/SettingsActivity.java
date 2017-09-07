@@ -26,9 +26,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.SQLException;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.StatFs;
-import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
@@ -48,15 +45,17 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -69,6 +68,9 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
 
     private static final String LABEL = "label";
     private static final String DESC = "desc";
+
+    @Inject
+    Navigator navigator;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,8 +93,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
                 resources.getString(R.string.reset_responses_desc)));
         list.add(createMap(resources.getString(R.string.resetall),
                 resources.getString(R.string.resetalldesc)));
-        list.add(createMap(resources.getString(R.string.checksd),
-                resources.getString(R.string.checksddesc)));
+        list.add(createMap(resources.getString(R.string.checksd), ""));
         String[] fromKeys = {
                 LABEL, DESC
         };
@@ -144,7 +145,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
             } else if (resources.getString(R.string.resetall).equals(val)) {
                 onDeleteEverythingOptionTap();
             } else if (resources.getString(R.string.checksd).equals(val)) {
-                onCheckSdCardStateOptionTap(resources);
+                onCheckSdCardStateOptionTap();
             } else if (resources.getString(R.string.sendoptlabel).equals(val)) {
                 onSyncDataOptionTap(view);
             }
@@ -157,40 +158,8 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
         finish();
     }
 
-    private void onCheckSdCardStateOptionTap(Resources resources) {
-        String state = Environment.getExternalStorageState();
-        StringBuilder builder = new StringBuilder();
-        if (state == null || !Environment.MEDIA_MOUNTED.equals(state)) {
-            builder.append("<b>").append(resources.getString(R.string.sdmissing))
-                    .append("</b><br>");
-        } else {
-            builder.append(resources.getString(R.string.sdmounted)).append("<br>");
-            File f = Environment.getExternalStorageDirectory();
-            if (f != null) {
-                // normally, we could just do f.getFreeSpace() but that
-                // would tie us to later versions of Android. So for
-                // maximum compatibility, just use StatFS
-                StatFs fs = new StatFs(f.getAbsolutePath());
-                // We first cast the blocks and size values to float, to avoid an
-                // integer overflow scenario. Ideally we should use getFreeBlocksLong()
-                // instead, but it's only available in API level 18+
-                long fb = fs.getFreeBlocks();
-                long bs = fs.getBlockSize();
-                long space = fb * bs;
-                builder.append(resources.getString(R.string.sdcardspace))
-                        .append(String.format(" %.2f", (double) space / (double) (1024 * 1024)));
-            }
-        }
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle(R.string.checksd);
-        String text = Html.fromHtml(builder.toString()).toString();
-        dialog.setMessage(text);
-        dialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        dialog.show();
+    private void onCheckSdCardStateOptionTap() {
+        navigator.navigateToStorageSettings(this);
     }
 
     private void onDeleteEverythingOptionTap() {
@@ -354,8 +323,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     private static class SettingsAdapter extends SimpleAdapter {
 
         public SettingsAdapter(Context context, List<? extends Map<String, ?>> data, int resource,
-                String[] from,
-                int[] to) {
+                String[] from, int[] to) {
             super(context, data, resource, from, to);
         }
 

@@ -200,6 +200,22 @@ public class Navigator {
         }
     }
 
+    public void navigateToStorageSettings(@NonNull Context context) {
+        Intent intent = new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+        PackageManager packageManager = context.getPackageManager();
+        if (intent.resolveActivity(packageManager) != null) {
+            context.startActivity(intent);
+        } else {
+            intent = new Intent(Settings.ACTION_MEMORY_CARD_SETTINGS);
+            packageManager = context.getPackageManager();
+            if (intent.resolveActivity(packageManager) != null) {
+                context.startActivity(intent);
+            } else {
+                navigateToSettings(context);
+            }
+        }
+    }
+
     /**
      * Fallback as Settings.ACTION_LOCATION_SOURCE_SETTINGS may not be available on some devices
      */

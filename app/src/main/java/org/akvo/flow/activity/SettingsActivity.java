@@ -109,7 +109,7 @@ public class SettingsActivity extends BackActivity implements AdapterView.OnItem
     private void initializeInjector() {
         ViewComponent viewComponent = DaggerViewComponent.builder()
                 .applicationComponent(getApplicationComponent()).build();
-        viewComponent.inject(this);
+//        viewComponent.inject(this);
     }
 
     /**

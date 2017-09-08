@@ -116,22 +116,24 @@ public class PreferenceActivity extends BackActivity {
         preferences.add(new PreferenceSwitch(2, "Enable usage of mobile data"));
         preferences.add(new PreferenceTitleSubtitle(3, "App language", "English"));
         preferences.add(new PreferenceTitleSubtitle(4, "Image size", maxImgSizes[0]));
-        preferences.add(new PreferenceSeparator(5, "Configuration"));
-        preferences.add(new PreferenceTitle(6, "GPS fixes"));
-        preferences.add(new PreferenceTitle(7, "Available storage"));
-        preferences.add(new PreferenceSeparator(8, "Information"));
-        preferences.add(new PreferenceTitleSubtitle(9, "Device identifier", "valeria"));
-        preferences.add(new PreferenceTitleSubtitle(10, "Instance name", BuildConfig.INSTANCE_URL));
-        preferences.add(new PreferenceSeparator(11, "Data"));
-        preferences.add(new PreferenceTitle(12, "Send submitted data points to Flow instance"));
-        preferences.add(new PreferenceTitleSubtitle(13, "Delete collected data and images",
+        preferences.add(new PreferenceSeparator(5, "Data"));
+        preferences.add(new PreferenceTitle(6, "Send submitted data points to Flow instance"));
+        preferences.add(new PreferenceTitleSubtitle(7, "Delete collected data and images",
                 getString(R.string.reset_responses_desc)));
-        preferences.add(new PreferenceTitleSubtitle(14, "Delete everything",
+        preferences.add(new PreferenceTitleSubtitle(8, "Delete everything",
                 getString(R.string.resetalldesc)));
-        preferences.add(new PreferenceTitleSubtitle(15, getString(R.string.downloadsurveylabel),
-                getString(R.string.downloadsurveydesc)));
-        preferences.add(new PreferenceTitleSubtitle(16, getString(R.string.reloadsurveyslabel),
+        preferences.add(new PreferenceTitleSubtitle(9,
+                getString(R.string.preference_download_form_title),
+                getString(R.string.preference_download_form_subtitle)));
+        preferences.add(new PreferenceTitleSubtitle(10, getString(R.string.reloadsurveyslabel),
                 getString(R.string.reloadsurveysdesc)));
+        preferences.add(new PreferenceSeparator(11, "Configuration"));
+        preferences.add(new PreferenceTitle(12, "GPS fixes"));
+        preferences.add(new PreferenceTitle(13, "Available storage"));
+        preferences.add(new PreferenceSeparator(14, "Information"));
+        preferences.add(new PreferenceTitleSubtitle(15, "Device identifier", "valeria"));
+        preferences.add(new PreferenceTitleSubtitle(16, "Instance name", BuildConfig.INSTANCE_URL));
+
         preferencesRv.setAdapter(new PreferenceAdapter(preferences));
     }
 
@@ -304,7 +306,7 @@ public class PreferenceActivity extends BackActivity {
         public void updateViews(PreferenceTitle preference, int position) {
             title.setText(preference.getTitle());
             //TODO: use ids!!!
-            if (position == 4 || position == 7 || position == 10) {
+            if (position == 4 || position == 13 || position == 10) {
                 separator.setVisibility(View.GONE);
             } else {
                 separator.setVisibility(View.VISIBLE);

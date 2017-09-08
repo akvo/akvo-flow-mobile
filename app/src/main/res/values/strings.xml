@@ -51,8 +51,8 @@
     <string name="langmandatorytitle">Invalid Selection</string>
     <string name="langmandatorytext">You must select at least one language</string>
     <string name="pleasewait">Please wait</string>
-    <string name="downloadsurveylabel">Download Form</string>
-    <string name="downloadsurveydesc">Downloads arbitrary surveys (only run if instructed)</string>
+    <string name="preference_download_form_title">Download form using form ID</string>
+    <string name="preference_download_form_subtitle">Only run if instructed</string>
     <string name="downloadsurveyinstr">Enter the form id you wish to download.</string>
     <string name="deletealldatawarning">This will permanently delete all data (surveys, responses, images, and users) on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="delete_responses_warning">This will permanently delete responses, images, and zip files on the device. This operation is not reversible. Click OK to proceed or cancel to abort.</string>

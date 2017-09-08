@@ -6,6 +6,7 @@
     <color name="black_main">#000000</color>
     <color name="black_disabled">#8f8f8f</color>
     <color name="black_transparent">#20000000</color>
+    <color name="grey_transparent">#10000000</color>
 
     <color name="orange_main">#DE8929</color>
     <color name="orange_dark">#ba661c</color>

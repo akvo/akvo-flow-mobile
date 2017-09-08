@@ -22,8 +22,10 @@ package org.akvo.flow.presentation.settings;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +53,13 @@ public class PreferenceActivity extends BackActivity {
 
     @BindView(R.id.preferences_rv)
     RecyclerView preferencesRv;
+
+    @BindView(R.id.appbar_layout)
+    AppBarLayout appBarLayout;
+
+    @BindView(R.id.toolbar_shadow)
+    View toolbarShadow;
+
     private String[] maxImgSizes;
 
     @Override
@@ -60,8 +69,36 @@ public class PreferenceActivity extends BackActivity {
         ButterKnife.bind(this);
         initializeInjector();
         setupToolBar();
+        setUpToolBarAnimationListener();
         maxImgSizes = getResources().getStringArray(R.array.max_image_size_pref);
         setUpPreferences();
+    }
+
+    private void setUpToolBarAnimationListener() {
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+                    onToolBarCollapsed();
+                } else if (verticalOffset == 0) {
+                    onToolbarExpanded();
+                } else {
+                    onToolbarMove();
+                }
+            }
+
+            private void onToolbarMove() {
+                toolbarShadow.setVisibility(View.GONE);
+            }
+
+            private void onToolbarExpanded() {
+                toolbarShadow.setVisibility(View.VISIBLE);
+            }
+
+            private void onToolBarCollapsed() {
+                toolbarShadow.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void initializeInjector() {
@@ -75,8 +112,8 @@ public class PreferenceActivity extends BackActivity {
         //TODO: extract all constants and string
         List<Preference> preferences = new ArrayList<>(17);
         preferences.add(new PreferenceSeparator(0, "Settings"));
-        preferences.add(new PreferenceTitle(1, "Keep screen on during form input"));
-        preferences.add(new PreferenceTitle(2, "Enable usage of mobile data"));
+        preferences.add(new PreferenceSwitch(1, "Keep screen on during form input"));
+        preferences.add(new PreferenceSwitch(2, "Enable usage of mobile data"));
         preferences.add(new PreferenceTitleSubtitle(3, "App language", "English"));
         preferences.add(new PreferenceTitleSubtitle(4, "Image size", maxImgSizes[0]));
         preferences.add(new PreferenceSeparator(5, "Configuration"));
@@ -127,6 +164,13 @@ public class PreferenceActivity extends BackActivity {
         }
     }
 
+    public class PreferenceSwitch extends Preference {
+
+        protected PreferenceSwitch(int id, String title) {
+            super(id, title);
+        }
+    }
+
     public class PreferenceTitleSubtitle extends Preference {
 
         private final String subtitle;
@@ -146,6 +190,7 @@ public class PreferenceActivity extends BackActivity {
         private static final int VIEW_TYPE_SEPARATOR = 0;
         private static final int VIEW_TYPE_TITLE = 1;
         private static final int VIEW_TYPE_TITLE_AND_SUBTITLE = 2;
+        private static final int VIEW_TYPE_SWITCH = 3;
 
         @NonNull
         private final List<Preference> preferences;
@@ -160,16 +205,20 @@ public class PreferenceActivity extends BackActivity {
             switch (viewType) {
                 case VIEW_TYPE_SEPARATOR:
                     view = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.settings_separator, parent, false);
+                            .inflate(R.layout.preference_separator, parent, false);
                     return new SeparatorPreferenceViewHolder(view);
                 case VIEW_TYPE_TITLE:
                     view = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.settings_title, parent, false);
+                            .inflate(R.layout.preference_title, parent, false);
                     return new TitlePreferenceViewHolder(view);
                 case VIEW_TYPE_TITLE_AND_SUBTITLE:
                     view = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.settings_title_subtitle, parent, false);
+                            .inflate(R.layout.preference_title_subtitle, parent, false);
                     return new TitleSubtitlePreferenceViewHolder(view);
+                case VIEW_TYPE_SWITCH:
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.preference_switch, parent, false);
+                    return new SwitchPreferenceViewHolder(view);
                 default:
                     throw new IllegalArgumentException("Wrong view type");
             }
@@ -184,6 +233,8 @@ public class PreferenceActivity extends BackActivity {
                 return VIEW_TYPE_TITLE;
             } else if (preference instanceof PreferenceTitleSubtitle) {
                 return VIEW_TYPE_TITLE_AND_SUBTITLE;
+            } else if (preference instanceof PreferenceSwitch) {
+                return VIEW_TYPE_SWITCH;
             } else {
                 throw new IllegalArgumentException(
                         "invalid data found: " + preference.getClass().getSimpleName());
@@ -193,7 +244,7 @@ public class PreferenceActivity extends BackActivity {
         @Override
         public void onBindViewHolder(PreferenceViewHolder holder, int position) {
             Preference preference = preferences.get(position);
-            holder.updateViews(preference);
+            holder.updateViews(preference, position);
         }
 
         @Override
@@ -209,7 +260,7 @@ public class PreferenceActivity extends BackActivity {
             super(itemView);
         }
 
-        public abstract void updateViews(T preference);
+        public abstract void updateViews(T preference, int position);
     }
 
     public class SeparatorPreferenceViewHolder extends PreferenceViewHolder<PreferenceSeparator> {
@@ -217,13 +268,21 @@ public class PreferenceActivity extends BackActivity {
         @BindView(R.id.title)
         TextView title;
 
+        @BindView(R.id.separator)
+        View separator;
+
         public SeparatorPreferenceViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         @Override
-        public void updateViews(PreferenceSeparator preference) {
+        public void updateViews(PreferenceSeparator preference, int position) {
+            if (position == 0) {
+                separator.setVisibility(View.GONE);
+            } else {
+                separator.setVisibility(View.VISIBLE);
+            }
             title.setText(preference.getTitle());
         }
     }
@@ -233,14 +292,48 @@ public class PreferenceActivity extends BackActivity {
         @BindView(R.id.title)
         TextView title;
 
+        @BindView(R.id.separator)
+        View separator;
+
         public TitlePreferenceViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         @Override
-        public void updateViews(PreferenceTitle preference) {
+        public void updateViews(PreferenceTitle preference, int position) {
             title.setText(preference.getTitle());
+            //TODO: use ids!!!
+            if (position == 4 || position == 7 || position == 10) {
+                separator.setVisibility(View.GONE);
+            } else {
+                separator.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public class SwitchPreferenceViewHolder extends PreferenceViewHolder<PreferenceSwitch> {
+
+        @BindView(R.id.switch_compat)
+        SwitchCompat switchCompat;
+
+        @BindView(R.id.separator)
+        View separator;
+
+        public SwitchPreferenceViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public void updateViews(PreferenceSwitch preference, int position) {
+            switchCompat.setText(preference.getTitle());
+            //TODO: use ids!!!
+            if (position == 4 || position == 7 || position == 10) {
+                separator.setVisibility(View.GONE);
+            } else {
+                separator.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -253,15 +346,24 @@ public class PreferenceActivity extends BackActivity {
         @BindView(R.id.subtitle)
         TextView subtitle;
 
+        @BindView(R.id.separator)
+        View separator;
+
         public TitleSubtitlePreferenceViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         @Override
-        public void updateViews(PreferenceTitleSubtitle preference) {
+        public void updateViews(PreferenceTitleSubtitle preference, int position) {
             title.setText(preference.getTitle());
             subtitle.setText(preference.getSubtitle());
+            //TODO: use ids!!!
+            if (position == 4 || position == 7 || position == 10) {
+                separator.setVisibility(View.GONE);
+            } else {
+                separator.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

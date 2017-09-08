@@ -4,30 +4,26 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
-    <TextView
-            android:id="@+id/title"
+
+    <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch_compat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="test"
+            android:checked="true"
             android:paddingLeft="16dp"
             android:paddingStart="16dp"
             android:paddingRight="16dp"
             android:paddingTop="8dp"
-            android:paddingBottom="4dp"
-            android:textSize="16sp"
-            android:textColor="@color/black_main">
-    </TextView>
-    <TextView
-            android:id="@+id/subtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="test"
-            android:paddingLeft="16dp"
-            android:paddingStart="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="4dp"
             android:paddingBottom="8dp"
-            android:textSize="14sp"
-            android:textColor="@color/black_disabled">
-    </TextView>
+            android:textSize="16sp"
+            android:textColor="@color/black_main"
+            tools:text="Test"/>
+
+    <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/grey_transparent"/>
 </LinearLayout>

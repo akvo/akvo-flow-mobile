@@ -56,7 +56,7 @@
         <activity
                 android:name=".activity.SettingsActivity"
                 android:configChanges="locale|layoutDirection"
-                android:label="@string/settingslabel"/>
+                android:label="@string/preferences_settings_section"/>
         <activity
                 android:name=".activity.PreferencesActivity"
                 android:configChanges="locale|layoutDirection"

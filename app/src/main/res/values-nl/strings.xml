@@ -16,7 +16,7 @@
   <string name="geodialog">Schakel s.v.p. locatie instellingen in</string>
   <string name="settings">Instellingen</string>
   <string name="resize_large_images">Formaat wijzigen van grote beelden</string>
-  <string name="settingslabel">Instellingen</string>
+  <string name="preferences_settings_section">Instellingen</string>
   <string name="prefoptlabel">Voorkeuren</string>
   <string name="prefoptdesc">Stel standaard taal voor de vragenlijst en andere voorkeur data in</string>
   <string name="sendoptlabel">Synchroniseer data</string>

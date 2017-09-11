@@ -112,32 +112,42 @@ public class PreferenceActivity extends BackActivity {
 
     private void setUpPreferences() {
         preferencesRv.setLayoutManager(new LinearLayoutManager(this));
-        //TODO: extract all constants and string
+        //TODO: extract all constants
+        //TODO: retrieve values in preferences
         List<Preference> preferences = new ArrayList<>(17);
-        preferences.add(new PreferenceSeparator(0, "Settings"));
-        preferences.add(new PreferenceSwitch(1, "Keep screen on during form input"));
-        preferences.add(new PreferenceSwitch(2, "Enable usage of mobile data"));
-        preferences.add(new PreferenceSpinner(3, "App language", R.array.app_languages,
+        preferences
+                .add(new PreferenceSeparator(0, getString(R.string.preferences_settings_section)));
+        preferences.add(new PreferenceSwitch(1, getString(R.string.preference_screen_on)));
+        preferences.add(new PreferenceSwitch(2, getString(R.string.preference_mobile_data)));
+        preferences.add(new PreferenceSpinner(3, getString(R.string.preference_app_language),
+                R.array.app_languages,
                 0));
-        preferences.add(new PreferenceSpinner(4, "Image size", R.array.max_image_size_pref, 1));
-        preferences.add(new PreferenceSeparator(5, "Data"));
-        preferences.add(new PreferenceTitle(6, "Send submitted data points to Flow instance"));
-        preferences.add(new PreferenceTitleSubtitle(7, "Delete collected data and images",
+        preferences.add(new PreferenceSpinner(4, getString(R.string.preference_image_size),
+                R.array.max_image_size_pref, 0));
+        preferences.add(new PreferenceSeparator(5, getString(R.string.preferences_data_section)));
+        preferences.add(new PreferenceTitle(6, getString(R.string.preference_sync_datapoints)));
+        preferences.add(new PreferenceTitleSubtitle(7,
+                getString(R.string.preference_delete_collected_data),
                 getString(R.string.reset_responses_desc)));
-        preferences.add(new PreferenceTitleSubtitle(8, "Delete everything",
+        preferences.add(new PreferenceTitleSubtitle(8,
+                getString(R.string.preference_delete_everything),
                 getString(R.string.resetalldesc)));
         preferences.add(new PreferenceTitleSubtitle(9,
                 getString(R.string.preference_download_form_title),
                 getString(R.string.preference_download_form_subtitle)));
         preferences.add(new PreferenceTitleSubtitle(10, getString(R.string.reloadsurveyslabel),
                 getString(R.string.reloadsurveysdesc)));
-        preferences.add(new PreferenceSeparator(11, "Configuration"));
-        preferences.add(new PreferenceTitle(12, "GPS fixes"));
-        preferences.add(new PreferenceTitle(13, "Available storage"));
-        preferences.add(new PreferenceSeparator(14, "Information"));
-        preferences.add(new PreferenceTitleSubtitle(15, "Device identifier", "valeria"));
-        preferences.add(new PreferenceTitleSubtitle(16, "Instance name", BuildConfig.INSTANCE_URL));
-
+        preferences.add(new PreferenceSeparator(11,
+                getString(R.string.preferences_configuration_section)));
+        preferences.add(new PreferenceTitle(12, getString(R.string.preference_gps)));
+        preferences.add(new PreferenceTitle(13, getString(R.string.preference_storage)));
+        preferences.add(new PreferenceSeparator(14,
+                getString(R.string.preferences_section_information)));
+        preferences.add(new PreferenceTitleSubtitle(15, getString(R.string.preference_identifier),
+                ""));
+        preferences
+                .add(new PreferenceTitleSubtitle(16, getString(R.string.preference_instance_name),
+                        BuildConfig.INSTANCE_URL));
         preferencesRv.setAdapter(new PreferenceAdapter(preferences));
     }
 

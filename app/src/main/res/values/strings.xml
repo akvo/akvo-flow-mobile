@@ -16,7 +16,7 @@
     <string name="geodialog">Please enable location settings</string>
     <string name="settings">Settings</string>
     <string name="resize_large_images">Resize large images</string>
-    <string name="settingslabel">Settings</string>
+    <string name="preferences_settings_section">Settings</string>
     <string name="prefoptlabel">Preferences</string>
     <string name="prefoptdesc">Set default survey language and other preference data</string>
     <string name="sendoptlabel">Sync Data</string>
@@ -266,5 +266,19 @@
     <string name="help">Help</string>
     <string name="error_loading_help">Error loading help content</string>
     <string name="error_mobile_data_sync">Mobile data sync disabled</string>
+    <string name="preference_screen_on">Keep screen on during form input</string>
+    <string name="preference_mobile_data">Enable usage of mobile data</string>
+    <string name="preference_app_language">App language</string>
+    <string name="preference_image_size">Image size</string>
+    <string name="preferences_data_section">Data</string>
+    <string name="preference_sync_datapoints">Send submitted data points to Flow instance</string>
+    <string name="preference_delete_collected_data">Delete collected data and images</string>
+    <string name="preference_delete_everything">Delete everything</string>
+    <string name="preferences_configuration_section">Configuration</string>
+    <string name="preference_gps">GPS fixes</string>
+    <string name="preference_storage">Available storage</string>
+    <string name="preferences_section_information">Information</string>
+    <string name="preference_identifier">Device identifier</string>
+    <string name="preference_instance_name">Instance name</string>
 
 </resources>

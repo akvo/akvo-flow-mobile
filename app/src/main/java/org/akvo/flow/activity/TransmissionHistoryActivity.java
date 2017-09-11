@@ -23,7 +23,7 @@ import android.os.Bundle;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
 import org.akvo.flow.util.ConstantUtil;
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class TransmissionHistoryActivity extends BackActivity {
 
-    private SurveyDbAdapter databaseAdapter;
+    private  SurveyDbDataSource databaseAdapter;
     private Long surveyInstanceId;
     private ListView transmissionsList;
 
@@ -49,7 +49,7 @@ public class TransmissionHistoryActivity extends BackActivity {
         setupToolBar();
         transmissionsList = (ListView) findViewById(R.id.transmission_list);
         surveyInstanceId = getSurveyInstanceId(savedInstanceState);
-        databaseAdapter = new SurveyDbAdapter(this);
+        databaseAdapter = new SurveyDbDataSource(this, null);
     }
 
     private Long getSurveyInstanceId(Bundle savedInstanceState) {

@@ -69,7 +69,7 @@ public class UserRequestedApkUpdateService extends IntentService {
         Context applicationContext = getApplicationContext();
         this.connectivityStateManager = new ConnectivityStateManager(applicationContext);
         this.prefs = new Prefs(applicationContext);
-        this.apkUpdateHelper = new ApkUpdateHelper(applicationContext);
+        this.apkUpdateHelper = new ApkUpdateHelper();
         checkUpdates();
     }
 

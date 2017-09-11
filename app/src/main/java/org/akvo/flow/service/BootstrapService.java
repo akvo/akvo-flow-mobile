@@ -25,10 +25,11 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
@@ -56,6 +57,8 @@ import java.util.zip.ZipInputStream;
 
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
+
 /**
  * Service that will check a well-known location on the device's SD card for a
  * zip file that contains data that should be loaded on the device. The root of
@@ -80,7 +83,7 @@ public class BootstrapService extends IntentService {
     public volatile static boolean isProcessing = false;
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
-    private SurveyDbAdapter databaseAdapter;
+    private SurveyDbDataSource databaseAdapter;
     private Handler mHandler;
 
     public BootstrapService() {
@@ -110,7 +113,7 @@ public class BootstrapService extends IntentService {
 
             String startMessage = getString(R.string.bootstrapstart);
             displayNotification(startMessage);
-            databaseAdapter = new SurveyDbAdapter(this);
+            databaseAdapter = new SurveyDbDataSource(this, null);
             databaseAdapter.open();
             try {
                 for (File file : zipFiles) {
@@ -118,7 +121,6 @@ public class BootstrapService extends IntentService {
                         processFile(file);
                     } catch (Exception e) {
                         // try to roll back any database changes (if the zip has a rollback file)
-                        rollback(file);
                         String newFilename = file.getAbsolutePath();
                         file.renameTo(new File(newFilename + ConstantUtil.PROCESSED_ERROR_SUFFIX));
                         throw (e);
@@ -150,26 +152,6 @@ public class BootstrapService extends IntentService {
     }
 
     /**
-     * looks for the rollback file in the zip and, if it exists, attempts to
-     * execute the statements contained therein
-     */
-    private void rollback(File zipFile) throws Exception {
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-        ZipEntry entry;
-        while ((entry = zis.getNextEntry()) != null) {
-            String parts[] = entry.getName().split("/");
-            String fileName = parts[parts.length - 1];
-            // make sure we're not processing a hidden file
-            if (!fileName.startsWith(".")) {
-                if (entry.getName().toLowerCase()
-                        .endsWith(ConstantUtil.BOOTSTRAP_ROLLBACK_FILE.toLowerCase())) {
-                    processDbInstructions(FileUtil.readText(zis), false);
-                }
-            }
-        }
-    }
-
-    /**
      * processes a bootstrap zip file
      */
     private void processFile(File file) throws Exception {
@@ -180,16 +162,14 @@ public class BootstrapService extends IntentService {
             String entryName = entry.getName();
 
             // Skip directories and hidden/unwanted files
-            if (entry.isDirectory() || entryName.startsWith(".") ||
-                    entryName.endsWith(ConstantUtil.BOOTSTRAP_ROLLBACK_FILE) || TextUtils
-                    .isEmpty(entryName)) {
+            if (entry.isDirectory() || TextUtils
+                    .isEmpty(entryName) || entryName.startsWith(".") ||
+                    entryName.endsWith(ConstantUtil.BOOTSTRAP_ROLLBACK_FILE) || entryName
+                    .endsWith(ConstantUtil.BOOTSTRAP_DB_FILE)) {
                 continue;
             }
 
-            if (entryName.endsWith(ConstantUtil.BOOTSTRAP_DB_FILE)) {
-                // DB instructions
-                processDbInstructions(FileUtil.readText(zipFile.getInputStream(entry)), true);
-            } else if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
+          if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
                 // Cascade resource
                 FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
                         FileUtil.getFilesDir(FileType.RES));
@@ -303,7 +283,7 @@ public class BootstrapService extends IntentService {
      * @param loadedSurvey survey to verify
      */
     private void verifyAppId(@NonNull SurveyMetadata loadedSurvey) {
-        final String app = StatusUtil.getApplicationId(this);
+        final String app = StatusUtil.getApplicationId();
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
             ViewUtil.displayToastFromService(getString(R.string.bootstrap_invalid_app), mHandler,
@@ -353,30 +333,6 @@ public class BootstrapService extends IntentService {
     }
 
     /**
-     * tokenizes instructions using the newline character as a delimiter and
-     * executes each line as a separate SQL command;
-     */
-    private void processDbInstructions(String instructions, boolean failOnError)
-            throws Exception {
-        if (instructions != null && instructions.trim().length() > 0) {
-            String[] instructionList = instructions.split("\n");
-            for (String instruction : instructionList) {
-                String command = instruction.trim();
-                if (!command.endsWith(";")) {
-                    command = command + ";";
-                }
-                try {
-                    databaseAdapter.executeSql(command);
-                } catch (Exception e) {
-                    if (failOnError) {
-                        throw e;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * returns an ordered list of zip files that exist in the device's bootstrap
      * directory
      */
@@ -415,7 +371,7 @@ public class BootstrapService extends IntentService {
      * refresh its data
      */
     private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(getString(R.string.action_surveys_sync));
-        sendBroadcast(intentBroadcast);
+        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 }

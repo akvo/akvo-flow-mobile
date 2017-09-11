@@ -22,7 +22,7 @@ package org.akvo.flow.activity.testhelper;
 import android.content.Context;
 import android.util.Log;
 
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
@@ -42,12 +42,12 @@ import java.util.Queue;
 public class SurveyInstaller {
 
     private static final String TAG = "SurveyInstaller";
-    private SurveyDbAdapter adapter;
+    private SurveyDbDataSource adapter;
     //Need an array that holds every File so we can delete them in the end
     private Queue<File> surveyFiles = new ArrayDeque<>();
 
-    public SurveyInstaller(SurveyDbAdapter adapter) {
-        this.adapter = adapter;
+    public SurveyInstaller(Context context) {
+       this.adapter = new SurveyDbDataSource(context, null);
     }
 
     public Survey installSurvey(int resId, Context context) {
@@ -66,7 +66,7 @@ public class SurveyInstaller {
      * Creates a survey object out of an XML string and persists the .xml file in the surveys/
      * directory of the phone
      *
-     * @param xml of the survey (from akvosandbox)
+     * @param xml of the survey
      * @return survey
      * @throws IOException if string cannot be written to file
      */
@@ -130,5 +130,4 @@ public class SurveyInstaller {
         adapter.deleteResponses(surveyInstanceId);
         adapter.close();
     }
-
 }

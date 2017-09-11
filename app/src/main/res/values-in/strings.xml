@@ -211,7 +211,7 @@
   <string name="clearbutton">Bersihkan</string>
   <string name="yes">Ya</string>
   <string name="no">Tidak</string>
-  <string name="retry">Coba kembali</string>
+  <string name="action_retry">Coba kembali</string>
   <string name="delete">Hapus</string>
   <string name="drawer_open">Laci terbuka</string>
   <string name="drawer_close">Laci tertutup</string>

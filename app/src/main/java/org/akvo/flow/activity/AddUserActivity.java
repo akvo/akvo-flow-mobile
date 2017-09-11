@@ -20,6 +20,7 @@
 package org.akvo.flow.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -29,7 +30,7 @@ import android.widget.EditText;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.User;
 
@@ -68,7 +69,10 @@ public class AddUserActivity extends Activity {
     private void saveUserData() {
         String username = nameEt.getText().toString().trim();
         String deviceId = deviceIdEt.getText().toString().trim();
-        SurveyDbAdapter db = new SurveyDbAdapter(AddUserActivity.this).open();
+        Context context = getApplicationContext();
+        Prefs prefs = new Prefs(context);
+        SurveyDbDataSource db = new SurveyDbDataSource(context, null);
+        db.open();
         long uid = db.createOrUpdateUser(null, username);
         db.close();
 

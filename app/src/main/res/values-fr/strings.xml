@@ -227,7 +227,7 @@
   <string name="clearbutton">Effacer</string>
   <string name="yes">Oui</string>
   <string name="no">Non</string>
-  <string name="retry">Réessayer</string>
+  <string name="action_retry">Réessayer</string>
   <string name="delete">Supprimer</string>
   <string name="drawer_open">Menu ouvert</string>
   <string name="drawer_close">Menu fermé</string>

@@ -121,7 +121,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
-                        android:text="@string/serverlabel"
+                        android:text="@string/preference_dashboard_url_description"
                         android:textSize="20sp"/>
 
                 <TextView

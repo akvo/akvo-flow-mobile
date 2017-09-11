@@ -23,7 +23,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import org.akvo.flow.data.loader.base.DataLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter;
 
 public class UserLoader extends DataLoader<Cursor> {
 

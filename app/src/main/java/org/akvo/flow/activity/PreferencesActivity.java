@@ -22,7 +22,6 @@ package org.akvo.flow.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,11 +31,11 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.service.SurveyDownloadService;
-import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -59,7 +58,6 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
     private TextView localeTextView;
 
     private Prefs prefs;
-    private ServerManager serverManager;
     private String[] maxImgSizes;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -73,17 +71,13 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         maxImgSizeTextView = (TextView) findViewById(R.id.max_img_size_txt);
         localeTextView = (TextView) findViewById(R.id.locale_name);
         prefs = new Prefs(getApplicationContext());
-        serverManager = new ServerManager(getApplicationContext());
 
-        Resources res = getResources();
-
-        maxImgSizes = res.getStringArray(R.array.max_image_size_pref);
+        maxImgSizes = getResources().getStringArray(R.array.max_image_size_pref);
 
         // Setup event listeners
         screenOnCheckbox.setOnCheckedChangeListener(this);
         mobileDataCheckbox.setOnCheckedChangeListener(this);
         findViewById(R.id.pref_locale).setOnClickListener(this);
-        findViewById(R.id.pref_server).setOnClickListener(this);
         findViewById(R.id.pref_deviceid).setOnClickListener(this);
         findViewById(R.id.pref_resize).setOnClickListener(this);
     }
@@ -107,7 +101,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
         mobileDataCheckbox.setChecked(prefs.getBoolean(Prefs.KEY_CELL_UPLOAD,
                 Prefs.DEFAULT_VALUE_CELL_UPLOAD));
 
-        serverTextView.setText(serverManager.getServerBase());
+        serverTextView.setText(BuildConfig.INSTANCE_URL);
 
         int maxImgSize = prefs.getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE);
         maxImgSizeTextView.setText(maxImgSizes[maxImgSize]);
@@ -134,25 +128,6 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
             case R.id.pref_locale:
                 showLanguageDialog();
                 break;
-            case R.id.pref_server:
-                StringPrefInputDialogListener dialogListener = new StringPrefInputDialogListener(
-                        this) {
-                    @Override
-                    public void usePreference(String userInput) {
-                        PreferencesActivity preferencesActivity = activityWeakReference.get();
-                        if (preferencesActivity != null) {
-                            preferencesActivity.saveBackendUrl(userInput);
-                        }
-                    }
-                };
-                //TODO: check duplicated title and subtitle --> remove subtitle
-                ViewUtil.showAdminAuthDialog(this,
-                        new StringPreferencesAuthDialogListener(this, dialogListener,
-                                R.string.serverlabel,
-                                R.string.serverlabel,
-                                serverManager.getServerBase())
-                );
-                break;
             case R.id.pref_deviceid:
                 StringPrefInputDialogListener dialogListenerId = new StringPrefInputDialogListener(
                         this) {
@@ -178,11 +153,6 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                          maxImgSizes, maxImgSizeTextView);
                 break;
         }
-    }
-
-    private void saveBackendUrl(String userInput) {
-        prefs.setString(Prefs.KEY_BACKEND_SERVER, userInput);
-        serverTextView.setText(userInput);
     }
 
     /**

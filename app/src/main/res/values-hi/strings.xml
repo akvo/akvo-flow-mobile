@@ -211,7 +211,7 @@
   <string name="clearbutton">हटाएं </string>
   <string name="yes">हाँ </string>
   <string name="no">नहीं </string>
-  <string name="retry">पुन: प्रयास</string>
+  <string name="action_retry">पुन: प्रयास</string>
   <string name="delete">हटाएं </string>
   <!--app update service-->
 </resources>

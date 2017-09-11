@@ -211,7 +211,7 @@
   <string name="clearbutton">លុបចេញ (Clear) </string>
   <string name="yes">បាទ/ចាស</string>
   <string name="no">ទេ</string>
-  <string name="retry">ព្យាយាមម្តងទៀត</string>
+  <string name="action_retry">ព្យាយាមម្តងទៀត</string>
   <string name="delete">លុប (Delete) </string>
   <string name="drawer_open">ថត បើក</string>
   <string name="drawer_close">ថត បិទ </string>

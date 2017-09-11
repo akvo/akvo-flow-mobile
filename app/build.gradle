@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenCentral()
@@ -51,10 +50,25 @@ android {
         }
         buildTypes {
             release {
+                minifyEnabled true
+                proguardFile 'proguard-files/proguard-rules.pro'
+                proguardFile 'proguard-files/proguard-butterknife.pro'
+                proguardFile 'proguard-files/proguard-glide.pro'
+                proguardFile 'proguard-files/proguard-google-play-services.pro'
+                proguardFile 'proguard-files/proguard-gson.pro'
+                proguardFile 'proguard-files/proguard-jackson.pro'
+                proguardFile 'proguard-files/proguard-maps-utils.pro'
+                proguardFile 'proguard-files/proguard-prettytime.pro'
+                proguardFile 'proguard-files/proguard-sentry.pro'
+                proguardFile 'proguard-files/proguard-square-retrofit.pro'
+                proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+                proguardFile 'proguard-files/proguard-rxjava.pro'
+                proguardFile getDefaultProguardFile('proguard-android.txt')
                 signingConfig signingConfigs.flowRelease
             }
         }
     }
+
     buildTypes {
         buildTypes.each {
             def serverBase = surveyProps['serverBase'].toString()
@@ -83,17 +97,17 @@ android {
         }
     }
 
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
-        exclude '.readme'
-    }
+        packagingOptions {
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/license.txt'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/notice.txt'
+            exclude 'META-INF/ASL2.0'
+            exclude '.readme'
+        }
 
     productFlavors {
         flow {
@@ -104,9 +118,9 @@ android {
         }
     }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
+        testOptions {
+            unitTests.returnDefaultValues = true
+        }
 
     lintOptions {
         // set to true to turn off analysis progress reporting by lint
@@ -116,6 +130,7 @@ android {
         // if true, only report errors
         ignoreWarnings false
         lintConfig file('lint.xml')
+        ignore 'InvalidPackage'
     }
 
 
@@ -148,20 +163,20 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:support-annotations:25.3.1'
     compile 'com.android.support:design:25.3.1'
-    compile 'com.google.android.gms:play-services-base:7.5.0'
     compile 'com.google.android.gms:play-services-maps:7.5.0'
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
     compile 'com.google.maps.android:android-maps-utils:0.4'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
-    compile 'com.google.code.gson:gson:2.3'
-    compile 'com.jakewharton.timber:timber:4.3.1'
-    compile 'com.google.dagger:dagger:2.4'
-    apt 'com.google.dagger:dagger-compiler:2.4'
+    compile 'com.jakewharton.timber:timber:4.5.1'
+    compile 'com.google.dagger:dagger:2.8'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
     compile 'com.jakewharton:butterknife:8.5.1'
-    apt 'com.jakewharton:butterknife-compiler:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile 'com.getsentry.raven:raven-android:8.0.2'
     compile 'com.github.bumptech.glide:glide:3.8.0'
+    compile 'com.squareup.sqlbrite2:sqlbrite:2.0.0'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -193,4 +208,5 @@ dependencies {
 
     compile project(':domain')
     compile project(':data')
+    compile project(':database')
 }

@@ -230,7 +230,7 @@ Sem espaço para armazenamento
   <string name="clearbutton">Limpar</string>
   <string name="yes">Sim</string>
   <string name="no">Não</string>
-  <string name="retry">Tentar novamente</string>
+  <string name="action_retry">Tentar novamente</string>
   <string name="delete">Apagar</string>
   <string name="drawer_open">Desenhador aberto</string>
   <string name="drawer_close">Desenhador fechado</string>

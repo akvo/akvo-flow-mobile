@@ -12,6 +12,22 @@ Date: 31 August 2017
 * **Portrait photo shown in app UI as landscape** - [#832](https://github.com/akvo/akvo-flow-mobile/issues/832) Photos are now displayed correctly for both portrait and landscape images.
 
 ---------------
+# ver 2.4.0 (Pre-release)
+Date: 10 August 2017
+
+# New and noteworthy
+* **Add help section** - [#798](https://github.com/akvo/akvo-flow-mobile/issues/798) Direct access to the support website from the navigation drawer.
+* **New screen for empty surveys** - [#621](https://github.com/akvo/akvo-flow-mobile/issues/621) The datapoints list empty screen has been redesigned.
+* **Improve datapoint sync layout** - [#583](https://github.com/akvo/akvo-flow-mobile/issues/583) The datapoint display and sync layout has been redesigned.
+
+# Resolved issues
+* **Viewing single data point on map UI** - [#821](https://github.com/akvo/akvo-flow-mobile/issues/821) Fixed issue when datapoint map had no toolbar.
+* **When adding new datapoints they do not show on the map** - [#728](https://github.com/akvo/akvo-flow-mobile/issues/728) When adding a new datapoint, it will be displayed on the map correctly.
+* **Repeated groups delete button can delete the questions of the whole group** - [#651](https://github.com/akvo/akvo-flow-mobile/issues/651) Deleting the last iteration of a repeated group no longer deletes all the group questions.
+* **DatabaseHelper upgrade method** - [#646](https://github.com/akvo/akvo-flow-mobile/issues/646) Improved the code of the database helper upgrade method.
+* **Answers in repeated groups not shown in point History** - [#600](https://github.com/akvo/akvo-flow-mobile/issues/600) All the answers are now displayed correctly.
+
+---------------
 # ver 2.3.6
 Date: 20 July 2017
 

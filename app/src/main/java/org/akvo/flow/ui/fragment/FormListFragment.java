@@ -116,6 +116,7 @@ public class FormListFragment extends ListFragment
     static class SurveyAdapter extends ArrayAdapter<ViewSurveyInfo> {
 
         private static final int LAYOUT_RES = R.layout.survey_item;
+
         private final int[] backgrounds;
         private final int versionTextSize;
         private final int titleTextSize;

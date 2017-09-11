@@ -254,8 +254,13 @@ public class CascadeQuestionView extends QuestionView
         }
 
         String response = CascadeValue.serialize(values);
-        setResponse(new QuestionResponse(response, ConstantUtil.CASCADE_RESPONSE_TYPE,
-                getQuestion().getId()), suppressListeners);
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                .setValue(response)
+                .setType(ConstantUtil.CASCADE_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse(), suppressListeners);
     }
 
     private Spinner getSpinner(int position) {

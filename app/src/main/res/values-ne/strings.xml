@@ -223,7 +223,7 @@
   <string name="clearbutton">हटाउनुहोस्</string>
   <string name="yes">हो</string>
   <string name="no">हैन</string>
-  <string name="retry">फेरि प्रयास गर्नुहोस्</string>
+  <string name="action_retry">फेरि प्रयास गर्नुहोस्</string>
   <string name="delete">डिलिट गर्नुहोस्</string>
   <string name="drawer_open">ड्रअर खुला छ</string>
   <string name="drawer_close">ड्रअर बन्द छ</string>

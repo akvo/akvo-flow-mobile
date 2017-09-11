@@ -23,6 +23,7 @@ import android.animation.LayoutTransition;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -42,6 +43,7 @@ import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,7 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.OnDeleteListener {
+public class QuestionGroupTab extends LinearLayout implements QuestionGroupIterationHeader.OnDeleteListener {
 
     private final QuestionGroup mQuestionGroup;
     private final QuestionInteractionListener mQuestionListener;
@@ -64,8 +66,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
 
     private TextView mRepetitionsText;
 
-    private final Map<Integer, RepetitionHeader> mHeaders;
-    private final Repetitions mRepetitionsIds;
+    private final Map<Integer, QuestionGroupIterationHeader> groupIterationHeaders;
+    private final RepeatableGroupIterations groupIterations;
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -74,8 +76,8 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         mSurveyListener = surveyListener;
         mQuestionListener = questionListener;
         mQuestionViews = new HashMap<>();
-        mHeaders = new HashMap<>();
-        mRepetitionsIds = new Repetitions();
+        groupIterationHeaders = new HashMap<>();
+        groupIterations = new RepeatableGroupIterations();
         mLoaded = false;
         mQuestions = new HashSet<>();
         for (Question q : mQuestionGroup.getQuestions()) {
@@ -173,14 +175,29 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
             mQuestionViews.clear();
 
             // Load existing iterations. If no iteration is available, show one by default.
-            mRepetitionsIds.loadIDs();
-            int iterCount = Math.max(mRepetitionsIds.size(), 1);
+            groupIterations.loadIDs(mQuestions, mSurveyListener.getResponses().values());
+            int iterCount = Math.max(groupIterations.size(), 1);
             for (int i = 0; i < iterCount; i++) {
                 loadGroup(i);
             }
+            updateGroupIterationHeaders();
         }
 
         displayResponses();
+    }
+
+    private void updateGroupIterationHeaders() {
+        if (groupIterationHeaders.size() > 1) {
+            Collection<QuestionGroupIterationHeader> iterationHeaders = groupIterationHeaders
+                    .values();
+            for (QuestionGroupIterationHeader header : iterationHeaders) {
+                header.enableDeleteButton();
+            }
+        } else if (groupIterationHeaders.size() == 1) {
+            QuestionGroupIterationHeader header = groupIterationHeaders.entrySet().iterator().next()
+                    .getValue();
+            header.disableDeleteButton();
+        }
     }
 
     private void displayResponses() {
@@ -236,28 +253,28 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
     }
 
     private void updateRepetitionsHeader() {
+        //TODO: replace string concatenation by replaceable params inside string and/or plurals
         mRepetitionsText
-                .setText(getContext().getString(R.string.repetitions) + mRepetitionsIds.size());
+                .setText(getContext().getString(R.string.repetitions) + groupIterations.size());
     }
 
     private void loadGroup() {
-        loadGroup(mRepetitionsIds.size());
+        loadGroup(groupIterations.size());
+        if (mQuestionGroup.isRepeatable()) {
+            updateGroupIterationHeaders();
+        }
     }
 
     private void loadGroup(int index) {
-        final int repetitionId =
-                mRepetitionsIds.size() <= index ?
-                        mRepetitionsIds.next() :
-                        mRepetitionsIds.getRepetitionId(index);
+        final int repetitionId = getRepetitionId(index);
         final int visualIndicator = index + 1;
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
-            RepetitionHeader header =
-                    new RepetitionHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
-                            visualIndicator,
-                            mSurveyListener.isReadOnly() ? null : this);
-            mHeaders.put(repetitionId, header);
+            QuestionGroupIterationHeader header =
+                    new QuestionGroupIterationHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
+                            visualIndicator, mSurveyListener.isReadOnly() ? null : this);
+            groupIterationHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
 
@@ -265,7 +282,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
                 q = Question
-                        .copy(q, q.getId() + "|" + repetitionId);// compound id. (qid|repetition)
+                        .copy(q, q.getId() + "|" + repetitionId);
             }
 
             QuestionView questionView;
@@ -309,35 +326,42 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         }
     }
 
+    private int getRepetitionId(int index) {
+        return groupIterations.size() <= index ?
+                groupIterations.next() :
+                groupIterations.getRepetitionId(index);
+    }
+
     @Override
     public void onDeleteRepetition(Integer repetitionID) {
         // Delete question views and corresponding responses
-        for (String qid : mQuestions) {
-            qid += "|" + repetitionID;
+        for (String questionId : mQuestions) {
+            String qid = questionId + "|" + repetitionID;
             QuestionView qv = mQuestionViews.get(qid);
             if (qv != null) {
                 qv.onDestroy();
                 mQuestionViews.remove(qid);
                 mContainer.removeView(qv);
             }
-            mSurveyListener.deleteResponse(qid);
+            mSurveyListener.deleteResponse(questionId, String.valueOf(repetitionID));
         }
 
         // Rearrange header positions (just the visual indicator).
-        for (Integer id : mRepetitionsIds) {
+        for (Integer id : groupIterations) {
             if (id.intValue() == repetitionID.intValue()) {
-                View header = mHeaders.remove(repetitionID);
+                View header = groupIterationHeaders.remove(repetitionID);
                 if (header != null) {
                     mContainer.removeView(header);
                 }
-            } else if (id > repetitionID && mHeaders.containsKey(id)) {
-                mHeaders.get(id).decreasePosition();
+            } else if (id > repetitionID && groupIterationHeaders.containsKey(id)) {
+                groupIterationHeaders.get(id).decreasePosition();
             }
         }
 
         // Remove the ID from the repetitions list.
-        mRepetitionsIds.remove(repetitionID);
+        groupIterations.remove(repetitionID);
         updateRepetitionsHeader();
+        updateGroupIterationHeaders();
     }
 
     public void setupDependencies() {
@@ -379,7 +403,7 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
         return -1;
     }
 
-    class Repetitions implements Iterable<Integer> {
+    static class RepeatableGroupIterations implements Iterable<Integer> {
 
         List<Integer> mIDs = new ArrayList<>();
 
@@ -388,13 +412,17 @@ public class QuestionGroupTab extends LinearLayout implements RepetitionHeader.O
          * The populated list will contain the IDs of existing repetitions.
          * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
+         *
+         * @param questions
+         * @param questionResponses
          */
-        void loadIDs() {
+        void loadIDs(Set<String> questions, Collection<QuestionResponse> questionResponses) {
             Set<Integer> reps = new HashSet<>();
-            for (QuestionResponse qr : mSurveyListener.getResponses().values()) {
-                String[] qid = qr.getQuestionId().split("\\|", -1);
-                if (qid.length == 2 && mQuestions.contains(qid[0])) {
-                    reps.add(Integer.valueOf(qid[1]));
+            for (QuestionResponse qr : questionResponses) {
+                String qid = qr.getQuestionId();
+                if (!TextUtils.isEmpty(qid) && questions.contains(qid) && qr
+                        .isAnswerToRepeatableGroup()) {
+                    reps.add(qr.getIteration());
                 }
             }
 

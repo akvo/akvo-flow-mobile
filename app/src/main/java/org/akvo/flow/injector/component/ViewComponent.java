@@ -20,14 +20,18 @@
 
 package org.akvo.flow.injector.component;
 
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
+import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 
@@ -37,17 +41,25 @@ import dagger.Component;
 @Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
 public interface ViewComponent {
 
+    void inject(DatapointsFragment datapointsFragment);
+
+    void inject(FormActivity formActivity);
+
+    void inject(DataPointsMapFragment dataPointsMapFragment);
+
+    void inject(DataPointsListFragment dataPointsListFragment);
+
     void inject(RecordActivity recordActivity);
+
+    void inject(SignatureActivity signatureActivity);
+
+    void inject(LegalNoticesActivity legalNoticesActivity);
+
+    void inject(AboutActivity aboutActivity);
 
     void inject(ResponseListFragment responseListFragment);
 
     void inject(SettingsActivity settingsActivity);
-
-    void inject(AboutActivity aboutActivity);
-
-    void inject(LegalNoticesActivity legalNoticesActivity);
-
-    void inject(SignatureActivity signatureActivity);
 
     void inject(DrawerFragment drawerFragment);
 

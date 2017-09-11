@@ -227,7 +227,7 @@
   <string name="clearbutton">Borrar</string>
   <string name="yes">Sí</string>
   <string name="no">No</string>
-  <string name="retry">Reintentar</string>
+  <string name="action_retry">Reintentar</string>
   <string name="delete">Borrar</string>
   <string name="drawer_open">Abrir menú</string>
   <string name="drawer_close">Cerrar menú</string>

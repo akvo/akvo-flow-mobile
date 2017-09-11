@@ -33,6 +33,13 @@
         <item name="colorControlNormal">@color/black_disabled</item>
     </style>
 
+    <style name="PreferenceSpinner">
+        <!-- Default color for the dropdown arrow -->
+        <item name="colorControlNormal">@color/black_disabled</item>
+        <item name="android:textColor">@color/black_disabled</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="ImageButtonStyle">
         <item name="android:background">@drawable/image_button_background</item>
         <item name="android:padding">4dp</item>

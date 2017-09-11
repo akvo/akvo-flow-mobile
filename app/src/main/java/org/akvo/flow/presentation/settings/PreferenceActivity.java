@@ -21,6 +21,7 @@
 package org.akvo.flow.presentation.settings;
 
 import android.os.Bundle;
+import android.support.annotation.ArrayRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +30,8 @@ import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.akvo.flow.BuildConfig;
@@ -114,8 +117,9 @@ public class PreferenceActivity extends BackActivity {
         preferences.add(new PreferenceSeparator(0, "Settings"));
         preferences.add(new PreferenceSwitch(1, "Keep screen on during form input"));
         preferences.add(new PreferenceSwitch(2, "Enable usage of mobile data"));
-        preferences.add(new PreferenceTitleSubtitle(3, "App language", "English"));
-        preferences.add(new PreferenceTitleSubtitle(4, "Image size", maxImgSizes[0]));
+        preferences.add(new PreferenceSpinner(3, "App language", R.array.app_languages,
+                0));
+        preferences.add(new PreferenceSpinner(4, "Image size", R.array.max_image_size_pref, 1));
         preferences.add(new PreferenceSeparator(5, "Data"));
         preferences.add(new PreferenceTitle(6, "Send submitted data points to Flow instance"));
         preferences.add(new PreferenceTitleSubtitle(7, "Delete collected data and images",
@@ -187,12 +191,35 @@ public class PreferenceActivity extends BackActivity {
         }
     }
 
+    public class PreferenceSpinner extends Preference {
+
+        @ArrayRes
+        private final int items;
+        private final int selectedItemPosition;
+
+        protected PreferenceSpinner(int id, String title, @ArrayRes int items,
+                int selectedItemPosition) {
+            super(id, title);
+            this.items = items;
+            this.selectedItemPosition = selectedItemPosition;
+        }
+
+        public int getItems() {
+            return items;
+        }
+
+        public int getSelectedItemPosition() {
+            return selectedItemPosition;
+        }
+    }
+
     public class PreferenceAdapter extends RecyclerView.Adapter<PreferenceViewHolder> {
 
         private static final int VIEW_TYPE_SEPARATOR = 0;
         private static final int VIEW_TYPE_TITLE = 1;
         private static final int VIEW_TYPE_TITLE_AND_SUBTITLE = 2;
         private static final int VIEW_TYPE_SWITCH = 3;
+        private static final int VIEW_TYPE_SPINNER = 4;
 
         @NonNull
         private final List<Preference> preferences;
@@ -221,6 +248,10 @@ public class PreferenceActivity extends BackActivity {
                     view = LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.preference_switch, parent, false);
                     return new SwitchPreferenceViewHolder(view);
+                case VIEW_TYPE_SPINNER:
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.preference_spinner, parent, false);
+                    return new SpinnerPreferenceViewHolder(view);
                 default:
                     throw new IllegalArgumentException("Wrong view type");
             }
@@ -237,6 +268,8 @@ public class PreferenceActivity extends BackActivity {
                 return VIEW_TYPE_TITLE_AND_SUBTITLE;
             } else if (preference instanceof PreferenceSwitch) {
                 return VIEW_TYPE_SWITCH;
+            } else if (preference instanceof PreferenceSpinner) {
+                return VIEW_TYPE_SPINNER;
             } else {
                 throw new IllegalArgumentException(
                         "invalid data found: " + preference.getClass().getSimpleName());
@@ -258,20 +291,29 @@ public class PreferenceActivity extends BackActivity {
     public abstract class PreferenceViewHolder<T extends Preference>
             extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.separator)
+        View separator;
+
         public PreferenceViewHolder(View itemView) {
             super(itemView);
         }
 
         public abstract void updateViews(T preference, int position);
+
+        protected void updateDivider(int position) {
+            //TODO: use ids!!!
+            if (position == 4 || position == 13 || position == 10 || position == 16) {
+                separator.setVisibility(View.GONE);
+            } else {
+                separator.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     public class SeparatorPreferenceViewHolder extends PreferenceViewHolder<PreferenceSeparator> {
 
         @BindView(R.id.title)
         TextView title;
-
-        @BindView(R.id.separator)
-        View separator;
 
         public SeparatorPreferenceViewHolder(View itemView) {
             super(itemView);
@@ -280,11 +322,7 @@ public class PreferenceActivity extends BackActivity {
 
         @Override
         public void updateViews(PreferenceSeparator preference, int position) {
-            if (position == 0) {
-                separator.setVisibility(View.GONE);
-            } else {
-                separator.setVisibility(View.VISIBLE);
-            }
+            updateDivider(position);
             title.setText(preference.getTitle());
         }
     }
@@ -294,9 +332,6 @@ public class PreferenceActivity extends BackActivity {
         @BindView(R.id.title)
         TextView title;
 
-        @BindView(R.id.separator)
-        View separator;
-
         public TitlePreferenceViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -304,23 +339,16 @@ public class PreferenceActivity extends BackActivity {
 
         @Override
         public void updateViews(PreferenceTitle preference, int position) {
+            updateDivider(position);
             title.setText(preference.getTitle());
-            //TODO: use ids!!!
-            if (position == 4 || position == 13 || position == 10) {
-                separator.setVisibility(View.GONE);
-            } else {
-                separator.setVisibility(View.VISIBLE);
-            }
         }
+
     }
 
     public class SwitchPreferenceViewHolder extends PreferenceViewHolder<PreferenceSwitch> {
 
         @BindView(R.id.switch_compat)
         SwitchCompat switchCompat;
-
-        @BindView(R.id.separator)
-        View separator;
 
         public SwitchPreferenceViewHolder(View itemView) {
             super(itemView);
@@ -329,13 +357,35 @@ public class PreferenceActivity extends BackActivity {
 
         @Override
         public void updateViews(PreferenceSwitch preference, int position) {
+            updateDivider(position);
             switchCompat.setText(preference.getTitle());
-            //TODO: use ids!!!
-            if (position == 4 || position == 7 || position == 10) {
-                separator.setVisibility(View.GONE);
-            } else {
-                separator.setVisibility(View.VISIBLE);
-            }
+        }
+    }
+
+    public class SpinnerPreferenceViewHolder
+            extends PreferenceViewHolder<PreferenceSpinner> {
+
+        @BindView(R.id.title)
+        TextView title;
+
+        @BindView(R.id.preference_spinner)
+        Spinner preferenceS;
+
+        public SpinnerPreferenceViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public void updateViews(PreferenceSpinner preference, int position) {
+            updateDivider(position);
+            title.setText(preference.getTitle());
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter
+                    .createFromResource(preferenceS.getContext(),
+                            preference.getItems(), android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            preferenceS.setAdapter(adapter);
+            preferenceS.setSelection(preference.getSelectedItemPosition());
         }
     }
 
@@ -358,14 +408,9 @@ public class PreferenceActivity extends BackActivity {
 
         @Override
         public void updateViews(PreferenceTitleSubtitle preference, int position) {
+            updateDivider(position);
             title.setText(preference.getTitle());
             subtitle.setText(preference.getSubtitle());
-            //TODO: use ids!!!
-            if (position == 4 || position == 7 || position == 10) {
-                separator.setVisibility(View.GONE);
-            } else {
-                separator.setVisibility(View.VISIBLE);
-            }
         }
     }
 }

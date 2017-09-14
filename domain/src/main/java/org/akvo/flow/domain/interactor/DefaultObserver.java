@@ -42,5 +42,4 @@ public class DefaultObserver<T> extends DisposableObserver<T> {
     public void onNext(T t) {
         // no-op by default.
     }
-
 }

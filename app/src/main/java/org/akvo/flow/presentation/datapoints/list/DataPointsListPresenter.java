@@ -25,7 +25,9 @@ import android.support.annotation.NonNull;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.SyncResult;
+import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -49,7 +51,8 @@ import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
 public class DataPointsListPresenter implements Presenter {
 
     private final UseCase getSavedDataPoints;
-    private final UseCase syncDataPoints;
+    private final SyncDataPoints syncDataPoints;
+    private final UseCase allowedToConnect;
     private final ListDataPointMapper mapper;
 
     private DataPointsListView view;
@@ -59,10 +62,12 @@ public class DataPointsListPresenter implements Presenter {
     private Double longitude;
 
     @Inject DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            ListDataPointMapper mapper, @Named("syncDataPoints") UseCase syncDataPoints) {
+            ListDataPointMapper mapper, SyncDataPoints syncDataPoints,
+            @Named("allowedToConnect") UseCase allowedToConnect) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.syncDataPoints = syncDataPoints;
+        this.allowedToConnect = allowedToConnect;
     }
 
     public void setView(@NonNull DataPointsListView view) {
@@ -122,6 +127,7 @@ public class DataPointsListPresenter implements Presenter {
     public void destroy() {
         getSavedDataPoints.dispose();
         syncDataPoints.dispose();
+        allowedToConnect.dispose();
     }
 
     void onSyncRecordsPressed() {
@@ -132,20 +138,32 @@ public class DataPointsListPresenter implements Presenter {
     }
 
     private void syncRecords(final long surveyGroupId) {
-        Map<String, Object> params = new HashMap<>(2);
-        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        syncDataPoints.execute(new DefaultObserver<SyncResult>() {
-
+        allowedToConnect.execute(new DefaultObserver<Boolean>() {
             @Override
-            public void onComplete() {
-                view.hideLoading();
+            public void onError(Throwable e) {
+                Timber.e(e); //should not happen
             }
 
             @Override
-            public void onError(Throwable e) {
-                Timber.e(e, "Error syncing %s", surveyGroupId);
+            public void onNext(Boolean aBoolean) {
+                if (aBoolean == null || !aBoolean) {
+                    view.hideLoading();
+                    view.showErrorSyncNotAllowed();
+                } else {
+                    sync(surveyGroupId);
+                }
+            }
+        }, null);
+
+    }
+
+    private void sync(final long surveyGroupId) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        syncDataPoints.execute(new DefaultFlowableObserver<SyncResult>() {
+            @Override
+            public void onComplete() {
                 view.hideLoading();
-                view.showErrorSync();
             }
 
             @Override
@@ -156,9 +174,6 @@ public class DataPointsListPresenter implements Presenter {
                     }
                 } else {
                     switch (result.getResultCode()) {
-                        case ERROR_SYNC_NOT_ALLOWED_OVER_3G:
-                            view.showErrorSyncNotAllowed();
-                            break;
                         case ERROR_NO_NETWORK:
                             view.showErrorNoNetwork();
                             break;
@@ -170,6 +185,13 @@ public class DataPointsListPresenter implements Presenter {
                             break;
                     }
                 }
+            }
+        }, new ErrorComposable() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e, "Error syncing %s", surveyGroupId);
+                view.hideLoading();
+                view.showErrorSync();
             }
         }, params);
     }

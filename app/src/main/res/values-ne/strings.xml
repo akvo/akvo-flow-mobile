@@ -46,8 +46,7 @@
   <string name="langoption">भाषाहरु</string>
   <string name="langmandatorytitle">गलत छनौट</string>
   <string name="langmandatorytext">तपाईंले कम्तीमा एउटा भाषा छान्नुपर्ने हुन्छ।</string>
-  <string name="pleasewait">कृपया पर्खनुहोस्।</string>
-  <string name="downloadsurveylabel">फारम डाउन्लोड गर्नुहोस्।</string>
+    <string name="downloadsurveylabel">फारम डाउन्लोड गर्नुहोस्।</string>
   <string name="downloadsurveydesc">अनियमित सर्भेहरु डाउन्लोड गर्दछ। (निर्देशन हुँदा मात्र प्रयोग गर्नुहोला)</string>
   <string name="downloadsurveyinstr">आफुले डाउनलोड गर्न चाहेको फारमको फारम आइ डि हाल्नुहोस्। </string>
   <string name="deletealldatawarning">यसले स्थाई रूपमा उपकरणमा भएका सबै डाटाहरु (सर्भेहरु, उतरहरु, तस्बिरहरु र प्रयोगकर्ताहरु) हटाउँछ। यो कार्य एक पल्ट गरेपछि सच्चाउन मिल्दैन। अघि बढ्न OK वा पछाडि जान Cancel थिच्नुहोस्।</string>
@@ -90,13 +89,14 @@
   <string name="sync">सिन्क गर्नुहोस्</string>
   <string name="sort">क्रममा मिलाउनुहोस्</string>
   <string name="stats">तथ्यान्क</string>
+    <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
   <string name="syncing_records">डाटा पोइन्टहरु सिँक हुँदैछन्...</string>
   <string name="synced_records">सिँक भएका %1$d डाटा पोइन्टहरु</string>
   <string name="sync_error">डाटा पोइन्टहरु सिँक भएनन्।</string>
   <string name="syncing_corrupted_data_points_error">कृपया फेरि सिन्क गर्नुहोस्।</string>
   <string name="network_error">नेटवर्क त्रुटि</string>
-  <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
   <string name="prefill_text">पहिलेको उतरहरुले फारम भर्न चाहनुहुन्छ?</string>
+    <!--Data sync-->
   <string name="error_assignment_text">Akvo Flow ड्यास्बोर्डमा assignment हरु चाहियो।</string>
   <!--Data sync-->
   <string name="data_sync_all">सिँक भएका फारमहरु %1$d - सिँक नभएका फारमहरु %2$d</string>
@@ -107,6 +107,7 @@
   <string name="app_language">एप्प्को भाषा</string>
   <string name="please_restart">कृपया एप्पलाई पुन: शुरु गर्नुहोस्।</string>
   <!--Empty Views-->
+  <!--ToolBar-->
   <string name="no_surveys_text">तपाईंलाई कुनै सर्भे तोकिएको छैन। सर्भेहरु ड्यास्बोर्डमा तोकिएको छ।</string>
   <string name="no_survey_selected_text">तपाईंको कुनै सर्भे छानिएको छैन। कुनै एक सर्भे छान्नको लागि साइडको मेनु खोल्नुहोस्।</string>
   <!--ToolBar-->
@@ -146,8 +147,7 @@
   <string name="image_location_reading">भू-अवस्थिती पढ्दै</string>
   <string name="image_location_saved">भू-अवस्थिती सेभ भयो।</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">डाटा प्वाईन्ट थप्नुहोस्</string>
-  <string name="stats_total">जम्मा डाटा प्वाइन्टहरु</string>
+    <string name="stats_total">जम्मा डाटा प्वाइन्टहरु</string>
   <string name="stats_week">गएको 7 दिन</string>
   <string name="stats_today">आज</string>
   <string name="distance_label">दूरी</string>

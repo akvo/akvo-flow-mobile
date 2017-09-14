@@ -25,7 +25,6 @@ import org.akvo.flow.domain.executor.ThreadExecutor;
 
 import java.util.Map;
 
-import dagger.internal.Preconditions;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -59,7 +58,6 @@ public abstract class UseCase {
 
     @SuppressWarnings("unchecked")
     public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
-        Preconditions.checkNotNull(observer);
         final Observable<T> observable = buildUseCaseObservable(parameters)
                 .subscribeOn(Schedulers.from(threadExecutor))
                 .observeOn(postExecutionThread.getScheduler());
@@ -68,13 +66,11 @@ public abstract class UseCase {
 
     public void dispose() {
         if (!disposables.isDisposed()) {
-            disposables.dispose();
+            disposables.clear();
         }
     }
 
     private void addDisposable(Disposable disposable) {
-        Preconditions.checkNotNull(disposable);
-        Preconditions.checkNotNull(disposables);
         disposables.add(disposable);
     }
 }

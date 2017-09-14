@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.sentry.android.gradle'
 
 repositories {
     mavenCentral()
@@ -59,7 +60,6 @@ android {
                     proguardFile 'proguard-files/proguard-glide.pro'
                     proguardFile 'proguard-files/proguard-google-play-services.pro'
                     proguardFile 'proguard-files/proguard-gson.pro'
-                    proguardFile 'proguard-files/proguard-jackson.pro'
                     proguardFile 'proguard-files/proguard-maps-utils.pro'
                     proguardFile 'proguard-files/proguard-prettytime.pro'
                     proguardFile 'proguard-files/proguard-sentry.pro'

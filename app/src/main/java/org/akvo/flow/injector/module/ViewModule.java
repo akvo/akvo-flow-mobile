@@ -20,10 +20,9 @@
 
 package org.akvo.flow.injector.module;
 
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -44,12 +43,6 @@ public class ViewModule {
     @Named("getSavedDataPoints")
     UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
         return getSavedDataPoints;
-    }
-
-    @Provides
-    @Named("syncDataPoints")
-    UseCase provideSyncDataPointsUseCase(SyncDataPoints syncDataPoints) {
-        return syncDataPoints;
     }
 
     @Provides

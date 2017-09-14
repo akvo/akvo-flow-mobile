@@ -94,6 +94,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     Navigator navigator;
 
     private ClusterManager<MapDataPoint> mClusterManager;
+    private boolean activityJustCreated;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -147,6 +148,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         presenter.onDataReady(surveyGroup);
         getMapAsync(this);
+        activityJustCreated = true;
     }
 
     private void initializeInjector() {
@@ -251,10 +253,10 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public void onResume() {
         super.onResume();
-        if (mItems.isEmpty()) {
-            // Make sure we only fetch the data and center the map once
+        if (!activityJustCreated) {
             presenter.loadDataPoints();
         }
+        activityJustCreated = false;
     }
 
     @Override

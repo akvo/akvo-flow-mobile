@@ -46,8 +46,7 @@
   <string name="langoption">Bahasa</string>
   <string name="langmandatorytitle">Pilihan Invalid</string>
   <string name="langmandatorytext">Anda harus memilih sedikitnya satu bahasa</string>
-  <string name="pleasewait">Mohon tunggu</string>
-  <string name="downloadsurveylabel">Mengunduh Formulir</string>
+    <string name="downloadsurveylabel">Mengunduh Formulir</string>
   <string name="downloadsurveydesc">Unduh survei (Jalankan jika diinstruksikan)</string>
   <string name="downloadsurveyinstr">Masukkan identitas formulir yang ingin Anda unduh.</string>
   <string name="deletealldatawarning">Proses ini akan menghapus semua data (survei, respon, gambar, dan pengguna) di perangkat ini secara permanen. Data yang hilang tidak akan dapat dikembalikan. Klik OK untuk melanjutkan atau batal untuk membatalkan</string>
@@ -89,12 +88,13 @@
   <string name="sync">Sinkronisasi</string>
   <string name="sort">Sortir</string>
   <string name="stats">Statistik</string>
+    <string name="prefill_title">Mengisi respons awal</string>
   <string name="syncing_records">Sinkronisasi Data Point...</string>
   <string name="synced_records">Menyinkronisasi %1$d Data Point</string>
   <string name="sync_error">Sinkronisasi Data Point gagal</string>
   <string name="network_error">Kesalahan Jaringan</string>
-  <string name="prefill_title">Mengisi respons awal</string>
   <string name="prefill_text">Mengisi formulir dengan jawaban sebelumnya?</string>
+    <!--Data sync-->
   <string name="error_assignment_text">Membutuhkan penugasan dalam dasbor Akvo Flow.</string>
   <!--Data sync-->
   <string name="data_sync_all">Sinkronisasi formulir: %1$d - Gagal: %2$d</string>
@@ -141,8 +141,7 @@
   <string name="image_location_reading">Membaca geolokasi</string>
   <string name="image_location_saved">Geolokasi telah tersimpan</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">Tambah Data</string>
-  <string name="stats_total">Total Data:</string>
+    <string name="stats_total">Total Data:</string>
   <string name="stats_week">7 hari terakhir</string>
   <string name="stats_today">Hari ini:</string>
   <string name="distance_label">Jarak:</string>

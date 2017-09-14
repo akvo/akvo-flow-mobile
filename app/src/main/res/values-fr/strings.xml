@@ -50,8 +50,7 @@
   <string name="langoption">Langues</string>
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
-  <string name="pleasewait">Veuillez attendre</string>
-  <string name="downloadsurveylabel">Téléchargement du formulaire</string>
+    <string name="downloadsurveylabel">Téléchargement du formulaire</string>
   <string name="downloadsurveydesc">Télécharger une enquête choisie (effectuer seulement si demandé)</string>
   <string name="downloadsurveyinstr">Indiquez l\'identifiant du formulaire à télécharger.</string>
   <string name="deletealldatawarning">Vous allez effacer définitivement toutes les données (enquêtes, données, images, et utilisateurs) de l\'appareil. Cette opération est irréversible.</string>
@@ -101,6 +100,7 @@
   <string name="network_error">Erreur de réseau</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
+    <!--Data sync-->
   <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_all">Formulaires synchronisés: %1$d - Echoués: %2$d</string>
@@ -111,6 +111,7 @@
   <string name="app_language">Langue de l\'application</string>
   <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
+  <!--ToolBar-->
   <string name="no_surveys_text">Aucune enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord Flow</string>
   <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
   <!--ToolBar-->
@@ -150,8 +151,7 @@
   <string name="image_location_reading">Lecture de la géolocalisation</string>
   <string name="image_location_saved">Géolocalisation enregistrée</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">Créer un point de donnée</string>
-  <string name="stats_total">Total de points:</string>
+    <string name="stats_total">Total de points:</string>
   <string name="stats_week">Les 7 derniers jours:</string>
   <string name="stats_today">Aujourd\'hui:</string>
   <string name="distance_label">Distance: </string>

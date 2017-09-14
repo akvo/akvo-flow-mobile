@@ -18,29 +18,18 @@
  *
  */
 
-package org.akvo.flow.domain.entity;
+package org.akvo.flow.domain.interactor;
 
-public class SyncResult {
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 
-    private final ResultCode resultCode;
-    private final int numberOfSyncedItems;
+public abstract class ErrorComposable implements Consumer<Throwable> {
 
-    public SyncResult(ResultCode resultCode, int numberOfSyncedItems) {
-        this.resultCode = resultCode;
-        this.numberOfSyncedItems = numberOfSyncedItems;
+
+    @Override
+    public void accept(@NonNull Throwable throwable) throws Exception {
+        onError(throwable);
     }
 
-    public ResultCode getResultCode() {
-        return resultCode;
-    }
-
-    public int getNumberOfSyncedItems() {
-        return numberOfSyncedItems;
-    }
-
-    public enum ResultCode {
-        SUCCESS,
-        ERROR_NO_NETWORK,
-        ERROR_ASSIGNMENT_MISSING
-    }
+    public abstract void onError(Throwable throwable);
 }

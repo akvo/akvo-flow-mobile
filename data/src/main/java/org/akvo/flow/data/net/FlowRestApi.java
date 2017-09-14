@@ -28,7 +28,7 @@ import org.akvo.flow.data.entity.ApiLocaleResult;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 
 @Singleton
 public class FlowRestApi {
@@ -48,7 +48,7 @@ public class FlowRestApi {
         this.encoder = encoder;
     }
 
-    public Observable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
+    public Flowable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
             @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
         String phoneNumber = encoder.encodeParam(this.phoneNumber);

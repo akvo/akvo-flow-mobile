@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.3.7.1
+Date: 06 September 2017
+
+# Resolved issues
+* **For only monitoring assignments, cannot submit a form if no previous monitoring ones submitted** - [#855](https://github.com/akvo/akvo-flow-mobile/issues/855) Once the registration form has been submitted, you can create monitoring forms even if the registration form has not been assigned to your device.
+
+---------------
 # ver 2.3.7
 Date: 31 August 2017
 

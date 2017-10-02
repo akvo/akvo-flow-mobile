@@ -20,7 +20,7 @@
 
 package org.akvo.flow.data.loader.models;
 
-public class SurveyInfo {
+public class FormInfo {
 
     private final String id;
     private final String name;
@@ -28,15 +28,17 @@ public class SurveyInfo {
     private final Long lastSubmission;
     private final boolean deleted;
     private final boolean isRegistrationSurvey;
+    private final boolean submittedDataPoint;
 
-    public SurveyInfo(String id, String name, String version, Long lastSubmission,
-            boolean deleted, boolean isRegistrationSurvey) {
+    public FormInfo(String id, String name, String version, Long lastSubmission,
+            boolean deleted, boolean isRegistrationSurvey, boolean submittedDataPoint) {
         this.id = id;
         this.name = name;
         this.version = version;
         this.lastSubmission = lastSubmission;
         this.deleted = deleted;
         this.isRegistrationSurvey = isRegistrationSurvey;
+        this.submittedDataPoint = submittedDataPoint;
     }
 
     public String getId() {
@@ -59,7 +61,16 @@ public class SurveyInfo {
         return deleted;
     }
 
-    public boolean isRegistrationSurvey() {
+    public boolean isRegistrationForm() {
         return isRegistrationSurvey;
     }
+
+    public boolean isSubmittedDataPoint() {
+        return submittedDataPoint;
+    }
+
+    public boolean hasBeenSubmitted() {
+        return lastSubmission != null && lastSubmission != 0L;
+    }
+
 }

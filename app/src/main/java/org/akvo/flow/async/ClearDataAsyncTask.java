@@ -61,7 +61,9 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
             // External storage
             clearExternalStorage(responsesOnly);
-            clearUserPreferences();
+            if (!responsesOnly) {
+                clearUserPreferences();
+            }
         } catch (SQLException e) {
             Timber.e(e.getMessage());
             ok = false;

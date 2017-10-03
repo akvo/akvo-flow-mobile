@@ -23,15 +23,14 @@ package org.akvo.flow.util;
 import android.content.Context;
 import android.text.TextUtils;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.data.preference.Prefs;
 
 public class ServerManager {
 
-    private final Context context;
     private Prefs prefs;
 
     public ServerManager(Context context) {
-        this.context = context;
         this.prefs = new Prefs(context);
     }
 
@@ -44,15 +43,13 @@ public class ServerManager {
     public String getServerBase() {
         String serverBase = prefs.getString(Prefs.KEY_BACKEND_SERVER, null);
         if (TextUtils.isEmpty(serverBase)) {
-            serverBase = new PropertyUtil(context.getResources())
-                    .getProperty(ConstantUtil.SERVER_BASE);
+            serverBase = BuildConfig.SERVER_BASE;
         }
         return serverBase;
     }
 
 
     public String getApiKey() {
-        PropertyUtil props = new PropertyUtil(context.getResources());
-        return props.getProperty(ConstantUtil.API_KEY);
+        return BuildConfig.API_KEY;
     }
 }

@@ -1,9 +1,28 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'jacoco'
 
 repositories {
     mavenCentral()
     jcenter()
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testFlowDebugUnitTest', 'createFlowDebugCoverageReport']) {
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "$project.buildDir/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: project.buildDir, includes: [
+            'jacoco/testFlowDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
+    ])
 }
 
 android {
@@ -56,6 +75,9 @@ android {
                 release {
                     signingConfig signingConfigs.flowRelease
                 }
+                debug {
+                    testCoverageEnabled true
+                }
             }
         }
         packagingOptions {
@@ -83,6 +105,11 @@ android {
 
         testOptions {
             unitTests.returnDefaultValues = true
+            unitTests.all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
 
         lintOptions {

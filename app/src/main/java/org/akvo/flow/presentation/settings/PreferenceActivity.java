@@ -45,6 +45,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import javax.inject.Inject;
@@ -121,6 +122,12 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     private void setUpPreferences() {
         //TODO: retrieve values in preferences
         instanceNameTv.setText(BuildConfig.INSTANCE_URL);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
     }
 
     @OnClick(R.id.send_data_points)
@@ -224,6 +231,28 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
                 builder.show();
             }
         });
+    }
+
+    @OnClick(R.id.preference_gps_fixes)
+    void onGpsFixesTap() {
+        try {
+            Intent i = new Intent(ConstantUtil.GPS_STATUS_INTENT);
+            startActivity(i);
+        } catch (Exception e) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.nogpsstatus);
+            builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
+        }
+    }
+
+    @OnClick(R.id.preference_storage)
+    void onCheckSdCardStateOptionTap() {
+        navigator.navigateToStorageSettings(this);
     }
 
     /**

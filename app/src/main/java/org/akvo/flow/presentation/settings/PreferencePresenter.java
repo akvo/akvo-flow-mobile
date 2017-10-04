@@ -22,7 +22,13 @@ package org.akvo.flow.presentation.settings;
 
 import org.akvo.flow.presentation.Presenter;
 
+import javax.inject.Inject;
+
 public class PreferencePresenter implements Presenter {
+
+    @Inject
+    public PreferencePresenter() {
+    }
 
     @Override
     public void destroy() {

@@ -85,6 +85,7 @@
                     style="@style/PreferenceSectionTitleStyle"/>
 
             <TextView
+                    android:id="@+id/send_data_points"
                     android:text="@string/preference_sync_datapoints"
                     style="@style/PreferenceTitleStyle"
                     android:paddingBottom="8dp"/>

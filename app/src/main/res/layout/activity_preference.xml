@@ -24,11 +24,169 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-            android:id="@+id/preferences_rv"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+            <TextView
+                    android:text="@string/preferences_settings_section"
+                    style="@style/PreferenceSectionTitleStyle"/>
+
+            <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switch_screen_on"
+                    android:text="@string/preference_screen_on"
+                    style="@style/PreferenceSwitch"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switch_enable_data"
+                    android:text="@string/preference_mobile_data"
+                    style="@style/PreferenceSwitch"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:text="@string/preference_app_language"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <Spinner
+                    android:entries="@array/app_languages"
+                    android:id="@+id/preference_language"
+                    style="@style/PreferenceSpinnerStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:text="@string/preference_image_size"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <Spinner
+                    android:entries="@array/max_image_size_pref"
+                    android:id="@+id/preference_image_size"
+                    style="@style/PreferenceSpinnerStyle"/>
+
+            <View
+                    style="@style/PreferenceSectionSeparator"/>
+
+            <TextView
+                    android:text="@string/preferences_data_section"
+                    style="@style/PreferenceSectionTitleStyle"/>
+
+            <TextView
+                    android:text="@string/preference_sync_datapoints"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="8dp"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:id="@+id/preference_delete_collected_data_title"
+                    android:text="@string/preference_delete_collected_data"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_delete_collected_data_subtitle"
+                    android:text="@string/reset_responses_desc"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+            <TextView
+                    android:id="@+id/preference_delete_everything_title"
+                    android:text="@string/preference_delete_everything"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_delete_everything_subtitle"
+                    android:text="@string/resetalldesc"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+            <TextView
+                    android:id="@+id/preference_download_form_title"
+                    android:text="@string/preference_download_form_title"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_download_form_subtitle"
+                    android:text="@string/preference_download_form_subtitle"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+            <TextView
+                    android:id="@+id/preference_reload_forms_title"
+                    android:text="@string/reloadsurveyslabel"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_reload_forms_subtitle"
+                    android:text="@string/reloadsurveysdesc"
+                    style="@style/PreferenceSubtitleStyle"/>
+            <View
+                    style="@style/PreferenceSectionSeparator"/>
+
+            <TextView
+                    android:text="@string/preferences_configuration_section"
+                    style="@style/PreferenceSectionTitleStyle"/>
+            <TextView
+                    android:id="@+id/preference_gps_fixes"
+                    android:text="@string/preference_gps"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="8dp"/>
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+            <TextView
+                    android:id="@+id/preference_storage"
+                    android:text="@string/preference_storage"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="8dp"/>
+            <View
+                    style="@style/PreferenceSectionSeparator"/>
+
+            <TextView
+                    android:text="@string/preferences_section_information"
+                    style="@style/PreferenceSectionTitleStyle"/>
+            <TextView
+                    android:text="@string/preference_identifier"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_identifier_value"
+                    tools:text="valeria"
+                    style="@style/PreferenceSubtitleStyle"/>
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+            <TextView
+                    android:text="@string/preference_instance_name"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_instance_value"
+                    tools:text="https://some_instance.akvoflow.org"
+                    style="@style/PreferenceSubtitleStyle"/>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
     <View
             android:id="@+id/toolbar_shadow"

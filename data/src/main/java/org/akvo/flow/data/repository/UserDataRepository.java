@@ -61,4 +61,24 @@ public class UserDataRepository implements UserRepository {
     public Observable<String> getDeviceId() {
         return dataSourceFactory.getSharedPreferencesDataSource().getDeviceId();
     }
+
+    @Override
+    public Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveScreenOn(keepScreenOn);
+    }
+
+    @Override
+    public Observable<Boolean> saveEnableMobileDataPreference(Boolean enable) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveEnableMobileData(enable);
+    }
+
+    @Override
+    public Observable<Boolean> saveLanguagePreference(String language) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveLanguage(language);
+    }
+
+    @Override
+    public Observable<Boolean> saveImageSizePreference(Integer size) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveImageSize(size);
+    }
 }

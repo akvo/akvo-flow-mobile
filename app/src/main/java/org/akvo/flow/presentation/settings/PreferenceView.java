@@ -27,4 +27,6 @@ public interface PreferenceView {
     void hideLoading();
 
     void displaySettings(ViewUserSettings viewUserSettings);
+
+    void displayLanguageChanged(String language);
 }

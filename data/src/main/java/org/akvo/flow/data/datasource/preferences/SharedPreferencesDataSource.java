@@ -80,4 +80,35 @@ public class SharedPreferencesDataSource {
         return preferences.getString(key, defaultValue);
     }
 
+    private void setString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
+    }
+
+    private void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
+    }
+
+    private void setInt(String key, int value) {
+        preferences.edit().putInt(key, value).apply();
+    }
+
+    public Observable<Boolean> saveScreenOn(Boolean keepScreenOn) {
+        setBoolean(KEY_SCREEN_ON, keepScreenOn);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> saveEnableMobileData(Boolean enable) {
+        setBoolean(KEY_CELL_UPLOAD, enable);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> saveLanguage(String language) {
+        setString(KEY_LOCALE, language);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> saveImageSize(Integer size) {
+        setInt(KEY_MAX_IMG_SIZE, size);
+        return Observable.just(true);
+    }
 }

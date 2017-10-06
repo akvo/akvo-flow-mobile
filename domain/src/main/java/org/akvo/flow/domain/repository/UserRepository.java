@@ -34,4 +34,11 @@ public interface UserRepository {
 
     Observable<String> getDeviceId();
 
+    Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn);
+
+    Observable<Boolean> saveEnableMobileDataPreference(Boolean enable);
+
+    Observable<Boolean> saveLanguagePreference(String language);
+
+    Observable<Boolean> saveImageSizePreference(Integer size);
 }

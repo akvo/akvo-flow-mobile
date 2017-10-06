@@ -24,6 +24,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.SQLException;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -57,12 +58,15 @@ import org.akvo.flow.util.ViewUtil;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnItemSelected;
 import timber.log.Timber;
 
 public class PreferenceActivity extends BackActivity implements PreferenceView {
@@ -100,6 +104,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     @Inject
     PreferencePresenter presenter;
 
+    private List<String> languages;
+    private boolean trackChanges = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,8 +116,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         setupToolBar();
         setUpToolBarAnimationListener();
         updateProgressDrawable();
-        List<String> languages = Arrays
-                .asList(getResources().getStringArray(R.array.app_language_codes));
+        languages = Arrays.asList(getResources().getStringArray(R.array.app_language_codes));
         presenter.setView(this);
         presenter.loadPreferences(languages);
     }
@@ -290,6 +296,33 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         navigator.navigateToStorageSettings(this);
     }
 
+    @OnCheckedChanged(R.id.switch_enable_data)
+    void onDataCheckChanged(boolean checked) {
+        if (trackChanges) {
+            presenter.saveEnableMobileData(checked);
+        }
+    }
+
+    @OnCheckedChanged(R.id.switch_screen_on)
+    void onScreenOnCheckChanged(boolean checked) {
+        if (trackChanges) {
+            presenter.saveKeepScreenOn(checked);
+        }
+    }
+
+    @OnItemSelected(R.id.preference_language)
+    void onLanguageSelected(int position) {
+        if (trackChanges) {
+            Timber.d("app language changed");
+            presenter.saveAppLanguage(position, languages);
+        }
+    }
+
+    @OnItemSelected(R.id.preference_image_size)
+    void onImageSizeSelected(int position) {
+        presenter.saveImageSize(position);
+    }
+
     /**
      * Permanently deletes data from the device. If unsubmitted data is found on
      * the database, the user will be prompted with a message to confirm the
@@ -362,5 +395,29 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         enableDataSc.setChecked(viewUserSettings.isDataEnabled());
         appLanguageSp.setSelection(viewUserSettings.getLanguage());
         imageSizeSp.setSelection(viewUserSettings.getImageSize());
+        delayListeners();
+    }
+
+    /**
+     * Delay enabling listeners in order to give ui time to draw spinners
+     */
+    private void delayListeners() {
+        appLanguageSp.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                trackChanges = true;
+            }
+        }, 50);
+    }
+
+    @Override
+    public void displayLanguageChanged(String languageCode) {
+        Locale locale = new Locale(languageCode);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getResources().updateConfiguration(config, null);
+        Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
+                .show();
     }
 }

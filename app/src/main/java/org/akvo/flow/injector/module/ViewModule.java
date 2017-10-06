@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.UseCase;
 
@@ -42,5 +43,11 @@ public class ViewModule {
     @Named("allowedToConnect")
     UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
         return allowedToConnect;
+    }
+
+    @Provides
+    @Named("getUserSettings")
+    UseCase provideGetUserSettings(GetUserSettings getUserSettings) {
+        return getUserSettings;
     }
 }

@@ -195,4 +195,16 @@
             android:layout_height="6dp"
             android:layout_width="match_parent"
             android:background="@drawable/shadow_background"/>
+
+    <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_gravity="center"
+            android:padding="2dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/progress_circle_background"
+            android:elevation="2dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 </android.support.design.widget.CoordinatorLayout>

@@ -30,8 +30,16 @@ import rx.Observable;
 @Singleton
 public class SharedPreferencesDataSource {
 
-    private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    public static final String KEY_LOCALE = "pref.locale";
+    public static final String KEY_SCREEN_ON = "screen.keepon";
+    public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
+    public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
+
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
+    public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
+    public static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
+    public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
 
     private final SharedPreferences preferences;
 
@@ -44,7 +52,32 @@ public class SharedPreferencesDataSource {
         return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
     }
 
-    public boolean getBoolean(String key, boolean defValue) {
+    public Observable<Boolean> keepScreenOn() {
+        return Observable.just(getBoolean(KEY_SCREEN_ON, DEFAULT_VALUE_SCREEN_ON));
+    }
+
+    public Observable<String> getAppLanguage() {
+        return Observable.just(getString(KEY_LOCALE, ""));
+    }
+
+    public Observable<Integer> getImageSize() {
+        return Observable.just(getInt(KEY_MAX_IMG_SIZE, DEFAULT_VALUE_IMAGE_SIZE));
+    }
+
+    public Observable<String> getDeviceId() {
+        return Observable.just(getString(KEY_DEVICE_IDENTIFIER, DEFAULT_VALUE_DEVICE_IDENTIFIER));
+    }
+
+    private int getInt(String key, int defaultValue) {
+        return preferences.getInt(key, defaultValue);
+    }
+
+    private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
     }
+
+    private String getString(String key, String defaultValue) {
+        return preferences.getString(key, defaultValue);
+    }
+
 }

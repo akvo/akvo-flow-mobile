@@ -21,4 +21,10 @@
 package org.akvo.flow.presentation.settings;
 
 public interface PreferenceView {
+
+    void showLoading();
+
+    void hideLoading();
+
+    void displaySettings(ViewUserSettings viewUserSettings);
 }

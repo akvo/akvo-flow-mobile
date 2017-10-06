@@ -20,22 +20,48 @@
 
 package org.akvo.flow.presentation.settings;
 
+import org.akvo.flow.domain.entity.UserSettings;
+import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
+import java.util.List;
+
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class PreferencePresenter implements Presenter {
 
+    private final UseCase getUserSettings;
+    private final ViewUserSettingsMapper mapper;
+
+    private PreferenceView view;
+
     @Inject
-    public PreferencePresenter() {
+    public PreferencePresenter(@Named("getUserSettings") UseCase getUserSettings,
+            ViewUserSettingsMapper mapper) {
+        this.getUserSettings = getUserSettings;
+        this.mapper = mapper;
+    }
+
+    public void setView(PreferenceView view) {
+        this.view = view;
+    }
+
+    public void loadPreferences(final List<String> languages) {
+        view.showLoading();
+        getUserSettings.execute(new DefaultSubscriber<UserSettings>() {
+            @Override
+            public void onNext(UserSettings userSettings) {
+                ViewUserSettings viewUserSettings = mapper.transform(userSettings, languages);
+                view.hideLoading();
+                view.displaySettings(viewUserSettings);
+            }
+        }, null);
     }
 
     @Override
     public void destroy() {
-        //TODO:
-    }
-
-    public void deleteResponses() {
-
+        getUserSettings.unSubscribe();
     }
 }

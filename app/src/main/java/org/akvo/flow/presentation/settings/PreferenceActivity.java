@@ -25,12 +25,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.SQLException;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +54,9 @@ import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
+
+import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -72,6 +82,21 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     @BindView(R.id.preference_instance_value)
     TextView instanceNameTv;
 
+    @BindView(R.id.progress)
+    ProgressBar progressBar;
+
+    @BindView(R.id.switch_screen_on)
+    SwitchCompat screenOnSc;
+
+    @BindView(R.id.switch_enable_data)
+    SwitchCompat enableDataSc;
+
+    @BindView(R.id.preference_language)
+    Spinner appLanguageSp;
+
+    @BindView(R.id.preference_image_size)
+    Spinner imageSizeSp;
+
     @Inject
     PreferencePresenter presenter;
 
@@ -83,7 +108,11 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         initializeInjector();
         setupToolBar();
         setUpToolBarAnimationListener();
-        setUpPreferences();
+        updateProgressDrawable();
+        List<String> languages = Arrays
+                .asList(getResources().getStringArray(R.array.app_language_codes));
+        presenter.setView(this);
+        presenter.loadPreferences(languages);
     }
 
     private void setUpToolBarAnimationListener() {
@@ -113,15 +142,21 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         });
     }
 
+    private void updateProgressDrawable() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            Drawable progressDrawable = progressBar.getIndeterminateDrawable();
+            if (progressDrawable != null) {
+                progressDrawable
+                        .setColorFilter(ContextCompat.getColor(this, R.color.colorAccent),
+                                PorterDuff.Mode.MULTIPLY);
+            }
+        }
+    }
+
     private void initializeInjector() {
         ViewComponent viewComponent = DaggerViewComponent.builder()
                 .applicationComponent(getApplicationComponent()).build();
         viewComponent.inject(this);
-    }
-
-    private void setUpPreferences() {
-        //TODO: retrieve values in preferences
-        instanceNameTv.setText(BuildConfig.INSTANCE_URL);
     }
 
     @Override
@@ -307,5 +342,25 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         } finally {
             db.close();
         }
+    }
+
+    @Override
+    public void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void displaySettings(ViewUserSettings viewUserSettings) {
+        instanceNameTv.setText(BuildConfig.INSTANCE_URL);
+        deviceIdentifierTv.setText(viewUserSettings.getIdentifier());
+        screenOnSc.setChecked(viewUserSettings.isScreenOn());
+        enableDataSc.setChecked(viewUserSettings.isDataEnabled());
+        appLanguageSp.setSelection(viewUserSettings.getLanguage());
+        imageSizeSp.setSelection(viewUserSettings.getImageSize());
     }
 }

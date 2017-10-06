@@ -25,4 +25,13 @@ import rx.Observable;
 public interface UserRepository {
 
     Observable<Boolean> mobileSyncAllowed();
+
+    Observable<Boolean> keepScreenOn();
+
+    Observable<String> getAppLanguage();
+
+    Observable<Integer> getImageSize();
+
+    Observable<String> getDeviceId();
+
 }

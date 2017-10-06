@@ -117,7 +117,7 @@ public class HelpActivity extends BackActivity implements HelpView {
                 .setAction(R.string.settings, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        navigator.navigateToPreferences(HelpActivity.this);
+                        navigator.navigateToAppSettings(HelpActivity.this);
                     }
                 }).show();
     }

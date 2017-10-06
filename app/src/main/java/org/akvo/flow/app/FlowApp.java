@@ -42,9 +42,6 @@ import javax.inject.Inject;
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
 
-    //TODO: use shared pref?
-    private Locale mLocale;
-
     private User mUser;
     private Prefs prefs;
 
@@ -96,14 +93,15 @@ public class FlowApp extends Application {
         // is not very 'clean', but Android makes it really hard to
         // customize an application wide locale.
         String languageCode = loadLocalePref();
+        Locale savedLocale = null;
         if (!TextUtils.isEmpty(languageCode)) {
-            mLocale = new Locale(languageCode);
+            savedLocale = new Locale(languageCode);
         }
-        if (mLocale != null && !mLocale.getLanguage().equalsIgnoreCase(
+        if (savedLocale != null && !savedLocale.getLanguage().equalsIgnoreCase(
                 newConfig.locale.getLanguage())) {
             // Re-enable our custom locale, using this newConfig reference
-            newConfig.locale = mLocale;
-            Locale.setDefault(mLocale);
+            newConfig.locale = savedLocale;
+            Locale.setDefault(savedLocale);
             getBaseContext().getResources().updateConfiguration(newConfig, null);
         }
     }
@@ -119,21 +117,6 @@ public class FlowApp extends Application {
 
     public User getUser() {
         return mUser;
-    }
-
-    public String getAppLanguageCode() {
-        return mLocale.getLanguage();
-    }
-
-    public String getAppDisplayLanguage() {
-        String lang = mLocale.getDisplayLanguage();
-        if (!TextUtils.isEmpty(lang)) {
-            // Ensure the first letter is upper case
-            char[] strArray = lang.toCharArray();
-            strArray[0] = Character.toUpperCase(strArray[0]);
-            lang = new String(strArray);
-        }
-        return lang;
     }
 
     /**
@@ -160,15 +143,6 @@ public class FlowApp extends Application {
         }
 
         database.close();
-    }
-
-    public void setAppLanguage(String language) {
-        // Override system locale
-        mLocale = new Locale(language);
-        Locale.setDefault(mLocale);
-        Configuration config = getBaseContext().getResources().getConfiguration();
-        config.locale = mLocale;
-        getBaseContext().getResources().updateConfiguration(config, null);
     }
 
     @Nullable

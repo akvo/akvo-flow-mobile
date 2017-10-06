@@ -39,7 +39,6 @@ import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
-import org.akvo.flow.activity.PreferencesActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
@@ -250,11 +249,5 @@ public class Navigator {
 
     public void navigateToHelp(@NonNull Context context) {
         context.startActivity(new Intent(context, HelpActivity.class));
-    }
-
-    public void navigateToPreferences(@Nullable Context context) {
-        if (context != null) {
-            context.startActivity(new Intent(context, PreferencesActivity.class));
-        }
     }
 }

@@ -54,14 +54,6 @@
                 android:configChanges="keyboardHidden|orientation|screenSize|locale|layoutDirection"
                 android:windowSoftInputMode="adjustResize"/>
         <activity
-                android:name=".activity.SettingsActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/preferences_settings_section"/>
-        <activity
-                android:name=".activity.PreferencesActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/prefoptlabel"/>
-        <activity
                 android:name=".activity.TransmissionHistoryActivity"
                 android:configChanges="locale|layoutDirection"
                 android:label="@string/transmissionhist"/>

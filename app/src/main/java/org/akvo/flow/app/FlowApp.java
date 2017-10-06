@@ -24,9 +24,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.widget.Toast;
 
-import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.database.UserColumns;
 import org.akvo.flow.data.preference.Prefs;
@@ -35,10 +33,8 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.logging.LoggingHelper;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -99,6 +95,10 @@ public class FlowApp extends Application {
         // to enable our custom locale again. Note that this approach
         // is not very 'clean', but Android makes it really hard to
         // customize an application wide locale.
+        String languageCode = loadLocalePref();
+        if (!TextUtils.isEmpty(languageCode)) {
+            mLocale = new Locale(languageCode);
+        }
         if (mLocale != null && !mLocale.getLanguage().equalsIgnoreCase(
                 newConfig.locale.getLanguage())) {
             // Re-enable our custom locale, using this newConfig reference
@@ -109,22 +109,6 @@ public class FlowApp extends Application {
     }
 
     private void init() {
-        // Load custom locale into the app. If the locale has not previously been configured
-        // check if the device has a compatible language active. Otherwise, fall back to English
-        String language = loadLocalePref();
-
-        //TODO: this is not necessary as by default locale is english anyway
-        if (TextUtils.isEmpty(language)) {
-            language = Locale.getDefault().getLanguage();
-            // Is that available in our language list?
-            if (!Arrays.asList(getResources().getStringArray(R.array.app_language_codes))
-                    .contains(language)) {
-                language = ConstantUtil.ENGLISH_CODE;// TODO: Move this constant to @strings
-            }
-        }
-        //TODO: only set the language if it is different than the device locale
-        setAppLanguage(language, false);
-
         loadLastUser();
     }
 
@@ -178,30 +162,17 @@ public class FlowApp extends Application {
         database.close();
     }
 
-    public void setAppLanguage(String language, boolean requireRestart) {
+    public void setAppLanguage(String language) {
         // Override system locale
         mLocale = new Locale(language);
         Locale.setDefault(mLocale);
         Configuration config = getBaseContext().getResources().getConfiguration();
         config.locale = mLocale;
         getBaseContext().getResources().updateConfiguration(config, null);
-
-        // Save it in the preferences
-        saveLocalePref(language);
-
-        if (requireRestart) {
-            Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
-                    .show();
-        }
     }
 
     @Nullable
     private String loadLocalePref() {
         return prefs.getString(Prefs.KEY_LOCALE, null);
     }
-
-    private void saveLocalePref(String language) {
-        prefs.setString(Prefs.KEY_LOCALE, language);
-    }
-
 }

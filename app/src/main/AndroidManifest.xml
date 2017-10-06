@@ -124,17 +124,22 @@
 
         <activity
                 android:name=".presentation.AboutActivity"
+                android:configChanges="locale"
                 android:label="@string/about_activity_title">
         </activity>
         <activity
                 android:name=".presentation.help.HelpActivity"
+                android:configChanges="locale"
                 android:label="@string/help">
         </activity>
         <activity
                 android:name=".presentation.legal.LegalNoticesActivity"
+                android:configChanges="locale"
                 android:label="@string/licences_title">
         </activity>
-        <activity android:name=".presentation.settings.PreferenceActivity">
+        <activity
+                android:name=".presentation.settings.PreferenceActivity"
+                android:configChanges="locale">
         </activity>
     </application>
 

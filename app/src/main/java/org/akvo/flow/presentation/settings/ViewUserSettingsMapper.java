@@ -22,14 +22,19 @@ package org.akvo.flow.presentation.settings;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.akvo.flow.domain.entity.UserSettings;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
 public class ViewUserSettingsMapper {
+
+    public static final String DEFAULT_LANGUAGE = "en";
+    public static final int INVALID_LANGUAGE = -1;
 
     @Inject
     public ViewUserSettingsMapper() {
@@ -38,22 +43,33 @@ public class ViewUserSettingsMapper {
     public ViewUserSettings transform(@Nullable UserSettings userSettings,
             @NonNull List<String> languages) {
         if (userSettings == null) {
-            int englishPosition = getLanguagePosition(languages, "en");
+            int englishPosition = getEnglishLanguagePosition(languages);
             return new ViewUserSettings(false, false, englishPosition, 0, "");
         }
+        String language = userSettings.getLanguage();
+        if (TextUtils.isEmpty(language)) {
+            language = Locale.getDefault().getLanguage();
+        }
+        int languagePosition = getLanguagePosition(languages, language);
         return new ViewUserSettings(userSettings.isScreenOn(), userSettings.isDataEnabled(),
-                getLanguagePosition(languages, userSettings.getLanguage()),
-                userSettings.getImageSize(), userSettings.getIdentifier());
+                languagePosition, userSettings.getImageSize(), userSettings.getIdentifier());
     }
 
     private int getLanguagePosition(@NonNull List<String> languages, String language) {
-        int languagePosition = 0;
+        int languagePosition = INVALID_LANGUAGE;
         for (int i = 0; i < languages.size(); i++) {
             if (language.equals(languages.get(i))) {
                 languagePosition = i;
                 break;
             }
         }
+        if (languagePosition == INVALID_LANGUAGE) {
+            languagePosition = getEnglishLanguagePosition(languages);
+        }
         return languagePosition;
+    }
+
+    private int getEnglishLanguagePosition(@NonNull List<String> languages) {
+        return getLanguagePosition(languages, DEFAULT_LANGUAGE);
     }
 }

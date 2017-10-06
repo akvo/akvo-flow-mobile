@@ -407,17 +407,21 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
             public void run() {
                 trackChanges = true;
             }
-        }, 50);
+        }, 500);
     }
 
     @Override
     public void displayLanguageChanged(String languageCode) {
-        Locale locale = new Locale(languageCode);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        getResources().updateConfiguration(config, null);
+        updateLocale(languageCode);
         Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
                 .show();
+    }
+
+    private void updateLocale(String languageCode) {
+        Locale locale = new Locale(languageCode);
+        Locale.setDefault(locale);
+        Configuration config = getBaseContext().getResources().getConfiguration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config, null);
     }
 }

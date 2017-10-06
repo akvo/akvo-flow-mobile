@@ -201,7 +201,7 @@ public class PreferencesActivity extends BackActivity implements OnClickListener
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        FlowApp.getApp().setAppLanguage(languageCodes[which], true);
+                        FlowApp.getApp().setAppLanguage(languageCodes[which]);
                     }
                 }
         );

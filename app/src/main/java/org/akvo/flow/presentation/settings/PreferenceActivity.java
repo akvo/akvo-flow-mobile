@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.SQLException;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -176,14 +177,12 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         Intent i = new Intent(this, DataSyncService.class);
         getApplicationContext().startService(i);
         finish();
-        //TODO: display some confirmation to the user
     }
 
     @OnClick({R.id.preference_delete_collected_data_title,
             R.id.preference_delete_collected_data_subtitle
     })
     void onDeleteCollectedDataTap() {
-        //TODO: refactor
         ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
             @Override
             public void onAuthenticated() {
@@ -196,7 +195,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
             R.id.preference_delete_everything_subtitle
     })
     void onDeleteAllTap() {
-        //TODO: refactor
         ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
             @Override
             public void onAuthenticated() {
@@ -217,9 +215,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
                 inputDialog.setTitle(R.string.downloadsurveylabel);
                 inputDialog.setMessage(R.string.downloadsurveyinstr);
 
-                // Set an EditText view to get user input
                 final EditText input = new EditText(PreferenceActivity.this);
-
                 input.setKeyListener(new DigitsKeyListener(false, false));
                 inputDialog.setView(input);
                 inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
@@ -236,7 +232,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
 
                 inputDialog.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        // Canceled.
+                        dialog.dismiss();
                     }
                 });
 
@@ -313,7 +309,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     @OnItemSelected(R.id.preference_language)
     void onLanguageSelected(int position) {
         if (trackChanges) {
-            Timber.d("app language changed");
             presenter.saveAppLanguage(position, languages);
         }
     }
@@ -420,8 +415,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     private void updateLocale(String languageCode) {
         Locale locale = new Locale(languageCode);
         Locale.setDefault(locale);
-        Configuration config = getBaseContext().getResources().getConfiguration();
+        Resources resources = getBaseContext().getResources();
+        Configuration config = resources.getConfiguration();
         config.locale = locale;
-        getBaseContext().getResources().updateConfiguration(config, null);
+        resources.updateConfiguration(config, null);
     }
 }

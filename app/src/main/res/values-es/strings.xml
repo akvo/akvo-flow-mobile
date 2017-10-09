@@ -16,7 +16,7 @@
   <string name="geodialog">Habilita el acceso a la ubicación</string>
   <string name="settings">Ajustes</string>
   <string name="resize_large_images">Reducir imágenes grandes</string>
-  <string name="settingslabel">Ajustes</string>
+  <string name="preferences_settings_section">Ajustes</string>
   <string name="prefoptlabel">Ajustes</string>
   <string name="prefoptdesc">Seleccionar el idioma predeterminado y otras opciones</string>
   <string name="sendoptlabel">Sincronizar datos</string>

@@ -12,7 +12,7 @@
   <string name="elevation"> उचाइ</string>
   <string name="submitbutton">बुझाउनुहोस्।</string>
   <string name="resize_large_images">ठुलो तस्बिरहरुको नाप मिलाउनुहोस्</string>
-  <string name="settingslabel">सेटीङ्स्</string>
+  <string name="preferences_settings_section">सेटीङ्स्</string>
   <string name="prefoptlabel">छनौट</string>
   <string name="prefoptdesc">पुर्व निर्धारित सर्भे भाषा तथा छनौटहरु राख्नुहोस्। </string>
   <string name="sendoptlabel">डाटा सिन्क गर्नुहोस्</string>

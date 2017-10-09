@@ -12,7 +12,7 @@
   <string name="elevation">Ketinggian</string>
   <string name="submitbutton">Kirim</string>
   <string name="resize_large_images">Sesuaikan resolusi gambar</string>
-  <string name="settingslabel">Pengaturan</string>
+  <string name="preferences_settings_section">Pengaturan</string>
   <string name="prefoptlabel">Preferensi</string>
   <string name="prefoptdesc">Atur bahasa survei dan preferensi lainnya</string>
   <string name="sendoptlabel">Sinkronisasi data</string>

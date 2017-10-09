@@ -12,7 +12,7 @@
   <string name="elevation">Độ cao</string>
   <string name="submitbutton">Đệ trình</string>
   <string name="resize_large_images">Thay đổi kích thước của những ảnh cỡ lớn</string>
-  <string name="settingslabel">Cài đặt</string>
+  <string name="preferences_settings_section">Cài đặt</string>
   <string name="prefoptlabel">Sự ưu tiên</string>
   <string name="prefoptdesc">Cài đặt ngôn ngữ khảo sát mặc định và dữ liệu ưu tiên khác</string>
   <string name="sendoptlabel">Đồng bộ hóa dữ liệu</string>

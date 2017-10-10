@@ -51,8 +51,8 @@ import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
-import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -91,7 +91,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mProgressBar = (ProgressBar)findViewById(R.id.progress);
         mDownloadBtn = findViewById(R.id.download);
         mLocationInfo = (TextView)findViewById(R.id.location_info);
-        imageLoader = new GlideImageLoader(getContext());
+        imageLoader = new PicassoImageLoader(getContext());
         if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
         } else {

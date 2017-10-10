@@ -37,7 +37,6 @@ import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.serialization.response.SurveyedLocaleParser;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StatusUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,9 +79,8 @@ public class FlowApi {
     private final String baseUrl;
 
     public FlowApi(Context context) {
-        ServerManager serverManager = new ServerManager(context);
-        this.baseUrl = serverManager.getServerBase();
-        this.apiKey = serverManager.getApiKey();
+        this.baseUrl = BuildConfig.SERVER_BASE;
+        this.apiKey = BuildConfig.API_KEY;
         this.phoneNumber = StatusUtil.getPhoneNumber(context);
         this.imei = StatusUtil.getImei(context);
         this.androidId = PlatformUtil.getAndroidID(context);

@@ -25,6 +25,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
@@ -63,6 +64,15 @@ public class GlideImageLoader implements ImageLoader {
                         listener.onImageReady(bitmap);
                     }
                 });
+    }
+
+    @Override
+    public void loadFromFile(File file, ImageView imageView) {
+        requestManager.load(file)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .override(SimpleTarget.SIZE_ORIGINAL, SimpleTarget.SIZE_ORIGINAL)
+                .into(imageView);
     }
 
     @Override

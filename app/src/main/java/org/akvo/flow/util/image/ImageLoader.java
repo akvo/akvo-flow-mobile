@@ -20,11 +20,15 @@
 
 package org.akvo.flow.util.image;
 
+import android.widget.ImageView;
+
 import java.io.File;
 
 public interface ImageLoader {
 
     void loadFromFile(File file, ImageLoaderListener listener);
+
+    void loadFromFile(File file, ImageView imageView);
 
     void loadFromBase64String(String image, final ImageLoaderListener listener);
 }

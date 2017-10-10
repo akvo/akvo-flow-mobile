@@ -61,7 +61,9 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
             // External storage
             clearExternalStorage(responsesOnly);
-            clearUserPreferences();
+            if (!responsesOnly) {
+                clearUserPreferences();
+            }
         } catch (SQLException e) {
             Timber.e(e.getMessage());
             ok = false;
@@ -93,9 +95,8 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
     /**
      * Permanently deletes data from the internal database.
-     * 
-     * @param responsesOnly Flag to specify a partial deletion (user generated
-     *            data).
+     *
+     * @param responsesOnly Flag to specify a partial deletion (user generated data).
      */
     private void clearDatabase(boolean responsesOnly) throws SQLException {
         try {

@@ -30,6 +30,7 @@ import android.util.Base64;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
@@ -50,7 +51,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,7 +97,6 @@ public class DataSyncService extends IntentService {
     private static final String DELIMITER = "\t";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
 
-    private static final String SIGNING_KEY_PROP = "signingKey";
     private static final String SIGNING_ALGORITHM = "HmacSHA1";
 
     private static final String SURVEY_DATA_FILE_JSON = "data.json";
@@ -118,7 +117,6 @@ public class DataSyncService extends IntentService {
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
-    private PropertyUtil mProps;
     private SurveyDbAdapter mDatabase;
     private Prefs preferences;
     private ConnectivityStateManager connectivityStateManager;
@@ -130,7 +128,6 @@ public class DataSyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
-            mProps = new PropertyUtil(getResources());
             mDatabase = new SurveyDbAdapter(this);
             mDatabase.open();
             preferences = new Prefs(getApplicationContext());
@@ -262,7 +259,7 @@ public class DataSyncService extends IntentService {
             ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
 
             writeTextToZip(zos, zipFileData.data, SURVEY_DATA_FILE_JSON);
-            String signingKeyString = mProps.getProperty(SIGNING_KEY_PROP);
+            String signingKeyString = BuildConfig.SIGNING_KEY;
             if (!StringUtil.isNullOrEmpty(signingKeyString)) {
                 MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
                 byte[] digest = sha1Digest.digest(zipFileData.data.getBytes(UTF_8_CHARSET));

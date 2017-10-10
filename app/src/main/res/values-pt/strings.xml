@@ -18,19 +18,14 @@ Sem espaço para armazenamento
   <string name="geodialog">Autorize o acesso à sua localização</string>
   <string name="settings">Configurações</string>
   <string name="resize_large_images">Redimensionar imagens grandes</string>
-  <string name="settingslabel">Definições</string>
-  <string name="nouser">Sem usuários!</string>
-  <string name="exportcomplete">Os dados foram exportados para o cartão de memória</string>
+  <string name="preferences_settings_section">Definições</string>
   <string name="prefoptlabel">Preferências</string>
   <string name="prefoptdesc">Definir o idioma padrão do inquérito e outras preferências de dados</string>
   <string name="sendoptlabel">Sincronizar dados</string>
   <string name="sendoptdesc">Sincronizar dados do inquérito. Você precisa ter acesso à internet (dados móveis ou Wi-Fi) para efectuar esta operação.</string>
-  <string name="poweroptlabel">Gestão da carga da bateria</string>
-  <string name="poweroptdesc">Alterna Wi-fi para melhor gestão do tempo de vida da bateria</string>
   <string name="screenoptlabel">Manter a tela do dispositivo ligada durante a inserção dos dados no inquérito de pesquisa</string>
   <string name="screenoptdesc">Impedir que a tela se desligue enquanto no modo de preenchimento de dados no inquérito. Certifique-se de desligar manualmente a tela (ou sair do aplicativo) quando não estiver em uso para evitar gastar a bateria.</string>
   <string name="aboutlabel">Sobre</string>
-  <string name="aboutdesc">Exibir informações sobre a versão.</string>
   <string name="gpsstatuslabel">Estado do GPS</string>
   <string name="gpsstatusdesc">Iniciar a aplicação do Estado do GPS se o tiver instalado no dispositivo.</string>
   <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>
@@ -41,7 +36,6 @@ Sem espaço para armazenamento
   <string name="helpheading">Opções de Ajuda</string>
   <string name="deleteresponse">Apagar Resposta</string>
   <string name="othertext">Outro...</string>
-  <string name="savelastuserlabel">Manter o último usuário seleccionado com a sessão iniciada entre as sessões</string>
   <string name="uploadoptionlabel">Sincronizar dados através da rede móvel</string>
   <string name="surveylanglabel"> Idiomas do inquérito</string>
   <string name="scanbarcode">Digitalizar o código de barras</string>
@@ -55,7 +49,6 @@ Sem espaço para armazenamento
   <string name="reloadconftext">Tem certeza de que deseja limpar e descarregar novamente os inquéritos?</string>
   <string name="submitcompletetitle">Inquérito submetido</string>
   <string name="submitcompletetext">As respostas do inquérito serão enviadas para o servidor.</string>
-  <string name="optiontext">Opção</string>
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selecção inválida</string>
   <string name="langmandatorytext">Deve seleccionar pelo menos um idioma</string>
@@ -86,8 +79,6 @@ Sem espaço para armazenamento
   <string name="transmissionhist">Histórico de transmissão</string>
   <string name="transstartdate">Iniciado:</string>
   <string name="transenddate">Terminado</string>
-  <string name="confirmchangetitle">Alterar resposta?</string>
-  <string name="confirmchangetext">Deseja alterar a sua resposta?</string>
   <string name="resetall">Apagar tudo (usuários, inquéritos e todos os dados colectados)</string>
   <string name="resetalldesc">Apagar permanentemente todos os inquéritos, as respostas (incluindo imagens e arquivos zip exportação) e usuários</string>
   <string name="reset_responses">Apagar imagens e dados colectados</string>
@@ -101,24 +92,19 @@ Sem espaço para armazenamento
   <string name="pleasewaitforbootstrap">Por favor, aguarde até que o arquivo de inicialização conclua o processamento.</string>
   <string name="clear_data_success">Dados apagados do dispositivo com sucesso </string>
   <string name="clear_data_error">Erro ao apagar os dados do dispositivo</string>
-  <string name="configuring_languages">Configurando idiomas do inquérito...</string>
   <string name="search">Procurar</string>
   <string name="sync">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estatísticas</string>
   <string name="syncing_records">Sincronizando pontos de dados</string>
-  <string name="sync_finished">Sincronização de pontos de dados concluída</string>
   <string name="synced_records">Pontos de Dados %1$d sincronizados</string>
   <string name="sync_error"> Falhou a sincronização de Pontos de Dados </string>
   <string name="syncing_corrupted_data_points_error">Faça a sincronização novamente.</string>
   <string name="network_error">Erro de rede</string>
-  <string name="loading">Carregando...</string>
   <string name="prefill_title">Preencher novamente as respostas</string>
   <string name="prefill_text">Preencher antecipadamente o formulário com respostas anteriores?</string>
   <string name="error_assignment_text">É necessário o emparelhamento no painel do Akvo Flow</string>
   <!--Data sync-->
-  <string name="data_sync_title">Sincronização de Dados</string>
-  <string name="data_sync_text">Carregando dados. Por favor, aguarde...</string>
   <string name="data_sync_all">Formulários sincronizados: %1$d - Falha:%2$d</string>
   <string name="data_sync_synced">Formulários sincronizados:%1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulário eliminado</string>
@@ -128,12 +114,8 @@ Sem espaço para armazenamento
   <string name="please_restart">Por favor, reinicie o aplicativo</string>
   <!--Empty Views-->
   <string name="no_surveys_text">Não existem inquéritos emparelhados. Os inquéritos são emparelhados no painel do Flow</string>
-  <string name="no_records_text">Você ainda não tem pontos de dados. Clique em \'+\', no topo da tela para adicionar um novo ponto de dados</string>
   <string name="no_survey_selected_text">Nenhum inquérito seleccionado. Abra o menu lateral para seleccionar um inquérito</string>
-  <!--Activity Labels-->
-  <string name="survey_groups_activity">Inquéritos</string>
-  <string name="record_list_activity">Seleccionar Ponto de Dados</string>
-  <!--ActionBar-->
+  <!--ToolBar-->
   <string name="more">Mais</string>
   <!--Search-->
   <string name="search_hint">Pesquisar Ponto de dados</string>
@@ -160,7 +142,6 @@ Sem espaço para armazenamento
   <string name="clear_feature_text">Deseja remover este recurso?</string>
   <string name="repeat_group">Repetir grupo</string>
   <string name="repetitions">Repetições:</string>
-  <string name="view_responses">Ver respostas</string>
   <string name="view_map">Ver mapa</string>
   <string name="delete_group_title">Apagar grupo</string>
   <string name="delete_group_text">Deseja apagar este grupo?</string>
@@ -251,7 +232,6 @@ Sem espaço para armazenamento
   <string name="no">Não</string>
   <string name="retry">Tentar novamente</string>
   <string name="delete">Apagar</string>
-  <string name="error_value_required">Este campo não pode ficar em branco</string>
   <string name="drawer_open">Desenhador aberto</string>
   <string name="drawer_close">Desenhador fechado</string>
   <!--app update service-->

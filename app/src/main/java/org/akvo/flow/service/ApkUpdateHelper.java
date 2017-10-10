@@ -19,7 +19,6 @@
 
 package org.akvo.flow.service;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 
@@ -28,7 +27,6 @@ import org.akvo.flow.api.service.ApkApiService;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,14 +37,12 @@ public class ApkUpdateHelper {
 
     private final ApkApiService apkApiService = new ApkApiService();
     private final ApkUpdateMapper apkUpdateMapper = new ApkUpdateMapper();
-    private final ServerManager serverManager;
 
-    public ApkUpdateHelper(Context context) {
-        this.serverManager = new ServerManager(context);
+    public ApkUpdateHelper() {
     }
 
     Pair<Boolean, ViewApkData> shouldUpdate() throws IOException, JSONException {
-        JSONObject json = apkApiService.getApkDataObject(serverManager.getServerBase());
+        JSONObject json = apkApiService.getApkDataObject(BuildConfig.SERVER_BASE);
         ViewApkData data = apkUpdateMapper.transform(json);
         return new Pair<>(shouldAppBeUpdated(data), data);
     }

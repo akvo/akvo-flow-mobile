@@ -110,7 +110,7 @@ public class ApkUpdateService extends GcmTaskService {
         schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
         Context applicationContext = getApplicationContext();
-        apkUpdateHelper = new ApkUpdateHelper(applicationContext);
+        apkUpdateHelper = new ApkUpdateHelper();
         ConnectivityStateManager connectivityStateManager = new ConnectivityStateManager(
                 applicationContext);
         Prefs prefs = new Prefs(applicationContext);

@@ -21,7 +21,6 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.entity.ApiDataPoint;
@@ -86,19 +85,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Flowable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
-        return getServerBaseUrl()
-                .concatMap(new Function<String, Flowable<Integer>>() {
-                    @Override
-                    public Flowable<Integer> apply(final String serverBaseUrl) {
-                        return dataSourceFactory.getPropertiesDataSource().getApiKey()
-                                .concatMap(new Function<String, Flowable<Integer>>() {
-                                    @Override
-                                    public Flowable<Integer> apply(String apiKey) {
-                                        return syncDataPoints(serverBaseUrl, apiKey, surveyGroupId);
-                                    }
-                                });
-                    }
-                })
+        return syncDataPoints(surveyGroupId)
                 .onErrorResumeNext(new Function<Throwable, Flowable<Integer>>() {
                     @Override
                     public Flowable<Integer> apply(Throwable throwable) {
@@ -121,24 +108,9 @@ public class SurveyDataRepository implements SurveyRepository {
         return syncedTimeMapper.getTime(syncedTime);
     }
 
-    private Flowable<String> getServerBaseUrl() {
-        return dataSourceFactory.getSharedPreferencesDataSource().getBaseUrl().concatMap(
-                new Function<String, Flowable<String>>() {
-                    @Override
-                    public Flowable<String> apply(String baseUrl) {
-                        if (TextUtils.isEmpty(baseUrl)) {
-                            return dataSourceFactory.getPropertiesDataSource().getBaseUrl();
-                        } else {
-                            return Flowable.just(baseUrl);
-                        }
-                    }
-                });
-    }
-
-    private Flowable<Integer> syncDataPoints(final String baseUrl, final String apiKey,
-            final long surveyGroupId) {
+    private Flowable<Integer> syncDataPoints(final long surveyGroupId) {
         final State state = new State(getSyncedTime(surveyGroupId));
-        return loadNewDataPoints(baseUrl, apiKey, surveyGroupId, state)
+        return loadNewDataPoints(surveyGroupId, state)
                 .doOnNext(new Consumer<State>() {
                     @Override
                     public void accept(@NonNull State state) throws Exception {
@@ -172,12 +144,12 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Flowable<State> loadNewDataPoints(final String baseUrl,
-            final String apiKey, final long surveyGroupId, final State state) {
+    private Flowable<State> loadNewDataPoints(final long surveyGroupId,
+            final State state) {
         return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
             @Override
             public Flowable<ApiLocaleResult> call() throws Exception {
-                return restApi.loadNewDataPoints(baseUrl, apiKey, surveyGroupId,
+                return restApi.loadNewDataPoints(surveyGroupId,
                         state.getTimestamp());
             }
         }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {

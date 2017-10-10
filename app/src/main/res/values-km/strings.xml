@@ -12,7 +12,7 @@
   <string name="elevation">កំពស់</string>
   <string name="submitbutton">ចុចបញ្ជូនចេញ </string>
   <string name="resize_large_images">ដាក់រូបភាពទំហំធំឲ្យតូចឡើងវិញ</string>
-  <string name="settingslabel">ចុចកំណត់ (settings) </string>
+  <string name="preferences_settings_section">ចុចកំណត់ (settings) </string>
   <string name="prefoptlabel">ចូលចិត្តជាងគេ </string>
   <string name="prefoptdesc">កំណត់ភាសានៃការធ្វើអង្កេត និងទិន្នន័យដែលចូលចិត្តជាងគេផ្សេងៗទៀត</string>
   <string name="sendoptlabel">ធ្វើទិន្នន័យឲ្យចេញដំណាលគ្នា (Sync Data) </string>

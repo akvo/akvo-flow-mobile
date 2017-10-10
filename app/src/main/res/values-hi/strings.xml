@@ -12,7 +12,7 @@
   <string name="elevation">ऊंचाई </string>
   <string name="submitbutton">जमा करें</string>
   <string name="resize_large_images">फोटो का साइज़</string>
-  <string name="settingslabel">सेटिंग्स </string>
+  <string name="preferences_settings_section">सेटिंग्स </string>
   <string name="prefoptlabel">प्रेफ्रेंसेस </string>
   <string name="prefoptdesc">सर्वे की भाषा तथा अन्य विकल्प की सूची </string>
   <string name="sendoptlabel">सिंक डेटा </string>

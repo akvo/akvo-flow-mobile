@@ -24,7 +24,6 @@ set -e
 # Move to the project directory
 cd $FLOW_MOBILE
 
-. app/version.properties
 version=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
 echo $version
 
@@ -32,7 +31,6 @@ rm -rf tmp
 rm -rf builds
 mkdir tmp
 mkdir builds
-mkdir -p data/src/main/res/raw
 
 build_name() {
     if [[ "$1" == "akvoflow-89" ]]; then
@@ -64,8 +62,7 @@ for i in $(cat tmp/instances.txt); do
         build=$(build_name $i)
 
         echo "generating apk version" $version "for instance" $i "and build" $build
-        cp $FLOW_SERVER_CONFIG/$i/survey.properties data/src/main/res/raw/survey.properties
-        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
+        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/survey.properties
         ./gradlew $build
         mkdir -p builds/$i/$version
         mv app/bin/flow.apk $filename

@@ -152,7 +152,8 @@ public class ApplicationModule {
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_PATTERN, Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new RestServiceFactory(loggingInterceptor, simpleDateFormat, new Encoder());
+        return new RestServiceFactory(loggingInterceptor, simpleDateFormat, new Encoder(),
+                BuildConfig.API_KEY, BuildConfig.SERVER_BASE);
     }
 
     @Provides

@@ -527,7 +527,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 1));
                     tv.setTextSize(ITEM_TEXT_SIZE);
                     tv.setTextColor(Color.BLACK);
-                    tv.setText(getString(R.string.settingslabel));
+                    tv.setText(getString(R.string.preferences_settings_section));
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;

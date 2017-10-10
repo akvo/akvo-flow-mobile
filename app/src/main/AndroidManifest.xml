@@ -31,8 +31,8 @@
         <activity
                 android:name=".activity.SurveyActivity"
                 android:configChanges="locale|layoutDirection"
-                android:launchMode="singleTop"
-                android:label="@string/app_name">
+                android:label="@string/app_name"
+                android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -53,14 +53,6 @@
                 android:name=".activity.FormActivity"
                 android:configChanges="keyboardHidden|orientation|screenSize|locale|layoutDirection"
                 android:windowSoftInputMode="adjustResize"/>
-        <activity
-                android:name=".activity.SettingsActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/settingslabel"/>
-        <activity
-                android:name=".activity.PreferencesActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/prefoptlabel"/>
         <activity
                 android:name=".activity.TransmissionHistoryActivity"
                 android:configChanges="locale|layoutDirection"
@@ -123,15 +115,22 @@
 
         <activity
                 android:name=".presentation.AboutActivity"
+                android:configChanges="locale"
                 android:label="@string/about_activity_title">
         </activity>
         <activity
                 android:name=".presentation.help.HelpActivity"
+                android:configChanges="locale"
                 android:label="@string/help">
         </activity>
         <activity
                 android:name=".presentation.legal.LegalNoticesActivity"
+                android:configChanges="locale"
                 android:label="@string/licences_title">
+        </activity>
+        <activity
+                android:name=".presentation.settings.PreferenceActivity"
+                android:configChanges="locale">
         </activity>
     </application>
 

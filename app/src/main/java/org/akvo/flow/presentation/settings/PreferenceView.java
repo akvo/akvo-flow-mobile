@@ -18,27 +18,15 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.presentation.settings;
 
-import io.reactivex.Observable;
+public interface PreferenceView {
 
-public interface UserRepository {
+    void showLoading();
 
-    Observable<Boolean> mobileSyncAllowed();
+    void hideLoading();
 
-    Observable<Boolean> keepScreenOn();
+    void displaySettings(ViewUserSettings viewUserSettings);
 
-    Observable<String> getAppLanguage();
-
-    Observable<Integer> getImageSize();
-
-    Observable<String> getDeviceId();
-
-    Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn);
-
-    Observable<Boolean> saveEnableMobileDataPreference(Boolean enable);
-
-    Observable<Boolean> saveLanguagePreference(String language);
-
-    Observable<Boolean> saveImageSizePreference(Integer size);
+    void displayLanguageChanged(String language);
 }

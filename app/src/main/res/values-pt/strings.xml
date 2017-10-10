@@ -18,7 +18,7 @@ Sem espaço para armazenamento
   <string name="geodialog">Autorize o acesso à sua localização</string>
   <string name="settings">Configurações</string>
   <string name="resize_large_images">Redimensionar imagens grandes</string>
-  <string name="settingslabel">Definições</string>
+  <string name="preferences_settings_section">Definições</string>
   <string name="prefoptlabel">Preferências</string>
   <string name="prefoptdesc">Definir o idioma padrão do inquérito e outras preferências de dados</string>
   <string name="sendoptlabel">Sincronizar dados</string>

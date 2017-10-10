@@ -48,11 +48,11 @@ public class FlowRestApi {
         this.encoder = encoder;
     }
 
-    public Flowable<ApiLocaleResult> loadNewDataPoints(@NonNull String baseUrl,
-            @NonNull String apiKey, long surveyGroup, @NonNull String timestamp) {
+    public Flowable<ApiLocaleResult> loadNewDataPoints(long surveyGroup,
+            @NonNull String timestamp) {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
         String phoneNumber = encoder.encodeParam(this.phoneNumber);
-        return serviceFactory.createRetrofitService(baseUrl, DataPointSyncService.class, apiKey)
+        return serviceFactory.createRetrofitService(DataPointSyncService.class)
                 .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "");
     }
 }

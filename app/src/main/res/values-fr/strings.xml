@@ -16,7 +16,7 @@
   <string name="geodialog">Veuillez autoriser l\'accès aux données de localisation</string>
   <string name="settings">Paramètres</string>
   <string name="resize_large_images">Redimensionner les images trop grandes</string>
-  <string name="settingslabel">Paramètres</string>
+  <string name="preferences_settings_section">Paramètres</string>
   <string name="prefoptlabel">Préférences</string>
   <string name="prefoptdesc">Choisir la langue par défaut de l\'enquête et autres préférences</string>
   <string name="sendoptlabel">Synchroniser les données</string>

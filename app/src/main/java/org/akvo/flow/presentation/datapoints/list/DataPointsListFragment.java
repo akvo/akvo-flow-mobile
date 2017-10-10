@@ -386,7 +386,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigator.navigateToPreferences(getActivity());
+                navigator.navigateToAppSettings(getActivity());
             }
         });
     }

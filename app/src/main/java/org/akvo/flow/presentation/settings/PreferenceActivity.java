@@ -24,7 +24,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.SQLException;
@@ -55,7 +54,6 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.Arrays;
@@ -273,20 +271,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
 
     @OnClick(R.id.preference_gps_fixes)
     void onGpsFixesTap() {
-        PackageManager packageManager = getPackageManager();
-        Intent intent = new Intent(ConstantUtil.GPS_STATUS_PACKAGE);
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivity(intent);
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(R.string.nogpsstatus);
-            builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.cancel();
-                }
-            });
-            builder.show();
-        }
+       navigator.navigateToGpsFixes(this);
     }
 
     @OnClick(R.id.preference_storage)

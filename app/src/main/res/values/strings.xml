@@ -264,4 +264,7 @@
     <string name="preference_identifier">Device identifier</string>
     <string name="preference_instance_name">Instance name</string>
 
+
+    <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
+
 </resources>

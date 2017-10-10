@@ -32,6 +32,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
@@ -44,6 +45,7 @@ import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
@@ -132,9 +134,8 @@ public class Navigator {
         builder.setPositiveButton(R.string.install,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse("http://play.google.com/store/search?q=Barcode Scanner"));
-                        activity.startActivity(intent);
+                        navigateToPlayStore(activity,
+                                "http://play.google.com/store/search?q=Barcode Scanner");
                     }
                 });
         builder.setNegativeButton(R.string.cancelbutton,
@@ -144,6 +145,12 @@ public class Navigator {
                     }
                 });
         builder.show();
+    }
+
+    public void navigateToPlayStore(@NonNull Activity activity, String uriString) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(uriString));
+        activity.startActivity(intent);
     }
 
     public void navigateToExternalSource(@NonNull Activity activity, Bundle data,
@@ -249,5 +256,37 @@ public class Navigator {
 
     public void navigateToHelp(@NonNull Context context) {
         context.startActivity(new Intent(context, HelpActivity.class));
+    }
+
+    public void navigateToGpsFixes(AppCompatActivity activity) {
+        if (activity != null) {
+            PackageManager packageManager = activity.getPackageManager();
+            Intent intent = new Intent(ConstantUtil.GPS_STATUS_PACKAGE_V2);
+            intent.setAction(Intent.ACTION_VIEW);
+//            try {
+//                activity.startActivity(intent);
+//            } catch (Exception e) {
+//                displayGpsStatusNotFoundDialog(activity);
+//            }
+            if (intent.resolveActivity(packageManager) != null) {
+                activity.startActivity(intent);
+            } else {
+                intent = new Intent(ConstantUtil.GPS_STATUS_PACKAGE_V1);
+                if (intent.resolveActivity(packageManager) != null) {
+                    activity.startActivity(intent);
+                } else {
+                    displayGpsStatusNotFoundDialog(activity);
+                }
+            }
+        }
+    }
+
+    private void displayGpsStatusNotFoundDialog(AppCompatActivity activity) {
+        AppDownloadDialogFragment fragment = AppDownloadDialogFragment
+                .newInstance(R.string.no_gps_status_message,
+                        "http://play.google.com/store/apps/details?id="
+                                + ConstantUtil.GPS_STATUS_PACKAGE_V2);
+        fragment.show(activity.getSupportFragmentManager(),
+                AppDownloadDialogFragment.TAG);
     }
 }

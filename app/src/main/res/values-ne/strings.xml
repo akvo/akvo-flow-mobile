@@ -11,17 +11,7 @@
   <string name="lon">देशान्तर</string>
   <string name="elevation"> उचाइ</string>
   <string name="submitbutton">बुझाउनुहोस्।</string>
-  <string name="resize_large_images">ठुलो तस्बिरहरुको नाप मिलाउनुहोस्</string>
-  <string name="preferences_settings_section">सेटीङ्स्</string>
-  <string name="prefoptlabel">छनौट</string>
-  <string name="prefoptdesc">पुर्व निर्धारित सर्भे भाषा तथा छनौटहरु राख्नुहोस्। </string>
-  <string name="sendoptlabel">डाटा सिन्क गर्नुहोस्</string>
-  <string name="sendoptdesc">सर्भे डाटा सिँक गर्दछ। यसका लागि तपाईंसँग इन्टरनेट (मोबाइल वा वाइ-फाइ) सुबिधा हुन पर्छ।</string>
-  <string name="screenoptlabel">सर्भेमा डाटा भर्दा स्क्रिन अन राख्नुहोस्</string>
-  <string name="screenoptdesc">सर्भेको उतर दिँदा उपकरणको स्क्रिनलाई बन्द हुन बाट रोक्दछ। ब्याट्री खपतलाई जोगाउन सर्भे प्रयोगमा नभएको बेला आफैले स्क्रिन बन्द गर्न (वा एप्पबाट बहिर निस्कन) नबिर्सनु होला।</string>
   <string name="aboutlabel">हाम्रो बारेमा</string>
-  <string name="gpsstatuslabel">जि पि एस् को स्थिति </string>
-  <string name="gpsstatusdesc">उपकरणमा GPS Status एप्प राख्नु भएको छ भने चालु गराउँदछ।</string>
   <string name="nogpsstatus">GPS Status राखिएको छैन। कृपया गुगलको Play Store मा गएर डाउन्लोड ग रि राख्नु होला।</string>
   <string name="otherinstructions">कृपया वर्णन लेख्नुहोस्।</string>
   <string name="texthelpoption">सहयोग पाठ हेर्नुहोस्।</string>
@@ -30,13 +20,11 @@
   <string name="helpheading">सहयोगका विकल्पहरु</string>
   <string name="deleteresponse">उतर हटाउनुहोस्।</string>
   <string name="othertext">अरु...</string>
-  <string name="uploadoptionlabel">मोबाइल नेटवर्क प्रयोग गरेर डाटा सिँक गर्नुहोस्।</string>
   <string name="surveylanglabel">सर्भे भाषाहरु</string>
   <string name="scanbarcode">बारकोड स्क्यान गर्नुहोस्।</string>
   <string name="toosmallerr">मान धेरै सानो भयो। न्युनतम मान:</string>
   <string name="toolargeerr">मान धेरै ठुलो भयो। अधिकतम मान:</string>
   <string name="baddatatypeerr">उतर संख्यामा हुनुपर्छ।</string>
-  <string name="serverlabel">डाटा सरभर (निर्देशन हुँदा मात्र बद्ल्नुहोला)</string>
   <string name="reloadsurveyslabel">सबै सर्भेहरु रि-लोड गर्नुहोस्।</string>
   <string name="reloadsurveysdesc">सर्भेहरु हटाएर ड्यास्बोर्डबाट पठाइेका सर्भेहरु फेरी डाउन्लोड गर्छ। (निर्देशन हुँदा मात्र प्रयोग गर्नुहोला)</string>
   <string name="conftitle">कृपया निधो गर्नुहोस्।</string>
@@ -46,8 +34,8 @@
   <string name="langoption">भाषाहरु</string>
   <string name="langmandatorytitle">गलत छनौट</string>
   <string name="langmandatorytext">तपाईंले कम्तीमा एउटा भाषा छान्नुपर्ने हुन्छ।</string>
-    <string name="downloadsurveylabel">फारम डाउन्लोड गर्नुहोस्।</string>
-  <string name="downloadsurveydesc">अनियमित सर्भेहरु डाउन्लोड गर्दछ। (निर्देशन हुँदा मात्र प्रयोग गर्नुहोला)</string>
+  <string name="pleasewait">कृपया पर्खनुहोस्।</string>
+  <string name="downloadsurveylabel">फारम डाउन्लोड गर्नुहोस्।</string>
   <string name="downloadsurveyinstr">आफुले डाउनलोड गर्न चाहेको फारमको फारम आइ डि हाल्नुहोस्। </string>
   <string name="deletealldatawarning">यसले स्थाई रूपमा उपकरणमा भएका सबै डाटाहरु (सर्भेहरु, उतरहरु, तस्बिरहरु र प्रयोगकर्ताहरु) हटाउँछ। यो कार्य एक पल्ट गरेपछि सच्चाउन मिल्दैन। अघि बढ्न OK वा पछाडि जान Cancel थिच्नुहोस्।</string>
   <string name="delete_responses_warning">यसले स्थाई रूपमा उपकरणमा भएका उतरहरु, तस्बिरहरु र zip फाइलहरु हटाउँछ। यो कार्य एक पल्ट गरेपछि सच्चाउन मिल्दैन। अघि बढ्न OK वा पछाडि जान Cancel थिच्नुहोस्।</string>
@@ -64,7 +52,6 @@
   <string name="clearquestion">उतर हटाउनुहोस्।</string>
   <string name="clearquestiondesc">के तपाईं यो प्रश्नको उतर हटाउन चाहनुहुन्छ?</string>
   <string name="identlabel">उपकरण पहिचान</string>
-  <string name="setidentlabel">उपकरण पहिचान राख्नुहोस्।</string>
   <string name="bootstrapstart">एस डि कार्डबाट डाटा लोड हुँदैछ।</string>
   <string name="bootstrapcomplete">एस डि कार्डबाट डाटा लोड भई सक्यो।</string>
   <string name="bootstraperror">बुट स्ट्र्याप zip फाइल प्रसारणमा त्रुटि </string>
@@ -72,15 +59,9 @@
   <string name="transmissionhist">डाटा प्रसारण हिस्ट्री</string>
   <string name="transstartdate">शुरु भयो</string>
   <string name="transenddate">सकियो</string>
-  <string name="resetall">सबै हटाउँछ। (प्रयोगकर्ताहरु, सर्भेहरु, र संकलन गरिएका डाटाहरु)</string>
   <string name="resetalldesc">सबै सर्भेहरु, सर्भे उतरहरु (तस्बिर र पठाईएका zip फाइलहरु सहित) र प्रयोगकर्ताहरु स्थाई रूपमा हटाउँछ।</string>
-  <string name="reset_responses">संकलन गरिएका डाटा र तस्बिरहरु हटाउँछ।</string>
   <string name="reset_responses_desc">सबै सर्भे उतरहरु स्थाई रूपमा हटाउँछ। (तस्बिर र पठाईएका zip फाइलहरु सहित)  </string>
-  <string name="checksd">एस डि कार्डको अवस्था जाँच्नुहोस्।</string>
-  <string name="checksddesc">एस डि कार्ड सहि तरिकाले बसेको र कार्डमा रहेको खालि ठाउँ देखाउँछ भन्ने जाँच गर्नुहोस्।</string>
   <string name="sdmissing">एस डि कार्ड सहि तरिकाले बसेको छैन वा उपलब्ध छैन। USB file copying चालु नरहेको सुनिश्चित गर्नुहोस्।</string>
-  <string name="sdmounted">एस डि कार्ड सहि तरिकाले बसेको छ। </string>
-  <string name="sdcardspace">खालि ठाउँ (एम बि)</string>
   <string name="pickdate">मिति छन्नुहोस्।</string>
   <string name="pleasewaitforbootstrap">कृपया बुट स्ट्र्याप फाइल process हुँदासम्म पर्खनुहोस्।</string>
   <string name="clear_data_success">डिभाइसबाट डाटा सफलतापुर्वक हटाइयो।</string>
@@ -89,14 +70,13 @@
   <string name="sync">सिन्क गर्नुहोस्</string>
   <string name="sort">क्रममा मिलाउनुहोस्</string>
   <string name="stats">तथ्यान्क</string>
-    <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
   <string name="syncing_records">डाटा पोइन्टहरु सिँक हुँदैछन्...</string>
   <string name="synced_records">सिँक भएका %1$d डाटा पोइन्टहरु</string>
   <string name="sync_error">डाटा पोइन्टहरु सिँक भएनन्।</string>
   <string name="syncing_corrupted_data_points_error">कृपया फेरि सिन्क गर्नुहोस्।</string>
   <string name="network_error">नेटवर्क त्रुटि</string>
+  <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
   <string name="prefill_text">पहिलेको उतरहरुले फारम भर्न चाहनुहुन्छ?</string>
-    <!--Data sync-->
   <string name="error_assignment_text">Akvo Flow ड्यास्बोर्डमा assignment हरु चाहियो।</string>
   <!--Data sync-->
   <string name="data_sync_all">सिँक भएका फारमहरु %1$d - सिँक नभएका फारमहरु %2$d</string>
@@ -104,11 +84,8 @@
   <string name="data_sync_error_form_deleted_title">फारम हटाइयो।</string>
   <string name="data_sync_error_form_deleted_text">फारम %1$s हटाइयो।</string>
   <!--Localization-->
-  <string name="app_language">एप्प्को भाषा</string>
   <string name="please_restart">कृपया एप्पलाई पुन: शुरु गर्नुहोस्।</string>
   <!--Empty Views-->
-  <!--ToolBar-->
-  <string name="no_surveys_text">तपाईंलाई कुनै सर्भे तोकिएको छैन। सर्भेहरु ड्यास्बोर्डमा तोकिएको छ।</string>
   <string name="no_survey_selected_text">तपाईंको कुनै सर्भे छानिएको छैन। कुनै एक सर्भे छान्नको लागि साइडको मेनु खोल्नुहोस्।</string>
   <!--ToolBar-->
   <string name="more">अझै</string>
@@ -147,7 +124,7 @@
   <string name="image_location_reading">भू-अवस्थिती पढ्दै</string>
   <string name="image_location_saved">भू-अवस्थिती सेभ भयो।</string>
   <!--RecordList Activity-->
-    <string name="stats_total">जम्मा डाटा प्वाइन्टहरु</string>
+  <string name="stats_total">जम्मा डाटा प्वाइन्टहरु</string>
   <string name="stats_week">गएको 7 दिन</string>
   <string name="stats_today">आज</string>
   <string name="distance_label">दूरी</string>

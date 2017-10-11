@@ -17,17 +17,7 @@ Sem espaço para armazenamento
   <string name="submitbutton">Submeter</string>
   <string name="geodialog">Autorize o acesso à sua localização</string>
   <string name="settings">Configurações</string>
-  <string name="resize_large_images">Redimensionar imagens grandes</string>
-  <string name="preferences_settings_section">Definições</string>
-  <string name="prefoptlabel">Preferências</string>
-  <string name="prefoptdesc">Definir o idioma padrão do inquérito e outras preferências de dados</string>
-  <string name="sendoptlabel">Sincronizar dados</string>
-  <string name="sendoptdesc">Sincronizar dados do inquérito. Você precisa ter acesso à internet (dados móveis ou Wi-Fi) para efectuar esta operação.</string>
-  <string name="screenoptlabel">Manter a tela do dispositivo ligada durante a inserção dos dados no inquérito de pesquisa</string>
-  <string name="screenoptdesc">Impedir que a tela se desligue enquanto no modo de preenchimento de dados no inquérito. Certifique-se de desligar manualmente a tela (ou sair do aplicativo) quando não estiver em uso para evitar gastar a bateria.</string>
   <string name="aboutlabel">Sobre</string>
-  <string name="gpsstatuslabel">Estado do GPS</string>
-  <string name="gpsstatusdesc">Iniciar a aplicação do Estado do GPS se o tiver instalado no dispositivo.</string>
   <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>
   <string name="otherinstructions">Por favor, insira uma descrição</string>
   <string name="texthelpoption">Visualizar texto de ajuda</string>
@@ -36,13 +26,11 @@ Sem espaço para armazenamento
   <string name="helpheading">Opções de Ajuda</string>
   <string name="deleteresponse">Apagar Resposta</string>
   <string name="othertext">Outro...</string>
-  <string name="uploadoptionlabel">Sincronizar dados através da rede móvel</string>
   <string name="surveylanglabel"> Idiomas do inquérito</string>
   <string name="scanbarcode">Digitalizar o código de barras</string>
   <string name="toosmallerr">O valor é demasiado pequeno. Valor mínimo:</string>
   <string name="toolargeerr">O valor é muito longo. Valor máximo:</string>
   <string name="baddatatypeerr">A resposta deve ser numérica</string>
-  <string name="serverlabel">Servidor de Dados (só mude se for instruído)</string>
   <string name="reloadsurveyslabel">Actualizar todos os inquéritos</string>
   <string name="reloadsurveysdesc">Apagar e descarrega novamente inquéritos emparelhados (execute apenas se instruído)</string>
   <string name="conftitle">Por favor, confirme</string>
@@ -52,8 +40,8 @@ Sem espaço para armazenamento
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selecção inválida</string>
   <string name="langmandatorytext">Deve seleccionar pelo menos um idioma</string>
-    <string name="downloadsurveylabel">Descarregar formulário</string>
-  <string name="downloadsurveydesc">Descargas arbitrárias dos inquéritos (somente executar se instruído)</string>
+  <string name="pleasewait">Por favor, espere</string>
+  <string name="downloadsurveylabel">Descarregar formulário</string>
   <string name="downloadsurveyinstr">Insira o código do inquérito que deseja descarregar.</string>
   <string name="deletealldatawarning">Isto apagará permanentemente todos os dados (inquéritos, respostas, imagens e usuários) no dispositivo. Esta operação não é reversível. Clique em OK para prosseguir ou Cancelar para interromper.</string>
   <string name="delete_responses_warning">Isto apagará permanentemente as respostas, imagens e arquivos zip no dispositivo. Esta operação não é reversível. Clique em OK para prosseguir ou Cancelar para interromper.</string>
@@ -70,7 +58,6 @@ Sem espaço para armazenamento
   <string name="clearquestion">Limpar Respostas</string>
   <string name="clearquestiondesc">Quer limpar a resposta desta pergunta?</string>
   <string name="identlabel">Identificador do dispositivo</string>
-  <string name="setidentlabel">Definir identificador do dispositivo</string>
   <string name="bootstrapstart">Carregando dados do inquérito do cartão de memória</string>
   <string name="bootstrapcomplete">Concluído o carregamento de dados do cartão de memória</string>
   <string name="bootstraperror">Erro no processamento do ficheiro de inicialização zip</string>
@@ -78,15 +65,9 @@ Sem espaço para armazenamento
   <string name="transmissionhist">Histórico de transmissão</string>
   <string name="transstartdate">Iniciado:</string>
   <string name="transenddate">Terminado</string>
-  <string name="resetall">Apagar tudo (usuários, inquéritos e todos os dados colectados)</string>
   <string name="resetalldesc">Apagar permanentemente todos os inquéritos, as respostas (incluindo imagens e arquivos zip exportação) e usuários</string>
-  <string name="reset_responses">Apagar imagens e dados colectados</string>
   <string name="reset_responses_desc">Apagar permanentemente todas as respostas do inquérito (incluindo imagens e arquivos zip exportados)</string>
-  <string name="checksd">Verificar o estado do cartão de memória</string>
-  <string name="checksddesc">Verifica se o cartão de memória está inserido e se exibe o espaço livre que nele resta</string>
   <string name="sdmissing">Cartão de memória em falta ou desmontado. Certifique-se de que opção \"Cópia de Arquivo USB\" está desligada</string>
-  <string name="sdmounted">O cartão de memória está montado correctamente.</string>
-  <string name="sdcardspace">Espaço Livre (MB):</string>
   <string name="pickdate">Seleccionar dados</string>
   <string name="pleasewaitforbootstrap">Por favor, aguarde até que o arquivo de inicialização conclua o processamento.</string>
   <string name="clear_data_success">Dados apagados do dispositivo com sucesso </string>
@@ -102,7 +83,6 @@ Sem espaço para armazenamento
   <string name="network_error">Erro de rede</string>
   <string name="prefill_title">Preencher novamente as respostas</string>
   <string name="prefill_text">Preencher antecipadamente o formulário com respostas anteriores?</string>
-    <!--Data sync-->
   <string name="error_assignment_text">É necessário o emparelhamento no painel do Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_all">Formulários sincronizados: %1$d - Falha:%2$d</string>
@@ -110,12 +90,9 @@ Sem espaço para armazenamento
   <string name="data_sync_error_form_deleted_title">Formulário eliminado</string>
   <string name="data_sync_error_form_deleted_text">O formulário %1$s foi eliminado.</string>
   <!--Localization-->
-  <string name="app_language">Idioma da Aplicação </string>
   <string name="please_restart">Por favor, reinicie o aplicativo</string>
   <!--Empty Views-->
-    <string name="no_survey_selected_text">Nenhum inquérito seleccionado. Abra o menu lateral para seleccionar um inquérito</string>
-  <!--ToolBar-->
-  <string name="no_surveys_text">Não existem inquéritos emparelhados. Os inquéritos são emparelhados no painel do Flow</string>
+  <string name="no_survey_selected_text">Nenhum inquérito seleccionado. Abra o menu lateral para seleccionar um inquérito</string>
   <!--ToolBar-->
   <string name="more">Mais</string>
   <!--Search-->
@@ -154,7 +131,7 @@ Sem espaço para armazenamento
   <string name="image_location_reading">lendo geo localização</string>
   <string name="image_location_saved">Geo localização gravado </string>
   <!--RecordList Activity-->
-    <string name="stats_total">Total de Pontos de Dados:</string>
+  <string name="stats_total">Total de Pontos de Dados:</string>
   <string name="stats_week">Últimos 7 dias:</string>
   <string name="stats_today">Hoje</string>
   <string name="distance_label">Distância:</string>

@@ -203,10 +203,14 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
     private void displayResponses() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
         for (QuestionView qv : mQuestionViews.values()) {
-            final String questionId = qv.getQuestion().getId();
+            String questionId = qv.getQuestion().getId();
             if (responses.containsKey(questionId)) {
-                // Update the question view to reflect the loaded data
                 qv.rehydrate(responses.get(questionId));
+            } else if (qv.getQuestion().isRepeatable() && !TextUtils.isEmpty(questionId)) {
+                questionId = questionId.split("\\|")[0];
+                if (responses.containsKey(questionId)) {
+                    qv.rehydrate(responses.get(questionId));
+                }
             }
         }
     }
@@ -272,8 +276,9 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
             QuestionGroupIterationHeader header =
-                    new QuestionGroupIterationHeader(getContext(), mQuestionGroup.getHeading(), repetitionId,
-                            visualIndicator, mSurveyListener.isReadOnly() ? null : this);
+                    new QuestionGroupIterationHeader(getContext(), mQuestionGroup.getHeading(),
+                            repetitionId, visualIndicator,
+                            mSurveyListener.isReadOnly() ? null : this);
             groupIterationHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -281,8 +286,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
-                q = Question
-                        .copy(q, q.getId() + "|" + repetitionId);
+                q = Question.copy(q, q.getId() + "|" + repetitionId);
             }
 
             QuestionView questionView;

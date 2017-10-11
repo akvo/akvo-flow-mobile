@@ -42,6 +42,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
 
@@ -95,22 +97,47 @@ public class FlowApp extends Application {
         // to enable our custom locale again. Note that this approach
         // is not very 'clean', but Android makes it really hard to
         // customize an application wide locale.
+        Locale savedLocale = getSavedLocale();
+        if (localeNeedsUpdating(savedLocale, newConfig.locale)) {
+            // Re-enable our custom locale, using this newConfig reference
+            Locale.setDefault(savedLocale);
+            updateConfiguration(savedLocale, newConfig);
+        }
+    }
+
+    private void init() {
+        updateLocale();
+        loadLastUser();
+    }
+
+    private void updateLocale() {
+        Locale savedLocale = getSavedLocale();
+        Locale currentLocale = Locale.getDefault();
+        if (localeNeedsUpdating(savedLocale, currentLocale)) {
+            Locale.setDefault(savedLocale);
+            updateConfiguration(savedLocale, new Configuration());
+        }
+    }
+
+    private boolean localeNeedsUpdating(Locale savedLocale, Locale currentLocale) {
+        return savedLocale != null && currentLocale != null && !currentLocale.getLanguage()
+                .equalsIgnoreCase(savedLocale.getLanguage());
+    }
+
+    private void updateConfiguration(Locale savedLocale, Configuration config) {
+        Timber.d("configuration will updated to "+savedLocale.getLanguage());
+        config.locale = savedLocale;
+        getBaseContext().getResources().updateConfiguration(config, null);
+    }
+
+    @Nullable
+    private Locale getSavedLocale() {
         String languageCode = loadLocalePref();
         Locale savedLocale = null;
         if (!TextUtils.isEmpty(languageCode)) {
             savedLocale = new Locale(languageCode);
         }
-        if (savedLocale != null && !savedLocale.getLanguage().equalsIgnoreCase(
-                newConfig.locale.getLanguage())) {
-            // Re-enable our custom locale, using this newConfig reference
-            newConfig.locale = savedLocale;
-            Locale.setDefault(savedLocale);
-            getBaseContext().getResources().updateConfiguration(newConfig, null);
-        }
-    }
-
-    private void init() {
-        loadLastUser();
+        return savedLocale;
     }
 
     public void setUser(User user) {

@@ -306,9 +306,9 @@ public class BriteSurveyDbAdapter {
         String sqlQuery = "SELECT * FROM " + Tables.SURVEY_GROUP;
         return briteDatabase
                 .createQuery(Tables.SURVEY_GROUP, sqlQuery)
-                .concatMap(new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
+                .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
                     @Override
-                    public Observable<? extends Cursor> call(SqlBrite.Query query) {
+                    public Observable<? extends Cursor> apply(SqlBrite.Query query) {
                         return Observable.just(query.run());
                     }
                 });

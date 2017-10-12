@@ -20,14 +20,16 @@
 
 package org.akvo.flow.presentation;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.widget.ImageView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -47,8 +49,31 @@ public class FullImageActivity extends BackActivity {
         setContentView(R.layout.activity_full_image);
         setupToolBar();
         ButterKnife.bind(this);
-        imageLoader = new GlideImageLoader(this);
-        imageLoader.loadFromFile(new File(getIntent().getStringExtra(ConstantUtil.IMAGE_URL_EXTRA)),
-                imageView);
+        setUpTitleAndSubtitle();
+        loadImage();
+    }
+
+    private void setUpTitleAndSubtitle() {
+        Intent intent = getIntent();
+        String title = intent.getStringExtra(ConstantUtil.FORM_TITLE_EXTRA);
+        if (title == null) {
+            title = "";
+        }
+        String subTitle = intent.getStringExtra(ConstantUtil.FORM_SUBTITLE_EXTRA);
+        if (subTitle == null) {
+            subTitle = "";
+        }
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(title);
+            supportActionBar.setSubtitle(subTitle);
+        }
+    }
+
+    private void loadImage() {
+        Intent intent = getIntent();
+        String imageFileName = intent.getStringExtra(ConstantUtil.IMAGE_URL_EXTRA);
+        imageLoader = new PicassoImageLoader(this);
+        imageLoader.loadFromFile(new File(imageFileName), imageView);
     }
 }

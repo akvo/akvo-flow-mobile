@@ -31,7 +31,9 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
@@ -44,12 +46,15 @@ import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -248,5 +253,26 @@ public class Navigator {
 
     public void navigateToHelp(@NonNull Context context) {
         context.startActivity(new Intent(context, HelpActivity.class));
+    }
+
+    public void navigateToLargeImage(AppCompatActivity activity, String filename) {
+        if (activity != null) {
+            Intent intent = new Intent(activity, FullImageActivity.class);
+            intent.putExtra(ConstantUtil.IMAGE_URL_EXTRA, filename);
+            ActionBar supportActionBar = activity.getSupportActionBar();
+            if (supportActionBar != null) {
+                CharSequence title = supportActionBar.getTitle();
+                CharSequence subtitle = supportActionBar.getSubtitle();
+                intent.putExtra(ConstantUtil.FORM_TITLE_EXTRA, title);
+                intent.putExtra(ConstantUtil.FORM_SUBTITLE_EXTRA, subtitle);
+            }
+            activity.startActivity(intent);
+        }
+    }
+
+    public void navigateToVideoView(Context context, String filename) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
+        context.startActivity(intent);
     }
 }

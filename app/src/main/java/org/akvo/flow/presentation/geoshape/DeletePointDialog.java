@@ -30,17 +30,17 @@ import android.support.v7.app.AlertDialog;
 
 import org.akvo.flow.R;
 
-public class DeletePointConfirmationDialog extends DialogFragment {
+public class DeletePointDialog extends DialogFragment {
 
-    public static final String TAG = "DeletePointConfirmationDialog";
+    public static final String TAG = "DeletePointDialog";
 
     private PointDeleteListener listener;
 
-    public DeletePointConfirmationDialog() {
+    public DeletePointDialog() {
     }
 
-    public static DeletePointConfirmationDialog newInstance() {
-        return new DeletePointConfirmationDialog();
+    public static DeletePointDialog newInstance() {
+        return new DeletePointDialog();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class DeletePointConfirmationDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new AlertDialog.Builder(getActivity()).setTitle(R.string.clear_point_title)
+        return new AlertDialog.Builder(getActivity()).setTitle(R.string.delete_point_title)
                 .setCancelable(true)
                 .setPositiveButton(R.string.delete,
                         new DialogInterface.OnClickListener() {

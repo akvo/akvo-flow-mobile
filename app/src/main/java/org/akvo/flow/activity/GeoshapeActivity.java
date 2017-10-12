@@ -48,7 +48,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import org.akvo.flow.R;
-import org.akvo.flow.presentation.geoshape.DeletePointConfirmationDialog;
+import org.akvo.flow.presentation.geoshape.DeletePointDialog;
+import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
 import org.akvo.flow.ui.map.Feature;
 import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
@@ -68,7 +69,8 @@ import timber.log.Timber;
 public class GeoshapeActivity extends BackActivity
         implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener,
         OnMyLocationChangeListener, OnMapReadyCallback,
-        DeletePointConfirmationDialog.PointDeleteListener {
+        DeletePointDialog.PointDeleteListener,
+        DeleteShapeDialog.ShapeDeleteListener {
 
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
@@ -269,19 +271,12 @@ public class GeoshapeActivity extends BackActivity
                     }
                     break;
                 case R.id.clear_point_btn:
-                    DeletePointConfirmationDialog fragment = DeletePointConfirmationDialog
-                            .newInstance();
-                    fragment.show(getSupportFragmentManager(), DeletePointConfirmationDialog.TAG);
+                    DeletePointDialog pointDelete = DeletePointDialog.newInstance();
+                    pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
                     break;
                 case R.id.clear_feature_btn:
-                    ViewUtil.showConfirmDialog(R.string.clear_feature_title, R.string.clear_feature_text,
-                                               GeoshapeActivity.this, true, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mCurrentFeature.delete();
-                                selectFeature(null, null);
-                            }
-                        });
+                    DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
+                    shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
                     break;
                 case R.id.properties:
                     displayProperties();
@@ -501,5 +496,11 @@ public class GeoshapeActivity extends BackActivity
     public void deletePoint() {
         mCurrentFeature.removePoint();
         selectFeature(mCurrentFeature, null);
+    }
+
+    @Override
+    public void deleteShape() {
+        mCurrentFeature.delete();
+        selectFeature(null, null);
     }
 }

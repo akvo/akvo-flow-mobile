@@ -22,12 +22,15 @@ package org.akvo.flow.presentation;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
@@ -102,7 +105,13 @@ public class AppDownloadDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.install,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                navigator.navigateToPlayStore(getActivity(), downloadUrl);
+                                if (messageId == R.string.no_gps_status_message
+                                        && android.os.Build.VERSION.SDK_INT
+                                        < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                                    navigator.downloadGpsStatusViaBrowser(getActivity());
+                                } else {
+                                    navigator.navigateToPlayStore(getActivity(), downloadUrl);
+                                }
                             }
                         })
                 .setNegativeButton(R.string.cancelbutton,

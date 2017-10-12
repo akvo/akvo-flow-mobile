@@ -260,18 +260,14 @@ public class Navigator {
     public void navigateToGpsFixes(AppCompatActivity activity) {
         if (activity != null) {
             PackageManager packageManager = activity.getPackageManager();
-            Intent intent = new Intent(ConstantUtil.GPS_STATUS_PACKAGE_V2);
-            intent.setAction(Intent.ACTION_VIEW);
-//            try {
-//                activity.startActivity(intent);
-//            } catch (Exception e) {
-//                displayGpsStatusNotFoundDialog(activity);
-//            }
-            if (intent.resolveActivity(packageManager) != null) {
+            Intent intent = packageManager
+                    .getLaunchIntentForPackage(ConstantUtil.GPS_STATUS_PACKAGE_V2);
+            if (intent != null) {
                 activity.startActivity(intent);
             } else {
-                intent = new Intent(ConstantUtil.GPS_STATUS_PACKAGE_V1);
-                if (intent.resolveActivity(packageManager) != null) {
+                intent = packageManager
+                        .getLaunchIntentForPackage(ConstantUtil.GPS_STATUS_PACKAGE_V1);
+                if (intent != null) {
                     activity.startActivity(intent);
                 } else {
                     displayGpsStatusNotFoundDialog(activity);

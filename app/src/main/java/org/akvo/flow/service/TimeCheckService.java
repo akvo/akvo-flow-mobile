@@ -21,7 +21,6 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import org.akvo.flow.activity.TimeCheckActivity;
 import org.akvo.flow.api.FlowApi;

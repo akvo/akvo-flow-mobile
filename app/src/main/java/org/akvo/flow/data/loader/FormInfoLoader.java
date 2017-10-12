@@ -24,11 +24,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceColumns;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.FormInfo;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyInstanceColumns;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 
 import java.util.ArrayList;
@@ -53,7 +56,10 @@ public class FormInfoLoader extends AsyncLoader<List<FormInfo>> {
 
     @Override
     public List<FormInfo> loadInBackground() {
-        SurveyDbAdapter database = new SurveyDbAdapter(getContext());
+        Context context = getContext();
+        SurveyDbAdapter database = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context),
+                        new MigrationLanguageMapper(context)));
         database.open();
 
         boolean submittedDataPoint = isDataPointSubmitted(database);

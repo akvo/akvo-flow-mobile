@@ -24,6 +24,7 @@ import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
+import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
@@ -41,6 +42,12 @@ public class ViewModule {
     @Named("saveImage")
     UseCase provideSaveImageUseCase(SaveImage saveImage) {
         return saveImage;
+    }
+
+    @Provides
+    @Named("getSavedDataPoints")
+    UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
+        return getSavedDataPoints;
     }
 
     @Provides

@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -45,19 +46,19 @@ import android.widget.Toast;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
-import org.akvo.flow.service.SurveyedDataPointSyncService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
@@ -75,6 +76,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
+
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
 
@@ -90,10 +93,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @BindView(R.id.add_data_point_fab)
     FloatingActionButton addDataPointFab;
 
-    private SurveyDbAdapter mDatabase;
-
     @Nullable
+    private SurveyDbDataSource mDatabase;
     private SurveyGroup mSurveyGroup;
+
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
     private Navigator navigator = new Navigator();
@@ -118,7 +121,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initializeToolBar();
 
-        mDatabase = new SurveyDbAdapter(this);
+        mDatabase = new SurveyDbDataSource(this, null);
         mDatabase.open();
 
         prefs = new Prefs(getApplicationContext());
@@ -164,7 +167,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                 R.string.drawer_open, R.string.drawer_close) {
+                R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             @Override
@@ -241,8 +244,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         // Delete empty responses, if any
         mDatabase.deleteEmptySurveyInstances();
         mDatabase.deleteEmptyRecords();
-        registerReceiver(mSurveysSyncReceiver,
-                new IntentFilter(getString(R.string.action_surveys_sync)));
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -275,7 +278,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(mSurveysSyncReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSurveysSyncReceiver);
     }
 
     @Override
@@ -345,9 +348,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 DATA_POINTS_FRAGMENT_TAG);
         if (f != null) {
             f.refresh(mSurveyGroup);
-        } else {
-            supportInvalidateOptionsMenu();
         }
+        supportInvalidateOptionsMenu();
         mDrawer.load();
         mDrawerLayout.closeDrawers();
         updateAddDataPointFab();
@@ -434,19 +436,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void refreshMenu() {
-        supportInvalidateOptionsMenu();
-    }
-
-    @Override
-    public void onSyncRecordsTap(long surveyGroupId) {
-        Toast.makeText(this, R.string.syncing_records, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, SurveyedDataPointSyncService.class);
-        intent.putExtra(SurveyedDataPointSyncService.SURVEY_GROUP, surveyGroupId);
-        startService(intent);
-    }
-
-    @Override
     public boolean onSearchTap() {
         return onSearchRequested();
     }
@@ -462,11 +451,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         onRecordSelected(newLocaleId);
     }
 
-    private static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
+    static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
 
         private final WeakReference<SurveyActivity> activityWeakReference;
 
-        private SurveySyncBroadcastReceiver(SurveyActivity activity) {
+        SurveySyncBroadcastReceiver(SurveyActivity activity) {
             this.activityWeakReference = new WeakReference<>(activity);
         }
 
@@ -479,5 +468,4 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             }
         }
     }
-
 }

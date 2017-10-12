@@ -29,8 +29,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func5;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function5;
 
 public class GetUserSettings extends UseCase {
 
@@ -48,9 +48,9 @@ public class GetUserSettings extends UseCase {
         return Observable.zip(userRepository.keepScreenOn(), userRepository.mobileSyncAllowed(),
                 userRepository.getAppLanguage(), userRepository.getImageSize(),
                 userRepository.getDeviceId(),
-                new Func5<Boolean, Boolean, String, Integer, String, UserSettings>() {
+                new Function5<Boolean, Boolean, String, Integer, String, UserSettings>() {
                     @Override
-                    public UserSettings call(Boolean screenOn, Boolean mobileSync, String language,
+                    public UserSettings apply(Boolean screenOn, Boolean mobileSync, String language,
                             Integer imageSize, String deviceId) {
                         return new UserSettings(screenOn, mobileSync, language, imageSize,
                                 deviceId);

@@ -48,6 +48,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import org.akvo.flow.R;
+import org.akvo.flow.presentation.geoshape.DeletePointConfirmationDialog;
 import org.akvo.flow.ui.map.Feature;
 import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
@@ -66,7 +67,8 @@ import timber.log.Timber;
 
 public class GeoshapeActivity extends BackActivity
         implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener,
-        OnMyLocationChangeListener, OnMapReadyCallback {
+        OnMyLocationChangeListener, OnMapReadyCallback,
+        DeletePointConfirmationDialog.PointDeleteListener {
 
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
@@ -267,14 +269,9 @@ public class GeoshapeActivity extends BackActivity
                     }
                     break;
                 case R.id.clear_point_btn:
-                    ViewUtil.showConfirmDialog(R.string.clear_point_title, R.string.clear_point_text,
-                                               GeoshapeActivity.this, true, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mCurrentFeature.removePoint();
-                                selectFeature(mCurrentFeature, null);
-                            }
-                        });
+                    DeletePointConfirmationDialog fragment = DeletePointConfirmationDialog
+                            .newInstance();
+                    fragment.show(getSupportFragmentManager(), DeletePointConfirmationDialog.TAG);
                     break;
                 case R.id.clear_feature_btn:
                     ViewUtil.showConfirmDialog(R.string.clear_feature_title, R.string.clear_feature_text,
@@ -498,5 +495,11 @@ public class GeoshapeActivity extends BackActivity
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, MAP_ZOOM_LEVEL));
             mCentered = true;
         }
+    }
+
+    @Override
+    public void deletePoint() {
+        mCurrentFeature.removePoint();
+        selectFeature(mCurrentFeature, null);
     }
 }

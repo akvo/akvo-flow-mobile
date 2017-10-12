@@ -115,7 +115,6 @@
     <string name="capture_shape">capture shape</string>
     <string name="view_shape">view shape</string>
     <string name="clear_point_title">Delete point</string>
-    <string name="clear_point_text">Do you want to remove this point?</string>
     <string name="clear_feature_title">Delete feature</string>
     <string name="clear_feature_text">Do you want to remove this feature?</string>
     <string name="repeat_group">Repeat group</string>

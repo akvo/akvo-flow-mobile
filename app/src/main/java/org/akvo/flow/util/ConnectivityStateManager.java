@@ -24,6 +24,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+@Deprecated
 public class ConnectivityStateManager {
 
     private final Context context;

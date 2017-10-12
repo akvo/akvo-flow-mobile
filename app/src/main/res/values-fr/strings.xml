@@ -15,17 +15,8 @@
   <string name="submitbutton">Envoyer</string>
   <string name="geodialog">Veuillez autoriser l\'accès aux données de localisation</string>
   <string name="settings">Paramètres</string>
-  <string name="resize_large_images">Redimensionner les images trop grandes</string>
-  <string name="preferences_settings_section">Paramètres</string>
-  <string name="prefoptlabel">Préférences</string>
-  <string name="prefoptdesc">Choisir la langue par défaut de l\'enquête et autres préférences</string>
-  <string name="sendoptlabel">Synchroniser les données</string>
-  <string name="sendoptdesc">Synchroniser les données de l\'enquête. Vous devez avoir une connexion Internet (mobile ou wi-fi) pour réaliser cette commande.</string>
-  <string name="screenoptlabel">Garder l\'écran activé pendant l\'entrée des données</string>
-  <string name="screenoptdesc">Empêcher l\'écran de s\'éteindre pendant que vous remplissez les données. Assurez-vous d\'éteindre l\'écran manuellement (ou de quitter l\'application) lorsque vous avez terminé afin d\'économiser la batterie.</string>
+  <string name="preferences_settings_section">Settings </string>
   <string name="aboutlabel">A propos</string>
-  <string name="gpsstatuslabel">Etat du GPS</string>
-  <string name="gpsstatusdesc">Démarre l\'application GPS Status si elle est installée sur cet appareil.</string>
   <string name="nogpsstatus">GPS Status n\'est pas installée sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
   <string name="otherinstructions">Veuillez entrer une description</string>
   <string name="texthelpoption">Voir le texte d\'aide</string>
@@ -34,13 +25,11 @@
   <string name="helpheading">Options d\'aide</string>
   <string name="deleteresponse">Effacer les réponses</string>
   <string name="othertext">Autre...</string>
-  <string name="uploadoptionlabel">Envoyer les données avec le réseau mobile</string>
   <string name="surveylanglabel">Langues de l\'enquête</string>
   <string name="scanbarcode">Scanner le code barre</string>
   <string name="toosmallerr">La valeur est trop petite. Valeur minimum: </string>
   <string name="toolargeerr">La valeur est trop grande. valeur maximum: </string>
   <string name="baddatatypeerr">La réponse doit être numérique</string>
-  <string name="serverlabel">Serveur de donnée (à changer seulement si demandé)</string>
   <string name="reloadsurveyslabel">Recharger toutes les enquêtes</string>
   <string name="reloadsurveysdesc">Effacer et recharger toutes les enquêtes affectées (à effectuer seulement si demandé)</string>
   <string name="conftitle">Veuillez confirmer</string>
@@ -51,8 +40,9 @@
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
   <string name="pleasewait">Veuillez attendre</string>
+  <string name="preference_download_form_title">Télécharger le formulaire en utilisant l\'ID du formulaire</string>
+  <string name="preference_download_form_subtitle">Faites-le seulenet si demandé</string>
   <string name="downloadsurveylabel">Téléchargement du formulaire</string>
-  <string name="downloadsurveydesc">Télécharger une enquête choisie (effectuer seulement si demandé)</string>
   <string name="downloadsurveyinstr">Indiquez l\'identifiant du formulaire à télécharger.</string>
   <string name="deletealldatawarning">Vous allez effacer définitivement toutes les données (enquêtes, données, images, et utilisateurs) de l\'appareil. Cette opération est irréversible.</string>
   <string name="delete_responses_warning">Vous allez effacer définitivement toutes les données, images et fichier .zip de l\'appareil de l\'appareil. Cette opération est irréversible. </string>
@@ -69,7 +59,6 @@
   <string name="clearquestion">Effacer les réponses</string>
   <string name="clearquestiondesc">Voulez-vous effacer la réponse à cette question?</string>
   <string name="identlabel">Identifiant de l\'appareil</string>
-  <string name="setidentlabel">Établir l\'identifiant de l\'appareil</string>
   <string name="bootstrapstart">Charger les données de l\'enquête depuis la carte SD</string>
   <string name="bootstrapcomplete">Chargement des données depuis la carte SD terminé</string>
   <string name="bootstraperror">Erreur lors de l\'exportation du fichier zip</string>
@@ -77,15 +66,10 @@
   <string name="transmissionhist">Historique des transmissions</string>
   <string name="transstartdate">Commencé:</string>
   <string name="transenddate">Fini:</string>
-  <string name="resetall">Tout effacer (utilisateurs, enquêtes, et toutes les données collectées)</string>
   <string name="resetalldesc">Effacer définitivement toutes les enquêtes, données (y compris les images et fichiers .zip exportés) et utilisateurs</string>
-  <string name="reset_responses">Effacer les données collectées et les images</string>
   <string name="reset_responses_desc">Effacer définitivement toutes les données de l\'enquêtes (y compris les images et fichiers .zip exportés)</string>
-  <string name="checksd">Vérifier l\'état de la carte SD</string>
-  <string name="checksddesc">Vérifier pour voir si la carte SD est activée et afficher l\'espace libre restant sur la carte.</string>
+  <string name="checksd">Stockage disponible</string>
   <string name="sdmissing">La carte SD est manquante ou désactivée. Vérifier que vous avez désactivé le transfert de fichier USB</string>
-  <string name="sdmounted">La carte SD est activée normalement.</string>
-  <string name="sdcardspace">Espace restant (MB):</string>
   <string name="pickdate">Choisir une date</string>
   <string name="pleasewaitforbootstrap">Veuillez attendre jusqu\'à ce que le fichier soit prêt.</string>
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
@@ -108,10 +92,9 @@
   <string name="data_sync_error_form_deleted_title">Ce formulaire a été supprimé.</string>
   <string name="data_sync_error_form_deleted_text">Le formulaire %1$s a été supprimé</string>
   <!--Localization-->
-  <string name="app_language">Langue de l\'application</string>
   <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">Aucune enquête affectée à l\'appareil. Les enquêtes sont affectées depuis le tableau de bord Flow</string>
+  <string name="no_datapoints_error_text">Vous n\'avez pas encore de points de données. Cliquer sur \'+\' pour ajouter un nouveau point de données.</string>
   <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
   <!--ToolBar-->
   <string name="more">Plus</string>
@@ -144,13 +127,13 @@
   <string name="delete_group_title">Supprimer le groupe</string>
   <string name="delete_group_text">Voulez-vous supprimer ce groupe?</string>
   <string name="add_signature">Ajouter une signature</string>
+  <string name="modify_signature">Modifier la signature</string>
   <string name="signed_by">Signé par:</string>
   <string name="signature_terms">Je comprends que ceci est une image éléctronique représentant ma signature</string>
   <string name="image_location_unknown">Géolocalisation inconnue</string>
   <string name="image_location_reading">Lecture de la géolocalisation</string>
   <string name="image_location_saved">Géolocalisation enregistrée</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">Créer un point de donnée</string>
   <string name="stats_total">Total de points:</string>
   <string name="stats_week">Les 7 derniers jours:</string>
   <string name="stats_today">Aujourd\'hui:</string>
@@ -227,7 +210,7 @@
   <string name="clearbutton">Effacer</string>
   <string name="yes">Oui</string>
   <string name="no">Non</string>
-  <string name="retry">Réessayer</string>
+  <string name="action_retry">Réessayer</string>
   <string name="delete">Supprimer</string>
   <string name="drawer_open">Menu ouvert</string>
   <string name="drawer_close">Menu fermé</string>
@@ -259,4 +242,23 @@
   <string name="barcode_scanner_missing_error">Aucune application Scanner n\'est installée sur cet appareil. Voulez-vous en installer une maintenant?</string>
   <string name="install">Installer</string>
   <string name="signature_name_hint">Veuillez saisir votre nom</string>
+  <string name="saving">Sauvegarde en cours…</string>
+  <string name="error_saving_signature">Erreur lors de la sauvegarde de la signature, veuillez réessayer.</string>
+  <string name="help">Aide</string>
+  <string name="error_loading_help">Erreur lors du chargement du contenu d\'aide</string>
+  <string name="error_mobile_data_sync">Désactiver la synchronisation des données mobiles</string>
+  <string name="preference_screen_on">Garder l\'ecran en marche pendant la collecte</string>
+  <string name="preference_mobile_data">Activer l\'utilisation des données mobiles</string>
+  <string name="preference_app_language">Langage App</string>
+  <string name="preference_image_size">Taille de l\'image</string>
+  <string name="preferences_data_section">Données</string>
+  <string name="preference_sync_datapoints">Envoyer les points de données dans l\'intance Flow</string>
+  <string name="preference_delete_collected_data">Effacer les données et images collectées</string>
+  <string name="preference_delete_everything">Tout supprimer</string>
+  <string name="preferences_configuration_section">Configuration</string>
+  <string name="preference_gps">Corrections du GPS</string>
+  <string name="preference_storage">Stockage disponible</string>
+  <string name="preferences_section_information">Information</string>
+  <string name="preference_identifier">Identifiant de l\'appareil</string>
+  <string name="preference_instance_name">Nom de l\'instance</string>
 </resources>

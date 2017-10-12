@@ -11,17 +11,7 @@
   <string name="lon">Kinh độ</string>
   <string name="elevation">Độ cao</string>
   <string name="submitbutton">Đệ trình</string>
-  <string name="resize_large_images">Thay đổi kích thước của những ảnh cỡ lớn</string>
-  <string name="preferences_settings_section">Cài đặt</string>
-  <string name="prefoptlabel">Sự ưu tiên</string>
-  <string name="prefoptdesc">Cài đặt ngôn ngữ khảo sát mặc định và dữ liệu ưu tiên khác</string>
-  <string name="sendoptlabel">Đồng bộ hóa dữ liệu</string>
-  <string name="sendoptdesc">Đồng bộ hóa dữ liệu khảo sát. Bạn phải có kết nối mạng (điện thoại di động hoặc wifi) để thực hiện thao tác này</string>
-  <string name="screenoptlabel">Giữ màn hình hoạt động trong quá trình nhập dữ liệu khảo sát</string>
-  <string name="screenoptdesc">Tránh để màn hình bị tắt khi đang ở chế độ nhập dữ liệu. Chắc chắn rằng tắt màn hình hoặc thoát khỏi ứng dụng bằng tay khi không sử dụng để tránh bị hao pin</string>
   <string name="aboutlabel">Phiên bản</string>
-  <string name="gpsstatuslabel">Trạng thái định vị tọa độ</string>
-  <string name="gpsstatusdesc">Khởi động ứng dụng định vị tọa độ nếu bạn đã cài đặt nó trên thiết bị này</string>
   <string name="nogpsstatus">Ứng dụng định vị tọa độ chưa được cài đặt trên thiết bị này. Vui lòng cài đặt nó bằng sử dụng kho dữ liệu của Google Play</string>
   <string name="otherinstructions">Vui lòng nhập một mô tả</string>
   <string name="texthelpoption">Xem trợ giúp dưới dạng văn bản</string>
@@ -30,13 +20,11 @@
   <string name="helpheading">Lựa chọn trợ giúp</string>
   <string name="deleteresponse">Xóa câu trả lời</string>
   <string name="othertext">Khác…</string>
-  <string name="uploadoptionlabel">Đồng bộ hóa dữ liệu qua mạng di động </string>
   <string name="surveylanglabel">Những ngôn ngữ của đợt khảo sát</string>
   <string name="scanbarcode">Quét mã vạch</string>
   <string name="toosmallerr">Giá trị quá nhỏ. Giá trị nhỏ nhất là: </string>
   <string name="toolargeerr">Giá trị quá lớn. Giá trị lớn nhất là: </string>
   <string name="baddatatypeerr">Câu trả lời phải là dạng số học</string>
-  <string name="serverlabel">Máy chủ dữ liệu (chỉ thay đổi nếu được chỉ thị)</string>
   <string name="reloadsurveyslabel">Tải lại toàn bộ những đợt khảo sát</string>
   <string name="reloadsurveysdesc">Xóa và tải lại những khảo sát được giao (chỉ hoạt động khi được chỉ dẫn)</string>
   <string name="conftitle">Vui lòng xác minh</string>
@@ -48,7 +36,6 @@
   <string name="langmandatorytext">Bạn phải lựa chọn tối thiểu 1 ngôn ngữ</string>
   <string name="pleasewait">Xin vui lòng đợi</string>
   <string name="downloadsurveylabel">Tải biểu mẫu</string>
-  <string name="downloadsurveydesc">Tải những khảo sát bất kỳ (chỉ hoạt động khi được chỉ dẫn)</string>
   <string name="downloadsurveyinstr">Nhập ID của form mà bạn muốn tải</string>
   <string name="deletealldatawarning">Điều này sẽ xóa vĩnh viễn tất cả dữ liệu (những câu hỏi, câu trả lời, hình ảnh và người sử dụng) trên thiết bị. Đây là hoạt động không thể đảo ngược. Nhấn OK để tiếp tục hoặc hủy bỏ để thoát</string>
   <string name="delete_responses_warning">Điều này sẽ xóa vĩnh viễn tất cả dữ liệu những câu trả lời, hình ảnh và file nén trên thiết bị. Đây là hoạt động không thể đảo ngược. Nhấn OK để tiếp tục hoặc hủy bỏ để thoát</string>
@@ -65,22 +52,15 @@
   <string name="clearquestion">Xóa dữ liệu</string>
   <string name="clearquestiondesc">Bạn có muốn xóa câu trả lời của câu hỏi này?</string>
   <string name="identlabel">Nhận dạng thiết bị</string>
-  <string name="setidentlabel">Cài đặt nhận dạng thiết bị</string>
   <string name="bootstrapstart">Tải dữ liệu điều tra từ thẻ nhớ SD</string>
   <string name="bootstrapcomplete">Hoàn thành tải dữ liệu khảo sát từ thẻ nhớ SD</string>
   <string name="bootstraperror">Lỗi khi xử lý tập tin zip bootstrap</string>
   <string name="transmissionhist">Lịch sử truyền dữ liệu</string>
   <string name="transstartdate">Quá trình truyền dữ liệu đã bắt đầu</string>
   <string name="transenddate">Quá trình truyền dữ liệu đã kết thúc</string>
-  <string name="resetall">Xóa toàn bộ dữ liệu (người sử dụng, những câu hỏi và toàn bộ dữ liệu thu thập)</string>
   <string name="resetalldesc">Xóa vĩnh viễn toàn bộ những câu hỏi, trả lời (bao gồm những hình ảnh và file nén được xuất) và những người sử dụng</string>
-  <string name="reset_responses">Xóa dữ liệu và những hình ảnh đã thu thập</string>
   <string name="reset_responses_desc">Xóa vĩnh viễn toàn bộ những câu trả lời khảo sát (bao gồm những hình ảnh và file nén được xuất)</string>
-  <string name="checksd">Kiểm tra tình trạng của thẻ nhớ SD</string>
-  <string name="checksddesc">Kiểm tra để thấy rằng thẻ SD được lắp và hiển thị dung lượng trống còn lại trên thẻ.</string>
   <string name="sdmissing">Thẻ nhớ SD thiếu hoặc không được lắp. Chắc chắn rằng bạn đã tắt chế độ \"Sao chép tập tin qua cổng USB\"</string>
-  <string name="sdmounted">Thẻ nhớ SD được lắp đúng vị trí</string>
-  <string name="sdcardspace">Khoảng trống dữ liệu (Mb)</string>
   <string name="pickdate">Chọn ngày</string>
   <string name="pleasewaitforbootstrap">Vui lòng đợi đến khi file hoàn tất quá trình xử lý</string>
   <string name="clear_data_success">Dữ liệu đã được xóa khỏi thiết bị</string>
@@ -100,7 +80,6 @@
   <string name="data_sync_all">Dữ liệu đã được đồng bộ hóa %1$d - Bị lỗi %2$d</string>
   <string name="data_sync_synced">Dữ liệu đã được đồng bộ hóa: %1$d</string>
   <!--Localization-->
-  <string name="app_language">Ngôn ngữ của ứng dụng</string>
   <string name="please_restart">Vui lòng, khởi động lại ứng dụng</string>
   <!--Empty Views-->
   <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
@@ -141,7 +120,6 @@
   <string name="image_location_reading">Đang đọc vị trí địa lý</string>
   <string name="image_location_saved">Đã lưu vị trí địa lý</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">Tạo điểm dữ liệu mới</string>
   <string name="stats_total">Tổng số những điểm dữ liệu:</string>
   <string name="stats_week">7 ngày trước:</string>
   <string name="stats_today">Hôm nay:</string>
@@ -211,7 +189,7 @@
   <string name="clearbutton">Xóa dữ liệu</string>
   <string name="yes">Có</string>
   <string name="no">Không</string>
-  <string name="retry">Làm lại</string>
+  <string name="action_retry">Làm lại</string>
   <string name="delete">Xóa</string>
   <string name="drawer_open">Drawer open</string>
   <string name="drawer_close">Drawer close</string>

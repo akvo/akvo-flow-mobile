@@ -28,7 +28,6 @@ import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -71,7 +70,7 @@ public class OptionsFormActivityTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(new SurveyDbAdapter(targetContext));
+        installer = new SurveyInstaller(targetContext);
         installer.installSurvey(optionsurvey, InstrumentationRegistry.getContext());
     }
 

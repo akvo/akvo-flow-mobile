@@ -25,7 +25,7 @@ import android.content.SharedPreferences;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 @Singleton
 public class SharedPreferencesDataSource {
@@ -74,6 +74,10 @@ public class SharedPreferencesDataSource {
 
     private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
+    }
+
+    public void removePreference(String key) {
+        preferences.edit().remove(key).apply();
     }
 
     private String getString(String key, String defaultValue) {

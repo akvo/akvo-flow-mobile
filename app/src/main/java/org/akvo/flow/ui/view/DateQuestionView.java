@@ -142,10 +142,13 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     @Override
     public void captureResponse(boolean suppressListeners) {
         String utcTimeStampString = mLocalCalendar.getTimeInMillis() + "";
-        setResponse(new QuestionResponse(utcTimeStampString,
-                        ConstantUtil.DATE_RESPONSE_TYPE,
-                        getQuestion().getId()),
-                suppressListeners);
+        Question question = getQuestion();
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                        .setValue(utcTimeStampString)
+                        .setType(ConstantUtil.DATE_RESPONSE_TYPE)
+                        .setQuestionId(question.getQuestionId())
+                        .setIteration(question.getIteration())
+                        .createQuestionResponse(), suppressListeners);
     }
 
     @Override

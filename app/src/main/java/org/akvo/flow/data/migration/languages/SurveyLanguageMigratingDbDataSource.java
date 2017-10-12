@@ -24,7 +24,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import org.akvo.flow.data.database.LanguageTable;
+import org.akvo.flow.database.LanguageTable;
 
 import java.util.Set;
 

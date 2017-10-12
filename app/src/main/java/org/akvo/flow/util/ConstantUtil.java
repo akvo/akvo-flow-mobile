@@ -142,7 +142,7 @@ public class ConstantUtil {
     public static final String SCREEN_ON_KEY = "screen.keepon";
     public static final String DEVICE_IDENT_KEY = "device.identifier";
     public static final String MAX_IMG_SIZE = "media.img.maxsize";
-    
+
     /**
      * intents
      */
@@ -190,11 +190,8 @@ public class ConstantUtil {
     /**
      * Order By
      */
-    public static final int ORDER_BY_NONE = -1;
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
-    public static final int ORDER_BY_STATUS = 2;
-    public static final int ORDER_BY_NAME = 3;
 
     /**
      * Max picture size
@@ -204,8 +201,6 @@ public class ConstantUtil {
     public static final int IMAGE_SIZE_320_240 = 0;
     public static final int IMAGE_SIZE_640_480 = 1;
     public static final int IMAGE_SIZE_1280_960 = 2;
-
-    public static final int NOTIFICATION_RECORD_SYNC = 100;
 
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
@@ -231,8 +226,8 @@ public class ConstantUtil {
     public static final String CADDISFLY_MIME = "text/plain";
 
     //broadcasts
-    public static final String ACTION_LOCALE_SYNC = "fieldsurvey.ACTION_LOCALES_SYNC";
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
+    public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs

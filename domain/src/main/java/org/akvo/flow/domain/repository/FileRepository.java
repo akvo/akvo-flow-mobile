@@ -22,7 +22,7 @@ package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public interface FileRepository {
 

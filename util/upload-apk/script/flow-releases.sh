@@ -24,8 +24,8 @@ set -e
 # Move to the project directory
 cd $FLOW_MOBILE
 
+. app/version.properties
 version=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
-echo $version
 
 rm -rf tmp
 rm -rf builds

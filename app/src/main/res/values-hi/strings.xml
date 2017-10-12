@@ -11,17 +11,7 @@
   <string name="lon">लोंगिट्यूड</string>
   <string name="elevation">ऊंचाई </string>
   <string name="submitbutton">जमा करें</string>
-  <string name="resize_large_images">फोटो का साइज़</string>
-  <string name="preferences_settings_section">सेटिंग्स </string>
-  <string name="prefoptlabel">प्रेफ्रेंसेस </string>
-  <string name="prefoptdesc">सर्वे की भाषा तथा अन्य विकल्प की सूची </string>
-  <string name="sendoptlabel">सिंक डेटा </string>
-  <string name="sendoptdesc">सर्वे डेटा सिंक करें | इस कार्य करें के लिए डेटा (मोबाइल या वाई -फाई) का होना आवश्यक है |</string>
-  <string name="screenoptlabel">सर्वे के दौरान, स्क्रीन को ओन रखें </string>
-  <string name="screenoptdesc">सर्वे करते समय स्क्रीन को बंद नहीं होने देना  | याद रहे की बैटरी की बचत के लिए, इस्तमाल न करते समय स्क्रीन को स्वयं बंद करदें (या ऐप्प से बाहर निकल जाएं )</string>
   <string name="aboutlabel">ऐप्प के बारे में</string>
-  <string name="gpsstatuslabel">GPS स्टेटस </string>
-  <string name="gpsstatusdesc">GPS स्टेटस ऐप्प को इस्तेमाल करने के लिए | इस ऐप्प का आपके फ़ोन या टैबलेट में होना आवश्यक है</string>
   <string name="nogpsstatus">आपके उपकरण में GPS स्टेटस स्तापित नहीं है I इसे स्तापित करने के गूगल प्ले स्टोर इस्तमाल करैं I</string>
   <string name="otherinstructions">कृपया विवरण डाले </string>
   <string name="texthelpoption">सहायक पुस्तिका देखें </string>
@@ -30,13 +20,11 @@
   <string name="helpheading">सहायक विकल्प </string>
   <string name="deleteresponse">प्रतिक्रिया को हटाएं </string>
   <string name="othertext">अन्य </string>
-  <string name="uploadoptionlabel">मोबाइल नेटवर्क का इस्तमाल करते हुए डेटा सिंक करें </string>
   <string name="surveylanglabel">सर्वे की  भाषाएँ </string>
   <string name="scanbarcode">बारकोड को स्कैन करें </string>
   <string name="toosmallerr"> संख्या अति छोटी है I नुन्यतम संख्या डाले :</string>
   <string name="toolargeerr">संख्या अति बड़ी है I अधिकतम संख्या डाले :</string>
   <string name="baddatatypeerr">उत्तर संख्या में दें </string>
-  <string name="serverlabel">डेटा सर्वर (निर्देश पर ही बदलें )</string>
   <string name="reloadsurveyslabel">सभी सर्वे को पुनः लोड करें </string>
   <string name="reloadsurveysdesc">सभी नियुक्त सर्वे को हटाने और पुनः डाउनलोड करने के लिए (निर्देश पर ही प्रयोग करें  )</string>
   <string name="conftitle">कृपया निश्चित करें </string>
@@ -48,7 +36,6 @@
   <string name="langmandatorytext">किसी भी  एक भाषा का चनाव करें </string>
   <string name="pleasewait">कृपया प्रतीक्षा करें </string>
   <string name="downloadsurveylabel">फॉर्म को डाउनलोड करें </string>
-  <string name="downloadsurveydesc">स्वेच्छित सर्वे डाउनलोड करें (निर्देशित करने पर ही करें )</string>
   <string name="downloadsurveyinstr">वह फॉर्म आईडी  डालें जिसे डाउनलोड करना है </string>
   <string name="deletealldatawarning">ऐसा करने पर सभी डेटा स्थाईरुप से हट जायेगा (सर्वे प्रतिउत्तर , चित्र आदि ) I यह प्रतिक्रिया उलटनीय  नहीं है  आगे बढ़ने के लिए OK तथा समाप्त करने के लिए कैंसिल दबाएं I</string>
   <string name="delete_responses_warning">ऐसा करने पर प्रतिउत्तर ,चित्र व ज़िप फाइल स्तापितरुप से हट जायेगा Iयह प्रतिक्रिया उलटनीय  नहीं हैI आगे बढ़ने के लिए OK तथा समाप्त करने के लिए कैंसिल दबाएंI</string>
@@ -65,22 +52,15 @@
   <string name="clearquestion">दिए गए उत्तर को हटाएं </string>
   <string name="clearquestiondesc">क्या आप  इस प्रशन का उत्तर हटाना चाहते हैं?</string>
   <string name="identlabel">डिवाइस आइडेंटिफायर </string>
-  <string name="setidentlabel">उपकरण अभिज्ञापक  सेट करें </string>
   <string name="bootstrapstart">S.D  कार्ड से सर्वे डेटा लोड हो रहा है </string>
   <string name="bootstrapcomplete">SD कार्ड से डेटा लोड पूर्ण हुआ </string>
   <string name="bootstraperror">बूटस्ट्रैप ज़िप फाइल की प्रक्रिया में त्रुटि</string>
   <string name="transmissionhist">ट्रांसमिशन हिस्ट्री </string>
   <string name="transstartdate">शुरू </string>
   <string name="transenddate">समाप्त</string>
-  <string name="resetall">सभी उपभोक्ता सर्वे अन्य  इकट्ठा करा डेटा डिलीट करें </string>
   <string name="resetalldesc">स्थाईरुप  से सभी सर्वे, उत्तर (चित्र तथा बाहर भेजदी गई ज़िप फाइल्स) और उपभोक्ता डिलीट करें </string>
-  <string name="reset_responses">सर्वे </string>
   <string name="reset_responses_desc">स्थाईरुप से सभी सर्वे उत्तर (चित्र और बाहर भेजी ज़िप फाइल सहित) हटाने के लिए </string>
-  <string name="checksd">S D कार्ड की स्तिथि जाँचे </string>
-  <string name="checksddesc">जाँचे की SD कार्ड ठीक तरह से लगा हुआ है तथा कार्ड पर कितनी  खली जगह उपलब्ध है </string>
   <string name="sdmissing">SD कार्ड नमौजूद या लगा नहीं हैI  सनुचित करें कि USB फाइल कॉपीइंग बंद कर दिया गया हैI</string>
-  <string name="sdmounted">SD कार्ड सही तरह से लगा है </string>
-  <string name="sdcardspace">उपलब्ध स्थान (MB)</string>
   <string name="pickdate">दिनांक  चुनिए </string>
   <string name="pleasewaitforbootstrap">कृपया बूटस्ट्रैप फाइल की प्रासेसिंग पूरा होने तक रुकें </string>
   <string name="clear_data_success">डेटा आपके फ़ोन अथवा टेबलेट से सफलता पूर्ण हटा दिया गया है </string>
@@ -100,7 +80,6 @@
   <string name="data_sync_all">सिंक हुआ फॉर्म: %1$d-  असफल %2$d</string>
   <string name="data_sync_synced">सिंक हुआ फॉर्म: %1$d</string>
   <!--Localization-->
-  <string name="app_language">ऐप  की भाषा </string>
   <string name="please_restart">कृपया ऐप को पुनर्प्रारंभ करें </string>
   <!--Empty Views-->
   <string name="no_survey_selected_text">आपने कोई सर्वे नहीं चुना है । कृपया साइड मेनू से कोई सर्वे चुने । </string>
@@ -141,7 +120,6 @@
   <string name="image_location_reading">भौगोलिक स्थिति की जांच जारी</string>
   <string name="image_location_saved">भौगोलिक स्थिति अभिलिखित</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">नया डेटा पॉइंट बनाएं</string>
   <string name="stats_total">कुल डेटा पॉइंट्स </string>
   <string name="stats_week">पिछले सात, 7, दिन </string>
   <string name="stats_today">आज </string>
@@ -211,7 +189,7 @@
   <string name="clearbutton">हटाएं </string>
   <string name="yes">हाँ </string>
   <string name="no">नहीं </string>
-  <string name="retry">पुन: प्रयास</string>
+  <string name="action_retry">पुन: प्रयास</string>
   <string name="delete">हटाएं </string>
   <!--app update service-->
 </resources>

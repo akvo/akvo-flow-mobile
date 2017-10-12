@@ -33,7 +33,6 @@ import android.support.test.runner.AndroidJUnit4;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.ValidationRule;
 import org.junit.After;
@@ -77,7 +76,7 @@ public class NumberFreeTextFormActivityTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(new SurveyDbAdapter(targetContext));
+        installer = new SurveyInstaller(targetContext);
         survey = installer.installSurvey(numbersurvey, InstrumentationRegistry.getContext());
     }
 

@@ -35,8 +35,8 @@
 
     <style name="PreferenceSpinner">
         <!-- Default color for the dropdown arrow -->
-        <item name="colorControlNormal">@color/black_disabled</item>
-        <item name="android:textColor">@color/black_disabled</item>
+        <item name="colorControlNormal">@color/black_main</item>
+        <item name="android:textColor">@color/black_main</item>
         <item name="android:textSize">14sp</item>
     </style>
 
@@ -120,8 +120,8 @@
     <style name="PreferenceSpinnerStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingStart">12dp</item>
         <item name="android:paddingRight">16dp</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">8dp</item>

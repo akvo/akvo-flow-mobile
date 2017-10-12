@@ -33,8 +33,6 @@ import timber.log.Timber;
 
 public class GsonMapper {
 
-    private static final String TAG = GsonMapper.class.getSimpleName();
-
     private final Gson mapper;
 
     public GsonMapper() {

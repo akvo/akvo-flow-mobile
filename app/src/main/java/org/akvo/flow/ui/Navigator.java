@@ -22,7 +22,6 @@ package org.akvo.flow.ui;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -30,8 +29,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import org.akvo.flow.R;
@@ -119,32 +116,21 @@ public class Navigator {
         activity.startActivityForResult(i, ConstantUtil.VIDEO_ACTIVITY_REQUEST);
     }
 
-    public void navigateToBarcodeScanner(@NonNull Activity activity) {
+    public void navigateToBarcodeScanner(@NonNull AppCompatActivity activity) {
         Intent intent = new Intent(ConstantUtil.BARCODE_SCAN_INTENT);
         try {
             activity.startActivityForResult(intent, ConstantUtil.SCAN_ACTIVITY_REQUEST);
         } catch (ActivityNotFoundException ex) {
-            displayScannerNotFoundDialog(activity, R.string.barcode_scanner_missing_error);
+            displayScannerNotFoundDialog(activity);
         }
     }
 
-    private void displayScannerNotFoundDialog(@NonNull final Activity activity, @StringRes int messageId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.install,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        navigateToPlayStore(activity,
-                                "http://play.google.com/store/search?q=Barcode Scanner");
-                    }
-                });
-        builder.setNegativeButton(R.string.cancelbutton,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        builder.show();
+    private void displayScannerNotFoundDialog(@NonNull final AppCompatActivity activity) {
+        AppDownloadDialogFragment fragment = AppDownloadDialogFragment
+                .newInstance(R.string.barcode_scanner_missing_error,
+                        "http://play.google.com/store/search?q=Barcode Scanner");
+        fragment.show(activity.getSupportFragmentManager(),
+                AppDownloadDialogFragment.TAG);
     }
 
     public void navigateToPlayStore(@NonNull Activity activity, String uriString) {

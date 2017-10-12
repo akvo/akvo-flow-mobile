@@ -25,7 +25,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
@@ -39,12 +39,11 @@ import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public class DatabaseDataSource {
 
@@ -85,15 +84,7 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
-    public Observable<List<ApiDataPoint>> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
-        if (apiDataPoints == null) {
-            return Observable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
-        }
-        syncDataPointsWithDataBase(apiDataPoints);
-        return Observable.just(apiDataPoints);
-    }
-
-    private void syncDataPointsWithDataBase(@Nullable List<ApiDataPoint> apiDataPoints) {
+    public void syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null || apiDataPoints.size() == 0) {
             return;
         }

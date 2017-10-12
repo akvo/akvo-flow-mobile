@@ -30,7 +30,7 @@ import com.google.android.gms.gcm.TaskParams;
 
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
@@ -110,7 +110,7 @@ public class ApkUpdateService extends GcmTaskService {
         schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
         Context applicationContext = getApplicationContext();
-        apkUpdateHelper = new ApkUpdateHelper(applicationContext);
+        apkUpdateHelper = new ApkUpdateHelper();
         ConnectivityStateManager connectivityStateManager = new ConnectivityStateManager(
                 applicationContext);
         Prefs prefs = new Prefs(applicationContext);

@@ -23,8 +23,8 @@ package org.akvo.flow.injector.module;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
+import com.squareup.sqlbrite2.BriteDatabase;
+import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
@@ -63,8 +63,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.logging.HttpLoggingInterceptor;
-import rx.schedulers.Schedulers;
 
 @Module
 public class ApplicationModule {
@@ -152,7 +152,8 @@ public class ApplicationModule {
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_PATTERN, Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new RestServiceFactory(loggingInterceptor, simpleDateFormat, new Encoder());
+        return new RestServiceFactory(loggingInterceptor, simpleDateFormat, new Encoder(),
+                BuildConfig.API_KEY, BuildConfig.SERVER_BASE);
     }
 
     @Provides

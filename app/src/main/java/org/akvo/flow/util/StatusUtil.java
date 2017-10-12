@@ -27,6 +27,8 @@ import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import org.akvo.flow.BuildConfig;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -98,11 +100,10 @@ public class StatusUtil {
     /**
      * Get the application (FLOW instance) id.
      */
-    public static String getApplicationId(Context context) {
+    public static String getApplicationId() {
         // Directly fetch the server from the properties file. A local serverBase found in the DB
         // will cause a permanent mismatch for all surveys, since XML files will contain original application
-        String serverBase = new PropertyUtil(context.getResources())
-                .getProperty(ConstantUtil.SERVER_BASE);
+        String serverBase = BuildConfig.SERVER_BASE;
         try {
             // Match instance name from server base, for example:
             // https://akvoflow-X.appspot.com --> akvoflow-X

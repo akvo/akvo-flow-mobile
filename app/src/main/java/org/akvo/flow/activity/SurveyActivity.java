@@ -79,7 +79,7 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
+        DrawerFragment.DrawerListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
     private static final String DRAWER_FRAGMENT_TAG = "f";
@@ -181,7 +181,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
              */
             @Override
             public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
                 //prevent the back icon from showing
                 super.onDrawerSlide(drawerView, 0);
                 supportInvalidateOptionsMenu();

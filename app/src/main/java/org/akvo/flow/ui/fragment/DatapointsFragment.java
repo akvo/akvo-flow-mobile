@@ -133,38 +133,6 @@ public class DatapointsFragment extends Fragment {
         return v;
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        if (mSurveyGroup != null) {
-//            inflater.inflate(R.menu.datapoints_fragment, menu);
-//            SubMenu subMenu = menu.findItem(R.id.more_submenu).getSubMenu();
-//            if (!mSurveyGroup.isMonitored()) {
-//                subMenu.removeItem(R.id.sync_records);
-//            }
-//
-//            // "Order By" is only available for the ListFragment, not the MapFragment.
-//            // The navigation components maintain 2 different indexes: Tab index and Pager index.
-//            // The system seems to always update the tab index first, prior to the onCreateOptionsMenu
-//            // call (either selecting the Tab or swiping the Pager). For this reason, we need to check
-//            // the Tab index, not the Pager one, which turns out to be buggy in some Android versions.
-//            // TODO: If this approach is still unreliable, we'll need to invalidate the menu twice.
-//            if (mPager != null && mPager.getCurrentItem() == POSITION_MAP) {
-//                //TODO: maybe instead of removing we should use custom menu for each fragment
-//                subMenu.removeItem(R.id.order_by);
-//            }
-//            FragmentActivity activity = getActivity();
-//            SearchManager searchManager = (SearchManager)
-//                    activity.getSystemService(Context.SEARCH_SERVICE);
-//            MenuItem searchMenuItem = menu.findItem(R.id.search);
-//            SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-//
-//            searchView.setSearchableInfo(searchManager.
-//                    getSearchableInfo(activity.getComponentName()));
-//            searchView.setIconifiedByDefault(true);
-//        }
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.stats) {

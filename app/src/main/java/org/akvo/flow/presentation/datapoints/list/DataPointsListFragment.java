@@ -21,6 +21,7 @@
 package org.akvo.flow.presentation.datapoints.list;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +39,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -294,6 +297,16 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         } else {
             inflater.inflate(R.menu.datapoints_list, menu);
         }
+
+        FragmentActivity activity = getActivity();
+        SearchManager searchManager = (SearchManager)
+                activity.getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+        searchView.setSearchableInfo(searchManager.
+                getSearchableInfo(activity.getComponentName()));
+        searchView.setIconifiedByDefault(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

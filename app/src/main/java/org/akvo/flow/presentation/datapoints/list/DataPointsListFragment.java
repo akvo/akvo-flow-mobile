@@ -303,10 +303,30 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 activity.getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchMenuItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-
         searchView.setSearchableInfo(searchManager.
                 getSearchableInfo(activity.getComponentName()));
         searchView.setIconifiedByDefault(true);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Timber.d("query submitted: "+query);
+                mAdapter.filterResults(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Timber.d("search closed");
+                mAdapter.clearFilter();
+                return false;
+            }
+        });
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -42,7 +42,7 @@ import org.akvo.flow.domain.SurveyGroup;
 
 import static org.akvo.flow.data.preference.Prefs.KEY_SURVEY_GROUP_ID;
 
-public class DataProvider extends ContentProvider {
+public class SearchProvider extends ContentProvider {
     
     public static final String AUTHORITY = "org.akvo.flow";
     

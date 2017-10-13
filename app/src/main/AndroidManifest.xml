@@ -107,7 +107,7 @@
                 android:value="@integer/google_play_services_version"/>
 
         <provider
-                android:name=".data.DataProvider"
+                android:name=".data.SearchProvider"
                 android:authorities="org.akvo.flow"
                 android:label="@string/app_name"
                 android:syncable="true"

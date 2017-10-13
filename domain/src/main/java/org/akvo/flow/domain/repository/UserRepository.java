@@ -20,7 +20,7 @@
 
 package org.akvo.flow.domain.repository;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public interface UserRepository {
 

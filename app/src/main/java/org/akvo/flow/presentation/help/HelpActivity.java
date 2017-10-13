@@ -22,7 +22,7 @@ package org.akvo.flow.presentation.help;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.CoordinatorLayout;
 import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -34,6 +34,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.ui.Navigator;
 
 import java.lang.ref.WeakReference;
@@ -53,11 +54,17 @@ public class HelpActivity extends BackActivity implements HelpView {
     @BindView(R.id.help_pb)
     ProgressBar helpPb;
 
+    @BindView(R.id.coordinator_layout)
+    CoordinatorLayout rootView;
+
     @Inject
     HelpPresenter presenter;
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,13 +104,13 @@ public class HelpActivity extends BackActivity implements HelpView {
 
     @Override
     public void displayError() {
-        Snackbar.make(helpWv, R.string.error_loading_help, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.retry, new View.OnClickListener() {
+        snackBarManager.displaySnackBarWithAction(rootView, R.string.error_loading_help,
+                R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         presenter.load();
                     }
-                }).show();
+                }, this);
     }
 
     @Override
@@ -113,13 +120,13 @@ public class HelpActivity extends BackActivity implements HelpView {
 
     @Override
     public void displayErrorDataSyncDisabled() {
-        Snackbar.make(helpWv, R.string.error_mobile_data_sync, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.settings, new View.OnClickListener() {
+        snackBarManager.displaySnackBarWithAction(rootView, R.string.error_mobile_data_sync,
+                R.string.action_settings, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         navigator.navigateToAppSettings(HelpActivity.this);
                     }
-                }).show();
+                }, this);
     }
 
     @Override
@@ -142,12 +149,14 @@ public class HelpActivity extends BackActivity implements HelpView {
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
             hideProgress();
         }
 
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request,
                 WebResourceError error) {
+            super.onReceivedError(view, request, error);
             hideProgress();
             displayError();
         }

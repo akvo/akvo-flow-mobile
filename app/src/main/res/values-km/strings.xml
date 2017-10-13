@@ -11,17 +11,7 @@
   <string name="lon">រយៈបណ្តោយ </string>
   <string name="elevation">កំពស់</string>
   <string name="submitbutton">ចុចបញ្ជូនចេញ </string>
-  <string name="resize_large_images">ដាក់រូបភាពទំហំធំឲ្យតូចឡើងវិញ</string>
-  <string name="preferences_settings_section">ចុចកំណត់ (settings) </string>
-  <string name="prefoptlabel">ចូលចិត្តជាងគេ </string>
-  <string name="prefoptdesc">កំណត់ភាសានៃការធ្វើអង្កេត និងទិន្នន័យដែលចូលចិត្តជាងគេផ្សេងៗទៀត</string>
-  <string name="sendoptlabel">ធ្វើទិន្នន័យឲ្យចេញដំណាលគ្នា (Sync Data) </string>
-  <string name="sendoptdesc">ធ្វើទិន្នន័យអង្កេតឲ្យចេញដំណាលគ្នា។ អ្នកត្រូវតែមានសេវាអ៊ីនធើណិត (3G ឬ Wifi) ដើម្បីធ្វើកិច្ចការនេះ </string>
-  <string name="screenoptlabel">កុំឲ្យស្គ្រីនទូរស័ព្ទរលត់ពេលកំពុងធ្វើអង្កេត </string>
-  <string name="screenoptdesc">បង្ការស្គ្រីនទូរស័ព្ទកុំឲ្យរលត់ពេលកំពុងបញ្ចូលទិន្នន័យអង្កេត។ ត្រូវបិទពន្លត់ស្គ្រីន (ឬចេញពី app) ពេលមិនប្រើ ដើម្បីចៀសវាងការស៊ីថ្មខ្លាំង </string>
   <string name="aboutlabel">អំពី</string>
-  <string name="gpsstatuslabel">ស្ថានភាពជីភីអេស </string>
-  <string name="gpsstatusdesc">ដំណើរការស្ថានភាពជីភីអេស ប្រសិនបើអ្នកបានតម្លើងវាក្នុងឧបករណ៍នេះ </string>
   <string name="nogpsstatus">ស្ថានភាពជីភីអេសពុំមានតម្លើងក្នុងឧបករណ៍នេះឡើយ។ សូមតម្លើងវាដោយចូលទៅក្នុង Google Play Store </string>
   <string name="otherinstructions">សូមបញ្ចូលការព៌ណនា </string>
   <string name="texthelpoption">មើលអត្ថបទក្នុង Help</string>
@@ -30,13 +20,11 @@
   <string name="helpheading">ជម្រើសក្នុង Help</string>
   <string name="deleteresponse">លុបចម្លើយ</string>
   <string name="othertext">ផ្សេងៗ...</string>
-  <string name="uploadoptionlabel">ទិន្នន័យដោយប្រើបណ្តាញទូរស័ព្ទ (3G)</string>
   <string name="surveylanglabel">ភាសាប្រើក្នុងការអង្កេត</string>
   <string name="scanbarcode">ស្គែនសញ្ញានាំផ្លូវ</string>
   <string name="toosmallerr">តម្លៃតូចជ្រុល។ តម្លៃអប្បបរមាៈ  </string>
   <string name="toolargeerr">តម្លៃធំជ្រុល។ តម្លៃអតិបរមាៈ </string>
   <string name="baddatatypeerr">ចម្លើយត្រូវតែជាលេខ </string>
-  <string name="serverlabel">ស៊ើវើរទិន្នន័យ (ប្តូរបាននៅពេលដែលមានការណែនាំតែប៉ុណ្ណោះ)</string>
   <string name="reloadsurveyslabel">ផ្ទុកការអង្កេតទាំងអស់ឡើងវិញ</string>
   <string name="reloadsurveysdesc">លុប និងដោនឡូតការអង្កេតដែលបានកំណត់ឡើងវិញ (ប្រសិនបើមានការណែនាំតែប៉ុណ្ណោះ) </string>
   <string name="conftitle">សូមបញ្ជាក់ </string>
@@ -48,7 +36,6 @@
   <string name="langmandatorytext">អ្នកត្រូវជ្រើសរើសភាសាមួយ តិចបំផុត </string>
   <string name="pleasewait">សូមរង់ចាំ </string>
   <string name="downloadsurveylabel">ដោនឡូតទម្រង់</string>
-  <string name="downloadsurveydesc">ដោនឡូតការអង្កេតមិនមានក្នុងផែនការ (ដោនឡូតប្រសិនបើមានការណែនាំតែប៉ុណ្ណោះ)</string>
   <string name="downloadsurveyinstr">បញ្ចូលលេខសំគាល់របស់ទំរង់ដែលអ្នកចង់ដោនឡូត </string>
   <string name="deletealldatawarning">រាល់ទិន្នន័យទាំងអស់ (ការអង្កេត, ចម្លើយ, រូបភាព និងអ្នកប្រើប្រាស់) នឹងត្រូវលុបជាអចិន្ត្រៃយ៍ក្នុងឧបករណ៍នេះ។ ប្រតិបត្តិការនេះមិនអាចត្រឡប់ក្រោយវិញបានឡើយ។ ចុច OK ដើម្បីបន្ត ឬចុច Cancel ដើម្បីបញ្ឈប់។  </string>
   <string name="delete_responses_warning">ប្រតិបត្តិការនេះនឹងលុប ចម្លើយ, រូបភាព និងឯកសារzip នានាក្នុងឧបករណ៍នេះ។ ប្រតិបត្តិការនេះមិនអាចត្រឡប់ក្រោយវិញបានឡើយ។ ចុច​ OK ដើម្បីបន្ត ឬចុច Cancel ដើម្បីបញ្ឈប់។  </string>
@@ -65,22 +52,15 @@
   <string name="clearquestion">លុបចម្លើយអង្កេតចេញ</string>
   <string name="clearquestiondesc">តើអ្នកចង់លុបចម្លើយចំពោះសំណួរនេះចេញឬ? </string>
   <string name="identlabel">អត្តសញ្ញាណឧបករណ៍នេះ </string>
-  <string name="setidentlabel">កំណត់អត្តសញ្ញាណឧបករណ៍នេះ </string>
   <string name="bootstrapstart">កំពុងផ្ទុកទិន្នន័យអង្កេតពី SD card </string>
   <string name="bootstrapcomplete">ការផ្ទុកទិន្នន័យអង្កេតពី SD card បានធ្វើរួចរាល់ </string>
   <string name="bootstraperror">ដំណើរការ bootstrap ឯកសារzip​មានកំហុសឆ្គង </string>
   <string name="transmissionhist">ប្រវតិ្តការបញ្ជូន </string>
   <string name="transstartdate">បានចាប់ផ្តើមៈ </string>
   <string name="transenddate">បានបញ្ចប់ៈ </string>
-  <string name="resetall">លុបទាំងអស់ (អ្នកប្រើប្រាស់, ការអង្កេត, និងទិន្នន័យប្រមូលបានទាំងអស់) </string>
   <string name="resetalldesc">លុបជាអចិន្ត្រៃយ៍នូវ ការអង្កេតទាំងអស់ ចម្លើយទាំងអស់ (រួមទាំងរូបភាព និងឯកសារzip ដែលបាននាំចេញ) និងអ្នកប្រើប្រាស់</string>
-  <string name="reset_responses">លុបទិន្នន័យ និងរូបភាពដែលបានប្រមូលទាំងអស់ </string>
   <string name="reset_responses_desc">លុបជាអចិន្ត្រៃយ៍នូវចម្លើយអង្កេតទាំងអស់ (រូមទាំងរូបភាព និងឯកសារzip ដែលបាននាំចេញ)</string>
-  <string name="checksd">ពិនិត្យមើលស្ថានភាព SD Card </string>
-  <string name="checksddesc">ពិនិត្យមើលថា SD card បានស៊កបញ្ចូល និងបង្ហាញចន្លោះនៅសល់ក្នុង card​ ។ </string>
   <string name="sdmissing">SD card មិនឃើញ ឬមិនបានស៊កបញ្ចូល។ ត្រូវប្រាកដថា អ្នកបាន​បិទ \"USB File Copying\" </string>
-  <string name="sdmounted">SD card បានស៊កចូលត្រឹមត្រូវ </string>
-  <string name="sdcardspace">ចន្លោះនៅទំនេរ (MB): </string>
   <string name="pickdate">ជ្រើសរើសកាលបរិច្ឆេទ </string>
   <string name="pleasewaitforbootstrap">សូមរង់ចាំរហូតដល់ឯកសារ bootstrap ចប់ដំណើរការ</string>
   <string name="clear_data_success">ទិន្នន័យត្រូវបានលុបចេញពីឧបករណ៍នេះដោយជោគជ័យ</string>
@@ -100,7 +80,6 @@
   <string name="data_sync_all">ដាក់ទម្រង់ឲ្យចេញដំណាលគ្នាៈ %1$d - មិនសម្រេចៈ​ %2$d​ </string>
   <string name="data_sync_synced">បានដាក់ទំរង់ឲ្យចេញដំណាលគ្នា: %1$d </string>
   <!--Localization-->
-  <string name="app_language">ភាសា​ App </string>
   <string name="please_restart">សូមចាប់ផ្តើម Appឡើងវិញ </string>
   <!--Empty Views-->
   <string name="no_survey_selected_text">អ្នកបានជ្រើសរើសការអង្កេតឡើយ។ ចូរបើកម៉ឺនុយនៅចំហៀង ដើម្បីជ្រើសរើស។  </string>
@@ -141,7 +120,6 @@
   <string name="image_location_reading">កំពុងអានទីតាំងជីភីអេស </string>
   <string name="image_location_saved">ទីតាំងជីភីអេសបានរក្សាទុក </string>
   <!--RecordList Activity-->
-  <string name="add_data_point">បន្ថែមចំណុចទិន្នន័យ</string>
   <string name="stats_total">ចំណុចទិន្នន័យសរុបៈ </string>
   <string name="stats_week">៧ថ្ងៃចុងក្រោយៈ </string>
   <string name="stats_today">ថ្ងៃនេះ: </string>
@@ -211,7 +189,7 @@
   <string name="clearbutton">លុបចេញ (Clear) </string>
   <string name="yes">បាទ/ចាស</string>
   <string name="no">ទេ</string>
-  <string name="retry">ព្យាយាមម្តងទៀត</string>
+  <string name="action_retry">ព្យាយាមម្តងទៀត</string>
   <string name="delete">លុប (Delete) </string>
   <string name="drawer_open">ថត បើក</string>
   <string name="drawer_close">ថត បិទ </string>

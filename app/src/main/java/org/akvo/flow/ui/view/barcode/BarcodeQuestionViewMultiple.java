@@ -97,11 +97,15 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
      * pulls the data out of the fields and saves it as a response object,
      * possibly suppressing listeners
      */
+    @Override
     public void captureResponse(boolean suppressListeners) {
         String value = barcodeQuestionAdapter.getBarcodes();
-        setResponse(new QuestionResponse(value, ConstantUtil.VALUE_RESPONSE_TYPE,
-                        getQuestion().getId()),
-                suppressListeners);
+        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                .setQuestionId(getQuestion().getId())
+                .createQuestionResponse();
+        setResponse(questionResponse, suppressListeners);
     }
 
     @Override

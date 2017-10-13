@@ -32,7 +32,6 @@ import android.widget.DatePicker;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -76,7 +75,7 @@ public class DateFormActivityTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(new SurveyDbAdapter(targetContext));
+        installer = new SurveyInstaller(targetContext);
         installer.installSurvey(datesurvey, InstrumentationRegistry.getContext());
     }
 

@@ -48,8 +48,14 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.loader.SurveyGroupLoader;
+import org.akvo.flow.data.loader.UserLoader;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.data.loader.SurveyGroupLoader;
 import org.akvo.flow.data.loader.UserLoader;
 import org.akvo.flow.data.preference.Prefs;
@@ -118,7 +124,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         selectedSurveyId = new Prefs(getContext())
                 .getLong(KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
         if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
+            Context context = getActivity().getApplicationContext();
+            mDatabase = new SurveyDbAdapter(context,
+                    new FlowMigrationListener(new Prefs(context),
+                            new MigrationLanguageMapper(context)));
             mDatabase.open();
         }
         if (mAdapter == null) {
@@ -209,7 +218,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mSurveys.clear();
                     if (cursor.moveToFirst()) {
                         do {
-                            mSurveys.add(SurveyDbAdapter.getSurveyGroup(cursor));
+                            mSurveys.add(SurveyDbDataSource.getSurveyGroup(cursor));
                         } while (cursor.moveToNext());
                         cursor.close();
                     }

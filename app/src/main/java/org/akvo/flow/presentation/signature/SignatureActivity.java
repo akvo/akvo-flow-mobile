@@ -38,9 +38,9 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.view.signature.SignatureDrawView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
-import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;
+import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -82,7 +82,7 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
         String name = getIntent().getStringExtra(ConstantUtil.SIGNATURE_NAME_EXTRA);
         presenter.setView(this);
         presenter.setExtras(questionId, datapointId, name);
-        imageLoader = new GlideImageLoader(this);
+        imageLoader = new PicassoImageLoader(this);
         setSignatureDrawView();
     }
 

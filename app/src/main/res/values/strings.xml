@@ -78,14 +78,11 @@
     <string name="sync">Sync</string>
     <string name="sort">Sort</string>
     <string name="stats">Stats</string>
-    <string name="syncing_records">Syncing Data Points...</string>
-    <string name="synced_records">Synced %1$d Data Points</string>
-    <string name="sync_error">Data Points Sync failed</string>
-    <string name="syncing_corrupted_data_points_error">Please sync again.</string>
-    <string name="network_error">Network Error</string>
+    <string name="data_points_sync_error_message_network">Sync failed. No connection.</string>
+    <string name="data_points_sync_error_message_assignment">Sync failed. Assignment missing.</string>
+    <string name="data_points_sync_error_message_default">Sync failed</string>
     <string name="prefill_title">Pre-fill Responses</string>
     <string name="prefill_text">Pre-fill form with previous answers?</string>
-    <string name="error_assignment_text">Flow dashboard assignment required</string>
     <!--Data sync-->
     <string name="data_sync_all">Synced Forms: %1$d - Failed: %2$d</string>
     <string name="data_sync_synced">Synced Forms: %1$d</string>
@@ -94,7 +91,7 @@
     <!--Localization-->
     <string name="please_restart">Please, restart the app</string>
     <!--Empty Views-->
-    <string name="no_datapoints_error_text">You have no data points yet. Click \'+\' to add a new data point</string>
+    <string name="no_datapoints_error_text">You have no data points</string>
     <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
     <!--ToolBar-->
     <string name="more">More</string>
@@ -210,7 +207,7 @@
     <string name="clearbutton">Clear</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="retry">Retry</string>
+    <string name="action_retry">Retry</string>
     <string name="delete">Delete</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
@@ -263,5 +260,15 @@
     <string name="preferences_section_information">Information</string>
     <string name="preference_identifier">Device identifier</string>
     <string name="preference_instance_name">Instance name</string>
+    <string name="data_points_sync_error_mobile_data_sync">Mobile data sync disabled</string>
+    <string name="action_settings">Settings</string>
+    <string name="no_records_subtitle_monitored">Use \'+\' to capture data or \'Sync\' to get existing data</string>
+    <string name="no_records_subtitle_non_monitored">Use \'+\' to capture data.</string>
+
+    <!--Verify if this works for transifex-->
+    <plurals name="data_points_sync_success_message">
+        <item quantity="one">%1$d data point synced</item>
+        <item quantity="other">%1$d data points synced</item>
+    </plurals>
 
 </resources>

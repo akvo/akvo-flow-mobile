@@ -21,7 +21,7 @@
 package org.akvo.flow.presentation.settings;
 
 import org.akvo.flow.domain.entity.UserSettings;
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImageSize;
@@ -69,7 +69,7 @@ public class PreferencePresenter implements Presenter {
 
     public void loadPreferences(final List<String> languages) {
         view.showLoading();
-        getUserSettings.execute(new DefaultSubscriber<UserSettings>() {
+        getUserSettings.execute(new DefaultObserver<UserSettings>() {
             @Override
             public void onNext(UserSettings userSettings) {
                 ViewUserSettings viewUserSettings = mapper.transform(userSettings, languages);
@@ -80,10 +80,10 @@ public class PreferencePresenter implements Presenter {
     }
 
     public void saveAppLanguage(int languagePosition, final List<String> languages) {
-        Map<String, String> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         final String language = languages.get(languagePosition);
         params.put(SaveAppLanguage.PARAM_LANGUAGE, language);
-        saveAppLanguage.execute(new DefaultSubscriber<Boolean>() {
+        saveAppLanguage.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -97,9 +97,9 @@ public class PreferencePresenter implements Presenter {
     }
 
     public void saveEnableMobileData(boolean enable) {
-        Map<String, Boolean> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(SaveEnableMobileData.PARAM_ENABLE_MOBILE_DATA, enable);
-        saveEnableMobileData.execute(new DefaultSubscriber<Boolean>() {
+        saveEnableMobileData.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -108,9 +108,9 @@ public class PreferencePresenter implements Presenter {
     }
 
     public void saveImageSize(int size) {
-        Map<String, Integer> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(SaveImageSize.PARAM_IMAGE_SIZE, size);
-        saveImageSize.execute(new DefaultSubscriber<Boolean>() {
+        saveImageSize.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -119,9 +119,9 @@ public class PreferencePresenter implements Presenter {
     }
 
     public void saveKeepScreenOn(boolean enable) {
-        Map<String, Boolean> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(SaveKeepScreenOn.PARAM_KEEP_SCREEN_ON, enable);
-        saveKeepScreenOn.execute(new DefaultSubscriber<Boolean>() {
+        saveKeepScreenOn.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -131,10 +131,10 @@ public class PreferencePresenter implements Presenter {
 
     @Override
     public void destroy() {
-        getUserSettings.unSubscribe();
-        saveAppLanguage.unSubscribe();
-        saveEnableMobileData.unSubscribe();
-        saveImageSize.unSubscribe();
-        saveKeepScreenOn.unSubscribe();
+        getUserSettings.dispose();
+        saveAppLanguage.dispose();
+        saveEnableMobileData.dispose();
+        saveImageSize.dispose();
+        saveKeepScreenOn.dispose();
     }
 }

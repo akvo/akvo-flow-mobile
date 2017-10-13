@@ -30,8 +30,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
-import org.akvo.flow.data.database.SurveyDbAdapter.FormInstanceQuery;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
@@ -49,18 +49,18 @@ public class ResponseListAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        final int status = cursor.getInt(FormInstanceQuery.STATUS);
+        final int status = cursor.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
 
         int icon = 0;
         // Default to 'Submitted' status values
         String statusText = context.getString(R.string.status_submitted) + ": ";
-        long displayDate = cursor.getLong(FormInstanceQuery.SUBMITTED_DATE);
+        long displayDate = cursor.getLong(SurveyDbAdapter.FormInstanceQuery.SUBMITTED_DATE);
 
         switch (status) {
             case SurveyInstanceStatus.SAVED:
                 icon = R.drawable.form_saved_icn;
                 statusText = context.getString(R.string.status_saved) + ": ";
-                displayDate = cursor.getLong(FormInstanceQuery.SAVED_DATE);
+                displayDate = cursor.getLong(SurveyDbAdapter.FormInstanceQuery.SAVED_DATE);
                 break;
             case SurveyInstanceStatus.SUBMITTED:
             case SurveyInstanceStatus.EXPORTED:
@@ -75,7 +75,7 @@ public class ResponseListAdapter extends CursorAdapter {
         TextView userView = (TextView) view.findViewById(R.id.username);
         TextView statusView = (TextView) view.findViewById(R.id.status);
 
-        String username = cursor.getString(FormInstanceQuery.SUBMITTER);
+        String username = cursor.getString(SurveyDbAdapter.FormInstanceQuery.SUBMITTER);
         if (TextUtils.isEmpty(username)) {
             userView.setVisibility(View.GONE);
         } else {
@@ -89,9 +89,11 @@ public class ResponseListAdapter extends CursorAdapter {
                 + DateFormat.getLongDateFormat(context).format(date) + " "
                 + DateFormat.getTimeFormat(context).format(date));
         TextView headingView = (TextView) view.findViewById(R.id.form_name);
-        headingView.setText(cursor.getString(FormInstanceQuery.NAME));
-        view.setTag(ConstantUtil.SURVEY_ID_TAG_KEY, cursor.getLong(FormInstanceQuery.SURVEY_ID));
-        view.setTag(ConstantUtil.RESPONDENT_ID_TAG_KEY, cursor.getLong(FormInstanceQuery._ID));
+        headingView.setText(cursor.getString(SurveyDbAdapter.FormInstanceQuery.NAME));
+        view.setTag(ConstantUtil.SURVEY_ID_TAG_KEY, cursor.getLong(
+                SurveyDbAdapter.FormInstanceQuery.SURVEY_ID));
+        view.setTag(ConstantUtil.RESPONDENT_ID_TAG_KEY, cursor.getLong(
+                SurveyDbAdapter.FormInstanceQuery._ID));
         view.setTag(ConstantUtil.READ_ONLY_TAG_KEY, status != SurveyInstanceStatus.SAVED);
         ImageView stsIcon = (ImageView) view.findViewById(R.id.status_img);
         stsIcon.setImageResource(icon);

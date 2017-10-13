@@ -206,7 +206,6 @@ public class Navigator {
             context.startActivity(intent);
         } else {
             intent = new Intent(Settings.ACTION_MEMORY_CARD_SETTINGS);
-            packageManager = context.getPackageManager();
             if (intent.resolveActivity(packageManager) != null) {
                 context.startActivity(intent);
             } else {

@@ -24,6 +24,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.SQLException;
@@ -48,7 +49,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.DataSyncService;
@@ -272,10 +273,11 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
 
     @OnClick(R.id.preference_gps_fixes)
     void onGpsFixesTap() {
-        try {
-            Intent i = new Intent(ConstantUtil.GPS_STATUS_INTENT);
-            startActivity(i);
-        } catch (Exception e) {
+        PackageManager packageManager = getPackageManager();
+        Intent intent = new Intent(ConstantUtil.GPS_STATUS_INTENT);
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent);
+        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(R.string.nogpsstatus);
             builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
@@ -363,10 +365,10 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     }
 
     private boolean unsentData() throws SQLException {
-        SurveyDbAdapter db = new SurveyDbAdapter(this);
+        SurveyDbDataSource db = new SurveyDbDataSource(this, null);
         try {
             db.open();
-            return db.getUnsyncedTransmissions().size() > 0;
+            return db.getUnSyncedTransmissions().size() > 0;
         } finally {
             db.close();
         }

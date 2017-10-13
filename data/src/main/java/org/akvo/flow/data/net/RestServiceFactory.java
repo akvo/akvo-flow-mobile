@@ -20,8 +20,6 @@
 
 package org.akvo.flow.data.net;
 
-import android.support.annotation.NonNull;
-
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +29,7 @@ import javax.inject.Singleton;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Singleton
@@ -46,16 +44,20 @@ public class RestServiceFactory {
     private final HttpLoggingInterceptor loggingInterceptor;
     private final SimpleDateFormat dateFormat;
     private final Encoder encoder;
+    private final String key;
+    private final String baseUrl;
 
     @Inject
     public RestServiceFactory(HttpLoggingInterceptor loggingInterceptor,
-            SimpleDateFormat simpleDateFormat, Encoder encoder) {
+            SimpleDateFormat simpleDateFormat, Encoder encoder, String key, String baseUrl) {
         this.loggingInterceptor = loggingInterceptor;
         this.dateFormat = simpleDateFormat;
         this.encoder = encoder;
+        this.key = key;
+        this.baseUrl = baseUrl;
     }
 
-    public <T> T createRetrofitService(@NonNull String baseUrl, final Class<T> clazz, String key) {
+    public <T> T createRetrofitService(final Class<T> clazz) {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(loggingInterceptor);
         httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
@@ -63,7 +65,7 @@ public class RestServiceFactory {
         httpClient.addInterceptor(new HMACInterceptor(key, dateFormat, encoder));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
                 .build();

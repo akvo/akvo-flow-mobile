@@ -24,8 +24,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
+import com.squareup.sqlbrite2.BriteDatabase;
+import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -38,14 +38,10 @@ import org.akvo.flow.database.TransmissionStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
-
 import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
 import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
 import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
@@ -100,9 +96,9 @@ public class BriteSurveyDbAdapter {
         return briteDatabase
                 .createQuery(tables, queryString + whereClause + groupBy + orderByStr, whereValues)
                 .concatMap(
-                        new Func1<SqlBrite.Query, Observable<Cursor>>() {
+                        new Function<SqlBrite.Query, Observable<Cursor>>() {
                             @Override
-                            public Observable<Cursor> call(SqlBrite.Query query) {
+                            public Observable<Cursor> apply(SqlBrite.Query query) {
                                 return Observable.just(query.run());
                             }
                         });
@@ -139,9 +135,9 @@ public class BriteSurveyDbAdapter {
                         + " = ?";
         return briteDatabase.createQuery(Tables.RECORD, sqlQuery,
                 String.valueOf(surveyGroupId)).concatMap(
-                new Func1<SqlBrite.Query, Observable<? extends Cursor>>() {
+                new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
                     @Override
-                    public Observable<? extends Cursor> call(SqlBrite.Query query) {
+                    public Observable<? extends Cursor> apply(SqlBrite.Query query) {
                         return Observable.just(query.run());
                     }
                 });

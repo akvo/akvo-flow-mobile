@@ -12,20 +12,17 @@ android:
     - tools
     - build-tools-25.0.1
     - android-25
+    - android-21
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-armeabi-v7a-android-19
+    - sys-img-armeabi-v7a-android-21
 
 before_script:
-    - mkdir app/src/main/res/raw
-    - mkdir data/src/main/res/
-    - mkdir data/src/main/res/raw
-    - mv app/config/survey.properties.template app/src/main/res/raw/survey.properties
-    - cp app/src/main/res/raw/survey.properties data/src/main/res/raw/survey.properties
+    - mv app/config/survey.properties.template app/survey.properties
     - mv app/gradle.properties.template app/gradle.properties
-    - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
-    - emulator -avd test -no-audio -no-window &
+    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
+    - emulator -avd test -no-audio -no-window -no-skin &
     - android-wait-for-emulator
     - adb shell settings put global window_animation_scale 0 &
     - adb shell settings put global transition_animation_scale 0 &

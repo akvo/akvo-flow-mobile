@@ -23,7 +23,7 @@ package org.akvo.flow.presentation.navigation;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.Survey;
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -63,9 +63,9 @@ public class FlowNavigationPresenter implements Presenter {
 
     @Override
     public void destroy() {
-        getAllSurveys.unSubscribe();
-        deleteSurvey.unSubscribe();
-        saveSelectedSurvey.unSubscribe();
+        getAllSurveys.dispose();
+        deleteSurvey.dispose();
+        saveSelectedSurvey.dispose();
     }
 
     public void setView(FlowNavigationView view) {
@@ -73,7 +73,7 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void load() {
-        getAllSurveys.execute(new DefaultSubscriber<Pair<List<Survey>, Long>>() {
+        getAllSurveys.execute(new DefaultObserver<Pair<List<Survey>, Long>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error getting all surveys");
@@ -90,9 +90,9 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void onDeleteSurvey(final long surveyGroupId) {
-        Map<String, Long> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(DeleteSurvey.SURVEY_ID_PARAM, surveyGroupId);
-        deleteSurvey.execute(new DefaultSubscriber<Boolean>() {
+        deleteSurvey.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -110,9 +110,9 @@ public class FlowNavigationPresenter implements Presenter {
 
     public void onSurveyItemTap(final ViewSurvey viewSurvey) {
         if (viewSurvey != null) {
-            Map<String, Long> params = new HashMap<>(2);
+            Map<String, Object> params = new HashMap<>(2);
             params.put(SaveSelectedSurvey.KEY_SURVEY_GROUP_ID, viewSurvey.getId());
-            saveSelectedSurvey.execute(new DefaultSubscriber<Boolean>() {
+            saveSelectedSurvey.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);

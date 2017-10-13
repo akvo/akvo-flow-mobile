@@ -33,8 +33,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class GetAllSurveys extends UseCase {
 
@@ -53,14 +53,14 @@ public class GetAllSurveys extends UseCase {
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return surveyRepository.getSurveys()
-                .concatMap(new Func1<List<Survey>, Observable<Pair<List<Survey>, Long>>>() {
+                .concatMap(new Function<List<Survey>, Observable<Pair<List<Survey>, Long>>>() {
                     @Override
-                    public Observable<Pair<List<Survey>, Long>> call(final List<Survey> surveys) {
+                    public Observable<Pair<List<Survey>, Long>> apply(final List<Survey> surveys) {
                         return userRepository.getSelectedSurvey()
                                 .concatMap(
-                                        new Func1<Long, Observable<Pair<List<Survey>, Long>>>() {
+                                        new Function<Long, Observable<Pair<List<Survey>, Long>>>() {
                                             @Override
-                                            public Observable<Pair<List<Survey>, Long>> call(
+                                            public Observable<Pair<List<Survey>, Long>> apply(
                                                     Long selectedSurvey) {
                                                 return Observable
                                                         .just(new Pair<>(surveys, selectedSurvey));

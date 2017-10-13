@@ -25,7 +25,7 @@ import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public class UserDataRepository implements UserRepository {
 
@@ -39,6 +39,46 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> mobileSyncAllowed() {
         return dataSourceFactory.getSharedPreferencesDataSource().mobileSyncEnabled();
+    }
+
+    @Override
+    public Observable<Boolean> keepScreenOn() {
+        return dataSourceFactory.getSharedPreferencesDataSource().keepScreenOn();
+    }
+
+    @Override
+    public Observable<String> getAppLanguage() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getAppLanguage();
+    }
+
+    @Override
+    public Observable<Integer> getImageSize() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getImageSize();
+    }
+
+    @Override
+    public Observable<String> getDeviceId() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getDeviceId();
+    }
+
+    @Override
+    public Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveScreenOn(keepScreenOn);
+    }
+
+    @Override
+    public Observable<Boolean> saveEnableMobileDataPreference(Boolean enable) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveEnableMobileData(enable);
+    }
+
+    @Override
+    public Observable<Boolean> saveLanguagePreference(String language) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveLanguage(language);
+    }
+
+    @Override
+    public Observable<Boolean> saveImageSizePreference(Integer size) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveImageSize(size);
     }
 
     @Override

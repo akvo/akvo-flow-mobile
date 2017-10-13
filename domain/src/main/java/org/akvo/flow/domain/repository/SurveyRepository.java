@@ -20,12 +20,13 @@
 
 package org.akvo.flow.domain.repository;
 
-import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.Survey;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 public interface SurveyRepository {
 
@@ -34,7 +35,7 @@ public interface SurveyRepository {
     Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
             Double longitude, Integer orderBy);
 
-    Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
+    Flowable<Integer> syncRemoteDataPoints(long surveyGroupId);
 
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 }

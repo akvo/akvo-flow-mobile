@@ -167,14 +167,6 @@ public class ConstantUtil {
     public static final String ADMIN_AUTH_CODE = "12345";
 
     /**
-     * property file keys
-     */
-    public static final String SERVER_BASE = "serverBase";
-    public static final String S3_BUCKET = "awsBucket";
-    public static final String S3_ACCESSKEY = "awsAccessKeyId";
-    public static final String S3_SECRET = "awsSecretKey";
-
-    /**
      * S3 bucket directories (object prefixes)
      */
     public static final String S3_DATA_DIR = "devicezip/";

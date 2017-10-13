@@ -29,8 +29,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class DeleteSurvey extends UseCase {
 
@@ -54,14 +54,14 @@ public class DeleteSurvey extends UseCase {
             return Observable.error(new IllegalArgumentException("params missing"));
         }
         final long surveyToDeleteId = (Long) parameters.get(SURVEY_ID_PARAM);
-        return userRepository.getSelectedSurvey().concatMap(new Func1<Long, Observable<?>>() {
+        return userRepository.getSelectedSurvey().concatMap(new Function<Long, Observable<?>>() {
             @Override
-            public Observable<?> call(Long currentSelectedSurvey) {
+            public Observable<?> apply(Long currentSelectedSurvey) {
                 if (currentSelectedSurvey == surveyToDeleteId) {
                     return userRepository.clearSelectedSurvey().concatMap(
-                            new Func1<Boolean, Observable<?>>() {
+                            new Function<Boolean, Observable<?>>() {
                                 @Override
-                                public Observable<?> call(Boolean aBoolean) {
+                                public Observable<?> apply(Boolean aBoolean) {
                                     return deleteSurvey(surveyToDeleteId);
                                 }
                             });

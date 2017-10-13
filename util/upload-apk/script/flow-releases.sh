@@ -26,7 +26,6 @@ cd $FLOW_MOBILE
 
 . app/version.properties
 version=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
-echo $version
 
 rm -rf tmp
 rm -rf builds
@@ -63,7 +62,7 @@ for i in $(cat tmp/instances.txt); do
         build=$(build_name $i)
 
         echo "generating apk version" $version "for instance" $i "and build" $build
-        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
+        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/survey.properties
         ./gradlew $build
         mkdir -p builds/$i/$version
         mv app/bin/flow.apk $filename

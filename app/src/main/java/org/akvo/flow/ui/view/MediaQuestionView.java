@@ -26,6 +26,7 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -50,8 +51,8 @@ import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
-import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -90,7 +91,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mProgressBar = (ProgressBar)findViewById(R.id.progress);
         mDownloadBtn = findViewById(R.id.download);
         mLocationInfo = (TextView)findViewById(R.id.location_info);
-        imageLoader = new GlideImageLoader(getContext());
+        imageLoader = new PicassoImageLoader(getContext());
         if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
         } else {
@@ -231,12 +232,23 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     public void captureResponse(boolean suppressListeners) {
         QuestionResponse response = null;
         if (mMedia != null && !TextUtils.isEmpty(mMedia.getFilename())) {
-            response = new QuestionResponse(MediaValue.serialize(mMedia),
-                    isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE,
-                    getQuestion().getId());
-            response.setFilename(mMedia.getFilename());
+            Question question = getQuestion();
+            String value = MediaValue.serialize(mMedia);
+            String type = getType();
+            response = new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(value)
+                    .setType(type)
+                    .setQuestionId(question.getQuestionId())
+                    .setIteration(question.getIteration())
+                    .setFilename(mMedia.getFilename())
+                    .createQuestionResponse();
         }
         setResponse(response);
+    }
+
+    @NonNull
+    private String getType() {
+        return isImage() ? ConstantUtil.IMAGE_RESPONSE_TYPE : ConstantUtil.VIDEO_RESPONSE_TYPE;
     }
 
     @Override

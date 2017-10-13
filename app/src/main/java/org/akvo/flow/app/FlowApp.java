@@ -20,34 +20,32 @@
 package org.akvo.flow.app;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.widget.Toast;
 
-import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.logging.LoggingHelper;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
-
-    //TODO: use shared pref?
-    private Locale mLocale;
 
     private User mUser;
     private Prefs prefs;
@@ -99,33 +97,47 @@ public class FlowApp extends Application {
         // to enable our custom locale again. Note that this approach
         // is not very 'clean', but Android makes it really hard to
         // customize an application wide locale.
-        if (mLocale != null && !mLocale.getLanguage().equalsIgnoreCase(
-                newConfig.locale.getLanguage())) {
+        Locale savedLocale = getSavedLocale();
+        if (localeNeedsUpdating(savedLocale, newConfig.locale)) {
             // Re-enable our custom locale, using this newConfig reference
-            newConfig.locale = mLocale;
-            Locale.setDefault(mLocale);
-            getBaseContext().getResources().updateConfiguration(newConfig, null);
+            Locale.setDefault(savedLocale);
+            updateConfiguration(savedLocale, newConfig);
         }
     }
 
     private void init() {
-        // Load custom locale into the app. If the locale has not previously been configured
-        // check if the device has a compatible language active. Otherwise, fall back to English
-        String language = loadLocalePref();
-
-        //TODO: this is not necessary as by default locale is english anyway
-        if (TextUtils.isEmpty(language)) {
-            language = Locale.getDefault().getLanguage();
-            // Is that available in our language list?
-            if (!Arrays.asList(getResources().getStringArray(R.array.app_language_codes))
-                    .contains(language)) {
-                language = ConstantUtil.ENGLISH_CODE;// TODO: Move this constant to @strings
-            }
-        }
-        //TODO: only set the language if it is different than the device locale
-        setAppLanguage(language, false);
-
+        updateLocale();
         loadLastUser();
+    }
+
+    private void updateLocale() {
+        Locale savedLocale = getSavedLocale();
+        Locale currentLocale = Locale.getDefault();
+        if (localeNeedsUpdating(savedLocale, currentLocale)) {
+            Locale.setDefault(savedLocale);
+            updateConfiguration(savedLocale, new Configuration());
+        }
+    }
+
+    private boolean localeNeedsUpdating(Locale savedLocale, Locale currentLocale) {
+        return savedLocale != null && currentLocale != null && !currentLocale.getLanguage()
+                .equalsIgnoreCase(savedLocale.getLanguage());
+    }
+
+    private void updateConfiguration(Locale savedLocale, Configuration config) {
+        Timber.d("configuration will updated to "+savedLocale.getLanguage());
+        config.locale = savedLocale;
+        getBaseContext().getResources().updateConfiguration(config, null);
+    }
+
+    @Nullable
+    private Locale getSavedLocale() {
+        String languageCode = loadLocalePref();
+        Locale savedLocale = null;
+        if (!TextUtils.isEmpty(languageCode)) {
+            savedLocale = new Locale(languageCode);
+        }
+        return savedLocale;
     }
 
     public void setUser(User user) {
@@ -137,27 +149,14 @@ public class FlowApp extends Application {
         return mUser;
     }
 
-    public String getAppLanguageCode() {
-        return mLocale.getLanguage();
-    }
-
-    public String getAppDisplayLanguage() {
-        String lang = mLocale.getDisplayLanguage();
-        if (!TextUtils.isEmpty(lang)) {
-            // Ensure the first letter is upper case
-            char[] strArray = lang.toCharArray();
-            strArray[0] = Character.toUpperCase(strArray[0]);
-            lang = new String(strArray);
-        }
-        return lang;
-    }
-
     /**
      * Checks if the user preference to persist logged-in users is set and, if
      * so, loads the last logged-in user from the DB
      */
     private void loadLastUser() {
-        SurveyDbAdapter database = new SurveyDbAdapter(FlowApp.this);
+        Context context = getApplicationContext();
+        SurveyDbAdapter database = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
         database.open();
 
         // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades
@@ -178,30 +177,8 @@ public class FlowApp extends Application {
         database.close();
     }
 
-    public void setAppLanguage(String language, boolean requireRestart) {
-        // Override system locale
-        mLocale = new Locale(language);
-        Locale.setDefault(mLocale);
-        Configuration config = getBaseContext().getResources().getConfiguration();
-        config.locale = mLocale;
-        getBaseContext().getResources().updateConfiguration(config, null);
-
-        // Save it in the preferences
-        saveLocalePref(language);
-
-        if (requireRestart) {
-            Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
-                    .show();
-        }
-    }
-
     @Nullable
     private String loadLocalePref() {
         return prefs.getString(Prefs.KEY_LOCALE, null);
     }
-
-    private void saveLocalePref(String language) {
-        prefs.setString(Prefs.KEY_LOCALE, language);
-    }
-
 }

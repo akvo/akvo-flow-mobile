@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -36,6 +36,7 @@ public interface SurveyListener {
     void openQuestion(String questionId);
     Map<String, QuestionResponse> getResponses();
     void deleteResponse(String questionId);
+    void deleteResponse(String questionId, String iteration);
     QuestionView getQuestionView(String questionId);
     String getDatapointId();
     String getFormId();

@@ -25,30 +25,30 @@ import org.akvo.flow.domain.executor.ThreadExecutor;
 
 import java.util.Map;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Abstract class for a Use Case (Interactor in terms of Clean Architecture).
  * This interface represents a execution unit for different use cases (this means any use case
  * in the application should implement this contract).
- * <p>
- * By convention each UseCase implementation will return the result using a {@link Subscriber}
+ * By convention each UseCase implementation will return the result using a {@link DisposableObserver}
  * that will execute its job in a background thread and will post the result in the UI thread.
  */
 public abstract class UseCase {
 
     private final ThreadExecutor threadExecutor;
     private final PostExecutionThread postExecutionThread;
-
-    private Subscription subscription = null;
+    private final CompositeDisposable disposables;
 
     protected UseCase(ThreadExecutor threadExecutor,
-                      PostExecutionThread postExecutionThread) {
+            PostExecutionThread postExecutionThread) {
         this.threadExecutor = threadExecutor;
         this.postExecutionThread = postExecutionThread;
+        this.disposables = new CompositeDisposable();
     }
 
     /**
@@ -56,26 +56,21 @@ public abstract class UseCase {
      */
     protected abstract <T> Observable buildUseCaseObservable(Map<String, T> parameters);
 
-    /**
-     * Executes the current use case.
-     *
-     * @param UseCaseSubscriber Will be listen to the observable built with buildUseCaseObservable.
-     */
     @SuppressWarnings("unchecked")
-    public <T> void execute(Subscriber UseCaseSubscriber, Map<String, T> parameters) {
-        this.subscription = this.buildUseCaseObservable(parameters)
+    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
+        final Observable<T> observable = buildUseCaseObservable(parameters)
                 .subscribeOn(Schedulers.from(threadExecutor))
-                .observeOn(postExecutionThread.getScheduler())
-                .subscribe(UseCaseSubscriber);
+                .observeOn(postExecutionThread.getScheduler());
+        addDisposable(observable.subscribeWith(observer));
     }
 
-    /**
-     * UnSubscribes from current {@link Subscription}.
-     */
-    public void unSubscribe() {
-        if (subscription != null && !subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
-            subscription = null;
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
         }
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
     }
 }

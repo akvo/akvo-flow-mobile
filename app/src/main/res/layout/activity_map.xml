@@ -8,9 +8,11 @@
 
     <include layout="@layout/app_bar_layout"/>
 
-    <FrameLayout
-            android:id="@+id/content_frame"
+    <fragment
             android:layout_marginTop="?actionBarSize"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            tools:context=".activity.MapActivity"
+            android:name="com.google.android.gms.maps.SupportMapFragment"/>
 </android.support.design.widget.CoordinatorLayout>

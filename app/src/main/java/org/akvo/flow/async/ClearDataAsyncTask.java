@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,7 +25,8 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 
@@ -40,13 +41,14 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
      */
     private WeakReference<Context> mWeakContext;
 
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
 
     public ClearDataAsyncTask(Context context) {
-        mWeakContext = new WeakReference<Context>(context);
+        mWeakContext = new WeakReference<>(context);
         // Use the Application Context to be held by the Database
         // This will allow the current Activity to be GC if it's finished
-        mDatabase = new SurveyDbAdapter(context.getApplicationContext());
+        Context applicationContext = context.getApplicationContext();
+        mDatabase = new SurveyDbDataSource(applicationContext, null);
     }
 
     @Override
@@ -60,12 +62,25 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
             // External storage
             clearExternalStorage(responsesOnly);
+            if (!responsesOnly) {
+                clearUserPreferences();
+            }
         } catch (SQLException e) {
             Timber.e(e.getMessage());
             ok = false;
         }
 
         return ok;
+    }
+
+    private void clearUserPreferences() {
+        Context context = mWeakContext.get();
+        if (context != null) {
+            Prefs prefs = new Prefs(context.getApplicationContext());
+            prefs.removePreference(Prefs.KEY_USER_ID);
+            prefs.removePreference(Prefs.KEY_SETUP);
+            prefs.removePreference(Prefs.KEY_SURVEY_GROUP_ID);
+        }
     }
 
     @Override
@@ -81,9 +96,8 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
     /**
      * Permanently deletes data from the internal database.
-     * 
-     * @param responsesOnly Flag to specify a partial deletion (user generated
-     *            data).
+     *
+     * @param responsesOnly Flag to specify a partial deletion (user generated data).
      */
     private void clearDatabase(boolean responsesOnly) throws SQLException {
         try {
@@ -105,8 +119,7 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     /**
      * Permanently deletes data from the external storage
      * 
-     * @param responsesOnly Flag to specify a partial deletion (user generated
-     *            data).
+     * @param responsesOnly Flag to specify a partial deletion (user generated data).
      */
     private void clearExternalStorage(boolean responsesOnly) {
         if (!responsesOnly) {

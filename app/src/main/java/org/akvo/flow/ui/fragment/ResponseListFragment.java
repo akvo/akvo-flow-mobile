@@ -42,8 +42,11 @@ import android.widget.ListView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
 import org.akvo.flow.data.loader.SurveyInstanceResponseLoader;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -59,11 +62,10 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
+import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
 
-public class  ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
-
-    private static final String EXTRA_SURVEY_GROUP = "survey_group";
+public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 
     // Context menu items
     private static final int DELETE_ONE = 0;
@@ -98,7 +100,7 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
-        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(EXTRA_SURVEY_GROUP);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_GROUP_EXTRA);
         recordId = intent.getStringExtra(RECORD_ID_EXTRA);
 
         if (mAdapter == null) {
@@ -203,7 +205,10 @@ public class  ResponseListFragment extends ListFragment implements LoaderCallbac
     }
 
     private void deleteSurveyInstance(String surveyId, long surveyInstanceId) {
-        SurveyDbAdapter db = new SurveyDbAdapter(getActivity().getApplicationContext()).open();
+        Context context = getActivity().getApplicationContext();
+        SurveyDbAdapter db = new SurveyDbAdapter(context,
+                new FlowMigrationListener(new Prefs(context),
+                        new MigrationLanguageMapper(context)));
         boolean nameResetNeeded = surveyId != null && surveyId
                 .equals(mSurveyGroup.getRegisterSurveyId());
         if (nameResetNeeded) {

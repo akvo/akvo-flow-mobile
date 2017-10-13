@@ -43,7 +43,7 @@ public class GsonMapper {
         try {
             return this.mapper.fromJson(content, type);
         } catch (JsonSyntaxException e) {
-            Timber.e(e, "Error mapping json to class '" + type + "' with contents: '" + content + "'");
+            Timber.e("Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
         }
     }
@@ -52,7 +52,7 @@ public class GsonMapper {
         try {
             return this.mapper.fromJson(content, type);
         } catch (JsonSyntaxException e) {
-            Timber.e(e, "Error mapping json to class '" + type + "' with contents: '" + content + "'");
+            Timber.e("Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
         }
     }
@@ -61,7 +61,7 @@ public class GsonMapper {
         try {
             return this.mapper.fromJson(new InputStreamReader(content), type);
         } catch (JsonIOException | JsonSyntaxException e) {
-            Timber.e(e, "Error mapping json to class '" + type + "' with contents: '" + content + "'");
+            Timber.e("Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
         }
     }

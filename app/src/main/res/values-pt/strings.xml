@@ -40,8 +40,7 @@ Sem espaço para armazenamento
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selecção inválida</string>
   <string name="langmandatorytext">Deve seleccionar pelo menos um idioma</string>
-  <string name="pleasewait">Por favor, espere</string>
-  <string name="downloadsurveylabel">Descarregar formulário</string>
+    <string name="downloadsurveylabel">Descarregar formulário</string>
   <string name="downloadsurveyinstr">Insira o código do inquérito que deseja descarregar.</string>
   <string name="deletealldatawarning">Isto apagará permanentemente todos os dados (inquéritos, respostas, imagens e usuários) no dispositivo. Esta operação não é reversível. Clique em OK para prosseguir ou Cancelar para interromper.</string>
   <string name="delete_responses_warning">Isto apagará permanentemente as respostas, imagens e arquivos zip no dispositivo. Esta operação não é reversível. Clique em OK para prosseguir ou Cancelar para interromper.</string>
@@ -72,19 +71,12 @@ Sem espaço para armazenamento
   <string name="pleasewaitforbootstrap">Por favor, aguarde até que o arquivo de inicialização conclua o processamento.</string>
   <string name="clear_data_success">Dados apagados do dispositivo com sucesso </string>
   <string name="clear_data_error">Erro ao apagar os dados do dispositivo</string>
-  <string name="search">Procurar</string>
-  <string name="sync">Sincronizar</string>
+    <string name="sync">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estatísticas</string>
-  <string name="syncing_records">Sincronizando pontos de dados</string>
-  <string name="synced_records">Pontos de Dados %1$d sincronizados</string>
-  <string name="sync_error"> Falhou a sincronização de Pontos de Dados </string>
-  <string name="syncing_corrupted_data_points_error">Faça a sincronização novamente.</string>
-  <string name="network_error">Erro de rede</string>
-  <string name="prefill_title">Preencher novamente as respostas</string>
+    <string name="prefill_title">Preencher novamente as respostas</string>
   <string name="prefill_text">Preencher antecipadamente o formulário com respostas anteriores?</string>
-  <string name="error_assignment_text">É necessário o emparelhamento no painel do Akvo Flow</string>
-  <!--Data sync-->
+    <!--Data sync-->
   <string name="data_sync_all">Formulários sincronizados: %1$d - Falha:%2$d</string>
   <string name="data_sync_synced">Formulários sincronizados:%1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulário eliminado</string>

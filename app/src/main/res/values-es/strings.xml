@@ -38,8 +38,7 @@
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selección no válida</string>
   <string name="langmandatorytext">Debe elegir al menos un idioma</string>
-  <string name="pleasewait">Por favor, espere</string>
-  <string name="downloadsurveylabel">Descargar formulario</string>
+    <string name="downloadsurveylabel">Descargar formulario</string>
   <string name="downloadsurveyinstr">Introduzca el ID del formulario que desea descargar</string>
   <string name="deletealldatawarning">Esta acción borrará permanentemente todos los datos (encuestas, respuestas, imágenes y usuarios) en el dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="delete_responses_warning">Esta acción borrará permanentemente las respuestas, imágenes y archivos zip del dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
@@ -70,19 +69,12 @@
   <string name="pleasewaitforbootstrap">Por favor, espere a que el archivo bootstrap haya sido procesado.</string>
   <string name="clear_data_success">Los datos han sido correctamente eliminados del dispositivo</string>
   <string name="clear_data_error">Ha ocurrido un error borrando los datos</string>
-  <string name="search">Buscar</string>
-  <string name="sync">Sincronizar</string>
+    <string name="sync">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estadísticas</string>
-  <string name="syncing_records">Sincronizando Puntos de Datos...</string>
-  <string name="synced_records">%1$d Puntos de Datos sincronizados</string>
-  <string name="sync_error">Sincronización de Puntos de Datos fallida</string>
-  <string name="syncing_corrupted_data_points_error">Vuelva a sincronizar.</string>
-  <string name="network_error">Error de conexión</string>
-  <string name="prefill_title">Pre-llenar respuestas</string>
+    <string name="prefill_title">Pre-llenar respuestas</string>
   <string name="prefill_text">Pre-llenar respuestas con previos valores de las mismas preguntas</string>
-  <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control Flow</string>
-  <!--Data sync-->
+    <!--Data sync-->
   <string name="data_sync_all">Formularios sincronizados: %1$d - Fallidos: %2$d</string>
   <string name="data_sync_synced">Formularios sincronizados: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulario borrado</string>

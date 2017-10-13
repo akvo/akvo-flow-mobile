@@ -39,7 +39,6 @@
     <string name="langoption">Languages</string>
     <string name="langmandatorytitle">Invalid Selection</string>
     <string name="langmandatorytext">You must select at least one language</string>
-    <string name="pleasewait">Please wait</string>
     <string name="preference_download_form_title">Download form using form ID</string>
     <string name="preference_download_form_subtitle">Only run if instructed</string>
     <string name="downloadsurveylabel">Download Form</string>

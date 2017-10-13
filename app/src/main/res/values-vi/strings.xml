@@ -34,8 +34,7 @@
   <string name="langoption">Ngôn ngữ</string>
   <string name="langmandatorytitle">Lựa chọn sai</string>
   <string name="langmandatorytext">Bạn phải lựa chọn tối thiểu 1 ngôn ngữ</string>
-  <string name="pleasewait">Xin vui lòng đợi</string>
-  <string name="downloadsurveylabel">Tải biểu mẫu</string>
+    <string name="downloadsurveylabel">Tải biểu mẫu</string>
   <string name="downloadsurveyinstr">Nhập ID của form mà bạn muốn tải</string>
   <string name="deletealldatawarning">Điều này sẽ xóa vĩnh viễn tất cả dữ liệu (những câu hỏi, câu trả lời, hình ảnh và người sử dụng) trên thiết bị. Đây là hoạt động không thể đảo ngược. Nhấn OK để tiếp tục hoặc hủy bỏ để thoát</string>
   <string name="delete_responses_warning">Điều này sẽ xóa vĩnh viễn tất cả dữ liệu những câu trả lời, hình ảnh và file nén trên thiết bị. Đây là hoạt động không thể đảo ngược. Nhấn OK để tiếp tục hoặc hủy bỏ để thoát</string>
@@ -65,18 +64,12 @@
   <string name="pleasewaitforbootstrap">Vui lòng đợi đến khi file hoàn tất quá trình xử lý</string>
   <string name="clear_data_success">Dữ liệu đã được xóa khỏi thiết bị</string>
   <string name="clear_data_error">Lỗi xảy ra trong quá trình xóa dữ liệu khỏi thiết bị</string>
-  <string name="search">Search</string>
-  <string name="sync">Đồng bộ hóa dữ liệu</string>
+    <string name="sync">Đồng bộ hóa dữ liệu</string>
   <string name="sort">Sắp xếp theo</string>
   <string name="stats">Thống kê điều tra</string>
-  <string name="syncing_records">Đang đồng bộ hóa dữ liệu...</string>
-  <string name="synced_records">Đã đồng bộ được %1$d dữ liệu</string>
-  <string name="sync_error">Quá trình đồng bộ hóa dữ liệu bị lỗi</string>
-  <string name="network_error">Lỗi kết nối mạng</string>
-  <string name="prefill_title">Những câu trả lời trước đây</string>
+    <string name="prefill_title">Những câu trả lời trước đây</string>
   <string name="prefill_text">Biểu mẫu với những câu trả lời trước đây?</string>
-  <string name="error_assignment_text">Nhiệm vụ được yêu cầu trong bảng điều khiển Akvo Flow</string>
-  <!--Data sync-->
+    <!--Data sync-->
   <string name="data_sync_all">Dữ liệu đã được đồng bộ hóa %1$d - Bị lỗi %2$d</string>
   <string name="data_sync_synced">Dữ liệu đã được đồng bộ hóa: %1$d</string>
   <!--Localization-->

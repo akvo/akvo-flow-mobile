@@ -41,8 +41,6 @@ public class FullImageActivity extends BackActivity {
     @BindView(R.id.imageView)
     ImageView imageView;
 
-    private ImageLoader imageLoader;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +71,7 @@ public class FullImageActivity extends BackActivity {
     private void loadImage() {
         Intent intent = getIntent();
         String imageFileName = intent.getStringExtra(ConstantUtil.IMAGE_URL_EXTRA);
-        imageLoader = new PicassoImageLoader(this);
+        ImageLoader imageLoader = new PicassoImageLoader(this);
         imageLoader.loadFromFile(new File(imageFileName), imageView);
     }
 }

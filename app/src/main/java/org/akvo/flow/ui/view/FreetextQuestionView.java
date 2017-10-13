@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,9 +21,11 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
@@ -33,7 +35,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.ValidationRule;
@@ -41,6 +42,8 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.exception.ValidationException;
 import org.akvo.flow.util.ConstantUtil;
+
+import java.util.Locale;
 
 /**
  * Question that supports free-text input via the keyboard
@@ -137,7 +140,8 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
      */
     @Override
     public void captureResponse(boolean suppressListeners) {
-        ValidationRule rule = getQuestion().getValidationRule();
+        Question question = getQuestion();
+        ValidationRule rule = question.getValidationRule();
         try {
             if (!TextUtils.isEmpty(mEditText.getText().toString())) {
                 // Do not validate void answers
@@ -165,8 +169,12 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
             return;// Die early. Don't store the value.
         }
 
-        setResponse(new QuestionResponse(mEditText.getText().toString(),
-                ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()),
+        setResponse(new QuestionResponse.QuestionResponseBuilder()
+                        .setValue(mEditText.getText().toString())
+                        .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                        .setQuestionId(question.getQuestionId())
+                        .setIteration(question.getIteration())
+                        .createQuestionResponse(),
                 suppressListeners);
 
         checkMandatory();// Mandatory question must be answered
@@ -205,12 +213,24 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
         super.resetQuestion(fireEvent);
     }
 
+    /**
+     * Display the error within the EditText (instead of question text)
+     *
+     * @param error Error text
+     */
     @Override
-    public void displayError(String error) {
-        // Display the error within the EditText (instead of question text)
-        mEditText.setError(error);
-        if (isDoubleEntry()) {
-            mDoubleEntryText.setError(error);
+    public void displayError(@Nullable String error) {
+        if (TextUtils.isEmpty(error)) {
+            mEditText.setError(null);
+            if (isDoubleEntry()) {
+                mDoubleEntryText.setError(null);
+            }
+        } else {
+            SpannableStringBuilder errorSpannable = errorMessageFormatter.getErrorSpannable(error);
+            mEditText.setError(errorSpannable);
+            if (isDoubleEntry()) {
+                mDoubleEntryText.setError(errorSpannable);
+            }
         }
     }
 
@@ -227,8 +247,13 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
     @Override
     public void questionComplete(Bundle data) {
         if (data != null && data.containsKey(ConstantUtil.CADDISFLY_RESPONSE)) {
-            setResponse(new QuestionResponse(data.getString(ConstantUtil.CADDISFLY_RESPONSE),
-                    ConstantUtil.VALUE_RESPONSE_TYPE, getQuestion().getId()));
+            Question question = getQuestion();
+            setResponse(new QuestionResponse.QuestionResponseBuilder()
+                    .setValue(data.getString(ConstantUtil.CADDISFLY_RESPONSE))
+                    .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                    .setQuestionId(question.getQuestionId())
+                    .setIteration(question.getIteration())
+                    .createQuestionResponse());
         }
     }
 
@@ -241,7 +266,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
             data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
             data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
             data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
-            data.putString(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+            data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
             notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT, data);
         }
     }

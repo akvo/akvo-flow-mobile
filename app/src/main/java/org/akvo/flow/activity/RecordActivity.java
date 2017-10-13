@@ -21,6 +21,8 @@ package org.akvo.flow.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,33 +30,33 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
-import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.RecordTabsAdapter;
-import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
+import org.akvo.flow.ui.fragment.FormListFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
-public class RecordActivity extends BackActivity implements SurveyListListener,
-        ResponseListFragment.ResponseListListener {
+public class RecordActivity extends BackActivity implements FormListFragment.SurveyListListener,
+        ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
 
     private static final int REQUEST_FORM = 0;
 
     private User mUser;
-    private SurveyedLocale mRecord;
     private SurveyGroup mSurveyGroup;
-    private SurveyDbAdapter mDatabase;
+    private SurveyDbDataSource mDatabase;
+    private String recordId;
 
     @Inject
     Navigator navigator;
@@ -68,7 +70,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
         RecordTabsAdapter recordTabsAdapter = new RecordTabsAdapter(getSupportFragmentManager(),
                 getResources().getStringArray(R.array.record_tabs));
         viewPager.setAdapter(recordTabsAdapter);
-        mDatabase = new SurveyDbAdapter(this);
+        mDatabase = new SurveyDbDataSource(this, null);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(
                 ConstantUtil.SURVEY_GROUP_EXTRA);
@@ -82,29 +84,14 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
         viewComponent.inject(this);
     }
 
-    protected ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getApplication()).getApplicationComponent();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         mDatabase.open();
 
         mUser = FlowApp.getApp().getUser();
-
-        updateRecordTitle();
-    }
-
-    private void updateRecordTitle() {
-        // Record might have changed while answering a registration survey
-        String recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID_EXTRA);
-        mRecord = mDatabase.getSurveyedLocale(recordId);
-        if (mRecord != null) {
-            setTitle(mRecord.getDisplayName(this));
-        } else {
-            setTitle(getString(R.string.unknown));
-        }
+        recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID_EXTRA);
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -133,25 +120,20 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
         }
 
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        String surveyedLocaleId = getRecordId();
-        long[] instances = mDatabase.getFormInstances(surveyedLocaleId, formId,
+        long[] instances = mDatabase.getFormInstances(recordId, formId,
                 SurveyInstanceStatus.SAVED);
         long formInstanceId = instances.length > 0 ?
                 instances[0] :
                 mDatabase.createSurveyRespondent(formId, survey.getVersion(), mUser,
-                        surveyedLocaleId);
+                        recordId);
 
-        navigator.navigateToFormActivity(this, surveyedLocaleId, formId,
+        navigator.navigateToFormActivity(this, recordId, formId,
                 formInstanceId, false, mSurveyGroup);
-    }
-
-    private String getRecordId() {
-        return mRecord == null ? "" : mRecord.getId();
     }
 
     @Override
     public void onNamedRecordDeleted() {
-        updateRecordTitle();
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     // ==================================== //
@@ -160,7 +142,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.datapoint_activity, menu);
+        getMenuInflater().inflate(R.menu.record_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -168,12 +150,30 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.view_map:
-                String recordId = getRecordId();
                 startActivity(new Intent(this, MapActivity.class)
                         .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public Loader<SurveyedLocale> onCreateLoader(int id, Bundle args) {
+        return new SurveyedLocaleItemLoader(this, recordId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<SurveyedLocale> loader, SurveyedLocale data) {
+        if (data != null) {
+            setTitle(data.getDisplayName(this));
+        } else {
+            setTitle(getString(R.string.unknown));
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<SurveyedLocale> loader) {
+        // EMPTY
     }
 }

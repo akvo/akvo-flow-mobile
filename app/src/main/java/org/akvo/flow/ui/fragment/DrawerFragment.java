@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -48,20 +47,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.UserColumns;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.loader.SurveyGroupLoader;
+import org.akvo.flow.data.loader.UserLoader;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.data.loader.SurveyGroupLoader;
 import org.akvo.flow.data.loader.UserLoader;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import static org.akvo.flow.data.preference.Prefs.KEY_SURVEY_GROUP_ID;
 
@@ -77,6 +87,8 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int GROUP_USERS = 0;
     private static final int GROUP_SURVEYS = 1;
     private static final int GROUP_SETTINGS = 2;
+    private static final int GROUP_ABOUT = 3;
+    private static final int GROUP_HELP = 4;
 
     // Loader IDs
     private static final int LOADER_SURVEYS = 0;
@@ -92,6 +104,9 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     private List<User> mUsers = new ArrayList<>();
     private List<SurveyGroup> mSurveys = new ArrayList<>();
+
+    @Inject
+    Navigator navigator;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,7 +124,10 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
         selectedSurveyId = new Prefs(getContext())
                 .getLong(KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
         if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
+            Context context = getActivity().getApplicationContext();
+            mDatabase = new SurveyDbAdapter(context,
+                    new FlowMigrationListener(new Prefs(context),
+                            new MigrationLanguageMapper(context)));
             mDatabase.open();
         }
         if (mAdapter == null) {
@@ -120,6 +138,23 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
             mListView.setOnChildClickListener(mAdapter);
             registerForContextMenu(mListView);
         }
+        initializeInjector();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override
@@ -183,7 +218,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     mSurveys.clear();
                     if (cursor.moveToFirst()) {
                         do {
-                            mSurveys.add(SurveyDbAdapter.getSurveyGroup(cursor));
+                            mSurveys.add(SurveyDbDataSource.getSurveyGroup(cursor));
                         } while (cursor.moveToNext());
                         cursor.close();
                     }
@@ -215,6 +250,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        //EMPTY
     }
 
     private void addUser() {
@@ -410,7 +446,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
 
         @Override
         public int getGroupCount() {
-            return 3;
+            return 5;
         }
 
         @Override
@@ -491,7 +527,23 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 1));
                     tv.setTextSize(ITEM_TEXT_SIZE);
                     tv.setTextColor(Color.BLACK);
-                    tv.setText(getString(R.string.settingslabel));
+                    tv.setText(getString(R.string.preferences_settings_section));
+                    img.setVisibility(View.GONE);
+                    dropdown.setVisibility(View.GONE);
+                    break;
+                case GROUP_HELP:
+                    divider.setVisibility(View.GONE);
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
+                    tv.setText(getString(R.string.help));
+                    img.setVisibility(View.GONE);
+                    dropdown.setVisibility(View.GONE);
+                    break;
+                case GROUP_ABOUT:
+                    divider.setVisibility(View.GONE);
+                    tv.setTextSize(ITEM_TEXT_SIZE);
+                    tv.setTextColor(Color.BLACK);
+                    tv.setText(getString(R.string.aboutlabel));
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;
@@ -547,7 +599,13 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                 case GROUP_SURVEYS:
                     return true; // This way the expander cannot be collapsed
                 case GROUP_SETTINGS:
-                    startActivity(new Intent(getActivity(), SettingsActivity.class));
+                    navigator.navigateToAppSettings(getActivity());
+                    return true;
+                case GROUP_ABOUT:
+                    navigator.navigateToAbout(getActivity());
+                    return true;
+                case GROUP_HELP:
+                    navigator.navigateToHelp(getContext());
                     return true;
                 default:
                     return false;

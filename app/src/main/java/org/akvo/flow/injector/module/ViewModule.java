@@ -20,7 +20,14 @@
 
 package org.akvo.flow.injector.module;
 
+import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.GetUserSettings;
+import org.akvo.flow.domain.interactor.SaveAppLanguage;
+import org.akvo.flow.domain.interactor.SaveEnableMobileData;
+import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SaveImage;
+import org.akvo.flow.domain.interactor.SaveImageSize;
+import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -35,5 +42,47 @@ public class ViewModule {
     @Named("saveImage")
     UseCase provideSaveImageUseCase(SaveImage saveImage) {
         return saveImage;
+    }
+
+    @Provides
+    @Named("getSavedDataPoints")
+    UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
+        return getSavedDataPoints;
+    }
+
+    @Provides
+    @Named("allowedToConnect")
+    UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
+        return allowedToConnect;
+    }
+
+    @Provides
+    @Named("getUserSettings")
+    UseCase provideGetUserSettings(GetUserSettings getUserSettings) {
+        return getUserSettings;
+    }
+
+    @Provides
+    @Named("saveAppLanguage")
+    UseCase provideSaveAppLanguage(SaveAppLanguage saveAppLanguage) {
+        return saveAppLanguage;
+    }
+
+    @Provides
+    @Named("saveEnableMobileData")
+    UseCase provideSaveEnableMobileData(SaveEnableMobileData saveEnableMobileData) {
+        return saveEnableMobileData;
+    }
+
+    @Provides
+    @Named("saveImageSize")
+    UseCase provideSaveImageSize(SaveImageSize saveImageSize) {
+        return saveImageSize;
+    }
+
+    @Provides
+    @Named("saveKeepScreenOn")
+    UseCase provideSaveKeepScreenOn(SaveKeepScreenOn saveKeepScreenOn) {
+        return saveKeepScreenOn;
     }
 }

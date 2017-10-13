@@ -5,8 +5,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'io.sentry:sentry-android-gradle-plugin:1.5.3'
     }
 }
 
@@ -35,6 +35,10 @@ task checkstyle(type: Checkstyle) {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+configurations {
+    all*.exclude group: 'com.android.support', module: 'support-v4'
 }
 
 apply plugin: 'checkstyle'

@@ -28,7 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.TransmissionStatus;
+import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.domain.FileTransmission;
 
 import java.text.DateFormat;

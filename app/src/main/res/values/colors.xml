@@ -6,13 +6,14 @@
     <color name="black_main">#000000</color>
     <color name="black_disabled">#8f8f8f</color>
     <color name="black_transparent">#20000000</color>
+    <color name="grey_transparent">#10000000</color>
 
     <color name="orange_main">#DE8929</color>
     <color name="orange_dark">#ba661c</color>
     <color name="orange_disabled">#80e17e26</color>
 
     <color name="blue_main">#2bb5e6</color>
-    <color name="blue_disabled">#802bb5e6</color>
+    <color name="blue_disabled">#602bb5e6</color>
 
     <color name="green">#00a79d</color>
     <color name="button_green">@color/green</color>
@@ -32,9 +33,6 @@
     <!-- Text -->
     <color name="text_primary">@color/black_main</color>
     <color name="text_primary_disabled">@color/black_disabled</color>
-
-    <color name="tab_text">@color/white</color>
-    <color name="tab_text_selected">@color/orange_main</color>
 
     <!-- Buttons -->
     <color name="button_primary">@color/button_green</color>

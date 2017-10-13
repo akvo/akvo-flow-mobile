@@ -1,20 +1,21 @@
 /*
  * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.akvo.flow.data.preference;
@@ -38,7 +39,6 @@ public class Prefs {
     public static final String KEY_SETUP = "setup";
     public static final String KEY_LOCALE = "pref.locale";
     public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
-    public static final String KEY_BACKEND_SERVER = "backend.server";
     public static final String KEY_SCREEN_ON = "screen.keepon";
     public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";

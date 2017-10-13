@@ -79,30 +79,6 @@ public class NotificationHelper {
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
-    public static void displayNotificationWithProgress(Context context, String title, String text, boolean ongoing,
-                                                       boolean indeterminate, int notificationId) {
-        NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
-
-        builder.setOngoing(ongoing); // Ongoing if still syncing the records
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, indeterminate);
-
-        notifyWithDummyIntent(context, notificationId, builder);
-    }
-
-    public static void displayErrorNotificationWithProgress(Context context, String title, String text, boolean ongoing,
-                                                       boolean indeterminate, int notificationId) {
-        NotificationCompat.Builder builder = createErrorNotificationBuilder(title, text, context);
-
-        builder.setOngoing(ongoing); // Ongoing if still syncing the records
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, indeterminate);
-
-        notifyWithDummyIntent(context, notificationId, builder);
-    }
-
     private static void notifyWithDummyIntent(Context context, int notificationId, NotificationCompat.Builder builder) {
         // Dummy intent. Do nothing when clicked
         PendingIntent dummyIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);

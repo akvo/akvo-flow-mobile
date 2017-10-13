@@ -24,7 +24,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -40,6 +39,7 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
@@ -58,7 +58,6 @@ public class GeoQuestionView extends QuestionView
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
-    private static final int SNACK_BAR_DURATION_IN_MS = 4000;
     public static final int POSITION_LATITUDE = 0;
     public static final int POSITION_LONGITUDE = 1;
     private static final int POSITION_ALTITUDE = 2;
@@ -66,6 +65,7 @@ public class GeoQuestionView extends QuestionView
 
     private final TimedLocationListener mLocationListener;
     private final LocationValidator locationValidator = new LocationValidator();
+    private final SnackBarManager snackBarManager = new SnackBarManager();
 
     private Button mGeoButton;
     private View geoLoading;
@@ -271,24 +271,17 @@ public class GeoQuestionView extends QuestionView
     @Override
     public void onTimeout() {
         showLocationListenerStopped();
-        View rootView = getRootView().findViewById(R.id.coordinator_layout);
-        Snackbar snackbar = Snackbar
-                .make(rootView, R.string.location_timeout, SNACK_BAR_DURATION_IN_MS)
-                .setAction(R.string.retry, new OnClickListener() {
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        snackBarManager.displaySnackBarWithAction(coordinatorLayout, R.string.location_timeout,
+                R.string.action_retry,
+                new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         resetResponseValues();
                         startLocation();
                         showLocationListenerStarted();
                     }
-                });
-        View snackBarView = snackbar.getView();
-        int snackBarTextId = android.support.design.R.id.snackbar_text;
-        TextView textView = (TextView) snackBarView.findViewById(snackBarTextId);
-        if (textView != null) {
-            textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-        }
-        snackbar.show();
+                }, getContext());
     }
 
     @Override
@@ -308,8 +301,7 @@ public class GeoQuestionView extends QuestionView
         final String lon = geoInputContainer.getLongitudeText();
         if (locationValidator.validCoordinates(lat, lon)) {
             updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
-            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+            setGeoQuestionResponse(lat, lon);
         } else {
             resetCode();
             setResponse(null);
@@ -323,9 +315,17 @@ public class GeoQuestionView extends QuestionView
         if (TextUtils.isEmpty(lat) || TextUtils.isEmpty(lon)) {
             setResponse(null);
         } else {
-            setResponse(new QuestionResponse(getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE,
-                    getQuestion().getId()));
+            setGeoQuestionResponse(lat, lon);
         }
+    }
+
+    private void setGeoQuestionResponse(String lat, String lon) {
+        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(getResponse(lat, lon))
+                .setType(ConstantUtil.GEO_RESPONSE_TYPE)
+                .setQuestionId(getQuestion().getId())
+                .createQuestionResponse();
+        setResponse(questionResponse);
     }
 
     @NonNull

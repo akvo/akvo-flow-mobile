@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,7 +22,7 @@ package org.akvo.flow.data.migration.preferences;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import org.akvo.flow.data.database.PreferenceHandler;
+import org.akvo.flow.database.PreferenceHandler;
 import org.akvo.flow.util.ConstantUtil;
 
 public class PreferenceExtractor {

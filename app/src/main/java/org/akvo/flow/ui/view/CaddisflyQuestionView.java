@@ -28,7 +28,6 @@ import android.view.View;
 import android.widget.Button;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
@@ -42,6 +41,7 @@ import org.akvo.flow.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -78,9 +78,14 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        QuestionResponse r = new QuestionResponse(mValue, ConstantUtil.CADDISFLY_RESPONSE_TYPE,
-                getQuestion().getId());
-        r.setFilename(mImage);
+        Question question = getQuestion();
+        QuestionResponse r = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(mValue)
+                .setType(ConstantUtil.CADDISFLY_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .setFilename(mImage)
+                .createQuestionResponse();
         setResponse(r);
     }
 
@@ -137,7 +142,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
         data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
-        data.putString(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+        data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
         notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY, data);
     }
 

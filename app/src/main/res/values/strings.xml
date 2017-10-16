@@ -269,4 +269,7 @@
         <item quantity="other">%1$d data points synced</item>
     </plurals>
 
+
+    <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
+
 </resources>

@@ -28,8 +28,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
@@ -49,8 +48,8 @@ import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.NotificationHelper;
-import org.akvo.flow.util.PropertyUtil;
 import org.akvo.flow.util.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,7 +96,6 @@ public class DataSyncService extends IntentService {
     private static final String DELIMITER = "\t";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
 
-    private static final String SIGNING_KEY_PROP = "signingKey";
     private static final String SIGNING_ALGORITHM = "HmacSHA1";
 
     private static final String SURVEY_DATA_FILE_JSON = "data.json";
@@ -118,7 +116,6 @@ public class DataSyncService extends IntentService {
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
-    private PropertyUtil mProps;
     private SurveyDbDataSource mDatabase;
     private Prefs preferences;
     private ConnectivityStateManager connectivityStateManager;
@@ -130,7 +127,6 @@ public class DataSyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
-            mProps = new PropertyUtil(getResources());
             mDatabase = new SurveyDbDataSource(this, null);
             mDatabase.open();
             preferences = new Prefs(getApplicationContext());
@@ -233,7 +229,7 @@ public class DataSyncService extends IntentService {
                     zipFileData.imagePaths);
 
             // Serialize form instance as JSON
-            zipFileData.data = new ObjectMapper().writeValueAsString(formInstance);
+            zipFileData.data = new GsonMapper().write(formInstance, FormInstance.class);
             zipFileData.uuid = formInstance.getUUID();
             zipFileData.formId = formInstance.getFormId();
             if (TextUtils.isEmpty(zipFileData.formId)) {
@@ -262,7 +258,7 @@ public class DataSyncService extends IntentService {
             ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
 
             writeTextToZip(zos, zipFileData.data, SURVEY_DATA_FILE_JSON);
-            String signingKeyString = mProps.getProperty(SIGNING_KEY_PROP);
+            String signingKeyString = BuildConfig.SIGNING_KEY;
             if (!StringUtil.isNullOrEmpty(signingKeyString)) {
                 MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
                 byte[] digest = sha1Digest.digest(zipFileData.data.getBytes(UTF_8_CHARSET));

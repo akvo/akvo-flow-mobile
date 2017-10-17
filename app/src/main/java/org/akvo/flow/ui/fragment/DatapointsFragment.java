@@ -58,7 +58,6 @@ public class DatapointsFragment extends Fragment {
     SurveyDbDataSource mDatabase;
 
     private TabsAdapter mTabsAdapter;
-    private ViewPager mPager;
     private SurveyGroup mSurveyGroup;
 
     @Nullable
@@ -144,7 +143,7 @@ public class DatapointsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
-        mPager = (ViewPager) v.findViewById(R.id.pager);
+        ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
         TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
 
         mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);

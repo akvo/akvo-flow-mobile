@@ -22,63 +22,55 @@ package org.akvo.flow.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.User;
 
-public class AddUserActivity extends Activity implements TextWatcher, TextView.OnEditorActionListener {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnEditorAction;
+import butterknife.OnTextChanged;
 
-    private View mNextBt;
-    private EditText mName;
-    private EditText mID;
+import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
+
+public class AddUserActivity extends Activity {
+
+    @BindView(R.id.login_btn)
+    View nextBt;
+
+    @BindView(R.id.username)
+    EditText nameEt;
+
+    @BindView(R.id.device_id)
+    EditText deviceIdEt;
+
+    private Prefs prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
-
-        mName = (EditText) findViewById(R.id.username);
-        mID = (EditText) findViewById(R.id.device_id);
-        mNextBt = findViewById(R.id.login_btn);
-
-        // Ensure the username is not left blank
-        mNextBt.setEnabled(false);
-        mName.addTextChangedListener(this);
-        mID.addTextChangedListener(this);
-        mID.setOnEditorActionListener(this);
-
-        mNextBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveUserData();
-            }
-        });
+        ButterKnife.bind(this);
+        prefs = new Prefs(getApplicationContext());
+        deviceIdEt.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, ""));
     }
 
     //TODO: database operations should be done on separate thread
     private void saveUserData() {
-        String username = mName.getText().toString().trim();
-        String deviceId = mID.getText().toString().trim();
+        String username = nameEt.getText().toString().trim();
+        String deviceId = deviceIdEt.getText().toString().trim();
         Context context = getApplicationContext();
-        Prefs prefs = new Prefs(context);
-        SurveyDbAdapter db = new SurveyDbAdapter(context,
-                new FlowMigrationListener(prefs,
-                        new MigrationLanguageMapper(context)));
+        SurveyDbDataSource db = new SurveyDbDataSource(context, null);
         db.open();
         long uid = db.createOrUpdateUser(null, username);
         db.close();
@@ -91,22 +83,20 @@ public class AddUserActivity extends Activity implements TextWatcher, TextView.O
         finish();
     }
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    @OnTextChanged(value = { R.id.username, R.id.device_id }, callback = AFTER_TEXT_CHANGED)
+    void afterUserInputChanged() {
+        boolean valid =
+                !TextUtils.isEmpty(nameEt.getText()) && !TextUtils.isEmpty(deviceIdEt.getText());
+        nextBt.setEnabled(valid);
     }
 
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    @OnClick(R.id.login_btn)
+    void onNextButtonTap() {
+        saveUserData();
     }
 
-    @Override
-    public void afterTextChanged(Editable s) {
-        boolean valid = !TextUtils.isEmpty(mName.getText()) && !TextUtils.isEmpty(mID.getText());
-        mNextBt.setEnabled(valid);
-    }
-
-    @Override
-    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+    @OnEditorAction(R.id.device_id)
+    boolean onDeviceIdAction(int actionId) {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             saveUserData();
             return true;

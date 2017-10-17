@@ -49,10 +49,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-/**
- * List Adapter to bind the Surveyed Locales into the list items
- */
-class DataPointListAdapter extends BaseAdapter implements Filterable{
+class DataPointListAdapter extends BaseAdapter implements Filterable {
 
     private Double latitude;
     private Double longitude;
@@ -218,18 +215,15 @@ class DataPointListAdapter extends BaseAdapter implements Filterable{
                     results.values = unfilteredDataPoints;
                 } else {
                     final List<ListDataPoint> filteredItems = new ArrayList<>();
-                    constraint = constraint.toString().toLowerCase();
+                    String searchTerm = constraint.toString();
                     for (ListDataPoint dataPoint : unfilteredDataPoints) {
                         String displayName = dataPoint.getDisplayName();
                         if (displayName != null) {
                             displayName = displayName.toLowerCase();
                         }
                         String id = dataPoint.getId();
-                        if (id != null) {
-                            id = id.toLowerCase();
-                        }
-                        if ((displayName != null && displayName.contains(constraint))
-                                || (id != null && id.contains(constraint))) {
+                        if ((displayName != null && displayName.contains(searchTerm.toLowerCase()))
+                                || (id != null && id.startsWith(searchTerm))) {
                             filteredItems.add(dataPoint);
                         }
                     }

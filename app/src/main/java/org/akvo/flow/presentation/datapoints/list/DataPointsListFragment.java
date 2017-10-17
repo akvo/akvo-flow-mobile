@@ -21,7 +21,6 @@
 package org.akvo.flow.presentation.datapoints.list;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -105,6 +104,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     DataPointsListPresenter presenter;
 
     private boolean displayMonitoredMenu;
+    private SearchView searchView;
 
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
@@ -194,14 +194,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onResume() {
         super.onResume();
 
-        // try to find out where we are
-        updateLocation();
-
-        // Listen for data sync updates, so we can update the UI accordingly
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
-        presenter.loadDataPoints();
+        if (searchView == null || searchView.isIconified()) {
+            updateLocation();
+            presenter.loadDataPoints();
+        }
     }
 
     private void updateLocation() {
@@ -298,35 +297,37 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             inflater.inflate(R.menu.datapoints_list, menu);
         }
 
-        FragmentActivity activity = getActivity();
-        SearchManager searchManager = (SearchManager)
-                activity.getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchMenuItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-        searchView.setSearchableInfo(searchManager.
-                getSearchableInfo(activity.getComponentName()));
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
         searchView.setIconifiedByDefault(true);
+        searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Timber.d("query submitted: "+query);
-                mAdapter.filterResults(query);
-                return true;
+                //TODO
+                return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                mAdapter.filterResults(newText);
                 return false;
             }
         });
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                Timber.d("search closed");
-                mAdapter.clearFilter();
-                return false;
-            }
-        });
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem,
+                new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        // EMPTY
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        mAdapter.clearFilter();
+                        return true;
+                    }
+                });
         super.onCreateOptionsMenu(menu, inflater);
     }
 

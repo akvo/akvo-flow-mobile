@@ -22,7 +22,6 @@ package org.akvo.flow.ui;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -30,24 +29,24 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
-import org.akvo.flow.activity.PreferencesActivity;
 import org.akvo.flow.activity.RecordActivity;
-import org.akvo.flow.activity.SettingsActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
@@ -118,33 +117,27 @@ public class Navigator {
         activity.startActivityForResult(i, ConstantUtil.VIDEO_ACTIVITY_REQUEST);
     }
 
-    public void navigateToBarcodeScanner(@NonNull Activity activity) {
+    public void navigateToBarcodeScanner(@NonNull AppCompatActivity activity) {
         Intent intent = new Intent(ConstantUtil.BARCODE_SCAN_INTENT);
         try {
             activity.startActivityForResult(intent, ConstantUtil.SCAN_ACTIVITY_REQUEST);
         } catch (ActivityNotFoundException ex) {
-            displayScannerNotFoundDialog(activity, R.string.barcode_scanner_missing_error);
+            displayScannerNotFoundDialog(activity);
         }
     }
 
-    private void displayScannerNotFoundDialog(@NonNull final Activity activity, @StringRes int messageId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.install,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse("http://play.google.com/store/search?q=Barcode Scanner"));
-                        activity.startActivity(intent);
-                    }
-                });
-        builder.setNegativeButton(R.string.cancelbutton,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        builder.show();
+    private void displayScannerNotFoundDialog(@NonNull final AppCompatActivity activity) {
+        AppDownloadDialogFragment fragment = AppDownloadDialogFragment
+                .newInstance(R.string.barcode_scanner_missing_error,
+                        "http://play.google.com/store/search?q=Barcode Scanner");
+        fragment.show(activity.getSupportFragmentManager(),
+                AppDownloadDialogFragment.TAG);
+    }
+
+    public void navigateToPlayStore(@NonNull Activity activity, String uriString) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(uriString));
+        activity.startActivity(intent);
     }
 
     public void navigateToExternalSource(@NonNull Activity activity, Bundle data,
@@ -200,6 +193,21 @@ public class Navigator {
         }
     }
 
+    public void navigateToStorageSettings(@NonNull Context context) {
+        Intent intent = new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+        PackageManager packageManager = context.getPackageManager();
+        if (intent.resolveActivity(packageManager) != null) {
+            context.startActivity(intent);
+        } else {
+            intent = new Intent(Settings.ACTION_MEMORY_CARD_SETTINGS);
+            if (intent.resolveActivity(packageManager) != null) {
+                context.startActivity(intent);
+            } else {
+                navigateToSettings(context);
+            }
+        }
+    }
+
     /**
      * Fallback as Settings.ACTION_LOCATION_SOURCE_SETTINGS may not be available on some devices
      */
@@ -229,16 +237,48 @@ public class Navigator {
     }
 
     public void navigateToAppSettings(@NonNull Context context) {
-        context.startActivity(new Intent(context, SettingsActivity.class));
+        context.startActivity(new Intent(context, PreferenceActivity.class));
     }
 
     public void navigateToHelp(@NonNull Context context) {
         context.startActivity(new Intent(context, HelpActivity.class));
     }
 
-    public void navigateToPreferences(@Nullable Context context) {
-        if (context != null) {
-            context.startActivity(new Intent(context, PreferencesActivity.class));
+    public void navigateToGpsFixes(AppCompatActivity activity) {
+        if (activity != null) {
+            PackageManager packageManager = activity.getPackageManager();
+            Intent intent = packageManager
+                    .getLaunchIntentForPackage(ConstantUtil.GPS_STATUS_PACKAGE_V2);
+            if (intent != null) {
+                activity.startActivity(intent);
+            } else {
+                intent = packageManager
+                        .getLaunchIntentForPackage(ConstantUtil.GPS_STATUS_PACKAGE_V1);
+                if (intent != null) {
+                    activity.startActivity(intent);
+                } else {
+                    displayGpsStatusNotFoundDialog(activity);
+                }
+            }
         }
+    }
+
+    private void displayGpsStatusNotFoundDialog(AppCompatActivity activity) {
+        AppDownloadDialogFragment fragment = AppDownloadDialogFragment
+                .newInstance(R.string.no_gps_status_message,
+                        "http://play.google.com/store/apps/details?id="
+                                + ConstantUtil.GPS_STATUS_PACKAGE_V2);
+        fragment.show(activity.getSupportFragmentManager(),
+                AppDownloadDialogFragment.TAG);
+    }
+
+    /**
+     * Gps status app in play store is only available to 4.0++ devices, for older devices
+     * we need to take them to the browser to download the url
+     */
+    public void downloadGpsStatusViaBrowser(@NonNull Context context) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(BuildConfig.SERVER_BASE + "/" + "gps"));
+        context.startActivity(browserIntent);
     }
 }

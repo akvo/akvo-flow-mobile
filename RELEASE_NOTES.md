@@ -1,5 +1,62 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.0.1
+Date: 16 October 2017
+
+# New and noteworthy
+* **Update French translations** - [#885](https://github.com/akvo/akvo-flow-mobile/issues/885) Updated French translations.
+* **Improve the way dashboard configuration is stored/used** - [#848](https://github.com/akvo/akvo-flow-mobile/issues/848) Avoid constantly reading config file for any immutable dashboard configuration.
+* **Improve UI for syncing in data points - progress spinner** - [#822](https://github.com/akvo/akvo-flow-mobile/issues/822) Progress bar showing data points are being loaded has an improved design.
+* **Display user friendly dashboard url in Settings** - [#804](https://github.com/akvo/akvo-flow-mobile/issues/804) The url displayed now includes the dashboard name.
+* **Simplify Check SD Card State** - [#803](https://github.com/akvo/akvo-flow-mobile/issues/803) Simplified the way remaining memory space is displayed.
+* **Reorganize the settings screen in a logical way** - [#501](https://github.com/akvo/akvo-flow-mobile/issues/501) The settings screen has been redesigned.
+
+# Resolved issues
+* **Unable to install app 2.4.0.1 on old devices** - [#882](https://github.com/akvo/akvo-flow-mobile/issues/882) Fixed the issue where the application could not be installed on devices with android 2.3.x.
+* **Data point History shows no answers** - [#873](https://github.com/akvo/akvo-flow-mobile/issues/873) Fixed some answers were missing from the data point history.
+* **Toolbar back navigation is slow to respond on some older devices** - [#863](https://github.com/akvo/akvo-flow-mobile/issues/863) Fixed toolbar touches slow to respond on devices with android 2.3.x.
+* **When deleting collected data selected survey still displays datapoints on map** - [#846](https://github.com/akvo/akvo-flow-mobile/issues/846) Fixed map not updated after all collected data was deleted.
+* **More than 1000 datapoints crashes with OOME** - [#844](https://github.com/akvo/akvo-flow-mobile/issues/844) Optimized data point syncing performance to avoid crashes.
+* **Endless syncing in data points for large survey forms** - [#843](https://github.com/akvo/akvo-flow-mobile/issues/843) Fixed issue where data point sync never stopped.
+* **Datapoints from wrong survey are sometimes displayed** - [#841](https://github.com/akvo/akvo-flow-mobile/issues/841) Fixed data points from wrong survey displayed after another survey was selected.
+* **After deleting everything, users and surveys, the previous survey title still shows** - [#790](https://github.com/akvo/akvo-flow-mobile/issues/790) After deleting everything, the user is now taken to the login screen.
+
+---------------
+# ver 2.3.7.1
+Date: 06 September 2017
+
+# Resolved issues
+* **For only monitoring assignments, cannot submit a form if no previous monitoring ones submitted** - [#855](https://github.com/akvo/akvo-flow-mobile/issues/855) Once the registration form has been submitted, you can create monitoring forms even if the registration form has not been assigned to your device.
+
+---------------
+# ver 2.3.7
+Date: 31 August 2017
+
+# New and noteworthy
+* **Add Dutch as a new language for the app** - [#812](https://github.com/akvo/akvo-flow-mobile/issues/812) From now on, the app is also available in Dutch.
+* **Add help section** - [#798](https://github.com/akvo/akvo-flow-mobile/issues/798) Direct access to the support website from the navigation drawer.
+* **Basic survey question test** - [#613](https://github.com/akvo/akvo-flow-mobile/issues/613) Basic question type surveys are now tested.
+
+# Resolved issues
+* **Portrait photo shown in app UI as landscape** - [#832](https://github.com/akvo/akvo-flow-mobile/issues/832) Photos are now displayed correctly for both portrait and landscape images.
+
+---------------
+# ver 2.4.0 (Pre-release)
+Date: 10 August 2017
+
+# New and noteworthy
+* **Add help section** - [#798](https://github.com/akvo/akvo-flow-mobile/issues/798) Direct access to the support website from the navigation drawer.
+* **New screen for empty surveys** - [#621](https://github.com/akvo/akvo-flow-mobile/issues/621) The datapoints list empty screen has been redesigned.
+* **Improve datapoint sync layout** - [#583](https://github.com/akvo/akvo-flow-mobile/issues/583) The datapoint display and sync layout has been redesigned.
+
+# Resolved issues
+* **Viewing single data point on map UI** - [#821](https://github.com/akvo/akvo-flow-mobile/issues/821) Fixed issue when datapoint map had no toolbar.
+* **When adding new datapoints they do not show on the map** - [#728](https://github.com/akvo/akvo-flow-mobile/issues/728) When adding a new datapoint, it will be displayed on the map correctly.
+* **Repeated groups delete button can delete the questions of the whole group** - [#651](https://github.com/akvo/akvo-flow-mobile/issues/651) Deleting the last iteration of a repeated group no longer deletes all the group questions.
+* **DatabaseHelper upgrade method** - [#646](https://github.com/akvo/akvo-flow-mobile/issues/646) Improved the code of the database helper upgrade method.
+* **Answers in repeated groups not shown in point History** - [#600](https://github.com/akvo/akvo-flow-mobile/issues/600) All the answers are now displayed correctly.
+
+---------------
 # ver 2.3.6
 Date: 20 July 2017
 

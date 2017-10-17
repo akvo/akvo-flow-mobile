@@ -30,8 +30,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class DeleteUser extends UseCase {
 
@@ -55,14 +55,14 @@ public class DeleteUser extends UseCase {
         }
         final User user = (User) parameters.get(PARAM_USER);
         return userRepository.getSelectedUser()
-                .concatMap(new Func1<Long, Observable<Boolean>>() {
+                .concatMap(new Function<Long, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(Long selectedUserId) {
+                    public Observable<Boolean> apply(Long selectedUserId) {
                         if (selectedUserId == user.getId()) {
                             return userRepository.clearSelectedUser().concatMap(
-                                    new Func1<Boolean, Observable<Boolean>>() {
+                                    new Function<Boolean, Observable<Boolean>>() {
                                         @Override
-                                        public Observable<Boolean> call(Boolean aBoolean) {
+                                        public Observable<Boolean> apply(Boolean aBoolean) {
                                             return deleteUser(user);
                                         }
                                     });

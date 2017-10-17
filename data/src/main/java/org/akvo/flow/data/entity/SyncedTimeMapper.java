@@ -21,6 +21,7 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import org.akvo.flow.database.SyncTimeColumns;
 
@@ -32,11 +33,12 @@ public class SyncedTimeMapper {
     public SyncedTimeMapper() {
     }
 
+    @NonNull
     public String getTime(Cursor cursor) {
         if (cursor == null) {
-            return null;
+            return "";
         }
-        String time = null;
+        String time = "";
         if (cursor.moveToFirst()) {
             time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
         }

@@ -51,6 +51,8 @@ import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
+import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -60,6 +62,7 @@ import java.io.File;
  * 
  * @author Christopher Fagiani
  */
+//TODO: separate video and image into different classes
 public class MediaQuestionView extends QuestionView implements OnClickListener,
         TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
     private Button mMediaButton;
@@ -70,6 +73,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     private String mMediaType;
     private TimedLocationListener mLocationListener;
     private Media mMedia;
+    private ImageLoader imageLoader;
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
@@ -87,7 +91,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mProgressBar = (ProgressBar)findViewById(R.id.progress);
         mDownloadBtn = findViewById(R.id.download);
         mLocationInfo = (TextView)findViewById(R.id.location_info);
-
+        imageLoader = new PicassoImageLoader(getContext());
         if (isImage()) {
             mMediaButton.setText(R.string.takephoto);
         } else {
@@ -115,7 +119,6 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
      * handle the action button click
      */
     public void onClick(View v) {
-        // TODO: Use switch instead of if-else
         if (v == mImageView) {
             String filename = mMedia != null ? mMedia.getFilename() : null;
             if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
@@ -129,7 +132,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
                 ImageView imageView = new ImageView(getContext());
                 imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                         LayoutParams.MATCH_PARENT));
-                ImageUtil.displayImage(imageView, filename);
+                displayImage(filename, imageView);
                 dia.setContentView(imageView);
                 dia.show();
             } else {
@@ -147,9 +150,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             mDownloadBtn.setVisibility(GONE);
             mProgressBar.setVisibility(VISIBLE);
 
-            MediaSyncTask downloadTask = new MediaSyncTask(getContext(), new File(mMedia.getFilename()), this);
+            MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
+                    new File(mMedia.getFilename()), this);
             downloadTask.execute();
         }
+    }
+
+    private void displayImage(String filename, ImageView imageView) {
+        imageLoader.loadFromFile(new File(filename), imageView);
     }
 
     /**
@@ -262,7 +270,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {
             // Image thumbnail
-            ImageUtil.displayImage(mImageView, filename);
+            displayImage(filename, mImageView);
         } else {
             // Video thumbnail
             mImageView.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
@@ -284,7 +292,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     }
 
     @Override
-    public void onLocationReady(double latitude, double longitude, double altitude, float accuracy) {
+    public void onLocationReady(double latitude, double longitude, double altitude,
+            float accuracy) {
         if (accuracy > TimedLocationListener.ACCURACY_DEFAULT) {
             // This location is not accurate enough. Keep listening for updates
             return;

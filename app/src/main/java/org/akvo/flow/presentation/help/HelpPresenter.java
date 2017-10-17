@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.help;
 
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -41,7 +41,7 @@ public class HelpPresenter implements Presenter {
 
     @Override
     public void destroy() {
-        allowedToConnect.unSubscribe();
+        allowedToConnect.dispose();
     }
 
     public void setView(HelpView view) {
@@ -50,7 +50,7 @@ public class HelpPresenter implements Presenter {
 
     public void load() {
         view.showProgress();
-        allowedToConnect.execute(new DefaultSubscriber<Boolean>() {
+        allowedToConnect.execute(new DefaultObserver<Boolean>() {
 
             @Override
             public void onError(Throwable e) {

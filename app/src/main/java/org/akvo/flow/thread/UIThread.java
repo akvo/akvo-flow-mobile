@@ -25,8 +25,8 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * MainThread (UI Thread) implementation based on a {@link Scheduler}

@@ -27,7 +27,7 @@ import android.database.SQLException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
@@ -652,5 +652,17 @@ public class SurveyDbDataSource {
 
     public void clearSurveyedLocaleName(long surveyInstanceId) {
         surveyDbAdapter.clearSurveyedLocaleName(surveyInstanceId);
+    }
+
+    public void clearCollectedData() {
+        surveyDbAdapter.clearCollectedData();
+    }
+
+    public void clearAllData() {
+        surveyDbAdapter.clearAllData();
+    }
+
+    public long createOrUpdateUser(Long id, String username) {
+        return surveyDbAdapter.createOrUpdateUser(id, username);
     }
 }

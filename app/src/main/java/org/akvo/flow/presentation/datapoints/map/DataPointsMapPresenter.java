@@ -25,7 +25,9 @@ import android.support.annotation.NonNull;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.SyncResult;
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -48,17 +50,20 @@ public class DataPointsMapPresenter implements Presenter {
 
     private final UseCase getSavedDataPoints;
     private final MapDataPointMapper mapper;
-    private final UseCase syncDataPoints;
+    private final SyncDataPoints syncDataPoints;
+    private final UseCase allowedToConnect;
 
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
 
     @Inject
     DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            MapDataPointMapper mapper, @Named("syncDataPoints") UseCase syncDataPoints) {
+            MapDataPointMapper mapper, SyncDataPoints syncDataPoints,
+            @Named("allowedToConnect") UseCase allowedToConnect) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.syncDataPoints = syncDataPoints;
+        this.allowedToConnect = allowedToConnect;
     }
 
     void setView(@NonNull DataPointsMapView view) {
@@ -77,10 +82,11 @@ public class DataPointsMapPresenter implements Presenter {
     }
 
     void loadDataPoints() {
+        getSavedDataPoints.dispose();
         if (surveyGroup != null) {
-            Map<String, Long> params = new HashMap<>(2);
+            Map<String, Object> params = new HashMap<>(2);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
-            getSavedDataPoints.execute(new DefaultSubscriber<List<DataPoint>>() {
+            getSavedDataPoints.execute(new DefaultObserver<List<DataPoint>>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
@@ -97,8 +103,8 @@ public class DataPointsMapPresenter implements Presenter {
 
     @Override
     public void destroy() {
-        getSavedDataPoints.unSubscribe();
-        syncDataPoints.unSubscribe();
+        getSavedDataPoints.dispose();
+        syncDataPoints.dispose();
     }
 
     void onSyncRecordsPressed() {
@@ -109,20 +115,32 @@ public class DataPointsMapPresenter implements Presenter {
     }
 
     private void syncRecords(final long surveyGroupId) {
-        Map<String, Long> params = new HashMap<>(2);
-        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {
-
+        allowedToConnect.execute(new DefaultObserver<Boolean>() {
             @Override
-            public void onCompleted() {
-                view.hideProgress();
+            public void onError(Throwable e) {
+                Timber.e(e); //should not happen
             }
 
             @Override
-            public void onError(Throwable e) {
-                Timber.e(e, "Error syncing %s", surveyGroupId);
+            public void onNext(Boolean aBoolean) {
+                if (aBoolean == null || !aBoolean) {
+                    view.hideProgress();
+                    view.showErrorSyncNotAllowed();
+                } else {
+                    sync(surveyGroupId);
+                }
+            }
+        }, null);
+
+    }
+
+    private void sync(final long surveyGroupId) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        syncDataPoints.execute(new DefaultFlowableObserver<SyncResult>() {
+            @Override
+            public void onComplete() {
                 view.hideProgress();
-                view.showErrorSync();
             }
 
             @Override
@@ -135,9 +153,6 @@ public class DataPointsMapPresenter implements Presenter {
                     }
                 } else {
                     switch (result.getResultCode()) {
-                        case ERROR_SYNC_NOT_ALLOWED_OVER_3G:
-                            view.showErrorSyncNotAllowed();
-                            break;
                         case ERROR_NO_NETWORK:
                             view.showErrorNoNetwork();
                             break;
@@ -150,12 +165,19 @@ public class DataPointsMapPresenter implements Presenter {
                     }
                 }
             }
+        }, new ErrorComposable() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e, "Error syncing %s", surveyGroupId);
+                view.hideProgress();
+                view.showErrorSync();
+            }
         }, params);
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
-        getSavedDataPoints.unSubscribe();
-        syncDataPoints.unSubscribe();
+        getSavedDataPoints.dispose();
+        syncDataPoints.dispose();
         view.hideProgress();
         onDataReady(surveyGroup);
         loadDataPoints();

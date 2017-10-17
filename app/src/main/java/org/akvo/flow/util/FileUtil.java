@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.media.ExifInterface;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
@@ -117,8 +118,17 @@ public class FileUtil {
      */
     private static String getFilesStorageDir(boolean internal) {
         if (internal) {
-            return FlowApp.getApp().getExternalFilesDir(null).getAbsolutePath();
+            FlowApp app = FlowApp.getApp();
+            File externalFilesDir = app.getExternalFilesDir(null);
+            if (externalFilesDir != null) {
+                return externalFilesDir.getAbsolutePath();
+            }
         }
+        return getExternalStoragePath();
+    }
+
+    @NonNull
+    private static String getExternalStoragePath() {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 

@@ -40,7 +40,6 @@ public class SyncResult {
 
     public enum ResultCode {
         SUCCESS,
-        ERROR_SYNC_NOT_ALLOWED_OVER_3G,
         ERROR_NO_NETWORK,
         ERROR_ASSIGNMENT_MISSING
     }

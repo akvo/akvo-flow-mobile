@@ -31,16 +31,13 @@ public class DataSourceFactory {
     private final SharedPreferencesDataSource sharedPreferencesDataSource;
     private final ImageDataSource imageDataSource;
     private final DatabaseDataSource dataBaseDataSource;
-    private final PropertiesDataSource propertiesDataSource;
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
-            ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
-            PropertiesDataSource propertiesDataSource) {
+            ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;
-        this.propertiesDataSource = propertiesDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
@@ -53,9 +50,5 @@ public class DataSourceFactory {
 
     public DatabaseDataSource getDataBaseDataSource() {
         return dataBaseDataSource;
-    }
-
-    public PropertiesDataSource getPropertiesDataSource() {
-        return propertiesDataSource;
     }
 }

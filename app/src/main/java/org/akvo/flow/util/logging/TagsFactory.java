@@ -27,9 +27,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PropertyUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class TagsFactory {
 
     private void initTags(Context context, Prefs prefs) {
         tags.put(DEVICE_MODEL_TAG_KEY, Build.MODEL);
-        tags.put(GAE_INSTANCE_ID_TAG_KEY, getAppId(context));
+        tags.put(GAE_INSTANCE_ID_TAG_KEY, getAppId());
         tags.put(DEVICE_ID_TAG_KEY, getDeviceId(prefs));
         tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
         try {
@@ -89,9 +88,8 @@ public class TagsFactory {
     }
 
     @NonNull
-    private String getAppId(Context context) {
-        final PropertyUtil props = new PropertyUtil(context.getResources());
-        String property = props.getProperty(ConstantUtil.S3_BUCKET);
+    private String getAppId() {
+        String property = BuildConfig.AWS_BUCKET;
         return TextUtils.isEmpty(property) ? DEFAULT_TAG_VALUE : property;
     }
 }

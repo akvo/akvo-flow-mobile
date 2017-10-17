@@ -22,11 +22,10 @@ package org.akvo.flow.api;
 import android.content.Context;
 import android.util.Base64;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.exception.HttpException;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.PropertyUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -64,10 +63,9 @@ public class S3Api {
     private String mSecret;
 
     public S3Api(Context c) {
-        PropertyUtil properties = new PropertyUtil(c.getResources());
-        mBucket = properties.getProperty(ConstantUtil.S3_BUCKET);
-        mAccessKey = properties.getProperty(ConstantUtil.S3_ACCESSKEY);
-        mSecret = properties.getProperty(ConstantUtil.S3_SECRET);
+        mBucket = BuildConfig.AWS_BUCKET;
+        mAccessKey = BuildConfig.AWS_ACCESS_KEY_ID;
+        mSecret = BuildConfig.AWS_SECRET_KEY;
     }
 
     public String getEtag(String objectKey) throws IOException {

@@ -22,7 +22,7 @@ package org.akvo.flow.activity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -37,20 +37,15 @@ public abstract class BackActivity extends AppCompatActivity {
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     protected ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getApplication()).getApplicationComponent();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }

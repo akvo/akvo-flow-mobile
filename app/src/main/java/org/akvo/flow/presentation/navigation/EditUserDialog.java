@@ -91,7 +91,7 @@ public class EditUserDialog extends DialogFragment implements
         super.onCreateDialog(savedInstanceState);
         Context context = getContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View main = LayoutInflater.from(context).inflate(R.layout.edit_user_dialog, null);
+        View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);
         builder.setTitle(R.string.edit_user);
         userNameEt = (EditText) main.findViewById(R.id.user_name_et);
         userNameEt.setText(viewUser.getName());

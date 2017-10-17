@@ -42,9 +42,9 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.MediaFileHelper;
-import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;
+import org.akvo.flow.util.image.PicassoImageLoader;
 
 import static org.akvo.flow.util.MediaFileHelper.RESIZED_SUFFIX;
 
@@ -74,7 +74,7 @@ public class SignatureQuestionView extends QuestionView {
         mImage = (ImageView)findViewById(R.id.image);
         signButton = (Button)findViewById(R.id.sign_btn);
         Context context = getContext();
-        imageLoader = new GlideImageLoader(context);
+        imageLoader = new PicassoImageLoader(context);
         mediaFileHelper = new MediaFileHelper(context);
 
         if (isReadOnly()) {

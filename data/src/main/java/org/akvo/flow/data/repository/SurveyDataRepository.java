@@ -21,7 +21,6 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.entity.ApiDataPoint;
@@ -37,17 +36,26 @@ import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.reactivestreams.Publisher;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import retrofit2.HttpException;
-import rx.Observable;
-import rx.functions.Func1;
 
 public class SurveyDataRepository implements SurveyRepository {
 
@@ -73,9 +81,9 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<List<Survey>> getSurveys() {
         return dataSourceFactory.getDataBaseDataSource().getSurveys()
-                .map(new Func1<Cursor, List<Survey>>() {
+                .map(new Function<Cursor, List<Survey>>() {
                     @Override
-                    public List<Survey> call(Cursor cursor) {
+                    public List<Survey> apply(Cursor cursor) {
                         return surveyMapper.getSurveys(cursor);
                     }
                 });
@@ -86,36 +94,24 @@ public class SurveyDataRepository implements SurveyRepository {
             Double latitude, Double longitude, Integer orderBy) {
         return dataSourceFactory.getDataBaseDataSource()
                 .getDataPoints(surveyGroupId, latitude, longitude, orderBy).concatMap(
-                        new Func1<Cursor, Observable<List<DataPoint>>>() {
+                        new Function<Cursor, Observable<List<DataPoint>>>() {
                             @Override
-                            public Observable<List<DataPoint>> call(Cursor cursor) {
+                            public Observable<List<DataPoint>> apply(Cursor cursor) {
                                 return Observable.just(dataPointMapper.getDataPoints(cursor));
                             }
                         });
     }
 
     @Override
-    public Observable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
-        return getServerBaseUrl()
-                .concatMap(new Func1<String, Observable<Integer>>() {
+    public Flowable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
+        return syncDataPoints(surveyGroupId)
+                .onErrorResumeNext(new Function<Throwable, Flowable<Integer>>() {
                     @Override
-                    public Observable<Integer> call(final String serverBaseUrl) {
-                        return dataSourceFactory.getPropertiesDataSource().getApiKey()
-                                .concatMap(new Func1<String, Observable<Integer>>() {
-                                    @Override
-                                    public Observable<Integer> call(String apiKey) {
-                                        return syncDataPoints(serverBaseUrl, apiKey, surveyGroupId);
-                                    }
-                                });
-                    }
-                })
-                .onErrorResumeNext(new Func1<Throwable, Observable<Integer>>() {
-                    @Override
-                    public Observable<Integer> call(Throwable throwable) {
+                    public Flowable<Integer> apply(Throwable throwable) {
                         if (isErrorForbidden(throwable)) {
                             throw new AssignmentRequiredException("Dashboard Assignment missing");
                         } else {
-                            return Observable.error(throwable);
+                            return Flowable.error(throwable);
                         }
                     }
                 });
@@ -131,118 +127,126 @@ public class SurveyDataRepository implements SurveyRepository {
         return syncedTimeMapper.getTime(syncedTime);
     }
 
-    private Observable<String> getServerBaseUrl() {
-        return dataSourceFactory.getSharedPreferencesDataSource().getBaseUrl().concatMap(
-                new Func1<String, Observable<String>>() {
+    private Flowable<Integer> syncDataPoints(final long surveyGroupId) {
+        final State state = new State(getSyncedTime(surveyGroupId));
+        return loadNewDataPoints(surveyGroupId, state)
+                .doOnNext(new Consumer<State>() {
                     @Override
-                    public Observable<String> call(String baseUrl) {
-                        if (TextUtils.isEmpty(baseUrl)) {
-                            return dataSourceFactory.getPropertiesDataSource().getBaseUrl();
-                        } else {
-                            return Observable.just(baseUrl);
-                        }
-                    }
-                });
-    }
-
-    private Observable<Integer> syncDataPoints(final String baseUrl, final String apiKey,
-            final long surveyGroupId) {
-        final List<ApiDataPoint> lastBatch = new ArrayList<>();
-        final List<ApiDataPoint> allResults = new ArrayList<>();
-        String syncedTime = getSyncedTime(surveyGroupId);
-        return loadAndSave(baseUrl, apiKey, surveyGroupId, lastBatch, allResults, syncedTime)
-                .repeatWhen(new Func1<Observable<? extends Void>, Observable<?>>() {
-                    @Override
-                    public Observable<?> call(final Observable<? extends Void> observable) {
-                        return observable.delay(5, TimeUnit.SECONDS);
+                    public void accept(@NonNull State state) throws Exception {
+                        List<ApiDataPoint> lastBatch = state.getLastBatch();
+                        dataSourceFactory.getDataBaseDataSource().syncDataPoints(lastBatch);
                     }
                 })
-                .takeUntil(new Func1<List<ApiDataPoint>, Boolean>() {
+                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
                     @Override
-                    public Boolean call(List<ApiDataPoint> apiDataPoints) {
-                        return apiDataPoints.isEmpty();
+                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) throws Exception {
+                        return flowable.delay(15, TimeUnit.SECONDS);
                     }
                 })
-                .filter(new Func1<List<ApiDataPoint>, Boolean>() {
+                .takeUntil(new Predicate<State>() {
                     @Override
-                    public Boolean call(List<ApiDataPoint> apiDataPoints) {
-                        return apiDataPoints.isEmpty();
+                    public boolean test(State state) throws Exception {
+                        return state.getLastBatch().isEmpty();
                     }
-                }).map(new Func1<List<ApiDataPoint>, Integer>() {
+                })
+                .filter(new Predicate<State>() {
                     @Override
-                    public Integer call(List<ApiDataPoint> apiDataPoints) {
-                        return allResults.size();
+                    public boolean test(State state) throws Exception {
+                        return state.getLastBatch().isEmpty();
                     }
-                });
-    }
-
-    private Observable<List<ApiDataPoint>> loadAndSave(final String baseUrl, final String apiKey,
-            final long surveyGroupId, final List<ApiDataPoint> lastBatch,
-            final List<ApiDataPoint> allResults, String syncedTime) {
-        return loadNewDataPoints(baseUrl, apiKey, surveyGroupId, syncedTime, lastBatch)
-                .flatMap(new Func1<ApiLocaleResult, Observable<List<ApiDataPoint>>>() {
+                })
+                .map(new Function<State, Integer>() {
                     @Override
-                    public Observable<List<ApiDataPoint>> call(ApiLocaleResult apiLocaleResult) {
-                        return saveToDataBase(apiLocaleResult, lastBatch, allResults);
+                    public Integer apply(State state) {
+                        return state.retrievedItems;
                     }
                 });
     }
 
-    private Observable<String> getLatestSyncedTime(String syncedTime,
-            List<ApiDataPoint> lastBatch) {
-        ApiDataPoint apiDataPoint = lastBatch.isEmpty() ?
-                null :
-                lastBatch.get(lastBatch.size() - 1);
-        if (apiDataPoint != null) {
-            syncedTime = String.valueOf(apiDataPoint.getLastModified());
-        }
-        return Observable.just(syncedTime);
-    }
-
-    private Observable<List<ApiDataPoint>> saveToDataBase(ApiLocaleResult apiLocaleResult,
-            List<ApiDataPoint> lastBatch, List<ApiDataPoint> allResults) {
-        List<ApiDataPoint> dataPoints = getNonEmptyDataPoints(apiLocaleResult);
-        dataPoints.removeAll(lastBatch); //remove duplicates
-        lastBatch.clear();
-        lastBatch.addAll(dataPoints);
-        allResults.addAll(dataPoints);
-        return dataSourceFactory.getDataBaseDataSource().syncDataPoints(dataPoints);
-    }
-
-    /**
-     * Removes datapoints which have no survey instances (bug in backend)
-     */
-    private List<ApiDataPoint> getNonEmptyDataPoints(ApiLocaleResult apiLocaleResult) {
-        List<ApiDataPoint> allDataPoints = apiLocaleResult.getDataPoints();
-        List<ApiDataPoint> nonEmptyDataPoints = new ArrayList<>();
-        if (allDataPoints != null) {
-            for (ApiDataPoint dataPoint : allDataPoints) {
-                List<ApiSurveyInstance> surveyInstances = dataPoint.getSurveyInstances();
-                if (surveyInstances != null && !surveyInstances.isEmpty()) {
-                    nonEmptyDataPoints.add(dataPoint);
+    private Flowable<State> loadNewDataPoints(final long surveyGroupId,
+            final State state) {
+        return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
+            @Override
+            public Flowable<ApiLocaleResult> call() throws Exception {
+                return restApi.loadNewDataPoints(surveyGroupId,
+                        state.getTimestamp());
+            }
+        }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {
+            @Override
+            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult)
+                    throws Exception {
+                if (apiLocaleResult == null || apiLocaleResult.getDataPoints() == null) {
+                    return Collections.emptyList();
                 }
+                List<ApiDataPoint> dataPoints = apiLocaleResult.getDataPoints();
+                dataPoints.removeAll(state.getLastBatch()); //remove duplicates
+                return dataPoints;
+            }
+        }).concatMap(new Function<List<ApiDataPoint>, Flowable<State>>() {
+            @Override
+            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints)
+                    throws Exception {
+                return filterDataPoints(dataPoints, state);
+            }
+        });
+    }
+
+    private Flowable<State> filterDataPoints(@NonNull List<ApiDataPoint> dataPoints,
+            final State state) {
+        return Flowable.fromIterable(dataPoints)
+                .filter(new Predicate<ApiDataPoint>() {
+                    @Override
+                    public boolean test(@NonNull ApiDataPoint apiDataPoint) throws Exception {
+                        List<ApiSurveyInstance> instances = apiDataPoint.getSurveyInstances();
+                        return instances != null && !instances.isEmpty();
+                    }
+                })
+                .toList()
+                .flatMap(new Function<List<ApiDataPoint>, SingleSource<State>>() {
+                    @Override
+                    public SingleSource<State> apply(@NonNull List<ApiDataPoint> points)
+                            throws Exception {
+                        state.update(points);
+                        return Single.just(state);
+                    }
+                })
+                .toFlowable();
+    }
+
+    public class State {
+
+        @NonNull
+        private final List<ApiDataPoint> lastBatch;
+
+        private String timestamp;
+        private int retrievedItems = 0;
+
+        State(String timestamp) {
+            this.timestamp = timestamp;
+            this.lastBatch = new ArrayList<>();
+        }
+
+        void update(List<ApiDataPoint> dataPoints) {
+            if (dataPoints == null) {
+                return;
+            }
+            lastBatch.clear();
+            lastBatch.addAll(dataPoints);
+            retrievedItems += dataPoints.size();
+            int size = lastBatch.size();
+            if (size != 0) {
+                ApiDataPoint lastDataPoint = lastBatch.get(size - 1);
+                timestamp = String.valueOf(lastDataPoint.getLastModified());
             }
         }
-        return nonEmptyDataPoints;
-    }
 
-    private Observable<ApiLocaleResult> loadNewDataPoints(final String baseUrl, final String apiKey,
-            final long surveyGroupId, final String syncedTime, final List<ApiDataPoint> lastBatch) {
-        return Observable.just(true) //necessary or the timestamp does not get updated
-                .concatMap(new Func1<Boolean, Observable<ApiLocaleResult>>() {
-                    @Override
-                    public Observable<ApiLocaleResult> call(Boolean aBoolean) {
-                        return getLatestSyncedTime(syncedTime, lastBatch)
-                                .flatMap(new Func1<String, Observable<ApiLocaleResult>>() {
-                                    @Override
-                                    public Observable<ApiLocaleResult> call(String time) {
-                                        return restApi
-                                                .loadNewDataPoints(baseUrl, apiKey, surveyGroupId,
-                                                        time);
-                                    }
-                                });
-                    }
-                });
+        String getTimestamp() {
+            return timestamp;
+        }
+
+        List<ApiDataPoint> getLastBatch() {
+            return lastBatch;
+        }
     }
 
     @Override
@@ -253,9 +257,9 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<List<User>> getUsers() {
         return dataSourceFactory.getDataBaseDataSource().getUsers()
-                .map(new Func1<Cursor, List<User>>() {
+                .map(new Function<Cursor, List<User>>() {
                     @Override
-                    public List<User> call(Cursor cursor) {
+                    public List<User> apply(Cursor cursor) {
                         return userMapper.getUsers(cursor);
                     }
                 });

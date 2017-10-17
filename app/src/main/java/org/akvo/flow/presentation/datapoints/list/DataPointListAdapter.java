@@ -166,8 +166,8 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
 
     void setDataPoints(List<ListDataPoint> dataPoints) {
         clear();
-        for (ListDataPoint sl : dataPoints) {
-            add(sl);
+        for (ListDataPoint listDataPoint : dataPoints) {
+            add(listDataPoint);
         }
         notifyDataSetChanged();
     }

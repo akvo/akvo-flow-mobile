@@ -24,7 +24,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
@@ -60,7 +60,7 @@ public class SignaturePresenter implements Presenter {
 
     @Override
     public void destroy() {
-        saveImage.unSubscribe();
+        saveImage.dispose();
     }
 
     @NonNull
@@ -105,7 +105,7 @@ public class SignaturePresenter implements Presenter {
             params.put(SaveImage.ORIGINAL_FILE_NAME_PARAM,
                     getOriginalSignatureFile().getAbsolutePath());
             params.put(SaveImage.IMAGE_BITMAP_PARAM, bitmap);
-            saveImage.execute(new DefaultSubscriber() {
+            saveImage.execute(new DefaultObserver() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error saving image");

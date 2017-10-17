@@ -55,7 +55,7 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.domain.apkupdate.GsonMapper;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
@@ -116,6 +116,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private ApkUpdateStore apkUpdateStore;
 
     private long selectedSurveyId;
+    private boolean activityJustCreated;
 
     /**
      * BroadcastReceiver to notify of surveys synchronisation. This should be
@@ -146,22 +147,23 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initDataPointsFragment(savedInstanceState);
 
-        prefs = new Prefs(getApplicationContext());
-        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
-        // Start the setup Activity if necessary.
-        boolean noDevIdYet = false;
-        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            noDevIdYet = true;
-            navigator.navigateToAddUser(this);
-        }
+        navigateToSetupIfNeeded();
 
-        startServices(noDevIdYet);
+        startServices();
 
         //When the app is restarted we need to display the current user
         if (savedInstanceState == null) {
             displaySelectedUser();
         }
+        activityJustCreated = true;
         navigationView.setSurveyListener(this);
+    }
+
+    private void navigateToSetupIfNeeded() {
+        boolean deviceSetCorrectly = prefs.getBoolean(Prefs.KEY_SETUP, false);
+        if (!deviceSetCorrectly) {
+            navigator.navigateToAddUser(this);
+        }
     }
 
     private void initializeToolBar() {
@@ -188,7 +190,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
              */
             @Override
             public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
                 //prevent the back icon from showing
                 super.onDrawerSlide(drawerView, 0);
                 supportInvalidateOptionsMenu();
@@ -226,25 +227,27 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case ConstantUtil.REQUEST_ADD_USER:
-                if (resultCode == RESULT_OK) {
-                    displaySelectedUser();
-                    prefs.setBoolean(Prefs.KEY_SETUP, true);
-                    // Trigger the delayed services, so the first
-                    // backend connections uses the new Device ID
-                    startService(new Intent(this, SurveyDownloadService.class));
-                    startService(new Intent(this, DataSyncService.class));
-                } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-                    finish();
-                }
-                break;
+        if (requestCode == ConstantUtil.REQUEST_ADD_USER) {
+            if (resultCode == RESULT_OK) {
+                displaySelectedUser();
+                prefs.setBoolean(Prefs.KEY_SETUP, true);
+                // Trigger the delayed services, so the first
+                // backend connections uses the new Device ID
+                startService(new Intent(this, SurveyDownloadService.class));
+                startService(new Intent(this, DataSyncService.class));
+            } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
+                finish();
+            }
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if (!activityJustCreated) {
+            navigateToSetupIfNeeded();
+        }
+        activityJustCreated = false;
         // Delete empty responses, if any
         mDatabase.deleteEmptySurveyInstances();
         mDatabase.deleteEmptyRecords();
@@ -298,7 +301,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDrawerToggle.syncState();
     }
 
-    private void startServices(boolean waitForDeviceId) {
+    private void startServices() {
         if (!StatusUtil.hasExternalStorage()) {
             ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                     false,
@@ -310,7 +313,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     },
                     null);
         } else {
-            if (!waitForDeviceId) {
+            boolean deviceSetUpCompleted = prefs.getBoolean(Prefs.KEY_SETUP, false);
+            if (deviceSetUpCompleted) {
                 startService(new Intent(this, SurveyDownloadService.class));
                 startService(new Intent(this, DataSyncService.class));
             }

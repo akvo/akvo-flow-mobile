@@ -23,11 +23,21 @@ package org.akvo.flow.data.datasource.preferences;
 import android.content.SharedPreferences;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
+@Singleton
 public class SharedPreferencesDataSource {
 
+    private static final String KEY_LOCALE = "pref.locale";
+    private static final String KEY_SCREEN_ON = "screen.keepon";
+    private static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
+    private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
+
+    private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
+    private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
+    private static final boolean DEFAULT_VALUE_SCREEN_ON = true;
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     private static final String KEY_BACKEND_SERVER = "backend.server";
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
@@ -46,16 +56,20 @@ public class SharedPreferencesDataSource {
         return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
     }
 
-    public Observable<String> getBaseUrl() {
-        return Observable.just(getString(KEY_BACKEND_SERVER, null));
+    public Observable<Boolean> keepScreenOn() {
+        return Observable.just(getBoolean(KEY_SCREEN_ON, DEFAULT_VALUE_SCREEN_ON));
     }
 
-    public String getString(String key, String defValue) {
-        return preferences.getString(key, defValue);
+    public Observable<String> getAppLanguage() {
+        return Observable.just(getString(KEY_LOCALE, ""));
     }
 
-    public void setString(String key, String value) {
-        preferences.edit().putString(key, value).apply();
+    public Observable<Integer> getImageSize() {
+        return Observable.just(getInt(KEY_MAX_IMG_SIZE, DEFAULT_VALUE_IMAGE_SIZE));
+    }
+
+    public Observable<String> getDeviceId() {
+        return Observable.just(getString(KEY_DEVICE_IDENTIFIER, DEFAULT_VALUE_DEVICE_IDENTIFIER));
     }
 
     public Observable<Long> getSelectedSurvey() {
@@ -83,20 +97,44 @@ public class SharedPreferencesDataSource {
         preferences.edit().putLong(key, value).apply();
     }
 
-    private void setBoolean(String key, boolean value) {
-        preferences.edit().putBoolean(key, value).apply();
-    }
-
     private int getInt(String key, int defValue) {
         return preferences.getInt(key, defValue);
+    }
+
+    private String getString(String key, String defaultValue) {
+        return preferences.getString(key, defaultValue);
+    }
+
+    private void setString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
+    }
+
+    private void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
     }
 
     private void setInt(String key, int value) {
         preferences.edit().putInt(key, value).apply();
     }
 
-    private void removePreference(String key) {
-        preferences.edit().remove(key).apply();
+    public Observable<Boolean> saveScreenOn(Boolean keepScreenOn) {
+        setBoolean(KEY_SCREEN_ON, keepScreenOn);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> saveEnableMobileData(Boolean enable) {
+        setBoolean(KEY_CELL_UPLOAD, enable);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> saveLanguage(String language) {
+        setString(KEY_LOCALE, language);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> saveImageSize(Integer size) {
+        setInt(KEY_MAX_IMG_SIZE, size);
+        return Observable.just(true);
     }
 
     public Observable<Long> getSelectedUser() {

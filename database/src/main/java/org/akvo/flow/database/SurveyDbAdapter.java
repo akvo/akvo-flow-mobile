@@ -824,6 +824,49 @@ public class SurveyDbAdapter {
         return database.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
     }
 
+    public Cursor getDatapointStatus(String recordId) {
+        Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
+                new String[] {
+                        SurveyInstanceColumns.STATUS
+                },
+                SurveyInstanceColumns.RECORD_ID + "= ?",
+                new String[] { String.valueOf(recordId) },
+                null, null, null);
+        return cursor;
+    }
+
+    public Cursor getDataPointForms(long surveyGroupId, String recordId) {
+        String table = SurveyDbAdapter.SURVEY_JOIN_SURVEY_INSTANCE;
+        if (recordId != null) {
+            // Add record id to the join condition. If put in the where, the left join won't work
+            table +=  " AND " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID
+                    + "='" + recordId + "'";
+        }
+        return database.query(table,
+                SurveyQuery.PROJECTION,
+                SurveyColumns.SURVEY_GROUP_ID + " = ?",
+                new String[] { String.valueOf(surveyGroupId) },
+                Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
+                null,
+                SurveyColumns.NAME);
+    }
+
+    public interface SurveyQuery {
+        String[] PROJECTION = {
+                Tables.SURVEY + "." + SurveyColumns.SURVEY_ID,
+                Tables.SURVEY + "." + SurveyColumns.NAME,
+                Tables.SURVEY + "." + SurveyColumns.VERSION,
+                Tables.SURVEY + "." + SurveyColumns.DELETED,
+                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SUBMITTED_DATE,
+        };
+
+        int SURVEY_ID = 0;
+        int NAME = 1;
+        int VERSION = 2;
+        int DELETED = 3;
+        int SUBMITTED = 4;
+    }
+
     // Wrap DB projections and column indexes.
     public interface RecordQuery {
         String[] PROJECTION = {

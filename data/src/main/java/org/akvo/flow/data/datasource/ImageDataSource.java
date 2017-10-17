@@ -32,8 +32,8 @@ import java.io.OutputStream;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
-import rx.functions.Func2;
+import io.reactivex.Observable;
+import io.reactivex.functions.BiFunction;
 import timber.log.Timber;
 
 @Singleton
@@ -81,9 +81,10 @@ public class ImageDataSource {
     public Observable<Boolean> saveImages(Bitmap bitmap, String originalFilePath,
             String resizedFilePath) {
         return Observable.zip(saveImage(bitmap, originalFilePath),
-                saveResizedImage(bitmap, resizedFilePath), new Func2<Boolean, Boolean, Boolean>() {
+                saveResizedImage(bitmap, resizedFilePath),
+                new BiFunction<Boolean, Boolean, Boolean>() {
                     @Override
-                    public Boolean call(Boolean savedImage, Boolean savedResizedImage) {
+                    public Boolean apply(Boolean savedImage, Boolean savedResizedImage) {
                         return savedImage && savedResizedImage;
                     }
                 });

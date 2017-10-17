@@ -23,9 +23,9 @@ package org.akvo.flow.presentation.navigation;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.CreateUser;
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
 import org.akvo.flow.domain.interactor.EditUser;
@@ -85,14 +85,14 @@ public class FlowNavigationPresenter implements Presenter {
 
     @Override
     public void destroy() {
-        getAllSurveys.unSubscribe();
-        deleteSurvey.unSubscribe();
-        saveSelectedSurvey.unSubscribe();
-        getUsers.unSubscribe();
-        editUser.unSubscribe();
-        deleteUser.unSubscribe();
-        setSelectedUser.unSubscribe();
-        createUser.unSubscribe();
+        getAllSurveys.dispose();
+        deleteSurvey.dispose();
+        saveSelectedSurvey.dispose();
+        getUsers.dispose();
+        editUser.dispose();
+        deleteUser.dispose();
+        setSelectedUser.dispose();
+        createUser.dispose();
     }
 
     public void setView(FlowNavigationView view) {
@@ -105,7 +105,7 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     private void loadSurveys() {
-        getAllSurveys.execute(new DefaultSubscriber<Pair<List<Survey>, Long>>() {
+        getAllSurveys.execute(new DefaultObserver<Pair<List<Survey>, Long>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error getting all surveys");
@@ -120,7 +120,7 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     private void loadUsers() {
-        getUsers.execute(new DefaultSubscriber<Pair<User, List<User>>>() {
+        getUsers.execute(new DefaultObserver<Pair<User, List<User>>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error getting users");
@@ -137,9 +137,9 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void onDeleteSurvey(final long surveyGroupId) {
-        Map<String, Long> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(DeleteSurvey.SURVEY_ID_PARAM, surveyGroupId);
-        deleteSurvey.execute(new DefaultSubscriber<Boolean>() {
+        deleteSurvey.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -157,9 +157,9 @@ public class FlowNavigationPresenter implements Presenter {
 
     public void onSurveyItemTap(final ViewSurvey viewSurvey) {
         if (viewSurvey != null) {
-            Map<String, Long> params = new HashMap<>(2);
+            Map<String, Object> params = new HashMap<>(2);
             params.put(SaveSelectedSurvey.KEY_SURVEY_GROUP_ID, viewSurvey.getId());
-            saveSelectedSurvey.execute(new DefaultSubscriber<Boolean>() {
+            saveSelectedSurvey.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
@@ -181,9 +181,9 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void editUser(ViewUser viewUser) {
-        Map<String, User> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(EditUser.PARAM_USER, userMapper.transform(viewUser));
-        editUser.execute(new DefaultSubscriber<Boolean>() {
+        editUser.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -193,9 +193,9 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void deleteUser(ViewUser viewUser) {
-        Map<String, User> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(DeleteUser.PARAM_USER, userMapper.transform(viewUser));
-        deleteUser.execute(new DefaultSubscriber<Boolean>() {
+        deleteUser.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -208,9 +208,9 @@ public class FlowNavigationPresenter implements Presenter {
         if (item.getId() == ViewUser.ADD_USER_ID) {
             view.displayAddUser();
         } else {
-            Map<String, Long> params = new HashMap<>(2);
+            Map<String, Object> params = new HashMap<>(2);
             params.put(SetSelectedUser.PARAM_USER_ID, item.getId());
-            setSelectedUser.execute(new DefaultSubscriber<Boolean>() {
+            setSelectedUser.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
@@ -226,9 +226,9 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     public void createUser(String userName) {
-        Map<String, String> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(CreateUser.PARAM_USER_NAME, userName);
-        createUser.execute(new DefaultSubscriber<Boolean>() {
+        createUser.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);

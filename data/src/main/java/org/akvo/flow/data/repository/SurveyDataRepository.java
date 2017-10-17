@@ -257,9 +257,9 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<List<User>> getUsers() {
         return dataSourceFactory.getDataBaseDataSource().getUsers()
-                .map(new Func1<Cursor, List<User>>() {
+                .map(new Function<Cursor, List<User>>() {
                     @Override
-                    public List<User> call(Cursor cursor) {
+                    public List<User> apply(Cursor cursor) {
                         return userMapper.getUsers(cursor);
                     }
                 });

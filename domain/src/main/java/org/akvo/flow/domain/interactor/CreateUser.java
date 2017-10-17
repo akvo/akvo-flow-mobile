@@ -29,8 +29,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class CreateUser extends UseCase {
 
@@ -55,9 +55,9 @@ public class CreateUser extends UseCase {
         }
         String userName = (String) parameters.get(PARAM_USER_NAME);
         return surveyRepository.createUser(userName)
-                .concatMap(new Func1<Long, Observable<Boolean>>() {
+                .concatMap(new Function<Long, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(final Long userId) {
+                    public Observable<Boolean> apply(final Long userId) {
                         if (userId == INVALID_ID) {
                             return Observable.error(new Exception("Error inserting user"));
                         }

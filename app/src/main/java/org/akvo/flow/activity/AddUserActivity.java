@@ -70,7 +70,6 @@ public class AddUserActivity extends Activity {
         String username = nameEt.getText().toString().trim();
         String deviceId = deviceIdEt.getText().toString().trim();
         Context context = getApplicationContext();
-        Prefs prefs = new Prefs(context);
         SurveyDbDataSource db = new SurveyDbDataSource(context, null);
         db.open();
         long uid = db.createOrUpdateUser(null, username);

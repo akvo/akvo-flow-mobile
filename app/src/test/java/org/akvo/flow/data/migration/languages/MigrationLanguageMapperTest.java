@@ -62,7 +62,7 @@ public class MigrationLanguageMapperTest {
     };
 
     @Before
-    public void setup() {
+    public void setUp() {
         PowerMockito.mockStatic(TextUtils.class);
         PowerMockito.when(TextUtils.isEmpty(any(CharSequence.class)))
                 .thenAnswer(new Answer<Boolean>() {

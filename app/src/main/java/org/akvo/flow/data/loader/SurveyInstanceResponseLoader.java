@@ -24,7 +24,6 @@ import android.content.Context;
 import android.database.Cursor;
 
 import org.akvo.flow.data.loader.base.AsyncLoader;
-import org.akvo.flow.data.loader.base.DataLoader;
 import org.akvo.flow.database.SurveyDbAdapter;
 
 public class SurveyInstanceResponseLoader extends AsyncLoader<Cursor> {

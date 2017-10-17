@@ -114,10 +114,8 @@
     <string name="or">or</string>
     <string name="capture_shape">capture shape</string>
     <string name="view_shape">view shape</string>
-    <string name="clear_point_title">Delete point</string>
-    <string name="clear_point_text">Do you want to remove this point?</string>
-    <string name="clear_feature_title">Delete feature</string>
-    <string name="clear_feature_text">Do you want to remove this feature?</string>
+    <string name="delete_point_title">Delete point?</string>
+    <string name="delete_shape_title">Delete shape?</string>
     <string name="repeat_group">Repeat group</string>
     <string name="repetitions">Repetitions:</string>
     <string name="view_map">View map</string>
@@ -270,5 +268,8 @@
         <item quantity="one">%1$d data point synced</item>
         <item quantity="other">%1$d data points synced</item>
     </plurals>
+
+
+    <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
 
 </resources>

@@ -293,10 +293,8 @@ public class BriteSurveyDbAdapter {
     }
 
     public Observable<Boolean> deleteSurvey(long surveyGroupId) {
-        // First the group
         briteDatabase.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
                 String.valueOf(surveyGroupId));
-        // Now the surveys
         briteDatabase.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
                 String.valueOf(surveyGroupId));
         return Observable.just(true);

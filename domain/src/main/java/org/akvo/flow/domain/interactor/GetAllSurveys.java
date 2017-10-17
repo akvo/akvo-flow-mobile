@@ -56,16 +56,17 @@ public class GetAllSurveys extends UseCase {
                 .concatMap(new Function<List<Survey>, Observable<Pair<List<Survey>, Long>>>() {
                     @Override
                     public Observable<Pair<List<Survey>, Long>> apply(final List<Survey> surveys) {
-                        return userRepository.getSelectedSurvey()
-                                .concatMap(
-                                        new Function<Long, Observable<Pair<List<Survey>, Long>>>() {
-                                            @Override
-                                            public Observable<Pair<List<Survey>, Long>> apply(
-                                                    Long selectedSurvey) {
-                                                return Observable
-                                                        .just(new Pair<>(surveys, selectedSurvey));
-                                            }
-                                        });
+                        return getSelectedSurvey(surveys);
+                    }
+                });
+    }
+
+    private Observable<Pair<List<Survey>, Long>> getSelectedSurvey(final List<Survey> surveys) {
+        return userRepository.getSelectedSurvey()
+                .concatMap(new Function<Long, Observable<Pair<List<Survey>, Long>>>() {
+                    @Override
+                    public Observable<Pair<List<Survey>, Long>> apply(Long selectedSurvey) {
+                        return Observable.just(new Pair<>(surveys, selectedSurvey));
                     }
                 });
     }

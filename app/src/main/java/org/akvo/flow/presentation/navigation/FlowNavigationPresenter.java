@@ -77,13 +77,10 @@ public class FlowNavigationPresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error getting all surveys");
-                //what error to display here and how?
             }
 
             @Override
             public void onNext(Pair<List<Survey>, Long> result) {
-                int size = result.first == null ? 0 : result.first.size();
-                Timber.d("found new surveys: " + size);
                 view.display(surveyMapper.transform(result.first), result.second);
             }
         }, null);
@@ -96,7 +93,6 @@ public class FlowNavigationPresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                //TODO: notify user
                 load();
             }
 
@@ -116,7 +112,6 @@ public class FlowNavigationPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
-                    //TODO: error
                 }
 
                 @Override

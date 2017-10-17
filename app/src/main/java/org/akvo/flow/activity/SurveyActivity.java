@@ -182,7 +182,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
              */
             @Override
             public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
                 //prevent the back icon from showing
                 super.onDrawerSlide(drawerView, 0);
                 supportInvalidateOptionsMenu();

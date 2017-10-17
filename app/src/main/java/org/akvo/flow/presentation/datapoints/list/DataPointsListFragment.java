@@ -297,6 +297,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             inflater.inflate(R.menu.datapoints_list, menu);
         }
 
+        setUpSearchView(menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void setUpSearchView(final Menu menu) {
         MenuItem searchMenuItem = menu.findItem(R.id.search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
         searchView.setIconifiedByDefault(true);
@@ -304,13 +309,14 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //TODO
+                // Empty
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 mAdapter.filterResults(newText);
+                presenter.updateSearchResultsEmptyView(mAdapter.getCount());
                 return false;
             }
         });
@@ -325,10 +331,10 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
                         mAdapter.clearFilter();
+                        presenter.updateEmptyViewsSearchEnded(mAdapter.getCount());
                         return true;
                     }
                 });
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -443,6 +449,16 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 presenter.onSyncRecordsPressed();
             }
         });
+    }
+
+    @Override
+    public void displayNoSearchResultsFound() {
+        if (emptyTitleTv != null) {
+            emptyTitleTv.setText(R.string.no_search_results_error_text);
+        }
+        if (emptySubTitleTv != null) {
+            emptySubTitleTv.setText("");
+        }
     }
 
     //TODO: once we insert data using brite database this will no longer be necessary either

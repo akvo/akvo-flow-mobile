@@ -91,6 +91,7 @@
     <string name="please_restart">Please, restart the app</string>
     <!--Empty Views-->
     <string name="no_datapoints_error_text">You have no data points</string>
+    <string name="no_search_results_error_text">No results found</string>
     <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
     <!--ToolBar-->
     <string name="more">More</string>

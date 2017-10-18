@@ -358,4 +358,39 @@ public class BriteSurveyDbAdapter {
         values.put(UserColumns.NAME, userName);
         return briteDatabase.insert(Tables.USER, values);
     }
+
+    /**
+     * reinserts the test survey into the database. For debugging purposes only.
+     * The survey xml must exist in the APK
+     */
+    public void reinstallTestSurvey() {
+        ContentValues values = new ContentValues();
+        values.put(SurveyColumns.SURVEY_ID, "999991");
+        values.put(SurveyColumns.NAME, "Sample Survey");
+        values.put(SurveyColumns.VERSION, 1.0);
+        values.put(SurveyColumns.TYPE, "Survey");
+        values.put(SurveyColumns.LOCATION, "res");
+        values.put(SurveyColumns.FILENAME, "999991.xml");
+        values.put(SurveyColumns.LANGUAGE, "en");
+        briteDatabase.insert(Tables.SURVEY, values);
+    }
+
+    @Nullable
+    public Cursor updateSurvey(ContentValues updatedValues, String surveyId) {
+        Cursor cursor = briteDatabase.query(Tables.SURVEY,
+                new String[] {
+                        SurveyColumns._ID
+                }, SurveyColumns.SURVEY_ID + " = ?",
+                new String[] {
+                        surveyId,
+                }, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            briteDatabase.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
+                    surveyId);
+        } else {
+            briteDatabase.insert(Tables.SURVEY, updatedValues);
+        }
+        return cursor;
+    }
 }

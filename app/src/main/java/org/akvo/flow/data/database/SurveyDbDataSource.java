@@ -342,7 +342,7 @@ public class SurveyDbDataSource {
         return survey;
     }
 
-    private static Survey getSurvey(Cursor cursor) {
+    private Survey getSurvey(Cursor cursor) {
         Survey survey = new Survey();
         survey.setId(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID)));
         survey.setName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.NAME)));
@@ -545,7 +545,7 @@ public class SurveyDbDataSource {
     }
 
     public void reinstallTestSurvey() {
-        surveyDbAdapter.reinstallTestSurvey();
+        briteSurveyDbAdapter.reinstallTestSurvey();
     }
 
     public void deleteEmptyRecords() {

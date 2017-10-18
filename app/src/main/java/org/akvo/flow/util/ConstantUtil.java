@@ -150,7 +150,8 @@ public class ConstantUtil {
      * intents
      */
     public static final String DATA_AVAILABLE_INTENT = "org.akvo.flow.DATA_SUBMITTED";
-    public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
+    public static final String GPS_STATUS_PACKAGE_V2 = "com.eclipsim.gpsstatus2";
+    public static final String GPS_STATUS_PACKAGE_V1 = "com.eclipsim.gpsstatus";
     public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 
     /**

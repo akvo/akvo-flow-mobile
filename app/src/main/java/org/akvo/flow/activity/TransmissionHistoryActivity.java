@@ -25,11 +25,15 @@ import android.widget.ListView;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Activity to show the transmission history of all files in a survey submission
@@ -38,7 +42,9 @@ import java.util.List;
  */
 public class TransmissionHistoryActivity extends BackActivity {
 
-    private  SurveyDbDataSource databaseAdapter;
+    @Inject
+    SurveyDbDataSource databaseAdapter;
+
     private Long surveyInstanceId;
     private ListView transmissionsList;
 
@@ -46,10 +52,17 @@ public class TransmissionHistoryActivity extends BackActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transmission_history);
+        initializeInjector();
         setupToolBar();
         transmissionsList = (ListView) findViewById(R.id.transmission_list);
         surveyInstanceId = getSurveyInstanceId(savedInstanceState);
-        databaseAdapter = new SurveyDbDataSource(this, null);
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     private Long getSurveyInstanceId(Bundle savedInstanceState) {

@@ -93,6 +93,12 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
 
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs prefs;
+
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
 
@@ -114,11 +120,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
 
-    @Inject
-    SurveyDbDataSource mDatabase;
-
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
-    private Prefs prefs;
 
     private String[] mLanguages;
     private LanguageMapper languageMapper;
@@ -143,7 +145,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mDatabase.open();
 
         Context context = getApplicationContext();
-        prefs = new Prefs(context);
         languageMapper = new LanguageMapper(context);
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
                 new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));

@@ -32,6 +32,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.ResponseColumns;
@@ -73,6 +74,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -116,21 +118,30 @@ public class DataSyncService extends IntentService {
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
-    private SurveyDbDataSource mDatabase;
-    private Prefs preferences;
-    private ConnectivityStateManager connectivityStateManager;
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs preferences;
+
+    @Inject
+    ConnectivityStateManager connectivityStateManager;
 
     public DataSyncService() {
         super(TAG);
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
         try {
-            mDatabase = new SurveyDbDataSource(this, null);
             mDatabase.open();
-            preferences = new Prefs(getApplicationContext());
-            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             exportSurveys();// Create zip files, if necessary
 
             if (connectivityStateManager.isConnectionAvailable(preferences

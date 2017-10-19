@@ -20,7 +20,6 @@
 package org.akvo.flow.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -33,6 +32,11 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,27 +57,45 @@ public class AddUserActivity extends Activity {
     @BindView(R.id.device_id)
     EditText deviceIdEt;
 
-    private Prefs prefs;
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    SurveyDbDataSource surveyDbDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
+        initializeInjector();
         ButterKnife.bind(this);
-        prefs = new Prefs(getApplicationContext());
         deviceIdEt.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, ""));
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     //TODO: database operations should be done on separate thread
     private void saveUserData() {
         String username = nameEt.getText().toString().trim();
         String deviceId = deviceIdEt.getText().toString().trim();
-        Context context = getApplicationContext();
-        SurveyDbDataSource db = new SurveyDbDataSource(context, null);
-        db.open();
-        long uid = db.createOrUpdateUser(null, username);
-        db.close();
+        surveyDbDataSource.open();
+        long uid = surveyDbDataSource.createOrUpdateUser(null, username);
+        surveyDbDataSource.close();
 
         prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
 

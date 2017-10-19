@@ -29,6 +29,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyMetadata;
@@ -55,6 +56,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
@@ -79,15 +82,27 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
  */
 public class BootstrapService extends IntentService {
 
-    private static final String TAG = "BOOTSTRAP_SERVICE";
     public volatile static boolean isProcessing = false;
+
+    private static final String TAG = "BOOTSTRAP_SERVICE";
+
+    @Inject
+    SurveyDbDataSource databaseAdapter;
+
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
-    private SurveyDbDataSource databaseAdapter;
     private Handler mHandler;
 
     public BootstrapService() {
         super(TAG);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
+        mHandler = new Handler();
     }
 
     public void onHandleIntent(Intent intent) {
@@ -113,7 +128,6 @@ public class BootstrapService extends IntentService {
 
             String startMessage = getString(R.string.bootstrapstart);
             displayNotification(startMessage);
-            databaseAdapter = new SurveyDbDataSource(this, null);
             databaseAdapter.open();
             try {
                 for (File file : zipFiles) {
@@ -354,15 +368,6 @@ public class BootstrapService extends IntentService {
             Collections.sort(zipFiles);
         }
         return zipFiles;
-    }
-
-    /**
-     * sets up the uncaught exception handler for this thread so we can report
-     * errors to the server.
-     */
-    public void onCreate() {
-        super.onCreate();
-        mHandler = new Handler();
     }
 
     /**

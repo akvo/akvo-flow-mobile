@@ -20,8 +20,11 @@
 
 package org.akvo.flow.injector.component;
 
+import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.RecordActivity;
+import org.akvo.flow.activity.SurveyActivity;
+import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
@@ -67,4 +70,10 @@ public interface ViewComponent {
     void inject(FlowNavigation navigation);
 
     void inject(AppDownloadDialogFragment fragment);
+
+    void inject(AddUserActivity addUserActivity);
+
+    void inject(SurveyActivity surveyActivity);
+
+    void inject(TransmissionHistoryActivity transmissionHistoryActivity);
 }

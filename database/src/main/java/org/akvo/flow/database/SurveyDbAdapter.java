@@ -25,7 +25,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
 
 import org.akvo.flow.database.migration.MigrationListener;
 
@@ -313,16 +312,19 @@ public class SurveyDbAdapter {
 
     //TODO: verify method naming
     public Cursor checkSurveyVersion(String surveyId, String surveyVersion) {
+        String selection =
+                SurveyColumns.SURVEY_ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
+                        + SurveyColumns.DELETED + " = ?)";
+        String[] selectionArgs = {
+                surveyId,
+                surveyVersion,
+                String.valueOf(1)
+        };
         return database.query(Tables.SURVEY,
                 new String[] {
                         SurveyColumns.SURVEY_ID
                 },
-                SurveyColumns.SURVEY_ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
-                        + SurveyColumns.DELETED + " = ?)", new String[] {
-                        surveyId,
-                        surveyVersion,
-                        String.valueOf(1)//ConstantUtil.IS_DELETED
-                }, null, null, null);
+                selection, selectionArgs, null, null, null);
     }
 
     /**
@@ -340,27 +342,6 @@ public class SurveyDbAdapter {
         }
     }
 
-    @Nullable
-    public Cursor updateSurvey(ContentValues updatedValues, String surveyId) {
-        Cursor cursor = database.query(Tables.SURVEY,
-                new String[] {
-                        SurveyColumns._ID
-                }, SurveyColumns.SURVEY_ID + " = ?",
-                new String[] {
-                        surveyId,
-                }, null, null, null);
-        if (cursor != null && cursor.getCount() > 0) {
-            // if we found an item, it's an update, otherwise, it's an insert
-            database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                    new String[] {
-                            surveyId
-                    });
-        } else {
-            database.insert(Tables.SURVEY, null, updatedValues);
-        }
-        return cursor;
-    }
-
     /**
      * Gets a single survey from the db using its survey id
      */
@@ -373,14 +354,6 @@ public class SurveyDbAdapter {
                 new String[] {
                         surveyId
                 }, null, null, null);
-    }
-
-    /**
-     * deletes all the surveys from the database
-     */
-    public void deleteAllSurveys() {
-        database.delete(Tables.SURVEY, null, null);
-        database.delete(Tables.SURVEY_GROUP, null, null);
     }
 
     /**
@@ -643,15 +616,6 @@ public class SurveyDbAdapter {
                         SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION, SurveyColumns.LOCATION
                 },
                 whereClause, whereParams, null, null, null);
-    }
-
-    public void deleteSurveyGroup(long surveyGroupId) {
-        // First the group
-        database.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
-        // Now the surveys
-        database.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
     }
 
     /**

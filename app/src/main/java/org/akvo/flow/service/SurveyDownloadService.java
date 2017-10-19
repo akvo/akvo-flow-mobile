@@ -158,7 +158,7 @@ public class SurveyDownloadService extends IntentService {
         syncSurveyGroups(surveys);
 
         // Check synced versions, and omit up-to-date surveys
-        surveys = databaseAdaptor.checkSurveyVersions(surveys);
+        surveys = databaseAdaptor.fetchOutDatedSurveys(surveys);
 
         if (!surveys.isEmpty()) {
             int synced = 0, failed = 0;

@@ -22,7 +22,15 @@ package org.akvo.flow.activity.testhelper;
 import android.content.Context;
 import android.util.Log;
 
+import com.squareup.sqlbrite2.BriteDatabase;
+import com.squareup.sqlbrite2.SqlBrite;
+
 import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.migration.FlowMigrationListener;
+import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
@@ -39,6 +47,8 @@ import java.io.Writer;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+
 public class SurveyInstaller {
 
     private static final String TAG = "SurveyInstaller";
@@ -47,7 +57,13 @@ public class SurveyInstaller {
     private Queue<File> surveyFiles = new ArrayDeque<>();
 
     public SurveyInstaller(Context context) {
-       this.adapter = new SurveyDbDataSource(context, null);
+        SqlBrite sqlBrite = new SqlBrite.Builder().build();
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(),
+                new FlowMigrationListener(new Prefs(context),
+                        new MigrationLanguageMapper(context)));
+        BriteDatabase db = sqlBrite
+                .wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
+        this.adapter = new SurveyDbDataSource(context, db);
     }
 
     public Survey installSurvey(int resId, Context context) {

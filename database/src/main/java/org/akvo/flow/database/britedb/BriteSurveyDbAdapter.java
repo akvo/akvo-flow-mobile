@@ -340,7 +340,7 @@ public class BriteSurveyDbAdapter {
                     String.valueOf(surveyGroupId)
             };
         }
-        sqlQuery += "WHERE " + whereClause;
+        sqlQuery += " WHERE " + whereClause;
         return briteDatabase.query(sqlQuery, whereParams);
     }
 
@@ -349,7 +349,7 @@ public class BriteSurveyDbAdapter {
         String sqlQuery = "SELECT "
                 + SurveyColumns.SURVEY_ID
                 + " FROM " + Tables.SURVEY
-                + "WHERE " + SurveyColumns.DELETED + " <> 1";
+                + " WHERE " + SurveyColumns.DELETED + " <> 1";
         Cursor c =  briteDatabase.query(sqlQuery, "");
         if (c != null) {
             String[] ids = new String[c.getCount()];

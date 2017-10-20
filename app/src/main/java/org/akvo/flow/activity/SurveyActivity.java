@@ -24,7 +24,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -87,6 +89,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener {
 
+    public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
 
     @BindView(R.id.toolbar)
@@ -148,7 +151,50 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             displaySelectedUser();
         }
         activityJustCreated = true;
+        setNavigationView();
+    }
+
+    private void setNavigationView() {
         navigationView.setSurveyListener(this);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.settings:
+                                navigate(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        navigator.navigateToAppSettings(SurveyActivity.this);
+                                    }
+                                });
+                                return false;
+                            case R.id.about:
+                                navigate(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        navigator.navigateToAbout(SurveyActivity.this);
+                                    }
+                                });
+                                return false;
+                            case R.id.help:
+                                navigate(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        navigator.navigateToHelp(SurveyActivity.this);
+                                    }
+                                });
+                                return false;
+                            default:
+                                return false;
+                        }
+                    }
+
+                    private void navigate(Runnable runnable) {
+                        mDrawerLayout.closeDrawers();
+                        mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
+                    }
+                });
     }
 
     private void initializeInjector() {
@@ -190,7 +236,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                supportInvalidateOptionsMenu();
             }
 
             /**
@@ -198,15 +243,12 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
              */
             @Override
             public void onDrawerOpened(View drawerView) {
-                //prevent the back icon from showing
-                super.onDrawerSlide(drawerView, 0);
-                supportInvalidateOptionsMenu();
+                super.onDrawerOpened(drawerView);
             }
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-                //disable drawer animation
-                super.onDrawerSlide(drawerView, 0);
+                super.onDrawerSlide(drawerView, slideOffset);
             }
         };
 

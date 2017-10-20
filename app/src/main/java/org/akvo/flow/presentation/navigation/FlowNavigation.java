@@ -22,7 +22,7 @@ package org.akvo.flow.presentation.navigation;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
+import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -31,7 +31,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -41,7 +40,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.presentation.SnackBarManager;
 
 import java.util.List;
@@ -67,9 +65,6 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     FlowNavigationPresenter presenter;
 
     @Inject
-    Navigator navigator;
-
-    @Inject
     SnackBarManager snackBarManager;
 
     public FlowNavigation(Context context) {
@@ -91,7 +86,6 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         initCurrentUserText();
         initUserList();
         initSurveyList();
-        setNavigationItemListener();
         presenter.setView(this);
         presenter.load();
     }
@@ -103,6 +97,10 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
         usersRv = ButterKnife.findById(headerView, R.id.users_rv);
         userHeader = ButterKnife.findById(headerView, R.id.user_header);
+        NavigationMenuView navigationMenuView = (NavigationMenuView) getChildAt(0);
+        if (navigationMenuView != null) {
+            navigationMenuView.setVerticalScrollBarEnabled(false);
+        }
     }
 
     private void initialiseInjector() {
@@ -134,28 +132,6 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
                     }
                 })
         );
-    }
-
-    private void setNavigationItemListener() {
-        final Context context = getContext();
-        setNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.settings:
-                        navigator.navigateToAppSettings(context);
-                        return true;
-                    case R.id.about:
-                        navigator.navigateToAbout(context);
-                        return true;
-                    case R.id.help:
-                        navigator.navigateToHelp(context);
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        });
     }
 
     private void initSurveyList() {

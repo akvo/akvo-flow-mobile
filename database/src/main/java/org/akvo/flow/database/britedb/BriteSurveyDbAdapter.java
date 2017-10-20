@@ -434,7 +434,7 @@ public class BriteSurveyDbAdapter {
     }
 
     public Cursor getSurveys(String surveyId, String surveyVersion) {
-        String sql = "SELECT "+SurveyColumns.SURVEY_ID + " FROM "+Tables.SURVEY + "WHERE " +
+        String sql = "SELECT " + SurveyColumns.SURVEY_ID + " FROM " + Tables.SURVEY + " WHERE " +
                 SurveyColumns.SURVEY_ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
                 + SurveyColumns.DELETED + " = ?)";
         String[] selectionArgs = {

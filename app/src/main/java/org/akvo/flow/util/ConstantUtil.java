@@ -229,7 +229,6 @@ public class ConstantUtil {
 
     //broadcasts
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
-    public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs

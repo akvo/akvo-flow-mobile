@@ -19,18 +19,14 @@
 
 package org.akvo.flow.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -78,16 +74,11 @@ import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
-import java.lang.ref.WeakReference;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
-
-import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         DatapointsFragment.DatapointFragmentListener,
@@ -126,12 +117,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private long selectedSurveyId;
     private boolean activityJustCreated;
-
-    /**
-     * BroadcastReceiver to notify of surveys synchronisation. This should be
-     * fired from {@link SurveyDownloadService}.
-     */
-    private final BroadcastReceiver mSurveysSyncReceiver = new SurveySyncBroadcastReceiver(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -274,8 +259,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         // Delete empty responses, if any
         mDatabase.deleteEmptySurveyInstances();
         mDatabase.deleteEmptyRecords();
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -303,12 +286,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSurveysSyncReceiver);
     }
 
     @Override
@@ -500,32 +477,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         return onSearchRequested();
     }
 
-    private void reloadDrawer() {
-        // TODO:
-    }
-
     @OnClick(R.id.add_data_point_fab)
     void onAddDataPointTap() {
         addDataPointFab.setEnabled(false);
         String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
         onRecordSelected(newLocaleId);
-    }
-
-    static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
-
-        private final WeakReference<SurveyActivity> activityWeakReference;
-
-        SurveySyncBroadcastReceiver(SurveyActivity activity) {
-            this.activityWeakReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.i("Surveys have been synchronised. Refreshing data...");
-            SurveyActivity surveyActivity = activityWeakReference.get();
-            if (surveyActivity != null) {
-                surveyActivity.reloadDrawer();
-            }
-        }
     }
 }

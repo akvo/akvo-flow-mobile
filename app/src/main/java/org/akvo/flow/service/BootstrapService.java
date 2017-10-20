@@ -25,7 +25,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
@@ -59,8 +58,6 @@ import java.util.zip.ZipInputStream;
 import javax.inject.Inject;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -109,7 +106,6 @@ public class BootstrapService extends IntentService {
         isProcessing = true;
         checkAndInstall();
         isProcessing = false;
-        sendBroadcastNotification();
     }
 
     /**
@@ -368,15 +364,5 @@ public class BootstrapService extends IntentService {
             Collections.sort(zipFiles);
         }
         return zipFiles;
-    }
-
-    /**
-     * Dispatch a Broadcast notification to notify of surveys synchronization.
-     * This notification will be received in SurveyHomeActivity, in order to
-     * refresh its data
-     */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 }

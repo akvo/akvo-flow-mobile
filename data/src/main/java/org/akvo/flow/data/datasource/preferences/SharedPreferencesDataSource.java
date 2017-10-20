@@ -39,7 +39,6 @@ public class SharedPreferencesDataSource {
     private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
     private static final boolean DEFAULT_VALUE_SCREEN_ON = true;
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
-    private static final String KEY_BACKEND_SERVER = "backend.server";
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     private static final String KEY_USER_ID = "userId";
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;

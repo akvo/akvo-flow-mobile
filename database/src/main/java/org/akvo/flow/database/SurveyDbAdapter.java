@@ -210,25 +210,6 @@ public class SurveyDbAdapter {
         return cursor;
     }
 
-    /**
-     * if the ID is populated, this will update a user record. Otherwise, it
-     * will be inserted
-     */
-    public long createOrUpdateUser(Long id, String name) {
-        ContentValues initialValues = new ContentValues();
-        Long idVal = id;
-        initialValues.put(UserColumns.NAME, name);
-        initialValues.put(UserColumns.DELETED, 0);
-
-        if (idVal == null) {
-            idVal = database.insert(Tables.USER, null, initialValues);
-        } else {
-            database.update(Tables.USER, initialValues, UserColumns._ID + "=?",
-                    new String[] { idVal.toString() });
-        }
-        return idVal;
-    }
-
     public Cursor getResponses(long surveyInstanceId) {
         return database.query(Tables.RESPONSE,
                 new String[] {

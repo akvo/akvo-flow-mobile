@@ -470,4 +470,23 @@ public class BriteSurveyDbAdapter {
         briteDatabase
                 .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?", surveyId);
     }
+
+    /**
+     * if the ID is populated, this will update a user record. Otherwise, it
+     * will be inserted
+     */
+    public long createOrUpdateUser(Long id, String name) {
+        ContentValues initialValues = new ContentValues();
+        Long userId = id;
+        initialValues.put(UserColumns.NAME, name);
+        initialValues.put(UserColumns.DELETED, 0);
+
+        if (userId == null) {
+            userId = briteDatabase.insert(Tables.USER, initialValues);
+        } else {
+            briteDatabase
+                    .update(Tables.USER, initialValues, UserColumns._ID + "=?", userId.toString());
+        }
+        return userId;
+    }
 }

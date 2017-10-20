@@ -645,6 +645,6 @@ public class SurveyDbDataSource {
     }
 
     public long createOrUpdateUser(Long id, String username) {
-        return surveyDbAdapter.createOrUpdateUser(id, username);
+        return briteSurveyDbAdapter.createOrUpdateUser(id, username);
     }
 }

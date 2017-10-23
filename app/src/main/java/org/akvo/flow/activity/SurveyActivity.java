@@ -36,7 +36,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -396,9 +395,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (f != null) {
             f.refresh(mSurveyGroup);
         }
-        supportInvalidateOptionsMenu();
-
         mDrawerLayout.closeDrawers();
+        invalidateOptionsMenu();
+
         updateAddDataPointFab();
     }
 
@@ -451,16 +450,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean showItems =
-                !mDrawerLayout.isDrawerOpen(GravityCompat.START) && mSurveyGroup != null;
-        for (int i = 0; i < menu.size(); i++) {
-            menu.getItem(i).setVisible(showItems);
-        }
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

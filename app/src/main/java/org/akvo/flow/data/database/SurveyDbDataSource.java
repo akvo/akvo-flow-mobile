@@ -154,23 +154,10 @@ public class SurveyDbDataSource {
         QuestionResponse resp = null;
         Cursor cursor = surveyDbAdapter.getResponse(surveyInstanceId, questionId);
         if (cursor != null && cursor.moveToFirst()) {
-            String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER));
-            String type = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE));
-            Long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID));
-            String filename = cursor
-                    .getString(cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME));
-            boolean include =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
-            int iteration = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION));
-            resp = new QuestionResponse.QuestionResponseBuilder()
-                    .setValue(value)
-                    .setType(type)
-                    .setId(id)
-                    .setSurveyInstanceId(surveyInstanceId)
+            QuestionResponseColumns columns = new QuestionResponseColumns(cursor);
+            resp = getQuestionResponseBuilder(cursor, columns)
                     .setQuestionId(questionId)
-                    .setFilename(filename)
-                    .setIncludeFlag(include)
-                    .setIteration(iteration)
+                    .setSurveyInstanceId(surveyInstanceId)
                     .createQuestionResponse();
         }
 

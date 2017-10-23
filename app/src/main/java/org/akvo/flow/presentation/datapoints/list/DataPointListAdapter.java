@@ -29,7 +29,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,26 +43,29 @@ import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * List Adapter to bind the Surveyed Locales into the list items
- */
-class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
+import timber.log.Timber;
+
+class DataPointListAdapter extends BaseAdapter implements Filterable {
 
     private Double latitude;
     private Double longitude;
     private final LayoutInflater inflater;
     private final String dataLabel;
+    private final List<ListDataPoint> dataPoints;
+    private final List<ListDataPoint> unfilteredDataPoints;
 
     DataPointListAdapter(Context context, @Nullable Double latitude,
             @Nullable Double longitude, SurveyGroup surveyGroup) {
-        super(context, R.layout.surveyed_locale_item);
         this.latitude = latitude;
         this.longitude = longitude;
         this.inflater = LayoutInflater.from(context);
         this.dataLabel = context.getString(getDateLabel(surveyGroup));
+        dataPoints = new ArrayList<>();
+        unfilteredDataPoints = new ArrayList<>();
     }
 
     @StringRes
@@ -70,6 +75,22 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         } else {
             return R.string.last_modified_regular;
         }
+    }
+
+    @Override
+    public int getCount() {
+        return dataPoints.size();
+    }
+
+    @Nullable
+    @Override
+    public ListDataPoint getItem(int position) {
+        return dataPoints.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @NonNull
@@ -165,15 +186,68 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
     }
 
     void setDataPoints(List<ListDataPoint> dataPoints) {
-        clear();
-        for (ListDataPoint listDataPoint : dataPoints) {
-            add(listDataPoint);
-        }
+        replaceDataPoints(dataPoints);
+        unfilteredDataPoints.clear();
+        unfilteredDataPoints.addAll(dataPoints);
+    }
+
+    private void replaceDataPoints(List<ListDataPoint> dataPoints) {
+        this.dataPoints.clear();
+        this.dataPoints.addAll(dataPoints);
         notifyDataSetChanged();
     }
 
     void updateLocation(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    @NonNull
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                Timber.d("constraint : "+constraint);
+                if (TextUtils.isEmpty(constraint)) {
+                    results.count = unfilteredDataPoints.size();
+                    results.values = unfilteredDataPoints;
+                } else {
+                    final List<ListDataPoint> filteredItems = new ArrayList<>();
+                    String searchTerm = constraint.toString();
+                    for (ListDataPoint dataPoint : unfilteredDataPoints) {
+                        String displayName = dataPoint.getDisplayName();
+                        if (displayName != null) {
+                            displayName = displayName.toLowerCase();
+                        }
+                        String id = dataPoint.getId();
+                        if ((displayName != null && displayName.contains(searchTerm.toLowerCase()))
+                                || (id != null && id.startsWith(searchTerm))) {
+                            filteredItems.add(dataPoint);
+                        }
+                    }
+                    results.count = filteredItems.size();
+                    results.values = filteredItems;
+                }
+                Timber.d("Filtered items count : "+results.count);
+                return results;
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                Timber.d("publish results called with "+results.count);
+                replaceDataPoints((List<ListDataPoint>) results.values);
+            }
+        };
+    }
+
+    void filterResults(String term) {
+        getFilter().filter(term);
+    }
+
+    void clearFilter() {
+        getFilter().filter("");
     }
 }

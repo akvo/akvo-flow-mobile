@@ -39,8 +39,7 @@
   <string name="langoption">Langues</string>
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
-  <string name="pleasewait">Veuillez attendre</string>
-  <string name="preference_download_form_title">Télécharger le formulaire en utilisant l\'ID du formulaire</string>
+    <string name="preference_download_form_title">Télécharger le formulaire en utilisant l\'ID du formulaire</string>
   <string name="preference_download_form_subtitle">Faites-le seulenet si demandé</string>
   <string name="downloadsurveylabel">Téléchargement du formulaire</string>
   <string name="downloadsurveyinstr">Indiquez l\'identifiant du formulaire à télécharger.</string>
@@ -74,19 +73,12 @@
   <string name="pleasewaitforbootstrap">Veuillez attendre jusqu\'à ce que le fichier soit prêt.</string>
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
-  <string name="search">Recherche</string>
-  <string name="sync">Sync</string>
+    <string name="sync">Sync</string>
   <string name="sort">Trier</string>
   <string name="stats">Stats</string>
-  <string name="syncing_records">Synchronisation des enregistrements en cours...</string>
-  <string name="synced_records">%1$d enregistrements synchronisés</string>
-  <string name="sync_error">La synchronisation des enregistrements à échoué</string>
-  <string name="syncing_corrupted_data_points_error">Veuillez synchroniser de nouveau.</string>
-  <string name="network_error">Erreur de réseau</string>
-  <string name="prefill_title">Pré-remplir les réponses</string>
+    <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
-  <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo Flow</string>
-  <!--Data sync-->
+    <!--Data sync-->
   <string name="data_sync_all">Formulaires synchronisés: %1$d - Echoués: %2$d</string>
   <string name="data_sync_synced">Formulaires synchronisés: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Ce formulaire a été supprimé.</string>

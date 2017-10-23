@@ -38,6 +38,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -102,6 +104,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     DataPointsListPresenter presenter;
 
     private boolean displayMonitoredMenu;
+    private SearchView searchView;
 
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
@@ -191,14 +194,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onResume() {
         super.onResume();
 
-        // try to find out where we are
-        updateLocation();
-
-        // Listen for data sync updates, so we can update the UI accordingly
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
-        presenter.loadDataPoints();
+        if (searchView == null || searchView.isIconified()) {
+            updateLocation();
+            presenter.loadDataPoints();
+        }
     }
 
     private void updateLocation() {
@@ -294,7 +296,45 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         } else {
             inflater.inflate(R.menu.datapoints_list, menu);
         }
+
+        setUpSearchView(menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void setUpSearchView(final Menu menu) {
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        searchView.setIconifiedByDefault(true);
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Empty
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.filterResults(newText);
+                presenter.updateSearchResultsEmptyView(mAdapter.getCount());
+                return false;
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem,
+                new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        // EMPTY
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        mAdapter.clearFilter();
+                        presenter.updateEmptyViewsSearchEnded(mAdapter.getCount());
+                        return true;
+                    }
+                });
     }
 
     @Override
@@ -409,6 +449,16 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 presenter.onSyncRecordsPressed();
             }
         });
+    }
+
+    @Override
+    public void displayNoSearchResultsFound() {
+        if (emptyTitleTv != null) {
+            emptyTitleTv.setText(R.string.no_search_results_error_text);
+        }
+        if (emptySubTitleTv != null) {
+            emptySubTitleTv.setText("");
+        }
     }
 
     //TODO: once we insert data using brite database this will no longer be necessary either

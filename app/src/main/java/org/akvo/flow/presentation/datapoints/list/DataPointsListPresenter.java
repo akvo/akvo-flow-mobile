@@ -225,4 +225,16 @@ public class DataPointsListPresenter implements Presenter {
         onDataReady(surveyGroup);
         loadDataPoints();
     }
+
+    public void updateSearchResultsEmptyView(int count) {
+        if (count == 0) {
+            view.displayNoSearchResultsFound();
+        }
+    }
+
+    public void updateEmptyViewsSearchEnded(int count) {
+        if (count == 0) {
+            view.showNoDataPoints(surveyGroup.isMonitored());
+        }
+    }
 }

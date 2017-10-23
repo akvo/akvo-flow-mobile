@@ -132,14 +132,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         mDatabase.open();
 
-        selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
-        if (selectedSurveyId != SurveyGroup.ID_NONE) {
-            mSurveyGroup = mDatabase.getSurveyGroup(selectedSurveyId);
-        }
+        updateSelectedSurvey();
         apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
 
         initNavigationDrawer();
-
+        selectSurvey();
         initDataPointsFragment(savedInstanceState);
 
         navigateToSetupIfNeeded();
@@ -152,6 +149,13 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
         activityJustCreated = true;
         setNavigationView();
+    }
+
+    private void updateSelectedSurvey() {
+        selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        if (selectedSurveyId != SurveyGroup.ID_NONE) {
+            mSurveyGroup = mDatabase.getSurveyGroup(selectedSurveyId);
+        }
     }
 
     private void setNavigationView() {
@@ -253,12 +257,15 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         };
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+        if (mSurveyGroup == null) {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
 
+    private void selectSurvey() {
         // Automatically select the survey
         if (mSurveyGroup != null) {
             onSurveySelected(mSurveyGroup);
-        } else {
-            mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }
 
@@ -281,6 +288,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             if (resultCode == RESULT_OK) {
                 displaySelectedUser();
                 prefs.setBoolean(Prefs.KEY_SETUP, true);
+                updateSelectedSurvey();
+                updateActivityTitle();
                 // Trigger the delayed services, so the first
                 // backend connections uses the new Device ID
                 startService(new Intent(this, SurveyDownloadService.class));
@@ -378,9 +387,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
 
-        CharSequence title =
-                mSurveyGroup != null ? mSurveyGroup.getName() : getString(R.string.app_name);
-        setTitle(title);
+        updateActivityTitle();
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
@@ -393,6 +400,12 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         mDrawerLayout.closeDrawers();
         updateAddDataPointFab();
+    }
+
+    private void updateActivityTitle() {
+        CharSequence title =
+                mSurveyGroup != null ? mSurveyGroup.getName() : getString(R.string.app_name);
+        setTitle(title);
     }
 
     @Override

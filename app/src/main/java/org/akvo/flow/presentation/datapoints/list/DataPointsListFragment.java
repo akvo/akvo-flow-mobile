@@ -77,6 +77,7 @@ import timber.log.Timber;
 public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, OrderByDialogListener, DataPointsListView {
 
+    public static final int SEARCH_FILTER_DELAY_MILLIS = 50;
     private LocationManager mLocationManager;
     private Double mLatitude = null;
     private Double mLongitude = null;
@@ -316,7 +317,12 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             @Override
             public boolean onQueryTextChange(String newText) {
                 mAdapter.filterResults(newText);
-                presenter.updateSearchResultsEmptyView(mAdapter.getCount());
+                searchView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        presenter.updateSearchResultsEmptyView(mAdapter.getCount());
+                    }
+                }, SEARCH_FILTER_DELAY_MILLIS);
                 return false;
             }
         });

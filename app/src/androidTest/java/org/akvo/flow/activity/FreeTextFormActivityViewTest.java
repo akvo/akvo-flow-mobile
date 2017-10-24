@@ -30,6 +30,7 @@ import android.support.test.runner.AndroidJUnit4;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
@@ -42,7 +43,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.tests.R.raw.freetextsurvey;
 
@@ -60,7 +60,12 @@ public class FreeTextFormActivityViewTest {
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             Survey survey = installer
                     .installSurvey(freetextsurvey, InstrumentationRegistry.getContext());
-            long id = installer.createDataPoint(survey.getSurveyGroup(), "47313003");
+            long id = installer.createDataPoint(survey.getSurveyGroup(),
+                    new QuestionResponse.QuestionResponseBuilder()
+                            .setValue("test")
+                            .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
+                            .setQuestionId("47313003")
+                            .setIteration(-1));
             Context activityContext = InstrumentationRegistry.getInstrumentation()
                     .getTargetContext();
             Intent result = new Intent(activityContext, FormActivity.class);
@@ -79,7 +84,6 @@ public class FreeTextFormActivityViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.resetRequisites(targetContext);
         SurveyInstaller installer = new SurveyInstaller(targetContext);
-        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
         installer.clearSurveys();
     }
 

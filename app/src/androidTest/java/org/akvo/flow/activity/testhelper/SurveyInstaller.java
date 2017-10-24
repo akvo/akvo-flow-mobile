@@ -134,7 +134,8 @@ public class SurveyInstaller {
         adapter.close();
     }
 
-    public long createDataPoint(SurveyGroup surveyGroup, String questionId) {
+    public long createDataPoint(SurveyGroup surveyGroup,
+            QuestionResponse.QuestionResponseBuilder ... responseBuilders) {
         adapter.open();
         Survey registrationForm = adapter.getRegistrationForm(surveyGroup);
         String surveyedLocaleId = adapter.createSurveyedLocale(surveyGroup.getId());
@@ -142,14 +143,15 @@ public class SurveyInstaller {
         long surveyInstanceId = adapter
                 .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
                         user, surveyedLocaleId);
-        QuestionResponse responseToSave = new QuestionResponse.QuestionResponseBuilder()
-                .setValue("test")
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId(questionId)
-                .setSurveyInstanceId(surveyInstanceId)
-                .setIteration(-1)
-                .createQuestionResponse();
-        adapter.createOrUpdateSurveyResponse(responseToSave);
+        if (responseBuilders != null) {
+            int length = responseBuilders.length;
+            for (int i = 0; i < length; i++) {
+                QuestionResponse responseToSave = responseBuilders[i]
+                        .setSurveyInstanceId(surveyInstanceId)
+                        .createQuestionResponse();
+                adapter.createOrUpdateSurveyResponse(responseToSave);
+            }
+        }
         adapter.close();
         return surveyInstanceId;
     }

@@ -40,6 +40,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -319,7 +320,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                presenter.getFilteredDataPoints(newText);
+                if (!TextUtils.isEmpty(newText)) {
+                    presenter.getFilteredDataPoints(newText);
+                } else {
+                    presenter.loadDataPoints();
+                }
                 return false;
             }
         });

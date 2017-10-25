@@ -61,7 +61,8 @@ public class DataPointsListPresenter implements Presenter {
     private Double latitude;
     private Double longitude;
 
-    @Inject DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+    @Inject
+    DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             ListDataPointMapper mapper, SyncDataPoints syncDataPoints,
             @Named("allowedToConnect") UseCase allowedToConnect) {
         this.getSavedDataPoints = getSavedDataPoints;
@@ -103,23 +104,43 @@ public class DataPointsListPresenter implements Presenter {
                     view.displayData(mapDataPoints);
                     if (mapDataPoints.isEmpty()) {
                         view.showNoDataPoints(surveyGroup.isMonitored());
-                    } else {
-                        long receivedDataPointsSurveyGroupId = dataPoints.get(0).getSurveyGroupId();
-                        long currentDataPointsSurveyGroupId = surveyGroup.getId();
-                        if (receivedDataPointsSurveyGroupId != currentDataPointsSurveyGroupId) {
-                            Timber.e(new IllegalArgumentException(
-                                    "Datapoints from wrong survey: expected from surveyId: "
-                                            + currentDataPointsSurveyGroupId
-                                            + " got from surveyId: "
-                                            + receivedDataPointsSurveyGroupId));
-                        }
                     }
                 }
             }, params);
         } else {
-            //noinspection unchecked
-            view.displayData(Collections.EMPTY_LIST);
-            view.showNoSurveySelected();
+            noSurveySelected();
+        }
+    }
+
+    void getFilteredDataPoints(String filter) {
+        getSavedDataPoints.dispose();
+        if (surveyGroup != null) {
+            Map<String, Object> params = new HashMap<>(8);
+            params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
+            params.put(GetSavedDataPoints.KEY_ORDER_BY, orderBy);
+            params.put(GetSavedDataPoints.KEY_LATITUDE, latitude);
+            params.put(GetSavedDataPoints.KEY_LONGITUDE, longitude);
+            params.put(GetSavedDataPoints.KEY_FILTER, filter);
+            getSavedDataPoints.execute(new DefaultObserver<List<DataPoint>>() {
+
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e, "Error loading saved datapoints");
+                    view.displayData(Collections.EMPTY_LIST);
+                    view.displayNoSearchResultsFound();
+                }
+
+                @Override
+                public void onNext(List<DataPoint> dataPoints) {
+                    List<ListDataPoint> mapDataPoints = mapper.transform(dataPoints);
+                    view.displayData(mapDataPoints);
+                    if (mapDataPoints.isEmpty()) {
+                        view.displayNoSearchResultsFound();
+                    }
+                }
+            }, params);
+        } else {
+            noSurveySelected();
         }
     }
 
@@ -218,7 +239,7 @@ public class DataPointsListPresenter implements Presenter {
         view.showOrderByDialog(orderBy);
     }
 
-    public void onNewSurveySelected(SurveyGroup surveyGroup) {
+    void onNewSurveySelected(SurveyGroup surveyGroup) {
         getSavedDataPoints.dispose();
         syncDataPoints.dispose();
         view.hideLoading();
@@ -226,15 +247,8 @@ public class DataPointsListPresenter implements Presenter {
         loadDataPoints();
     }
 
-    public void updateSearchResultsEmptyView(int count) {
-        if (count == 0) {
-            view.displayNoSearchResultsFound();
-        }
-    }
-
-    public void updateEmptyViewsSearchEnded(int count) {
-        if (count == 0) {
-            view.showNoDataPoints(surveyGroup.isMonitored());
-        }
+    private void noSurveySelected() {
+        view.displayData(Collections.EMPTY_LIST);
+        view.showNoSurveySelected();
     }
 }

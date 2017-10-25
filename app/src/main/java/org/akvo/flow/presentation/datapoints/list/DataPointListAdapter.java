@@ -30,8 +30,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -47,16 +45,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import timber.log.Timber;
-
-class DataPointListAdapter extends BaseAdapter implements Filterable {
+class DataPointListAdapter extends BaseAdapter {
 
     private Double latitude;
     private Double longitude;
     private final LayoutInflater inflater;
     private final String dataLabel;
     private final List<ListDataPoint> dataPoints;
-    private final List<ListDataPoint> unfilteredDataPoints;
 
     DataPointListAdapter(Context context, @Nullable Double latitude,
             @Nullable Double longitude, SurveyGroup surveyGroup) {
@@ -65,7 +60,6 @@ class DataPointListAdapter extends BaseAdapter implements Filterable {
         this.inflater = LayoutInflater.from(context);
         this.dataLabel = context.getString(getDateLabel(surveyGroup));
         dataPoints = new ArrayList<>();
-        unfilteredDataPoints = new ArrayList<>();
     }
 
     @StringRes
@@ -186,12 +180,6 @@ class DataPointListAdapter extends BaseAdapter implements Filterable {
     }
 
     void setDataPoints(List<ListDataPoint> dataPoints) {
-        replaceDataPoints(dataPoints);
-        unfilteredDataPoints.clear();
-        unfilteredDataPoints.addAll(dataPoints);
-    }
-
-    private void replaceDataPoints(List<ListDataPoint> dataPoints) {
         this.dataPoints.clear();
         this.dataPoints.addAll(dataPoints);
         notifyDataSetChanged();
@@ -200,54 +188,5 @@ class DataPointListAdapter extends BaseAdapter implements Filterable {
     void updateLocation(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    @NonNull
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                FilterResults results = new FilterResults();
-                Timber.d("constraint : "+constraint);
-                if (TextUtils.isEmpty(constraint)) {
-                    results.count = unfilteredDataPoints.size();
-                    results.values = unfilteredDataPoints;
-                } else {
-                    final List<ListDataPoint> filteredItems = new ArrayList<>();
-                    String searchTerm = constraint.toString();
-                    for (ListDataPoint dataPoint : unfilteredDataPoints) {
-                        String displayName = dataPoint.getDisplayName();
-                        if (displayName != null) {
-                            displayName = displayName.toLowerCase();
-                        }
-                        String id = dataPoint.getId();
-                        if ((displayName != null && displayName.contains(searchTerm.toLowerCase()))
-                                || (id != null && id.startsWith(searchTerm))) {
-                            filteredItems.add(dataPoint);
-                        }
-                    }
-                    results.count = filteredItems.size();
-                    results.values = filteredItems;
-                }
-                Timber.d("Filtered items count : "+results.count);
-                return results;
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                Timber.d("publish results called with "+results.count);
-                replaceDataPoints((List<ListDataPoint>) results.values);
-            }
-        };
-    }
-
-    void filterResults(String term) {
-        getFilter().filter(term);
-    }
-
-    void clearFilter() {
-        getFilter().filter("");
     }
 }

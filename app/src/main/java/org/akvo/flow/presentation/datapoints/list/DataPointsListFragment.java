@@ -48,6 +48,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,7 +78,6 @@ import timber.log.Timber;
 public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, OrderByDialogListener, DataPointsListView {
 
-    public static final int SEARCH_FILTER_DELAY_MILLIS = 50;
     private LocationManager mLocationManager;
     private Double mLatitude = null;
     private Double mLongitude = null;
@@ -87,6 +87,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     private TextView emptyTitleTv;
     private TextView emptySubTitleTv;
+    private ImageView emptyIv;
     private ProgressBar progressBar;
 
     /**
@@ -138,7 +139,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.surveyed_locales_list_fragment, container, false);
+        return inflater.inflate(R.layout.data_points_list_fragment, container, false);
     }
 
     @Override
@@ -152,6 +153,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         listView.setEmptyView(emptyView);
         emptyTitleTv = (TextView) view.findViewById(R.id.empty_title_tv);
         emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
+        emptyIv = (ImageView) view.findViewById(R.id.empty_iv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
@@ -265,6 +267,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 R.string.no_records_subtitle_monitored :
                 R.string.no_records_subtitle_non_monitored;
         emptySubTitleTv.setText(subtitleResource);
+        emptyIv.setImageResource(R.drawable.ic_format_list_bulleted);
     }
 
     @Override
@@ -316,13 +319,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mAdapter.filterResults(newText);
-                searchView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        presenter.updateSearchResultsEmptyView(mAdapter.getCount());
-                    }
-                }, SEARCH_FILTER_DELAY_MILLIS);
+                presenter.getFilteredDataPoints(newText);
                 return false;
             }
         });
@@ -336,8 +333,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
-                        mAdapter.clearFilter();
-                        presenter.updateEmptyViewsSearchEnded(mAdapter.getCount());
+                        presenter.loadDataPoints();
                         return true;
                     }
                 });
@@ -464,6 +460,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         }
         if (emptySubTitleTv != null) {
             emptySubTitleTv.setText("");
+        }
+        if (emptyIv != null) {
+            emptyIv.setImageResource(R.drawable.ic_search_results_error);
         }
     }
 

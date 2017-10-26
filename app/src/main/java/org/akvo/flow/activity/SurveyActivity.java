@@ -24,9 +24,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -169,46 +167,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void setNavigationView() {
-        navigationView.setSurveyListener(this);
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        switch (menuItem.getItemId()) {
-                            case R.id.settings:
-                                navigate(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        navigator.navigateToAppSettings(SurveyActivity.this);
-                                    }
-                                });
-                                return false;
-                            case R.id.about:
-                                navigate(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        navigator.navigateToAbout(SurveyActivity.this);
-                                    }
-                                });
-                                return false;
-                            case R.id.help:
-                                navigate(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        navigator.navigateToHelp(SurveyActivity.this);
-                                    }
-                                });
-                                return false;
-                            default:
-                                return false;
-                        }
-                    }
-
-                    private void navigate(Runnable runnable) {
-                        mDrawerLayout.closeDrawers();
-                        mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
-                    }
-                });
+        navigationView.setDrawerNavigationListener(this);
     }
 
     private void initializeInjector() {
@@ -501,6 +460,41 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void navigateToHelp() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToHelp(SurveyActivity.this);
+            }
+        });
+    }
+
+    @Override
+    public void navigateToAbout() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToAbout(SurveyActivity.this);
+            }
+        });
+    }
+
+    @Override
+    public void navigateToSettings() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToAppSettings(SurveyActivity.this);
+            }
+        });
+    }
+
+    private void navigate(Runnable runnable) {
+        mDrawerLayout.closeDrawers();
+        mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
     }
 
     @Override

@@ -42,6 +42,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.ui.Navigator;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     private TextView surveyTitleTv;
     private RecyclerView surveysRv;
     private RecyclerView usersRv;
-    private DrawerNavigationListener surveyListener;
+    private DrawerNavigationListener drawerNavigationListener;
     private SurveyAdapter surveyAdapter;
     private UserAdapter usersAdapter;
     private Drawable hideUsersDrawable;
@@ -90,12 +91,42 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
                     public void onGlobalLayout() {
                         getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         initViews();
+                        initListeners();
                         initCurrentUserText();
                         initUserList();
                         initSurveyList();
                         presenter.load();
                     }
                 });
+    }
+
+    private void initListeners() {
+        ButterKnife.findById(this, R.id.settings_tv).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToSettings();
+                }
+            }
+        });
+
+        ButterKnife.findById(this, R.id.help_tv).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToHelp();
+                }
+            }
+        });
+
+        ButterKnife.findById(this, R.id.about_tv).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToAbout();
+                }
+            }
+        });
     }
 
     private void initViews() {
@@ -207,8 +238,8 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         presenter.onSurveyItemTap(surveyAdapter.getItem(position));
     }
 
-    public void setSurveyListener(DrawerNavigationListener surveyListener) {
-        this.surveyListener = surveyListener;
+    public void setDrawerNavigationListener(DrawerNavigationListener drawerNavigationListener) {
+        this.drawerNavigationListener = drawerNavigationListener;
     }
 
     @Override
@@ -218,15 +249,15 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     @Override
     public void notifySurveyDeleted(long surveyGroupId) {
-        if (surveyListener != null) {
-            surveyListener.onSurveyDeleted(surveyGroupId);
+        if (drawerNavigationListener != null) {
+            drawerNavigationListener.onSurveyDeleted(surveyGroupId);
         }
     }
 
     @Override
     public void onSurveySelected(SurveyGroup surveyGroup) {
-        if (surveyListener != null) {
-            surveyListener.onSurveySelected(surveyGroup);
+        if (drawerNavigationListener != null) {
+            drawerNavigationListener.onSurveySelected(surveyGroup);
             surveyAdapter.updateSelected(surveyGroup.getId());
         }
     }
@@ -321,5 +352,11 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
         void onSurveySelected(SurveyGroup surveyGroup);
 
         void onSurveyDeleted(long surveyGroupId);
+
+        void navigateToHelp();
+
+        void navigateToAbout();
+
+        void navigateToSettings();
     }
 }

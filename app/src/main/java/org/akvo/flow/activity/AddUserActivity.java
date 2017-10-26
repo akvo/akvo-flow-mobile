@@ -35,6 +35,7 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
@@ -63,6 +64,11 @@ public class AddUserActivity extends Activity {
     @Inject
     SurveyDbDataSource surveyDbDataSource;
 
+    @Inject
+    Navigator navigator;
+
+    private boolean isJustCreated;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +77,30 @@ public class AddUserActivity extends Activity {
         initializeInjector();
         ButterKnife.bind(this);
         deviceIdEt.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, ""));
+        navigateToSurveyIfNoSetupNeeded();
+        isJustCreated = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isJustCreated) {
+            isJustCreated = false;
+        } else {
+            navigateToSurveyIfNoSetupNeeded();
+        }
+    }
+
+    private void navigateToSurveyIfNoSetupNeeded() {
+        boolean deviceSetCorrectly = prefs.getBoolean(Prefs.KEY_SETUP, false);
+        if (deviceSetCorrectly) {
+            navigateToSurvey();
+        }
+    }
+
+    private void navigateToSurvey() {
+        navigator.navigateToSurveyActivity(this);
+        finish();
     }
 
     private void initializeInjector() {
@@ -98,11 +128,11 @@ public class AddUserActivity extends Activity {
         surveyDbDataSource.close();
 
         prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
+        prefs.setBoolean(Prefs.KEY_SETUP, true);
 
         // Select the newly created user, and exit the Activity
         FlowApp.getApp().setUser(new User(uid, username));
-        setResult(RESULT_OK);
-        finish();
+        navigateToSurvey();
     }
 
     @OnTextChanged(value = { R.id.username, R.id.device_id }, callback = AFTER_TEXT_CHANGED)

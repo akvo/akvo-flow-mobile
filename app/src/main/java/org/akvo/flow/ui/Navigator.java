@@ -39,6 +39,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
+import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
@@ -52,8 +53,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
 import javax.inject.Inject;
-
-import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
 
@@ -77,9 +76,8 @@ public class Navigator {
         context.startActivity(i);
     }
 
-    public void navigateToAddUser(Activity activity) {
-        activity.startActivityForResult(new Intent(activity, AddUserActivity.class),
-                REQUEST_ADD_USER);
+    public void navigateToAddUser(Context context) {
+        context.startActivity(new Intent(context, AddUserActivity.class));
     }
 
     public void navigateToRecordActivity(Context context, String surveyedLocaleId,
@@ -280,5 +278,10 @@ public class Navigator {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse(BuildConfig.SERVER_BASE + "/" + "gps"));
         context.startActivity(browserIntent);
+    }
+
+    public void navigateToSurveyActivity(Context context) {
+        Intent intent = new Intent(context, SurveyActivity.class);
+        context.startActivity(intent);
     }
 }

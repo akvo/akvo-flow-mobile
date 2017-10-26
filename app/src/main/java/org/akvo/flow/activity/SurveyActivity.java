@@ -69,7 +69,6 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -129,25 +128,37 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initializeToolBar();
 
-        mDatabase.open();
+        if (!deviceSetUpCompleted()) {
+            navigateToSetUp();
+        } else {
 
-        updateSelectedSurvey();
-        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
+            mDatabase.open();
 
-        initNavigationDrawer();
-        selectSurvey();
-        initDataPointsFragment(savedInstanceState);
+            updateSelectedSurvey();
+            apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
 
-        navigateToSetupIfNeeded();
+            initNavigationDrawer();
+            selectSurvey();
+            initDataPointsFragment(savedInstanceState);
 
-        startServices();
+            startServices();
 
-        //When the app is restarted we need to display the current user
-        if (savedInstanceState == null) {
-            displaySelectedUser();
+            //When the app is restarted we need to display the current user
+            if (savedInstanceState == null) {
+                displaySelectedUser();
+            }
+            activityJustCreated = true;
+            setNavigationView();
         }
-        activityJustCreated = true;
-        setNavigationView();
+    }
+
+    private boolean deviceSetUpCompleted() {
+        return prefs.getBoolean(Prefs.KEY_SETUP, false);
+    }
+
+    private void navigateToSetUp() {
+        navigator.navigateToAddUser(this);
+        finish();
     }
 
     private void updateSelectedSurvey() {
@@ -216,13 +227,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
-    private void navigateToSetupIfNeeded() {
-        boolean deviceSetCorrectly = prefs.getBoolean(Prefs.KEY_SETUP, false);
-        if (!deviceSetCorrectly) {
-            navigator.navigateToAddUser(this);
-        }
-    }
-
     private void initializeToolBar() {
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
@@ -280,44 +284,28 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ConstantUtil.REQUEST_ADD_USER) {
-            if (resultCode == RESULT_OK) {
-                displaySelectedUser();
-                prefs.setBoolean(Prefs.KEY_SETUP, true);
-                updateSelectedSurvey();
-                updateActivityTitle();
-                // Trigger the delayed services, so the first
-                // backend connections uses the new Device ID
-                startService(new Intent(this, SurveyDownloadService.class));
-                startService(new Intent(this, DataSyncService.class));
-            } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-                finish();
-            }
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        if (!activityJustCreated) {
-            navigateToSetupIfNeeded();
+        if (isFinishing()) {
+            return;
         }
-        activityJustCreated = false;
-        // Delete empty responses, if any
-        mDatabase.deleteEmptySurveyInstances();
-        mDatabase.deleteEmptyRecords();
+        if (!activityJustCreated && !deviceSetUpCompleted()) {
+            navigateToSetUp();
+        } else {
+            activityJustCreated = false;
+            // Delete empty responses, if any
+            mDatabase.deleteEmptySurveyInstances();
+            mDatabase.deleteEmptyRecords();
 
-        ViewApkData apkData = apkUpdateStore.getApkData();
-        boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
-        if (apkData != null && shouldNotifyUpdate && PlatformUtil
-                .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
-            apkUpdateStore.saveAppUpdateNotifiedTime();
-            navigator.navigateToAppUpdate(this, apkData);
+            ViewApkData apkData = apkUpdateStore.getApkData();
+            boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
+            if (apkData != null && shouldNotifyUpdate && PlatformUtil
+                    .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
+                apkUpdateStore.saveAppUpdateNotifiedTime();
+                navigator.navigateToAppUpdate(this, apkData);
+            }
+            updateAddDataPointFab();
         }
-        updateAddDataPointFab();
     }
 
     private void updateAddDataPointFab() {
@@ -341,7 +329,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mDatabase.close();
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
     }
 
     @Override
@@ -363,11 +353,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     },
                     null);
         } else {
-            boolean deviceSetUpCompleted = prefs.getBoolean(Prefs.KEY_SETUP, false);
-            if (deviceSetUpCompleted) {
-                startService(new Intent(this, SurveyDownloadService.class));
-                startService(new Intent(this, DataSyncService.class));
-            }
+            startService(new Intent(this, SurveyDownloadService.class));
+            startService(new Intent(this, DataSyncService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, TimeCheckService.class));
         }

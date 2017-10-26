@@ -32,6 +32,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -82,21 +83,27 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     private void init() {
         initialiseInjector();
-        initViews();
-        initCurrentUserText();
-        initUserList();
-        initSurveyList();
         presenter.setView(this);
-        presenter.load();
+        getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        initViews();
+                        initCurrentUserText();
+                        initUserList();
+                        initSurveyList();
+                        presenter.load();
+                    }
+                });
     }
 
     private void initViews() {
-        View headerView = getHeaderView(0);
-        currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
-        surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
-        surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
-        usersRv = ButterKnife.findById(headerView, R.id.users_rv);
-        userHeader = ButterKnife.findById(headerView, R.id.user_header);
+        currentUserTv = ButterKnife.findById(this, R.id.current_user_name);
+        surveyTitleTv = ButterKnife.findById(this, R.id.surveys_title_tv);
+        surveysRv = ButterKnife.findById(this, R.id.surveys_rv);
+        usersRv = ButterKnife.findById(this, R.id.users_rv);
+        userHeader = ButterKnife.findById(this, R.id.user_header);
         NavigationMenuView navigationMenuView = (NavigationMenuView) getChildAt(0);
         if (navigationMenuView != null) {
             navigationMenuView.setVerticalScrollBarEnabled(false);

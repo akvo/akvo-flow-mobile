@@ -8,10 +8,9 @@ repositories {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
-    def Properties versionProps = loadProperties('version.properties')
-    def Properties surveyProps = loadProperties('survey.properties')
+    Properties versionProps = loadProperties('version.properties')
+    Properties surveyProps = loadProperties('survey.properties')
 
     def versionMajor = versionProps['VERSION_MAJOR'].toString()
     def versionMinor = versionProps['VERSION_MINOR'].toString()
@@ -112,12 +111,17 @@ android {
         exclude '.readme'
     }
 
+    flavorDimensions "default"
+
     productFlavors {
         flow {
+            dimension "default"
         }
         biogas {
+            dimension "default"
         }
         cookstoves {
+            dimension "default"
         }
     }
 
@@ -154,8 +158,8 @@ private Properties loadProperties(String fileName) {
 }
 
 android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-        output.outputFile = file("bin/flow.apk")
+    variant.outputs.all { output ->
+        outputFileName = file("bin/flow.apk")
     }
 }
 

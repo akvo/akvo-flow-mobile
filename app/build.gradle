@@ -6,6 +6,14 @@ repositories {
     jcenter()
 }
 
+def isCi = ("true".equals(System.getenv("TRAVIS")))
+
+sentry {
+    autoProguardConfig true
+
+    autoUpload !isCi
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 

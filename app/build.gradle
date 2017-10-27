@@ -58,7 +58,7 @@ android {
             keyAlias RELEASE_KEY_ALIAS
             keyPassword RELEASE_KEY_PASSWORD
         }
-        
+
         buildTypes {
             release {
                 minifyEnabled true
@@ -74,7 +74,11 @@ android {
                 proguardFile 'proguard-files/proguard-square-retrofit.pro'
                 proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
                 proguardFile getDefaultProguardFile('proguard-android.txt')
-                signingConfig signingConfigs.flowRelease
+                if (isCi) {
+                    signingConfig signingConfigs.debug
+                } else {
+                    signingConfig signingConfigs.flowRelease
+                }
             }
         }
     }

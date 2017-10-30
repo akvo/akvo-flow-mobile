@@ -19,19 +19,15 @@
 
 package org.akvo.flow.ui.view;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -48,6 +44,7 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.serialization.response.value.MediaValue;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
@@ -74,6 +71,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     private TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
+    private Navigator navigator = new Navigator();
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
@@ -126,19 +124,10 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
                 return;
             }
             if (isImage()) {
-                // Images are embedded in the app itself, whereas video are delegated through an Intent
-                Dialog dia = new Dialog(new ContextThemeWrapper(getContext(), R.style.Flow_Dialog));
-                dia.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                ImageView imageView = new ImageView(getContext());
-                imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT));
-                displayImage(filename, imageView);
-                dia.setContentView(imageView);
-                dia.show();
+                AppCompatActivity activity = (AppCompatActivity) getContext();
+                navigator.navigateToLargeImage(activity, filename);
             } else {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
-                getContext().startActivity(intent);
+                navigator.navigateToVideoView(getContext(), filename);
             }
         } else if (v == mMediaButton) {
             if (isImage()) {

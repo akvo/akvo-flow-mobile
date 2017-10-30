@@ -34,7 +34,7 @@
   <string name="langoption">भाषाएं </string>
   <string name="langmandatorytitle">फॉर्म डाउनलोड करें </string>
   <string name="langmandatorytext">किसी भी  एक भाषा का चनाव करें </string>
-    <string name="downloadsurveylabel">फॉर्म को डाउनलोड करें </string>
+  <string name="downloadsurveylabel">फॉर्म को डाउनलोड करें </string>
   <string name="downloadsurveyinstr">वह फॉर्म आईडी  डालें जिसे डाउनलोड करना है </string>
   <string name="deletealldatawarning">ऐसा करने पर सभी डेटा स्थाईरुप से हट जायेगा (सर्वे प्रतिउत्तर , चित्र आदि ) I यह प्रतिक्रिया उलटनीय  नहीं है  आगे बढ़ने के लिए OK तथा समाप्त करने के लिए कैंसिल दबाएं I</string>
   <string name="delete_responses_warning">ऐसा करने पर प्रतिउत्तर ,चित्र व ज़िप फाइल स्तापितरुप से हट जायेगा Iयह प्रतिक्रिया उलटनीय  नहीं हैI आगे बढ़ने के लिए OK तथा समाप्त करने के लिए कैंसिल दबाएंI</string>
@@ -64,12 +64,13 @@
   <string name="pleasewaitforbootstrap">कृपया बूटस्ट्रैप फाइल की प्रासेसिंग पूरा होने तक रुकें </string>
   <string name="clear_data_success">डेटा आपके फ़ोन अथवा टेबलेट से सफलता पूर्ण हटा दिया गया है </string>
   <string name="clear_data_error">उपकरण से डेटा हटाने  में त्रुटि</string>
-    <string name="sync">सिंक </string>
+  <string name="search">खोज </string>
+  <string name="sync">सिंक </string>
   <string name="sort">छाँटिएन </string>
   <string name="stats">आंकड़े</string>
-    <string name="prefill_title">पूर्व दिए उत्तर </string>
+  <string name="prefill_title">पूर्व दिए उत्तर </string>
   <string name="prefill_text">पूर्व भरे फॉर्म, पिछले दिए गय उत्तरों के साथ ?</string>
-    <!--Data sync-->
+  <!--Data sync-->
   <string name="data_sync_all">सिंक हुआ फॉर्म: %1$d-  असफल %2$d</string>
   <string name="data_sync_synced">सिंक हुआ फॉर्म: %1$d</string>
   <!--Localization-->
@@ -97,10 +98,6 @@
   <string name="or">या </string>
   <string name="capture_shape">आकर लेने के लिए</string>
   <string name="view_shape">आकार देखें </string>
-  <string name="clear_point_title">पॉइंट हटाने के लिए </string>
-  <string name="clear_point_text">क्या आप इस पॉइंट को हटाना चाहेंगे ?</string>
-  <string name="clear_feature_title"> फीचर डिलीट करें </string>
-  <string name="clear_feature_text">क्या आप इस फीचर को हटाना चाहेंगे ?</string>
   <string name="repeat_group">सवाल दोहराइए </string>
   <string name="repetitions">दुहराव</string>
   <string name="view_map">मैप देखिये </string>
@@ -182,7 +179,7 @@
   <string name="clearbutton">हटाएं </string>
   <string name="yes">हाँ </string>
   <string name="no">नहीं </string>
-  <string name="action_retry">पुन: प्रयास</string>
   <string name="delete">हटाएं </string>
   <!--app update service-->
+  <!--Verify if this works for transifex-->
 </resources>

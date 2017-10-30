@@ -101,26 +101,27 @@
 
         <activity
                 android:name=".presentation.AboutActivity"
-                android:configChanges="locale"
+                android:configChanges="locale|layoutDirection"
                 android:label="@string/about_activity_title">
         </activity>
         <activity
                 android:name=".presentation.help.HelpActivity"
-                android:configChanges="locale"
+                android:configChanges="locale|layoutDirection"
                 android:label="@string/help">
         </activity>
         <activity
                 android:name=".presentation.legal.LegalNoticesActivity"
-                android:configChanges="locale"
+                android:configChanges="locale|layoutDirection"
                 android:label="@string/licences_title">
         </activity>
         <activity
                 android:name=".presentation.settings.PreferenceActivity"
-                android:configChanges="locale">
+                android:configChanges="locale|layoutDirection">
         </activity>
         <activity
                 android:name=".presentation.FullImageActivity"
-                android:label="">
+                android:label=""
+                android:configChanges="locale|layoutDirection">
         </activity>
     </application>
 

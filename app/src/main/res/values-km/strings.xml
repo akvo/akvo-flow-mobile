@@ -34,7 +34,7 @@
   <string name="langoption">ភាសា</string>
   <string name="langmandatorytitle">ការជ្រើសរើសមិនត្រឹមត្រូវ </string>
   <string name="langmandatorytext">អ្នកត្រូវជ្រើសរើសភាសាមួយ តិចបំផុត </string>
-    <string name="downloadsurveylabel">ដោនឡូតទម្រង់</string>
+  <string name="downloadsurveylabel">ដោនឡូតទម្រង់</string>
   <string name="downloadsurveyinstr">បញ្ចូលលេខសំគាល់របស់ទំរង់ដែលអ្នកចង់ដោនឡូត </string>
   <string name="deletealldatawarning">រាល់ទិន្នន័យទាំងអស់ (ការអង្កេត, ចម្លើយ, រូបភាព និងអ្នកប្រើប្រាស់) នឹងត្រូវលុបជាអចិន្ត្រៃយ៍ក្នុងឧបករណ៍នេះ។ ប្រតិបត្តិការនេះមិនអាចត្រឡប់ក្រោយវិញបានឡើយ។ ចុច OK ដើម្បីបន្ត ឬចុច Cancel ដើម្បីបញ្ឈប់។  </string>
   <string name="delete_responses_warning">ប្រតិបត្តិការនេះនឹងលុប ចម្លើយ, រូបភាព និងឯកសារzip នានាក្នុងឧបករណ៍នេះ។ ប្រតិបត្តិការនេះមិនអាចត្រឡប់ក្រោយវិញបានឡើយ។ ចុច​ OK ដើម្បីបន្ត ឬចុច Cancel ដើម្បីបញ្ឈប់។  </string>
@@ -64,12 +64,13 @@
   <string name="pleasewaitforbootstrap">សូមរង់ចាំរហូតដល់ឯកសារ bootstrap ចប់ដំណើរការ</string>
   <string name="clear_data_success">ទិន្នន័យត្រូវបានលុបចេញពីឧបករណ៍នេះដោយជោគជ័យ</string>
   <string name="clear_data_error">កំហុសឆ្គងលុបទិន្នន័យពីឧបករណ៍ </string>
-    <string name="sync">ធ្វើឲ្យចេញដំណាលគ្នា</string>
+  <string name="search">ស្វែងរក </string>
+  <string name="sync">ធ្វើឲ្យចេញដំណាលគ្នា</string>
   <string name="sort">ដាក់ទៅតាមប្រភេទ </string>
   <string name="stats">ស្ថានភាព </string>
-    <string name="prefill_title">បំពេញចម្លើយជាមុន </string>
+  <string name="prefill_title">បំពេញចម្លើយជាមុន </string>
   <string name="prefill_text">បំពេញទម្រង់ជាមុន ដោយប្រើចម្លើយលើកមុន?</string>
-    <!--Data sync-->
+  <!--Data sync-->
   <string name="data_sync_all">ដាក់ទម្រង់ឲ្យចេញដំណាលគ្នាៈ %1$d - មិនសម្រេចៈ​ %2$d​ </string>
   <string name="data_sync_synced">បានដាក់ទំរង់ឲ្យចេញដំណាលគ្នា: %1$d </string>
   <!--Localization-->
@@ -97,10 +98,6 @@
   <string name="or">ឬ</string>
   <string name="capture_shape">ចាប់ទ្រង់ទ្រាយ </string>
   <string name="view_shape">មើលទ្រង់ទ្រាយ</string>
-  <string name="clear_point_title">លុបចំណុច </string>
-  <string name="clear_point_text">តើអ្នកចង់លុបចំណុចនេះឬទេ?</string>
-  <string name="clear_feature_title">លុបលក្ខណៈសណ្ឋាន </string>
-  <string name="clear_feature_text">តើអ្នកចង់លុបលក្ខណៈសណ្ឋាននេះឬទេ? </string>
   <string name="repeat_group">បន្ថែមមួយទៀត  </string>
   <string name="repetitions">ចំនួនសំណួរដែលបានឆ្លើយ</string>
   <string name="view_map">​មើលផែនទី </string>
@@ -182,9 +179,9 @@
   <string name="clearbutton">លុបចេញ (Clear) </string>
   <string name="yes">បាទ/ចាស</string>
   <string name="no">ទេ</string>
-  <string name="action_retry">ព្យាយាមម្តងទៀត</string>
   <string name="delete">លុប (Delete) </string>
   <string name="drawer_open">ថត បើក</string>
   <string name="drawer_close">ថត បិទ </string>
   <!--app update service-->
+  <!--Verify if this works for transifex-->
 </resources>

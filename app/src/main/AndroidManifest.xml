@@ -118,6 +118,10 @@
                 android:name=".presentation.settings.PreferenceActivity"
                 android:configChanges="locale">
         </activity>
+        <activity
+                android:name=".presentation.FullImageActivity"
+                android:label="">
+        </activity>
     </application>
 
 </manifest>

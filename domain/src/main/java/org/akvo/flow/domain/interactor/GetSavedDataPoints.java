@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
@@ -73,7 +74,7 @@ public class GetSavedDataPoints extends UseCase {
     }
 
     private Observable<List<DataPoint>> getFilteredDataPoints(Long surveyGroupId, Double latitude,
-            Double longitude, Integer orderBy, final String filter) {
+            Double longitude, Integer orderBy, @NonNull final String filter) {
         return surveyRepository.getDataPoints(surveyGroupId, latitude, longitude, orderBy)
                 .flatMap(new Function<List<DataPoint>, ObservableSource<List<DataPoint>>>() {
                     @Override
@@ -86,23 +87,27 @@ public class GetSavedDataPoints extends UseCase {
     }
 
     private Observable<List<DataPoint>> filterDataPoints(@NonNull List<DataPoint> dataPoints,
-            final String filter) {
+            @NonNull final String filter) {
         return Observable
                 .fromIterable(dataPoints)
                 .filter(new Predicate<DataPoint>() {
                     @Override
                     public boolean test(@NonNull DataPoint dataPoint) throws Exception {
                         String name = dataPoint.getName();
-                        if (name != null) {
-                            name = name.toLowerCase();
-                        }
                         String id = dataPoint.getId();
-                        return ((name != null && name
-                                .contains(filter.toLowerCase()))
-                                || (id != null && id.startsWith(filter)));
+                        return (fieldContains(name, filter)
+                                || fieldContains(id, filter));
                     }
                 })
                 .toList()
                 .toObservable();
+    }
+
+    private boolean fieldContains(@Nullable String field, @NonNull String filter) {
+        if (field != null) {
+            field = field.toLowerCase();
+        }
+        return field != null && field
+                .contains(filter.toLowerCase());
     }
 }

@@ -79,7 +79,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DatapointsFragment.DatapointFragmentListener,
         FlowNavigation.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
@@ -113,7 +112,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private ActionBarDrawerToggle mDrawerToggle;
     private ApkUpdateStore apkUpdateStore;
-
     private long selectedSurveyId;
     private boolean activityJustCreated;
 
@@ -495,11 +493,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void navigate(Runnable runnable) {
         mDrawerLayout.closeDrawers();
         mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
-    }
-
-    @Override
-    public boolean onSearchTap() {
-        return onSearchRequested();
     }
 
     @OnClick(R.id.add_data_point_fab)

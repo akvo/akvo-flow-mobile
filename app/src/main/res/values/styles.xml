@@ -56,7 +56,9 @@
 
     <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-    <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="searchViewStyle">@style/SearchView</item>
+    </style>
 
     <style name="LinkTextViewStyle">
         <item name="android:layout_width">match_parent</item>
@@ -139,6 +141,12 @@
         <item name="android:paddingBottom">8dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/black_disabled</item>
+    </style>
+
+    <style name="SearchView" parent="Widget.AppCompat.Light.SearchView">
+        <item name="searchHintIcon">@null</item>
+        <item name="searchIcon">@null</item>
+        <item name="suggestionRowLayout">@layout/search_suggestion_row</item>
     </style>
 
     <style name="NavigationMenuItemStyle">

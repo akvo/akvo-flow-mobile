@@ -19,9 +19,7 @@
 
 package org.akvo.flow.ui.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -60,9 +58,6 @@ public class DatapointsFragment extends Fragment {
     private TabsAdapter mTabsAdapter;
     private SurveyGroup mSurveyGroup;
 
-    @Nullable
-    private DatapointFragmentListener listener;
-
     private String[] tabNames;
 
     public DatapointsFragment() {
@@ -74,15 +69,6 @@ public class DatapointsFragment extends Fragment {
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (!(activity instanceof DatapointFragmentListener)) {
-            throw new IllegalArgumentException("Activity must implement DatapointFragmentListener");
-        }
-        this.listener = (DatapointFragmentListener) activity;
     }
 
     @Override
@@ -118,12 +104,6 @@ public class DatapointsFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        this.listener = null;
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         mDatabase.close();
@@ -155,20 +135,13 @@ public class DatapointsFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.search:
-                if (listener != null) {
-                    return listener.onSearchTap();
-                }
-            case R.id.stats:
-                StatsDialogFragment dialogFragment = StatsDialogFragment
-                        .newInstance(mSurveyGroup.getId());
-                dialogFragment.show(getFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.stats) {
+            StatsDialogFragment dialogFragment = StatsDialogFragment
+                    .newInstance(mSurveyGroup.getId());
+            dialogFragment.show(getFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     static class TabsAdapter extends FragmentPagerAdapter {
@@ -223,7 +196,6 @@ public class DatapointsFragment extends Fragment {
             if (position == POSITION_LIST) {
                 return DataPointsListFragment.newInstance(surveyGroup);
             }
-            // Map mode
             return DataPointsMapFragment.newInstance(surveyGroup);
         }
 
@@ -244,10 +216,5 @@ public class DatapointsFragment extends Fragment {
         if (mTabsAdapter != null) {
             mTabsAdapter.refreshFragments(mSurveyGroup);
         }
-    }
-
-    public interface DatapointFragmentListener {
-
-        boolean onSearchTap();
     }
 }

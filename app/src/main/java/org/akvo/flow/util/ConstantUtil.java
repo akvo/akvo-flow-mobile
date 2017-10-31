@@ -135,6 +135,9 @@ public class ConstantUtil {
     public static final String RECORD_ID_EXTRA = "record_id";
     public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
     public static final String VIEW_USER_EXTRA = "view_user";
+    public static final String IMAGE_URL_EXTRA = "image_url";
+    public static final String FORM_TITLE_EXTRA = "title";
+    public static final String FORM_SUBTITLE_EXTRA = "subtitle";
 
     /**
      * settings keys

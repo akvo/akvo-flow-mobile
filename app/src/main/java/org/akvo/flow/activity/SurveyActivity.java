@@ -82,7 +82,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DatapointsFragment.DatapointFragmentListener,
         FlowNavigation.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
@@ -116,7 +115,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private ActionBarDrawerToggle mDrawerToggle;
     private ApkUpdateStore apkUpdateStore;
-
     private long selectedSurveyId;
     private boolean activityJustCreated;
 
@@ -514,11 +512,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
                     Toast.LENGTH_LONG).show();
         }
-    }
-
-    @Override
-    public boolean onSearchTap() {
-        return onSearchRequested();
     }
 
     @OnClick(R.id.add_data_point_fab)

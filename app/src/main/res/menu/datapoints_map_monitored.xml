@@ -12,10 +12,6 @@
         <menu>
 
             <item
-                    android:id="@+id/search"
-                    android:title="@string/search"/>
-
-            <item
                     android:id="@+id/sync_records"
                     android:title="@string/sync"/>
 

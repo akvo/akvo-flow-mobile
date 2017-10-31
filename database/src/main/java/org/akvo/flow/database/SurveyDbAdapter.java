@@ -57,6 +57,12 @@ public class SurveyDbAdapter {
             "survey LEFT OUTER JOIN survey_instance ON "
             + "survey.survey_id=survey_instance.survey_id";
 
+    public static final String[] RESPONSE_COLUMNS = {
+            ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
+            ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
+            ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
+    };
+
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
@@ -212,11 +218,7 @@ public class SurveyDbAdapter {
 
     public Cursor getResponses(long surveyInstanceId) {
         return database.query(Tables.RESPONSE,
-                new String[] {
-                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
-                },
+                RESPONSE_COLUMNS,
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
                 null, null, null);
@@ -231,11 +233,7 @@ public class SurveyDbAdapter {
      */
     public Cursor getResponse(Long surveyInstanceId, String questionId) {
         return database.query(Tables.RESPONSE,
-                new String[] {
-                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
-                },
+                RESPONSE_COLUMNS,
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                         + " =?",
                 new String[] { String.valueOf(surveyInstanceId), questionId },
@@ -244,11 +242,7 @@ public class SurveyDbAdapter {
 
     public Cursor getResponse(Long surveyInstanceId, String questionId, int iteration) {
         return database.query(Tables.RESPONSE,
-                new String[] {
-                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
-                },
+                RESPONSE_COLUMNS,
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                         + " =? AND " + "CAST(" + ResponseColumns.ITERATION + " as TEXT) = ? ",
                 new String[] { String.valueOf(surveyInstanceId), questionId,

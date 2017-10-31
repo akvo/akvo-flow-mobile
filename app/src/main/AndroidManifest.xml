@@ -72,6 +72,7 @@
                 android:screenOrientation="landscape"/>
 
         <service android:name=".service.DataSyncService"/>
+        <service android:name=".service.FileChangeTrackingService"/>
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.UserRequestedApkUpdateService"/>
@@ -89,6 +90,12 @@
             <intent-filter>
                 <action android:name="org.akvo.flow.DATA_SUBMITTED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".broadcast.BootStrapReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="org.akvo.flow.BOOTSTRAP_NEEDED"/>
             </intent-filter>
         </receiver>
 

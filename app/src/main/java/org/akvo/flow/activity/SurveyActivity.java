@@ -54,6 +54,7 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
+import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.service.BootstrapService;
@@ -283,6 +284,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onDestroy() {
         super.onDestroy();
         mDatabase.close();
+        stopService(new Intent(this, FileChangeTrackingService.class));
     }
 
     @Override
@@ -311,6 +313,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             }
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, TimeCheckService.class));
+            startService(new Intent(this, FileChangeTrackingService.class));
         }
     }
 

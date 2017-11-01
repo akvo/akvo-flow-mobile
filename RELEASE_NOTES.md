@@ -1,5 +1,22 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.1
+Date: 02 November 2017
+
+# New and noteworthy
+* **View image in full screen** - [#833](https://github.com/akvo/akvo-flow-mobile/issues/833) Images from image questions can now be viewed in full screen.
+* **Simplify delete dialogues in geoshape editor** - [#787](https://github.com/akvo/akvo-flow-mobile/issues/787) Geoshapes delete dialog messages have been simplified.
+* **Search - no results found** - [#752](https://github.com/akvo/akvo-flow-mobile/issues/752) The whole search data points interface has been redesigned.
+* **What to do when GPS Status is not installed** - [#517](https://github.com/akvo/akvo-flow-mobile/issues/517) If the GPS Status app is not installed, the user will be offered the possibility to install it.
+
+# Resolved issues
+* **Translations for 2.4.1** - [#909](https://github.com/akvo/akvo-flow-mobile/issues/909) Spanish and Portuguese translations have been updated.
+* **Pre-fill not working** - [#904](https://github.com/akvo/akvo-flow-mobile/issues/904) The pre-fill option issue has been fixed.
+* **Wrong exception throwing when assignment missing** - [#895](https://github.com/akvo/akvo-flow-mobile/issues/895) When the assignment is missing, the user will see a specific error message.
+* **App flickering on certain devices** - [#847](https://github.com/akvo/akvo-flow-mobile/issues/847) The issue of the application starting to flicker on some devices has been fixed.
+* **Imported data shows "null" for submitter** - [#620](https://github.com/akvo/akvo-flow-mobile/issues/620) The data imported via the importer, will now display IMPORTER as username.
+
+---------------
 # ver 2.4.0.2
 Date: 18 October 2017
 

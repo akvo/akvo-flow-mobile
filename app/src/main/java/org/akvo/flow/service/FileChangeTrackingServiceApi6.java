@@ -22,6 +22,7 @@ package org.akvo.flow.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
@@ -36,6 +37,8 @@ import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 public class FileChangeTrackingServiceApi6 extends GcmTaskService {
 
@@ -69,11 +72,14 @@ public class FileChangeTrackingServiceApi6 extends GcmTaskService {
     @Override
     public void onInitializeTasks() {
         super.onInitializeTasks();
-        scheduleVerifier(getApplicationContext());
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+            scheduleVerifier(getApplicationContext());
+        }
     }
 
     @Override
     public int onRunTask(TaskParams taskParams) {
+        Timber.d("onRunTask");
         List<File> files = zipFileLister.getZipFiles();
         if (!files.isEmpty()) {
             sendBroadcast();

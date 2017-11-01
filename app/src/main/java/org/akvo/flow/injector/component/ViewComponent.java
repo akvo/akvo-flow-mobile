@@ -25,6 +25,7 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
@@ -69,4 +70,6 @@ public interface ViewComponent {
     void inject(HelpActivity activity);
 
     void inject(PreferenceActivity preferenceActivity);
+
+    void inject(AppDownloadDialogFragment fragment);
 }

@@ -39,7 +39,6 @@
     <string name="langoption">Languages</string>
     <string name="langmandatorytitle">Invalid Selection</string>
     <string name="langmandatorytext">You must select at least one language</string>
-    <string name="pleasewait">Please wait</string>
     <string name="preference_download_form_title">Download form using form ID</string>
     <string name="preference_download_form_subtitle">Only run if instructed</string>
     <string name="downloadsurveylabel">Download Form</string>
@@ -92,6 +91,7 @@
     <string name="please_restart">Please, restart the app</string>
     <!--Empty Views-->
     <string name="no_datapoints_error_text">You have no data points</string>
+    <string name="no_search_results_error_text">No results found</string>
     <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
     <!--ToolBar-->
     <string name="more">More</string>
@@ -114,10 +114,8 @@
     <string name="or">or</string>
     <string name="capture_shape">capture shape</string>
     <string name="view_shape">view shape</string>
-    <string name="clear_point_title">Delete point</string>
-    <string name="clear_point_text">Do you want to remove this point?</string>
-    <string name="clear_feature_title">Delete feature</string>
-    <string name="clear_feature_text">Do you want to remove this feature?</string>
+    <string name="delete_point_title">Delete point?</string>
+    <string name="delete_shape_title">Delete shape?</string>
     <string name="repeat_group">Repeat group</string>
     <string name="repetitions">Repetitions:</string>
     <string name="view_map">View map</string>
@@ -270,5 +268,8 @@
         <item quantity="one">%1$d data point synced</item>
         <item quantity="other">%1$d data points synced</item>
     </plurals>
+
+
+    <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
 
 </resources>

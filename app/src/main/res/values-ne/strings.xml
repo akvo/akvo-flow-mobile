@@ -34,7 +34,6 @@
   <string name="langoption">भाषाहरु</string>
   <string name="langmandatorytitle">गलत छनौट</string>
   <string name="langmandatorytext">तपाईंले कम्तीमा एउटा भाषा छान्नुपर्ने हुन्छ।</string>
-  <string name="pleasewait">कृपया पर्खनुहोस्।</string>
   <string name="downloadsurveylabel">फारम डाउन्लोड गर्नुहोस्।</string>
   <string name="downloadsurveyinstr">आफुले डाउनलोड गर्न चाहेको फारमको फारम आइ डि हाल्नुहोस्। </string>
   <string name="deletealldatawarning">यसले स्थाई रूपमा उपकरणमा भएका सबै डाटाहरु (सर्भेहरु, उतरहरु, तस्बिरहरु र प्रयोगकर्ताहरु) हटाउँछ। यो कार्य एक पल्ट गरेपछि सच्चाउन मिल्दैन। अघि बढ्न OK वा पछाडि जान Cancel थिच्नुहोस्।</string>
@@ -70,14 +69,8 @@
   <string name="sync">सिन्क गर्नुहोस्</string>
   <string name="sort">क्रममा मिलाउनुहोस्</string>
   <string name="stats">तथ्यान्क</string>
-  <string name="syncing_records">डाटा पोइन्टहरु सिँक हुँदैछन्...</string>
-  <string name="synced_records">सिँक भएका %1$d डाटा पोइन्टहरु</string>
-  <string name="sync_error">डाटा पोइन्टहरु सिँक भएनन्।</string>
-  <string name="syncing_corrupted_data_points_error">कृपया फेरि सिन्क गर्नुहोस्।</string>
-  <string name="network_error">नेटवर्क त्रुटि</string>
   <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
   <string name="prefill_text">पहिलेको उतरहरुले फारम भर्न चाहनुहुन्छ?</string>
-  <string name="error_assignment_text">Akvo Flow ड्यास्बोर्डमा assignment हरु चाहियो।</string>
   <!--Data sync-->
   <string name="data_sync_all">सिँक भएका फारमहरु %1$d - सिँक नभएका फारमहरु %2$d</string>
   <string name="data_sync_synced">सिँक भएका फारमहरु %1$d</string>
@@ -108,10 +101,6 @@
   <string name="or">अथवा</string>
   <string name="capture_shape">आकार कब्जा गर्नुहोस्।</string>
   <string name="view_shape">आकार हेर्नुहोस्</string>
-  <string name="clear_point_title">बिन्दु हटाउनुहोस्</string>
-  <string name="clear_point_text">के तपाईं यो बिन्दु हटाउन चाहनुहुन्छ?</string>
-  <string name="clear_feature_title">फिचर हटाउनुहोस्</string>
-  <string name="clear_feature_text">के तपाईं यो फिचर हटाउन चाहनुहुन्छ?</string>
   <string name="repeat_group">समुह दोहोर्याउनुहोस्</string>
   <string name="repetitions">दोहोरिएको</string>
   <string name="view_map">नक्सा/मानचित्र हेर्नुहोस्</string>
@@ -200,7 +189,6 @@
   <string name="clearbutton">हटाउनुहोस्</string>
   <string name="yes">हो</string>
   <string name="no">हैन</string>
-  <string name="action_retry">फेरि प्रयास गर्नुहोस्</string>
   <string name="delete">डिलिट गर्नुहोस्</string>
   <string name="drawer_open">ड्रअर खुला छ</string>
   <string name="drawer_close">ड्रअर बन्द छ</string>
@@ -209,4 +197,5 @@
   <string name="apk_update_service_error_update">एप्प अप्डेट गर्दा त्रुटि भयो। कृपया फेरि प्रयास गर्नुहोस्।</string>
   <string name="apk_update_service_error_no_internet">एप्प अप्डेट गर्दा त्रुटि भयो। तपाईंको फोनमा इन्टर्नेट छैन।</string>
   <string name="locale_list_error_unknown_location">अपरिचित स्थान</string>
+  <!--Verify if this works for transifex-->
 </resources>

@@ -24,7 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import org.akvo.flow.service.DataSyncService;
+import org.akvo.flow.service.BootstrapService;
 
 import timber.log.Timber;
 
@@ -33,6 +33,6 @@ public class BootStrapReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Timber.d("Bootstrap will be started");
-        context.startService(new Intent(context, DataSyncService.class));
+        context.startService(new Intent(context, BootstrapService.class));
     }
 }

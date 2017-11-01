@@ -41,17 +41,23 @@ public class FileChangeTrackingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        fileObserver = new FileObserver(
-                FileUtil.getFilesDir(FileUtil.FileType.INBOX).getAbsolutePath(),
-                FileObserver.CREATE) {
-            @Override
-            public void onEvent(int event, @Nullable String path) {
-                Intent bootStrapIntent = new Intent(ConstantUtil.BOOTSTRAP_INTENT);
-                sendBroadcast(bootStrapIntent);
-            }
-        };
-        fileObserver.startWatching();
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+//                || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            fileObserver = new FileObserver(
+                    FileUtil.getFilesDir(FileUtil.FileType.INBOX).getAbsolutePath(),
+                    FileObserver.CREATE) {
+                @Override
+                public void onEvent(int event, @Nullable String path) {
+                    sendBroadCast();
+                }
+            };
+            fileObserver.startWatching();
         return START_STICKY;
+    }
+
+    private void sendBroadCast() {
+        Intent bootStrapIntent = new Intent(ConstantUtil.BOOTSTRAP_INTENT);
+        sendBroadcast(bootStrapIntent);
     }
 
     @Override

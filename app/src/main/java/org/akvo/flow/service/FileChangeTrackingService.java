@@ -29,6 +29,13 @@ import android.support.annotation.Nullable;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 
+import timber.log.Timber;
+
+/**
+ * Monitors changes to the inbox folder
+ * This will be run on all devices except on Android 6.0 and 6.0.1 devices which have a
+ * bug preventing the FileObserver to work properly
+ */
 public class FileChangeTrackingService extends Service {
 
     public FileObserver fileObserver;
@@ -41,17 +48,16 @@ public class FileChangeTrackingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-//                || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            fileObserver = new FileObserver(
-                    FileUtil.getFilesDir(FileUtil.FileType.INBOX).getAbsolutePath(),
-                    FileObserver.CREATE) {
-                @Override
-                public void onEvent(int event, @Nullable String path) {
-                    sendBroadCast();
-                }
-            };
-            fileObserver.startWatching();
+        fileObserver = new FileObserver(
+                FileUtil.getFilesDir(FileUtil.FileType.INBOX).getAbsolutePath(),
+                FileObserver.CREATE) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                Timber.d("event received: " + event);
+                sendBroadCast();
+            }
+        };
+        fileObserver.startWatching();
         return START_STICKY;
     }
 

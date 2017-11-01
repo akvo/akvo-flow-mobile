@@ -21,7 +21,6 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -48,9 +47,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -83,6 +81,7 @@ public class BootstrapService extends IntentService {
     public volatile static boolean isProcessing = false;
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
+    private final ZipFileLister zipFileLister = new ZipFileLister();
     private SurveyDbDataSource databaseAdapter;
     private Handler mHandler;
 
@@ -92,9 +91,11 @@ public class BootstrapService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         isProcessing = true;
-        checkAndInstall();
+        int installed = checkAndInstall();
         isProcessing = false;
-        sendBroadcastNotification();
+        if (installed > 0) {
+            sendBroadcastNotification();
+        }
     }
 
     /**
@@ -104,11 +105,12 @@ public class BootstrapService extends IntentService {
      * multiple zips in the directory) just in case data in a later zip depends
      * on the previous one being there.
      */
-    private void checkAndInstall() {
+    private int checkAndInstall() {
+        int installedFiles = 0;
         try {
-            ArrayList<File> zipFiles = getZipFiles();
+            List<File> zipFiles = zipFileLister.getSortedZipFiles();
             if (zipFiles.isEmpty()) {
-                return;
+                return 0;
             }
 
             String startMessage = getString(R.string.bootstrapstart);
@@ -119,6 +121,7 @@ public class BootstrapService extends IntentService {
                 for (File file : zipFiles) {
                     try {
                         processFile(file);
+                        installedFiles++;
                     } catch (Exception e) {
                         // try to roll back any database changes (if the zip has a rollback file)
                         String newFilename = file.getAbsolutePath();
@@ -139,6 +142,7 @@ public class BootstrapService extends IntentService {
 
             Timber.e(e,"Bootstrap error");
         }
+        return installedFiles;
     }
 
     private void displayErrorNotification(String errorMessage) {
@@ -330,30 +334,6 @@ public class BootstrapService extends IntentService {
         String entryName = entry.getName();
         String entryPaths[] = entryName == null ? new String[0] : entryName.split(File.separator);
         return entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
-    }
-
-    /**
-     * returns an ordered list of zip files that exist in the device's bootstrap
-     * directory
-     */
-    private ArrayList<File> getZipFiles() {
-        ArrayList<File> zipFiles = new ArrayList<>();
-        // zip files can only be loaded on the SD card (not internal storage) so
-        // we only need to look there
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = FileUtil.getFilesDir(FileType.INBOX);
-            File[] fileList = dir.listFiles();
-            if (fileList != null) {
-                for (File file : fileList) {
-                    if (file.isFile() && file.getName().toLowerCase()
-                                .endsWith(ConstantUtil.ARCHIVE_SUFFIX)) {
-                        zipFiles.add(file);
-                    }
-                }
-            }
-            Collections.sort(zipFiles);
-        }
-        return zipFiles;
     }
 
     /**

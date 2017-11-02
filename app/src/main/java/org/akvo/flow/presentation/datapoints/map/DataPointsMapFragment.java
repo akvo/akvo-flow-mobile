@@ -374,7 +374,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
             }
         });
     }
-    
+
     @Override
     public void showNoDataPointsToSync() {
         dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());

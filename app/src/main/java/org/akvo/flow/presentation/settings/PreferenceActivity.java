@@ -239,9 +239,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         });
     }
 
-    @OnClick({R.id.preference_reload_forms_title,
-            R.id.preference_reload_forms_subtitle
-    })
+    @OnClick(R.id.preference_reload_forms_title)
     void onReloadAllSurveysOptionTap() {
         ReloadFormsConfirmationDialog dialog = ReloadFormsConfirmationDialog.newInstance();
         dialog.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);

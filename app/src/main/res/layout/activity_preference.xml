@@ -136,12 +136,7 @@
                     android:id="@+id/preference_reload_forms_title"
                     android:text="@string/reload_forms"
                     style="@style/PreferenceTitleStyle"
-                    android:paddingBottom="4dp"/>
-
-            <TextView
-                    android:id="@+id/preference_reload_forms_subtitle"
-                    android:text="@string/reloadsurveysdesc"
-                    style="@style/PreferenceSubtitleStyle"/>
+                    android:paddingBottom="8dp"/>
             <View
                     style="@style/PreferenceSectionSeparator"/>
 

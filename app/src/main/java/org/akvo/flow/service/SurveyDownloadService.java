@@ -91,9 +91,9 @@ public class SurveyDownloadService extends IntentService {
             prefs = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
-                downloadSurvey(intent);
+                installSurvey(intent);
             } else {
-                checkAndDownload(null);
+                downloadAndInstallSurveys();
             }
         } catch (Exception e) {
             Timber.e(e, e.getMessage());
@@ -103,36 +103,42 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
-    private void downloadSurvey(@NonNull Intent intent) {
+    private void downloadAndInstallSurveys() {
+        if (!isConnectionAvailable()) {
+            return;
+        }
+        List<Survey> surveys = checkForSurveys();
+        updateSurveys(surveys);
+    }
+
+    private void installSurvey(@NonNull Intent intent) {
         String surveyId = intent.getStringExtra(EXTRA_SURVEY_ID);
         intent.removeExtra(EXTRA_SURVEY_ID);
         if (TEST_SURVEY_ID.equals(surveyId)) {
-            databaseAdaptor.reinstallTestSurvey();
+            installTestSurvey();
         } else {
-            checkAndDownload(new String[] { surveyId });
+            downloadAndInstallSurvey(surveyId);
         }
     }
 
-    /**
-     * if no surveyIds are passed in, this will check for new surveys and, if
-     * there are some new ones, downloads them to the DATA_DIR. If surveyIds are
-     * passed in, then those specific surveys will be downloaded. If they're already
-     * on the device, the surveys will be replaced with the new ones.
-     */
-    private void checkAndDownload(@Nullable String[] surveyIds) {
-        if (!connectivityStateManager.isConnectionAvailable(
-                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            //No internet or not allowed to sync
+    private void downloadAndInstallSurvey(String surveyId) {
+        if (!isConnectionAvailable()) {
             return;
         }
+        List<Survey>surveys = getSurveyHeaders(surveyId);
+        updateSurveys(surveys);
+    }
 
-        List<Survey> surveys;
-        if (surveyIds != null && surveyIds.length > 0) {
-            surveys = getSurveyHeaders(surveyIds);
-        } else {
-            surveys = checkForSurveys();
-        }
+    private void installTestSurvey() {
+        databaseAdaptor.reinstallTestSurvey();
+    }
 
+    private boolean isConnectionAvailable() {
+        return connectivityStateManager.isConnectionAvailable(
+                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD));
+    }
+
+    private void updateSurveys(List<Survey> surveys) {
         // Update all survey groups
         syncSurveyGroups(surveys);
 
@@ -158,8 +164,14 @@ public class SurveyDownloadService extends IntentService {
             }
         }
 
-        // now check if any previously downloaded surveys still need
-        // don't have their help media pre-cached
+        downloadAllSurveysHelp();
+    }
+
+    /**
+     * Check if any previously downloaded surveys still miss help media or cascade resources
+     */
+    private void downloadAllSurveysHelp() {
+        List<Survey> surveys;
         surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
         for (Survey survey : surveys) {
             if (!survey.isHelpDownloaded()) {
@@ -316,20 +328,18 @@ public class SurveyDownloadService extends IntentService {
      * invokes a service call to get the header information for multiple surveys
      */
     @NonNull
-    private List<Survey> getSurveyHeaders(@NonNull String[] surveyIds) {
+    private List<Survey> getSurveyHeaders(@NonNull String surveyId) {
         List<Survey> surveys = new ArrayList<>();
         FlowApi flowApi = new FlowApi(getApplicationContext());
-        for (String id : surveyIds) {
             try {
-                surveys.addAll(flowApi.getSurveyHeader(id));
+                surveys.addAll(flowApi.getSurveyHeader(surveyId));
             } catch (IllegalArgumentException | IOException e) {
                 if (e instanceof IllegalArgumentException) {
                     Timber.e(e);
                 }
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
-                        getString(R.string.error_form_header, id));
+                        getString(R.string.error_form_header, surveyId));
             }
-        }
         return surveys;
     }
 

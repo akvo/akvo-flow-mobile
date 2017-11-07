@@ -66,7 +66,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         caddisflyResultsAdapter = new CaddisflyResultsAdapter(
                 new ArrayList<CaddisflyTestResult>());
         resultsRv.setAdapter(caddisflyResultsAdapter);
-        mButton = (Button) findViewById(R.id.button);
+        mButton = (Button) findViewById(R.id.caddisfly_button);
         mButton.setOnClickListener(this);
         displayResponseView();
     }

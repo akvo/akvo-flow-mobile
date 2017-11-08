@@ -24,10 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -36,7 +33,10 @@ import android.view.View;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
@@ -46,6 +46,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -54,23 +55,23 @@ import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.withHint;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
+import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.tests.R.raw.test_form;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.IsNot.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class SurveyActivityTest {
 
     private static SurveyInstaller installer;
+    private static Survey survey;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -86,7 +87,7 @@ public class SurveyActivityTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(test_form, InstrumentationRegistry.getContext());
+        survey = installer.installSurvey(test_form, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -106,7 +107,48 @@ public class SurveyActivityTest {
         //make sure everything is loaded
         addExecutionDelay(5000);
 
-        List<QuestionGroup> questions = ((FormActivity) rule.getActivity()).getQuestionGroups();
+        List<QuestionGroup> questionGroups = survey.getQuestionGroups();
+        List<Question> mandatoryQuestions = new ArrayList<>();
+        for (int i = 0; i < questionGroups.size(); i++) {
+            QuestionGroup group = questionGroups.get(i);
+            //select the tab
+            ViewInteraction tab = onView(childAtPosition(childAtPosition(withId(R.id.tabs), 0), i));
+            tab.perform(click());
+            tab.check(matches(withText(group.getHeading())));
+            List<Question> questions = group.getQuestions();
+            for (Question question: questions) {
+                String questionHeader = question.getText();
+                if (question.isMandatory()) {
+                    mandatoryQuestions.add(question);
+                    questionHeader = questionHeader + "*";
+                }
+                ViewInteraction questionTitle = findQuestionTitle(questionHeader);
+                questionTitle.perform(scrollTo());
+                questionTitle.check(matches(isDisplayed()));
+                switch(question.getType()) {
+                    case ConstantUtil.FREE_QUESTION_TYPE:
+                        ViewInteraction freeTextQuestionInput = onView(
+                                allOf(withId(R.id.input_et), withParent(allOf(
+                                        IsInstanceOf.<View>instanceOf(
+                                                org.akvo.flow.ui.view.FreetextQuestionView.class),
+                                        withTagValue(is((Object)question.getId()))))));
+                        freeTextQuestionInput.check(matches(withText("")));
+                        freeTextQuestionInput.perform(click());
+                        freeTextQuestionInput.perform(closeSoftKeyboard());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        //check submit tab
+        ViewInteraction submitTab = onView(
+                childAtPosition(childAtPosition(withId(R.id.tabs), 0), questionGroups.size()));
+        submitTab.perform(click());
+        submitTab.check(matches(isDisplayed()));
+
+        /**
         ViewInteraction firstQuestionTitle = findQuestionTitle("1. text question*");
         firstQuestionTitle.check(matches(isDisplayed()));
 
@@ -406,7 +448,7 @@ public class SurveyActivityTest {
                         withParent(withId(R.id.pager)),
                         5),
                         isDisplayed()));
-        sendButton.check(matches(not(isEnabled())));
+        sendButton.check(matches(not(isEnabled()))); **/
     }
 
     @NonNull

@@ -45,6 +45,7 @@ import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.MediaQuestionView;
+import org.akvo.flow.ui.view.QuestionHeaderView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewSingle;
@@ -123,7 +124,7 @@ public class SurveyActivityTest {
     }
 
     @Test
-    public void surveyActivityTest() {
+    public void viewEmptySurveyTest() {
 
         //make sure everything is loaded
         addExecutionDelay(5000);
@@ -148,308 +149,6 @@ public class SurveyActivityTest {
         }
 
         verifySubmitTab(questionGroups, mandatoryQuestions);
-
-        /**
-         ViewInteraction firstQuestionTitle = findQuestionTitle("1. text question*");
-         firstQuestionTitle.check(matches(isDisplayed()));
-
-         ViewInteraction firstQuestionInput = onView(
-         allOf(withId(R.id.input_et),
-         questionListItem(0),
-         isDisplayed()));
-         firstQuestionInput.check(matches(withText("")));
-         firstQuestionInput.perform(click());
-         firstQuestionInput.perform(closeSoftKeyboard());
-
-         ViewInteraction secondQuestionTitle = findQuestionTitle("2. option*");
-         secondQuestionTitle.check(matches(isDisplayed()));
-
-         ViewInteraction optionOne = radioButtonWithText("yes", 0);
-         optionOne.check(matches(isDisplayed()));
-
-         ViewInteraction optionTwo = radioButtonWithText("no", 1);
-         optionTwo.check(matches(isDisplayed()));
-
-         ViewInteraction optionThree = radioButtonWithText("maybe", 2);
-         optionThree.check(matches(isDisplayed()));
-
-         ViewInteraction thirdQuestionTitle = findQuestionTitle("3. cascade");
-         thirdQuestionTitle.check(matches(isDisplayed()));
-
-         ViewInteraction textView4 = onView(
-         allOf(withId(R.id.text), withText("1"),
-         childAtPosition(
-         childAtPosition(
-         withId(R.id.cascade_content),
-         0),
-         0),
-         isDisplayed()));
-         textView4.check(matches(withText("1")));
-
-         ViewInteraction textView5 = onView(
-         allOf(withId(R.id.cascade_spinner_item_text),
-         childAtPosition(
-         childAtPosition(
-         withId(R.id.spinner),
-         0),
-         0),
-         isDisplayed()));
-         textView5.check(matches(withText("please select")));
-
-         ViewInteraction spinner = onView(
-         allOf(withId(R.id.spinner),
-         childAtPosition(
-         childAtPosition(
-         withId(R.id.cascade_content),
-         0),
-         1)));
-         spinner.check(matches(isDisplayed()));
-
-         ViewInteraction fourthQuestionTitle = findQuestionTitle("4. number*");
-         fourthQuestionTitle.check(matches(isDisplayed()));
-
-         ViewInteraction questionHelpTip = onView(
-         allOf(withId(R.id.tip_ib),
-         childAtPosition(linearLayoutChild(0), 1), isDisplayed()));
-         questionHelpTip.check(matches(isDisplayed()));
-
-         ViewInteraction fourthQuestionInputOne = onView(
-         allOf(withId(R.id.input_et),
-         questionListItem(3),
-         isDisplayed()));
-         fourthQuestionInputOne.check(matches(withText("")));
-
-         ViewInteraction fourthQuestionRepeatTitle = onView(
-         allOf(withId(R.id.double_entry_title), withText("Please, repeat answer"),
-         childAtPosition(childAtPosition(withId(R.id.question_list), 3), 2)));
-         fourthQuestionRepeatTitle.check(matches(isDisplayed()));
-
-         ViewInteraction fourthQuestionInput2 = onView(
-         allOf(withId(R.id.double_entry_et),
-         childAtPosition(
-         childAtPosition(
-         withId(R.id.question_list),
-         3),
-         3),
-         isDisplayed()));
-         fourthQuestionInput2.check(matches(withText("")));
-         fourthQuestionInput2.perform(click());
-         fourthQuestionInput2.perform(closeSoftKeyboard());
-
-         ViewInteraction fifthQuestionTitle = findQuestionTitle("5. geolocation");
-         fifthQuestionTitle.check(matches(isDisplayed()));
-
-         ViewInteraction latitudeLabel = onView(
-         allOf(withText("Lat"),
-         getRowCell(0, 0)));
-         latitudeLabel.check(matches(isDisplayed()));
-
-
-         ViewInteraction latitudeInput = onView(
-         allOf(withId(R.id.lat_et),
-         getRowCell(1, 0),
-         isDisplayed()));
-         latitudeInput.check(matches(withText("")));
-         latitudeInput.perform(click());
-         latitudeInput.perform(closeSoftKeyboard());
-
-         ViewInteraction longitudeLabel = onView(
-         allOf(withText("Lon"),
-         getRowCell(0, 1)));
-         longitudeLabel.check(matches(isDisplayed()));
-
-         ViewInteraction longitudeInput = onView(
-         allOf(withId(R.id.lon_et),
-         getRowCell(1, 1),
-         isDisplayed()));
-         longitudeInput.check(matches(withText("")));
-         longitudeInput.perform(click());
-         longitudeInput.perform(closeSoftKeyboard());
-
-         ViewInteraction heightLabel = onView(
-         allOf(withText("Height"),
-         getRowCell(0, 2)));
-         heightLabel.check(matches(withText("Height")));
-
-         ViewInteraction heightInput = onView(
-         allOf(withId(R.id.height_et),
-         getRowCell(1, 2)));
-         heightInput.check(matches(withText("")));
-         heightInput.perform(click());
-         heightInput.perform(closeSoftKeyboard());
-
-         ViewInteraction accuracyLabel = onView(
-         allOf(withId(R.id.acc_tv), withText("Accuracy: unknown"),
-         getRowCell(0, 3)));
-         accuracyLabel.check(matches(withText("Accuracy: unknown")));
-
-         ViewInteraction geoButton = onView(
-         allOf(withId(R.id.geo_btn),
-         childAtPosition(
-         childAtPosition(
-         withId(R.id.question_list),
-         4),
-         2),
-         isDisplayed()));
-         geoButton.check(matches(withText(R.string.getgeo)));
-         geoButton.check(matches(isEnabled()));
-
-         ViewInteraction sixthQuestionTitle = findQuestionTitle("6. photo");
-         sixthQuestionTitle.check(matches(isDisplayed()));
-
-         ViewInteraction photoButton = onView(
-         allOf(withId(R.id.media_btn),
-         withText(R.string.takephoto))).perform(ViewActions.scrollTo());
-         photoButton.check(matches(isDisplayed()));
-
-         ViewInteraction seventhQuestionLabel = findQuestionTitle("7. video");
-         seventhQuestionLabel.check(matches(isDisplayed()));
-
-         ViewInteraction videoButton = onView(
-         allOf(withId(R.id.media_btn),
-         withText(R.string.takevideo))).perform(scrollTo());
-         videoButton.check(matches(isDisplayed()));
-
-         ViewInteraction eightQuestionTitle = findQuestionTitle("8. date*")
-         .perform(scrollTo());
-         eightQuestionTitle.check(matches(isDisplayed()));
-
-         ViewInteraction dateInput = onView(withId(R.id.date_et)).perform(scrollTo());
-         dateInput.check(matches(isDisplayed()));
-         dateInput.check(matches(withText("")));
-
-         ViewInteraction dateButton = onView(withId(R.id.date_btn)).perform(scrollTo());
-         dateButton.check(matches(withText(R.string.pickdate)));
-         dateButton.check(matches(isDisplayed()));
-
-         ViewInteraction ninthQuestionLabel = findQuestionTitle("9. barcode").perform(scrollTo());
-         ninthQuestionLabel.check(matches(isDisplayed()));
-
-         ViewInteraction barcodeInput = onView(withId(R.id.barcode_input)).perform(scrollTo());
-         barcodeInput.check(matches(withHint(R.string.type_code)));
-         barcodeInput.check(matches(withText("")));
-         barcodeInput.check(matches(isDisplayed()));
-
-         ViewInteraction barcodeManualSeparator = onView(withId(R.id.barcode_manual_input_separator))
-         .perform(scrollTo());
-         barcodeManualSeparator.check(matches(withText(R.string.or)));
-         barcodeManualSeparator.check(matches(isDisplayed()));
-
-         ViewInteraction scanButton = onView(withId(R.id.scan_btn)).perform(scrollTo());
-         scanButton
-         .check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.scanbarcode))));
-
-         ViewInteraction tenthQuestionLabel = findQuestionTitle("10. geoshape").perform(scrollTo());
-         tenthQuestionLabel.check(matches(isDisplayed()));
-
-         ViewInteraction captureShapeButton = onView(withId(R.id.capture_shape_btn)).perform(scrollTo());
-         captureShapeButton.check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.capture_shape))));
-
-         ViewInteraction eleventhQuestionLabel = findQuestionTitle("11. signature").perform(scrollTo());
-         eleventhQuestionLabel.check(matches(isDisplayed()));
-
-         ViewInteraction signatureButton = onView(withId(R.id.sign_btn)).perform(scrollTo());
-         signatureButton.check(matches(
-         allOf(isDisplayed(), isEnabled(), withText(R.string.add_signature))));
-
-         ViewInteraction twelfthQuestionLabel = findQuestionTitle("12. caddisfly")
-         .perform(scrollTo());
-         twelfthQuestionLabel.check(matches(isDisplayed()));
-
-         ViewInteraction caddisflyButton = onView(withId(R.id.caddisfly_button)).perform(scrollTo());
-         caddisflyButton.check(matches(
-         allOf(isDisplayed(), isEnabled(), withText(R.string.caddisfly_test))));
-
-         Espresso.onView(ViewMatchers.withId(R.id.scroller)).perform(ViewActions.swipeUp());
-
-         ViewInteraction nextButton = onView(withId(R.id.next_btn));
-         nextButton.check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.nextbutton))));
-
-         ViewInteraction submitTab = onView(
-         allOf(childAtPosition(childAtPosition(withId(R.id.tabs), 0), 1), isDisplayed()));
-         submitTab.perform(click());
-
-         ViewInteraction submitTabHeader = onView(withId(R.id.submit_tab_header));
-         submitTabHeader.check(matches(withText(R.string.error_responses)));
-
-         ViewInteraction textView22 = onView(
-         allOf(withId(R.id.question_tv), withText("4. number*"),
-         childAtPosition(
-         linearLayoutChild(0),
-         0),
-         isDisplayed()));
-         textView22.check(matches(withText("4. number*")));
-
-         ViewInteraction imageButton2 = onView(
-         allOf(withId(R.id.tip_ib),
-         childAtPosition(
-         linearLayoutChild(0),
-         1),
-         isDisplayed()));
-         imageButton2.check(matches(isDisplayed()));
-
-         ViewInteraction imageView = onView(
-         allOf(withId(R.id.open_btn),
-         childAtPosition(
-         linearLayoutChild(0),
-         2),
-         isDisplayed()));
-         imageView.check(matches(isDisplayed()));
-
-         ViewInteraction textView23 = onView(
-         allOf(withId(R.id.question_tv), withText("1. text question*"),
-         childAtPosition(
-         linearLayoutChild(0),
-         0),
-         isDisplayed()));
-         textView23.check(matches(withText("1. text question*")));
-
-         ViewInteraction imageView2 = onView(
-         allOf(withId(R.id.open_btn),
-         childAtPosition(
-         linearLayoutChild(0),
-         1),
-         isDisplayed()));
-         imageView2.check(matches(isDisplayed()));
-
-         ViewInteraction textView24 = onView(
-         allOf(withId(R.id.question_tv), withText("8. date*"),
-         childAtPosition(
-         linearLayoutChild(0),
-         0),
-         isDisplayed()));
-         textView24.check(matches(withText("8. date*")));
-
-         ViewInteraction imageView3 = onView(
-         allOf(withId(R.id.open_btn),
-         childAtPosition(
-         linearLayoutChild(0),
-         1),
-         isDisplayed()));
-         imageView3.check(matches(isDisplayed()));
-
-         ViewInteraction textView25 = onView(
-         allOf(withId(R.id.question_tv), withText("2. option*"),
-         childAtPosition(
-         linearLayoutChild(0),
-         0),
-         isDisplayed()));
-         textView25.check(matches(withText("2. option*")));
-
-         ViewInteraction imageView4 = onView(
-         allOf(withId(R.id.open_btn),
-         childAtPosition(
-         linearLayoutChild(0),
-         1),
-         isDisplayed()));
-         imageView4.check(matches(isDisplayed()));
-
-         ViewInteraction sendButton = onView(
-         allOf(childAtPosition(
-         withParent(withId(R.id.pager)),
-         5),
-         isDisplayed()));
-         sendButton.check(matches(not(isEnabled()))); **/
     }
 
     private void verifyToolBar() {
@@ -465,6 +164,46 @@ public class SurveyActivityTest {
         submitTab.perform(click());
         submitTab.check(matches(isDisplayed()));
         submitTab.check(matches(hasDescendant(withText(R.string.submitbutton))));
+        if (mandatoryQuestions.isEmpty()) {
+            ViewInteraction submitTabHeader = onView(withId(R.id.submit_tab_header));
+            submitTabHeader.check(matches(withText(R.string.error_empty_form)));
+        } else {
+            ViewInteraction submitTabHeader = onView(withId(R.id.submit_tab_header));
+            submitTabHeader.check(matches(withText(R.string.error_responses)));
+            verifyErrorFields(mandatoryQuestions);
+        }
+        ViewInteraction submitButton = onView(withId(R.id.submit_tab_button));
+        submitButton.check(matches(
+                allOf(isDisplayed(), withText(R.string.submitbutton), not(isEnabled()))));
+    }
+
+    private void verifyErrorFields(List<Question> mandatoryQuestions) {
+        for (Question question : mandatoryQuestions) {
+            verifyQuestionErrorHeader(question);
+            verifyQuestionErrorTip(question);
+            verifyQuestionErrorEditButton(question);
+        }
+    }
+
+    private void verifyQuestionErrorEditButton(Question question) {
+        ViewInteraction questionHelpTip = onView(allOf(withId(R.id.invalid_question_open_btn),
+                withViewParent(question, QuestionHeaderView.class)));
+        questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
+    }
+
+    private void verifyQuestionErrorTip(Question question) {
+        if (question.getHelpTypeCount() > 0) {
+            ViewInteraction questionHelpTip = onView(allOf(withId(R.id.tip_ib),
+                    withViewParent(question, QuestionHeaderView.class)));
+            questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
+        }
+    }
+
+    private void verifyQuestionErrorHeader(Question question) {
+        String questionHeader = getQuestionHeader(question);
+        ViewInteraction questionHeaderView = onView(allOf(withId(R.id.question_tv),
+                withViewParent(question, QuestionHeaderView.class)));
+        questionHeaderView.check(matches(allOf(isDisplayed(), withText(questionHeader))));
     }
 
     private void verifyQuestionDisplayed(Question question, int questionPosition) {
@@ -533,8 +272,7 @@ public class SurveyActivityTest {
     private void verifyCaddisflyQuestionView(Question question) {
         ViewInteraction caddisflyButton = onView(allOf(withId(R.id.caddisfly_button),
                 withViewParent(question, CaddisflyQuestionView.class))).perform(scrollTo());
-        caddisflyButton.check(matches(
-                allOf(isDisplayed(), isEnabled(), withText(R.string.caddisfly_test))));
+        caddisflyButton.check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.caddisfly_test))));
     }
 
     private void verifySignatureQuestionView(Question question) {
@@ -563,7 +301,8 @@ public class SurveyActivityTest {
         boolean manualInputEnabled = !question.isLocked();
         if (manualInputEnabled) {
             ViewInteraction barcodeInput = onView(allOf(withId(R.id.barcode_input),
-                    withViewParent(question, BarcodeQuestionViewMultiple.class))).perform(scrollTo());
+                    withViewParent(question, BarcodeQuestionViewMultiple.class)))
+                    .perform(scrollTo());
             barcodeInput.check(matches(withHint(R.string.type_code)));
             barcodeInput.check(matches(withText("")));
             barcodeInput.check(matches(isDisplayed()));
@@ -728,7 +467,6 @@ public class SurveyActivityTest {
     }
 
     private void verifyFreeTextQuestionView(Question question) {
-        //TODO: add number verifications
         ViewInteraction freeTextQuestionInput = onView(
                 allOf(withId(R.id.input_et), withViewParent(question, FreetextQuestionView.class)));
         freeTextQuestionInput.check(matches(withText("")));
@@ -762,7 +500,6 @@ public class SurveyActivityTest {
         List<Option> options = question.getOptions();
         if (options != null) {
             if (question.isAllowMultiple()) {
-                //checkboxes
                 for (int i = 0; i < options.size(); i++) {
                     Option option = options.get(i);
                     ViewInteraction checkBox = checkBoxWithText(option, i, questionPosition);
@@ -792,14 +529,6 @@ public class SurveyActivityTest {
                         optionPosition + 1), withText(option.getText())));
     }
 
-    @NonNull
-    private Matcher<View> getRowCell(int position, int parentPosition) {
-        return childAtPosition(
-                childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.TableLayout.class),
-                        parentPosition),
-                position);
-    }
-
     private ViewInteraction radioButtonWithText(Option option, int childPosition) {
         if (option.isOther()) {
             return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
@@ -815,17 +544,12 @@ public class SurveyActivityTest {
     }
 
     @NonNull
-    private Matcher<View> questionListItem(int position) {
-        return childAtPosition(childAtPosition(withId(R.id.question_list), position), 1);
-    }
-
-    @NonNull
     private Matcher<View> linearLayoutChild(int position) {
         return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                 position);
     }
 
-    static void addExecutionDelay(int millis) {
+    private static void addExecutionDelay(int millis) {
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html

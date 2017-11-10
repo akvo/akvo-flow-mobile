@@ -472,6 +472,7 @@ public class FormActivityTest {
     private void verifyFreeTextQuestionView(Question question) {
         ViewInteraction freeTextQuestionInput = onView(
                 allOf(withId(R.id.input_et), withQuestionViewParent(question, FreetextQuestionView.class)));
+        freeTextQuestionInput.perform(scrollTo());
         freeTextQuestionInput.check(matches(withText("")));
         freeTextQuestionInput.perform(click());
         freeTextQuestionInput.perform(closeSoftKeyboard());

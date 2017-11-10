@@ -90,7 +90,7 @@ import static org.hamcrest.core.IsNot.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class SurveyActivityTest {
+public class FormActivityTest {
 
     private static SurveyInstaller installer;
     private static Survey survey;

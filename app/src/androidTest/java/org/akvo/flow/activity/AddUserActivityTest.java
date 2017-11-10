@@ -23,7 +23,7 @@ package org.akvo.flow.activity;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.MediumTest;
 
 import org.akvo.flow.R;
 import org.junit.Rule;
@@ -43,7 +43,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4.class)
 public class AddUserActivityTest {
 
@@ -55,21 +55,21 @@ public class AddUserActivityTest {
     public void testAddUser() {
         ViewInteraction nameEditText = onView(
                 allOf(withId(R.id.username), isDisplayed()));
-        nameEditText.check(matches(withHint("Username")));
+        nameEditText.check(matches(withHint(R.string.username)));
 
         ViewInteraction deviceEditText = onView(
                 allOf(withId(R.id.device_id), isDisplayed()));
-        deviceEditText.check(matches(withHint("Device Identifier")));
+        deviceEditText.check(matches(withHint(R.string.identlabel)));
 
         ViewInteraction button = onView(
                 allOf(withId(R.id.login_btn), isDisplayed()));
         button.check(matches(not(isEnabled())));
 
         nameEditText.perform(click());
-        nameEditText.perform(replaceText("valeria_emulator"), closeSoftKeyboard());
+        nameEditText.perform(replaceText("test_username"), closeSoftKeyboard());
         nameEditText.perform(pressImeActionButton());
 
-        deviceEditText.perform(replaceText("valeria_emulator"), closeSoftKeyboard());
+        deviceEditText.perform(replaceText("test_device"), closeSoftKeyboard());
 
         button.check(matches(isEnabled()));
         deviceEditText.perform(pressImeActionButton());

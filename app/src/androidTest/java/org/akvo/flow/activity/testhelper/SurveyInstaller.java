@@ -20,6 +20,7 @@
 package org.akvo.flow.activity.testhelper;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -31,6 +32,8 @@ import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.domain.Question;
+import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
@@ -43,6 +46,7 @@ import org.akvo.flow.util.FileUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,10 +79,29 @@ public class SurveyInstaller {
         Survey survey = null;
         try {
             survey = persistSurvey(FileUtil.readText(input));
+            installCascades(survey, context);
         } catch (IOException e) {
             Log.e(TAG, "Error installing survey");
         }
         return survey;
+    }
+
+    private void installCascades(Survey survey, Context context) throws IOException {
+        for (QuestionGroup group : survey.getQuestionGroups()) {
+            for (Question question : group.getQuestions()) {
+                String cascadeFileName = question.getSrc();
+                if (!TextUtils.isEmpty(cascadeFileName)) {
+                    String cascadeResourceName = cascadeFileName.replace(".sqlite", "");
+                    cascadeResourceName = cascadeResourceName.replaceAll("-", "_");
+                    int cascadeResId = context.getResources()
+                            .getIdentifier(cascadeResourceName, "raw", context.getPackageName());
+                    FileOutputStream output = new FileOutputStream(
+                            new File(FileUtil.getFilesDir(FileUtil.FileType.RES), cascadeFileName));
+                    InputStream input = context.getResources().openRawResource(cascadeResId);
+                    FileUtil.copy(input, output);
+                }
+            }
+        }
     }
 
     /**

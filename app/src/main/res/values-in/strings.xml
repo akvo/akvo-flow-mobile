@@ -34,7 +34,6 @@
   <string name="langoption">Bahasa</string>
   <string name="langmandatorytitle">Pilihan Invalid</string>
   <string name="langmandatorytext">Anda harus memilih sedikitnya satu bahasa</string>
-  <string name="pleasewait">Mohon tunggu</string>
   <string name="downloadsurveylabel">Mengunduh Formulir</string>
   <string name="downloadsurveyinstr">Masukkan identitas formulir yang ingin Anda unduh.</string>
   <string name="deletealldatawarning">Proses ini akan menghapus semua data (survei, respon, gambar, dan pengguna) di perangkat ini secara permanen. Data yang hilang tidak akan dapat dikembalikan. Klik OK untuk melanjutkan atau batal untuk membatalkan</string>
@@ -69,13 +68,8 @@
   <string name="sync">Sinkronisasi</string>
   <string name="sort">Sortir</string>
   <string name="stats">Statistik</string>
-  <string name="syncing_records">Sinkronisasi Data Point...</string>
-  <string name="synced_records">Menyinkronisasi %1$d Data Point</string>
-  <string name="sync_error">Sinkronisasi Data Point gagal</string>
-  <string name="network_error">Kesalahan Jaringan</string>
   <string name="prefill_title">Mengisi respons awal</string>
   <string name="prefill_text">Mengisi formulir dengan jawaban sebelumnya?</string>
-  <string name="error_assignment_text">Membutuhkan penugasan dalam dasbor Akvo Flow.</string>
   <!--Data sync-->
   <string name="data_sync_all">Sinkronisasi formulir: %1$d - Gagal: %2$d</string>
   <string name="data_sync_synced">Sinkronisasi Formulir: %1$d</string>
@@ -104,10 +98,6 @@
   <string name="or">atau</string>
   <string name="capture_shape">Rekam bentuk</string>
   <string name="view_shape">Tayangkan bentuk</string>
-  <string name="clear_point_title">Hapus titik</string>
-  <string name="clear_point_text">Apakah Anda ingin menghapus titik ini?</string>
-  <string name="clear_feature_title">Hapus fitur</string>
-  <string name="clear_feature_text">Apakah Anda ingin menghapus fitur ini?</string>
   <string name="repeat_group">Ulang grup</string>
   <string name="repetitions">Pengulangan:</string>
   <string name="view_map">Lihat peta</string>
@@ -189,9 +179,9 @@
   <string name="clearbutton">Bersihkan</string>
   <string name="yes">Ya</string>
   <string name="no">Tidak</string>
-  <string name="action_retry">Coba kembali</string>
   <string name="delete">Hapus</string>
   <string name="drawer_open">Laci terbuka</string>
   <string name="drawer_close">Laci tertutup</string>
   <!--app update service-->
+  <!--Verify if this works for transifex-->
 </resources>

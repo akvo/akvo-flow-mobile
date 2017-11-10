@@ -38,6 +38,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,6 +49,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -84,6 +88,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     private TextView emptyTitleTv;
     private TextView emptySubTitleTv;
+    private ImageView emptyIv;
     private ProgressBar progressBar;
 
     /**
@@ -102,6 +107,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     DataPointsListPresenter presenter;
 
     private boolean displayMonitoredMenu;
+    private SearchView searchView;
 
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
@@ -134,7 +140,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.surveyed_locales_list_fragment, container, false);
+        return inflater.inflate(R.layout.data_points_list_fragment, container, false);
     }
 
     @Override
@@ -148,6 +154,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         listView.setEmptyView(emptyView);
         emptyTitleTv = (TextView) view.findViewById(R.id.empty_title_tv);
         emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
+        emptyIv = (ImageView) view.findViewById(R.id.empty_iv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
@@ -191,14 +198,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onResume() {
         super.onResume();
 
-        // try to find out where we are
-        updateLocation();
-
-        // Listen for data sync updates, so we can update the UI accordingly
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
-        presenter.loadDataPoints();
+        if (searchView == null || searchView.isIconified()) {
+            updateLocation();
+            presenter.loadDataPoints();
+        }
     }
 
     private void updateLocation() {
@@ -262,6 +268,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 R.string.no_records_subtitle_monitored :
                 R.string.no_records_subtitle_non_monitored;
         emptySubTitleTv.setText(subtitleResource);
+        emptyIv.setImageResource(R.drawable.ic_format_list_bulleted);
     }
 
     @Override
@@ -294,7 +301,47 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         } else {
             inflater.inflate(R.menu.datapoints_list, menu);
         }
+
+        setUpSearchView(menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void setUpSearchView(final Menu menu) {
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        searchView.setIconifiedByDefault(true);
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Empty
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!TextUtils.isEmpty(newText)) {
+                    presenter.getFilteredDataPoints(newText);
+                } else {
+                    presenter.loadDataPoints();
+                }
+                return false;
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem,
+                new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        // EMPTY
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        presenter.loadDataPoints();
+                        return true;
+                    }
+                });
     }
 
     @Override
@@ -409,6 +456,19 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 presenter.onSyncRecordsPressed();
             }
         });
+    }
+
+    @Override
+    public void displayNoSearchResultsFound() {
+        if (emptyTitleTv != null) {
+            emptyTitleTv.setText(R.string.no_search_results_error_text);
+        }
+        if (emptySubTitleTv != null) {
+            emptySubTitleTv.setText("");
+        }
+        if (emptyIv != null) {
+            emptyIv.setImageResource(R.drawable.ic_search_results_error);
+        }
     }
 
     //TODO: once we insert data using brite database this will no longer be necessary either

@@ -51,4 +51,6 @@ interface DataPointsListView {
     void showOrderByDialog(int orderBy);
 
     void showErrorAssignmentMissing();
+
+    void displayNoSearchResultsFound();
 }

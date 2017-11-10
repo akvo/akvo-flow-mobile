@@ -40,6 +40,8 @@ public class SharedPreferencesDataSource {
     public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     public static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
+    private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
+    private static final long NO_SURVEY_SELECTED = -1;
 
     private final SharedPreferences preferences;
 
@@ -68,12 +70,33 @@ public class SharedPreferencesDataSource {
         return Observable.just(getString(KEY_DEVICE_IDENTIFIER, DEFAULT_VALUE_DEVICE_IDENTIFIER));
     }
 
-    private int getInt(String key, int defaultValue) {
-        return preferences.getInt(key, defaultValue);
+    public Observable<Long> getSelectedSurvey() {
+        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, NO_SURVEY_SELECTED));
+    }
+
+    public Observable<Boolean> setSelectedSurvey(long surveyId) {
+        setLong(KEY_SURVEY_GROUP_ID, surveyId);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearSelectedSurvey() {
+        return setSelectedSurvey(NO_SURVEY_SELECTED);
     }
 
     private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
+    }
+
+    private long getLong(String key, long defValue) {
+        return preferences.getLong(key, defValue);
+    }
+
+    private void setLong(String key, long value) {
+        preferences.edit().putLong(key, value).apply();
+    }
+
+    private int getInt(String key, int defValue) {
+        return preferences.getInt(key, defValue);
     }
 
     public void removePreference(String key) {

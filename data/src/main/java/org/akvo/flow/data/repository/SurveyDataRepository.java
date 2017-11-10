@@ -27,9 +27,11 @@ import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
+import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.reactivestreams.Publisher;
@@ -59,15 +61,28 @@ public class SurveyDataRepository implements SurveyRepository {
     private final DataPointMapper dataPointMapper;
     private final SyncedTimeMapper syncedTimeMapper;
     private final FlowRestApi restApi;
+    private final SurveyMapper surveyMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper,
-            FlowRestApi restApi) {
+            FlowRestApi restApi, SurveyMapper surveyMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
         this.restApi = restApi;
+        this.surveyMapper = surveyMapper;
+    }
+
+    @Override
+    public Observable<List<Survey>> getSurveys() {
+        return dataSourceFactory.getDataBaseDataSource().getSurveys()
+                .map(new Function<Cursor, List<Survey>>() {
+                    @Override
+                    public List<Survey> apply(Cursor cursor) {
+                        return surveyMapper.getSurveys(cursor);
+                    }
+                });
     }
 
     @Override
@@ -229,5 +244,10 @@ public class SurveyDataRepository implements SurveyRepository {
         List<ApiDataPoint> getLastBatch() {
             return lastBatch;
         }
+    }
+
+    @Override
+    public Observable<Boolean> deleteSurvey(long surveyToDeleteId) {
+        return dataSourceFactory.getDataBaseDataSource().deleteSurvey(surveyToDeleteId);
     }
 }

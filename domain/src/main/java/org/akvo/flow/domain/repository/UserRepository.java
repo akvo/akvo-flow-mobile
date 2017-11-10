@@ -41,4 +41,10 @@ public interface UserRepository {
     Observable<Boolean> saveLanguagePreference(String language);
 
     Observable<Boolean> saveImageSizePreference(Integer size);
+
+    Observable<Long> getSelectedSurvey();
+
+    Observable<Boolean> clearSelectedSurvey();
+
+    Observable<Boolean> setSelectedSurvey(long surveyGroupId);
 }

@@ -29,6 +29,8 @@ import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.database.SurveyColumns;
+import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
@@ -288,5 +290,29 @@ public class BriteSurveyDbAdapter {
                 + " WHERE " + RecordColumns.RECORD_ID + " NOT IN "
                 + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
                 + " FROM " + Tables.SURVEY_INSTANCE + ")");
+    }
+
+    public Observable<Boolean> deleteSurvey(long surveyGroupId) {
+        briteDatabase.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
+        briteDatabase.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getSurveys() {
+        String sqlQuery = "SELECT * FROM " + Tables.SURVEY_GROUP;
+        return briteDatabase
+                .createQuery(Tables.SURVEY_GROUP, sqlQuery)
+                .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
+                    @Override
+                    public Observable<? extends Cursor> apply(SqlBrite.Query query) {
+                        return Observable.just(query.run());
+                    }
+                });
+    }
+
+    public void addSurveyGroup(ContentValues values) {
+        briteDatabase.insert(Tables.SURVEY_GROUP, values);
     }
 }

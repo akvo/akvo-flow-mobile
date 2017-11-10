@@ -31,8 +31,8 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.testhelper.SurveyInstaller;
-import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;

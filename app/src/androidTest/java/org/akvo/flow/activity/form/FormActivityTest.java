@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity;
+package org.akvo.flow.activity.form;
 
 import android.content.Context;
 import android.content.Intent;
@@ -32,8 +32,9 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.testhelper.SurveyInstaller;
-import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
@@ -80,7 +81,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
-import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
 import static org.akvo.flow.tests.R.raw.test_form;

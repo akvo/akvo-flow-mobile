@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity;
+package org.akvo.flow.activity.form;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +28,8 @@ import android.support.test.espresso.ViewInteraction;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.Constants;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -48,7 +50,7 @@ import static org.hamcrest.Matchers.not;
 public class FormActivityTestUtil {
 
     @NonNull
-    static Intent getFormActivityIntent(long surveyGroupId, String formId, String formTitle) {
+    public static Intent getFormActivityIntent(long surveyGroupId, String formId, String formTitle) {
         Context targetContext = InstrumentationRegistry.getInstrumentation()
                 .getTargetContext();
         Intent result = new Intent(targetContext, FormActivity.class);
@@ -61,27 +63,27 @@ public class FormActivityTestUtil {
         return result;
     }
 
-    static void verifySubmitButtonEnabled() {
+    public static void verifySubmitButtonEnabled() {
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches(isEnabled()));
     }
 
-    static void verifySubmitButtonDisabled() {
+    public static void verifySubmitButtonDisabled() {
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches(not(isEnabled())));
     }
 
-    static ViewInteraction matchToolbarTitle(String title) {
+    public static ViewInteraction matchToolbarTitle(String title) {
         return onView(allOf(instanceOf(TextView.class), withParent(withId(R.id.toolbar)),
                 withText(title)))
                 .check(matches(isDisplayed()));
     }
 
-    static void verifyQuestionTitleDisplayed() {
+    public static void verifyQuestionTitleDisplayed() {
         onView(withId(R.id.question_tv)).check(matches(isDisplayed()));
     }
 
-    static void clickNext() {
+    public static void clickNext() {
         onView(withId(R.id.next_btn)).perform(click());
     }
 }

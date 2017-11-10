@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity;
+package org.akvo.flow.activity.form.views;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,8 +29,9 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.testhelper.SurveyInstaller;
-import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -44,16 +45,16 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
-import static org.akvo.flow.activity.FormActivityTestUtil.clickNext;
-import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.FormActivityTestUtil.verifyQuestionTitleDisplayed;
-import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
-import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.freetextsurvey;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class FreeTextFormActivityTest {
+public class FreeTextQuestionViewTest {
 
     private static SurveyInstaller installer;
 

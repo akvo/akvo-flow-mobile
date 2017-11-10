@@ -192,6 +192,8 @@ public class DataPointsListPresenter implements Presenter {
                 if (result.getResultCode() == SUCCESS) {
                     if (result.getNumberOfSyncedItems() > 0) {
                         view.showSyncedResults(result.getNumberOfSyncedItems());
+                    } else {
+                        view.showNoDataPointsToSync();
                     }
                 } else {
                     switch (result.getResultCode()) {

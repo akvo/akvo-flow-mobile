@@ -1,5 +1,13 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.0.2
+Date: 18 October 2017
+
+# Resolved issues
+* **Missing datapoint history** - [#899](https://github.com/akvo/akvo-flow-mobile/issues/899) Fixed answers missing in point history.
+* **Unable to delete saved answers (crash)** - [#893](https://github.com/akvo/akvo-flow-mobile/issues/893) Fixed a crash when deleting saved entry in history tab.
+
+---------------
 # ver 2.4.0.1
 Date: 16 October 2017
 

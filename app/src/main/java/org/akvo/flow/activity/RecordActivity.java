@@ -143,7 +143,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.datapoint_activity, menu);
+        getMenuInflater().inflate(R.menu.record_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

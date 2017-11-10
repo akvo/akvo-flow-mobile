@@ -46,6 +46,7 @@ import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.MediaQuestionView;
+import org.akvo.flow.ui.view.QuestionGroupTab;
 import org.akvo.flow.ui.view.QuestionHeaderView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
@@ -81,9 +82,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.tests.R.raw.test_form;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
@@ -147,6 +148,7 @@ public class FormActivityTest {
                 }
                 verifyQuestionDisplayed(question, j);
             }
+            verifyNextButton(group);
         }
 
         verifySubmitTab(questionGroups, mandatoryQuestions);
@@ -188,14 +190,14 @@ public class FormActivityTest {
 
     private void verifyQuestionErrorEditButton(Question question) {
         ViewInteraction questionHelpTip = onView(allOf(withId(R.id.invalid_question_open_btn),
-                withViewParent(question, QuestionHeaderView.class)));
+                withQuestionViewParent(question, QuestionHeaderView.class)));
         questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
     }
 
     private void verifyQuestionErrorTip(Question question) {
         if (question.getHelpTypeCount() > 0) {
             ViewInteraction questionHelpTip = onView(allOf(withId(R.id.tip_ib),
-                    withViewParent(question, QuestionHeaderView.class)));
+                    withQuestionViewParent(question, QuestionHeaderView.class)));
             questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
         }
     }
@@ -203,7 +205,7 @@ public class FormActivityTest {
     private void verifyQuestionErrorHeader(Question question) {
         String questionHeader = getQuestionHeader(question);
         ViewInteraction questionHeaderView = onView(allOf(withId(R.id.question_tv),
-                withViewParent(question, QuestionHeaderView.class)));
+                withQuestionViewParent(question, QuestionHeaderView.class)));
         questionHeaderView.check(matches(allOf(isDisplayed(), withText(questionHeader))));
     }
 
@@ -212,18 +214,18 @@ public class FormActivityTest {
         verifyQuestionHeader(questionHeader);
         verifyHelpTip(question);
         verifyQuestionView(question, questionPosition);
-        verifyNextButton();
     }
 
-    private void verifyNextButton() {
-        ViewInteraction nextButton = onView(withId(R.id.next_btn));
+    private void verifyNextButton(QuestionGroup group) {
+        ViewInteraction nextButton = onView(
+                allOf(withId(R.id.next_btn), withQuestionGroupViewParent(group)));
         nextButton.check(matches(allOf(isEnabled(), withText(R.string.nextbutton))));
     }
 
     private void verifyHelpTip(Question question) {
         if (question.getHelpTypeCount() > 0) {
             ViewInteraction questionHelpTip = onView(
-                    allOf(withId(R.id.tip_ib), withViewParent(question, QuestionView.class)));
+                    allOf(withId(R.id.tip_ib), withQuestionViewParent(question, QuestionView.class)));
             questionHelpTip.perform(scrollTo());
             questionHelpTip.check(matches(isDisplayed()));
             questionHelpTip.check(matches(isEnabled()));
@@ -272,20 +274,20 @@ public class FormActivityTest {
 
     private void verifyCaddisflyQuestionView(Question question) {
         ViewInteraction caddisflyButton = onView(allOf(withId(R.id.caddisfly_button),
-                withViewParent(question, CaddisflyQuestionView.class))).perform(scrollTo());
+                withQuestionViewParent(question, CaddisflyQuestionView.class))).perform(scrollTo());
         caddisflyButton.check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.caddisfly_test))));
     }
 
     private void verifySignatureQuestionView(Question question) {
         ViewInteraction signatureButton = onView(allOf(withId(R.id.sign_btn),
-                withViewParent(question, SignatureQuestionView.class))).perform(scrollTo());
+                withQuestionViewParent(question, SignatureQuestionView.class))).perform(scrollTo());
         signatureButton.check(matches(
                 allOf(isDisplayed(), isEnabled(), withText(R.string.add_signature))));
     }
 
     private void verifyGeoShapeQuestionView(Question question) {
         ViewInteraction captureShapeButton = onView(allOf(withId(R.id.capture_shape_btn),
-                withViewParent(question, GeoshapeQuestionView.class))).perform(scrollTo());
+                withQuestionViewParent(question, GeoshapeQuestionView.class))).perform(scrollTo());
         captureShapeButton.check(matches(
                 allOf(isDisplayed(), isEnabled(), withText(R.string.capture_shape))));
     }
@@ -302,27 +304,27 @@ public class FormActivityTest {
         boolean manualInputEnabled = !question.isLocked();
         if (manualInputEnabled) {
             ViewInteraction barcodeInput = onView(allOf(withId(R.id.barcode_input),
-                    withViewParent(question, BarcodeQuestionViewMultiple.class)))
+                    withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)))
                     .perform(scrollTo());
             barcodeInput.check(matches(withHint(R.string.type_code)));
             barcodeInput.check(matches(withText("")));
             barcodeInput.check(matches(isDisplayed()));
 
             ViewInteraction addButton = onView(allOf(withId(R.id.barcode_add_btn),
-                    withViewParent(question, BarcodeQuestionViewMultiple.class)));
+                    withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)));
             addButton.perform(scrollTo());
             addButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
 
             ViewInteraction barcodeManualSeparator = onView(
                     allOf(withId(R.id.barcode_manual_input_separator),
-                            withViewParent(question, BarcodeQuestionViewMultiple.class)))
+                            withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)))
                     .perform(scrollTo());
             barcodeManualSeparator.check(matches(withText(R.string.or)));
             barcodeManualSeparator.check(matches(isDisplayed()));
         }
 
         ViewInteraction scanButton = onView(allOf(withId(R.id.scan_btn),
-                withViewParent(question, BarcodeQuestionViewMultiple.class))).perform(scrollTo());
+                withQuestionViewParent(question, BarcodeQuestionViewMultiple.class))).perform(scrollTo());
         scanButton
                 .check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.scanbarcode))));
     }
@@ -331,34 +333,34 @@ public class FormActivityTest {
         boolean manualInputEnabled = !question.isLocked();
         if (manualInputEnabled) {
             ViewInteraction barcodeInput = onView(allOf(withId(R.id.barcode_input),
-                    withViewParent(question, BarcodeQuestionViewSingle.class))).perform(scrollTo());
+                    withQuestionViewParent(question, BarcodeQuestionViewSingle.class))).perform(scrollTo());
             barcodeInput.check(matches(withHint(R.string.type_code)));
             barcodeInput.check(matches(withText("")));
             barcodeInput.check(matches(isDisplayed()));
 
             ViewInteraction barcodeManualSeparator = onView(
                     allOf(withId(R.id.barcode_manual_input_separator),
-                            withViewParent(question, BarcodeQuestionViewSingle.class)))
+                            withQuestionViewParent(question, BarcodeQuestionViewSingle.class)))
                     .perform(scrollTo());
             barcodeManualSeparator.check(matches(withText(R.string.or)));
             barcodeManualSeparator.check(matches(isDisplayed()));
         }
 
         ViewInteraction scanButton = onView(allOf(withId(R.id.scan_btn),
-                withViewParent(question, BarcodeQuestionViewSingle.class))).perform(scrollTo());
+                withQuestionViewParent(question, BarcodeQuestionViewSingle.class))).perform(scrollTo());
         scanButton
                 .check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.scanbarcode))));
     }
 
     private void verifyDateQuestionView(Question question) {
         ViewInteraction dateInput = onView(
-                allOf(withId(R.id.date_et), withViewParent(question, DateQuestionView.class)))
+                allOf(withId(R.id.date_et), withQuestionViewParent(question, DateQuestionView.class)))
                 .perform(scrollTo());
         dateInput.check(matches(isDisplayed()));
         dateInput.check(matches(withText("")));
 
         ViewInteraction dateButton = onView(
-                allOf(withId(R.id.date_btn), withViewParent(question, DateQuestionView.class)))
+                allOf(withId(R.id.date_btn), withQuestionViewParent(question, DateQuestionView.class)))
                 .perform(scrollTo());
         dateButton.check(matches(isDisplayed()));
         dateButton.check(matches(isEnabled()));
@@ -367,7 +369,7 @@ public class FormActivityTest {
 
     private void verifyPhotoQuestionView(Question question) {
         ViewInteraction photoButton = onView(
-                allOf(withId(R.id.media_btn), withViewParent(question, MediaQuestionView.class)))
+                allOf(withId(R.id.media_btn), withQuestionViewParent(question, MediaQuestionView.class)))
                 .perform(ViewActions.scrollTo());
         photoButton.check(matches(withText(R.string.takephoto)));
         photoButton.check(matches(isDisplayed()));
@@ -375,7 +377,7 @@ public class FormActivityTest {
 
     private void verifyVideoQuestionView(Question question) {
         ViewInteraction videoButton = onView(
-                allOf(withId(R.id.media_btn), withViewParent(question, MediaQuestionView.class)))
+                allOf(withId(R.id.media_btn), withQuestionViewParent(question, MediaQuestionView.class)))
                 .perform(ViewActions.scrollTo());
         videoButton.check(matches(withText(R.string.takevideo)));
         videoButton.check(matches(isDisplayed()));
@@ -390,13 +392,13 @@ public class FormActivityTest {
         verifyGeoInput(question, R.id.height_et);
 
         ViewInteraction accuracyLabel = onView(
-                allOf(withId(R.id.acc_tv), withViewParent(question, GeoQuestionView.class)));
+                allOf(withId(R.id.acc_tv), withQuestionViewParent(question, GeoQuestionView.class)));
         accuracyLabel.perform(scrollTo());
         accuracyLabel.check(matches(isDisplayed()));
         accuracyLabel.check(matches(withText(R.string.geo_location_accuracy_default)));
 
         ViewInteraction geoButton = onView(
-                allOf(withId(R.id.geo_btn), withViewParent(question, GeoQuestionView.class)));
+                allOf(withId(R.id.geo_btn), withQuestionViewParent(question, GeoQuestionView.class)));
         geoButton.perform(scrollTo());
         geoButton.check(matches(withText(R.string.getgeo)));
         geoButton.check(matches(isEnabled()));
@@ -406,7 +408,7 @@ public class FormActivityTest {
     private void verifyGeoInput(Question question, int resId) {
         boolean isManualInputEnabled = !question.isLocked();
         ViewInteraction input = onView(
-                allOf(withId(resId), withViewParent(question, GeoQuestionView.class)));
+                allOf(withId(resId), withQuestionViewParent(question, GeoQuestionView.class)));
         input.perform(scrollTo());
         input.check(matches(isDisplayed()));
         input.check(matches(withText("")));
@@ -421,7 +423,7 @@ public class FormActivityTest {
 
     private void verifyGeoLabel(Question question, int resourceId) {
         ViewInteraction label = onView(
-                allOf(withText(resourceId), withViewParent(question, GeoQuestionView.class)));
+                allOf(withText(resourceId), withQuestionViewParent(question, GeoQuestionView.class)));
         label.perform(scrollTo());
         label.check(matches(isDisplayed()));
     }
@@ -432,21 +434,21 @@ public class FormActivityTest {
             Level level = levels.get(0);
             ViewInteraction firstLevelCascadeNumber = onView(
                     allOf(withId(R.id.cascade_level_number),
-                            withViewParent(question, CascadeQuestionView.class)));
+                            withQuestionViewParent(question, CascadeQuestionView.class)));
             firstLevelCascadeNumber.perform(scrollTo());
             firstLevelCascadeNumber.check(matches(isDisplayed()));
             firstLevelCascadeNumber.check(matches(withText(level.getText())));
 
             ViewInteraction firstLevelCascadeDescription = onView(
                     allOf(withId(R.id.cascade_spinner_item_text),
-                            withViewParent(question, CascadeQuestionView.class)));
+                            withQuestionViewParent(question, CascadeQuestionView.class)));
             firstLevelCascadeDescription.perform(scrollTo());
             firstLevelCascadeDescription.check(matches(isDisplayed()));
             firstLevelCascadeDescription.check(matches(withText(R.string.select)));
 
             ViewInteraction cascadeFirstLevelSpinner = onView(
                     allOf(withId(R.id.cascade_level_spinner),
-                            withViewParent(question, CascadeQuestionView.class)));
+                            withQuestionViewParent(question, CascadeQuestionView.class)));
             cascadeFirstLevelSpinner.perform(scrollTo());
             cascadeFirstLevelSpinner.check(matches(isDisplayed()));
         }
@@ -469,19 +471,19 @@ public class FormActivityTest {
 
     private void verifyFreeTextQuestionView(Question question) {
         ViewInteraction freeTextQuestionInput = onView(
-                allOf(withId(R.id.input_et), withViewParent(question, FreetextQuestionView.class)));
+                allOf(withId(R.id.input_et), withQuestionViewParent(question, FreetextQuestionView.class)));
         freeTextQuestionInput.check(matches(withText("")));
         freeTextQuestionInput.perform(click());
         freeTextQuestionInput.perform(closeSoftKeyboard());
         if (question.isDoubleEntry()) {
             ViewInteraction repeatTextView = onView(allOf(withId(R.id.double_entry_title),
-                    withViewParent(question, FreetextQuestionView.class)));
+                    withQuestionViewParent(question, FreetextQuestionView.class)));
             repeatTextView.perform(scrollTo());
             repeatTextView.check(matches(withText(R.string.repeat_answer)));
             repeatTextView.check(matches(isDisplayed()));
 
             ViewInteraction repeatInput = onView(allOf(withId(R.id.double_entry_et),
-                    withViewParent(question, FreetextQuestionView.class)));
+                    withQuestionViewParent(question, FreetextQuestionView.class)));
             repeatInput.perform(scrollTo());
             repeatInput.check(matches(isDisplayed()));
             repeatInput.check(matches(withText("")));
@@ -491,10 +493,16 @@ public class FormActivityTest {
     }
 
     @NonNull
-    private <T extends View> Matcher<View> withViewParent(Question question,
+    private <T extends View> Matcher<View> withQuestionViewParent(Question question,
             Class<T> parentClass) {
         return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(parentClass),
                 withTagValue(is((Object) question.getId()))));
+    }
+
+    @NonNull
+    private <T extends View> Matcher<View> withQuestionGroupViewParent(QuestionGroup questionGroup) {
+        return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(QuestionGroupTab.class),
+                withTagValue(is((Object) questionGroup.getOrder()))));
     }
 
     private void verifyOptionQuestionView(Question question, int questionPosition) {

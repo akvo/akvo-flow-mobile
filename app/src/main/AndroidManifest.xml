@@ -72,6 +72,7 @@
                 android:screenOrientation="landscape"/>
 
         <service android:name=".service.DataSyncService"/>
+        <service android:name=".service.FileChangeTrackingService"/>
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.UserRequestedApkUpdateService"/>
@@ -85,10 +86,25 @@
             </intent-filter>
         </service>
 
+        <service
+                android:name=".service.FileChangeTrackingServiceApi6"
+                android:exported="true"
+                android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
+
         <receiver android:name=".broadcast.SyncDataReceiver">
             <intent-filter>
                 <action android:name="org.akvo.flow.DATA_SUBMITTED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".broadcast.BootStrapReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="org.akvo.flow.BOOTSTRAP_NEEDED"/>
             </intent-filter>
         </receiver>
 

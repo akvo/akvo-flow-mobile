@@ -136,22 +136,25 @@ public class FormActivityTest {
         List<Question> mandatoryQuestions = new ArrayList<>();
         for (int i = 0; i < questionGroups.size(); i++) {
             QuestionGroup group = questionGroups.get(i);
-            //select the tab
-            ViewInteraction tab = onView(childAtPosition(childAtPosition(withId(R.id.tabs), 0), i));
-            tab.perform(click());
-            tab.check(matches(hasDescendant(withText(group.getHeading()))));
-            List<Question> questions = group.getQuestions();
-            for (int j = 0; j < questions.size(); j++) {
-                Question question = questions.get(j);
-                if (question.isMandatory()) {
-                    mandatoryQuestions.add(question);
-                }
-                verifyQuestionDisplayed(question, j);
-            }
-            verifyNextButton(group);
+            verifyGroup(mandatoryQuestions, i, group);
         }
 
         verifySubmitTab(questionGroups, mandatoryQuestions);
+    }
+
+    private void verifyGroup(List<Question> mandatoryQuestions, int i, QuestionGroup group) {
+        ViewInteraction tab = onView(childAtPosition(childAtPosition(withId(R.id.tabs), 0), i));
+        tab.perform(click());
+        tab.check(matches(hasDescendant(withText(group.getHeading()))));
+        List<Question> questions = group.getQuestions();
+        for (int j = 0; j < questions.size(); j++) {
+            Question question = questions.get(j);
+            if (question.isMandatory()) {
+                mandatoryQuestions.add(question);
+            }
+            verifyQuestionDisplayed(question, j);
+        }
+        verifyNextButton(group);
     }
 
     private void verifyToolBar() {

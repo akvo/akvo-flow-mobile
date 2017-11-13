@@ -23,12 +23,10 @@ package org.akvo.flow.activity.form.views;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
@@ -39,13 +37,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
@@ -99,10 +93,5 @@ public class FreeTextQuestionViewTest {
         fillFreeTextQuestion("");
         clickNext();
         verifySubmitButtonDisabled();
-    }
-
-    private void fillFreeTextQuestion(String text) throws IOException {
-        onView(withId(R.id.input_et)).perform(typeText(text));
-        Espresso.closeSoftKeyboard();
     }
 }

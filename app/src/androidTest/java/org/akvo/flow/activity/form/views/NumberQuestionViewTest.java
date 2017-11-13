@@ -50,8 +50,10 @@ import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
@@ -122,6 +124,28 @@ public class NumberQuestionViewTest {
         clickNext();
         verifySubmitButtonDisabled();
     }
+
+    @Test
+    public void cannotEnterText() throws Exception {
+        fillFreeTextQuestion("This is an answer to your question");
+
+        onView(withId(R.id.input_et)).check(matches(withText("")));
+    }
+
+    @Test
+    public void cannotEnterSigned() throws Exception {
+        fillFreeTextQuestion("-1");
+
+        onView(withId(R.id.input_et)).check(matches(withText("1")));
+    }
+
+    @Test
+    public void cannotEnterDecimal() throws Exception {
+        fillFreeTextQuestion("1.1");
+
+        onView(withId(R.id.input_et)).check(matches(withText("11")));
+    }
+
 
     private void verifyNumberTooLargeErrorShown() {
         int maxValue = getValidationRule().getMaxVal().intValue();

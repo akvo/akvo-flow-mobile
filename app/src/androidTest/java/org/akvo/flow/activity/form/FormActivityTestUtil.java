@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
 import android.widget.TextView;
 
@@ -33,8 +34,11 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 
+import java.io.IOException;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
@@ -85,5 +89,10 @@ public class FormActivityTestUtil {
 
     public static void clickNext() {
         onView(withId(R.id.next_btn)).perform(click());
+    }
+
+    public static void fillFreeTextQuestion(String text) throws IOException {
+        onView(withId(R.id.input_et)).perform(typeText(text));
+        Espresso.closeSoftKeyboard();
     }
 }

@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity;
+package org.akvo.flow.activity.form;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +28,8 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.Constants;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.QuestionResponse;

@@ -44,7 +44,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIn
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.freetextsurvey;
+import static org.akvo.flow.tests.R.raw.freetext_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -65,7 +65,7 @@ public class FreeTextQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(freetextsurvey, InstrumentationRegistry.getContext());
+        installer.installSurvey(freetext_form, InstrumentationRegistry.getContext());
     }
 
     @After

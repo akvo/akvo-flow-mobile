@@ -25,8 +25,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
-import android.support.test.espresso.ViewInteraction;
-import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.Constants;
@@ -44,11 +42,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 
 public class FormActivityTestUtil {
@@ -75,12 +71,6 @@ public class FormActivityTestUtil {
     public static void verifySubmitButtonDisabled() {
         onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
                 .check(matches(not(isEnabled())));
-    }
-
-    public static ViewInteraction matchToolbarTitle(String title) {
-        return onView(allOf(instanceOf(TextView.class), withParent(withId(R.id.toolbar)),
-                withText(title)))
-                .check(matches(isDisplayed()));
     }
 
     public static void verifyQuestionTitleDisplayed() {

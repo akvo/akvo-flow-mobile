@@ -44,7 +44,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
-import static org.akvo.flow.tests.R.raw.freetextsurvey;
+import static org.akvo.flow.tests.R.raw.freetext_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -59,7 +59,7 @@ public class FreeTextFormActivityViewTest {
             SurveyRequisite.setRequisites(targetContext);
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             Survey survey = installer
-                    .installSurvey(freetextsurvey, InstrumentationRegistry.getContext());
+                    .installSurvey(freetext_form, InstrumentationRegistry.getContext());
             long id = installer.createDataPoint(survey.getSurveyGroup(),
                     new QuestionResponse.QuestionResponseBuilder()
                             .setValue("test")

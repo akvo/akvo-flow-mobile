@@ -55,7 +55,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.datesurvey;
+import static org.akvo.flow.tests.R.raw.date_form;
 import static org.hamcrest.Matchers.endsWith;
 
 @MediumTest
@@ -78,7 +78,7 @@ public class DateQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(datesurvey, InstrumentationRegistry.getContext());
+        installer.installSurvey(date_form, InstrumentationRegistry.getContext());
     }
 
     @After

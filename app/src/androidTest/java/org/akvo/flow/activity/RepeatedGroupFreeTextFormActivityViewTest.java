@@ -49,8 +49,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.MultiItemByPositionMatcher.getElementFromMatchAtPosition;
-import static org.akvo.flow.tests.R.raw.repeated_groups_survey;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.akvo.flow.tests.R.raw.repeated_groups_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -65,7 +65,7 @@ public class RepeatedGroupFreeTextFormActivityViewTest {
             SurveyRequisite.setRequisites(targetContext);
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             Survey survey = installer
-                    .installSurvey(repeated_groups_survey, InstrumentationRegistry.getContext());
+                    .installSurvey(repeated_groups_form, InstrumentationRegistry.getContext());
             long id = installer
                     .createDataPoint(survey.getSurveyGroup(), generateTestResponseData());
             Context activityContext = InstrumentationRegistry.getInstrumentation()

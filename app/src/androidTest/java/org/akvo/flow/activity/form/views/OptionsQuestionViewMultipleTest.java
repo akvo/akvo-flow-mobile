@@ -22,18 +22,19 @@ package org.akvo.flow.activity.form.views;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
+import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
+import android.widget.CheckBox;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -42,23 +43,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
+import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.freetext_double_entry_form;
+import static org.akvo.flow.tests.R.raw.option_multiple_other_form;
+import static org.hamcrest.Matchers.allOf;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class FreeTextDoubleQuestionViewTest {
+public class OptionsQuestionViewMultipleTest {
 
+    private static final String FORM_TITLE = "OptionsQuestionForm";
     private static SurveyInstaller installer;
 
     @Rule
@@ -66,7 +71,7 @@ public class FreeTextDoubleQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(44173002L, "47313002", "FreeTextForm");
+            return getFormActivityIntent(42573002L, "43623002", FORM_TITLE);
         }
     };
 
@@ -75,7 +80,7 @@ public class FreeTextDoubleQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(freetext_double_entry_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(option_multiple_other_form, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -90,58 +95,81 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     @Test
-    public void ensureCannotSubmitIfSecondEntryMissing() throws Exception {
-        verifyQuestionTitleDisplayed();
-        fillFreeTextQuestion("This is an answer to your question");
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
-
-    @Test
-    public void ensureCannotSubmitEmptyFreeText() throws Exception {
-        verifyQuestionTitleDisplayed();
-        fillFreeTextQuestion("");
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
-
-    @Test
-    public void ensureCannotSubmitDifferentAnswers() throws Exception {
+    public void ensureCanFillOneOptionsQuestion() throws Exception {
         verifyQuestionTitleDisplayed();
 
-        fillFreeTextQuestion("This is an answer to your question");
-        fillDoubleEntry("Something else");
+        fillOptionsQuestion(0);
 
-        verifyDoubleEntryMisMatchErrorDisplayed();
-
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
-
-    @Test
-    public void ensureCanSubmitCorrectQuestion() throws Exception {
-        verifyQuestionTitleDisplayed();
-
-        fillFreeTextQuestion("This is an answer to your question");
-        fillDoubleEntry("This is an answer to your question");
+        verifyOptionSelected(0);
 
         clickNext();
+
         verifySubmitButtonEnabled();
     }
 
-    private void verifyDoubleEntryMisMatchErrorDisplayed() {
-        onView(withId(R.id.double_entry_et))
-                .check(matches(hasErrorText(getString(R.string.error_answer_match))));
+    @Test
+    public void ensureCanFillMultipleOptionsQuestion() throws Exception {
+        verifyQuestionTitleDisplayed();
+
+        fillOptionsQuestion(0);
+        fillOptionsQuestion(1);
+
+        verifyOptionSelected(0);
+        verifyOptionSelected(1);
+
+        clickNext();
+
+        verifySubmitButtonEnabled();
     }
 
-    private void fillDoubleEntry(String text) {
-        onView(withId(R.id.double_entry_et)).perform(typeText(text));
-        Espresso.closeSoftKeyboard();
+    @Test
+    public void ensureCanFillOtherOptionsQuestion() throws Exception {
+        verifyQuestionTitleDisplayed();
+
+        fillOptionsQuestion(2);
+        fillOtherValue("other option");
+
+        verifyOtherOption(2, "other option");
+
+        clickNext();
+
+        verifySubmitButtonEnabled();
     }
 
-    @NonNull
-    private String getString(@StringRes int stringResId) {
-        return rule.getActivity().getApplicationContext().getResources()
-                .getString(stringResId);
+    private void fillOtherValue(String text) {
+        onView(withId(R.id.other_option_input)).perform(typeText(text));
+        onView(withId(android.R.id.button1)).perform(click());
     }
+
+    private void verifyOtherOption(int option, String text) {
+        ViewInteraction otherOption = getCheckbox(option);
+        otherOption.check(matches(isChecked()));
+        onView(withId(R.id.other_option_text))
+                .check(matches(allOf(isDisplayed(), withText(text))));
+    }
+
+    @Test
+    public void ensureCannotSubmitIfNoOptionSelected() throws Exception {
+        verifyQuestionTitleDisplayed();
+
+        clickNext();
+
+        verifySubmitButtonDisabled();
+    }
+
+    private void verifyOptionSelected(int option) {
+        ViewInteraction singleChoiceOption = getCheckbox(option);
+        singleChoiceOption.check(matches(isChecked()));
+    }
+
+    private void fillOptionsQuestion(int option) {
+        ViewInteraction checkbox = getCheckbox(option);
+        checkbox.perform(click());
+    }
+
+    private ViewInteraction getCheckbox(int option) {
+        return onView(allOf(withId(option), IsInstanceOf.<View>instanceOf(CheckBox.class)));
+    }
+
+
 }

@@ -23,13 +23,17 @@ package org.akvo.flow.activity.form.views;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
+import android.widget.RadioGroup;
 
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,20 +45,21 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.matchToolbarTitle;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.optionsurvey;
+import static org.akvo.flow.tests.R.raw.option_form;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.core.IsNot.not;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class OptionsQuestionViewTest {
+public class OptionsQuestionViewSingleTest {
 
     private static final String FORM_TITLE = "OptionsQuestionForm";
     private static SurveyInstaller installer;
@@ -73,7 +78,7 @@ public class OptionsQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(optionsurvey, InstrumentationRegistry.getContext());
+        installer.installSurvey(option_form, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -88,24 +93,47 @@ public class OptionsQuestionViewTest {
     }
 
     @Test
-    public void canFillOptionsQuestion() throws Exception {
+    public void ensureCanFillOptionsQuestion() throws Exception {
         verifyQuestionTitleDisplayed();
-        matchToolbarTitle(FORM_TITLE);
+
         fillOptionsQuestion(0);
+
+        verifyOptionSelected();
+        verifyOtherOptionUnselected();
+
         clickNext();
+
         verifySubmitButtonEnabled();
     }
 
-    private void fillOptionsQuestion(int option) {
-        onView(withId(option)).check(matches(isDisplayed())).perform(click());
-        onView(withId(option)).check(matches(isDisplayed())).check(matches(isChecked()));
-    }
-
     @Test
-    public void cannotSubmitIfNoOptionSelected() throws Exception {
-        matchToolbarTitle(FORM_TITLE);
+    public void ensureCannotSubmitIfNoOptionSelected() throws Exception {
         verifyQuestionTitleDisplayed();
+
         clickNext();
+
         verifySubmitButtonDisabled();
     }
+
+    private void verifyOptionSelected() {
+        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(0);
+        singleChoiceOption.check(matches(isChecked()));
+    }
+
+    private void verifyOtherOptionUnselected() {
+        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(1);
+        singleChoiceOption.check(matches(not(isChecked())));
+    }
+
+    private void fillOptionsQuestion(int option) {
+        ViewInteraction radioButton = getSingleChoiceRadioButton(option);
+        radioButton.perform(click());
+    }
+
+    private ViewInteraction getSingleChoiceRadioButton(int option) {
+        return onView(allOf(withId(option),
+                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))));
+    }
+
+
 }

@@ -85,7 +85,7 @@ import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.tests.R.raw.test_form;
+import static org.akvo.flow.tests.R.raw.all_questions_form;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.IsNot.not;
@@ -111,7 +111,7 @@ public class FormActivityTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(test_form, InstrumentationRegistry.getContext());
+        survey = installer.installSurvey(all_questions_form, InstrumentationRegistry.getContext());
     }
 
     @After

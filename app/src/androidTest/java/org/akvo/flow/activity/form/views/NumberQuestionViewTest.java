@@ -57,7 +57,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuest
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.numbersurvey;
+import static org.akvo.flow.tests.R.raw.number_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -80,7 +80,7 @@ public class NumberQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(numbersurvey, InstrumentationRegistry.getContext());
+        survey = installer.installSurvey(number_form, InstrumentationRegistry.getContext());
     }
 
     @After

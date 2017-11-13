@@ -2,4 +2,6 @@
 <resources>
     <item name="submit_tab_header" type="id"/>
     <item name="submit_tab_button" type="id"/>
+    <item name="other_option_input" type="id"/>
+    <item name="other_option_text" type="id"/>
 </resources>

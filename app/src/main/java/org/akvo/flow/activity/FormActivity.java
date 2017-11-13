@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -71,6 +72,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
 
@@ -793,6 +795,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
      * home screen if completely full.
      */
     private void spaceLeftOnCard() {
+        if (PlatformUtil.isEmulator()) {
+            return;
+        }
         long megaAvailable = storageHelper.getExternalStorageAvailableSpace();
 
         // keep track of changes

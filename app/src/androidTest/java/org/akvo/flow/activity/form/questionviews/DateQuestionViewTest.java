@@ -18,22 +18,22 @@
  *
  */
 
-package org.akvo.flow.activity.form.views;
+package org.akvo.flow.activity.form.questionviews;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.contrib.PickerActions;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.view.View;
-import android.widget.RadioGroup;
+import android.widget.DatePicker;
 
+import org.akvo.flow.R;
+import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,27 +41,27 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static java.util.Calendar.SHORT;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.option_form;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.IsNot.not;
+import static org.akvo.flow.tests.R.raw.date_form;
+import static org.hamcrest.Matchers.endsWith;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class OptionsQuestionViewSingleTest {
+public class DateQuestionViewTest {
 
-    private static final String FORM_TITLE = "OptionsQuestionForm";
     private static SurveyInstaller installer;
 
     @Rule
@@ -69,7 +69,7 @@ public class OptionsQuestionViewSingleTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(42573002L, "43623002", FORM_TITLE);
+            return getFormActivityIntent(41713002L, "49803002", "DateForm");
         }
     };
 
@@ -78,12 +78,12 @@ public class OptionsQuestionViewSingleTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(option_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(date_form, InstrumentationRegistry.getContext());
     }
 
     @After
     public void afterEachTest() {
-        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
+        installer.deleteResponses(Constants.TEST_FORM_SURVEY_INSTANCE_ID);
     }
 
     @AfterClass
@@ -93,47 +93,45 @@ public class OptionsQuestionViewSingleTest {
     }
 
     @Test
-    public void ensureCanFillOptionsQuestion() throws Exception {
-        verifyQuestionTitleDisplayed();
+    public void canFillDateQuestion() throws Exception {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
 
-        fillOptionsQuestion(0);
+        String dateString = getShortDate(cal);
 
-        verifyOptionSelected();
-        verifyOtherOptionUnselected();
-
+        pickDate(year, month + 1, day); // +1 on month due to January starting at 0
+        onView(withId(R.id.date_et)).check(matches(withText(dateString)));
         clickNext();
-
         verifySubmitButtonEnabled();
     }
 
     @Test
-    public void ensureCannotSubmitIfNoOptionSelected() throws Exception {
-        verifyQuestionTitleDisplayed();
-
+    public void canNotSubmitEmptyDateQuestion() throws Exception {
         clickNext();
-
         verifySubmitButtonDisabled();
     }
 
-    private void verifyOptionSelected() {
-        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(0);
-        singleChoiceOption.check(matches(isChecked()));
+    /**
+     * @param cal Calendar object populated with Calendar.getInstance()
+     * @return String representation of today's date, concatenated (ex. Jan 5, 2017)
+     */
+    private String getShortDate(Calendar cal) {
+        StringBuilder dateString = new StringBuilder();
+        dateString.append(cal.getDisplayName(Calendar.MONTH, SHORT, Locale.ENGLISH));
+        dateString.append(" ");
+        dateString.append(cal.get(Calendar.DAY_OF_MONTH));
+        dateString.append(", ");
+        dateString.append(cal.get(Calendar.YEAR));
+
+        return dateString.toString();
     }
 
-    private void verifyOtherOptionUnselected() {
-        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(1);
-        singleChoiceOption.check(matches(not(isChecked())));
+    private void pickDate(int year, int month, int day) {
+        onView(withId(R.id.date_btn)).perform(click());
+        onView(withClassName(endsWith(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(year, month, day));
+        onView(withId(android.R.id.button1)).perform(click());
     }
-
-    private void fillOptionsQuestion(int option) {
-        ViewInteraction radioButton = getSingleChoiceRadioButton(option);
-        radioButton.perform(click());
-    }
-
-    private ViewInteraction getSingleChoiceRadioButton(int option) {
-        return onView(allOf(withId(option),
-                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))));
-    }
-
-
 }

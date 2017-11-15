@@ -12,7 +12,7 @@
         <question
                 order="1"
                 type="free"
-                mandatory="false"
+                mandatory="true"
                 localeNameFlag="false"
                 id="154822013">
             <text>text question</text>
@@ -20,12 +20,12 @@
         <question
                 order="2"
                 type="option"
-                mandatory="false"
+                mandatory="true"
                 localeNameFlag="false"
                 id="154852013">
             <options
-                    allowOther="true"
-                    allowMultiple="true"
+                    allowOther="false"
+                    allowMultiple="false"
                     renderType="radio">
                 <option
                         value="yes"
@@ -49,11 +49,11 @@
                 order="3"
                 allowMultiple="true"
                 type="option"
-                mandatory="false"
+                mandatory="true"
                 localeNameFlag="false"
                 id="154872013">
             <options
-                    allowOther="false"
+                    allowOther="true"
                     allowMultiple="true">
                 <option
                         value="opt1"
@@ -95,7 +95,7 @@
                 order="5"
                 requireDoubleEntry="true"
                 type="free"
-                mandatory="false"
+                mandatory="true"
                 localeNameFlag="true"
                 id="153562013">
             <help type="tip">
@@ -147,7 +147,7 @@
         <question
                 order="10"
                 type="date"
-                mandatory="false"
+                mandatory="true"
                 localeNameFlag="false"
                 id="152722013">
             <text>date</text>
@@ -207,11 +207,5 @@
                 id="154062013">
             <text>caddisfly</text>
         </question>
-    </questionGroup>
-    <questionGroup>
-        <heading>New group - please change name</heading>
-    </questionGroup>
-    <questionGroup>
-        <heading>New group - please change name</heading>
     </questionGroup>
 </survey>

@@ -20,6 +20,7 @@
 package org.akvo.flow.activity.form.data;
 
 import android.content.Context;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -43,6 +44,7 @@ import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.GsonMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,9 +54,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import timber.log.Timber;
 
 public class SurveyInstaller {
 
@@ -157,7 +164,7 @@ public class SurveyInstaller {
         adapter.close();
     }
 
-    public long createDataPoint(SurveyGroup surveyGroup,
+    public Pair<Long, Map<String, QuestionResponse>> createDataPoint(SurveyGroup surveyGroup,
             QuestionResponse.QuestionResponseBuilder ... responseBuilders) {
         adapter.open();
         Survey registrationForm = adapter.getRegistrationForm(surveyGroup);
@@ -166,17 +173,46 @@ public class SurveyInstaller {
         long surveyInstanceId = adapter
                 .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
                         user, surveyedLocaleId);
+        Map<String, QuestionResponse> questionResponseMap = new HashMap<>();
         if (responseBuilders != null) {
             int length = responseBuilders.length;
             for (int i = 0; i < length; i++) {
                 QuestionResponse responseToSave = responseBuilders[i]
                         .setSurveyInstanceId(surveyInstanceId)
                         .createQuestionResponse();
+                questionResponseMap.put(responseToSave.getResponseKey(), responseToSave);
                 adapter.createOrUpdateSurveyResponse(responseToSave);
             }
         }
         adapter.close();
-        return surveyInstanceId;
+        return new Pair<>(surveyInstanceId, questionResponseMap);
+    }
+
+    public Pair<Long, Map<String, QuestionResponse>> createDataPointFromFile(
+            SurveyGroup surveyGroup, Context context, int resId) {
+
+        InputStream input = context.getResources()
+                .openRawResource(resId);
+        try {
+            String jsonDataString = FileUtil.readText(input);
+            GsonMapper mapper = new GsonMapper();
+            TestDataPoint dataPoint = mapper.read(jsonDataString, TestDataPoint.class);
+            List<TestResponse> responses = dataPoint.getResponses();
+            List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(responses.size());
+            for (TestResponse response : responses) {
+                QuestionResponse.QuestionResponseBuilder questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                        .setValue(response.getValue())
+                        .setType(response.getAnswerType())
+                        .setQuestionId(response.getQuestionId())
+                        .setIteration(response.getIteration());
+                builders.add(questionResponse);
+            }
+            return createDataPoint(surveyGroup, builders
+                    .toArray(new QuestionResponse.QuestionResponseBuilder[builders.size()]));
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+        return null;
     }
 
     public void clearSurveys() {
@@ -194,4 +230,6 @@ public class SurveyInstaller {
         adapter.deleteResponses(surveyInstanceId);
         adapter.close();
     }
+
+
 }

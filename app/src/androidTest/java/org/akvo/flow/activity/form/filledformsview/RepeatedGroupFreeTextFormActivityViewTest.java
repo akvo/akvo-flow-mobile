@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity.form;
+package org.akvo.flow.activity.form.filledformsview;
 
 import android.content.Context;
 import android.content.Intent;
@@ -69,10 +69,11 @@ public class RepeatedGroupFreeTextFormActivityViewTest {
             Survey survey = installer
                     .installSurvey(repeated_groups_form, InstrumentationRegistry.getContext());
             long id = installer
-                    .createDataPoint(survey.getSurveyGroup(), generateTestResponseData());
+                    .createDataPoint(survey.getSurveyGroup(), generateTestResponseData()).first;
             Context activityContext = InstrumentationRegistry.getInstrumentation()
                     .getTargetContext();
             Intent result = new Intent(activityContext, FormActivity.class);
+            result.putExtra(ConstantUtil.READ_ONLY_EXTRA, true);
             result.putExtra(ConstantUtil.FORM_ID_EXTRA, "200389118");
             result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, id);
             result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,

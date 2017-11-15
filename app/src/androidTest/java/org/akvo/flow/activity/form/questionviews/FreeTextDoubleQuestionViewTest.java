@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity.form.views;
+package org.akvo.flow.activity.form.questionviews;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,8 +34,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.ValidationRule;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -43,35 +41,32 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
-
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.number_form;
+import static org.akvo.flow.tests.R.raw.freetext_double_entry_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class NumberQuestionViewTest {
+public class FreeTextDoubleQuestionViewTest {
 
     private static SurveyInstaller installer;
-    private static Survey survey;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(47323002L, "49783002", "NumberForm");
+            return getFormActivityIntent(44173002L, "47313002", "FreeTextForm");
         }
     };
 
@@ -80,7 +75,7 @@ public class NumberQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(number_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(freetext_double_entry_form, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -95,76 +90,58 @@ public class NumberQuestionViewTest {
     }
 
     @Test
-    public void canFillNumberQuestion() throws IOException {
-        fillNumberQuestion(50);
+    public void ensureCannotSubmitIfSecondEntryMissing() throws Exception {
+        verifyQuestionTitleDisplayed();
+        fillFreeTextQuestion("This is an answer to your question");
+        clickNext();
+        verifySubmitButtonDisabled();
+    }
+
+    @Test
+    public void ensureCannotSubmitEmptyFreeText() throws Exception {
+        verifyQuestionTitleDisplayed();
+        fillFreeTextQuestion("");
+        clickNext();
+        verifySubmitButtonDisabled();
+    }
+
+    @Test
+    public void ensureCannotSubmitDifferentAnswers() throws Exception {
+        verifyQuestionTitleDisplayed();
+
+        fillFreeTextQuestion("This is an answer to your question");
+        fillDoubleEntry("Something else");
+
+        verifyDoubleEntryMisMatchErrorDisplayed();
+
+        clickNext();
+        verifySubmitButtonDisabled();
+    }
+
+    @Test
+    public void ensureCanSubmitCorrectQuestion() throws Exception {
+        verifyQuestionTitleDisplayed();
+
+        fillFreeTextQuestion("This is an answer to your question");
+        fillDoubleEntry("This is an answer to your question");
+
         clickNext();
         verifySubmitButtonEnabled();
+    }
+
+    private void verifyDoubleEntryMisMatchErrorDisplayed() {
+        onView(withId(R.id.double_entry_et))
+                .check(matches(hasErrorText(getString(R.string.error_answer_match))));
+    }
+
+    private void fillDoubleEntry(String text) {
+        onView(withId(R.id.double_entry_et)).perform(typeText(text));
+        Espresso.closeSoftKeyboard();
     }
 
     @NonNull
     private String getString(@StringRes int stringResId) {
         return rule.getActivity().getApplicationContext().getResources()
                 .getString(stringResId);
-    }
-
-    @Test
-    public void canNotifyWrongMaxInputNumberQuestion() throws Exception {
-        fillNumberQuestion(2000);
-
-        verifyNumberTooLargeErrorShown();
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
-
-    @Test
-    public void canNotifyWrongMinInputNumberQuestion() throws Exception {
-        fillNumberQuestion(0);
-
-        verifyNumberTooSmallErrorShown();
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
-
-    @Test
-    public void cannotEnterText() throws Exception {
-        fillFreeTextQuestion("This is an answer to your question");
-
-        onView(withId(R.id.input_et)).check(matches(withText("")));
-    }
-
-    @Test
-    public void cannotEnterSigned() throws Exception {
-        fillFreeTextQuestion("-1");
-
-        onView(withId(R.id.input_et)).check(matches(withText("1")));
-    }
-
-    @Test
-    public void cannotEnterDecimal() throws Exception {
-        fillFreeTextQuestion("1.1");
-
-        onView(withId(R.id.input_et)).check(matches(withText("11")));
-    }
-
-
-    private void verifyNumberTooLargeErrorShown() {
-        int maxValue = getValidationRule().getMaxVal().intValue();
-        String tooLargeError = getString(R.string.toolargeerr);
-        onView(withId(R.id.input_et)).check(matches(hasErrorText(tooLargeError + maxValue)));
-    }
-
-    private void verifyNumberTooSmallErrorShown() {
-        int minValue = getValidationRule().getMinVal().intValue();
-        String tooSmallError = getString(R.string.toosmallerr);
-        onView(withId(R.id.input_et)).check(matches(hasErrorText(tooSmallError + minValue)));
-    }
-
-    private ValidationRule getValidationRule() {
-        return survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule();
-    }
-
-    private void fillNumberQuestion(int firstValue) throws IOException {
-        onView(withId(R.id.input_et)).perform(typeText(String.valueOf(firstValue)));
-        Espresso.closeSoftKeyboard();
     }
 }

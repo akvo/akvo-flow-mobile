@@ -72,7 +72,6 @@
                 android:screenOrientation="landscape"/>
 
         <service android:name=".service.DataSyncService"/>
-        <service android:name=".service.FileChangeTrackingService"/>
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.UserRequestedApkUpdateService"/>
@@ -87,7 +86,7 @@
         </service>
 
         <service
-                android:name=".service.FileChangeTrackingServiceApi6"
+                android:name=".service.FileChangeTrackingService"
                 android:exported="true"
                 android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
             <intent-filter>

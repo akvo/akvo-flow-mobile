@@ -21,10 +21,8 @@ package org.akvo.flow.app;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.os.Build;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -38,7 +36,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.service.FileChangeTrackingServiceApi6;
 import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
@@ -72,12 +69,7 @@ public class FlowApp extends Application {
     }
 
     private void startBootstrapFolderTracker() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-                || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            startService(new Intent(this, FileChangeTrackingService.class));
-        } else {
-            FileChangeTrackingServiceApi6.scheduleVerifier(this);
-        }
+        FileChangeTrackingService.scheduleVerifier(this);
     }
 
     private void startUpdateService() {

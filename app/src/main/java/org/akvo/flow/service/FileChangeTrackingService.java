@@ -20,57 +20,69 @@
 
 package org.akvo.flow.service;
 
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.FileObserver;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.GcmTaskService;
+import com.google.android.gms.gcm.PeriodicTask;
+import com.google.android.gms.gcm.Task;
+import com.google.android.gms.gcm.TaskParams;
+
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
 
-import timber.log.Timber;
+import java.io.File;
+import java.util.List;
 
-/**
- * Monitors changes to the inbox folder
- * This will be run on all devices except on Android 6.0 and 6.0.1 devices which have a
- * bug preventing the FileObserver to work properly
- */
-public class FileChangeTrackingService extends Service {
+import javax.inject.Inject;
 
-    public FileObserver fileObserver;
+public class FileChangeTrackingService extends GcmTaskService {
 
-    @Nullable
+    private static final long VERIFY_PERIOD_SECONDS = 30;
+    private static final String TAG = "FileChangeTrackingService";
+
+    @Inject
+    ZipFileLister zipFileLister;
+
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
+    }
+
+    public static void scheduleVerifier(Context context) {
+        GcmNetworkManager gcmNetworkManager = GcmNetworkManager.getInstance(context);
+        Task periodicTask = new PeriodicTask.Builder()
+                .setPeriod(VERIFY_PERIOD_SECONDS)
+                .setRequiredNetwork(PeriodicTask.NETWORK_STATE_ANY)
+                .setTag(TAG)
+                .setService(FileChangeTrackingService.class)
+                .setPersisted(true)
+                .setUpdateCurrent(true)
+                .setRequiresCharging(true) //only run if we are connected via USB to PC
+                .build();
+        gcmNetworkManager.schedule(periodicTask);
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        fileObserver = new FileObserver(
-                FileUtil.getFilesDir(FileUtil.FileType.INBOX).getAbsolutePath(),
-                FileObserver.CREATE) {
-            @Override
-            public void onEvent(int event, @Nullable String path) {
-                Timber.d("event received: " + event);
-                sendBroadCast();
-            }
-        };
-        fileObserver.startWatching();
-        return START_STICKY;
+    public void onInitializeTasks() {
+        super.onInitializeTasks();
+        scheduleVerifier(getApplicationContext());
     }
 
-    private void sendBroadCast() {
+    @Override
+    public int onRunTask(TaskParams taskParams) {
+        List<File> files = zipFileLister.getZipFiles();
+        if (!files.isEmpty()) {
+            sendBroadcast();
+        }
+        return GcmNetworkManager.RESULT_SUCCESS;
+    }
+
+    private void sendBroadcast() {
         Intent bootStrapIntent = new Intent(ConstantUtil.BOOTSTRAP_INTENT);
         sendBroadcast(bootStrapIntent);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (fileObserver != null) {
-            fileObserver.stopWatching();
-        }
     }
 }

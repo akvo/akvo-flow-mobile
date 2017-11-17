@@ -143,12 +143,13 @@ public class SurveyDownloadService extends IntentService {
         syncSurveyGroups(surveys);
 
         // Check synced versions, and omit up-to-date surveys
-        surveys = databaseAdaptor.checkSurveyVersions(surveys);
+        List<Survey> outDatedSurveys = databaseAdaptor.checkSurveyVersions(surveys);
 
-        if (!surveys.isEmpty()) {
+        if (!outDatedSurveys.isEmpty()) {
             int synced = 0, failed = 0;
-            displayNotification(synced, failed, surveys.size());
-            for (Survey survey : surveys) {
+            int numberOfSurveysToBeSynced = outDatedSurveys.size();
+            displayNotification(synced, failed, numberOfSurveysToBeSynced);
+            for (Survey survey : outDatedSurveys) {
                 try {
                     downloadSurvey(survey);
                     databaseAdaptor.saveSurvey(survey);
@@ -160,7 +161,7 @@ public class SurveyDownloadService extends IntentService {
                     displayErrorNotification(ConstantUtil.NOTIFICATION_FORM_ERROR,
                             getString(R.string.error_form_download));
                 }
-                displayNotification(synced, failed, surveys.size());
+                displayNotification(synced, failed, numberOfSurveysToBeSynced);
             }
         }
 

@@ -61,7 +61,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     private void init() {
         setQuestionView(R.layout.caddisfly_question_view);
-        RecyclerView resultsRv = (RecyclerView) findViewById(R.id.results_recycler_view);
+        RecyclerView resultsRv = (RecyclerView) findViewById(R.id.caddisfly_results_recycler_view);
         resultsRv.setLayoutManager(new LinearLayoutManager(resultsRv.getContext()));
         caddisflyResultsAdapter = new CaddisflyResultsAdapter(
                 new ArrayList<CaddisflyTestResult>());

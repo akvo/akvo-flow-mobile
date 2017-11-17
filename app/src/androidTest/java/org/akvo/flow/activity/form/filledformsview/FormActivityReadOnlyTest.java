@@ -50,6 +50,8 @@ import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.serialization.response.value.SignatureValue;
+import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
+import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.FreetextQuestionView;
@@ -237,6 +239,18 @@ public class FormActivityReadOnlyTest {
 
     private void verifyCaddisflyQuestionView(Question question) {
         String questionValue = getResponseValue(question);
+
+        List<CaddisflyTestResult> caddisflyTestResults = new CaddisflyJsonMapper()
+                .transform(questionValue);
+        ViewInteraction caddislfyRecyclerView = onView(
+                allOf(withId(R.id.caddisfly_results_recycler_view),
+                        withQuestionViewParent(question,
+                                CaddisflyQuestionView.class))).perform(scrollTo());
+        for (int i = 0; i < caddisflyTestResults.size(); i++) {
+            caddislfyRecyclerView.perform(scrollToPosition(i));
+            caddislfyRecyclerView.check(matches(hasDescendant(withText(caddisflyTestResults.get(i).buildResultToDisplay()))));
+        }
+
         ViewInteraction caddisflyButton = onView(allOf(withId(R.id.caddisfly_button),
                 withQuestionViewParent(question, CaddisflyQuestionView.class))).perform(scrollTo());
         caddisflyButton.check(matches(

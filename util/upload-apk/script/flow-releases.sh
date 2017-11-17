@@ -31,13 +31,16 @@ rm -rf tmp
 rm -rf builds
 mkdir tmp
 mkdir builds
+flavor="flow"
 
 build_name() {
     if [[ "$1" == "akvoflow-89" ]]; then
 	# Biogas custom build
+	    flavor="biogas"
         echo "assembleBiogasRelease"
     elif [[ "$1" == "akvoflow-101" ]]; then
 	# Cookstoves custom build
+	    flavor="cookstoves"
         echo "assembleCookstovesRelease"
     else
 	# Regular Flow build
@@ -61,13 +64,13 @@ for i in $(cat tmp/instances.txt); do
         filename=builds/$i/$version/flow-$version.apk
         build=$(build_name $i)
 
-        echo "generating apk version" $version "for instance" $i "and build" $build
+        echo "generating apk version" $version "for instance" $i "and" $build
         cp $FLOW_SERVER_CONFIG/$i/survey.properties app/survey.properties
         ./gradlew $build
         mkdir -p builds/$i/$version
-        mv app/bin/flow.apk $filename
+        mv app/build/outputs/apk/$flavor/release/flow.apk $filename
         java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$accountId" "$accountSecret"
     else
-        echo "Cannot find survey.properties file for instance" $i
+        echo "Cannot find survey.properties or p12 file for instance" $i
     fi
 done

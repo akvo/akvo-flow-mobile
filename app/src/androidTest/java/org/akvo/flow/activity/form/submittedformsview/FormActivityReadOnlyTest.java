@@ -22,7 +22,6 @@ package org.akvo.flow.activity.form.submittedformsview;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
@@ -31,7 +30,6 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.util.Pair;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
-import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -55,13 +53,10 @@ import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.MediaQuestionView;
-import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewReadOnly;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.hamcrest.Matcher;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,7 +78,6 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
@@ -92,10 +86,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
-import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
-import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.linearLayoutChild;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyHelpTip;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionHeader;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyToolBar;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent;
 import static org.akvo.flow.tests.R.raw.all_questions_form;
 import static org.akvo.flow.tests.R.raw.data;
 import static org.hamcrest.CoreMatchers.is;
@@ -143,7 +141,7 @@ public class FormActivityReadOnlyTest {
         //make sure everything is loaded
         addExecutionDelay(5000);
 
-        verifyToolBar();
+        verifyToolBar(survey.getName(), survey.getVersion());
 
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         for (int i = 0; i < questionGroups.size(); i++) {
@@ -153,10 +151,7 @@ public class FormActivityReadOnlyTest {
     }
 
     private void verifyGroup(int groupPosition, QuestionGroup group) {
-        ViewInteraction tab = onView(
-                childAtPosition(childAtPosition(withId(R.id.tabs), 0), groupPosition));
-        tab.perform(click());
-        tab.check(matches(hasDescendant(withText(group.getHeading()))));
+        selectAndVerifyTab(groupPosition, group);
         List<Question> questions = group.getQuestions();
         for (int j = 0; j < questions.size(); j++) {
             Question question = questions.get(j);
@@ -164,28 +159,10 @@ public class FormActivityReadOnlyTest {
         }
     }
 
-    private void verifyToolBar() {
-        onView(withId(R.id.toolbar)).check(matches(withToolbarTitle(is(survey.getName()))));
-        onView(withId(R.id.toolbar))
-                .check(matches(withToolbarSubtitle(is("v " + survey.getVersion()))));
-    }
-
     private void verifyQuestionDisplayed(Question question, int questionPosition) {
-        String questionHeader = getQuestionHeader(question);
-        verifyQuestionHeader(questionHeader);
+        verifyQuestionHeader(question);
         verifyHelpTip(question);
         verifyQuestionView(question, questionPosition);
-    }
-
-    private void verifyHelpTip(Question question) {
-        if (question.getHelpTypeCount() > 0) {
-            ViewInteraction questionHelpTip = onView(
-                    allOf(withId(R.id.tip_ib),
-                            withQuestionViewParent(question, QuestionView.class)));
-            questionHelpTip.perform(scrollTo());
-            questionHelpTip.check(matches(isDisplayed()));
-            questionHelpTip.check(matches(isEnabled()));
-        }
     }
 
     private void verifyQuestionView(Question question, int questionPosition) {
@@ -239,7 +216,8 @@ public class FormActivityReadOnlyTest {
                                 CaddisflyQuestionView.class))).perform(scrollTo());
         for (int i = 0; i < caddisflyTestResults.size(); i++) {
             caddislfyRecyclerView.perform(scrollToPosition(i));
-            caddislfyRecyclerView.check(matches(hasDescendant(withText(caddisflyTestResults.get(i).buildResultToDisplay()))));
+            caddislfyRecyclerView.check(matches(
+                    hasDescendant(withText(caddisflyTestResults.get(i).buildResultToDisplay()))));
         }
 
         ViewInteraction caddisflyButton = onView(allOf(withId(R.id.caddisfly_button),
@@ -391,7 +369,8 @@ public class FormActivityReadOnlyTest {
 
     private void verifyGeoInput(Question question, int resId, String text) {
         ViewInteraction input = onView(
-                allOf(withId(resId), withQuestionViewParent(question, GeoQuestionView.class)));
+                allOf(withId(resId),
+                        withQuestionViewParent(question, GeoQuestionView.class)));
         input.perform(scrollTo());
         input.check(matches(isDisplayed()));
         input.check(matches(withText(text)));
@@ -431,21 +410,6 @@ public class FormActivityReadOnlyTest {
         }
     }
 
-    @NonNull
-    private String getQuestionHeader(Question question) {
-        String questionHeader = question.getOrder() + ". " + question.getText();
-        if (question.isMandatory()) {
-            questionHeader = questionHeader + "*";
-        }
-        return questionHeader;
-    }
-
-    private void verifyQuestionHeader(String questionHeader) {
-        ViewInteraction questionTitle = findQuestionTitle(questionHeader);
-        questionTitle.perform(scrollTo());
-        questionTitle.check(matches(isDisplayed()));
-    }
-
     private void verifyFreeTextQuestionView(Question question) {
         ViewInteraction freeTextQuestionInput = onView(
                 allOf(withId(R.id.input_et),
@@ -480,13 +444,6 @@ public class FormActivityReadOnlyTest {
             return null;
         }
         return questionResponse.getValue();
-    }
-
-    @NonNull
-    private <T extends View> Matcher<View> withQuestionViewParent(Question question,
-            Class<T> parentClass) {
-        return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(parentClass),
-                withTagValue(is((Object) question.getId()))));
     }
 
     private void verifyOptionQuestionView(Question question, int questionPosition) {
@@ -537,16 +494,5 @@ public class FormActivityReadOnlyTest {
         }
         return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
                 withText(option.getText())));
-    }
-
-    private ViewInteraction findQuestionTitle(String questionText) {
-        return onView(allOf(withId(R.id.question_tv), withText(questionText),
-                childAtPosition(linearLayoutChild(0), 0)));
-    }
-
-    @NonNull
-    private Matcher<View> linearLayoutChild(int position) {
-        return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                position);
     }
 }

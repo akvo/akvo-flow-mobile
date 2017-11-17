@@ -165,7 +165,7 @@ public class SurveyInstaller {
     }
 
     public Pair<Long, Map<String, QuestionResponse>> createDataPoint(SurveyGroup surveyGroup,
-            QuestionResponse.QuestionResponseBuilder ... responseBuilders) {
+            QuestionResponse.QuestionResponseBuilder... responseBuilders) {
         adapter.open();
         Survey registrationForm = adapter.getRegistrationForm(surveyGroup);
         String surveyedLocaleId = adapter.createSurveyedLocale(surveyGroup.getId());
@@ -198,7 +198,8 @@ public class SurveyInstaller {
             GsonMapper mapper = new GsonMapper();
             TestDataPoint dataPoint = mapper.read(jsonDataString, TestDataPoint.class);
             List<TestResponse> responses = dataPoint.getResponses();
-            List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(responses.size());
+            List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(
+                    responses.size());
             for (TestResponse response : responses) {
                 QuestionResponse.QuestionResponseBuilder questionResponse = new QuestionResponse.QuestionResponseBuilder()
                         .setValue(response.getValue())
@@ -230,6 +231,4 @@ public class SurveyInstaller {
         adapter.deleteResponses(surveyInstanceId);
         adapter.close();
     }
-
-
 }

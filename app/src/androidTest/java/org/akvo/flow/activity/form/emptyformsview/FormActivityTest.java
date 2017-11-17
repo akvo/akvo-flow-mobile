@@ -47,7 +47,6 @@ import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.MediaQuestionView;
 import org.akvo.flow.ui.view.QuestionGroupTab;
 import org.akvo.flow.ui.view.QuestionHeaderView;
-import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewSingle;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
@@ -81,10 +80,15 @@ import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
-import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
-import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getQuestionHeader;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.linearLayoutChild;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyHelpTip;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionHeader;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyToolBar;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent;
 import static org.akvo.flow.tests.R.raw.all_questions_form;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
@@ -128,11 +132,10 @@ public class FormActivityTest {
 
     @Test
     public void viewEmptySurveyTest() {
-
         //make sure everything is loaded
         addExecutionDelay(5000);
 
-        verifyToolBar();
+        verifyToolBar(survey.getName(), survey.getVersion());
 
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         List<Question> mandatoryQuestions = new ArrayList<>();
@@ -144,10 +147,9 @@ public class FormActivityTest {
         verifySubmitTab(questionGroups, mandatoryQuestions);
     }
 
-    private void verifyGroup(List<Question> mandatoryQuestions, int i, QuestionGroup group) {
-        ViewInteraction tab = onView(childAtPosition(childAtPosition(withId(R.id.tabs), 0), i));
-        tab.perform(click());
-        tab.check(matches(hasDescendant(withText(group.getHeading()))));
+    private void verifyGroup(List<Question> mandatoryQuestions, int groupPosition,
+            QuestionGroup group) {
+        selectAndVerifyTab(groupPosition, group);
         List<Question> questions = group.getQuestions();
         for (int j = 0; j < questions.size(); j++) {
             Question question = questions.get(j);
@@ -157,12 +159,6 @@ public class FormActivityTest {
             verifyQuestionDisplayed(question, j);
         }
         verifyNextButton(group);
-    }
-
-    private void verifyToolBar() {
-        onView(withId(R.id.toolbar)).check(matches(withToolbarTitle(is(survey.getName()))));
-        onView(withId(R.id.toolbar))
-                .check(matches(withToolbarSubtitle(is("v " + survey.getVersion()))));
     }
 
     private void verifySubmitTab(List<QuestionGroup> questionGroups,
@@ -215,8 +211,7 @@ public class FormActivityTest {
     }
 
     private void verifyQuestionDisplayed(Question question, int questionPosition) {
-        String questionHeader = getQuestionHeader(question);
-        verifyQuestionHeader(questionHeader);
+        verifyQuestionHeader(question);
         verifyHelpTip(question);
         verifyQuestionView(question, questionPosition);
     }
@@ -225,17 +220,6 @@ public class FormActivityTest {
         ViewInteraction nextButton = onView(
                 allOf(withId(R.id.next_btn), withQuestionGroupViewParent(group)));
         nextButton.check(matches(allOf(isEnabled(), withText(R.string.nextbutton))));
-    }
-
-    private void verifyHelpTip(Question question) {
-        if (question.getHelpTypeCount() > 0) {
-            ViewInteraction questionHelpTip = onView(
-                    allOf(withId(R.id.tip_ib),
-                            withQuestionViewParent(question, QuestionView.class)));
-            questionHelpTip.perform(scrollTo());
-            questionHelpTip.check(matches(isDisplayed()));
-            questionHelpTip.check(matches(isEnabled()));
-        }
     }
 
     private void verifyQuestionView(Question question, int questionPosition) {
@@ -471,21 +455,6 @@ public class FormActivityTest {
         }
     }
 
-    @NonNull
-    private String getQuestionHeader(Question question) {
-        String questionHeader = question.getOrder() + ". " + question.getText();
-        if (question.isMandatory()) {
-            questionHeader = questionHeader + "*";
-        }
-        return questionHeader;
-    }
-
-    private void verifyQuestionHeader(String questionHeader) {
-        ViewInteraction questionTitle = findQuestionTitle(questionHeader);
-        questionTitle.perform(scrollTo());
-        questionTitle.check(matches(isDisplayed()));
-    }
-
     private void verifyFreeTextQuestionView(Question question) {
         ViewInteraction freeTextQuestionInput = onView(
                 allOf(withId(R.id.input_et),
@@ -509,13 +478,6 @@ public class FormActivityTest {
             repeatInput.perform(click());
             repeatInput.perform(closeSoftKeyboard());
         }
-    }
-
-    @NonNull
-    private <T extends View> Matcher<View> withQuestionViewParent(Question question,
-            Class<T> parentClass) {
-        return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(parentClass),
-                withTagValue(is((Object) question.getId()))));
     }
 
     @NonNull
@@ -565,16 +527,5 @@ public class FormActivityTest {
         }
         return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
                 withText(option.getText())));
-    }
-
-    private ViewInteraction findQuestionTitle(String questionText) {
-        return onView(allOf(withId(R.id.question_tv), withText(questionText),
-                childAtPosition(linearLayoutChild(0), 0)));
-    }
-
-    @NonNull
-    private Matcher<View> linearLayoutChild(int position) {
-        return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                position);
     }
 }

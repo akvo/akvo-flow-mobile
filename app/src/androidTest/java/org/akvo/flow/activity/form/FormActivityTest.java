@@ -373,7 +373,7 @@ public class FormActivityTest {
     private void verifyPhotoQuestionView(Question question) {
         ViewInteraction photoButton = onView(
                 allOf(withId(R.id.media_btn), withQuestionViewParent(question, MediaQuestionView.class)))
-                .perform(ViewActions.scrollTo());
+                .perform(scrollTo());
         photoButton.check(matches(withText(R.string.takephoto)));
         photoButton.check(matches(isDisplayed()));
     }
@@ -381,7 +381,7 @@ public class FormActivityTest {
     private void verifyVideoQuestionView(Question question) {
         ViewInteraction videoButton = onView(
                 allOf(withId(R.id.media_btn), withQuestionViewParent(question, MediaQuestionView.class)))
-                .perform(ViewActions.scrollTo());
+                .perform(scrollTo());
         videoButton.check(matches(withText(R.string.takevideo)));
         videoButton.check(matches(isDisplayed()));
     }

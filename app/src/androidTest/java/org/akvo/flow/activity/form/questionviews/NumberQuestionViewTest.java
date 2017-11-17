@@ -95,20 +95,15 @@ public class NumberQuestionViewTest {
     }
 
     @Test
-    public void canFillNumberQuestion() throws IOException {
+    public void ensureCanFillNumberQuestion() throws IOException {
         fillNumberQuestion(50);
         clickNext();
         verifySubmitButtonEnabled();
     }
 
-    @NonNull
-    private String getString(@StringRes int stringResId) {
-        return rule.getActivity().getApplicationContext().getResources()
-                .getString(stringResId);
-    }
 
     @Test
-    public void canNotifyWrongMaxInputNumberQuestion() throws Exception {
+    public void ensureCanNotifyWrongMaxInputNumberQuestion() throws Exception {
         fillNumberQuestion(2000);
 
         verifyNumberTooLargeErrorShown();
@@ -117,7 +112,7 @@ public class NumberQuestionViewTest {
     }
 
     @Test
-    public void canNotifyWrongMinInputNumberQuestion() throws Exception {
+    public void ensureCanNotifyWrongMinInputNumberQuestion() throws Exception {
         fillNumberQuestion(0);
 
         verifyNumberTooSmallErrorShown();
@@ -126,26 +121,31 @@ public class NumberQuestionViewTest {
     }
 
     @Test
-    public void cannotEnterText() throws Exception {
+    public void ensureCannotEnterText() throws Exception {
         fillFreeTextQuestion("This is an answer to your question");
 
         onView(withId(R.id.input_et)).check(matches(withText("")));
     }
 
     @Test
-    public void cannotEnterSigned() throws Exception {
+    public void ensureCannotEnterSigned() throws Exception {
         fillFreeTextQuestion("-1");
 
         onView(withId(R.id.input_et)).check(matches(withText("1")));
     }
 
     @Test
-    public void cannotEnterDecimal() throws Exception {
+    public void ensureCannotEnterDecimal() throws Exception {
         fillFreeTextQuestion("1.1");
 
         onView(withId(R.id.input_et)).check(matches(withText("11")));
     }
 
+    @NonNull
+    private String getString(@StringRes int stringResId) {
+        return rule.getActivity().getApplicationContext().getResources()
+                .getString(stringResId);
+    }
 
     private void verifyNumberTooLargeErrorShown() {
         int maxValue = getValidationRule().getMaxVal().intValue();

@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.action.ViewActions;
 import android.view.View;
 
 import org.akvo.flow.R;
@@ -35,7 +36,9 @@ import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.FreetextQuestionView;
+import org.akvo.flow.ui.view.MediaQuestionView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
@@ -193,6 +196,36 @@ public class FormActivityTestUtil {
         repeatTextView.perform(scrollTo());
         repeatTextView.check(matches(withText(R.string.repeat_answer)));
         repeatTextView.check(matches(isDisplayed()));
+    }
+
+    @NonNull
+    public static ViewInteraction getMediaButton(Question question) {
+        return onView(
+                allOf(withId(R.id.media_btn),
+                        withQuestionViewParent(question, MediaQuestionView.class)))
+                .perform(ViewActions.scrollTo());
+    }
+
+    @NonNull
+    public static ViewInteraction getDateButton(Question question) {
+        return onView(allOf(withId(R.id.date_btn),
+                withQuestionViewParent(question, DateQuestionView.class))).perform(scrollTo());
+    }
+
+    @NonNull
+    public static ViewInteraction getDateEditText(Question question) {
+        return onView(
+                allOf(withId(R.id.date_et),
+                        withQuestionViewParent(question, DateQuestionView.class)))
+                .perform(scrollTo());
+    }
+
+    @NonNull
+    public static ViewInteraction getGeoButton(Question question) {
+        ViewInteraction geoButton = onView(allOf(withId(R.id.geo_btn),
+                withQuestionViewParent(question, GeoQuestionView.class)));
+        geoButton.perform(scrollTo());
+        return geoButton;
     }
 
     public static void verifyGeoLabel(Question question, int resourceId) {

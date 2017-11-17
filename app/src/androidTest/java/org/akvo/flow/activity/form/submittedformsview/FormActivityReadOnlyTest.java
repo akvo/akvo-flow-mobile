@@ -24,7 +24,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.action.ViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.util.Pair;
@@ -49,7 +48,6 @@ import org.akvo.flow.serialization.response.value.SignatureValue;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
-import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.MediaQuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewReadOnly;
@@ -84,9 +82,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getMediaButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;
@@ -283,11 +285,13 @@ public class FormActivityReadOnlyTest {
     }
 
     private void verifyDateQuestionView(Question question) {
+        verifyDateInput(question);
+        verifyDateButton(question);
+    }
+
+    private void verifyDateInput(Question question) {
         String questionValue = getResponseValue(question);
-        ViewInteraction dateInput = onView(
-                allOf(withId(R.id.date_et),
-                        withQuestionViewParent(question, DateQuestionView.class)))
-                .perform(scrollTo());
+        ViewInteraction dateInput = getDateEditText(question);
         dateInput.check(matches(isDisplayed()));
         DateFormat userDisplayedDateFormat = SimpleDateFormat.getDateInstance();
         userDisplayedDateFormat.setTimeZone(TimeZone.getDefault());
@@ -297,37 +301,33 @@ public class FormActivityReadOnlyTest {
         } else {
             dateInput.check(matches(withText("")));
         }
+    }
 
-        ViewInteraction dateButton = onView(allOf(withId(R.id.date_btn),
-                withQuestionViewParent(question, DateQuestionView.class))).perform(scrollTo());
+    private void verifyDateButton(Question question) {
+        ViewInteraction dateButton = getDateButton(question);
         dateButton.check(matches(isDisplayed()));
         dateButton.check(matches(not(isEnabled())));
         dateButton.check(matches(withText(R.string.pickdate)));
     }
 
     private void verifyPhotoQuestionView(Question question) {
-        ViewInteraction photoButton = onView(
-                allOf(withId(R.id.media_btn),
-                        withQuestionViewParent(question, MediaQuestionView.class)))
-                .perform(ViewActions.scrollTo());
-        photoButton.check(matches(withText(R.string.takephoto)));
-        photoButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
-        String questionValue = getResponseValue(question);
-        verifyMediaContent(question, questionValue);
+        verifyMediaButton(question, R.string.takephoto);
+        verifyMediaContent(question);
+    }
+
+    private void verifyMediaButton(Question question, int textResId) {
+        ViewInteraction mediaButton = getMediaButton(question);
+        mediaButton.check(matches(withText(textResId)));
+        mediaButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
     }
 
     private void verifyVideoQuestionView(Question question) {
-        ViewInteraction videoButton = onView(
-                allOf(withId(R.id.media_btn),
-                        withQuestionViewParent(question, MediaQuestionView.class)))
-                .perform(ViewActions.scrollTo());
-        videoButton.check(matches(withText(R.string.takevideo)));
-        videoButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
-        String questionValue = getResponseValue(question);
-        verifyMediaContent(question, questionValue);
+        verifyMediaButton(question, R.string.takevideo);
+        verifyMediaContent(question);
     }
 
-    private void verifyMediaContent(Question question, String questionValue) {
+    private void verifyMediaContent(Question question) {
+        String questionValue = getResponseValue(question);
         if (!TextUtils.isEmpty(questionValue)) {
             ViewInteraction downloadButton = onView(
                     allOf(withId(R.id.media_download),
@@ -361,9 +361,7 @@ public class FormActivityReadOnlyTest {
     }
 
     private void verifyGeoButton(Question question) {
-        ViewInteraction geoButton = onView(allOf(withId(R.id.geo_btn),
-                withQuestionViewParent(question, GeoQuestionView.class)));
-        geoButton.perform(scrollTo());
+        ViewInteraction geoButton = getGeoButton(question);
         geoButton.check(matches(withText(R.string.getgeo)));
         geoButton.check(matches(not(isEnabled())));
         geoButton.check(matches(isDisplayed()));

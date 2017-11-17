@@ -50,16 +50,18 @@ import static org.hamcrest.Matchers.not;
 public class FormActivityTestUtil {
 
     @NonNull
-    public static Intent getFormActivityIntent(long surveyGroupId, String formId, String formTitle) {
+    public static Intent getFormActivityIntent(long surveyGroupId, String formId,
+            String formTitle, long dataPointId, boolean readOnly) {
         Context targetContext = InstrumentationRegistry.getInstrumentation()
                 .getTargetContext();
         Intent result = new Intent(targetContext, FormActivity.class);
         result.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
-        result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0L);
+        result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, dataPointId);
         result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
                 new SurveyGroup(surveyGroupId, formTitle, null, false));
         result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA,
                 Constants.TEST_FORM_SURVEY_INSTANCE_ID);
+        result.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         return result;
     }
 
@@ -84,5 +86,16 @@ public class FormActivityTestUtil {
     public static void fillFreeTextQuestion(String text) throws IOException {
         onView(withId(R.id.input_et)).perform(typeText(text));
         Espresso.closeSoftKeyboard();
+    }
+
+    public static void addExecutionDelay(int millis) {
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

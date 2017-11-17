@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity.form.filledformsview;
+package org.akvo.flow.activity.form.submittedformsview;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +34,6 @@ import android.text.TextUtils;
 import android.view.View;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
@@ -44,7 +43,6 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.response.value.CascadeNode;
 import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.serialization.response.value.CascadeValue;
@@ -96,6 +94,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.tests.R.raw.all_questions_form;
 import static org.akvo.flow.tests.R.raw.data;
 import static org.hamcrest.CoreMatchers.is;
@@ -106,6 +106,7 @@ import static org.hamcrest.core.IsNot.not;
 @RunWith(AndroidJUnit4.class)
 public class FormActivityReadOnlyTest {
 
+    private static final String FORM_TITLE = "Test form";
     private Map<String, QuestionResponse> responseMap;
 
     private Survey survey;
@@ -123,19 +124,9 @@ public class FormActivityReadOnlyTest {
             Pair<Long, Map<String, QuestionResponse>> dataPointFromFile = installer
                     .createDataPointFromFile(survey.getSurveyGroup(),
                             InstrumentationRegistry.getContext(), data);
-            long id = dataPointFromFile.first;
+            long dataPointId = dataPointFromFile.first;
             responseMap = dataPointFromFile.second;
-            Context activityContext = InstrumentationRegistry.getInstrumentation()
-                    .getTargetContext();
-            Intent result = new Intent(activityContext, FormActivity.class);
-            result.putExtra(ConstantUtil.READ_ONLY_EXTRA, true);
-            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "156792013");
-            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, id);
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
-                    new SurveyGroup(155852013L, "Test form", null, false));
-            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA,
-                    Constants.TEST_FORM_SURVEY_INSTANCE_ID);
-            return result;
+            return getFormActivityIntent(155852013L, "156792013", FORM_TITLE, dataPointId, true);
         }
     };
 
@@ -149,9 +140,9 @@ public class FormActivityReadOnlyTest {
 
     @Test
     public void viewResponsesTest() {
-
         //make sure everything is loaded
         addExecutionDelay(5000);
+
         verifyToolBar();
 
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
@@ -557,16 +548,5 @@ public class FormActivityReadOnlyTest {
     private Matcher<View> linearLayoutChild(int position) {
         return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                 position);
-    }
-
-    private static void addExecutionDelay(int millis) {
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

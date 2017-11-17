@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.action.ViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -84,6 +83,7 @@ import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.tests.R.raw.all_questions_form;
 import static org.hamcrest.CoreMatchers.is;
@@ -94,6 +94,7 @@ import static org.hamcrest.core.IsNot.not;
 @RunWith(AndroidJUnit4.class)
 public class FormActivityTest {
 
+    private static final String FORM_TITLE = "Test form";
     private static SurveyInstaller installer;
     private static Survey survey;
 
@@ -102,7 +103,7 @@ public class FormActivityTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(155852013L, "156792013", "Test form");
+            return getFormActivityIntent(155852013L, "156792013", FORM_TITLE, 0L, false);
         }
     };
 
@@ -130,6 +131,7 @@ public class FormActivityTest {
 
         //make sure everything is loaded
         addExecutionDelay(5000);
+
         verifyToolBar();
 
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
@@ -228,7 +230,8 @@ public class FormActivityTest {
     private void verifyHelpTip(Question question) {
         if (question.getHelpTypeCount() > 0) {
             ViewInteraction questionHelpTip = onView(
-                    allOf(withId(R.id.tip_ib), withQuestionViewParent(question, QuestionView.class)));
+                    allOf(withId(R.id.tip_ib),
+                            withQuestionViewParent(question, QuestionView.class)));
             questionHelpTip.perform(scrollTo());
             questionHelpTip.check(matches(isDisplayed()));
             questionHelpTip.check(matches(isEnabled()));
@@ -278,7 +281,8 @@ public class FormActivityTest {
     private void verifyCaddisflyQuestionView(Question question) {
         ViewInteraction caddisflyButton = onView(allOf(withId(R.id.caddisfly_button),
                 withQuestionViewParent(question, CaddisflyQuestionView.class))).perform(scrollTo());
-        caddisflyButton.check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.caddisfly_test))));
+        caddisflyButton.check(matches(
+                allOf(isDisplayed(), isEnabled(), withText(R.string.caddisfly_test))));
     }
 
     private void verifySignatureQuestionView(Question question) {
@@ -327,7 +331,8 @@ public class FormActivityTest {
         }
 
         ViewInteraction scanButton = onView(allOf(withId(R.id.scan_btn),
-                withQuestionViewParent(question, BarcodeQuestionViewMultiple.class))).perform(scrollTo());
+                withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)))
+                .perform(scrollTo());
         scanButton
                 .check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.scanbarcode))));
     }
@@ -336,7 +341,8 @@ public class FormActivityTest {
         boolean manualInputEnabled = !question.isLocked();
         if (manualInputEnabled) {
             ViewInteraction barcodeInput = onView(allOf(withId(R.id.barcode_input),
-                    withQuestionViewParent(question, BarcodeQuestionViewSingle.class))).perform(scrollTo());
+                    withQuestionViewParent(question, BarcodeQuestionViewSingle.class)))
+                    .perform(scrollTo());
             barcodeInput.check(matches(withHint(R.string.type_code)));
             barcodeInput.check(matches(withText("")));
             barcodeInput.check(matches(isDisplayed()));
@@ -350,20 +356,23 @@ public class FormActivityTest {
         }
 
         ViewInteraction scanButton = onView(allOf(withId(R.id.scan_btn),
-                withQuestionViewParent(question, BarcodeQuestionViewSingle.class))).perform(scrollTo());
+                withQuestionViewParent(question, BarcodeQuestionViewSingle.class)))
+                .perform(scrollTo());
         scanButton
                 .check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.scanbarcode))));
     }
 
     private void verifyDateQuestionView(Question question) {
         ViewInteraction dateInput = onView(
-                allOf(withId(R.id.date_et), withQuestionViewParent(question, DateQuestionView.class)))
+                allOf(withId(R.id.date_et),
+                        withQuestionViewParent(question, DateQuestionView.class)))
                 .perform(scrollTo());
         dateInput.check(matches(isDisplayed()));
         dateInput.check(matches(withText("")));
 
         ViewInteraction dateButton = onView(
-                allOf(withId(R.id.date_btn), withQuestionViewParent(question, DateQuestionView.class)))
+                allOf(withId(R.id.date_btn),
+                        withQuestionViewParent(question, DateQuestionView.class)))
                 .perform(scrollTo());
         dateButton.check(matches(isDisplayed()));
         dateButton.check(matches(isEnabled()));
@@ -372,7 +381,8 @@ public class FormActivityTest {
 
     private void verifyPhotoQuestionView(Question question) {
         ViewInteraction photoButton = onView(
-                allOf(withId(R.id.media_btn), withQuestionViewParent(question, MediaQuestionView.class)))
+                allOf(withId(R.id.media_btn),
+                        withQuestionViewParent(question, MediaQuestionView.class)))
                 .perform(scrollTo());
         photoButton.check(matches(withText(R.string.takephoto)));
         photoButton.check(matches(isDisplayed()));
@@ -380,7 +390,8 @@ public class FormActivityTest {
 
     private void verifyVideoQuestionView(Question question) {
         ViewInteraction videoButton = onView(
-                allOf(withId(R.id.media_btn), withQuestionViewParent(question, MediaQuestionView.class)))
+                allOf(withId(R.id.media_btn),
+                        withQuestionViewParent(question, MediaQuestionView.class)))
                 .perform(scrollTo());
         videoButton.check(matches(withText(R.string.takevideo)));
         videoButton.check(matches(isDisplayed()));
@@ -395,13 +406,15 @@ public class FormActivityTest {
         verifyGeoInput(question, R.id.height_et);
 
         ViewInteraction accuracyLabel = onView(
-                allOf(withId(R.id.acc_tv), withQuestionViewParent(question, GeoQuestionView.class)));
+                allOf(withId(R.id.acc_tv),
+                        withQuestionViewParent(question, GeoQuestionView.class)));
         accuracyLabel.perform(scrollTo());
         accuracyLabel.check(matches(isDisplayed()));
         accuracyLabel.check(matches(withText(R.string.geo_location_accuracy_default)));
 
         ViewInteraction geoButton = onView(
-                allOf(withId(R.id.geo_btn), withQuestionViewParent(question, GeoQuestionView.class)));
+                allOf(withId(R.id.geo_btn),
+                        withQuestionViewParent(question, GeoQuestionView.class)));
         geoButton.perform(scrollTo());
         geoButton.check(matches(withText(R.string.getgeo)));
         geoButton.check(matches(isEnabled()));
@@ -426,7 +439,8 @@ public class FormActivityTest {
 
     private void verifyGeoLabel(Question question, int resourceId) {
         ViewInteraction label = onView(
-                allOf(withText(resourceId), withQuestionViewParent(question, GeoQuestionView.class)));
+                allOf(withText(resourceId),
+                        withQuestionViewParent(question, GeoQuestionView.class)));
         label.perform(scrollTo());
         label.check(matches(isDisplayed()));
     }
@@ -474,7 +488,8 @@ public class FormActivityTest {
 
     private void verifyFreeTextQuestionView(Question question) {
         ViewInteraction freeTextQuestionInput = onView(
-                allOf(withId(R.id.input_et), withQuestionViewParent(question, FreetextQuestionView.class)));
+                allOf(withId(R.id.input_et),
+                        withQuestionViewParent(question, FreetextQuestionView.class)));
         freeTextQuestionInput.perform(scrollTo());
         freeTextQuestionInput.check(matches(withText("")));
         freeTextQuestionInput.perform(click());
@@ -504,7 +519,8 @@ public class FormActivityTest {
     }
 
     @NonNull
-    private <T extends View> Matcher<View> withQuestionGroupViewParent(QuestionGroup questionGroup) {
+    private <T extends View> Matcher<View> withQuestionGroupViewParent(
+            QuestionGroup questionGroup) {
         return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(QuestionGroupTab.class),
                 withTagValue(is((Object) questionGroup.getOrder()))));
     }
@@ -560,16 +576,5 @@ public class FormActivityTest {
     private Matcher<View> linearLayoutChild(int position) {
         return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                 position);
-    }
-
-    private static void addExecutionDelay(int millis) {
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity.form.questionviews;
+package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;

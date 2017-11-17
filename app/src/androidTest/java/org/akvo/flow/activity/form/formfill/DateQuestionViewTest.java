@@ -18,19 +18,19 @@
  *
  */
 
-package org.akvo.flow.activity.form.questionviews;
+package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
+import android.support.test.espresso.contrib.PickerActions;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.widget.DatePicker;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
@@ -41,23 +41,26 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static java.util.Calendar.SHORT;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.freetext_double_entry_form;
+import static org.akvo.flow.tests.R.raw.date_form;
+import static org.hamcrest.Matchers.endsWith;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class FreeTextDoubleQuestionViewTest {
+public class DateQuestionViewTest {
 
     private static SurveyInstaller installer;
 
@@ -66,7 +69,7 @@ public class FreeTextDoubleQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(44173002L, "47313002", "FreeTextForm", 0L, false);
+            return getFormActivityIntent(41713002L, "49803002", "DateForm", 0L, false);
         }
     };
 
@@ -75,12 +78,12 @@ public class FreeTextDoubleQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(freetext_double_entry_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(date_form, InstrumentationRegistry.getContext());
     }
 
     @After
     public void afterEachTest() {
-        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
+        installer.deleteResponses(Constants.TEST_FORM_SURVEY_INSTANCE_ID);
     }
 
     @AfterClass
@@ -90,58 +93,45 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     @Test
-    public void ensureCannotSubmitIfSecondEntryMissing() throws Exception {
-        verifyQuestionTitleDisplayed();
-        fillFreeTextQuestion("This is an answer to your question");
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
+    public void canFillDateQuestion() throws Exception {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
 
-    @Test
-    public void ensureCannotSubmitEmptyFreeText() throws Exception {
-        verifyQuestionTitleDisplayed();
-        fillFreeTextQuestion("");
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
+        String dateString = getShortDate(cal);
 
-    @Test
-    public void ensureCannotSubmitDifferentAnswers() throws Exception {
-        verifyQuestionTitleDisplayed();
-
-        fillFreeTextQuestion("This is an answer to your question");
-        fillDoubleEntry("Something else");
-
-        verifyDoubleEntryMisMatchErrorDisplayed();
-
-        clickNext();
-        verifySubmitButtonDisabled();
-    }
-
-    @Test
-    public void ensureCanSubmitCorrectQuestion() throws Exception {
-        verifyQuestionTitleDisplayed();
-
-        fillFreeTextQuestion("This is an answer to your question");
-        fillDoubleEntry("This is an answer to your question");
-
+        pickDate(year, month + 1, day); // +1 on month due to January starting at 0
+        onView(withId(R.id.date_et)).check(matches(withText(dateString)));
         clickNext();
         verifySubmitButtonEnabled();
     }
 
-    private void verifyDoubleEntryMisMatchErrorDisplayed() {
-        onView(withId(R.id.double_entry_et))
-                .check(matches(hasErrorText(getString(R.string.error_answer_match))));
+    @Test
+    public void canNotSubmitEmptyDateQuestion() throws Exception {
+        clickNext();
+        verifySubmitButtonDisabled();
     }
 
-    private void fillDoubleEntry(String text) {
-        onView(withId(R.id.double_entry_et)).perform(typeText(text));
-        Espresso.closeSoftKeyboard();
+    /**
+     * @param cal Calendar object populated with Calendar.getInstance()
+     * @return String representation of today's date, concatenated (ex. Jan 5, 2017)
+     */
+    private String getShortDate(Calendar cal) {
+        StringBuilder dateString = new StringBuilder();
+        dateString.append(cal.getDisplayName(Calendar.MONTH, SHORT, Locale.ENGLISH));
+        dateString.append(" ");
+        dateString.append(cal.get(Calendar.DAY_OF_MONTH));
+        dateString.append(", ");
+        dateString.append(cal.get(Calendar.YEAR));
+
+        return dateString.toString();
     }
 
-    @NonNull
-    private String getString(@StringRes int stringResId) {
-        return rule.getActivity().getApplicationContext().getResources()
-                .getString(stringResId);
+    private void pickDate(int year, int month, int day) {
+        onView(withId(R.id.date_btn)).perform(click());
+        onView(withClassName(endsWith(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(year, month, day));
+        onView(withId(android.R.id.button1)).perform(click());
     }
 }

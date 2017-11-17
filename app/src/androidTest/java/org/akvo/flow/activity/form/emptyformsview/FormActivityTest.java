@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity.form;
+package org.akvo.flow.activity.form.emptyformsview;
 
 import android.content.Context;
 import android.content.Intent;

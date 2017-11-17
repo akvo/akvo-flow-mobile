@@ -31,10 +31,13 @@ import android.view.View;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsInstanceOf;
@@ -170,5 +173,72 @@ public class FormActivityTestUtil {
             Class<T> parentClass) {
         return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(parentClass),
                 withTagValue(is((Object) question.getId()))));
+    }
+
+    @NonNull
+    public static ViewInteraction getFreeTextInput(Question question) {
+        return onView(allOf(withId(R.id.input_et),
+                withQuestionViewParent(question, FreetextQuestionView.class))).perform(scrollTo());
+    }
+
+    @NonNull
+    public static ViewInteraction getDoubleEntryInput(Question question) {
+        return onView(allOf(withId(R.id.double_entry_et),
+                withQuestionViewParent(question, FreetextQuestionView.class))).perform(scrollTo());
+    }
+
+    public static void verifyDoubleEntryTitle(Question question) {
+        ViewInteraction repeatTextView = onView(allOf(withId(R.id.double_entry_title),
+                withQuestionViewParent(question, FreetextQuestionView.class)));
+        repeatTextView.perform(scrollTo());
+        repeatTextView.check(matches(withText(R.string.repeat_answer)));
+        repeatTextView.check(matches(isDisplayed()));
+    }
+
+    public static void verifyGeoLabel(Question question, int resourceId) {
+        ViewInteraction label = onView(
+                allOf(withText(resourceId),
+                        withQuestionViewParent(question, GeoQuestionView.class)));
+        label.perform(scrollTo());
+        label.check(matches(isDisplayed()));
+    }
+
+    public static void verifyAccuracyLabel(Question question) {
+        ViewInteraction accuracyLabel = onView(
+                allOf(withId(R.id.acc_tv),
+                        withQuestionViewParent(question, GeoQuestionView.class)));
+        accuracyLabel.perform(scrollTo());
+        accuracyLabel.check(matches(isDisplayed()));
+        accuracyLabel.check(matches(withText(R.string.geo_location_accuracy_default)));
+    }
+
+    public static ViewInteraction getOptionView(Question question, int questionPosition,
+            int optionPosition, Option option) {
+        if (question.isAllowMultiple()) {
+            return checkBoxWithText(option, optionPosition, questionPosition);
+        } else {
+            return radioButtonWithText(option, optionPosition);
+        }
+    }
+
+    private static ViewInteraction checkBoxWithText(Option option, int optionPosition,
+            int questionPosition) {
+        if (option.isOther()) {
+            return onView(
+                    allOf(childAtPosition(childAtPosition(withId(R.id.question_list),
+                            questionPosition), optionPosition + 1), withText(R.string.othertext)));
+        }
+        return onView(
+                allOf(childAtPosition(childAtPosition(withId(R.id.question_list), questionPosition),
+                        optionPosition + 1), withText(option.getText())));
+    }
+
+    private static ViewInteraction radioButtonWithText(Option option, int childPosition) {
+        if (option.isOther()) {
+            return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
+                    withText(R.string.othertext)));
+        }
+        return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
+                withText(option.getText())));
     }
 }

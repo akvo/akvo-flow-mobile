@@ -50,7 +50,6 @@ import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.DateQuestionView;
-import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.MediaQuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewReadOnly;
@@ -72,7 +71,6 @@ import java.util.TimeZone;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
@@ -85,11 +83,15 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.linearLayoutChild;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyDoubleEntryTitle;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyGeoLabel;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyHelpTip;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionHeader;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyToolBar;
@@ -353,12 +355,12 @@ public class FormActivityReadOnlyTest {
             verifyGeoInput(question, R.id.height_et, "");
         }
 
-        ViewInteraction accuracyLabel = onView(allOf(withId(R.id.acc_tv),
-                withQuestionViewParent(question, GeoQuestionView.class)));
-        accuracyLabel.perform(scrollTo());
-        accuracyLabel.check(matches(isDisplayed()));
-        accuracyLabel.check(matches(withText(R.string.geo_location_accuracy_default)));
+        verifyAccuracyLabel(question);
 
+        verifyGeoButton(question);
+    }
+
+    private void verifyGeoButton(Question question) {
         ViewInteraction geoButton = onView(allOf(withId(R.id.geo_btn),
                 withQuestionViewParent(question, GeoQuestionView.class)));
         geoButton.perform(scrollTo());
@@ -377,14 +379,6 @@ public class FormActivityReadOnlyTest {
         input.check(matches(not(isFocusable())));
     }
 
-    private void verifyGeoLabel(Question question, int resourceId) {
-        ViewInteraction label = onView(
-                allOf(withText(resourceId),
-                        withQuestionViewParent(question, GeoQuestionView.class)));
-        label.perform(scrollTo());
-        label.check(matches(isDisplayed()));
-    }
-
     private void verifyCascadeQuestionView(Question question) {
         List<Level> levels = question.getLevels();
         String value = getResponseValue(question);
@@ -395,47 +389,51 @@ public class FormActivityReadOnlyTest {
         if (levels != null && levels.size() > 0) {
             for (int i = 0; i < levels.size(); i++) {
                 Level level = levels.get(i);
-                ViewInteraction firstLevelCascadeNumber = onView(
-                        allOf(withId(R.id.cascade_level_number), withText(level.getText())));
-                firstLevelCascadeNumber.perform(scrollTo());
-                firstLevelCascadeNumber.check(matches(isDisplayed()));
-
-                ViewInteraction firstLevelCascadeDescription = onView(
-                        allOf(withId(R.id.cascade_level_spinner), withTagValue(is((Object) i))));
-                firstLevelCascadeDescription.perform(scrollTo());
-                firstLevelCascadeDescription.check(matches(isDisplayed()));
-                firstLevelCascadeDescription
-                        .check(matches(withSpinnerText(values.get(i).getName())));
+                verifyCascadeLevelNumber(level);
+                verifyCascadeLevelSpinner(values, i);
             }
         }
     }
 
+    private void verifyCascadeLevelSpinner(List<CascadeNode> values, int i) {
+        ViewInteraction cascadeLevelSpinner = onView(
+                allOf(withId(R.id.cascade_level_spinner), withTagValue(is((Object) i))));
+        cascadeLevelSpinner.perform(scrollTo());
+        cascadeLevelSpinner.check(matches(isDisplayed()));
+        cascadeLevelSpinner
+                .check(matches(withSpinnerText(values.get(i).getName())));
+    }
+
+    private void verifyCascadeLevelNumber(Level level) {
+        ViewInteraction cascadeLevelNumber = onView(
+                allOf(withId(R.id.cascade_level_number), withText(level.getText())));
+        cascadeLevelNumber.perform(scrollTo());
+        cascadeLevelNumber.check(matches(isDisplayed()));
+    }
+
     private void verifyFreeTextQuestionView(Question question) {
-        ViewInteraction freeTextQuestionInput = onView(
-                allOf(withId(R.id.input_et),
-                        withQuestionViewParent(question, FreetextQuestionView.class)));
-        freeTextQuestionInput.perform(scrollTo());
+        String questionValue = verifyFreeTextInput(question);
+        if (question.isDoubleEntry()) {
+            verifyDoubleEntryTitle(question);
+            verifyDoubleEntryInput(question, questionValue);
+        }
+    }
+
+    private void verifyDoubleEntryInput(Question question, String questionValue) {
+        ViewInteraction repeatInput = getDoubleEntryInput(question);
+        repeatInput.check(matches(isDisplayed()));
+        repeatInput.check(matches(withText(questionValue)));
+    }
+
+    private String verifyFreeTextInput(Question question) {
+        ViewInteraction freeTextQuestionInput = getFreeTextInput(question);
         String questionValue = getResponseValue(question);
         if (questionValue != null) {
             freeTextQuestionInput.check(matches(withText(questionValue)));
         } else {
             freeTextQuestionInput.check(matches(withText("")));
         }
-        if (question.isDoubleEntry()) {
-            ViewInteraction repeatTextView = onView(allOf(withId(R.id.double_entry_title),
-                    withQuestionViewParent(question, FreetextQuestionView.class)));
-            repeatTextView.perform(scrollTo());
-            repeatTextView.check(matches(withText(R.string.repeat_answer)));
-            repeatTextView.check(matches(isDisplayed()));
-
-            ViewInteraction repeatInput = onView(allOf(withId(R.id.double_entry_et),
-                    withQuestionViewParent(question, FreetextQuestionView.class)));
-            repeatInput.perform(scrollTo());
-            repeatInput.check(matches(isDisplayed()));
-            repeatInput.check(matches(withText(questionValue)));
-            repeatInput.perform(click());
-            repeatInput.perform(closeSoftKeyboard());
-        }
+        return questionValue;
     }
 
     private String getResponseValue(Question question) {
@@ -466,33 +464,4 @@ public class FormActivityReadOnlyTest {
         }
     }
 
-    private ViewInteraction getOptionView(Question question, int questionPosition,
-            int optionPosition, Option option) {
-        if (question.isAllowMultiple()) {
-            return checkBoxWithText(option, optionPosition, questionPosition);
-        } else {
-            return radioButtonWithText(option, optionPosition);
-        }
-    }
-
-    private ViewInteraction checkBoxWithText(Option option, int optionPosition,
-            int questionPosition) {
-        if (option.isOther()) {
-            return onView(
-                    allOf(childAtPosition(childAtPosition(withId(R.id.question_list),
-                            questionPosition), optionPosition + 1), withText(R.string.othertext)));
-        }
-        return onView(
-                allOf(childAtPosition(childAtPosition(withId(R.id.question_list), questionPosition),
-                        optionPosition + 1), withText(option.getText())));
-    }
-
-    private ViewInteraction radioButtonWithText(Option option, int childPosition) {
-        if (option.isOther()) {
-            return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
-                    withText(R.string.othertext)));
-        }
-        return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
-                withText(option.getText())));
-    }
 }

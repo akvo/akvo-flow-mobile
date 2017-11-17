@@ -33,7 +33,7 @@ import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
-import org.akvo.flow.service.FileChangeTrackingServiceApi6;
+import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Singleton;
@@ -66,5 +66,5 @@ public interface ApplicationComponent {
 
     UserRepository userRepository();
 
-    void inject(FileChangeTrackingServiceApi6 fileChangeTrackingServiceApi6);
+    void inject(FileChangeTrackingService fileChangeTrackingService);
 }

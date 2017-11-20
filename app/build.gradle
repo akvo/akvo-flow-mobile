@@ -171,7 +171,7 @@ private Properties loadProperties(String fileName) {
 
 android.applicationVariants.all { variant ->
     variant.outputs.all { output ->
-        outputFileName = file("bin/flow.apk")
+        outputFileName = file("/flow.apk")
     }
 }
 

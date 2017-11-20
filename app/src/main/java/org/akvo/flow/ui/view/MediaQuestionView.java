@@ -86,8 +86,8 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
         mImageView = (ImageView)findViewById(R.id.image);
-        mProgressBar = (ProgressBar)findViewById(R.id.progress);
-        mDownloadBtn = findViewById(R.id.download);
+        mProgressBar = (ProgressBar)findViewById(R.id.media_progress);
+        mDownloadBtn = findViewById(R.id.media_download);
         mLocationInfo = (TextView)findViewById(R.id.location_info);
         imageLoader = new PicassoImageLoader(getContext());
         if (isImage()) {

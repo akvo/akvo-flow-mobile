@@ -27,7 +27,7 @@
         android:src="@drawable/info"/>
 
     <ImageView
-        android:id="@+id/open_btn"
+        android:id="@+id/invalid_question_open_btn"
         android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"

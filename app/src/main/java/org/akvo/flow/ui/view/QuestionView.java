@@ -83,6 +83,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             sColors = context.getResources().getStringArray(R.array.colors);
         }
         mQuestion = q;
+        setTag(q.getId());
         mSurveyListener = surveyListener;
         mError = null;// so far so good.
     }

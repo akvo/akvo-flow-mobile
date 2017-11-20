@@ -7,8 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/activity_horizontal_margin"
-        android:background="@drawable/ab_solid_flow"
         android:text="@string/app_update_activity"
+        android:textColor="@color/black_main"
         android:textSize="20sp"/>
 
     <LinearLayout
@@ -26,12 +26,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:textColor="@color/black_main"
             android:text="@string/app_update"
             android:textSize="18sp"/>
 
         <ProgressBar
             android:id="@+id/progress"
-            style="@android:style/Widget.ProgressBar.Horizontal"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
@@ -43,6 +44,7 @@
 
             <Button
                 android:id="@+id/cancel_btn"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -50,6 +52,7 @@
 
             <Button
                 android:id="@+id/install_btn"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

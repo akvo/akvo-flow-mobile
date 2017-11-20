@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Flow.Dialog" parent="@android:style/Theme.Dialog">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:listViewStyle">@style/Flow.ListView</item>
+    <style name="Flow.Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <!--<item name="android:textColor">@color/white</item>-->
+        <!--<item name="android:listViewStyle">@style/Flow.ListView</item>-->
     </style>
 
     <style name="FlowAppTheme" parent="Theme.AppCompat.Light.NoActionBar">

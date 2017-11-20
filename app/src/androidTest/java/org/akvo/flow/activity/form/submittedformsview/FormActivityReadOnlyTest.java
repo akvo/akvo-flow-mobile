@@ -233,33 +233,56 @@ public class FormActivityReadOnlyTest {
     private void verifySignatureQuestionView(Question question) {
         String questionValue = getResponseValue(question);
         if (!TextUtils.isEmpty(questionValue)) {
-            ViewInteraction image = onView(allOf(withId(R.id.signature_image),
-                    withQuestionViewParent(question, SignatureQuestionView.class)))
-                    .perform(scrollTo());
-            image.check(matches(isDisplayed()));
-
-            ViewInteraction nameLabel = onView(allOf(withId(R.id.signature_name_label),
-                    withQuestionViewParent(question, SignatureQuestionView.class)))
-                    .perform(scrollTo());
-            nameLabel.check(matches(allOf(isDisplayed(), withText(R.string.signed_by))));
-
-            Signature signature = SignatureValue.deserialize(questionValue);
-            ViewInteraction name = onView(allOf(withId(R.id.signature_name),
-                    withQuestionViewParent(question, SignatureQuestionView.class)))
-                    .perform(scrollTo());
-            name.check(matches(allOf(isDisplayed(), withText(signature.getName()))));
-
-            ViewInteraction signatureButton = onView(allOf(withId(R.id.sign_btn),
-                    withQuestionViewParent(question, SignatureQuestionView.class)))
-                    .perform(scrollTo());
-            signatureButton.check(matches(
-                    allOf(isDisplayed(), not(isEnabled()), withText(R.string.modify_signature))));
+            verifySignatureImage(question);
+            verifySignatureNameLabel(question);
+            verifySignatureName(question, questionValue);
+            verifySignatureButton(question);
         }
+    }
+
+    private void verifySignatureButton(Question question) {
+        ViewInteraction signatureButton = onView(allOf(withId(R.id.sign_btn),
+                withQuestionViewParent(question, SignatureQuestionView.class))).perform(scrollTo());
+        signatureButton.check(matches(
+                allOf(isDisplayed(), not(isEnabled()), withText(R.string.modify_signature))));
+    }
+
+    private void verifySignatureName(Question question, String questionValue) {
+        Signature signature = SignatureValue.deserialize(questionValue);
+        ViewInteraction name = onView(allOf(withId(R.id.signature_name),
+                withQuestionViewParent(question, SignatureQuestionView.class)))
+                .perform(scrollTo());
+        name.check(matches(allOf(isDisplayed(), withText(signature.getName()))));
+    }
+
+    private void verifySignatureNameLabel(Question question) {
+        ViewInteraction nameLabel = onView(allOf(withId(R.id.signature_name_label),
+                withQuestionViewParent(question, SignatureQuestionView.class)))
+                .perform(scrollTo());
+        nameLabel.check(matches(allOf(isDisplayed(), withText(R.string.signed_by))));
+    }
+
+    private void verifySignatureImage(Question question) {
+        ViewInteraction image = onView(allOf(withId(R.id.signature_image),
+                withQuestionViewParent(question, SignatureQuestionView.class)))
+                .perform(scrollTo());
+        image.check(matches(isDisplayed()));
     }
 
     private void verifyGeoShapeQuestionView(Question question) {
         String questionValue = getResponseValue(question);
         if (!TextUtils.isEmpty(questionValue)) {
+            ViewInteraction capturedShapeImage = onView(allOf(withId(R.id.geo_shape_checkmark),
+                    withQuestionViewParent(question, GeoshapeQuestionView.class)))
+                    .perform(scrollTo());
+            capturedShapeImage.check(matches(isDisplayed()));
+
+            ViewInteraction capturedShapeText = onView(allOf(withId(R.id.geo_shape_captured_text),
+                    withQuestionViewParent(question, GeoshapeQuestionView.class)))
+                    .perform(scrollTo());
+            capturedShapeText
+                    .check(matches(allOf(isDisplayed(), withText(R.string.geoshape_response))));
+
             ViewInteraction captureShapeButton = onView(allOf(withId(R.id.capture_shape_btn),
                     withQuestionViewParent(question, GeoshapeQuestionView.class)))
                     .perform(scrollTo());

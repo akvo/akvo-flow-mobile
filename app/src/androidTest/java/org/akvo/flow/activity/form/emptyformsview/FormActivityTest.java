@@ -44,6 +44,7 @@ import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.QuestionGroupTab;
 import org.akvo.flow.ui.view.QuestionHeaderView;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewSingle;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
@@ -300,56 +301,53 @@ public class FormActivityTest {
     private void verifyMultipleBarcodeQuestionView(Question question) {
         boolean manualInputEnabled = !question.isLocked();
         if (manualInputEnabled) {
-            ViewInteraction barcodeInput = onView(allOf(withId(R.id.barcode_input),
-                    withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)))
-                    .perform(scrollTo());
-            barcodeInput.check(matches(withHint(R.string.type_code)));
-            barcodeInput.check(matches(withText("")));
-            barcodeInput.check(matches(isDisplayed()));
-
-            ViewInteraction addButton = onView(allOf(withId(R.id.barcode_add_btn),
-                    withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)));
-            addButton.perform(scrollTo());
-            addButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
-
-            ViewInteraction barcodeManualSeparator = onView(
-                    allOf(withId(R.id.barcode_manual_input_separator),
-                            withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)))
-                    .perform(scrollTo());
-            barcodeManualSeparator.check(matches(withText(R.string.or)));
-            barcodeManualSeparator.check(matches(isDisplayed()));
+            verifyBarcodeManualInput(question, BarcodeQuestionViewMultiple.class);
+            verifyBarcodeAddButton(question);
+            verifyBarcodeManualInputSeparator(question, BarcodeQuestionViewMultiple.class);
         }
+        verifyBarcodeScanButton(question, BarcodeQuestionViewMultiple.class);
+    }
 
-        ViewInteraction scanButton = onView(allOf(withId(R.id.scan_btn),
-                withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)))
-                .perform(scrollTo());
-        scanButton
-                .check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.scanbarcode))));
+    private void verifyBarcodeAddButton(Question question) {
+        ViewInteraction addButton = onView(allOf(withId(R.id.barcode_add_btn),
+                withQuestionViewParent(question, BarcodeQuestionViewMultiple.class)));
+        addButton.perform(scrollTo());
+        addButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
     }
 
     private void verifySingleBarcodeQuestionView(Question question) {
         boolean manualInputEnabled = !question.isLocked();
         if (manualInputEnabled) {
-            ViewInteraction barcodeInput = onView(allOf(withId(R.id.barcode_input),
-                    withQuestionViewParent(question, BarcodeQuestionViewSingle.class)))
-                    .perform(scrollTo());
-            barcodeInput.check(matches(withHint(R.string.type_code)));
-            barcodeInput.check(matches(withText("")));
-            barcodeInput.check(matches(isDisplayed()));
-
-            ViewInteraction barcodeManualSeparator = onView(
-                    allOf(withId(R.id.barcode_manual_input_separator),
-                            withQuestionViewParent(question, BarcodeQuestionViewSingle.class)))
-                    .perform(scrollTo());
-            barcodeManualSeparator.check(matches(withText(R.string.or)));
-            barcodeManualSeparator.check(matches(isDisplayed()));
+            verifyBarcodeManualInput(question, BarcodeQuestionViewSingle.class);
+            verifyBarcodeManualInputSeparator(question, BarcodeQuestionViewSingle.class);
         }
+        verifyBarcodeScanButton(question, BarcodeQuestionViewSingle.class);
+    }
 
+    private <T extends QuestionView> void verifyBarcodeScanButton(Question question,
+            Class<T> parentClass) {
         ViewInteraction scanButton = onView(allOf(withId(R.id.scan_btn),
-                withQuestionViewParent(question, BarcodeQuestionViewSingle.class)))
-                .perform(scrollTo());
+                withQuestionViewParent(question, parentClass))).perform(scrollTo());
         scanButton
                 .check(matches(allOf(isDisplayed(), isEnabled(), withText(R.string.scanbarcode))));
+    }
+
+    private <T extends QuestionView> void verifyBarcodeManualInputSeparator(Question question,
+            Class<T> parentClass) {
+        ViewInteraction manualSeparator = onView(
+                allOf(withId(R.id.barcode_manual_input_separator),
+                        withQuestionViewParent(question, parentClass))).perform(scrollTo());
+        manualSeparator.check(matches(withText(R.string.or)));
+        manualSeparator.check(matches(isDisplayed()));
+    }
+
+    private <T extends QuestionView> void verifyBarcodeManualInput(Question question,
+            Class<T> parentClass) {
+        ViewInteraction barcodeInput = onView(allOf(withId(R.id.barcode_input),
+                withQuestionViewParent(question, parentClass))).perform(scrollTo());
+        barcodeInput.check(matches(withHint(R.string.type_code)));
+        barcodeInput.check(matches(withText("")));
+        barcodeInput.check(matches(isDisplayed()));
     }
 
     private void verifyDateQuestionView(Question question) {

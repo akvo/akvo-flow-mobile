@@ -26,7 +26,6 @@ import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.action.ViewActions;
 import android.view.View;
 
 import org.akvo.flow.R;
@@ -203,7 +202,7 @@ public class FormActivityTestUtil {
         return onView(
                 allOf(withId(R.id.media_btn),
                         withQuestionViewParent(question, MediaQuestionView.class)))
-                .perform(ViewActions.scrollTo());
+                .perform(scrollTo());
     }
 
     @NonNull

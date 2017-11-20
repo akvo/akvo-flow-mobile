@@ -116,7 +116,7 @@ public class RepeatedGroupFreeTextFormActivityViewTest {
     @Test
     public void verifyOneRepetition() throws Exception {
         clickOnTabNamed("RepeatedBarcodeGroup");
-        onView(allOf(withId(R.id.input), isDisplayed())).check(matches(withText("123456")));
+        onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")));
         verifyRepeatHeaderText("Repetitions:1");
     }
 

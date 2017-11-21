@@ -358,6 +358,7 @@ public class FormActivityReadOnlyTest {
                     .perform(scrollTo());
             downloadButton.check(matches(isDisplayed()));
             downloadButton.perform(click());
+            addExecutionDelay(100);
             downloadButton.check(matches(not(isDisplayed())));
         }
     }

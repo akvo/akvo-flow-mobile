@@ -38,19 +38,6 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-allprojects {
-    tasks.withType(Test) {
-        testLogging {
-            exceptionFormat "full"
-            showCauses true
-            showExceptions true
-            showStackTraces true
-            showStandardStreams true
-            events = ["failed", "standardOut", "standardError"]
-        }
-    }
-}
-
 configurations {
     all*.exclude group: 'com.android.support', module: 'support-v4'
 }

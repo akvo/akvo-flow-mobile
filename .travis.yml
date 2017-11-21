@@ -1,5 +1,6 @@
 language: android
 sudo: required
+dist: trusty
 env:
   global:
     - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
@@ -33,3 +34,7 @@ before_script:
 script:
   - ./gradlew check --continue --stacktrace
   - ./gradlew connectedFlowDebugAndroidTest --continue --stacktrace
+
+after_failure:
+  - echo "Logging test results"
+  - "cat /home/travis/build/akvo/akvo-flow-mobile/app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.submittedformsview.FormActivityReadOnlyTest.html#viewResponsesTest"

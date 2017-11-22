@@ -92,6 +92,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getMediaButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyDoubleEntryTitle;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyGeoLabel;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyHelpTip;
@@ -422,13 +423,6 @@ public class FormActivityReadOnlyTest {
         cascadeLevelSpinner.check(matches(isDisplayed()));
         cascadeLevelSpinner
                 .check(matches(withSpinnerText(values.get(i).getName())));
-    }
-
-    private void verifyCascadeLevelNumber(Level level) {
-        ViewInteraction cascadeLevelNumber = onView(
-                allOf(withId(R.id.cascade_level_number), withText(level.getText())));
-        cascadeLevelNumber.perform(scrollTo());
-        cascadeLevelNumber.check(matches(isDisplayed()));
     }
 
     private void verifyFreeTextQuestionView(Question question) {

@@ -33,7 +33,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.CascadeDB;
+import org.akvo.flow.data.database.cascade.CascadeDB;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
@@ -156,7 +156,7 @@ public class CascadeQuestionView extends QuestionView
         text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
         // Insert a fake 'Select' value
-        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null);
+        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null, ID_NONE);
         values.add(0, node);
 
         SpinnerAdapter adapter = new CascadeAdapter(getContext(), values);

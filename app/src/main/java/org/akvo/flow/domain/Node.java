@@ -23,14 +23,16 @@ package org.akvo.flow.domain;
  * Node represents a cascading question tree value.
  */
 public class Node {
-    private long mId;
-    private String mName;
-    private String mCode;
+    private final long mId;
+    private final String mName;
+    private final String mCode;
+    private final long parent;
 
-    public Node(long id, String name, String code) {
-        mId = id;
-        mName = name;
-        mCode = code;
+    public Node(long id, String name, String code, long parent) {
+        this.mId = id;
+        this.mName = name;
+        this.mCode = code;
+        this.parent = parent;
     }
 
     public long getId() {
@@ -50,4 +52,7 @@ public class Node {
         return mName;
     }
 
+    public long getParent() {
+        return parent;
+    }
 }

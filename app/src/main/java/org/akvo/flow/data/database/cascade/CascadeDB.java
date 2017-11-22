@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,13 +18,12 @@
  *
  */
 
-package org.akvo.flow.data;
+package org.akvo.flow.data.database.cascade;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import org.akvo.flow.domain.Node;
 
@@ -37,9 +36,10 @@ public class CascadeDB {
 
     private final String mDBPath;
     private final Context mContext;
+    private final NodeMapper nodeMapper = new NodeMapper();
 
     private SQLiteDatabase mDatabase;
-    private DatabaseHelper mHelper;
+    private CascadeDatabaseHelper mHelper;
 
     public CascadeDB(Context context, String dbPath) {
         mContext = context;
@@ -47,7 +47,7 @@ public class CascadeDB {
     }
 
     public void open() throws SQLException {
-        mHelper = new DatabaseHelper(mContext, mDBPath);
+        mHelper = new CascadeDatabaseHelper(mContext, mDBPath);
         mDatabase = mHelper.getReadableDatabase();
     }
 
@@ -61,7 +61,7 @@ public class CascadeDB {
     }
 
     public List<Node> getValues(long parent) {
-        final List<Node> result = new ArrayList<>();
+        List<Node> result = new ArrayList<>();
         if (!isOpen()) {
             return result;
         }
@@ -71,43 +71,21 @@ public class CascadeDB {
                 null, null, NodeColumns.NAME);
 
         if (c != null) {
-            if (c.moveToFirst()) {
-                final int codeCol = c.getColumnIndex(NodeColumns.CODE);
-                do {
-                    Long id = c.getLong(c.getColumnIndex(NodeColumns.ID));
-                    String name = c.getString(c.getColumnIndex(NodeColumns.NAME));
-                    String code = codeCol > -1 ? c.getString(codeCol) : null;
-                    result.add(new Node(id, name, code));
-                } while (c.moveToNext());
-            }
-            c.close();
+            result = nodeMapper.mapNodes(c);
         }
         return result;
     }
 
-    static class DatabaseHelper extends SQLiteOpenHelper {
-
-        private static final int VERSION = 1;
-
-        DatabaseHelper(Context context, String dbPath) {
-            super(context, dbPath, null, VERSION);
+    public List<Node> getValues() {
+        List<Node> result = new ArrayList<>();
+        if (!isOpen()) {
+            return result;
         }
+        Cursor c = mDatabase.query(TABLE_NODE, null, null, null, null, null, NodeColumns.PARENT);
 
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            //EMPTY
+        if (c != null) {
+            result = nodeMapper.mapNodes(c);
         }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            //EMPTY
-        }
-    }
-
-    class NodeColumns {
-        static final String ID = "id";
-        static final String NAME = "name";
-        static final String CODE = "code";
-        static final String PARENT = "parent";
+        return result;
     }
 }

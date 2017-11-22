@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey name="OptionsQuestionForm" defaultLanguageCode="en" version='1.0' app="akvoflowsandbox" surveyGroupId="42573002" surveyGroupName="OptionsQuestionForm" surveyId="43623002">
+	<questionGroup>
+		<heading>OptionsQuestionGroup</heading>
+		<question order="1" type="option" mandatory="true" localeNameFlag="false" id="41643002">
+			<options allowOther="false" allowMultiple="false" renderType="radio">
+				<option value="Option1" code="0">
+					<text>Option1</text>
+				</option>
+				<option value="Option2" code="1">
+					<text>Option2</text>
+				</option>
+			</options>
+			<text>OptionsQuestion</text>
+		</question>
+	</questionGroup>
+</survey>

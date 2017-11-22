@@ -201,7 +201,8 @@ public class SurveyInstaller {
             List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(
                     responses.size());
             for (TestResponse response : responses) {
-                QuestionResponse.QuestionResponseBuilder questionResponse = new QuestionResponse.QuestionResponseBuilder()
+                QuestionResponse.QuestionResponseBuilder questionResponse =
+                        new QuestionResponse.QuestionResponseBuilder()
                         .setValue(response.getValue())
                         .setType(response.getAnswerType())
                         .setQuestionId(response.getQuestionId())

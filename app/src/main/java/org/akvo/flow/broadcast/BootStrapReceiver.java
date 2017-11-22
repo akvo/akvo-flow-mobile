@@ -18,31 +18,21 @@
  *
  */
 
-package org.akvo.flow.presentation.datapoints.map;
+package org.akvo.flow.broadcast;
 
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 
-import java.util.List;
+import org.akvo.flow.service.BootstrapService;
 
-interface DataPointsMapView {
+import timber.log.Timber;
 
-    void showProgress();
+public class BootStrapReceiver extends BroadcastReceiver {
 
-    void hideProgress();
-
-    void displayData(List<MapDataPoint> surveyedLocales);
-
-    void displayMenu(boolean monitored);
-
-    void showSyncedResults(int numberOfSyncedItems);
-
-    void showErrorAssignmentMissing();
-
-    void showErrorSyncNotAllowed();
-
-    void showErrorNoNetwork();
-
-    void showErrorSync();
-
-    void showNoDataPointsToSync();
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Timber.d("Bootstrap will be started");
+        context.startService(new Intent(context, BootstrapService.class));
+    }
 }

@@ -36,6 +36,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Locale;
@@ -64,6 +65,11 @@ public class FlowApp extends Application {
         init();
         startUpdateService();
         app = this;
+        startBootstrapFolderTracker();
+    }
+
+    private void startBootstrapFolderTracker() {
+        FileChangeTrackingService.scheduleVerifier(this);
     }
 
     private void startUpdateService() {

@@ -1,5 +1,20 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.2
+Date: 23 November 2017
+
+# New and noteworthy
+* **Inform the user when there are no data points to sync in** - [#922](https://github.com/akvo/akvo-flow-mobile/issues/922) A SnackBar message is now displayed when there are no datapoints to sync.
+* **Build config changes for android studio 3.0 update** - [#913](https://github.com/akvo/akvo-flow-mobile/issues/913) Updated build scripts for faster builds.
+* **Add tests for response viewing** - [#907](https://github.com/akvo/akvo-flow-mobile/issues/907) Viewing responses is now covered by unit tests.
+* **Survey bootstrap should be triggered automatically if possible** - [#635](https://github.com/akvo/akvo-flow-mobile/issues/635) When new surveys are pasted in the inbox folder, the bootstrap processing starts automatically without the user having to restart the app.
+
+# Resolved issues
+* **Fix build scripts after gradle update** - [#932](https://github.com/akvo/akvo-flow-mobile/issues/932) Some fixes were required after android studio update.
+* **Reload all forms (phase 1)** - [#923](https://github.com/akvo/akvo-flow-mobile/issues/923) The option 'Reload all forms', inside 'Settings', now works the same way as restarting the app and no longer requires a code.
+* **Script app/sh/install.sh** - [#811](https://github.com/akvo/akvo-flow-mobile/issues/811) Removed unused file.
+
+---------------
 # ver 2.4.1
 Date: 02 November 2017
 

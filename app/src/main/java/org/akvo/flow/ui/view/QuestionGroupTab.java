@@ -123,6 +123,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
                 }
             });
         }
+        setTag(mQuestionGroup.getOrder());
     }
 
     /**

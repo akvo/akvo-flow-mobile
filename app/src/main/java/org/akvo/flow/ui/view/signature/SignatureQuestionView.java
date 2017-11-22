@@ -69,9 +69,9 @@ public class SignatureQuestionView extends QuestionView {
 
         mSignature = new Signature();
 
-        mName = (EditText)findViewById(R.id.name);
-        nameLabel = (TextView)findViewById(R.id.name_label);
-        mImage = (ImageView)findViewById(R.id.image);
+        mName = (EditText)findViewById(R.id.signature_name);
+        nameLabel = (TextView)findViewById(R.id.signature_name_label);
+        mImage = (ImageView)findViewById(R.id.signature_image);
         signButton = (Button)findViewById(R.id.sign_btn);
         Context context = getContext();
         imageLoader = new PicassoImageLoader(context);

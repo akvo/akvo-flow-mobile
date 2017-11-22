@@ -6,7 +6,7 @@ repositories {
     jcenter()
 }
 
-def isCi = ("true".equals(System.getenv("TRAVIS")))
+def isCi = "true" == System.getenv("TRAVIS")
 
 sentry {
     autoProguardConfig true

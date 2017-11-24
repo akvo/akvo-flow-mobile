@@ -23,4 +23,8 @@ package org.akvo.flow.util.logging;
 public interface LoggingHelper {
 
     void init();
+
+    void initLoginData(String username, String deviceId);
+
+    void clearUser();
 }

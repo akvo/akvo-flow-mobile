@@ -23,11 +23,8 @@ package org.akvo.flow.util.logging;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.data.preference.Prefs;
 
 import java.util.HashMap;
@@ -37,13 +34,13 @@ import timber.log.Timber;
 
 public class TagsFactory {
 
-    private static final String GAE_INSTANCE_ID_TAG_KEY = "gae.instance";
-    private static final String DEVICE_ID_TAG_KEY = "flow.device.id";
-    private static final String DEVICE_MODEL_TAG_KEY = "device.model";
-    private static final String OS_VERSION_TAG_KEY = "os.version";
-    static final String VERSION_NAME_TAG_KEY = "version.name";
-    private static final String VERSION_CODE_TAG_KEY = "version.code";
-    private static final String DEFAULT_TAG_VALUE = "NotSet";
+    public static final String GAE_INSTANCE_ID_TAG_KEY = "flow.gae.instance";
+    public static final String DEVICE_ID_TAG_KEY = "flow.device.id";
+//    private static final String DEVICE_MODEL_TAG_KEY = "device.model";
+//    private static final String OS_VERSION_TAG_KEY = "os.version";
+//    static final String VERSION_NAME_TAG_KEY = "version.name";
+//    private static final String VERSION_CODE_TAG_KEY = "version.code";
+//    private static final String DEFAULT_TAG_VALUE = "NotSet";
     /**
      * The initial capacity is set to 9 for 6 tags (it should be increased if there are more tags)
      */
@@ -62,34 +59,34 @@ public class TagsFactory {
     }
 
     private void initTags(Context context, Prefs prefs) {
-        tags.put(DEVICE_MODEL_TAG_KEY, Build.MODEL);
-        tags.put(GAE_INSTANCE_ID_TAG_KEY, getAppId());
-        tags.put(DEVICE_ID_TAG_KEY, getDeviceId(prefs));
-        tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
+//        tags.put(DEVICE_MODEL_TAG_KEY, Build.MODEL);
+//        tags.put(GAE_INSTANCE_ID_TAG_KEY, getAppId());
+//        tags.put(DEVICE_ID_TAG_KEY, getDeviceId(prefs));
+//        tags.put(OS_VERSION_TAG_KEY, Build.VERSION.RELEASE);
         try {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
             String versionName = packageInfo.versionName;
             int versionCode = packageInfo.versionCode;
-            tags.put(VERSION_NAME_TAG_KEY, versionName);
-            tags.put(VERSION_CODE_TAG_KEY, versionCode + "");
+//            tags.put(VERSION_NAME_TAG_KEY, versionName);
+//            tags.put(VERSION_CODE_TAG_KEY, versionCode + "");
         } catch (PackageManager.NameNotFoundException e) {
             Timber.e("Error getting versionName and versionCode");
         }
     }
 
-    @NonNull
-    private String getDeviceId(Prefs prefs) {
-        String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, DEFAULT_TAG_VALUE);
-        if (TextUtils.isEmpty(deviceId)) {
-            return DEFAULT_TAG_VALUE;
-        }
-        return deviceId;
-    }
-
-    @NonNull
-    private String getAppId() {
-        String property = BuildConfig.AWS_BUCKET;
-        return TextUtils.isEmpty(property) ? DEFAULT_TAG_VALUE : property;
-    }
+//    @NonNull
+//    private String getDeviceId(Prefs prefs) {
+//        String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, DEFAULT_TAG_VALUE);
+//        if (TextUtils.isEmpty(deviceId)) {
+//            return DEFAULT_TAG_VALUE;
+//        }
+//        return deviceId;
+//    }
+//
+//    @NonNull
+//    private String getAppId() {
+//        String property = BuildConfig.AWS_BUCKET;
+//        return TextUtils.isEmpty(property) ? DEFAULT_TAG_VALUE : property;
+//    }
 }

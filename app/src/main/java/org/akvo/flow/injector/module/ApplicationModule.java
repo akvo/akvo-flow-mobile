@@ -46,14 +46,8 @@ import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.thread.UIThread;
-import org.akvo.flow.util.ConnectivityStateManager;
-import org.akvo.flow.util.logging.DebugLoggingHelper;
-import org.akvo.flow.util.logging.FlowAndroidRavenFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
-import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
-import org.akvo.flow.util.logging.RavenEventBuilderHelper;
 import org.akvo.flow.util.logging.ReleaseLoggingHelper;
-import org.akvo.flow.util.logging.TagsFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -95,18 +89,18 @@ public class ApplicationModule {
     @Provides
     @Singleton
     LoggingHelper loggingHelper() {
-        if (BuildConfig.DEBUG) {
-            return new DebugLoggingHelper();
-        } else {
-            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
-                    new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
-                            new Prefs(application));
-            RavenEventBuilderHelper loggingEventBuilderHelper
-                    = new RavenEventBuilderHelper(new TagsFactory(application).getTags());
-            FlowAndroidRavenFactory flowAndroidRavenFactory = new FlowAndroidRavenFactory(
-                    application, loggingSendPermissionVerifier, loggingEventBuilderHelper);
-            return new ReleaseLoggingHelper(application, flowAndroidRavenFactory);
-        }
+//        if (BuildConfig.DEBUG) {
+//            return new DebugLoggingHelper();
+//        } else {
+//            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
+//                    new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
+//                            new Prefs(application));
+//            RavenEventBuilderHelper loggingEventBuilderHelper
+//                    = new RavenEventBuilderHelper(new TagsFactory(application).getTags());
+//            FlowAndroidRavenFactory flowAndroidRavenFactory = new FlowAndroidRavenFactory(
+//                    application, loggingSendPermissionVerifier, loggingEventBuilderHelper);
+            return new ReleaseLoggingHelper(application/**, flowAndroidRavenFactory**/);
+//        }
     }
 
     @Provides

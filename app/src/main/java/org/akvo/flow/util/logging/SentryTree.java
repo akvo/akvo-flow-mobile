@@ -25,11 +25,10 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.getsentry.raven.android.Raven;
-
 import java.util.Arrays;
 import java.util.List;
 
+import io.sentry.Sentry;
 import timber.log.Timber;
 
 class SentryTree extends Timber.Tree {
@@ -59,9 +58,9 @@ class SentryTree extends Timber.Tree {
     @VisibleForTesting
     void captureException(@NonNull Throwable t, @Nullable String message) {
         if (TextUtils.isEmpty(message)) {
-            Raven.capture(t);
+            Sentry.capture(t);
         } else {
-            Raven.capture(new Throwable(message, t));
+            Sentry.capture(new Throwable(message, t));
         }
     }
 

@@ -21,35 +21,50 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.getsentry.raven.android.Raven;
-
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 
+import io.sentry.Sentry;
+import io.sentry.android.AndroidSentryClientFactory;
+import io.sentry.event.UserBuilder;
 import timber.log.Timber;
 
 public class ReleaseLoggingHelper implements LoggingHelper {
 
     private final Context context;
-    private final FlowAndroidRavenFactory ravenFactory;
+//    private final FlowAndroidRavenFactory ravenFactory;
 
-    public ReleaseLoggingHelper(Context context, FlowAndroidRavenFactory flowAndroidRavenFactory) {
+    public ReleaseLoggingHelper(Context context/**, FlowAndroidRavenFactory flowAndroidRavenFactory**/) {
         this.context = context;
-        this.ravenFactory = flowAndroidRavenFactory;
+//        this.ravenFactory = flowAndroidRavenFactory;
     }
 
     @Override
     public void init() {
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
-            Raven.init(context, sentryDsn, ravenFactory);
+            Sentry.init(sentryDsn, new AndroidSentryClientFactory(context));
+            Sentry.getContext().addTag(TagsFactory.GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET);
             Timber.plant(new SentryTree());
         }
     }
 
-    @Nullable
+    @Override
+    public void initLoginData(String username, String deviceId) {
+        io.sentry.context.Context sentryContext = Sentry.getContext();
+        sentryContext.setUser(new UserBuilder().setUsername(username).build());
+        sentryContext.addTag(TagsFactory.DEVICE_ID_TAG_KEY, deviceId);
+    }
+
+    @Override
+    public void clearUser() {
+        Sentry.getContext().clearUser();
+    }
+
+    @NonNull
     private String getSentryDsn(Resources resources) {
         return resources.getString(R.string.sentry_dsn);
     }

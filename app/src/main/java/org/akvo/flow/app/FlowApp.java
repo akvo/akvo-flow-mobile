@@ -66,6 +66,14 @@ public class FlowApp extends Application {
         startUpdateService();
         app = this;
         startBootstrapFolderTracker();
+        updateLoggingInfo();
+    }
+
+    private void updateLoggingInfo() {
+        String username = mUser.getName();
+        String deviceId = prefs
+                .getString(Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
+        loggingHelper.initLoginData(username, deviceId);
     }
 
     private void startBootstrapFolderTracker() {

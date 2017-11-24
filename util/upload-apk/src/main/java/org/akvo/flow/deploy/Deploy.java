@@ -131,8 +131,8 @@ public class Deploy {
         System.out.println("Apk uploaded successfully, with result ETag " + result.getETag());
     }
 
-    private static void updateVersion(String host, String accountId, String accountSecret, String url,
-            String version, String md5, String instance) throws IOException {
+    private static void updateVersion(String host, String accountId, String accountSecret,
+            String url, String version, String md5, String instance) throws IOException {
         RemoteApiOptions options = new RemoteApiOptions().server(host, 443)
                 .useServiceAccountCredential(accountId, accountSecret);
         RemoteApiInstaller installer = new RemoteApiInstaller();
@@ -147,14 +147,14 @@ public class Deploy {
             e.setProperty("fileName", url);
             e.setProperty("md5Checksum", md5);
 
-            final Date date = new Date();// use the same timestampt
+            final Date date = new Date(); // use the same timestampt
             e.setProperty("createdDateTime", date);
             e.setProperty("lastUpdateDateTime", date);
             ds.put(e);
         } finally {
             installer.uninstall();
         }
-        System.out.println("New APK version successfully stored in GAE for instance: "+instance);
+        System.out.println("New APK version successfully stored in GAE for instance: " + instance);
     }
 
     private static String getMD5Checksum(File file) {
@@ -169,7 +169,7 @@ public class Deploy {
                 md.update(buffer, 0, read);
             }
             byte[] rawHash = md.digest();
-            
+
             StringBuilder builder = new StringBuilder();
             for (byte b : rawHash) {
                 builder.append(String.format("%02x", b));
@@ -182,9 +182,10 @@ public class Deploy {
         } finally {
             try {
                 in.close();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                //Ignored
+            }
         }
         return null;
     }
-
 }

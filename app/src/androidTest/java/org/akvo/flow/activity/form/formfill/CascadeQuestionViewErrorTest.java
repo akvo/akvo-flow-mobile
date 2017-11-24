@@ -23,21 +23,22 @@ package org.akvo.flow.activity.form.formfill;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.SparseArray;
+import android.view.View;
+import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -46,34 +47,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
-import java.util.Random;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
-import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
-import static org.akvo.flow.tests.R.raw.cascade_form;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.IsAnything.anything;
+import static org.akvo.flow.tests.R.raw.cascade_error_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class CascadeQuestionViewTest {
+public class CascadeQuestionViewErrorTest {
 
     private static SurveyInstaller installer;
     private static Survey survey;
-
-    private Random random = new Random();
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -89,7 +76,7 @@ public class CascadeQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(cascade_form, InstrumentationRegistry.getContext());
+        survey = installer.installSurvey(cascade_error_form, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -104,47 +91,31 @@ public class CascadeQuestionViewTest {
     }
 
     @Test
-    public void ensureCascadesFullyDisplayed() throws Exception {
+    public void ensureCascadesErrorDisplayed() throws Exception {
         final List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         final Question question = questionGroups.get(0).getQuestions().get(0);
-        final SparseArray<List<Node>> cascadeNodes = installer
-                .getAllNodes(question, InstrumentationRegistry.getContext());
-        List<Node> levelNodes = cascadeNodes.get(0);
-        List<Level> levels = question.getLevels();
-        if (levels != null && levels.size() > 0) {
-            for (int i = 0; i < levels.size(); i++) {
-                Level level = levels.get(i);
-                verifyCascadeLevelNumber(level);
 
-                ViewInteraction cascadeLevelSpinner = onView(
-                        allOf(withId(R.id.cascade_level_spinner), withTagValue(is((Object) i))));
+        onView(withId(R.id.question_tv)).check(matches(withError(
+                InstrumentationRegistry.getTargetContext()
+                        .getString(R.string.cascade_error_message, question.getSrc()))));
+    }
 
-                verifyCascadeInitialState(cascadeLevelSpinner);
+    private static Matcher<View> withError(final String expected) {
+        return new TypeSafeMatcher<View>() {
 
-                int position = random.nextInt(levelNodes.size());
-                Node node = levelNodes.get(position);
-                levelNodes = cascadeNodes.get((int) node.getId());
-
-                selectSpinnerItem(cascadeLevelSpinner, position);
-
-                verifyCascadeNewState(cascadeLevelSpinner, node);
+            @Override
+            public boolean matchesSafely(View view) {
+                if (!(view instanceof TextView)) {
+                    return false;
+                }
+                TextView textView = (TextView) view;
+                return textView.getError().toString().equals(expected);
             }
-        }
-    }
 
-    private void verifyCascadeInitialState(ViewInteraction cascadeLevelSpinner) {
-        cascadeLevelSpinner.perform(scrollTo());
-        cascadeLevelSpinner.check(matches(isDisplayed()));
-        cascadeLevelSpinner.check(matches(withSpinnerText(R.string.select)));
-    }
-
-    private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, int position) {
-        cascadeLevelSpinner.perform(click());
-        onData(anything()).atPosition(position + 1).perform(click());
-        addExecutionDelay(100);
-    }
-
-    private void verifyCascadeNewState(ViewInteraction cascadeLevelSpinner, Node node) {
-        cascadeLevelSpinner.check(matches(withSpinnerText(node.getName())));
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Error text " + expected);
+            }
+        };
     }
 }

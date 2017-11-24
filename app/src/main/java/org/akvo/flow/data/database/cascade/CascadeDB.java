@@ -24,6 +24,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.SparseArray;
 
 import org.akvo.flow.domain.Node;
 
@@ -76,15 +77,15 @@ public class CascadeDB {
         return result;
     }
 
-    public List<Node> getValues() {
-        List<Node> result = new ArrayList<>();
+    public SparseArray<List<Node>> getValues() {
+        SparseArray<List<Node>> result = new SparseArray<>();
         if (!isOpen()) {
             return result;
         }
-        Cursor c = mDatabase.query(TABLE_NODE, null, null, null, null, null, NodeColumns.PARENT);
+        Cursor c = mDatabase.query(TABLE_NODE, null, null, null, null, null, NodeColumns.NAME);
 
         if (c != null) {
-            result = nodeMapper.mapNodes(c);
+            result = nodeMapper.nodesAsMap(c);
         }
         return result;
     }

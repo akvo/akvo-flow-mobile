@@ -12,7 +12,7 @@
         <question
                 order="1"
                 type="cascade"
-                cascadeResource="cascade-error-v1.sqlite"
+                cascadeResource=""
                 mandatory="false"
                 localeNameFlag="false"
                 id="153562014">

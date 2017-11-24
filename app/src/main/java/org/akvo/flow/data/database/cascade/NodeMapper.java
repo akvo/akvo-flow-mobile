@@ -22,6 +22,7 @@ package org.akvo.flow.data.database.cascade;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.util.SparseArray;
 
 import org.akvo.flow.domain.Node;
 
@@ -45,6 +46,22 @@ class NodeMapper {
         }
         c.close();
         return result;
+    }
+
+    @NonNull
+    SparseArray<List<Node>> nodesAsMap(Cursor c) {
+        SparseArray<List<Node>> resultMap = new SparseArray<>();
+        List<Node> nodes = mapNodes(c);
+        for (Node node : nodes) {
+            int parentId = (int) node.getParent();
+            List<Node> parentNodes = resultMap.get(parentId);
+            if (parentNodes == null) {
+                parentNodes = new ArrayList<>();
+            }
+            parentNodes.add(node);
+            resultMap.put(parentId, parentNodes);
+        }
+        return resultMap;
     }
 
     @NonNull

@@ -48,6 +48,7 @@ import org.akvo.flow.util.FileUtil.FileType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import timber.log.Timber;
 
 public class CascadeQuestionView extends QuestionView
@@ -234,7 +235,8 @@ public class CascadeQuestionView extends QuestionView
         super.resetQuestion(fireEvent);
         updateSpinners(POSITION_NONE);
         if (mDatabase == null) {
-            String error = "Cannot load cascade resource: " + getQuestion().getSrc();
+            String error = getContext()
+                    .getString(R.string.cascade_error_message, getQuestion().getSrc());
             Timber.e(new IllegalStateException(error), error);
             setError(error);
         }

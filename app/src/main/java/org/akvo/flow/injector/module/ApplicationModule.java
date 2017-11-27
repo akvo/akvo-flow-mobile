@@ -46,7 +46,10 @@ import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.thread.UIThread;
+import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.util.logging.FlowAndroidSentryFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
+import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
 import org.akvo.flow.util.logging.ReleaseLoggingHelper;
 
 import java.text.SimpleDateFormat;
@@ -89,18 +92,16 @@ public class ApplicationModule {
     @Provides
     @Singleton
     LoggingHelper loggingHelper() {
-//        if (BuildConfig.DEBUG) {
-//            return new DebugLoggingHelper();
-//        } else {
-//            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
-//                    new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
-//                            new Prefs(application));
-//            RavenEventBuilderHelper loggingEventBuilderHelper
-//                    = new RavenEventBuilderHelper(new TagsFactory(application).getTags());
-//            FlowAndroidRavenFactory flowAndroidRavenFactory = new FlowAndroidRavenFactory(
-//                    application, loggingSendPermissionVerifier, loggingEventBuilderHelper);
-            return new ReleaseLoggingHelper(application/**, flowAndroidRavenFactory**/);
-//        }
+        //        if (BuildConfig.DEBUG) {
+        //            return new DebugLoggingHelper();
+        //        } else {
+        LoggingSendPermissionVerifier loggingSendPermissionVerifier =
+                new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
+                        new Prefs(application));
+        FlowAndroidSentryFactory flowAndroidSentryFactory = new FlowAndroidSentryFactory(
+                application, loggingSendPermissionVerifier);
+        return new ReleaseLoggingHelper(application, flowAndroidSentryFactory);
+        //        }
     }
 
     @Provides

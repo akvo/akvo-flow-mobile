@@ -144,7 +144,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             displaySelectedUser();
         }
         activityJustCreated = true;
-
+        Timber.e(new Exception("Testing sentry update 2"));
     }
 
     private void navigateToSetupIfNeeded() {

@@ -28,25 +28,24 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 
 import io.sentry.Sentry;
-import io.sentry.android.AndroidSentryClientFactory;
 import io.sentry.event.UserBuilder;
 import timber.log.Timber;
 
 public class ReleaseLoggingHelper implements LoggingHelper {
 
     private final Context context;
-//    private final FlowAndroidRavenFactory ravenFactory;
+    private final FlowAndroidSentryFactory sentryFactory;
 
-    public ReleaseLoggingHelper(Context context/**, FlowAndroidRavenFactory flowAndroidRavenFactory**/) {
+    public ReleaseLoggingHelper(Context context, FlowAndroidSentryFactory flowAndroidSentryFactory) {
         this.context = context;
-//        this.ravenFactory = flowAndroidRavenFactory;
+        this.sentryFactory = flowAndroidSentryFactory;
     }
 
     @Override
     public void init() {
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
-            Sentry.init(sentryDsn, new AndroidSentryClientFactory(context));
+            Sentry.init(sentryDsn, sentryFactory);
             Sentry.getContext().addTag(TagsFactory.GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET);
             Timber.plant(new SentryTree());
         }

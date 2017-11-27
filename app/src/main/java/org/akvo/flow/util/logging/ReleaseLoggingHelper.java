@@ -57,10 +57,12 @@ public class ReleaseLoggingHelper implements LoggingHelper {
     @Override
     public void initLoginData(String username, String deviceId) {
         io.sentry.context.Context sentryContext = Sentry.getContext();
-        if (TextUtils.isEmpty(username)){
+        if (!TextUtils.isEmpty(username)){
             sentryContext.setUser(new UserBuilder().setUsername(username).build());
         }
-        sentryContext.addTag(DEVICE_ID_TAG_KEY, deviceId);
+        if (!TextUtils.isEmpty(deviceId)) {
+            sentryContext.addTag(DEVICE_ID_TAG_KEY, deviceId);
+        }
     }
 
     @Override

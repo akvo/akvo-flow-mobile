@@ -33,6 +33,9 @@ import timber.log.Timber;
 
 public class ReleaseLoggingHelper implements LoggingHelper {
 
+    private static final String GAE_INSTANCE_ID_TAG_KEY = "flow.gae.instance";
+    private static final String DEVICE_ID_TAG_KEY = "flow.device.id";
+
     private final Context context;
     private final FlowAndroidSentryFactory sentryFactory;
 
@@ -46,7 +49,7 @@ public class ReleaseLoggingHelper implements LoggingHelper {
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
             Sentry.init(sentryDsn, sentryFactory);
-            Sentry.getContext().addTag(TagsFactory.GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET);
+            Sentry.getContext().addTag(GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET);
             Timber.plant(new SentryTree());
         }
     }
@@ -54,8 +57,10 @@ public class ReleaseLoggingHelper implements LoggingHelper {
     @Override
     public void initLoginData(String username, String deviceId) {
         io.sentry.context.Context sentryContext = Sentry.getContext();
-        sentryContext.setUser(new UserBuilder().setUsername(username).build());
-        sentryContext.addTag(TagsFactory.DEVICE_ID_TAG_KEY, deviceId);
+        if (TextUtils.isEmpty(username)){
+            sentryContext.setUser(new UserBuilder().setUsername(username).build());
+        }
+        sentryContext.addTag(DEVICE_ID_TAG_KEY, deviceId);
     }
 
     @Override

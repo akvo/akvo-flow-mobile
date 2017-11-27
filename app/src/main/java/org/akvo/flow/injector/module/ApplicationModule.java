@@ -45,8 +45,9 @@ import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 import org.akvo.flow.thread.UIThread;
-import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.FlowAndroidSentryFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
 import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
@@ -66,8 +67,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 @Module
 public class ApplicationModule {
 
-    public static final String DATA_PATTERN = "yyyy/MM/dd HH:mm:ss";
-    public static final String TIMEZONE = "GMT";
+    private static final String DATA_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    private static final String TIMEZONE = "GMT";
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
@@ -92,16 +93,16 @@ public class ApplicationModule {
     @Provides
     @Singleton
     LoggingHelper loggingHelper() {
-        //        if (BuildConfig.DEBUG) {
-        //            return new DebugLoggingHelper();
-        //        } else {
-        LoggingSendPermissionVerifier loggingSendPermissionVerifier =
-                new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
-                        new Prefs(application));
-        FlowAndroidSentryFactory flowAndroidSentryFactory = new FlowAndroidSentryFactory(
-                application, loggingSendPermissionVerifier);
-        return new ReleaseLoggingHelper(application, flowAndroidSentryFactory);
-        //        }
+        if (BuildConfig.DEBUG) {
+            return new DebugLoggingHelper();
+        } else {
+            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
+                    new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
+                            new Prefs(application));
+            FlowAndroidSentryFactory flowAndroidSentryFactory = new FlowAndroidSentryFactory(
+                    application, loggingSendPermissionVerifier);
+            return new ReleaseLoggingHelper(application, flowAndroidSentryFactory);
+        }
     }
 
     @Provides

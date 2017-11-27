@@ -335,13 +335,17 @@ public class SurveyDownloadService extends IntentService {
             try {
                 surveys.addAll(flowApi.getSurveyHeader(surveyId));
             } catch (IllegalArgumentException | IOException e) {
-                if (e instanceof IllegalArgumentException) {
+                if (e instanceof IllegalArgumentException && !surveyHasBeenUnAssigned(e)) {
                     Timber.e(e);
                 }
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
                         getString(R.string.error_form_header, surveyId));
             }
         return surveys;
+    }
+
+    private boolean surveyHasBeenUnAssigned(Exception e) {
+        return e.getMessage() != null && e.getMessage().contains("null");
     }
 
     /**

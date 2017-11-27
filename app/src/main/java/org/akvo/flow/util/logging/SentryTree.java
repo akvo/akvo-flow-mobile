@@ -19,9 +19,11 @@
 
 package org.akvo.flow.util.logging;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.system.ErrnoException;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -41,8 +43,19 @@ class SentryTree extends Timber.Tree {
                     java.net.SocketTimeoutException.class,
                     java.net.UnknownHostException.class,
                     java.net.ConnectException.class,
-                    javax.net.ssl.SSLException.class
+                    javax.net.ssl.SSLException.class,
+                    java.io.EOFException.class,
+                    java.net.SocketException.class,
+                    java.io.InterruptedIOException.class,
+                    java.net.NoRouteToHostException.class,
+                    okhttp3.internal.http2.StreamResetException.class
             });
+
+    public SentryTree() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            IGNORED_EXCEPTIONS.add(ErrnoException.class);
+        }
+    }
 
     @Override
     protected void log(int priority, @Nullable String tag, @Nullable String message,

@@ -176,8 +176,8 @@ public class FlowApp extends Application {
             prefs.setBoolean(Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
         }
 
-        long id = prefs.getLong(Prefs.KEY_USER_ID, Prefs.DEF_VALUE_USER_ID);
-        if (id != Prefs.DEF_VALUE_USER_ID) {
+        long id = prefs.getLong(Prefs.KEY_USER_ID, Prefs.DEFAULT_VALUE_USER_ID);
+        if (id != Prefs.DEFAULT_VALUE_USER_ID) {
             Cursor cur = database.getUser(id);
             if (cur.moveToFirst()) {
                 String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));

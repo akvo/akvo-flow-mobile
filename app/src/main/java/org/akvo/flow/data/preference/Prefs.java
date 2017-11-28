@@ -52,7 +52,7 @@ public class Prefs {
     public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
     public static final long DEF_VALUE_SPACE_AVAILABLE = 101L;
-    public static final long DEF_VALUE_USER_ID = -1;
+    public static final long DEFAULT_VALUE_USER_ID = -1;
 
     private final Context context;
 

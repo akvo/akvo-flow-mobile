@@ -45,8 +45,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsInstanceOf;
 
-import java.io.IOException;
-
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
@@ -104,12 +102,12 @@ public class FormActivityTestUtil {
         onView(withId(R.id.next_btn)).perform(click());
     }
 
-    public static void fillFreeTextQuestion(String text) throws IOException {
+    public static void fillFreeTextQuestion(String text) {
         onView(withId(R.id.input_et)).perform(typeText(text));
         Espresso.closeSoftKeyboard();
     }
 
-    public static void addExecutionDelay(int millis) {
+    public static void addExecutionDelay(long millis) {
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
@@ -142,13 +140,13 @@ public class FormActivityTestUtil {
         return questionHeader;
     }
 
-    public static ViewInteraction findQuestionTitle(String questionText) {
+    private static ViewInteraction findQuestionTitle(String questionText) {
         return onView(allOf(withId(R.id.question_tv), withText(questionText),
                 childAtPosition(linearLayoutChild(0), 0)));
     }
 
     @NonNull
-    public static Matcher<View> linearLayoutChild(int position) {
+    private static Matcher<View> linearLayoutChild(int position) {
         return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                 position);
     }

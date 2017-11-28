@@ -23,9 +23,11 @@ package org.akvo.flow.activity.form;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
 import org.akvo.flow.R;
@@ -278,5 +280,12 @@ public class FormActivityTestUtil {
         }
         return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
                 withText(option.getText())));
+    }
+
+    @NonNull
+    public static String getString(@StringRes int stringResId,
+            ActivityTestRule<FormActivity> rule, String... args) {
+        return rule.getActivity().getApplicationContext().getResources()
+                .getString(stringResId, args);
     }
 }

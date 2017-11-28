@@ -26,8 +26,6 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
@@ -72,6 +70,7 @@ import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
 import static org.akvo.flow.tests.R.raw.locked_geo_form;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.IsNot.not;
@@ -175,7 +174,7 @@ public class LockedGeoQuestionViewTest {
         onView(withId(R.id.lon_et)).perform(replaceText(MOCK_LONGITUDE + ""));
         onView(withId(R.id.height_et)).perform(replaceText(MOCK_ALTITUDE + ""));
         ViewInteraction accuracyTv = onView(withId(R.id.acc_tv));
-        accuracyTv.perform(replaceTextInTextView(getString(R.string.geo_location_accuracy,
+        accuracyTv.perform(replaceTextInTextView(getString(R.string.geo_location_accuracy, rule,
                 accuracyFormat.format(MOCK_ACCURACY_ACCURATE))));
 
         clickGeoButton();
@@ -192,13 +191,14 @@ public class LockedGeoQuestionViewTest {
         ViewInteraction input = onView(withId(R.id.acc_tv));
         input.check(matches(isDisplayed()));
         input.check(matches(withText(
-                getString(R.string.geo_location_accuracy, accuracy))));
+                getString(R.string.geo_location_accuracy, rule, accuracy))));
         input.check(matches(hasTextColor(textColor)));
     }
 
     private void provideMockLocation(float accuracy) {
         LocationManager locationManager = (LocationManager) InstrumentationRegistry.getContext()
                 .getSystemService(Context.LOCATION_SERVICE);
+        assert locationManager != null;
         locationManager
                 .addTestProvider(LocationManager.GPS_PROVIDER, false, false, false, false, false,
                         false, false, Criteria.POWER_LOW, Criteria.ACCURACY_FINE);
@@ -253,12 +253,6 @@ public class LockedGeoQuestionViewTest {
         onView(withId(android.support.design.R.id.snackbar_action))
                 .perform(click());
         addExecutionDelay(100);
-    }
-
-    @NonNull
-    private String getString(@StringRes int stringResId, String format) {
-        return rule.getActivity().getApplicationContext().getResources()
-                .getString(stringResId, format);
     }
 
     public static Matcher<View> hasTextColor(final int color) {

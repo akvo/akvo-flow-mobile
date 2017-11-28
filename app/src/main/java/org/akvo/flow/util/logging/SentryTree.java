@@ -34,18 +34,18 @@ import timber.log.Timber;
 class SentryTree extends Timber.Tree {
 
     private static final List<Class> IGNORED_EXCEPTIONS = Arrays
-            .asList(new Class[] { java.net.ConnectException.class,
-                    javax.net.ssl.SSLHandshakeException.class,
+            .asList(new Class[] {
+                    java.io.EOFException.class,
+                    java.io.InterruptedIOException.class,
+                    java.net.ConnectException.class,
+                    java.net.NoRouteToHostException.class,
+                    java.net.SocketTimeoutException.class,
+                    java.net.SocketException.class,
+                    java.net.UnknownHostException.class,
                     java.security.cert.CertificateNotYetValidException.class,
                     javax.net.ssl.SSLProtocolException.class,
-                    java.net.SocketTimeoutException.class,
-                    java.net.UnknownHostException.class,
-                    java.net.ConnectException.class,
+                    javax.net.ssl.SSLHandshakeException.class,
                     javax.net.ssl.SSLException.class,
-                    java.io.EOFException.class,
-                    java.net.SocketException.class,
-                    java.io.InterruptedIOException.class,
-                    java.net.NoRouteToHostException.class,
                     okhttp3.internal.http2.StreamResetException.class
             });
 

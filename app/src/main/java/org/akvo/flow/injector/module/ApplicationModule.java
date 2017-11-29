@@ -51,6 +51,7 @@ import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.FlowAndroidRavenFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
 import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
+import org.akvo.flow.util.logging.LoggingSendPermissionVerifierTest;
 import org.akvo.flow.util.logging.RavenEventBuilderHelper;
 import org.akvo.flow.util.logging.ReleaseLoggingHelper;
 import org.akvo.flow.util.logging.TagsFactory;
@@ -95,10 +96,12 @@ public class ApplicationModule {
     @Provides
     @Singleton
     LoggingHelper loggingHelper() {
-        if (BuildConfig.DEBUG) {
+        boolean travisBuild = "true".equals(System.getenv("TRAVIS"));
+        if (BuildConfig.DEBUG && !travisBuild) {
             return new DebugLoggingHelper();
         } else {
-            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
+            LoggingSendPermissionVerifier loggingSendPermissionVerifier = travisBuild ?
+                    new LoggingSendPermissionVerifierTest():
                     new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
                             new Prefs(application));
             RavenEventBuilderHelper loggingEventBuilderHelper

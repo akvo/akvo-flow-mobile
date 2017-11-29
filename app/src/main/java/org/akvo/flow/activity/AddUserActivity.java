@@ -39,6 +39,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnEditorAction;
 import butterknife.OnTextChanged;
+import timber.log.Timber;
 
 import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
 
@@ -63,6 +64,7 @@ public class AddUserActivity extends Activity {
         ButterKnife.bind(this);
         prefs = new Prefs(getApplicationContext());
         deviceIdEt.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, ""));
+        Timber.e(new RuntimeException("failing tests testing sentry2"));
     }
 
     //TODO: database operations should be done on separate thread

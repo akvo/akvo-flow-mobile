@@ -57,6 +57,7 @@ import org.junit.runner.RunWith;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.replaceText;
@@ -222,6 +223,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     private void clickGeoButton() {
+        closeSoftKeyboard();
         final List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         final Question question = questionGroups.get(0).getQuestions().get(0);
         ViewInteraction geoButton = getGeoButton(question);

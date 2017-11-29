@@ -284,8 +284,15 @@ public class FormActivityTestUtil {
 
     @NonNull
     public static String getString(@StringRes int stringResId,
-            ActivityTestRule<FormActivity> rule, String... args) {
+            ActivityTestRule<FormActivity> rule, String param) {
         return rule.getActivity().getApplicationContext().getResources()
-                .getString(stringResId, args);
+                .getString(stringResId, param);
+    }
+
+    @NonNull
+    public static String getString(@StringRes int stringResId,
+            ActivityTestRule<FormActivity> rule) {
+        return rule.getActivity().getApplicationContext().getResources()
+                .getString(stringResId);
     }
 }

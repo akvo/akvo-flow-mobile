@@ -60,8 +60,10 @@ import java.util.List;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -223,7 +225,8 @@ public class LockedGeoQuestionViewTest {
         final List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         final Question question = questionGroups.get(0).getQuestions().get(0);
         ViewInteraction geoButton = getGeoButton(question);
-        geoButton.check(matches(isDisplayed()));
+        geoButton.perform(scrollTo());
+        geoButton.check(matches(isCompletelyDisplayed()));
         geoButton.perform(click());
     }
 

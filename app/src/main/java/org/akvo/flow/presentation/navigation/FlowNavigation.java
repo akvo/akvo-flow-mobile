@@ -48,10 +48,10 @@ import butterknife.ButterKnife;
 
 public class FlowNavigation extends NavigationView implements FlowNavigationView {
 
-    private TextView currentUserTv;
-    private TextView surveyTitleTv;
-    private RecyclerView surveysRv;
-    private RecyclerView usersRv;
+    private TextView currentUserTextView;
+    private TextView surveyTitleTextView;
+    private RecyclerView surveysRecyclerView;
+    private RecyclerView usersRecyclerView;
     private DrawerNavigationListener surveyListener;
     private SurveyAdapter adapter;
 
@@ -87,10 +87,10 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     private void initViews() {
         View headerView = getHeaderView(0);
-        currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
-        surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
-        surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
-        usersRv = ButterKnife.findById(headerView, R.id.users_rv);
+        currentUserTextView = ButterKnife.findById(headerView, R.id.current_user_name);
+        surveyTitleTextView = ButterKnife.findById(headerView, R.id.surveys_title_tv);
+        surveysRecyclerView = ButterKnife.findById(headerView, R.id.surveys_rv);
+        usersRecyclerView = ButterKnife.findById(headerView, R.id.users_rv);
     }
 
     private void initialiseInjector() {
@@ -132,10 +132,10 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
 
     private void initSurveyList() {
         final Context context = getContext();
-        surveysRv.setLayoutManager(new LinearLayoutManager(context));
+        surveysRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         adapter = new SurveyAdapter(context);
-        surveysRv.setAdapter(adapter);
-        surveysRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
+        surveysRecyclerView.setAdapter(adapter);
+        surveysRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(context,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View childView, int position) {
@@ -151,17 +151,17 @@ public class FlowNavigation extends NavigationView implements FlowNavigationView
     }
 
     private void initCurrentUserText() {
-        currentUserTv.setOnClickListener(new OnClickListener() {
+        currentUserTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (surveysRv.getVisibility() == VISIBLE) {
-                    surveyTitleTv.setVisibility(GONE);
-                    surveysRv.setVisibility(GONE);
-                    usersRv.setVisibility(VISIBLE);
+                if (surveysRecyclerView.getVisibility() == VISIBLE) {
+                    surveyTitleTextView.setVisibility(GONE);
+                    surveysRecyclerView.setVisibility(GONE);
+                    usersRecyclerView.setVisibility(VISIBLE);
                 } else {
-                    surveyTitleTv.setVisibility(VISIBLE);
-                    surveysRv.setVisibility(VISIBLE);
-                    usersRv.setVisibility(GONE);
+                    surveyTitleTextView.setVisibility(VISIBLE);
+                    surveysRecyclerView.setVisibility(VISIBLE);
+                    usersRecyclerView.setVisibility(GONE);
                 }
             }
         });

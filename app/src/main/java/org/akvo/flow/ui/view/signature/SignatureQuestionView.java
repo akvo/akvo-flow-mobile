@@ -78,7 +78,7 @@ public class SignatureQuestionView extends QuestionView {
         mediaFileHelper = new MediaFileHelper(context);
 
         if (isReadOnly()) {
-            signButton.setEnabled(false);
+            signButton.setVisibility(GONE);
         } else {
             signButton.setOnClickListener(new OnClickListener() {
                 @Override

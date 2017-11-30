@@ -228,6 +228,7 @@ public class LockedGeoQuestionViewTest {
         final Question question = questionGroups.get(0).getQuestions().get(0);
         ViewInteraction geoButton = getGeoButton(question);
         geoButton.perform(scrollTo());
+        addExecutionDelay(100);
         geoButton.check(matches(isCompletelyDisplayed()));
         geoButton.perform(click());
     }

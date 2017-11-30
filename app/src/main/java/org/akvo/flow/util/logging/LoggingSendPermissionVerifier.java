@@ -38,8 +38,9 @@ public class LoggingSendPermissionVerifier {
      *
      */
     public boolean shouldAttemptPost() {
-        boolean syncOver3GAllowed = prefs
-                .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
-        return connectivityStateManager.isConnectionAvailable(syncOver3GAllowed);
+//        boolean syncOver3GAllowed = prefs
+//                .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
+//        return connectivityStateManager.isConnectionAvailable(syncOver3GAllowed);
+        return true;
     }
 }

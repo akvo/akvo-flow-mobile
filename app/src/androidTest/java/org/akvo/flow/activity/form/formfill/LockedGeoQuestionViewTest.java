@@ -57,11 +57,10 @@ import org.junit.runner.RunWith;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
-import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
@@ -69,7 +68,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
@@ -112,7 +110,7 @@ public class LockedGeoQuestionViewTest {
 
     @After
     public void afterEachTest() {
-        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
+        installer.deleteResponses();
     }
 
     @AfterClass
@@ -223,14 +221,19 @@ public class LockedGeoQuestionViewTest {
     }
 
     private void clickGeoButton() {
-        closeSoftKeyboard();
+        makeSureKeyBoardClosed();
         final List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         final Question question = questionGroups.get(0).getQuestions().get(0);
         ViewInteraction geoButton = getGeoButton(question);
-        geoButton.perform(scrollTo());
-        addExecutionDelay(100);
         geoButton.check(matches(isCompletelyDisplayed()));
         geoButton.perform(click());
+    }
+
+    private void makeSureKeyBoardClosed() {
+        onView(withId(R.id.lat_et)).perform(closeSoftKeyboard());
+        onView(withId(R.id.lon_et)).perform(closeSoftKeyboard());
+        onView(withId(R.id.height_et)).perform(closeSoftKeyboard());
+        closeSoftKeyboard();
     }
 
     private void verifyProgressDisplayed() {

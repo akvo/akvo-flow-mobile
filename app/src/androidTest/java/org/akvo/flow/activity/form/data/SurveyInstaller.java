@@ -230,9 +230,9 @@ public class SurveyInstaller {
         adapter.close();
     }
 
-    public void deleteResponses(String surveyInstanceId) {
+    public void deleteResponses() {
         adapter.open();
-        adapter.deleteResponses(surveyInstanceId);
+        adapter.deleteAllResponses();
         adapter.close();
     }
 

@@ -47,6 +47,7 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.FlowAndroidRavenFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
 import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
@@ -94,9 +95,9 @@ public class ApplicationModule {
     @Provides
     @Singleton
     LoggingHelper loggingHelper() {
-//        if (BuildConfig.DEBUG) {
-//            return new DebugLoggingHelper();
-//        } else {
+        if (BuildConfig.DEBUG) {
+            return new DebugLoggingHelper();
+        } else {
             LoggingSendPermissionVerifier loggingSendPermissionVerifier =
                     new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
                             new Prefs(application));
@@ -105,7 +106,7 @@ public class ApplicationModule {
             FlowAndroidRavenFactory flowAndroidRavenFactory = new FlowAndroidRavenFactory(
                     application, loggingSendPermissionVerifier, loggingEventBuilderHelper);
             return new ReleaseLoggingHelper(application, flowAndroidRavenFactory);
-//        }
+        }
     }
 
     @Provides

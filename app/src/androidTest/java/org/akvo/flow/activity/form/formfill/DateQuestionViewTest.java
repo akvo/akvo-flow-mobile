@@ -30,7 +30,6 @@ import android.support.test.runner.AndroidJUnit4;
 import android.widget.DatePicker;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
@@ -83,7 +82,7 @@ public class DateQuestionViewTest {
 
     @After
     public void afterEachTest() {
-        installer.deleteResponses(Constants.TEST_FORM_SURVEY_INSTANCE_ID);
+        installer.deleteResponses();
     }
 
     @AfterClass

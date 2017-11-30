@@ -8,6 +8,10 @@ env:
 jdk:
   - oraclejdk8
 
+addons:
+  apt_packages:
+    - pandoc
+
 android:
   components:
     - tools

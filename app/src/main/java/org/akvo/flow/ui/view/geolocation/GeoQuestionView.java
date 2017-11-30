@@ -119,7 +119,6 @@ public class GeoQuestionView extends QuestionView
 
     private void showLocationListenerStarted() {
         geoLoading.setVisibility(VISIBLE);
-        findViewById(R.id.geo_question_progress).setVisibility(VISIBLE);
         geoInputContainer.showLocationListenerStarted();
         updateButtonTextToCancel();
     }
@@ -131,7 +130,6 @@ public class GeoQuestionView extends QuestionView
 
     private void showLocationListenerStopped() {
         geoLoading.setVisibility(GONE);
-        findViewById(R.id.geo_question_progress).setVisibility(GONE);
         geoInputContainer.showLocationListenerStopped();
         updateButtonTextToGetGeo();
     }

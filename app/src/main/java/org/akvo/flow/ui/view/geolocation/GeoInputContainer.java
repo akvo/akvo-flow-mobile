@@ -172,10 +172,12 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     private void resetChildViewsToDefaultValues() {
+        disableWatchers = true;
         statusIndicator.setText(R.string.geo_location_accuracy_default);
         latitudeInput.setText("");
         longitudeInput.setText("");
         elevationInput.setText("");
+        disableWatchers = false;
     }
 
     void displayCoordinates(@NonNull String latitude, @NonNull String longitude,

@@ -31,20 +31,27 @@ rm -rf tmp
 rm -rf builds
 mkdir tmp
 mkdir builds
-flavor="flow"
 
 build_name() {
     if [[ "$1" == "akvoflow-89" ]]; then
 	# Biogas custom build
-	    flavor="biogas"
         echo "assembleBiogasRelease"
     elif [[ "$1" == "akvoflow-101" ]]; then
 	# Cookstoves custom build
-	    flavor="cookstoves"
         echo "assembleCookstovesRelease"
     else
 	# Regular Flow build
         echo "assembleFlowRelease"
+    fi
+}
+
+flavor() {
+    if [[ "$1" == "akvoflow-89" ]]; then
+        echo "biogas"
+    elif [[ "$1" == "akvoflow-101" ]]; then
+        echo "cookstoves"
+    else
+        echo "flow"
     fi
 }
 
@@ -63,6 +70,7 @@ for i in $(cat tmp/instances.txt); do
         accountSecret=$FLOW_SERVER_CONFIG/$i/$i.p12
         filename=builds/$i/$version/flow-$version.apk
         build=$(build_name $i)
+        flavor=$(flavor $i)
 
         echo "generating apk version" $version "for instance" $i "and" $build
         cp $FLOW_SERVER_CONFIG/$i/survey.properties app/survey.properties

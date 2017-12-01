@@ -41,7 +41,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.event.TimedLocationListener;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -82,7 +81,6 @@ public class LockedGeoQuestionViewTest {
     private static final float MOCK_ACCURACY_INACCURATE = 101.0f;
 
     private static SurveyInstaller installer;
-    private static Survey survey;
 
     private final DecimalFormat accuracyFormat = new DecimalFormat("#");
 
@@ -100,7 +98,7 @@ public class LockedGeoQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(locked_geo_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(locked_geo_form, InstrumentationRegistry.getContext());
     }
 
     @After

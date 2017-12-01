@@ -22,9 +22,11 @@ package org.akvo.flow.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.widget.RadioButton;
 
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
@@ -49,6 +51,8 @@ import static org.akvo.flow.activity.FormActivityTestUtil.verifyQuestionTitleDis
 import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.optionsurvey;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.Matchers.instanceOf;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -95,8 +99,12 @@ public class OptionsFormActivityTest {
     }
 
     private void fillOptionsQuestion(int option) {
-        onView(withId(option)).check(matches(isDisplayed())).perform(click());
-        onView(withId(option)).check(matches(isDisplayed())).check(matches(isChecked()));
+        ViewInteraction radioButton = onView(
+                allOf(withId(option), instanceOf(RadioButton.class)));
+        radioButton.check(matches(isDisplayed()))
+                .perform(click());
+        radioButton.check(matches(isDisplayed()))
+                .check(matches(isChecked()));
     }
 
     @Test

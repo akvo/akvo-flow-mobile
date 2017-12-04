@@ -31,6 +31,7 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.matcher.BoundedMatcher;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -61,6 +62,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFro
 import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
+import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
@@ -115,7 +117,6 @@ public class LockedGeoQuestionViewTest {
     @Test
     public void ensureGeoQuestionProgressDisplayedOnButtonClick() throws Exception {
         clickGeoButton();
-        addExecutionDelay(100);
 
         verifyProgressDisplayed();
     }
@@ -156,8 +157,10 @@ public class LockedGeoQuestionViewTest {
     @Test
     public void ensureLocationValuesDisplayedCorrectlyIfInAccurate() throws Exception {
         clickGeoButton();
+        addExecutionDelay(100);
 
         provideMockLocation(MOCK_ACCURACY_INACCURATE);
+        addExecutionDelay(100);
 
         verifyAccuracy(accuracyFormat.format(MOCK_ACCURACY_INACCURATE), Color.RED);
     }
@@ -225,7 +228,7 @@ public class LockedGeoQuestionViewTest {
     private void verifyErrorSnackBarDisplayed() {
         onView(allOf(withId(android.support.design.R.id.snackbar_text),
                 withText(R.string.location_timeout)))
-                .check(matches(isDisplayed()));
+                .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }
 
     private void simulateLocationTimeout() {

@@ -186,6 +186,22 @@ public class LockedGeoQuestionViewTest {
                 .check(matches(withText(R.string.geo_location_accuracy_default)));
     }
 
+    @Test
+    public void ensureLocationValuesDisplayedCorrectlyWhenCancelled() throws Exception {
+        clickGeoButton();
+
+        addExecutionDelay(100);
+
+        clickCancelButton();
+
+        onView(withId(R.id.lat_et)).check(matches(withText("")));
+        onView(withId(R.id.lon_et)).check(matches(withText("")));
+        onView(withId(R.id.height_et)).check(matches(withText("")));
+
+        onView(withId(R.id.acc_tv))
+                .check(matches(withText(R.string.geo_location_accuracy_default)));
+    }
+
     private void verifyAccuracy(String accuracy, int textColor) {
         ViewInteraction input = onView(withId(R.id.acc_tv));
         input.check(matches(isDisplayed()));
@@ -222,6 +238,11 @@ public class LockedGeoQuestionViewTest {
         onView(withId(R.id.geo_btn)).check(matches(isCompletelyDisplayed())).perform(click());
     }
 
+    private void clickCancelButton() {
+        onView(allOf(withId(R.id.geo_btn), withText(R.string.cancelbutton)))
+                .check(matches(isCompletelyDisplayed())).perform(click());
+    }
+
     private void verifyProgressDisplayed() {
         ViewInteraction progress = onView(withId(R.id.auto_geo_location_progress));
         progress.check(matches(isDisplayed()));
@@ -248,25 +269,25 @@ public class LockedGeoQuestionViewTest {
         onView(withId(android.support.design.R.id.snackbar_action))
                 .check(matches(allOf(isEnabled(), isClickable())))
                 .perform(new ViewAction() {
-                    @Override
-                    public Matcher<View> getConstraints() {
-                        return isEnabled();
-                    }
+                             @Override
+                             public Matcher<View> getConstraints() {
+                                 return isEnabled();
+                             }
 
-                    @Override
-                    public String getDescription() {
-                        return "click SnackBar Retry Button";
-                    }
+                             @Override
+                             public String getDescription() {
+                                 return "click SnackBar Retry Button";
+                             }
 
-                    @Override
-                    public void perform(UiController uiController, View view) {
-                        view.performClick();
-                    }
-                }
-        );
+                             @Override
+                             public void perform(UiController uiController, View view) {
+                                 view.performClick();
+                             }
+                         }
+                );
     }
 
-    public static Matcher<View> hasTextColor(final int color) {
+    private static Matcher<View> hasTextColor(final int color) {
         return new BoundedMatcher<View, TextView>(TextView.class) {
             @Override
             public boolean matchesSafely(TextView warning) {
@@ -280,7 +301,7 @@ public class LockedGeoQuestionViewTest {
         };
     }
 
-    public static ViewAction replaceTextInTextView(final String value) {
+    private static ViewAction replaceTextInTextView(final String value) {
         return new ViewAction() {
             @SuppressWarnings("unchecked")
             @Override

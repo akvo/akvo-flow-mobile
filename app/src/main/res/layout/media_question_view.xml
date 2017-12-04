@@ -26,13 +26,13 @@
                 android:scaleType="centerInside" />
 
             <ProgressBar
-                android:id="@+id/progress"
+                android:id="@+id/media_progress"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true" />
 
             <ImageButton
-                android:id="@+id/download"
+                android:id="@+id/media_download"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"

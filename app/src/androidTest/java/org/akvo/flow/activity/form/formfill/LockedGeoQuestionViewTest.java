@@ -59,8 +59,10 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -244,8 +246,24 @@ public class LockedGeoQuestionViewTest {
 
     private void clickSnackBarRetry() {
         onView(withId(android.support.design.R.id.snackbar_action))
-                .perform(click());
-        addExecutionDelay(100);
+                .check(matches(allOf(isEnabled(), isClickable())))
+                .perform(new ViewAction() {
+                    @Override
+                    public Matcher<View> getConstraints() {
+                        return isEnabled();
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "click SnackBar Retry Button";
+                    }
+
+                    @Override
+                    public void perform(UiController uiController, View view) {
+                        view.performClick();
+                    }
+                }
+        );
     }
 
     public static Matcher<View> hasTextColor(final int color) {

@@ -190,7 +190,7 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
     implementation 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    implementation 'com.getsentry.raven:raven-android:8.0.2'
+    implementation 'io.sentry:sentry-android:1.6.3'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.squareup.sqlbrite2:sqlbrite:2.0.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'

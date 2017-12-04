@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey
+        name="TestForm"
+        defaultLanguageCode="en"
+        version='2.0'
+        app="akvoflow-dev2"
+        surveyGroupId="155852013"
+        surveyGroupName="New survey"
+        surveyId="156792013">
+    <questionGroup>
+        <heading>group1</heading>
+        <question
+                order="8"
+                type="photo"
+                mandatory="false"
+                localeNameFlag="false"
+                id="152712013">
+            <text>photo</text>
+        </question>
+    </questionGroup>
+</survey>

@@ -20,7 +20,7 @@
 package org.akvo.flow.util.logging;
 
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 
 public class LoggingSendPermissionVerifier {
 

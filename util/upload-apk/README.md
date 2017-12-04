@@ -16,7 +16,7 @@
    If any of those env vars is not set, the script will not run, displaying an error to request the missing variables.
 
 3. The script takes the version code and name from the `app/version.properties` file
-4. The apks are built and then stored in the folder `/app/bin/`
+4. The apks are built and then stored in the folder `/app/build/outputs/apk/$flavor/release/`
 
 ### How apks are uploaded to S3
 4. The script uses a jar file `deploy.jar`, which takes seven arguments:
@@ -41,6 +41,13 @@
 
 ### Stopping an instance from sending new versions to devices
 1. If we want to stop an instance to send new versions to devices, we can set the property `autoUpdateApk` in appengine-web.xml to `false`, and redeploy the instance.
+
+### Generate a new deploy.jar
+`cd util/upload-apk`
+
+`./gradlew fatJar`
+
+The file `deploy-$VERSION.jar` will be generated inside `util/upload-apk/build/libs`.
 
 ### Deploy Flow app for a single instance
 1. Run `flow-releases.sh [instance]`, where the instance is the ID of the GAE dashboard (i.e akvoflow-dev2)

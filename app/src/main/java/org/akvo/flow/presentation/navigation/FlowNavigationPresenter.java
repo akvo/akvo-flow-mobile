@@ -47,7 +47,7 @@ public class FlowNavigationPresenter implements Presenter {
     private final SurveyMapper surveyMapper;
     private final SurveyGroupMapper surveyGroupMapper;
 
-    private FlowNavigationView view;
+    private IFlowNavigationView view;
 
     @Inject
     public FlowNavigationPresenter(@Named("getAllSurveys") UseCase getAllSurveys,
@@ -68,7 +68,7 @@ public class FlowNavigationPresenter implements Presenter {
         saveSelectedSurvey.dispose();
     }
 
-    public void setView(FlowNavigationView view) {
+    public void setView(IFlowNavigationView view) {
         this.view = view;
     }
 
@@ -116,7 +116,7 @@ public class FlowNavigationPresenter implements Presenter {
 
                 @Override
                 public void onNext(Boolean aBoolean) {
-                    view.onSurveySelected(surveyGroupMapper.transform(viewSurvey));
+                    view.selectSurvey(surveyGroupMapper.transform(viewSurvey));
                 }
             }, params);
         }

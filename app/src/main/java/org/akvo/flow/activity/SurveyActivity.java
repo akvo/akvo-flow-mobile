@@ -56,7 +56,7 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.presentation.navigation.FlowNavigation;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
@@ -80,7 +80,7 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        FlowNavigation.DrawerNavigationListener,
+        FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -95,7 +95,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     FloatingActionButton addDataPointFab;
 
     @BindView(R.id.nav_view)
-    FlowNavigation navigationView;
+    FlowNavigationView navigationView;
 
     @Nullable
     private SurveyDbDataSource mDatabase;

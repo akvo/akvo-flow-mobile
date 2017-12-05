@@ -30,7 +30,7 @@ import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
-import org.akvo.flow.presentation.navigation.FlowNavigation;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
@@ -64,7 +64,7 @@ public interface ViewComponent {
 
     void inject(PreferenceActivity preferenceActivity);
 
-    void inject(FlowNavigation navigation);
+    void inject(FlowNavigationView navigation);
 
     void inject(AppDownloadDialogFragment fragment);
 }

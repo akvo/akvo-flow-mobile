@@ -1,5 +1,13 @@
 Akvo FLOW app release notes
 ===========================
+
+# ver 2.4.2.1
+Date: 06 December 2017
+
+# Resolved issues
+* **Revert reload all surveys setting** - [#953](https://github.com/akvo/akvo-flow-mobile/issues/953) The reload all surveys setting has been reverted to previous state which will allow the user to recover from missing forms error by force reloading all the forms.
+
+---------------
 # ver 2.4.2
 Date: 23 November 2017
 

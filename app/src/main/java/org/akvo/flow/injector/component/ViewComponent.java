@@ -26,19 +26,14 @@ import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
-import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
-import org.akvo.flow.presentation.legal.LegalNoticesActivity;
-import org.akvo.flow.presentation.settings.PreferenceActivity;
-import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.ui.fragment.DrawerFragment;
-import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
+import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 
 import dagger.Component;
@@ -65,11 +60,11 @@ public interface ViewComponent {
 
     void inject(ResponseListFragment responseListFragment);
 
-    void inject(DrawerFragment drawerFragment);
-
     void inject(HelpActivity activity);
 
     void inject(PreferenceActivity preferenceActivity);
+
+    void inject(FlowNavigationView navigation);
 
     void inject(AppDownloadDialogFragment fragment);
 }

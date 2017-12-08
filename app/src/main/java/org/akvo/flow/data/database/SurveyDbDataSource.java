@@ -401,7 +401,7 @@ public class SurveyDbDataSource {
         values.put(SurveyGroupColumns.NAME, surveyGroup.getName());
         values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, surveyGroup.getRegisterSurveyId());
         values.put(SurveyGroupColumns.MONITORED, surveyGroup.isMonitored() ? 1 : 0);
-        surveyDbAdapter.addSurveyGroup(values);
+        briteSurveyDbAdapter.addSurveyGroup(values);
     }
 
     // Attempt to fetch the registration form. If the form ID is explicitely set on the SurveyGroup,

@@ -40,6 +40,7 @@ import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FormFileUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -76,7 +77,7 @@ public class SurveyInstaller {
         try {
             survey = persistSurvey(FileUtil.readText(input));
         } catch (IOException e) {
-            Log.e(TAG, "Error installing survey");
+            Log.e(TAG,"Error installing survey", e);
         }
         return survey;
     }
@@ -91,7 +92,8 @@ public class SurveyInstaller {
      */
     public Survey persistSurvey(String xml) throws IOException {
         Survey survey = parseSurvey(xml);
-        File surveyFile = new File(FileUtil.getFilesDir(FileUtil.FileType.FORMS),
+        FormFileUtil formFileUtil = new FormFileUtil();
+        File surveyFile = new File(formFileUtil.getPublicFormFolderPath(),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 

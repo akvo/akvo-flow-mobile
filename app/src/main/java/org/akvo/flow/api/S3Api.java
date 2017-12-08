@@ -62,7 +62,7 @@ public class S3Api {
     private String mAccessKey;
     private String mSecret;
 
-    public S3Api(Context c) {
+    public S3Api() {
         mBucket = BuildConfig.AWS_BUCKET;
         mAccessKey = BuildConfig.AWS_ACCESS_KEY_ID;
         mSecret = BuildConfig.AWS_SECRET_KEY;

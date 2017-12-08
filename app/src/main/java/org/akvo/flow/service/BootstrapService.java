@@ -28,6 +28,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyMetadata;
@@ -35,6 +36,7 @@ import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.FormFileUtil;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.SurveyFileNameGenerator;
@@ -52,6 +54,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -72,13 +76,17 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
  * utility will process them in lexicographical order by file name; Any files
  * with a name starting with . will be skipped (to prevent inadvertent
  * processing of MAC OSX metadata files).
- * 
+ *
  * @author Christopher Fagiani
  */
 public class BootstrapService extends IntentService {
 
-    private static final String TAG = "BOOTSTRAP_SERVICE";
     public volatile static boolean isProcessing = false;
+
+    @Inject
+    FormFileUtil formFileUtil;
+
+    private static final String TAG = "BOOTSTRAP_SERVICE";
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
     private final ZipFileLister zipFileLister = new ZipFileLister();
@@ -87,6 +95,14 @@ public class BootstrapService extends IntentService {
 
     public BootstrapService() {
         super(TAG);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
+        mHandler = new Handler();
     }
 
     public void onHandleIntent(Intent intent) {
@@ -140,19 +156,21 @@ public class BootstrapService extends IntentService {
             String errorMessage = getString(R.string.bootstraperror);
             displayErrorNotification(errorMessage);
 
-            Timber.e(e,"Bootstrap error");
+            Timber.e(e, "Bootstrap error");
         }
         return installedFiles;
     }
 
     private void displayErrorNotification(String errorMessage) {
         //FIXME: why are we repeating the message in title and text?
-        NotificationHelper.displayErrorNotification(errorMessage, errorMessage, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
+        NotificationHelper.displayErrorNotification(errorMessage, errorMessage, this,
+                ConstantUtil.NOTIFICATION_BOOTSTRAP);
     }
 
     private void displayNotification(String message) {
         //FIXME: why are we repeating the message in title and text?
-        NotificationHelper.displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
+        NotificationHelper
+                .displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
     }
 
     /**
@@ -173,7 +191,7 @@ public class BootstrapService extends IntentService {
                 continue;
             }
 
-          if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
+            if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
                 // Cascade resource
                 FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
                         FileUtil.getFilesDir(FileType.RES));
@@ -185,14 +203,15 @@ public class BootstrapService extends IntentService {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
                 // Help media file
-                File helpDir = new File(FileUtil.getFilesDir(FileType.FORMS), id);
+                File helpDir = new File(formFileUtil.getFormStoragePath(getApplicationContext()),
+                        id);
                 if (!helpDir.exists()) {
                     helpDir.mkdir();
                 }
                 FileUtil.copy(zipFile.getInputStream(entry),
                         new FileOutputStream(new File(helpDir, filename)));
-                }
             }
+        }
 
         // now rename the zip file so we don't process it again
         file.renameTo(new File(file.getAbsolutePath() + ConstantUtil.PROCESSED_OK_SUFFIX));
@@ -284,6 +303,7 @@ public class BootstrapService extends IntentService {
 
     /**
      * Check form app id. Reject the form if it does not belong to the one set up
+     *
      * @param loadedSurvey survey to verify
      */
     private void verifyAppId(@NonNull SurveyMetadata loadedSurvey) {
@@ -291,9 +311,9 @@ public class BootstrapService extends IntentService {
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
             ViewUtil.displayToastFromService(getString(R.string.bootstrap_invalid_app), mHandler,
-                                             getApplicationContext());
+                    getApplicationContext());
             throw new IllegalArgumentException("Form belongs to a different instance." +
-                                                   " Expected: " + app + ". Got: " + formApp);
+                    " Expected: " + app + ". Got: " + formApp);
         }
     }
 
@@ -305,7 +325,7 @@ public class BootstrapService extends IntentService {
     @NonNull
     private File generateNewSurveyFile(@NonNull String filename,
             @Nullable String surveyFolderName) {
-        File filesDir = FileUtil.getFilesDir(FileType.FORMS);
+        File filesDir = formFileUtil.getFormStoragePath(getApplicationContext());
         if (TextUtils.isEmpty(surveyFolderName)) {
             return new File(filesDir, filename);
         } else {
@@ -334,15 +354,6 @@ public class BootstrapService extends IntentService {
         String entryName = entry.getName();
         String entryPaths[] = entryName == null ? new String[0] : entryName.split(File.separator);
         return entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
-    }
-
-    /**
-     * sets up the uncaught exception handler for this thread so we can report
-     * errors to the server.
-     */
-    public void onCreate() {
-        super.onCreate();
-        mHandler = new Handler();
     }
 
     /**

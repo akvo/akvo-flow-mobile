@@ -71,7 +71,7 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
 
         try {
             // Download resource and return success status
-            S3Api s3 = new S3Api(mContext);
+            S3Api s3 = new S3Api();
             s3.get(ConstantUtil.S3_IMAGE_DIR + mFile.getName(), mFile);
             return true;
         } catch (IOException e) {

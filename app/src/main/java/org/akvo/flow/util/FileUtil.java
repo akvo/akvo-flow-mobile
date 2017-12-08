@@ -25,6 +25,7 @@ import android.media.ExifInterface;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
@@ -60,14 +61,14 @@ public class FileUtil {
     private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
 
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
-    private static final String DIR_FORMS = "forms"; // Form definitions
+
     private static final String DIR_TMP = "tmp"; // Temporary files
     private static final String DIR_APK = "apk"; // App upgrades
     private static final String DIR_RES = "res"; // Survey resources (i.e. cascading DB)
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, FORMS, TMP, APK, RES}
+    public enum FileType {DATA, MEDIA, INBOX, TMP, APK, RES}
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -89,9 +90,6 @@ public class FileUtil {
             case INBOX:
                 path = getFilesStorageDir(false) + File.separator + DIR_INBOX;
                 break;
-            case FORMS:
-                path = getFilesStorageDir(true) + File.separator + DIR_FORMS;
-                break;
             case TMP:
                 path = getFilesStorageDir(true) + File.separator + DIR_TMP;
                 break;
@@ -102,12 +100,36 @@ public class FileUtil {
                 path = getFilesStorageDir(true) + File.separator + DIR_RES;
                 break;
         }
+        return createDir(path);
+    }
+
+    @NonNull
+    public static File createDir(String path) {
         File dir = new File(path);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         return dir;
     }
+
+    @NonNull
+    static String getInternalFolderPath(Context context, String folderName) {
+        return context.getFilesDir() + File.separator + folderName;
+    }
+
+    @Nullable
+    static String getAppExternalFolderPath(Context context, String folderName) {
+        String appExternalStoragePath = getAppExternalStoragePath(context);
+        return appExternalStoragePath == null ?
+                null :
+                appExternalStoragePath + File.separator + folderName;
+    }
+
+    @NonNull
+    static String getPublicFolderPath(String folderName) {
+        return getExternalStoragePath() + File.separator + folderName;
+    }
+
 
     /**
      * Get the root of the files storage directory, depending on the resource being app internal
@@ -118,13 +140,28 @@ public class FileUtil {
      */
     private static String getFilesStorageDir(boolean internal) {
         if (internal) {
-            FlowApp app = FlowApp.getApp();
-            File externalFilesDir = app.getExternalFilesDir(null);
+            String externalFilesDir = getAppExternalStoragePath(FlowApp.getApp());
             if (externalFilesDir != null) {
-                return externalFilesDir.getAbsolutePath();
+                return externalFilesDir;
             }
         }
         return getExternalStoragePath();
+    }
+
+    /**
+     * Returns app specific folder on the external storage
+     *
+     * External Storage may not be available
+     *
+     * @return
+     */
+    @Nullable
+    private static String getAppExternalStoragePath(Context context) {
+        File externalFilesDir = context.getExternalFilesDir(null);
+        if (externalFilesDir != null) {
+            return externalFilesDir.getAbsolutePath();
+        }
+        return null;
     }
 
     @NonNull
@@ -185,7 +222,7 @@ public class FileUtil {
      * directory itself if the "deleteFlag" is true
      */
     public static void deleteFilesInDirectory(File dir, boolean deleteDir) {
-        if (dir != null && dir.isDirectory()) {
+        if (dir != null && dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {

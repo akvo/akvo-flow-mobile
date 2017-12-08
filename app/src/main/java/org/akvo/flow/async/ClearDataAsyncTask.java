@@ -29,7 +29,9 @@ import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.FormFileUtil;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 import timber.log.Timber;
@@ -124,7 +126,15 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private void clearExternalStorage(boolean responsesOnly) {
         if (!responsesOnly) {
             // Delete downloaded survey xml/zips
-            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.FORMS), false);
+            final Context context = mWeakContext.get();
+            if (context != null) {
+                FormFileUtil formFileUtil = new FormFileUtil();
+                File[] files = formFileUtil
+                        .findAllPossibleSurveyFolders(context.getApplicationContext());
+                for (File file : files) {
+                    FileUtil.deleteFilesInDirectory(file, false);
+                }
+            }
             // Delete bootstraps
             FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INBOX), false);
         }

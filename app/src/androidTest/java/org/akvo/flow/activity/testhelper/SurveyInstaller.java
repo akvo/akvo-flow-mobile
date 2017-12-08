@@ -31,8 +31,11 @@ import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyMetadata;
+import org.akvo.flow.domain.User;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
@@ -129,6 +132,28 @@ public class SurveyInstaller {
         adapter.saveSurvey(survey);
         adapter.addSurveyGroup(survey.getSurveyGroup());
         adapter.close();
+    }
+
+    public long createDataPoint(SurveyGroup surveyGroup,
+            QuestionResponse.QuestionResponseBuilder ... responseBuilders) {
+        adapter.open();
+        Survey registrationForm = adapter.getRegistrationForm(surveyGroup);
+        String surveyedLocaleId = adapter.createSurveyedLocale(surveyGroup.getId());
+        User user = new User(1L, "User");
+        long surveyInstanceId = adapter
+                .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
+                        user, surveyedLocaleId);
+        if (responseBuilders != null) {
+            int length = responseBuilders.length;
+            for (int i = 0; i < length; i++) {
+                QuestionResponse responseToSave = responseBuilders[i]
+                        .setSurveyInstanceId(surveyInstanceId)
+                        .createQuestionResponse();
+                adapter.createOrUpdateSurveyResponse(responseToSave);
+            }
+        }
+        adapter.close();
+        return surveyInstanceId;
     }
 
     public void clearSurveys() {

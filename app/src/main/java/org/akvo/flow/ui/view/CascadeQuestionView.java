@@ -150,8 +150,8 @@ public class CascadeQuestionView extends QuestionView
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View view = inflater.inflate(R.layout.cascading_level_item, mSpinnerContainer, false);
-        final TextView text = (TextView) view.findViewById(R.id.text);
-        final Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
+        final TextView text = (TextView) view.findViewById(R.id.cascade_level_number);
+        final Spinner spinner = (Spinner) view.findViewById(R.id.cascade_level_spinner);
 
         text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
@@ -264,7 +264,7 @@ public class CascadeQuestionView extends QuestionView
     }
 
     private Spinner getSpinner(int position) {
-        return (Spinner) mSpinnerContainer.getChildAt(position).findViewById(R.id.spinner);
+        return (Spinner) mSpinnerContainer.getChildAt(position).findViewById(R.id.cascade_level_spinner);
     }
 
     @Override

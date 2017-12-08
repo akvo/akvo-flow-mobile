@@ -549,24 +549,6 @@ public class SurveyDbAdapter {
         executeSql("DELETE FROM " + Tables.TRANSMISSION);
     }
 
-    /**
-     * performs a soft-delete on a user
-     *
-     * @param id
-     */
-    public void deleteUser(Long id) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(UserColumns.DELETED, 1);
-            database.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
-                    new String[] {
-                            id.toString()
-                    });
-    }
-
-    public void addSurveyGroup(ContentValues values) {
-        database.insert(Tables.SURVEY_GROUP, null, values);
-    }
-
     public Cursor getSurveyGroup(long id) {
         return database.query(Tables.SURVEY_GROUP,
                 new String[] {
@@ -637,15 +619,6 @@ public class SurveyDbAdapter {
                         SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION, SurveyColumns.LOCATION
                 },
                 whereClause, whereParams, null, null, null);
-    }
-
-    public void deleteSurveyGroup(long surveyGroupId) {
-        // First the group
-        database.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
-        // Now the surveys
-        database.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
     }
 
     /**

@@ -58,7 +58,7 @@ public class FlowNavigationPresenter implements Presenter {
     private final UserMapper userMapper;
     private final SurveyGroupMapper surveyGroupMapper;
 
-    private FlowNavigationView view;
+    private IFlowNavigationView view;
     private ViewUser currentUser;
 
     @Inject
@@ -95,7 +95,7 @@ public class FlowNavigationPresenter implements Presenter {
         createUser.dispose();
     }
 
-    public void setView(FlowNavigationView view) {
+    public void setView(IFlowNavigationView view) {
         this.view = view;
     }
 

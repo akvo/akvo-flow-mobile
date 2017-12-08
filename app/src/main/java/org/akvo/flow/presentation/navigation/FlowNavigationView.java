@@ -52,10 +52,10 @@ import butterknife.ButterKnife;
 
 public class FlowNavigationView extends NavigationView implements IFlowNavigationView {
 
-    private TextView currentUserTv;
-    private TextView surveyTitleTv;
-    private RecyclerView surveysRv;
-    private RecyclerView usersRv;
+    private TextView currentUserTextView;
+    private TextView surveyTitleTextView;
+    private RecyclerView surveysRecyclerView;
+    private RecyclerView usersRecyclerView;
     private DrawerNavigationListener surveyListener;
     private SurveyAdapter surveyAdapter;
     private UserAdapter usersAdapter;
@@ -98,10 +98,10 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
 
     private void initViews() {
         headerView = getHeaderView(0);
-        currentUserTv = ButterKnife.findById(headerView, R.id.current_user_name);
-        surveyTitleTv = ButterKnife.findById(headerView, R.id.surveys_title_tv);
-        surveysRv = ButterKnife.findById(headerView, R.id.surveys_rv);
-        usersRv = ButterKnife.findById(headerView, R.id.users_rv);
+        currentUserTextView = ButterKnife.findById(headerView, R.id.current_user_name);
+        surveyTitleTextView = ButterKnife.findById(headerView, R.id.surveys_title_tv);
+        surveysRecyclerView = ButterKnife.findById(headerView, R.id.surveys_rv);
+        usersRecyclerView = ButterKnife.findById(headerView, R.id.users_rv);
     }
 
     private void initialiseInjector() {
@@ -117,10 +117,10 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
 
     private void initUserList() {
         final Context context = getContext();
-        usersRv.setLayoutManager(new LinearLayoutManager(context));
+        usersRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         usersAdapter = new UserAdapter(context);
-        usersRv.setAdapter(usersAdapter);
-        usersRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
+        usersRecyclerView.setAdapter(usersAdapter);
+        usersRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(context,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View childView, int position) {
@@ -159,10 +159,10 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
 
     private void initSurveyList() {
         final Context context = getContext();
-        surveysRv.setLayoutManager(new LinearLayoutManager(context));
+        surveysRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         surveyAdapter = new SurveyAdapter(context);
-        surveysRv.setAdapter(surveyAdapter);
-        surveysRv.addOnItemTouchListener(new RecyclerItemClickListener(context,
+        surveysRecyclerView.setAdapter(surveyAdapter);
+        surveysRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(context,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View childView, int position) {
@@ -183,16 +183,16 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         headerView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (surveysRv.getVisibility() == VISIBLE) {
+                if (surveysRecyclerView.getVisibility() == VISIBLE) {
                     updateTextViewDrawable(hideUsersDrawable);
-                    surveyTitleTv.setVisibility(GONE);
-                    surveysRv.setVisibility(GONE);
-                    usersRv.setVisibility(VISIBLE);
+                    surveyTitleTextView.setVisibility(GONE);
+                    surveysRecyclerView.setVisibility(GONE);
+                    usersRecyclerView.setVisibility(VISIBLE);
                 } else {
                     updateTextViewDrawable(showUsersDrawable);
-                    surveyTitleTv.setVisibility(VISIBLE);
-                    surveysRv.setVisibility(VISIBLE);
-                    usersRv.setVisibility(GONE);
+                    surveyTitleTextView.setVisibility(VISIBLE);
+                    surveysRecyclerView.setVisibility(VISIBLE);
+                    usersRecyclerView.setVisibility(GONE);
 
                 }
             }
@@ -207,7 +207,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void updateTextViewDrawable(Drawable drawable) {
-        currentUserTv.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+        currentUserTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
     }
 
     private void onSurveyItemLongPress(int position, SurveyAdapter adapter) {
@@ -241,7 +241,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     @Override
-    public void onSurveySelected(SurveyGroup surveyGroup) {
+    public void selectSurvey(SurveyGroup surveyGroup) {
         if (surveyListener != null) {
             surveyListener.onSurveySelected(surveyGroup);
             surveyAdapter.updateSelected(surveyGroup.getId());
@@ -251,7 +251,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     @Override
     public void displayUser(String userName, List<ViewUser> viewUsers) {
         usersAdapter.setUsers(viewUsers);
-        currentUserTv.setText(userName);
+        currentUserTextView.setText(userName);
     }
 
     @Override
@@ -300,6 +300,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         DialogFragment dialogFragment = UserOptionsDialog.newInstance(viewUser);
         dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);
     }
+
 
     private FragmentManager getSupportFragmentManager() {
         return ((AppCompatActivity) getContext()).getSupportFragmentManager();

@@ -471,6 +471,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         }
     }
 
+    @Override
+    public void showNoDataPointsToSync() {
+        dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
+    }
+
     //TODO: once we insert data using brite database this will no longer be necessary either
     public static class DataSyncBroadcastReceiver extends BroadcastReceiver {
 

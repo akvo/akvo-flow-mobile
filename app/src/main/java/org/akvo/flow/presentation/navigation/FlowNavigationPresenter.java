@@ -168,7 +168,7 @@ public class FlowNavigationPresenter implements Presenter {
 
                 @Override
                 public void onNext(Boolean ignored) {
-                    view.onSurveySelected(surveyGroupMapper.transform(viewSurvey));
+                    view.selectSurvey(surveyGroupMapper.transform(viewSurvey));
                 }
             }, params);
         }

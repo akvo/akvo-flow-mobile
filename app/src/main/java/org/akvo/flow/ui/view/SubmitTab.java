@@ -49,6 +49,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         mListener = listener;
 
         mHeaderView = new TextView(context);
+        mHeaderView.setId(R.id.submit_tab_header);
         mHeaderView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
         final int padding = (int)PlatformUtil.dp2Pixel(context, 8);
@@ -56,6 +57,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         mHeaderView.setTextSize(18);
         mHeaderView.setClickable(false);
         mSubmitButton = new Button(context);
+        mSubmitButton.setId(R.id.submit_tab_button);
         mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
         mSubmitButton.setTextColor(Color.WHITE);

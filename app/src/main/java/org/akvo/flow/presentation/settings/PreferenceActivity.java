@@ -55,6 +55,7 @@ import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -103,6 +104,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
 
     @Inject
     PreferencePresenter presenter;
+
+    @Inject
+    LoggingHelper helper;
 
     private List<String> languages;
     private boolean trackChanges = false;
@@ -332,6 +336,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
                             if (!responsesOnly) {
                                 // Delete everything implies logging the current user out (if any)
                                 FlowApp.getApp().setUser(null);
+                                helper.clearUser();
                             }
                             new ClearDataAsyncTask(PreferenceActivity.this).execute(responsesOnly);
                         }

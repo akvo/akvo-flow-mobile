@@ -53,4 +53,6 @@ interface DataPointsListView {
     void showErrorAssignmentMissing();
 
     void displayNoSearchResultsFound();
+
+    void showNoDataPointsToSync();
 }

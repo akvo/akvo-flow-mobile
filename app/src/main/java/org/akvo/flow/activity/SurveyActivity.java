@@ -54,7 +54,6 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
@@ -66,6 +65,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -102,7 +102,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private Navigator navigator = new Navigator();
+    private final Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
     private long selectedSurveyId;

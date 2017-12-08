@@ -1,5 +1,45 @@
 Akvo FLOW app release notes
 ===========================
+
+# ver 2.4.2.1
+Date: 06 December 2017
+
+# Resolved issues
+* **Revert reload all surveys setting** - [#953](https://github.com/akvo/akvo-flow-mobile/issues/953) The reload all surveys setting has been reverted to previous state which will allow the user to recover from missing forms error by force reloading all the forms.
+
+---------------
+# ver 2.4.2
+Date: 23 November 2017
+
+# New and noteworthy
+* **Inform the user when there are no data points to sync in** - [#922](https://github.com/akvo/akvo-flow-mobile/issues/922) A SnackBar message is now displayed when there are no datapoints to sync.
+* **Build config changes for android studio 3.0 update** - [#913](https://github.com/akvo/akvo-flow-mobile/issues/913) Updated build scripts for faster builds.
+* **Add tests for response viewing** - [#907](https://github.com/akvo/akvo-flow-mobile/issues/907) Viewing responses is now covered by unit tests.
+* **Survey bootstrap should be triggered automatically if possible** - [#635](https://github.com/akvo/akvo-flow-mobile/issues/635) When new surveys are pasted in the inbox folder, the bootstrap processing starts automatically without the user having to restart the app.
+
+# Resolved issues
+* **Fix build scripts after gradle update** - [#932](https://github.com/akvo/akvo-flow-mobile/issues/932) Some fixes were required after android studio update.
+* **Reload all forms (phase 1)** - [#923](https://github.com/akvo/akvo-flow-mobile/issues/923) The option 'Reload all forms', inside 'Settings', now works the same way as restarting the app and no longer requires a code.
+* **Script app/sh/install.sh** - [#811](https://github.com/akvo/akvo-flow-mobile/issues/811) Removed unused file.
+
+---------------
+# ver 2.4.1
+Date: 02 November 2017
+
+# New and noteworthy
+* **View image in full screen** - [#833](https://github.com/akvo/akvo-flow-mobile/issues/833) Images from image questions can now be viewed in full screen.
+* **Simplify delete dialogues in geoshape editor** - [#787](https://github.com/akvo/akvo-flow-mobile/issues/787) Geoshapes delete dialog messages have been simplified.
+* **Search - no results found** - [#752](https://github.com/akvo/akvo-flow-mobile/issues/752) The whole search data points interface has been redesigned.
+* **What to do when GPS Status is not installed** - [#517](https://github.com/akvo/akvo-flow-mobile/issues/517) If the GPS Status app is not installed, the user will be offered the possibility to install it.
+
+# Resolved issues
+* **Translations for 2.4.1** - [#909](https://github.com/akvo/akvo-flow-mobile/issues/909) Spanish and Portuguese translations have been updated.
+* **Pre-fill not working** - [#904](https://github.com/akvo/akvo-flow-mobile/issues/904) The pre-fill option issue has been fixed.
+* **Wrong exception throwing when assignment missing** - [#895](https://github.com/akvo/akvo-flow-mobile/issues/895) When the assignment is missing, the user will see a specific error message.
+* **App flickering on certain devices** - [#847](https://github.com/akvo/akvo-flow-mobile/issues/847) The issue of the application starting to flicker on some devices has been fixed.
+* **Imported data shows "null" for submitter** - [#620](https://github.com/akvo/akvo-flow-mobile/issues/620) The data imported via the importer, will now display IMPORTER as username.
+
+---------------
 # ver 2.4.0.2
 Date: 18 October 2017
 

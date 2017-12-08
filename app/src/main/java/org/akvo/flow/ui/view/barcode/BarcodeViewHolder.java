@@ -37,7 +37,7 @@ class BarcodeViewHolder extends RecyclerView.ViewHolder {
 
     BarcodeViewHolder(View itemView, RemoveButtonListener removeButtonListener) {
         super(itemView);
-        this.barcodeEdit = (EditText) itemView.findViewById(R.id.input);
+        this.barcodeEdit = (EditText) itemView.findViewById(R.id.barcode_input);
         this.positionTextView = (TextView) itemView.findViewById(R.id.order);
         this.deleteButton = (ImageButton) itemView.findViewById(R.id.delete);
         this.removeButtonListener = removeButtonListener;

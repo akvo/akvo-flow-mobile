@@ -344,7 +344,7 @@ public class SurveyDownloadService extends IntentService {
             try {
                 surveys.addAll(flowApi.getSurveyHeader(id));
             } catch (IllegalArgumentException | IOException e) {
-                if (e instanceof IllegalArgumentException) {
+                if (!surveyHasBeenUnAssigned(e)) {
                     Timber.e(e);
                 }
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
@@ -352,6 +352,11 @@ public class SurveyDownloadService extends IntentService {
             }
         }
         return surveys;
+    }
+
+    private boolean surveyHasBeenUnAssigned(Exception e) {
+        return e instanceof IllegalArgumentException && e.getMessage() != null && e.getMessage()
+                .contains("null");
     }
 
     /**

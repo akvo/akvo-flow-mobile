@@ -38,7 +38,6 @@ public class ConnectivityStateManager {
     /**
      * checks whether or not we have a usable data connection
      *
-     * @return
      */
     public boolean isConnectionAvailable() {
         ConnectivityManager connMgr = (ConnectivityManager) context
@@ -46,10 +45,31 @@ public class ConnectivityStateManager {
         if (connMgr != null) {
             NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
             if (infoArr != null) {
-                for (int i = 0; i < infoArr.length; i++) {
-                    if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                for (NetworkInfo anInfoArr : infoArr) {
+                    if (NetworkInfo.State.CONNECTED == anInfoArr.getState()) {
                         return true;
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isConnectionAvailable(boolean syncOver3GAllowed) {
+        if (syncOver3GAllowed) {
+            return isConnectionAvailable();
+        }
+        ConnectivityManager connMgr = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connMgr != null) {
+            NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
+            if (infoArr != null) {
+                for (NetworkInfo anInfoArr : infoArr) {
+                        // if we only want to use wifi, we need to check the type
+                        if (anInfoArr.getType() == ConnectivityManager.TYPE_WIFI
+                                && NetworkInfo.State.CONNECTED == anInfoArr.getState()) {
+                            return true;
+                        }
                 }
             }
         }
@@ -59,8 +79,8 @@ public class ConnectivityStateManager {
     public boolean isWifiConnected() {
         ConnectivityManager connectionManager = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifiCheck = connectionManager
-                .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return wifiCheck.isConnected();
+        NetworkInfo wifiCheck = connectionManager != null ? connectionManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI) : null;
+        return wifiCheck != null && wifiCheck.isConnected();
     }
 }

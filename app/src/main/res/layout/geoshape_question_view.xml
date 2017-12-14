@@ -10,7 +10,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/checkmark"
+            android:id="@+id/geo_shape_checkmark"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
@@ -20,16 +20,17 @@
             android:layout_centerVertical="true"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/checkmark"
-            android:layout_toEndOf="@id/checkmark"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:textSize="18sp"
-            android:textColor="#8dc63f"
-            android:text="@string/geoshape_response"
-            android:layout_centerVertical="true"/>
+                android:id="@+id/geo_shape_captured_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/geo_shape_checkmark"
+                android:layout_toEndOf="@id/geo_shape_checkmark"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:textSize="18sp"
+                android:textColor="#8dc63f"
+                android:text="@string/geoshape_response"
+                android:layout_centerVertical="true"/>
     </RelativeLayout>
 
     <Button

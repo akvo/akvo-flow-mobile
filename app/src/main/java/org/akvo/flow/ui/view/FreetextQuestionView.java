@@ -62,7 +62,6 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
 
     private void init() {
         setQuestionView(R.layout.freetext_question_view);
-
         mEditText = (EditText)findViewById(R.id.input_et);
         mDoubleEntryText = (EditText)findViewById(R.id.double_entry_et);
 

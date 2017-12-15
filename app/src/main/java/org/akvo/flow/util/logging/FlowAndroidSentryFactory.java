@@ -22,55 +22,46 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 
-import com.getsentry.raven.Raven;
-import com.getsentry.raven.android.AndroidRavenFactory;
-import com.getsentry.raven.connection.Connection;
-import com.getsentry.raven.connection.EventSampler;
-import com.getsentry.raven.connection.HttpConnection;
-import com.getsentry.raven.connection.RandomEventSampler;
-import com.getsentry.raven.dsn.Dsn;
-import com.getsentry.raven.marshaller.Marshaller;
-
+import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 
-public class FlowAndroidRavenFactory extends AndroidRavenFactory {
+import io.sentry.android.AndroidSentryClientFactory;
+import io.sentry.connection.Connection;
+import io.sentry.connection.EventSampler;
+import io.sentry.connection.HttpConnection;
+import io.sentry.connection.ProxyAuthenticator;
+import io.sentry.connection.RandomEventSampler;
+import io.sentry.dsn.Dsn;
+import io.sentry.marshaller.Marshaller;
+
+public class FlowAndroidSentryFactory extends AndroidSentryClientFactory {
 
     private final LoggingSendPermissionVerifier verifier;
-    private RavenEventBuilderHelper ravenEventBuilderHelper;
 
-    public FlowAndroidRavenFactory(Context context,
-            LoggingSendPermissionVerifier loggingSendPermissionVerifier,
-            RavenEventBuilderHelper ravenEventBuilderHelper) {
+    public FlowAndroidSentryFactory(Context context,
+            LoggingSendPermissionVerifier loggingSendPermissionVerifier) {
         super(context);
         this.verifier = loggingSendPermissionVerifier;
-        this.ravenEventBuilderHelper = ravenEventBuilderHelper;
     }
 
     @Override
-    public Raven createRavenInstance(Dsn dsn) {
-        Raven raven = new Raven(createConnection(dsn), getContextManager(dsn));
-        raven.addBuilderHelper(ravenEventBuilderHelper);
-        return raven;
-    }
-
-    /**
-     * Creates an HTTP connection to the Sentry server.
-     *
-     * @param dsn Data Source Name of the Sentry server.
-     * @return an {@link FlowRavenHttpConnection}
-     */
     protected Connection createHttpConnection(Dsn dsn) {
         URL sentryApiUrl = HttpConnection.getSentryApiUrl(dsn.getUri(), dsn.getProjectId());
 
         String proxyHost = getProxyHost(dsn);
+        String proxyUser = getProxyUser(dsn);
+        String proxyPass = getProxyPass(dsn);
         int proxyPort = getProxyPort(dsn);
 
         Proxy proxy = null;
         if (proxyHost != null) {
             InetSocketAddress proxyAddr = new InetSocketAddress(proxyHost, proxyPort);
             proxy = new Proxy(Proxy.Type.HTTP, proxyAddr);
+            if (proxyUser != null && proxyPass != null) {
+                Authenticator.setDefault(new ProxyAuthenticator(proxyUser, proxyPass));
+            }
         }
 
         Double sampleRate = getSampleRate(dsn);
@@ -79,7 +70,7 @@ public class FlowAndroidRavenFactory extends AndroidRavenFactory {
             eventSampler = new RandomEventSampler(sampleRate);
         }
 
-        HttpConnection httpConnection = new FlowRavenHttpConnection(sentryApiUrl,
+        HttpConnection httpConnection = new FlowSentryHttpConnection(sentryApiUrl,
                 dsn, proxy, eventSampler, verifier);
 
         Marshaller marshaller = createMarshaller(dsn);

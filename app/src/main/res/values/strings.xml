@@ -30,6 +30,8 @@
     <string name="toosmallerr">Value is too small. Minimum value: </string>
     <string name="toolargeerr">Value is too large. Maximum value: </string>
     <string name="baddatatypeerr">Answer must be numeric</string>
+    <string name="reloadsurveyslabel">Reload all surveys</string>
+    <string name="reloadsurveysdesc">Deletes and re-downloads assigned surveys (only run if instructed)</string>
     <string name="conftitle">Please Confirm</string>
     <string name="reloadconftext">Are you sure you want to purge and re-download surveys?</string>
     <string name="submitcompletetitle">Survey submitted</string>
@@ -268,9 +270,6 @@
 
     <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
     <string name="data_points_sync_no_data_points">No datapoints to sync</string>
-    <string name="reload_forms">Reload all forms</string>
-    <string name="reload_forms_title">Reload all forms?</string>
-    <string name="reload">Reload</string>
 
     <string name="app_update_dialog_title">New Flow version available</string>
     <string name="app_update_dialog_subtitle">Update to get the most out of your Flow app</string>

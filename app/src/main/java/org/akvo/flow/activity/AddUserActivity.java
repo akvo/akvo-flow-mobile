@@ -19,7 +19,6 @@
 
 package org.akvo.flow.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -33,6 +32,12 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.util.logging.LoggingHelper;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,7 +47,7 @@ import butterknife.OnTextChanged;
 
 import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
 
-public class AddUserActivity extends Activity {
+public class AddUserActivity extends BaseActivity {
 
     @BindView(R.id.login_btn)
     View nextBt;
@@ -55,14 +60,25 @@ public class AddUserActivity extends Activity {
 
     private Prefs prefs;
 
+    @Inject
+    LoggingHelper helper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
         ButterKnife.bind(this);
+        initializeInjector();
         prefs = new Prefs(getApplicationContext());
         deviceIdEt.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, ""));
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     //TODO: database operations should be done on separate thread
@@ -79,6 +95,7 @@ public class AddUserActivity extends Activity {
 
         // Select the newly created user, and exit the Activity
         FlowApp.getApp().setUser(new User(uid, username));
+        helper.initLoginData(username, deviceId);
         setResult(RESULT_OK);
         finish();
     }

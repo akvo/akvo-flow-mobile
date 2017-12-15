@@ -20,24 +20,24 @@
 
 package org.akvo.flow.util.logging;
 
-import com.getsentry.raven.connection.ConnectionException;
-import com.getsentry.raven.connection.EventSampler;
-import com.getsentry.raven.connection.HttpConnection;
-import com.getsentry.raven.dsn.Dsn;
-import com.getsentry.raven.event.Event;
-
 import java.net.Proxy;
 import java.net.URL;
+
+import io.sentry.connection.ConnectionException;
+import io.sentry.connection.EventSampler;
+import io.sentry.connection.HttpConnection;
+import io.sentry.dsn.Dsn;
+import io.sentry.event.Event;
 
 /**
  * An {@link HttpConnection} that verifies if the user allowed using mobile networks before
  * sending an exception to sentry
  */
-public class FlowRavenHttpConnection extends HttpConnection {
+public class FlowSentryHttpConnection extends HttpConnection {
 
     private final LoggingSendPermissionVerifier permissionVerifier;
 
-    public FlowRavenHttpConnection(URL sentryUrl, Dsn dsn,
+    public FlowSentryHttpConnection(URL sentryUrl, Dsn dsn,
             Proxy proxy, EventSampler eventSampler, LoggingSendPermissionVerifier verifier) {
         super(sentryUrl, dsn.getPublicKey(), dsn.getSecretKey(), proxy, eventSampler);
         this.permissionVerifier = verifier;

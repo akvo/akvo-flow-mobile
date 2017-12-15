@@ -20,6 +20,7 @@
 package org.akvo.flow.activity.testhelper;
 
 import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -77,7 +78,7 @@ public class SurveyInstaller {
         try {
             survey = persistSurvey(FileUtil.readText(input));
         } catch (IOException e) {
-            Log.e(TAG,"Error installing survey", e);
+            Log.e(TAG, "Error installing survey", e);
         }
         return survey;
     }
@@ -93,7 +94,8 @@ public class SurveyInstaller {
     public Survey persistSurvey(String xml) throws IOException {
         Survey survey = parseSurvey(xml);
         FormFileUtil formFileUtil = new FormFileUtil();
-        File surveyFile = new File(formFileUtil.getPublicFormFolderPath(),
+        File surveyFile = new File(
+                formFileUtil.getFormStoragePath(InstrumentationRegistry.getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 

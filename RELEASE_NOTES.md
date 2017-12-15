@@ -1,6 +1,17 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.3
+Date: 14 December 2017
 
+# New and noteworthy
+* **login screen tests** - [#936](https://github.com/akvo/akvo-flow-mobile/issues/936) Added tests to the login screen.
+* **Improve copy for new update message** - [#903](https://github.com/akvo/akvo-flow-mobile/issues/903) The message inviting to update the app is now shorter and clearer.
+* **Update Sentry Android SDK** - [#789](https://github.com/akvo/akvo-flow-mobile/issues/789) Using the new sentry library to send error logs.
+
+# Resolved issues
+* **Improve upload-apk module** - [#946](https://github.com/akvo/akvo-flow-mobile/issues/946) The upload-sdk module has been improved.
+
+---------------
 # ver 2.4.2.1
 Date: 06 December 2017
 

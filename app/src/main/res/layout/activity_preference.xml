@@ -134,9 +134,14 @@
                     style="@style/PreferenceItemSeparator"/>
             <TextView
                     android:id="@+id/preference_reload_forms_title"
-                    android:text="@string/reload_forms"
+                    android:text="@string/reloadsurveyslabel"
                     style="@style/PreferenceTitleStyle"
-                    android:paddingBottom="8dp"/>
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_reload_forms_subtitle"
+                    android:text="@string/reloadsurveysdesc"
+                    style="@style/PreferenceSubtitleStyle"/>
             <View
                     style="@style/PreferenceSectionSeparator"/>
 

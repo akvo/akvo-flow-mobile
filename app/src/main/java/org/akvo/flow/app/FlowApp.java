@@ -43,12 +43,12 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
-
 public class FlowApp extends Application {
     private static FlowApp app;// Singleton
 
+    @Nullable
     private User mUser;
+
     private Prefs prefs;
 
     private ApplicationComponent applicationComponent;
@@ -66,6 +66,13 @@ public class FlowApp extends Application {
         startUpdateService();
         app = this;
         startBootstrapFolderTracker();
+        updateLoggingInfo();
+    }
+
+    private void updateLoggingInfo() {
+        String username = mUser == null? null: mUser.getName();
+        String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, null);
+        loggingHelper.initLoginData(username, deviceId);
     }
 
     private void startBootstrapFolderTracker() {
@@ -131,7 +138,6 @@ public class FlowApp extends Application {
     }
 
     private void updateConfiguration(Locale savedLocale, Configuration config) {
-        Timber.d("configuration will updated to "+savedLocale.getLanguage());
         config.locale = savedLocale;
         getBaseContext().getResources().updateConfiguration(config, null);
     }
@@ -162,7 +168,7 @@ public class FlowApp extends Application {
     private void loadLastUser() {
         Context context = getApplicationContext();
         SurveyDbAdapter database = new SurveyDbAdapter(context,
-                new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
+                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
         database.open();
 
         // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades
@@ -170,8 +176,8 @@ public class FlowApp extends Application {
             prefs.setBoolean(Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
         }
 
-        long id = prefs.getLong(Prefs.KEY_USER_ID, -1);
-        if (id != -1) {
+        long id = prefs.getLong(Prefs.KEY_USER_ID, Prefs.DEFAULT_VALUE_USER_ID);
+        if (id != Prefs.DEFAULT_VALUE_USER_ID) {
             Cursor cur = database.getUser(id);
             if (cur.moveToFirst()) {
                 String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));

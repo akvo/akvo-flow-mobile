@@ -21,6 +21,7 @@
 package org.akvo.flow.presentation.settings;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -54,6 +55,7 @@ import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -102,6 +104,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
 
     @Inject
     PreferencePresenter presenter;
+
+    @Inject
+    LoggingHelper helper;
 
     private List<String> languages;
     private boolean trackChanges = false;
@@ -239,10 +244,33 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         });
     }
 
-    @OnClick(R.id.preference_reload_forms_title)
+    @OnClick({R.id.preference_reload_forms_title,
+            R.id.preference_reload_forms_subtitle
+    })
     void onReloadAllSurveysOptionTap() {
-        ReloadFormsConfirmationDialog dialog = ReloadFormsConfirmationDialog.newInstance();
-        dialog.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
+        ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
+            @Override
+            public void onAuthenticated() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(PreferenceActivity.this);
+                builder.setTitle(R.string.conftitle);
+                builder.setMessage(R.string.reloadconftext);
+                builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Context c = PreferenceActivity.this;
+                        Intent i = new Intent(c, SurveyDownloadService.class);
+                        i.putExtra(SurveyDownloadService.EXTRA_DELETE_SURVEYS, true);
+                        c.startService(i);
+                    }
+                });
+                builder.setNegativeButton(R.string.cancelbutton,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                builder.show();
+            }
+        });
     }
 
     @OnClick(R.id.preference_gps_fixes)
@@ -308,6 +336,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
                             if (!responsesOnly) {
                                 // Delete everything implies logging the current user out (if any)
                                 FlowApp.getApp().setUser(null);
+                                helper.clearUser();
                             }
                             new ClearDataAsyncTask(PreferenceActivity.this).execute(responsesOnly);
                         }

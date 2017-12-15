@@ -21,7 +21,7 @@ package org.akvo.flow.util;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.media.ExifInterface;
+import android.support.media.ExifInterface;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -153,7 +153,6 @@ public class FileUtil {
      *
      * External Storage may not be available
      *
-     * @return
      */
     @Nullable
     private static String getAppExternalStoragePath(Context context) {
@@ -225,12 +224,12 @@ public class FileUtil {
         if (dir != null && dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].isFile()) {
-                        files[i].delete();
+                for (File file : files) {
+                    if (file.isFile()) {
+                        file.delete();
                     } else {
                         // recursively delete
-                        deleteFilesInDirectory(files[i], true);
+                        deleteFilesInDirectory(file, true);
                     }
                 }
             }
@@ -359,28 +358,30 @@ public class FileUtil {
                 MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
         );
 
-        if (cursor.moveToFirst()) {
-            final String lastImagePath = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                final String lastImagePath = cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Images.ImageColumns.DATA));
 
-            if ((!filepath.equals(lastImagePath))
-                    && (FileUtil.compareImages(filepath, lastImagePath))) {
-                final int result = context.getContentResolver().delete(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        MediaStore.Images.ImageColumns.DATA + " = ?",
-                        new String[] {
-                                lastImagePath
-                        });
+                if ((!filepath.equals(lastImagePath))
+                        && (FileUtil.compareImages(filepath, lastImagePath))) {
+                    final int result = context.getContentResolver().delete(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            MediaStore.Images.ImageColumns.DATA + " = ?",
+                            new String[] {
+                                    lastImagePath
+                            });
 
-                if (result == 1) {
-                    Timber.i("Duplicated file successfully removed: " + lastImagePath);
-                } else {
-                    Timber.e("Error removing duplicated image:" + lastImagePath);
+                    if (result == 1) {
+                        Timber.i("Duplicated file successfully removed: " + lastImagePath);
+                    } else {
+                        Timber.e("Error removing duplicated image:" + lastImagePath);
+                    }
                 }
             }
-        }
 
-        cursor.close();
+            cursor.close();
+        }
     }
 
     /**
@@ -418,7 +419,7 @@ public class FileUtil {
             }
         }
 
-        if (apkPath != null && maxVersion != null) {
+        if (apkPath != null) {
             return apkPath;
         }
         return null;

@@ -75,7 +75,7 @@ public class SurveyDownloadService extends IntentService {
      */
     public static final String EXTRA_SURVEY_ID = "survey";
     public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
-    public static final String TEST_SURVEY_ID = "0";
+    private static final String TEST_SURVEY_ID = "0";
 
     @Inject
     FormFileUtil formFileUtil;
@@ -209,7 +209,7 @@ public class SurveyDownloadService extends IntentService {
     private void downloadSurvey(@NonNull Survey survey) throws IOException {
         final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        File formFolder = formFileUtil.getFormStoragePath(getApplicationContext());
+        File formFolder = formFileUtil.getFormsFolder(getApplicationContext());
         final File surveyFormsZipArchive = new File(formFolder, filename);
 
         S3Api s3Api = new S3Api();
@@ -240,13 +240,13 @@ public class SurveyDownloadService extends IntentService {
                         ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
             } else {
                 // load from file
-                File f = new File(formFileUtil.getFormStoragePath(getApplicationContext()),
+                File f = new File(formFileUtil.getFormsFolder(getApplicationContext()),
                         survey.getFileName());
                 in = new FileInputStream(f);
             }
             hydratedSurvey = SurveyDao.loadSurvey(survey, in);
         } catch (FileNotFoundException e) {
-            Timber.e(e, "Could not parse survey survey file");
+            Timber.e(e, "Could not parse survey %s file", survey.getId());
         } finally {
             FileUtil.close(in);
         }
@@ -257,7 +257,6 @@ public class SurveyDownloadService extends IntentService {
      * checks to see if we should pre-cache help media files (based on the
      * property in the settings db) and, if we should, downloads the files
      *
-     * @param survey
      */
     private void downloadResources(@NonNull Survey survey) {
         Survey hydratedSurvey = loadSurvey(survey);
@@ -330,7 +329,7 @@ public class SurveyDownloadService extends IntentService {
 
     private void downloadGaeResource(@NonNull String sid, @NonNull String url) throws IOException {
         final String filename = new File(url).getName();
-        final File surveyDir = new File(formFileUtil.getFormStoragePath(getApplicationContext()), sid);
+        final File surveyDir = new File(formFileUtil.getFormsFolder(getApplicationContext()), sid);
         if (!surveyDir.exists()) {
             surveyDir.mkdir();
         }

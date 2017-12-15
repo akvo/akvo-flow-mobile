@@ -33,6 +33,7 @@ import org.akvo.flow.util.FormFileUtil;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -41,9 +42,9 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     /**
      * Use a WeakReference to avoid Context leaks
      */
-    private WeakReference<Context> mWeakContext;
+    private final WeakReference<Context> mWeakContext;
 
-    private SurveyDbDataSource mDatabase;
+    private final SurveyDbDataSource mDatabase;
 
     public ClearDataAsyncTask(Context context) {
         mWeakContext = new WeakReference<>(context);
@@ -129,8 +130,8 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
             final Context context = mWeakContext.get();
             if (context != null) {
                 FormFileUtil formFileUtil = new FormFileUtil();
-                File[] files = formFileUtil
-                        .findAllPossibleSurveyFolders(context.getApplicationContext());
+                List<File> files = formFileUtil
+                        .findAllPossibleFormFolders(context.getApplicationContext());
                 for (File file : files) {
                     FileUtil.deleteFilesInDirectory(file, false);
                 }

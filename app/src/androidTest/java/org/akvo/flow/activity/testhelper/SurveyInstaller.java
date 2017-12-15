@@ -57,9 +57,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 public class SurveyInstaller {
 
     private static final String TAG = "SurveyInstaller";
-    private SurveyDbDataSource adapter;
+    private final SurveyDbDataSource adapter;
     //Need an array that holds every File so we can delete them in the end
-    private Queue<File> surveyFiles = new ArrayDeque<>();
+    private final Queue<File> surveyFiles = new ArrayDeque<>();
 
     public SurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
@@ -91,11 +91,11 @@ public class SurveyInstaller {
      * @return survey
      * @throws IOException if string cannot be written to file
      */
-    public Survey persistSurvey(String xml) throws IOException {
+    private Survey persistSurvey(String xml) throws IOException {
         Survey survey = parseSurvey(xml);
         FormFileUtil formFileUtil = new FormFileUtil();
         File surveyFile = new File(
-                formFileUtil.getFormStoragePath(InstrumentationRegistry.getTargetContext()),
+                formFileUtil.getFormsFolder(InstrumentationRegistry.getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 
@@ -148,9 +148,8 @@ public class SurveyInstaller {
                 .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
                         user, surveyedLocaleId);
         if (responseBuilders != null) {
-            int length = responseBuilders.length;
-            for (int i = 0; i < length; i++) {
-                QuestionResponse responseToSave = responseBuilders[i]
+            for (QuestionResponse.QuestionResponseBuilder responseBuilder : responseBuilders) {
+                QuestionResponse responseToSave = responseBuilder
                         .setSurveyInstanceId(surveyInstanceId)
                         .createQuestionResponse();
                 adapter.createOrUpdateSurveyResponse(responseToSave);

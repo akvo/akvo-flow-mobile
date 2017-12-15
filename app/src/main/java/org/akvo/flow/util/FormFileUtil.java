@@ -25,6 +25,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -36,47 +38,96 @@ public class FormFileUtil {
     public FormFileUtil() {
     }
 
-    public File getFormStoragePath(Context context) {
+    @NonNull
+    public File getFormsFolder(Context context) {
         String path = FileUtil.getInternalFolderPath(context, DIR_FORMS);
         return FileUtil.createDir(path);
     }
 
+    @NonNull
     public File findFormFile(Context context, String formFileName) {
-        File file = new File(getFormStoragePath(context), formFileName);
-        if (file.exists()) {
-            return file;
+        File file = getAppInternalFormFileIfExists(context, formFileName);
+        if (file == null) {
+            file = getAppExternalFormFileIfExists(context, formFileName);
         }
-        File folder = getFormAppExternalStoragePath(context);
-        if (folder != null && folder.exists()) {
-            file = new File(folder, formFileName);
-            if (file.exists()) {
-                return file;
-            }
+        if (file == null) {
+            file = getPublicFormFile(formFileName);
         }
-
-        return new File(getPublicFormFolderPath(), formFileName);
+        return file;
     }
 
-    public File[] findAllPossibleSurveyFolders(Context context) {
-        File[] folders = new File[3];
-        folders[0] = getFormStoragePath(context);
-        folders[1] = getFormAppExternalStoragePath(context);
-        folders[2] = new File(FileUtil.getPublicFolderPath(DIR_FORMS));
+    @NonNull
+    public List<File> findAllPossibleFormFolders(Context context) {
+        List<File> folders = new ArrayList<>(3);
+        File folder = getAppInternalFormsDir(context);
+        if (folder.exists()) {
+            folders.add(folder);
+        }
+        File folder2 = getAppExternalFormsDir(context);
+        if (folder2 != null && folder2.exists()) {
+            folders.add(folder2);
+        }
+        File folder3 = getPublicFormsDir();
+        if (folder3.exists()) {
+            folders.add(folder3);
+        }
         return folders;
     }
 
     @NonNull
-    public File getPublicFormFolderPath() {
+    private File getPublicFormFile(String formFileName) {
+        return new File(getPublicFolderPath(), formFileName);
+    }
+
+    @Nullable
+    private File getAppInternalFormFileIfExists(Context context, String formFileName) {
+        File folder = getAppInternalFormsDir(context);
+        if (folder.exists()) {
+            File file = new File(getFormsFolder(context), formFileName);
+            if (file.exists()) {
+                return file;
+            }
+        }
+        return null;
+    }
+
+    @NonNull
+    private File getAppInternalFormsDir(Context context) {
+        String path = FileUtil.getInternalFolderPath(context, DIR_FORMS);
+        return new File(path);
+    }
+
+    @Nullable
+    private File getAppExternalFormFileIfExists(Context context, String formFileName) {
+        File folder = getAppExternalFormsDir(context);
+        if (folder != null && folder.exists()) {
+            File file = new File(folder, formFileName);
+            if (file.exists()) {
+                return file;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private File getAppExternalFormsDir(Context context) {
+        String path = FileUtil.getAppExternalFolderPath(context, DIR_FORMS);
+        File folder = null;
+        if (path != null) {
+            folder = new File(path);
+        }
+        return folder;
+    }
+
+    @NonNull
+    private File getPublicFormsDir() {
+        return new File(FileUtil.getPublicFolderPath(DIR_FORMS));
+    }
+
+    @NonNull
+    private File getPublicFolderPath() {
         String publicFolderPath = FileUtil.getPublicFolderPath(DIR_FORMS);
         return FileUtil.createDir(publicFolderPath);
     }
 
-    @Nullable
-    private File getFormAppExternalStoragePath(Context context) {
-        String path = FileUtil.getAppExternalFolderPath(context, DIR_FORMS);
-        if (path != null) {
-            return FileUtil.createDir(path);
-        }
-        return null;
-    }
 }

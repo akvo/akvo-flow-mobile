@@ -20,6 +20,7 @@
 package org.akvo.flow.activity.form.data;
 
 import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
@@ -44,6 +45,7 @@ import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.FormFileUtil;
 import org.akvo.flow.util.GsonMapper;
 
 import java.io.ByteArrayInputStream;
@@ -121,7 +123,9 @@ public class SurveyInstaller {
      */
     public Survey persistSurvey(String xml) throws IOException {
         Survey survey = parseSurvey(xml);
-        File surveyFile = new File(FileUtil.getFilesDir(FileUtil.FileType.FORMS),
+        FormFileUtil formFileUtil = new FormFileUtil();
+        File surveyFile = new File(
+                formFileUtil.getFormsFolder(InstrumentationRegistry.getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 

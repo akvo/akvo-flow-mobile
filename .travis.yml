@@ -13,16 +13,16 @@ android:
     - tools
     - build-tools-26.0.2
     - android-25
-    - android-22
+    - android-21
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-android-21
 
 before_script:
     - mv app/config/survey.properties.template app/survey.properties
     - mv app/gradle.properties.template app/gradle.properties
-    - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a -c 2048M
+    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
     - mksdcard -l sdcard 2048M sdcard
     - emulator -avd test -no-audio -no-window -sdcard sdcard &
     - android-wait-for-emulator

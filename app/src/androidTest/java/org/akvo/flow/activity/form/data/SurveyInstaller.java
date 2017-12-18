@@ -46,6 +46,7 @@ import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FormFileUtil;
+import org.akvo.flow.util.FormResourcesFileUtil;
 import org.akvo.flow.util.GsonMapper;
 
 import java.io.ByteArrayInputStream;
@@ -96,6 +97,9 @@ public class SurveyInstaller {
     }
 
     private void installCascades(Survey survey, Context context) throws IOException {
+        FormResourcesFileUtil formResourcesFileUtil = new FormResourcesFileUtil();
+        File cascadeFolder = formResourcesFileUtil
+                .getFolder(InstrumentationRegistry.getTargetContext());
         for (QuestionGroup group : survey.getQuestionGroups()) {
             for (Question question : group.getQuestions()) {
                 String cascadeFileName = question.getSrc();
@@ -105,7 +109,7 @@ public class SurveyInstaller {
                     int cascadeResId = context.getResources()
                             .getIdentifier(cascadeResourceName, "raw", context.getPackageName());
                     FileOutputStream output = new FileOutputStream(
-                            new File(FileUtil.getFilesDir(FileUtil.FileType.RES), cascadeFileName));
+                            new File(cascadeFolder, cascadeFileName));
                     InputStream input = context.getResources().openRawResource(cascadeResId);
                     FileUtil.copy(input, output);
                 }

@@ -35,8 +35,8 @@ import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.FormFileUtil;
+import org.akvo.flow.util.FormResourcesFileUtil;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.SurveyFileNameGenerator;
@@ -85,6 +85,9 @@ public class BootstrapService extends IntentService {
 
     @Inject
     FormFileUtil formFileUtil;
+
+    @Inject
+    FormResourcesFileUtil resourcesFileUtil;
 
     private static final String TAG = "BOOTSTRAP_SERVICE";
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
@@ -194,7 +197,7 @@ public class BootstrapService extends IntentService {
             if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
                 // Cascade resource
                 FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
-                        FileUtil.getFilesDir(FileType.RES));
+                        resourcesFileUtil.getFolder(getApplicationContext()));
             } else if (entryName.endsWith(ConstantUtil.XML_SUFFIX)) {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);

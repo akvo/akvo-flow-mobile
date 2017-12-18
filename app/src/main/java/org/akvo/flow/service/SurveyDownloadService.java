@@ -41,8 +41,8 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.FormFileUtil;
+import org.akvo.flow.util.FormResourcesFileUtil;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.NotificationHelper;
 
@@ -79,6 +79,9 @@ public class SurveyDownloadService extends IntentService {
 
     @Inject
     FormFileUtil formFileUtil;
+
+    @Inject
+    FormResourcesFileUtil resourcesFileUtil;
 
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
     private static final String DEFAULT_TYPE = "Survey";
@@ -317,7 +320,7 @@ public class SurveyDownloadService extends IntentService {
         // resource is just a filename
         final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        final File resDir = FileUtil.getFilesDir(FileType.RES);
+        final File resDir = resourcesFileUtil.getFolder(getApplicationContext());
         final File file = new File(resDir, filename);
         S3Api s3 = new S3Api();
         s3.syncFile(objectKey, file);

@@ -28,7 +28,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-public class FormFileUtil extends InternalFileUtil{
+public class FormFileUtil extends InternalFileUtil {
 
     private static final String DIR_FORMS = "forms";
 

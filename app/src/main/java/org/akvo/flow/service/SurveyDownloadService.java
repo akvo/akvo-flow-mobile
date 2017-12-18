@@ -209,7 +209,7 @@ public class SurveyDownloadService extends IntentService {
     private void downloadSurvey(@NonNull Survey survey) throws IOException {
         final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        File formFolder = formFileUtil.getFormsFolder(getApplicationContext());
+        File formFolder = formFileUtil.getFolder(getApplicationContext());
         final File surveyFormsZipArchive = new File(formFolder, filename);
 
         S3Api s3Api = new S3Api();
@@ -240,7 +240,7 @@ public class SurveyDownloadService extends IntentService {
                         ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
             } else {
                 // load from file
-                File f = new File(formFileUtil.getFormsFolder(getApplicationContext()),
+                File f = new File(formFileUtil.getFolder(getApplicationContext()),
                         survey.getFileName());
                 in = new FileInputStream(f);
             }
@@ -329,7 +329,7 @@ public class SurveyDownloadService extends IntentService {
 
     private void downloadGaeResource(@NonNull String sid, @NonNull String url) throws IOException {
         final String filename = new File(url).getName();
-        final File surveyDir = new File(formFileUtil.getFormsFolder(getApplicationContext()), sid);
+        final File surveyDir = new File(formFileUtil.getFolder(getApplicationContext()), sid);
         if (!surveyDir.exists()) {
             surveyDir.mkdir();
         }

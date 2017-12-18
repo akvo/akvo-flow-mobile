@@ -203,7 +203,7 @@ public class BootstrapService extends IntentService {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
                 // Help media file
-                File helpDir = new File(formFileUtil.getFormsFolder(getApplicationContext()),
+                File helpDir = new File(formFileUtil.getFolder(getApplicationContext()),
                         id);
                 if (!helpDir.exists()) {
                     helpDir.mkdir();
@@ -325,7 +325,7 @@ public class BootstrapService extends IntentService {
     @NonNull
     private File generateNewSurveyFile(@NonNull String filename,
             @Nullable String surveyFolderName) {
-        File filesDir = formFileUtil.getFormsFolder(getApplicationContext());
+        File filesDir = formFileUtil.getFolder(getApplicationContext());
         if (TextUtils.isEmpty(surveyFolderName)) {
             return new File(filesDir, filename);
         } else {

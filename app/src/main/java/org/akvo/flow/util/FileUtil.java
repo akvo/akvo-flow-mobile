@@ -104,7 +104,7 @@ public class FileUtil {
     }
 
     @NonNull
-    public static File createDir(String path) {
+    static File createDir(String path) {
         File dir = new File(path);
         if (!dir.exists()) {
             dir.mkdirs();

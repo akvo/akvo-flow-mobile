@@ -95,7 +95,7 @@ public class SurveyInstaller {
         Survey survey = parseSurvey(xml);
         FormFileUtil formFileUtil = new FormFileUtil();
         File surveyFile = new File(
-                formFileUtil.getFormsFolder(InstrumentationRegistry.getTargetContext()),
+                formFileUtil.getFolder(InstrumentationRegistry.getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 

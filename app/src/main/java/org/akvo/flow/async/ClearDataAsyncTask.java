@@ -131,7 +131,7 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
             if (context != null) {
                 FormFileUtil formFileUtil = new FormFileUtil();
                 List<File> files = formFileUtil
-                        .findAllPossibleFormFolders(context.getApplicationContext());
+                        .findAllPossibleFolders(context.getApplicationContext());
                 for (File file : files) {
                     FileUtil.deleteFilesInDirectory(file, false);
                 }

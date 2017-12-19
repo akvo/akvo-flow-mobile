@@ -41,13 +41,13 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    public File findFile(Context context, String formFileName) {
-        File file = getAppInternalFileIfExists(context, formFileName);
+    public File findFile(Context context, String fileName) {
+        File file = getAppInternalFileIfExists(context, fileName);
         if (file == null) {
-            file = getAppExternalFileIfExists(context, formFileName);
+            file = getAppExternalFileIfExists(context, fileName);
         }
         if (file == null) {
-            file = getPublicFormFile(formFileName);
+            file = new File(getExistingPublicFolder(), fileName);
         }
         return file;
     }
@@ -71,18 +71,13 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    protected abstract String getInternalFolderPath(Context context);
+    protected abstract String getAppInternalFolderPath(Context context);
 
     @Nullable
     protected abstract String getAppExternalFolderPath(Context context);
 
     @NonNull
     protected abstract String getPublicFolderPath();
-
-    @NonNull
-    private File getPublicFormFile(String formFileName) {
-        return new File(getExistingPublicFolder(), formFileName);
-    }
 
     @Nullable
     private File getAppExternalFolder(Context context) {
@@ -108,7 +103,7 @@ public abstract class InternalFileUtil {
 
     @NonNull
     private File getAppInternalFolder(Context context) {
-        String path = getInternalFolderPath(context);
+        String path = getAppInternalFolderPath(context);
         return new File(path);
     }
 

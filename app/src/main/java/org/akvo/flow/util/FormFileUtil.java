@@ -36,7 +36,7 @@ public class FormFileUtil extends InternalFileUtil {
 
     @Override
     @NonNull
-    protected String getInternalFolderPath(Context context) {
+    protected String getAppInternalFolderPath(Context context) {
         return FileUtil.getInternalFolderPath(context, DIR_FORMS);
     }
 

@@ -70,7 +70,7 @@ public abstract class InternalFileUtil {
     protected abstract String getInternalFolderPath(Context context);
 
     @Nullable
-    protected abstract File getAppExternalFormsDir(Context context);
+    protected abstract String getAppExternalFolderPath(Context context);
 
     @NonNull
     protected abstract String getPublicFolderPath();
@@ -78,6 +78,16 @@ public abstract class InternalFileUtil {
     @NonNull
     private File getPublicFormFile(String formFileName) {
         return new File(getPublicFormFolderPath(), formFileName);
+    }
+
+    @Nullable
+    private File getAppExternalFormsDir(Context context) {
+        String path = getAppExternalFolderPath(context);
+        File folder = null;
+        if (path != null) {
+            folder = new File(path);
+        }
+        return folder;
     }
 
     @Nullable

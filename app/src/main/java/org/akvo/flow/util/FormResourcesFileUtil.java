@@ -45,13 +45,8 @@ public class FormResourcesFileUtil extends InternalFileUtil {
 
     @Override
     @Nullable
-    protected File getAppExternalFormsDir(Context context) {
-        String path = FileUtil.getAppExternalFolderPath(context, DIR_RES);
-        File folder = null;
-        if (path != null) {
-            folder = new File(path);
-        }
-        return folder;
+    protected String getAppExternalFolderPath(Context context) {
+        return FileUtil.getAppExternalFolderPath(context, DIR_RES);
     }
 
     @Override

@@ -93,7 +93,7 @@ public abstract class InternalFileUtil {
     private File getAppInternalFileIfExists(Context context, String fileName) {
         File folder = getAppInternalFolder(context);
         if (folder.exists()) {
-            File file = new File(getExistingAppInternalFolder(context), fileName);
+            File file = new File(folder, fileName);
             if (file.exists()) {
                 return file;
             }

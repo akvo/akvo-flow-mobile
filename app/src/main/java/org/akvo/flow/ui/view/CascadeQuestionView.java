@@ -47,8 +47,6 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.FormResourcesFileUtil;
 
 import java.io.File;

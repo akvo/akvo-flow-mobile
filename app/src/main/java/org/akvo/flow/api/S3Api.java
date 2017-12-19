@@ -19,7 +19,6 @@
 
 package org.akvo.flow.api;
 
-import android.content.Context;
 import android.util.Base64;
 
 import org.akvo.flow.BuildConfig;

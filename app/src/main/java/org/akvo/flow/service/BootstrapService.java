@@ -197,7 +197,7 @@ public class BootstrapService extends IntentService {
             if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
                 // Cascade resource
                 FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
-                        resourcesFileUtil.getFolder(getApplicationContext()));
+                        resourcesFileUtil.getExistingAppInternalFolder(getApplicationContext()));
             } else if (entryName.endsWith(ConstantUtil.XML_SUFFIX)) {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
@@ -206,7 +206,7 @@ public class BootstrapService extends IntentService {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
                 // Help media file
-                File helpDir = new File(formFileUtil.getFolder(getApplicationContext()),
+                File helpDir = new File(formFileUtil.getExistingAppInternalFolder(getApplicationContext()),
                         id);
                 if (!helpDir.exists()) {
                     helpDir.mkdir();
@@ -328,7 +328,7 @@ public class BootstrapService extends IntentService {
     @NonNull
     private File generateNewSurveyFile(@NonNull String filename,
             @Nullable String surveyFolderName) {
-        File filesDir = formFileUtil.getFolder(getApplicationContext());
+        File filesDir = formFileUtil.getExistingAppInternalFolder(getApplicationContext());
         if (TextUtils.isEmpty(surveyFolderName)) {
             return new File(filesDir, filename);
         } else {

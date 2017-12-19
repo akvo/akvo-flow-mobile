@@ -99,7 +99,7 @@ public class SurveyInstaller {
     private void installCascades(Survey survey, Context context) throws IOException {
         FormResourcesFileUtil formResourcesFileUtil = new FormResourcesFileUtil();
         File cascadeFolder = formResourcesFileUtil
-                .getFolder(InstrumentationRegistry.getTargetContext());
+                .getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext());
         for (QuestionGroup group : survey.getQuestionGroups()) {
             for (Question question : group.getQuestions()) {
                 String cascadeFileName = question.getSrc();
@@ -129,7 +129,7 @@ public class SurveyInstaller {
         Survey survey = parseSurvey(xml);
         FormFileUtil formFileUtil = new FormFileUtil();
         File surveyFile = new File(
-                formFileUtil.getFolder(InstrumentationRegistry.getTargetContext()),
+                formFileUtil.getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 

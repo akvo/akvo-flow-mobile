@@ -95,7 +95,7 @@ public class CascadeQuestionView extends QuestionView
         // Construct local filename (src refers to remote location of the resource)
         String src = getQuestion().getSrc();
         if (!TextUtils.isEmpty(src)) {
-            File db = new File(resourcesFileUtil.getFolder(getContext().getApplicationContext()),
+            File db = new File(resourcesFileUtil.getExistingAppInternalFolder(getContext().getApplicationContext()),
                     src);
             if (db.exists()) {
                 mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());

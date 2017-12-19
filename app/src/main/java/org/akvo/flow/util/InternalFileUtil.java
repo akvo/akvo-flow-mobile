@@ -31,16 +31,20 @@ import java.util.List;
 public abstract class InternalFileUtil {
 
     @NonNull
-    public File getFolder(Context context) {
-        String path = getInternalFolderPath(context);
-        return FileUtil.createDir(path);
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    public File getExistingAppInternalFolder(Context context) {
+        File folder = getAppInternalFolder(context);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        return folder;
     }
 
     @NonNull
     public File findFile(Context context, String formFileName) {
-        File file = getAppInternalFormFileIfExists(context, formFileName);
+        File file = getAppInternalFileIfExists(context, formFileName);
         if (file == null) {
-            file = getAppExternalFormFileIfExists(context, formFileName);
+            file = getAppExternalFileIfExists(context, formFileName);
         }
         if (file == null) {
             file = getPublicFormFile(formFileName);
@@ -51,15 +55,15 @@ public abstract class InternalFileUtil {
     @NonNull
     public List<File> findAllPossibleFolders(Context context) {
         List<File> folders = new ArrayList<>(3);
-        File folder = getAppInternalFormsDir(context);
+        File folder = getAppInternalFolder(context);
         if (folder.exists()) {
             folders.add(folder);
         }
-        File folder2 = getAppExternalFormsDir(context);
+        File folder2 = getAppExternalFolder(context);
         if (folder2 != null && folder2.exists()) {
             folders.add(folder2);
         }
-        File folder3 = getPublicFormsDir();
+        File folder3 = getPublicFolder();
         if (folder3.exists()) {
             folders.add(folder3);
         }
@@ -77,11 +81,11 @@ public abstract class InternalFileUtil {
 
     @NonNull
     private File getPublicFormFile(String formFileName) {
-        return new File(getPublicFormFolderPath(), formFileName);
+        return new File(getExistingPublicFolder(), formFileName);
     }
 
     @Nullable
-    private File getAppExternalFormsDir(Context context) {
+    private File getAppExternalFolder(Context context) {
         String path = getAppExternalFolderPath(context);
         File folder = null;
         if (path != null) {
@@ -91,10 +95,10 @@ public abstract class InternalFileUtil {
     }
 
     @Nullable
-    private File getAppInternalFormFileIfExists(Context context, String formFileName) {
-        File folder = getAppInternalFormsDir(context);
+    private File getAppInternalFileIfExists(Context context, String fileName) {
+        File folder = getAppInternalFolder(context);
         if (folder.exists()) {
-            File file = new File(getFolder(context), formFileName);
+            File file = new File(getExistingAppInternalFolder(context), fileName);
             if (file.exists()) {
                 return file;
             }
@@ -103,16 +107,16 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    private File getAppInternalFormsDir(Context context) {
+    private File getAppInternalFolder(Context context) {
         String path = getInternalFolderPath(context);
         return new File(path);
     }
 
     @Nullable
-    private File getAppExternalFormFileIfExists(Context context, String formFileName) {
-        File folder = getAppExternalFormsDir(context);
+    private File getAppExternalFileIfExists(Context context, String fileName) {
+        File folder = getAppExternalFolder(context);
         if (folder != null && folder.exists()) {
-            File file = new File(folder, formFileName);
+            File file = new File(folder, fileName);
             if (file.exists()) {
                 return file;
             }
@@ -121,13 +125,17 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    private File getPublicFormsDir() {
+    private File getPublicFolder() {
         return new File(getPublicFolderPath());
     }
 
     @NonNull
-    private File getPublicFormFolderPath() {
-        String publicFolderPath = getPublicFolderPath();
-        return FileUtil.createDir(publicFolderPath);
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    private File getExistingPublicFolder() {
+        File folder = getPublicFolder();
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        return folder;
     }
 }

@@ -212,7 +212,7 @@ public class SurveyDownloadService extends IntentService {
     private void downloadSurvey(@NonNull Survey survey) throws IOException {
         final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        File formFolder = formFileUtil.getFolder(getApplicationContext());
+        File formFolder = formFileUtil.getExistingAppInternalFolder(getApplicationContext());
         final File surveyFormsZipArchive = new File(formFolder, filename);
 
         S3Api s3Api = new S3Api();
@@ -243,7 +243,7 @@ public class SurveyDownloadService extends IntentService {
                         ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
             } else {
                 // load from file
-                File f = new File(formFileUtil.getFolder(getApplicationContext()),
+                File f = new File(formFileUtil.getExistingAppInternalFolder(getApplicationContext()),
                         survey.getFileName());
                 in = new FileInputStream(f);
             }
@@ -320,7 +320,7 @@ public class SurveyDownloadService extends IntentService {
         // resource is just a filename
         final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        final File resDir = resourcesFileUtil.getFolder(getApplicationContext());
+        final File resDir = resourcesFileUtil.getExistingAppInternalFolder(getApplicationContext());
         final File file = new File(resDir, filename);
         S3Api s3 = new S3Api();
         s3.syncFile(objectKey, file);
@@ -332,7 +332,7 @@ public class SurveyDownloadService extends IntentService {
 
     private void downloadGaeResource(@NonNull String sid, @NonNull String url) throws IOException {
         final String filename = new File(url).getName();
-        final File surveyDir = new File(formFileUtil.getFolder(getApplicationContext()), sid);
+        final File surveyDir = new File(formFileUtil.getExistingAppInternalFolder(getApplicationContext()), sid);
         if (!surveyDir.exists()) {
             surveyDir.mkdir();
         }

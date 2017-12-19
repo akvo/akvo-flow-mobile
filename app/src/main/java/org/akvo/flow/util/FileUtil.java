@@ -101,7 +101,8 @@ public class FileUtil {
     }
 
     @NonNull
-    static File createDir(String path) {
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    private static File createDir(String path) {
         File dir = new File(path);
         if (!dir.exists()) {
             dir.mkdirs();

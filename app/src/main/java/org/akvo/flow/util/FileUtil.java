@@ -111,12 +111,12 @@ public class FileUtil {
     }
 
     @NonNull
-    static String getInternalFolderPath(Context context, String folderName) {
+    public static String getInternalFolderPath(Context context, String folderName) {
         return context.getFilesDir() + File.separator + folderName;
     }
 
     @Nullable
-    static String getAppExternalFolderPath(Context context, String folderName) {
+    public static String getAppExternalFolderPath(Context context, String folderName) {
         String appExternalStoragePath = getAppExternalStoragePath(context);
         return appExternalStoragePath == null ?
                 null :
@@ -124,7 +124,7 @@ public class FileUtil {
     }
 
     @NonNull
-    static String getPublicFolderPath(String folderName) {
+    public static String getPublicFolderPath(String folderName) {
         return getExternalStoragePath() + File.separator + folderName;
     }
 

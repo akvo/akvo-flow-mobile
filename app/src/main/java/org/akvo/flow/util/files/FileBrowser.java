@@ -18,22 +18,29 @@
  *
  */
 
-package org.akvo.flow.util;
+package org.akvo.flow.util.files;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.akvo.flow.util.FileUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class InternalFileUtil {
+import javax.inject.Inject;
+
+public class FileBrowser {
+
+    @Inject public FileBrowser() {
+    }
 
     @NonNull
     @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
-    public File getExistingAppInternalFolder(Context context) {
-        File folder = getAppInternalFolder(context);
+    File getExistingAppInternalFolder(Context context, String folderName) {
+        File folder = getAppInternalFolder(context, folderName);
         if (!folder.exists()) {
             folder.mkdirs();
         }
@@ -41,29 +48,29 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    public File findFile(Context context, String fileName) {
-        File file = getAppInternalFileIfExists(context, fileName);
+    File findFile(Context context, String folderName, String fileName) {
+        File file = getAppInternalFileIfExists(context, folderName, fileName);
         if (file == null) {
-            file = getAppExternalFileIfExists(context, fileName);
+            file = getAppExternalFileIfExists(context, folderName, fileName);
         }
         if (file == null) {
-            file = new File(getExistingPublicFolder(), fileName);
+            file = new File(getExistingPublicFolder(folderName), fileName);
         }
         return file;
     }
 
     @NonNull
-    public List<File> findAllPossibleFolders(Context context) {
+    List<File> findAllPossibleFolders(Context context, String folderName) {
         List<File> folders = new ArrayList<>(3);
-        File folder = getAppInternalFolder(context);
+        File folder = getAppInternalFolder(context, folderName);
         if (folder.exists()) {
             folders.add(folder);
         }
-        File folder2 = getAppExternalFolder(context);
+        File folder2 = getAppExternalFolder(context, folderName);
         if (folder2 != null && folder2.exists()) {
             folders.add(folder2);
         }
-        File folder3 = getPublicFolder();
+        File folder3 = getPublicFolder(folderName);
         if (folder3.exists()) {
             folders.add(folder3);
         }
@@ -71,17 +78,23 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    protected abstract String getAppInternalFolderPath(Context context);
+    private String getAppInternalFolderPath(Context context, String folder) {
+        return FileUtil.getInternalFolderPath(context, folder);
+    }
 
     @Nullable
-    protected abstract String getAppExternalFolderPath(Context context);
+    private String getAppExternalFolderPath(Context context, String folder){
+        return FileUtil.getAppExternalFolderPath(context, folder);
+    }
 
     @NonNull
-    protected abstract String getPublicFolderPath();
+    private String getPublicFolderPath(String folder) {
+        return FileUtil.getPublicFolderPath(folder);
+    }
 
     @Nullable
-    private File getAppExternalFolder(Context context) {
-        String path = getAppExternalFolderPath(context);
+    private File getAppExternalFolder(Context context, String folderName) {
+        String path = getAppExternalFolderPath(context, folderName);
         File folder = null;
         if (path != null) {
             folder = new File(path);
@@ -90,8 +103,8 @@ public abstract class InternalFileUtil {
     }
 
     @Nullable
-    private File getAppInternalFileIfExists(Context context, String fileName) {
-        File folder = getAppInternalFolder(context);
+    private File getAppInternalFileIfExists(Context context, String folderName, String fileName) {
+        File folder = getAppInternalFolder(context, folderName);
         if (folder.exists()) {
             File file = new File(folder, fileName);
             if (file.exists()) {
@@ -102,14 +115,14 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    private File getAppInternalFolder(Context context) {
-        String path = getAppInternalFolderPath(context);
+    private File getAppInternalFolder(Context context, String folder) {
+        String path = getAppInternalFolderPath(context, folder);
         return new File(path);
     }
 
     @Nullable
-    private File getAppExternalFileIfExists(Context context, String fileName) {
-        File folder = getAppExternalFolder(context);
+    private File getAppExternalFileIfExists(Context context, String folderName, String fileName) {
+        File folder = getAppExternalFolder(context, folderName);
         if (folder != null && folder.exists()) {
             File file = new File(folder, fileName);
             if (file.exists()) {
@@ -120,14 +133,14 @@ public abstract class InternalFileUtil {
     }
 
     @NonNull
-    private File getPublicFolder() {
-        return new File(getPublicFolderPath());
+    private File getPublicFolder(String folderName) {
+        return new File(getPublicFolderPath(folderName));
     }
 
     @NonNull
     @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
-    private File getExistingPublicFolder() {
-        File folder = getPublicFolder();
+    private File getExistingPublicFolder(String folderName) {
+        File folder = getPublicFolder(folderName);
         if (!folder.exists()) {
             folder.mkdirs();
         }

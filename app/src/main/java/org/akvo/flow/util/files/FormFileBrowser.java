@@ -18,37 +18,41 @@
  *
  */
 
-package org.akvo.flow.util;
+package org.akvo.flow.util.files;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import org.akvo.flow.util.files.FileBrowser;
+
+import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 
-public class FormFileUtil extends InternalFileUtil {
+public class FormFileBrowser {
 
     private static final String DIR_FORMS = "forms";
 
+    private final FileBrowser fileBrowser;
+
     @Inject
-    public FormFileUtil() {
+    public FormFileBrowser(FileBrowser fileBrowser) {
+        this.fileBrowser = fileBrowser;
     }
 
-    @Override
     @NonNull
-    protected String getAppInternalFolderPath(Context context) {
-        return FileUtil.getInternalFolderPath(context, DIR_FORMS);
+    public File getExistingAppInternalFolder(Context context) {
+        return fileBrowser.getExistingAppInternalFolder(context, DIR_FORMS);
     }
 
-    @Override
-    @Nullable
-    protected String getAppExternalFolderPath(Context context) {
-        return FileUtil.getAppExternalFolderPath(context, DIR_FORMS);
-    }
-
-    @Override
     @NonNull
-    protected String getPublicFolderPath() {
-        return FileUtil.getPublicFolderPath(DIR_FORMS);
+    public File findFile(Context context, String fileName) {
+        return fileBrowser.findFile(context, DIR_FORMS, fileName);
+    }
+
+    @NonNull
+    public List<File> findAllPossibleFolders(Context context) {
+        return fileBrowser.findAllPossibleFolders(context, DIR_FORMS);
     }
 }

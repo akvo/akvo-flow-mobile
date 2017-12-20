@@ -18,38 +18,42 @@
  *
  */
 
-package org.akvo.flow.util;
+package org.akvo.flow.util.files;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import org.akvo.flow.util.files.FileBrowser;
+
+import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 
-public class FormResourcesFileUtil extends InternalFileUtil {
+public class FormResourcesFileBrowser extends FileBrowser {
 
     // Form resources (i.e. cascading DB)
     private static final String DIR_RES = "res";
 
+    private final FileBrowser fileBrowser;
+
     @Inject
-    public FormResourcesFileUtil() {
+    public FormResourcesFileBrowser(FileBrowser fileBrowser) {
+        this.fileBrowser = fileBrowser;
     }
 
-    @Override
     @NonNull
-    protected String getAppInternalFolderPath(Context context) {
-        return FileUtil.getInternalFolderPath(context, DIR_RES);
+    public File getExistingAppInternalFolder(Context context) {
+        return fileBrowser.getExistingAppInternalFolder(context, DIR_RES);
     }
 
-    @Override
-    @Nullable
-    protected String getAppExternalFolderPath(Context context) {
-        return FileUtil.getAppExternalFolderPath(context, DIR_RES);
-    }
-
-    @Override
     @NonNull
-    protected String getPublicFolderPath() {
-        return FileUtil.getPublicFolderPath(DIR_RES);
+    public File findFile(Context context, String fileName) {
+        return fileBrowser.findFile(context, DIR_RES, fileName);
+    }
+
+    @NonNull
+    public List<File> findAllPossibleFolders(Context context) {
+        return fileBrowser.findAllPossibleFolders(context, DIR_RES);
     }
 }

@@ -68,7 +68,7 @@ import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FormFileUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StorageHelper;
@@ -118,7 +118,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     SurveyDbDataSource mDatabase;
 
     @Inject
-    FormFileUtil formFileUtil;
+    FormFileBrowser formFileBrowser;
 
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
@@ -237,7 +237,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         Survey surveyMeta = mDatabase.getSurvey(surveyId);
         InputStream in = null;
         try {
-            File file = formFileUtil
+            File file = formFileBrowser
                     .findFile(getApplicationContext(), surveyMeta.getFileName());
             in = new FileInputStream(file);
             mSurvey = SurveyDao.loadSurvey(surveyMeta, in);

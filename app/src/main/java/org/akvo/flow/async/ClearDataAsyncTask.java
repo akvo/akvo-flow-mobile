@@ -27,9 +27,11 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.FormFileUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -129,9 +131,12 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
             // Delete downloaded survey xml/zips
             final Context context = mWeakContext.get();
             if (context != null) {
-                FormFileUtil formFileUtil = new FormFileUtil();
-                List<File> files = formFileUtil
-                        .findAllPossibleFolders(context.getApplicationContext());
+                FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
+                FormResourcesFileBrowser formResourcesFileBrowser = new FormResourcesFileBrowser(
+                        new FileBrowser());
+                Context applicationContext = context.getApplicationContext();
+                List<File> files = formFileBrowser.findAllPossibleFolders(applicationContext);
+                files.addAll(formResourcesFileBrowser.findAllPossibleFolders(applicationContext));
                 for (File file : files) {
                     FileUtil.deleteFilesInDirectory(file, false);
                 }

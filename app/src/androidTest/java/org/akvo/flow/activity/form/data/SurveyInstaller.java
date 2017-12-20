@@ -44,9 +44,10 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FormFileUtil;
-import org.akvo.flow.util.FormResourcesFileUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.GsonMapper;
 
 import java.io.ByteArrayInputStream;
@@ -97,7 +98,8 @@ public class SurveyInstaller {
     }
 
     private void installCascades(Survey survey, Context context) throws IOException {
-        FormResourcesFileUtil formResourcesFileUtil = new FormResourcesFileUtil();
+        FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
+                new FileBrowser());
         File cascadeFolder = formResourcesFileUtil
                 .getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext());
         for (QuestionGroup group : survey.getQuestionGroups()) {
@@ -127,9 +129,9 @@ public class SurveyInstaller {
      */
     public Survey persistSurvey(String xml) throws IOException {
         Survey survey = parseSurvey(xml);
-        FormFileUtil formFileUtil = new FormFileUtil();
+        FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
         File surveyFile = new File(
-                formFileUtil.getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext()),
+                formFileBrowser.getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 

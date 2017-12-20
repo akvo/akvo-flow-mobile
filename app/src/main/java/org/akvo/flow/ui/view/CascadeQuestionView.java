@@ -47,7 +47,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FormResourcesFileUtil;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class CascadeQuestionView extends QuestionView
         implements AdapterView.OnItemSelectedListener {
 
     @Inject
-    FormResourcesFileUtil resourcesFileUtil;
+    FormResourcesFileBrowser resourcesFileUtil;
 
     private static final int POSITION_NONE = -1; // no spinner position id
     private static final long ID_NONE = -1; // no node id
@@ -95,8 +95,7 @@ public class CascadeQuestionView extends QuestionView
         // Construct local filename (src refers to remote location of the resource)
         String src = getQuestion().getSrc();
         if (!TextUtils.isEmpty(src)) {
-            File db = new File(resourcesFileUtil.getExistingAppInternalFolder(getContext().getApplicationContext()),
-                    src);
+            File db = resourcesFileUtil.findFile(getContext().getApplicationContext(), src);
             if (db.exists()) {
                 mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
                 mDatabase.open();

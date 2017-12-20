@@ -41,8 +41,8 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FormFileUtil;
-import org.akvo.flow.util.FormResourcesFileUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.NotificationHelper;
 
@@ -78,10 +78,10 @@ public class SurveyDownloadService extends IntentService {
     private static final String TEST_SURVEY_ID = "0";
 
     @Inject
-    FormFileUtil formFileUtil;
+    FormFileBrowser formFileBrowser;
 
     @Inject
-    FormResourcesFileUtil resourcesFileUtil;
+    FormResourcesFileBrowser resourcesFileUtil;
 
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
     private static final String DEFAULT_TYPE = "Survey";
@@ -212,7 +212,7 @@ public class SurveyDownloadService extends IntentService {
     private void downloadSurvey(@NonNull Survey survey) throws IOException {
         final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        File formFolder = formFileUtil.getExistingAppInternalFolder(getApplicationContext());
+        File formFolder = formFileBrowser.getExistingAppInternalFolder(getApplicationContext());
         final File surveyFormsZipArchive = new File(formFolder, filename);
 
         S3Api s3Api = new S3Api();
@@ -243,7 +243,7 @@ public class SurveyDownloadService extends IntentService {
                         ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
             } else {
                 // load from file
-                File f = new File(formFileUtil.getExistingAppInternalFolder(getApplicationContext()),
+                File f = new File(formFileBrowser.getExistingAppInternalFolder(getApplicationContext()),
                         survey.getFileName());
                 in = new FileInputStream(f);
             }
@@ -332,7 +332,7 @@ public class SurveyDownloadService extends IntentService {
 
     private void downloadGaeResource(@NonNull String sid, @NonNull String url) throws IOException {
         final String filename = new File(url).getName();
-        final File surveyDir = new File(formFileUtil.getExistingAppInternalFolder(getApplicationContext()), sid);
+        final File surveyDir = new File(formFileBrowser.getExistingAppInternalFolder(getApplicationContext()), sid);
         if (!surveyDir.exists()) {
             surveyDir.mkdir();
         }

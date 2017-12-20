@@ -35,8 +35,8 @@ import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FormFileUtil;
-import org.akvo.flow.util.FormResourcesFileUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.SurveyFileNameGenerator;
@@ -84,10 +84,10 @@ public class BootstrapService extends IntentService {
     public volatile static boolean isProcessing = false;
 
     @Inject
-    FormFileUtil formFileUtil;
+    FormFileBrowser formFileBrowser;
 
     @Inject
-    FormResourcesFileUtil resourcesFileUtil;
+    FormResourcesFileBrowser resourcesFileUtil;
 
     private static final String TAG = "BOOTSTRAP_SERVICE";
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
@@ -206,7 +206,7 @@ public class BootstrapService extends IntentService {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
                 // Help media file
-                File helpDir = new File(formFileUtil.getExistingAppInternalFolder(getApplicationContext()),
+                File helpDir = new File(formFileBrowser.getExistingAppInternalFolder(getApplicationContext()),
                         id);
                 if (!helpDir.exists()) {
                     helpDir.mkdir();
@@ -328,7 +328,7 @@ public class BootstrapService extends IntentService {
     @NonNull
     private File generateNewSurveyFile(@NonNull String filename,
             @Nullable String surveyFolderName) {
-        File filesDir = formFileUtil.getExistingAppInternalFolder(getApplicationContext());
+        File filesDir = formFileBrowser.getExistingAppInternalFolder(getApplicationContext());
         if (TextUtils.isEmpty(surveyFolderName)) {
             return new File(filesDir, filename);
         } else {

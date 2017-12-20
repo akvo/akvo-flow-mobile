@@ -79,7 +79,7 @@ public class FileBrowser {
 
     @NonNull
     private String getAppInternalFolderPath(Context context, String folder) {
-        return context.getFilesDir() + File.separator + folder;
+        return context.getFilesDir().getAbsolutePath() + File.separator + folder;
     }
 
     @Nullable

@@ -78,6 +78,7 @@ public class FileUtil {
      * @param type FileType to determine the type of resource attempting to use.
      * @return File representing the root directory for the given FileType.
      */
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
@@ -97,37 +98,12 @@ public class FileUtil {
                 path = getFilesStorageDir(true) + File.separator + DIR_APK;
                 break;
         }
-        return createDir(path);
-    }
-
-    @NonNull
-    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
-    private static File createDir(String path) {
         File dir = new File(path);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         return dir;
     }
-
-    @NonNull
-    public static String getInternalFolderPath(Context context, String folderName) {
-        return context.getFilesDir() + File.separator + folderName;
-    }
-
-    @Nullable
-    public static String getAppExternalFolderPath(Context context, String folderName) {
-        String appExternalStoragePath = getAppExternalStoragePath(context);
-        return appExternalStoragePath == null ?
-                null :
-                appExternalStoragePath + File.separator + folderName;
-    }
-
-    @NonNull
-    public static String getPublicFolderPath(String folderName) {
-        return getExternalStoragePath() + File.separator + folderName;
-    }
-
 
     /**
      * Get the root of the files storage directory, depending on the resource being app internal
@@ -153,7 +129,7 @@ public class FileUtil {
      *
      */
     @Nullable
-    private static String getAppExternalStoragePath(Context context) {
+    public static String getAppExternalStoragePath(Context context) {
         File externalFilesDir = context.getExternalFilesDir(null);
         if (externalFilesDir != null) {
             return externalFilesDir.getAbsolutePath();
@@ -162,7 +138,7 @@ public class FileUtil {
     }
 
     @NonNull
-    private static String getExternalStoragePath() {
+    public static String getExternalStoragePath() {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
@@ -218,6 +194,7 @@ public class FileUtil {
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
      */
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
     public static void deleteFilesInDirectory(File dir, boolean deleteDir) {
         if (dir != null && dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();

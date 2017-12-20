@@ -79,17 +79,20 @@ public class FileBrowser {
 
     @NonNull
     private String getAppInternalFolderPath(Context context, String folder) {
-        return FileUtil.getInternalFolderPath(context, folder);
+        return context.getFilesDir() + File.separator + folder;
     }
 
     @Nullable
     private String getAppExternalFolderPath(Context context, String folder){
-        return FileUtil.getAppExternalFolderPath(context, folder);
+        String appExternalStoragePath = FileUtil.getAppExternalStoragePath(context);
+        return appExternalStoragePath == null ?
+                null :
+                appExternalStoragePath + File.separator + folder;
     }
 
     @NonNull
     private String getPublicFolderPath(String folder) {
-        return FileUtil.getPublicFolderPath(folder);
+        return FileUtil.getExternalStoragePath() + File.separator + folder;
     }
 
     @Nullable

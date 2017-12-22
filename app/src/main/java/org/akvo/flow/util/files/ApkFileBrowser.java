@@ -1,0 +1,128 @@
+/*
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ *
+ * This file is part of Akvo Flow.
+ *
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+package org.akvo.flow.util.files;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.akvo.flow.BuildConfig;
+import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.PlatformUtil;
+
+import java.io.File;
+import java.util.List;
+
+import javax.inject.Inject;
+
+public class ApkFileBrowser {
+
+    private static final String DIR_APK = "apk"; // App upgrades
+
+    private final FileBrowser fileBrowser;
+
+    @Inject
+    public ApkFileBrowser(FileBrowser fileBrowser) {
+        this.fileBrowser = fileBrowser;
+    }
+
+    @NonNull
+    public String getFileName(Context context, String apkUrl, String version) {
+        File file = createFile(context, apkUrl, version);
+        return file.getAbsolutePath();
+    }
+
+    @NonNull
+    private File createFile(Context context, String apkUrl, String version) {
+        String apkFileName = apkUrl.substring(apkUrl.lastIndexOf('/') + 1);
+        File directory = new File(fileBrowser.getExistingAppInternalFolder(context, DIR_APK),
+                version);
+        if (!directory.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            directory.mkdir();
+        }
+        return new File(directory, apkFileName);
+    }
+
+    @NonNull
+    public List<File> findAllPossibleFolders(Context context) {
+        return fileBrowser.findAllPossibleFolders(context, DIR_APK);
+    }
+
+    /**
+     * Check out previously downloaded files. If the APK update is already downloaded,
+     * and the MD5 checksum matches, the file is considered downloaded.
+     *
+     * @return filename of the already downloaded file, if exists. Null otherwise
+     */
+    public String verifyLatestApkFile(Context context, String apkCheckSum) {
+        final String latestVersion = getLatestApkFilePath(context);
+        if (latestVersion != null) {
+            if (apkCheckSum != null) {
+                File file = new File(latestVersion);
+                if (!apkCheckSum.equals(FileUtil.hexMd5(file))) {
+                    //noinspection ResultOfMethodCallIgnored
+                    file.delete();
+                    return null;
+                }
+            }
+            return latestVersion;
+        }
+        return null;
+    }
+
+    /**
+     * Check for the latest downloaded version. If old versions are found, delete them.
+     * The APK corresponding to the installed version will also be deleted, if found,
+     * in order to perform a cleanup after an upgrade.
+     *
+     * Apks are placed inside [internal storage]/apk/[version]/
+     *
+     * @return the path and version of a newer APK, if found, null otherwise
+     */
+    @Nullable
+    private String getLatestApkFilePath(Context context) {
+        String latestKnowVersion = BuildConfig.VERSION_NAME;
+        String apkPath = null;
+
+        File[] versionsFolders = getApksFoldersList(context);
+        if (versionsFolders != null) {
+            for (File versionFolder : versionsFolders) {
+                File[] apks = versionFolder.listFiles();
+                String currentFolderVersionName = versionFolder.getName();
+                if (!PlatformUtil.isNewerVersion(latestKnowVersion, currentFolderVersionName)) {
+                    // Delete old versions
+                    FileUtil.deleteFilesInDirectory(versionFolder, true);
+                } else if (apks != null && apks.length > 0) {
+                    latestKnowVersion = currentFolderVersionName;
+                    apkPath = apks[0].getAbsolutePath(); // There should only be 1
+                }
+            }
+        }
+        return apkPath;
+    }
+
+    @Nullable
+    private File[] getApksFoldersList(Context context) {
+        File apksFolder = fileBrowser.getAppInternalFolder(context, DIR_APK);
+        return apksFolder.exists()? apksFolder.listFiles(): null;
+    }
+}

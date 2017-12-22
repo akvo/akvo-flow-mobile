@@ -23,8 +23,6 @@ package org.akvo.flow.util.files;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import org.akvo.flow.util.files.FileBrowser;
-
 import java.io.File;
 import java.util.List;
 

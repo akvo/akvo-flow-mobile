@@ -28,7 +28,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 
 import java.io.BufferedInputStream;
@@ -63,12 +62,10 @@ public class FileUtil {
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
 
     private static final String DIR_TMP = "tmp"; // Temporary files
-    private static final String DIR_APK = "apk"; // App upgrades
-
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, TMP, APK}
+    public enum FileType {DATA, MEDIA, INBOX, TMP}
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -93,9 +90,6 @@ public class FileUtil {
                 break;
             case TMP:
                 path = getFilesStorageDir(true) + File.separator + DIR_TMP;
-                break;
-            case APK:
-                path = getFilesStorageDir(true) + File.separator + DIR_APK;
                 break;
         }
         File dir = new File(path);
@@ -357,46 +351,7 @@ public class FileUtil {
         cursor.close();
     }
 
-    /**
-     * Check for the latest downloaded version. If old versions are found, delete them.
-     * The APK corresponding to the installed version will also be deleted, if found,
-     * in order to perform a cleanup after an upgrade.
-     *
-     * @return the path and version of a newer APK, if found, null otherwise
-     */
-    public static String checkDownloadedVersions() {
 
-        String maxVersion = BuildConfig.VERSION_NAME;// Keep track of newest version available
-        String apkPath = null;
-
-        File appsLocation = getFilesDir(FileType.APK);
-        File[] versions = appsLocation.listFiles();
-        if (versions != null) {
-            for (File version : versions) {
-                File[] apks = version.listFiles();
-                if (apks == null) {
-                    continue;// Nothing to see here
-                }
-
-                String versionName = version.getName();
-                if (!PlatformUtil.isNewerVersion(maxVersion, versionName)) {
-                    // Delete old versions
-                    for (File apk : apks) {
-                        apk.delete();
-                    }
-                    version.delete();
-                } else if (apks.length > 0) {
-                    maxVersion = versionName;
-                    apkPath = apks[0].getAbsolutePath();// There should only be 1
-                }
-            }
-        }
-
-        if (apkPath != null) {
-            return apkPath;
-        }
-        return null;
-    }
 
     /**
      * Helper function to close a Closeable instance

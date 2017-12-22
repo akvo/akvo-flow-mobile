@@ -23,6 +23,7 @@ package org.akvo.flow.util.files;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.util.FileUtil;
@@ -45,21 +46,15 @@ public class ApkFileBrowser {
     }
 
     @NonNull
-    public String getFileName(Context context, String apkUrl, String version) {
-        File file = createFile(context, apkUrl, version);
-        return file.getAbsolutePath();
-    }
-
-    @NonNull
-    private File createFile(Context context, String apkUrl, String version) {
-        String apkFileName = apkUrl.substring(apkUrl.lastIndexOf('/') + 1);
+    public String getFileName(Context context, String version, String apkFileName) {
         File directory = new File(fileBrowser.getExistingAppInternalFolder(context, DIR_APK),
                 version);
         if (!directory.exists()) {
             //noinspection ResultOfMethodCallIgnored
             directory.mkdir();
         }
-        return new File(directory, apkFileName);
+        File file = new File(directory, apkFileName);
+        return file.getAbsolutePath();
     }
 
     @NonNull
@@ -73,18 +68,18 @@ public class ApkFileBrowser {
      *
      * @return filename of the already downloaded file, if exists. Null otherwise
      */
-    public String verifyLatestApkFile(Context context, String apkCheckSum) {
-        final String latestVersion = getLatestApkFilePath(context);
-        if (latestVersion != null) {
-            if (apkCheckSum != null) {
-                File file = new File(latestVersion);
-                if (!apkCheckSum.equals(FileUtil.hexMd5(file))) {
-                    //noinspection ResultOfMethodCallIgnored
-                    file.delete();
-                    return null;
-                }
+    public String verifyLatestApkFile(Context context, @Nullable String apkCheckSum) {
+        if (apkCheckSum == null) {
+            return null;
+        }
+        File file = getLatestApkFile(context);
+        if (file != null) {
+            if (apkCheckSum.equals(FileUtil.hexMd5(file))) {
+                return file.getAbsolutePath();
+            } else {
+                //noinspection ResultOfMethodCallIgnored
+                file.delete();
             }
-            return latestVersion;
         }
         return null;
     }
@@ -93,15 +88,15 @@ public class ApkFileBrowser {
      * Check for the latest downloaded version. If old versions are found, delete them.
      * The APK corresponding to the installed version will also be deleted, if found,
      * in order to perform a cleanup after an upgrade.
-     *
      * Apks are placed inside [internal storage]/apk/[version]/
      *
      * @return the path and version of a newer APK, if found, null otherwise
      */
+    @VisibleForTesting
     @Nullable
-    private String getLatestApkFilePath(Context context) {
+    File getLatestApkFile(Context context) {
         String latestKnowVersion = BuildConfig.VERSION_NAME;
-        String apkPath = null;
+        File apk = null;
 
         File[] versionsFolders = getApksFoldersList(context);
         if (versionsFolders != null) {
@@ -113,16 +108,17 @@ public class ApkFileBrowser {
                     FileUtil.deleteFilesInDirectory(versionFolder, true);
                 } else if (apks != null && apks.length > 0) {
                     latestKnowVersion = currentFolderVersionName;
-                    apkPath = apks[0].getAbsolutePath(); // There should only be 1
+                    apk = apks[0]; // There should only be 1
                 }
             }
         }
-        return apkPath;
+        return apk;
     }
 
+    @VisibleForTesting
     @Nullable
-    private File[] getApksFoldersList(Context context) {
+    File[] getApksFoldersList(Context context) {
         File apksFolder = fileBrowser.getAppInternalFolder(context, DIR_APK);
-        return apksFolder.exists()? apksFolder.listFiles(): null;
+        return apksFolder.exists() ? apksFolder.listFiles() : null;
     }
 }

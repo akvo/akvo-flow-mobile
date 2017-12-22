@@ -19,6 +19,7 @@
 
 package org.akvo.flow.activity;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -198,10 +199,11 @@ public class AppUpdateActivity extends BaseActivity {
             } else {
                 AppUpdateActivity appUpdateActivity = activityWeakReference.get();
                 if (appUpdateActivity != null) {
-                    String filename = apkFileBrowser
-                            .getFileName(appUpdateActivity.getApplicationContext(), mUrl, mVersion);
-                    if (downloadApk(mUrl, filename) && !isCancelled()) {
-                        return filename;
+                    String apkFileName = mUrl.substring(mUrl.lastIndexOf('/') + 1);
+                    Context context = appUpdateActivity.getApplicationContext();
+                    String apkFullPath = apkFileBrowser.getFileName(context, mVersion, apkFileName);
+                    if (downloadApk(mUrl, apkFullPath) && !isCancelled()) {
+                        return apkFullPath;
                     }
                     // Clean up sd-card to ensure no corrupted file is leaked.
                     cleanupDownloads();

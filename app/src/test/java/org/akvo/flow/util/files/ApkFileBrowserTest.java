@@ -66,7 +66,7 @@ public class ApkFileBrowserTest {
     File mockFolder;
 
     @Before
-    public void setup() {
+    public void setUp() {
         PowerMockito.mockStatic(FileUtil.class);
         PowerMockito.when(FileUtil.hexMd5(any(File.class))).thenAnswer(new Answer<String>() {
             @Override

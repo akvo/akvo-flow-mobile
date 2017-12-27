@@ -62,16 +62,17 @@ import java.io.File;
 //TODO: separate video and image into different classes
 public class MediaQuestionView extends QuestionView implements OnClickListener,
         TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
+    private final String mMediaType;
+    private final TimedLocationListener mLocationListener;
+    private final Navigator navigator = new Navigator();
+
     private Button mMediaButton;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
     private View mDownloadBtn;
     private TextView mLocationInfo;
-    private String mMediaType;
-    private TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
-    private Navigator navigator = new Navigator();
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
@@ -322,7 +323,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         }
 
         mLocationInfo.setVisibility(VISIBLE);
-        float[] location = ImageUtil.getLocation(filename);
+        double[] location = ImageUtil.getLocation(filename);
         if (location != null) {
             mLocationInfo.setText(R.string.image_location_saved);
         } else if (mLocationListener.isListening()) {

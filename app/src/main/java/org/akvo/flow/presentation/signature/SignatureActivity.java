@@ -39,6 +39,7 @@ import org.akvo.flow.ui.view.signature.SignatureDrawView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.util.image.ImageTarget;
 import org.akvo.flow.util.image.PicassoImageLoader;
 import org.akvo.flow.util.image.PicassoImageTarget;
 
@@ -70,7 +71,7 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
 
     private ImageLoader imageLoader;
 
-    private PicassoImageTarget imageTarget = new PicassoImageTarget() {
+    private final ImageTarget imageTarget = new PicassoImageTarget() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap) {
             if (bitmap != null) {
@@ -124,6 +125,7 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
                         File originalSignatureImage = presenter.getOriginalSignatureFile();
                         if (originalSignatureImage.exists()) {
                             imageLoader.clearImage(originalSignatureImage);
+                            //noinspection unchecked
                             imageLoader.loadFromFile(originalSignatureImage, imageTarget);
                         }
                     }

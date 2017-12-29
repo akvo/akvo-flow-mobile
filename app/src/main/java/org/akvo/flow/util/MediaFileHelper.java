@@ -26,7 +26,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 
 import org.akvo.flow.R;
-import org.akvo.flow.util.files.TempFileBrowser;
 
 import java.io.File;
 
@@ -36,21 +35,16 @@ import timber.log.Timber;
 
 public class MediaFileHelper {
 
-    public static final String RESIZED_SUFFIX = "resized";
-    public static final String ORIGINAL_SUFFIX = "original";
-
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
     private static final String IMAGE_SUFFIX = ".jpg";
     private static final String VIDEO_SUFFIX = ".mp4";
 
     private final Context context;
-    private final TempFileBrowser tempFileBrowser;
 
     @Inject
-    public MediaFileHelper(Context context, TempFileBrowser tempFileBrowser) {
+    public MediaFileHelper(Context context) {
         this.context = context;
-        this.tempFileBrowser = tempFileBrowser;
     }
 
     @NonNull
@@ -107,13 +101,6 @@ public class MediaFileHelper {
     }
 
     @NonNull
-    public File getImageFile(String sizeSuffix, String questionId, String datapointId) {
-        String fileName =
-                "signature_" + questionId + "_" + datapointId + "_" + sizeSuffix + IMAGE_SUFFIX;
-        return new File(tempFileBrowser.getExistingAppInternalFolder(context), fileName);
-    }
-
-    @NonNull
     private File getNamedMediaFile(String fileSuffix) {
         String filename = PlatformUtil.uuid() + fileSuffix;
         return new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), filename);
@@ -126,7 +113,7 @@ public class MediaFileHelper {
 
     @NonNull
     private File getMediaFile(String filename) {
-        return new File(tempFileBrowser.getExistingAppInternalFolder(context), filename);
+        return new File(FileUtil.getFilesDir(FileUtil.FileType.TMP), filename);
     }
 
     /**

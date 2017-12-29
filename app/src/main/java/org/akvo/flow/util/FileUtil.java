@@ -55,9 +55,12 @@ public class FileUtil {
     private static final String DIR_MEDIA = "akvoflow/data/media"; // form responses media files
     private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
 
+    // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
+    private static final String DIR_TMP = "tmp"; // Temporary files
+
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX}
+    public enum FileType {DATA, MEDIA, INBOX, TMP}
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -67,7 +70,6 @@ public class FileUtil {
      * @param type FileType to determine the type of resource attempting to use.
      * @return File representing the root directory for the given FileType.
      */
-    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
@@ -80,9 +82,13 @@ public class FileUtil {
             case INBOX:
                 path = getFilesStorageDir(false) + File.separator + DIR_INBOX;
                 break;
+            case TMP:
+                path = getFilesStorageDir(true) + File.separator + DIR_TMP;
+                break;
         }
         File dir = new File(path);
         if (!dir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             dir.mkdirs();
         }
         return dir;

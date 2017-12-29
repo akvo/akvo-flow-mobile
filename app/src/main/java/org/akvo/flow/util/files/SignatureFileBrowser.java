@@ -27,19 +27,33 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-public class TempFileBrowser {
+public class SignatureFileBrowser {
+
+    public static final String RESIZED_SUFFIX = "resized";
+    public static final String ORIGINAL_SUFFIX = "original";
 
     private static final String DIR_TMP = "tmp";
+    private static final String IMAGE_SUFFIX = ".jpg";
+    private static final String SIGNATURE_IMAGE_PREFIX = "signature_";
 
     private final FileBrowser fileBrowser;
+    private Context context;
 
     @Inject
-    public TempFileBrowser(FileBrowser fileBrowser) {
+    public SignatureFileBrowser(FileBrowser fileBrowser, Context context) {
         this.fileBrowser = fileBrowser;
+        this.context = context;
     }
 
     @NonNull
-    public File getExistingAppInternalFolder(Context context) {
-        return fileBrowser.getExistingAppInternalFolder(context, DIR_TMP);
+    public File getSignatureImageFile(String sizeSuffix, String questionId, String datapointId) {
+        String fileName = generateSignatureFileName(sizeSuffix, questionId, datapointId);
+        return new File(fileBrowser.getExistingAppInternalFolder(context, DIR_TMP), fileName);
+    }
+
+    private String generateSignatureFileName(String sizeSuffix, String questionId,
+            String datapointId) {
+        return SIGNATURE_IMAGE_PREFIX + questionId + "_" + datapointId + "_" + sizeSuffix
+                + IMAGE_SUFFIX;
     }
 }

@@ -46,9 +46,10 @@ import org.akvo.flow.serialization.response.value.SignatureValue;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
-import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.files.SignatureFileBrowser;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;
+import org.akvo.flow.util.image.ImageTarget;
 import org.akvo.flow.util.image.PicassoImageLoader;
 import org.akvo.flow.util.image.PicassoImageTarget;
 
@@ -56,12 +57,12 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import static org.akvo.flow.util.MediaFileHelper.RESIZED_SUFFIX;
+import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
 public class SignatureQuestionView extends QuestionView {
 
     @Inject
-    MediaFileHelper mediaFileHelper;
+    SignatureFileBrowser signatureFileBrowser;
 
     private EditText mName;
     private ImageView mImage;
@@ -70,7 +71,7 @@ public class SignatureQuestionView extends QuestionView {
     private ImageLoader imageLoader;
     private Signature mSignature;
 
-    private PicassoImageTarget imageTarget = new PicassoImageTarget() {
+    private final ImageTarget imageTarget = new PicassoImageTarget() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap) {
             setUpImage(bitmap);
@@ -124,7 +125,7 @@ public class SignatureQuestionView extends QuestionView {
         viewComponent.inject(this);
     }
 
-    protected ApplicationComponent getApplicationComponent() {
+    private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
@@ -134,9 +135,11 @@ public class SignatureQuestionView extends QuestionView {
             final String name = data.getString(ConstantUtil.SIGNATURE_NAME_EXTRA);
             mSignature.setName(name);
             setUpName(name);
-            File imageFile = mediaFileHelper.getImageFile(RESIZED_SUFFIX, mQuestion.getId(),
-                    mSurveyListener.getDatapointId());
+            File imageFile = signatureFileBrowser
+                    .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getId(),
+                            mSurveyListener.getDatapointId());
             imageLoader.clearImage(imageFile);
+            //noinspection unchecked
             imageLoader.loadFromFile(imageFile, imageTarget);
         }
     }

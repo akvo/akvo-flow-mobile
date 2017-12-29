@@ -531,7 +531,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (mRequestQuestionId == null || resultCode != RESULT_OK) {
             mRequestQuestionId = null;
             return;// Move along, nothing to see here
@@ -544,7 +544,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 onMediaAcquired(imageAbsolutePath);
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                String videoAbsolutePath = mediaFileHelper.getVideoFilePath();
+                String videoAbsolutePath = mediaFileHelper.getVideoFilePath(intent);
                 onMediaAcquired(videoAbsolutePath);
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
@@ -553,7 +553,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case ConstantUtil.PLOTTING_REQUEST:
             case ConstantUtil.SIGNATURE_REQUEST:
             default:
-                mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+                mAdapter.onQuestionComplete(mRequestQuestionId, intent.getExtras());
                 break;
         }
 

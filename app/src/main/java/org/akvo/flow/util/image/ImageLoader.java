@@ -30,5 +30,7 @@ public interface ImageLoader {
 
     void loadFromFile(File file, ImageView imageView);
 
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+    void loadVideoThumbnail(String filepath, ImageView imageView);
+
+    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
 }

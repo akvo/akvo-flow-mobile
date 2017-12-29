@@ -21,7 +21,12 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.akvo.flow.R;
 
@@ -71,22 +76,47 @@ public class MediaFileHelper {
         return absolutePath;
     }
 
-    @NonNull
-    public String getVideoFilePath() {
+    @Nullable
+    public String getVideoFilePath(Intent intent) {
         File tmp = getVideoTmpFile();
-        String tempAbsolutePath = tmp.getAbsolutePath();
-
-        // Ensure no image is saved in the DCIM folder
-        FileUtil.cleanDCIM(context, tempAbsolutePath);
-
-        File imgFile = getNamedMediaFile(VIDEO_SUFFIX);
-        String absolutePath = imgFile.getAbsolutePath();
-
-       if (!tmp.renameTo(imgFile)) {
-            // must check  return  value to  know if it  failed!
-            Timber.e("Media file rename failed");
+        if (tmp.exists()) {
+            // Ensure no duplicated video is saved in the DCIM folder
+            FileUtil.cleanDCIM(context, tmp.getAbsolutePath());
+        } else {
+            tmp = new File(getVideoPathFromIntent(intent));
         }
-        return absolutePath;
+        return renameFile(tmp);
+    }
+
+    /**
+     * On some devices the uri we pass for taking videos is ignored and in this case we need to get
+     * the actual uri returned by the intent
+     */
+    private String getVideoPathFromIntent(Intent intent) {
+        String videoAbsolutePath = null;
+        Uri videoUri = intent.getData();
+        if (videoUri != null) {
+            String[] filePathColumns = { MediaStore.Images.Media.DATA };
+            Cursor cursor = context.getContentResolver()
+                    .query(videoUri, filePathColumns, null, null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumns[0]);
+                videoAbsolutePath = cursor.getString(columnIndex);
+                cursor.close();
+            }
+        }
+        return videoAbsolutePath;
+    }
+
+    private String renameFile(File temporaryVideoFile) {
+        File videoFile = getNamedMediaFile(VIDEO_SUFFIX);
+
+        if (!temporaryVideoFile.renameTo(videoFile)) {
+            Timber.e("Media file rename failed");
+            return temporaryVideoFile.getAbsolutePath();
+        }
+        return videoFile.getAbsolutePath();
     }
 
     @NonNull

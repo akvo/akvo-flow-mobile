@@ -34,7 +34,8 @@ import javax.inject.Inject;
 
 public class FileBrowser {
 
-    @Inject public FileBrowser() {
+    @Inject
+    public FileBrowser() {
     }
 
     @NonNull

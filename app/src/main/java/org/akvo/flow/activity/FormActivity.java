@@ -93,10 +93,17 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener {
 
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    FormFileBrowser formFileBrowser;
+
+    @Inject
+    MediaFileHelper mediaFileHelper;
+
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
-
-    private MediaFileHelper mediaFileHelper;
 
     /**
      * When a request is done to perform photo, video, barcode scan, etc we store
@@ -107,18 +114,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private ViewPager mPager;
     private SurveyTabAdapter mAdapter;
 
-    private boolean mReadOnly;//flag to represent whether the Survey can be edited or not
+    /**
+     * flag to represent whether the Survey can be edited or not
+     */
+    private boolean mReadOnly;
     private long mSurveyInstanceId;
     private long mSessionStartTime;
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
-
-    @Inject
-    SurveyDbDataSource mDatabase;
-
-    @Inject
-    FormFileBrowser formFileBrowser;
 
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
@@ -126,7 +130,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private String[] mLanguages;
     private LanguageMapper languageMapper;
 
-    private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
+    private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
     private String surveyId;
 
     @Override
@@ -150,8 +154,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         languageMapper = new LanguageMapper(context);
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
                 new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
-
-        mediaFileHelper = new MediaFileHelper(this);
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
@@ -536,7 +538,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (mRequestQuestionId == null || resultCode != RESULT_OK) {
             mRequestQuestionId = null;
-            return;// Move along, nothing to see here
+            return;
         }
 
         switch (requestCode) {

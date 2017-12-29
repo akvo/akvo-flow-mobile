@@ -39,8 +39,8 @@ import org.akvo.flow.ui.view.signature.SignatureDrawView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.akvo.flow.util.image.ImageLoader;
-import org.akvo.flow.util.image.ImageLoaderListener;
 import org.akvo.flow.util.image.PicassoImageLoader;
+import org.akvo.flow.util.image.PicassoImageTarget;
 
 import java.io.File;
 
@@ -69,6 +69,17 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
     SignaturePresenter presenter;
 
     private ImageLoader imageLoader;
+
+    private PicassoImageTarget imageTarget = new PicassoImageTarget() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap) {
+            if (bitmap != null) {
+                mSignatureDrawView.setBitmap(bitmap);
+                mSignatureDrawView.invalidate();
+                onViewContentChanged();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,17 +123,8 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
                                 this);
                         File originalSignatureImage = presenter.getOriginalSignatureFile();
                         if (originalSignatureImage.exists()) {
-                            imageLoader.loadFromFile(originalSignatureImage,
-                                    new ImageLoaderListener() {
-                                        @Override
-                                        public void onImageReady(Bitmap bitmap) {
-                                            if (bitmap != null) {
-                                                mSignatureDrawView.setBitmap(bitmap);
-                                                mSignatureDrawView.invalidate();
-                                                onViewContentChanged();
-                                            }
-                                        }
-                                    });
+                            imageLoader.clearImage(originalSignatureImage);
+                            imageLoader.loadFromFile(originalSignatureImage, imageTarget);
                         }
                     }
                 });

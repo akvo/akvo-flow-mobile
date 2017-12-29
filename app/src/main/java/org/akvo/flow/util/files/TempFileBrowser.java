@@ -18,19 +18,28 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.util.files;
 
-import android.widget.ImageView;
+import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 
-public interface ImageLoader<T extends ImageTarget> {
+import javax.inject.Inject;
 
-    void loadFromFile(File file, T target);
+public class TempFileBrowser {
 
-    void loadFromFile(File file, ImageView imageView);
+    private static final String DIR_TMP = "tmp";
 
-    void loadFromBase64String(String image, final ImageLoaderListener listener);
+    private final FileBrowser fileBrowser;
 
-    void clearImage(File imageFile);
+    @Inject
+    public TempFileBrowser(FileBrowser fileBrowser) {
+        this.fileBrowser = fileBrowser;
+    }
+
+    @NonNull
+    public File getExistingAppInternalFolder(Context context) {
+        return fileBrowser.getExistingAppInternalFolder(context, DIR_TMP);
+    }
 }

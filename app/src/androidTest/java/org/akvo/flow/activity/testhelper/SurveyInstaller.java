@@ -20,6 +20,7 @@
 package org.akvo.flow.activity.testhelper;
 
 import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -39,7 +40,9 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -55,9 +58,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 public class SurveyInstaller {
 
     private static final String TAG = "SurveyInstaller";
-    private SurveyDbDataSource adapter;
+    private final SurveyDbDataSource adapter;
     //Need an array that holds every File so we can delete them in the end
-    private Queue<File> surveyFiles = new ArrayDeque<>();
+    private final Queue<File> surveyFiles = new ArrayDeque<>();
 
     public SurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
@@ -76,7 +79,7 @@ public class SurveyInstaller {
         try {
             survey = persistSurvey(FileUtil.readText(input));
         } catch (IOException e) {
-            Log.e(TAG, "Error installing survey");
+            Log.e(TAG, "Error installing survey", e);
         }
         return survey;
     }
@@ -89,9 +92,11 @@ public class SurveyInstaller {
      * @return survey
      * @throws IOException if string cannot be written to file
      */
-    public Survey persistSurvey(String xml) throws IOException {
+    private Survey persistSurvey(String xml) throws IOException {
         Survey survey = parseSurvey(xml);
-        File surveyFile = new File(FileUtil.getFilesDir(FileUtil.FileType.FORMS),
+        FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
+        File surveyFile = new File(
+                formFileBrowser.getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 
@@ -144,9 +149,8 @@ public class SurveyInstaller {
                 .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
                         user, surveyedLocaleId);
         if (responseBuilders != null) {
-            int length = responseBuilders.length;
-            for (int i = 0; i < length; i++) {
-                QuestionResponse responseToSave = responseBuilders[i]
+            for (QuestionResponse.QuestionResponseBuilder responseBuilder : responseBuilders) {
+                QuestionResponse responseToSave = responseBuilder
                         .setSurveyInstanceId(surveyInstanceId)
                         .createQuestionResponse();
                 adapter.createOrUpdateSurveyResponse(responseToSave);

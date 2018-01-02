@@ -21,10 +21,11 @@ package org.akvo.flow.util;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.media.ExifInterface;
+import android.support.media.ExifInterface;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
@@ -60,14 +61,14 @@ public class FileUtil {
     private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
 
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
-    private static final String DIR_FORMS = "forms"; // Form definitions
+
     private static final String DIR_TMP = "tmp"; // Temporary files
     private static final String DIR_APK = "apk"; // App upgrades
-    private static final String DIR_RES = "res"; // Survey resources (i.e. cascading DB)
+
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, FORMS, TMP, APK, RES}
+    public enum FileType {DATA, MEDIA, INBOX, TMP, APK}
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -77,6 +78,7 @@ public class FileUtil {
      * @param type FileType to determine the type of resource attempting to use.
      * @return File representing the root directory for the given FileType.
      */
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
@@ -89,17 +91,11 @@ public class FileUtil {
             case INBOX:
                 path = getFilesStorageDir(false) + File.separator + DIR_INBOX;
                 break;
-            case FORMS:
-                path = getFilesStorageDir(true) + File.separator + DIR_FORMS;
-                break;
             case TMP:
                 path = getFilesStorageDir(true) + File.separator + DIR_TMP;
                 break;
             case APK:
                 path = getFilesStorageDir(true) + File.separator + DIR_APK;
-                break;
-            case RES:
-                path = getFilesStorageDir(true) + File.separator + DIR_RES;
                 break;
         }
         File dir = new File(path);
@@ -118,17 +114,31 @@ public class FileUtil {
      */
     private static String getFilesStorageDir(boolean internal) {
         if (internal) {
-            FlowApp app = FlowApp.getApp();
-            File externalFilesDir = app.getExternalFilesDir(null);
+            String externalFilesDir = getAppExternalStoragePath(FlowApp.getApp());
             if (externalFilesDir != null) {
-                return externalFilesDir.getAbsolutePath();
+                return externalFilesDir;
             }
         }
         return getExternalStoragePath();
     }
 
+    /**
+     * Returns app specific folder on the external storage
+     *
+     * External Storage may not be available
+     *
+     */
+    @Nullable
+    public static String getAppExternalStoragePath(Context context) {
+        File externalFilesDir = context.getExternalFilesDir(null);
+        if (externalFilesDir != null) {
+            return externalFilesDir.getAbsolutePath();
+        }
+        return null;
+    }
+
     @NonNull
-    private static String getExternalStoragePath() {
+    public static String getExternalStoragePath() {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
@@ -184,16 +194,17 @@ public class FileUtil {
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
      */
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
     public static void deleteFilesInDirectory(File dir, boolean deleteDir) {
-        if (dir != null && dir.isDirectory()) {
+        if (dir != null && dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].isFile()) {
-                        files[i].delete();
+                for (File file : files) {
+                    if (file.isFile()) {
+                        file.delete();
                     } else {
                         // recursively delete
-                        deleteFilesInDirectory(files[i], true);
+                        deleteFilesInDirectory(file, true);
                     }
                 }
             }
@@ -381,7 +392,7 @@ public class FileUtil {
             }
         }
 
-        if (apkPath != null && maxVersion != null) {
+        if (apkPath != null) {
             return apkPath;
         }
         return null;

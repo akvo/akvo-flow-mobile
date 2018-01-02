@@ -27,10 +27,15 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -39,9 +44,9 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     /**
      * Use a WeakReference to avoid Context leaks
      */
-    private WeakReference<Context> mWeakContext;
+    private final WeakReference<Context> mWeakContext;
 
-    private SurveyDbDataSource mDatabase;
+    private final SurveyDbDataSource mDatabase;
 
     public ClearDataAsyncTask(Context context) {
         mWeakContext = new WeakReference<>(context);
@@ -124,7 +129,18 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
     private void clearExternalStorage(boolean responsesOnly) {
         if (!responsesOnly) {
             // Delete downloaded survey xml/zips
-            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.FORMS), false);
+            final Context context = mWeakContext.get();
+            if (context != null) {
+                FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
+                FormResourcesFileBrowser formResourcesFileBrowser = new FormResourcesFileBrowser(
+                        new FileBrowser());
+                Context applicationContext = context.getApplicationContext();
+                List<File> files = formFileBrowser.findAllPossibleFolders(applicationContext);
+                files.addAll(formResourcesFileBrowser.findAllPossibleFolders(applicationContext));
+                for (File file : files) {
+                    FileUtil.deleteFilesInDirectory(file, false);
+                }
+            }
             // Delete bootstraps
             FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INBOX), false);
         }

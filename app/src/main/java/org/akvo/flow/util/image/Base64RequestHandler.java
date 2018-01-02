@@ -42,7 +42,7 @@ class Base64RequestHandler extends RequestHandler {
 
     @Override
     public Result load(Request data, int arg1) throws IOException {
-        String imageData = data.uri.toString().replace(SCHEME_BASE64+":", "");
+        String imageData = data.uri.toString().replace(SCHEME_BASE64 + ":", "");
         byte[] decode = Base64.decode(imageData, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
         return new Result(bitmap, Picasso.LoadedFrom.DISK);

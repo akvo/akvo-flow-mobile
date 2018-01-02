@@ -96,7 +96,9 @@ public class MediaFileHelper {
         String videoAbsolutePath = null;
         Uri videoUri = intent.getData();
         if (videoUri != null) {
-            String[] filePathColumns = { MediaStore.Images.Media.DATA };
+            String[] filePathColumns = {
+                    MediaStore.Images.Media.DATA
+            };
             Cursor cursor = context.getContentResolver()
                     .query(videoUri, filePathColumns, null, null, null);
             if (cursor != null) {

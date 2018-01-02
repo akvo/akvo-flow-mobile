@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -81,7 +81,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
@@ -141,10 +140,7 @@ public class FormActivityReadOnlyTest {
     }
 
     @Test
-    public void viewResponsesTest() {
-        //make sure everything is loaded
-        addExecutionDelay(5000);
-
+    public void testViewFilledFormResponses() {
         verifyToolBar(survey.getName(), survey.getVersion());
 
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();

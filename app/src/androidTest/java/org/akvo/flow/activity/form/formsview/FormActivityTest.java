@@ -137,7 +137,7 @@ public class FormActivityTest {
     }
 
     @Test
-    public void viewEmptySurveyTest() {
+    public void testViewNonFilledForm() {
         verifyToolBar(survey.getName(), survey.getVersion());
 
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();

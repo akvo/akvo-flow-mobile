@@ -274,5 +274,6 @@
 
     <string name="app_update_dialog_title">New Flow version available</string>
     <string name="app_update_dialog_subtitle">Update to get the most out of your Flow app</string>
+    <string name="error_getting_media">Error getting media, please try again.</string>
 
 </resources>

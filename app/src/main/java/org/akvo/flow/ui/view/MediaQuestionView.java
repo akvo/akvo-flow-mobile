@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -43,6 +44,10 @@ import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
@@ -53,6 +58,8 @@ import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 /**
  * Question type that supports taking a picture/video/audio recording with the
  * device's on-board camera.
@@ -62,6 +69,13 @@ import java.io.File;
 //TODO: separate video and image into different classes
 public class MediaQuestionView extends QuestionView implements OnClickListener,
         TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
+
+    @Inject
+    SnackBarManager snackBarManager;
+
+    @Inject
+    Navigator navigator;
+
     private Button mMediaButton;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
@@ -71,7 +85,6 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     private TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
-    private Navigator navigator = new Navigator();
 
     public MediaQuestionView(Context context, Question q, SurveyListener surveyListener,
             String type) {
@@ -83,6 +96,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
 
     private void init() {
         setQuestionView(R.layout.media_question_view);
+        initialiseInjector();
 
         mMediaButton = (Button)findViewById(R.id.media_btn);
         mImageView = (ImageView)findViewById(R.id.image);
@@ -106,6 +120,17 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         mMedia = null;
 
         hideDownloadOptions();
+    }
+
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
     private void hideDownloadOptions() {
@@ -155,20 +180,23 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        String result = mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
-        if (result != null) {
+        String mediaFilePath =
+                mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
+        if (mediaFilePath != null && new File(mediaFilePath).exists()) {
             mMedia = new Media();
-            mMedia.setFilename(result);
+            mMedia.setFilename(mediaFilePath);
 
             captureResponse();
             displayThumbnail();
 
             if (isImage()) {
-                if (ImageUtil.getLocation(result) == null) {
+                if (ImageUtil.getLocation(mediaFilePath) == null) {
                     mLocationListener.start();
                 }
                 displayLocationInfo();
             }
+        } else {
+            snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
         }
     }
 

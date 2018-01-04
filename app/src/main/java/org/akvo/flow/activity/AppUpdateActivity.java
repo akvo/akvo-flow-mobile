@@ -65,11 +65,9 @@ public class AppUpdateActivity extends BaseActivity {
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS_IN_PERCENT = 100;
 
-    @SuppressWarnings({ "WeakerAccess", "unused" })
     @Inject
     ApkFileBrowser apkFileBrowser;
 
-    @SuppressWarnings({ "WeakerAccess", "unused" })
     @Inject
     Navigator navigator;
 
@@ -147,7 +145,7 @@ public class AppUpdateActivity extends BaseActivity {
 
     private void cancel() {
         if (isRunning()) {
-            mTask.cancel(true);// Stop the update process
+            mTask.cancel(true); // Stop the update process
         }
         finish();
     }
@@ -188,7 +186,6 @@ public class AppUpdateActivity extends BaseActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-            // Create parent directories, and delete files, if necessary
             cleanupDownloads();
 
             boolean syncOver3GAllowed = prefs
@@ -205,7 +202,6 @@ public class AppUpdateActivity extends BaseActivity {
                     if (downloadApk(mUrl, apkFullPath) && !isCancelled()) {
                         return apkFullPath;
                     }
-                    // Clean up sd-card to ensure no corrupted file is leaked.
                     cleanupDownloads();
                 }
             }
@@ -254,6 +250,9 @@ public class AppUpdateActivity extends BaseActivity {
             cleanupDownloads();
         }
 
+        /**
+         * Clean up sd-card to ensure no corrupted file remains.
+         */
         private void cleanupDownloads() {
             AppUpdateActivity appUpdateActivity = activityWeakReference.get();
             if (appUpdateActivity != null) {

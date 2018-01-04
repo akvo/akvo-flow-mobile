@@ -77,7 +77,6 @@ public class ApkFileBrowserTest {
 
         doReturn(true).when(mockFile).delete();
         doReturn(MOCK_APK_PATH).when(mockFile).getAbsolutePath();
-
         doReturn(new File[] { mockFile }).when(mockFolder).listFiles();
     }
 
@@ -216,6 +215,8 @@ public class ApkFileBrowserTest {
 
     /**
      * Returns a string containing the tokens joined by delimiters.
+     *
+     * Copied from {@link android.text.TextUtils} join method as static methods do not work on tests
      * @param tokens an array objects to be joined. Strings will be formed from
      *     the objects by calling object.toString().
      */

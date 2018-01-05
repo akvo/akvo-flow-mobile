@@ -102,7 +102,7 @@ public class ApkFileBrowser {
      * Check for the latest downloaded version. If old versions are found, delete them.
      * The APK corresponding to the installed version will also be deleted, if found,
      * in order to perform a cleanup after an upgrade.
-     * Apks are placed inside [internal storage]/apk/[version]/
+     * Apks are placed inside [external storage storage]/apk/[version]/
      *
      * @return the path and version of a newer APK, if found, null otherwise
      */

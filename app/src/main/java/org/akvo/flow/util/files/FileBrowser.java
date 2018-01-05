@@ -102,7 +102,7 @@ public class FileBrowser {
     }
 
     @Nullable
-    private File getAppExternalFolder(Context context, String folderName) {
+    File getAppExternalFolder(Context context, String folderName) {
         String path = getAppExternalFolderPath(context, folderName);
         File folder = null;
         if (path != null) {

@@ -111,6 +111,8 @@ public class FileUtil {
             String externalFilesDir = getAppExternalStoragePath(FlowApp.getApp());
             if (externalFilesDir != null) {
                 return externalFilesDir;
+            } else {
+                Timber.e(new Exception("App external storage unavailable"));
             }
         }
         return getExternalStoragePath();

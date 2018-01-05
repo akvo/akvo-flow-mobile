@@ -34,6 +34,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class ApkFileBrowser {
 
     private static final String DIR_APK = "apk"; // App upgrades
@@ -45,16 +47,28 @@ public class ApkFileBrowser {
         this.fileBrowser = fileBrowser;
     }
 
-    @NonNull
+    @Nullable
     public String getFileName(Context context, String version, String apkFileName) {
-        File directory = new File(fileBrowser.getExistingAppInternalFolder(context, DIR_APK),
-                version);
+        File apkFolder = getApkRootFolder(context);
+        if (apkFolder == null) {
+            Timber.e(new Exception("App external storage unavailable"));
+            return null;
+        }
+        if (!apkFolder.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            apkFolder.mkdirs();
+        }
+        File directory = new File(apkFolder, version);
         if (!directory.exists()) {
             //noinspection ResultOfMethodCallIgnored
             directory.mkdir();
         }
         File file = new File(directory, apkFileName);
         return file.getAbsolutePath();
+    }
+
+    private File getApkRootFolder(Context context) {
+        return fileBrowser.getAppExternalFolder(context, DIR_APK);
     }
 
     @NonNull
@@ -118,7 +132,7 @@ public class ApkFileBrowser {
     @VisibleForTesting
     @Nullable
     File[] getApksFoldersList(Context context) {
-        File apksFolder = fileBrowser.getAppInternalFolder(context, DIR_APK);
+        File apksFolder = getApkRootFolder(context);
         return apksFolder.exists() ? apksFolder.listFiles() : null;
     }
 }

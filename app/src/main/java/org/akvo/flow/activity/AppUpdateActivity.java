@@ -199,7 +199,7 @@ public class AppUpdateActivity extends BaseActivity {
                     String apkFileName = mUrl.substring(mUrl.lastIndexOf('/') + 1);
                     Context context = appUpdateActivity.getApplicationContext();
                     String apkFullPath = apkFileBrowser.getFileName(context, mVersion, apkFileName);
-                    if (downloadApk(mUrl, apkFullPath) && !isCancelled()) {
+                    if (apkFullPath != null && downloadApk(mUrl, apkFullPath) && !isCancelled()) {
                         return apkFullPath;
                     }
                     cleanupDownloads();
@@ -312,7 +312,7 @@ public class AppUpdateActivity extends BaseActivity {
                         // If we don't have a checksum yet, try to get it form the ETag header
                         String etag = conn.getHeaderField("ETag");
                         mMd5Checksum =
-                                etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+                                etag != null ? etag.replaceAll("\"", "") : null;
                     }
                     // Compare the MD5, if found. Otherwise, rely on the 200 status code
                     ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);

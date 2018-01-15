@@ -62,9 +62,8 @@ public class AboutActivity extends BackActivity {
     }
 
     private void initializeViews() {
-        String currentYear = Calendar.getInstance().get(Calendar.YEAR) + "";
         version.setText(getString(R.string.about_view_version, BuildConfig.VERSION_NAME));
-        copyright.setText(getString(R.string.about_view_copyright, currentYear));
+        copyright.setText(getString(R.string.about_view_copyright, BuildConfig.BUILD_YEAR));
     }
 
     private void initializeInjector() {

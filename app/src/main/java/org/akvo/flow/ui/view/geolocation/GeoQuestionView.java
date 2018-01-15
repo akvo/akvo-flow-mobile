@@ -89,11 +89,11 @@ public class GeoQuestionView extends QuestionView
         mGeoButton.setOnClickListener(this);
 
         if (isReadOnly()) {
-            geoInputContainer.disableInputsFocusability();
-            mGeoButton.setEnabled(false);
+            geoInputContainer.disableManualInputs();
+            mGeoButton.setVisibility(View.GONE);
         }
         if (mQuestion.isLocked()) {
-            geoInputContainer.disableInputsFocusability();
+            geoInputContainer.disableManualInputs();
         }
     }
 

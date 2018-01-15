@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -32,6 +32,8 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.UserRequestedApkUpdateService;
 import org.akvo.flow.ui.Navigator;
 
+import java.util.Calendar;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -39,9 +41,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class AboutActivity extends BackActivity {
-
-    //TODO: this will be replaced by a year placed in a properties file
-    private static final String CURRENT_YEAR = "2017";
 
     @Inject
     Navigator navigator;
@@ -63,8 +62,9 @@ public class AboutActivity extends BackActivity {
     }
 
     private void initializeViews() {
+        String currentYear = Calendar.getInstance().get(Calendar.YEAR) + "";
         version.setText(getString(R.string.about_view_version, BuildConfig.VERSION_NAME));
-        copyright.setText(getString(R.string.about_view_copyright, CURRENT_YEAR));
+        copyright.setText(getString(R.string.about_view_copyright, currentYear));
     }
 
     private void initializeInjector() {

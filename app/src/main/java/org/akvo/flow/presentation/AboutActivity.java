@@ -32,8 +32,6 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.service.UserRequestedApkUpdateService;
 import org.akvo.flow.ui.Navigator;
 
-import java.util.Calendar;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;

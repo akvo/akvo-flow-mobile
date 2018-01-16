@@ -65,7 +65,12 @@ public class FileUtil {
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, TMP}
+    public enum FileType {
+        DATA,
+        MEDIA,
+        INBOX,
+        TMP
+    }
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -120,9 +125,7 @@ public class FileUtil {
 
     /**
      * Returns app specific folder on the external storage
-     *
      * External Storage may not be available
-     *
      */
     @Nullable
     public static String getAppExternalStoragePath(Context context) {
@@ -352,8 +355,6 @@ public class FileUtil {
 
         cursor.close();
     }
-
-
 
     /**
      * Helper function to close a Closeable instance

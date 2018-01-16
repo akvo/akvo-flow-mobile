@@ -190,7 +190,9 @@ public class ApkFileBrowserTest {
     @Test
     public void testEnsureGetLatestApkFileReturnsNullIfOldApkFolder() throws Exception {
         ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
-        File[] folderList = new File[] { mockFolder };
+        File[] folderList = new File[] {
+                mockFolder
+        };
 
         doReturn(BuildConfig.VERSION_NAME).when(mockFolder).getName();
         doReturn(folderList).when(apkFileBrowser).getApksFoldersList(any(Context.class));
@@ -204,7 +206,10 @@ public class ApkFileBrowserTest {
     public void testEnsureGetLatestApkFileReturnsNullIfOldApksFolders() throws Exception {
         ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
         File secondFolder = mock(File.class);
-        File[] folderList = new File[] { mockFolder, secondFolder };
+        File[] folderList = new File[] {
+                mockFolder,
+                secondFolder
+        };
 
         doReturn(BuildConfig.VERSION_NAME).when(mockFolder).getName();
         doReturn("1.9.0").when(secondFolder).getName();

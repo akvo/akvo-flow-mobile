@@ -60,7 +60,12 @@ public class FileUtil {
 
     private static final int BUFFER_SIZE = 2048;
 
-    public enum FileType {DATA, MEDIA, INBOX, TMP}
+    public enum FileType {
+        DATA,
+        MEDIA,
+        INBOX,
+        TMP
+    }
 
     /**
      * Get the appropriate files directory for the given FileType. The directory may or may
@@ -106,6 +111,8 @@ public class FileUtil {
             String externalFilesDir = getAppExternalStoragePath(FlowApp.getApp());
             if (externalFilesDir != null) {
                 return externalFilesDir;
+            } else {
+                Timber.e(new Exception("App external storage unavailable"));
             }
         }
         return getExternalStoragePath();

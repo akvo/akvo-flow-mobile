@@ -158,10 +158,12 @@ public class SignatureQuestionView extends QuestionView {
         final String name = mSignature == null ? "" : mSignature.getName();
         String base64ImageString = mSignature == null ? "" : mSignature.getImage();
         if (!TextUtils.isEmpty(base64ImageString)) {
-            imageLoader.loadFromBase64String(base64ImageString, new ImageLoaderListener() {
+            setUpName(name);
+            imageLoader.loadFromBase64String(base64ImageString, mImage, new ImageLoaderListener() {
                 @Override
                 public void onImageReady(@Nullable Bitmap bitmap) {
-                    displayResponse(name, bitmap);
+                    mImage.setVisibility(VISIBLE);
+                    updateSignButton();
                 }
             });
         } else {

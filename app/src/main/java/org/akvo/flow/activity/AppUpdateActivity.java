@@ -65,11 +65,9 @@ public class AppUpdateActivity extends BaseActivity {
     private static final int IO_BUFFER_SIZE = 8192;
     private static final int MAX_PROGRESS_IN_PERCENT = 100;
 
-    @SuppressWarnings({ "WeakerAccess", "unused" })
     @Inject
     ApkFileBrowser apkFileBrowser;
 
-    @SuppressWarnings({ "WeakerAccess", "unused" })
     @Inject
     Navigator navigator;
 
@@ -147,7 +145,7 @@ public class AppUpdateActivity extends BaseActivity {
 
     private void cancel() {
         if (isRunning()) {
-            mTask.cancel(true);// Stop the update process
+            mTask.cancel(true); // Stop the update process
         }
         finish();
     }
@@ -188,7 +186,6 @@ public class AppUpdateActivity extends BaseActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-            // Create parent directories, and delete files, if necessary
             cleanupDownloads();
 
             boolean syncOver3GAllowed = prefs
@@ -202,10 +199,9 @@ public class AppUpdateActivity extends BaseActivity {
                     String apkFileName = mUrl.substring(mUrl.lastIndexOf('/') + 1);
                     Context context = appUpdateActivity.getApplicationContext();
                     String apkFullPath = apkFileBrowser.getFileName(context, mVersion, apkFileName);
-                    if (downloadApk(mUrl, apkFullPath) && !isCancelled()) {
+                    if (apkFullPath != null && downloadApk(mUrl, apkFullPath) && !isCancelled()) {
                         return apkFullPath;
                     }
-                    // Clean up sd-card to ensure no corrupted file is leaked.
                     cleanupDownloads();
                 }
             }
@@ -254,6 +250,9 @@ public class AppUpdateActivity extends BaseActivity {
             cleanupDownloads();
         }
 
+        /**
+         * Clean up sd-card to ensure no corrupted file remains.
+         */
         private void cleanupDownloads() {
             AppUpdateActivity appUpdateActivity = activityWeakReference.get();
             if (appUpdateActivity != null) {
@@ -313,7 +312,7 @@ public class AppUpdateActivity extends BaseActivity {
                         // If we don't have a checksum yet, try to get it form the ETag header
                         String etag = conn.getHeaderField("ETag");
                         mMd5Checksum =
-                                etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+                                etag != null ? etag.replaceAll("\"", "") : null;
                     }
                     // Compare the MD5, if found. Otherwise, rely on the 200 status code
                     ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);

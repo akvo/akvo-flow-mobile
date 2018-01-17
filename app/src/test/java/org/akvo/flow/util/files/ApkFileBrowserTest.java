@@ -77,8 +77,9 @@ public class ApkFileBrowserTest {
 
         doReturn(true).when(mockFile).delete();
         doReturn(MOCK_APK_PATH).when(mockFile).getAbsolutePath();
-
-        doReturn(new File[] { mockFile }).when(mockFolder).listFiles();
+        doReturn(new File[] {
+                mockFile
+        }).when(mockFolder).listFiles();
     }
 
     @Test
@@ -148,7 +149,9 @@ public class ApkFileBrowserTest {
     @Test
     public void testEnsureGetLatestApkFileReturnsNonNullIfNewestApkFolder() throws Exception {
         ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
-        File[] folderList = new File[] { mockFolder };
+        File[] folderList = new File[] {
+                mockFolder
+        };
 
         doReturn(getLaterVersionThanCurrent(1)).when(mockFolder).getName();
         doReturn(folderList).when(apkFileBrowser).getApksFoldersList(any(Context.class));
@@ -160,15 +163,21 @@ public class ApkFileBrowserTest {
     }
 
     @Test
-    public void testEnsureGetLatestApkFileReturnsMostRecentIfMultipleApksFolders() throws Exception {
+    public void testEnsureGetLatestApkFileReturnsMostRecentIfMultipleApksFolders()
+            throws Exception {
         ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
         File secondFolder = mock(File.class);
         File secondFile = mock(File.class);
-        File[] folderList = new File[] { mockFolder, secondFolder };
+        File[] folderList = new File[] {
+                mockFolder,
+                secondFolder
+        };
 
         doReturn(getLaterVersionThanCurrent(1)).when(mockFolder).getName();
         doReturn(getLaterVersionThanCurrent(2)).when(secondFolder).getName();
-        doReturn(new File[] { secondFile }).when(secondFolder).listFiles();
+        doReturn(new File[] {
+                secondFile
+        }).when(secondFolder).listFiles();
         doReturn("path/12345").when(secondFile).getAbsolutePath();
         doReturn(folderList).when(apkFileBrowser).getApksFoldersList(any(Context.class));
 
@@ -181,7 +190,9 @@ public class ApkFileBrowserTest {
     @Test
     public void testEnsureGetLatestApkFileReturnsNullIfOldApkFolder() throws Exception {
         ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
-        File[] folderList = new File[] { mockFolder };
+        File[] folderList = new File[] {
+                mockFolder
+        };
 
         doReturn(BuildConfig.VERSION_NAME).when(mockFolder).getName();
         doReturn(folderList).when(apkFileBrowser).getApksFoldersList(any(Context.class));
@@ -195,7 +206,10 @@ public class ApkFileBrowserTest {
     public void testEnsureGetLatestApkFileReturnsNullIfOldApksFolders() throws Exception {
         ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
         File secondFolder = mock(File.class);
-        File[] folderList = new File[] { mockFolder, secondFolder };
+        File[] folderList = new File[] {
+                mockFolder,
+                secondFolder
+        };
 
         doReturn(BuildConfig.VERSION_NAME).when(mockFolder).getName();
         doReturn("1.9.0").when(secondFolder).getName();
@@ -206,7 +220,6 @@ public class ApkFileBrowserTest {
         assertNull(file);
     }
 
-
     private String getLaterVersionThanCurrent(int toAdd) {
         String[] versionParts = BuildConfig.VERSION_NAME.split("\\.");
         versionParts[versionParts.length - 1] =
@@ -216,13 +229,15 @@ public class ApkFileBrowserTest {
 
     /**
      * Returns a string containing the tokens joined by delimiters.
+     * Copied from {@link android.text.TextUtils} join method as static methods do not work on tests
+     *
      * @param tokens an array objects to be joined. Strings will be formed from
-     *     the objects by calling object.toString().
+     *               the objects by calling object.toString().
      */
     private static String join(CharSequence delimiter, Object[] tokens) {
         StringBuilder sb = new StringBuilder();
         boolean firstTime = true;
-        for (Object token: tokens) {
+        for (Object token : tokens) {
             if (firstTime) {
                 firstTime = false;
             } else {

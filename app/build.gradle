@@ -24,6 +24,7 @@ android {
     def versionMinor = versionProps['VERSION_MINOR'].toString()
     def versionPatch = versionProps['VERSION_PATCH'].toString()
     def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
+    def buildYear = getBuildYear()
 
     defaultConfig {
         versionCode versionCodeProperty
@@ -108,6 +109,7 @@ android {
             it.buildConfigField "String", "AWS_SECRET_KEY", "\"${awsSecretKey}\""
             it.buildConfigField "String", "API_KEY", "\"${apiKey}\""
             it.buildConfigField "String", "SIGNING_KEY", "\"${signingKey}\""
+            it.buildConfigField "String", "BUILD_YEAR", "\"${buildYear}\""
         }
     }
 
@@ -167,6 +169,10 @@ private Properties loadProperties(String fileName) {
         throw new GradleException("Could not read ".fileName)
     }
     versionProps
+}
+
+private String getBuildYear() {
+    new Date().format('yyyy')
 }
 
 android.applicationVariants.all { variant ->

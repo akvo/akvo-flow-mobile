@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+  <string name="geo_location_accuracy_default">अज्ञात जि .पि .एस्. शुद्धत्ता</string>
+  <string name="geo_location_accuracy">जि .पि .एस्. शुद्धत्ता: %1$sमिटर</string>
   <string name="nocardspacetitle">डाटाको ठाउँ छैन</string>
   <string name="lowcardspacetitle">डाटाको ठाउँ कम छ</string>
   <string name="nocardspacedialog">एस डि कार्ड भरिएको हुनाले डाटा सकंलन गर्न मिल्दैन। डाटा सकंलन गर्न कार्डबाट केही हटाएर खाली ठाउँ बनाउनु होला।  </string>
@@ -11,6 +13,9 @@
   <string name="lon">देशान्तर</string>
   <string name="elevation"> उचाइ</string>
   <string name="submitbutton">बुझाउनुहोस्।</string>
+  <string name="geodialog">स्थान सेटिङलाई समर्थ बनाउनुहोस्</string>
+  <string name="settings">सेटिङहरु</string>
+  <string name="preferences_settings_section">सेटिङहरु</string>
   <string name="aboutlabel">हाम्रो बारेमा</string>
   <string name="nogpsstatus">GPS Status राखिएको छैन। कृपया गुगलको Play Store मा गएर डाउन्लोड ग रि राख्नु होला।</string>
   <string name="otherinstructions">कृपया वर्णन लेख्नुहोस्।</string>
@@ -25,8 +30,8 @@
   <string name="toosmallerr">मान धेरै सानो भयो। न्युनतम मान:</string>
   <string name="toolargeerr">मान धेरै ठुलो भयो। अधिकतम मान:</string>
   <string name="baddatatypeerr">उतर संख्यामा हुनुपर्छ।</string>
-  <string name="reloadsurveyslabel">सबै सर्भेहरु रि-लोड गर्नुहोस्।</string>
-  <string name="reloadsurveysdesc">सर्भेहरु हटाएर ड्यास्बोर्डबाट पठाइेका सर्भेहरु फेरी डाउन्लोड गर्छ। (निर्देशन हुँदा मात्र प्रयोग गर्नुहोला)</string>
+  <string name="reloadsurveyslabel">सबै सर्भेहरु पुन: लोड् गर्नुहोस्</string>
+  <string name="reloadsurveysdesc">सबै असाइन गरिएका सर्भेहरु हटाएर फेरि डाउन्लोड् गर्छ। (निर्देशन भए मात्र प्रयोग गर्ने) </string>
   <string name="conftitle">कृपया निधो गर्नुहोस्।</string>
   <string name="reloadconftext">के तपाईं सबै सर्भेहरु बलपुर्वक हटाएर फेरि डाउन्लोड गर्न चाहनुहुन्छ? </string>
   <string name="submitcompletetitle">सर्भे बुझाईयो।</string>
@@ -34,6 +39,8 @@
   <string name="langoption">भाषाहरु</string>
   <string name="langmandatorytitle">गलत छनौट</string>
   <string name="langmandatorytext">तपाईंले कम्तीमा एउटा भाषा छान्नुपर्ने हुन्छ।</string>
+  <string name="preference_download_form_title">फारम आई डि प्रयोग गरेर फारम डाउन्लोड् गर्ने </string>
+  <string name="preference_download_form_subtitle">निर्देशन भए मात्र प्रयोग गर्ने</string>
   <string name="downloadsurveylabel">फारम डाउन्लोड गर्नुहोस्।</string>
   <string name="downloadsurveyinstr">आफुले डाउनलोड गर्न चाहेको फारमको फारम आइ डि हाल्नुहोस्। </string>
   <string name="deletealldatawarning">यसले स्थाई रूपमा उपकरणमा भएका सबै डाटाहरु (सर्भेहरु, उतरहरु, तस्बिरहरु र प्रयोगकर्ताहरु) हटाउँछ। यो कार्य एक पल्ट गरेपछि सच्चाउन मिल्दैन। अघि बढ्न OK वा पछाडि जान Cancel थिच्नुहोस्।</string>
@@ -141,8 +148,6 @@
   <string name="status_submitted">बुझाईयो।</string>
   <string name="status_exported">पठाइयो।</string>
   <!--APK update-->
-  <string name="app_update_activity">Akvo Flow अपडेट</string>
-  <string name="app_update">फ्लो एप्पको नयाँ भर्सन उपलब्ध छ। डाउन्लोड गरेर नयाँ सर्भे इन्स्टल गर्न \'Update\' मा थिच्नुहोस्। </string>
   <string name="update">अपडेट गर्नुहोस्</string>
   <string name="not_now">अहिले हैन</string>
   <string name="clicktoinstall">फ्लोको नयाँँ भर्सन डाउन्लोड भएको छ। के तपाईं त्यसलाई इन्स्टल गर्न चाहनुहुन्छ?</string>
@@ -197,5 +202,46 @@
   <string name="apk_update_service_error_update">एप्प अप्डेट गर्दा त्रुटि भयो। कृपया फेरि प्रयास गर्नुहोस्।</string>
   <string name="apk_update_service_error_no_internet">एप्प अप्डेट गर्दा त्रुटि भयो। तपाईंको फोनमा इन्टर्नेट छैन।</string>
   <string name="locale_list_error_unknown_location">अपरिचित स्थान</string>
+  <string name="about_view_subtitle">अझ राम्रो डाटा, छिटो सन्कलन गर्दछ</string>
+  <string name="about_view_version">भर्सन %1$s</string>
+  <string name="about_view_copyright">सर्वाधिकार © २०१०- %1$s स्टिट्चिङ एक्भो</string>
+  <string name="about_view_update">अपडेटको लागि चेक गर्नुहोस्</string>
+  <string name="about_view_legal">कानुनी जानकारी</string>
+  <string name="about_view_release_notes">रिलिज नोटहरु</string>
+  <string name="about_view_terms">प्रयोगको शर्तहरु</string>
+  <string name="licences_title">तेस्रो पार्टी लाइसेन्स् हरु</string>
+  <string name="licences_description">यस सफ्ट्वेयरले तल उल्लेखित प्रोजेक्टहरु बाट सामग्री समावेश गर्दछ</string>
+  <string name="apache_licence_title">अपा चे लाइसेन्स् २.०</string>
+  <string name="eclipse_licence_title">इक्लिप्स् पब्लिक लाइसेन्स्  १.०</string>
+  <string name="mit_licence_title">एम आई टी लाइसेन्स्</string>
+  <string name="barcode_scanner_missing_error">यस डिभाइस् मा कुनै स्क्यानर एप्प राखिएको छैन। के तपाईं अहिले एउटा राख्न चाहनुहुन्छ?</string>
+  <string name="install">इन्स्टल गर्नुहोस्</string>
+  <string name="signature_name_hint">कृपया, आफ्नो नाम टाइप गर्नुहोस्</string>
+  <string name="saving">सेभ गर्दै...</string>
+  <string name="error_saving_signature">हस्ताक्षर सेभ गर्दा त्रुटी भयो, कृपया फेरि प्रयास गर्नुहोस्</string>
+  <string name="help">सहयोग</string>
+  <string name="error_loading_help">सहयोग सामग्री लोड् हुँदा त्रुटी भयो </string>
+  <string name="error_mobile_data_sync">मोबाइल डाटाको सिन्क बन्द गरिएको छ</string>
+  <string name="preference_screen_on">फारम भरि राख्दा मोबाइलको स्क्रिन \'अन\' नै राख्नुहोस् </string>
+  <string name="preference_mobile_data">मोबाइल डाटाको प्रयोग शुरु गर्नुहोस्</string>
+  <string name="preference_app_language">एप्पको भाषा</string>
+  <string name="preference_image_size">फोटोको साइज</string>
+  <string name="preferences_data_section">डाटा</string>
+  <string name="preference_sync_datapoints">बुझाईएका डाटा प्वाइन्टहरु फ्लो इन्स्ट्यान्स् मा पठाउनुहोस्</string>
+  <string name="preference_delete_collected_data">सन्कलन गरिएका डाटा र फोटोहरु हटाउनुहोस्</string>
+  <string name="preference_delete_everything">सबै हटाउनुहोस्</string>
+  <string name="preferences_configuration_section">कन्फिगरेसन् </string>
+  <string name="preference_gps">जि पि एस् फिक्सहरु</string>
+  <string name="preference_storage">उपलब्ध ठाउँ</string>
+  <string name="preferences_section_information">सुचना</string>
+  <string name="preference_identifier">डिभाइस् आईडेन्टीफायर</string>
+  <string name="preference_instance_name">इन्स्ट्यान्स् को नाम</string>
+  <string name="data_points_sync_error_mobile_data_sync">मोबाइल डाटा सिन्क बन्द गरिएको छ</string>
+  <string name="action_settings">सेटिङ्स्</string>
+  <string name="no_records_subtitle_monitored">डाटा संकलनको लागि \'+\' को प्रयोग गर्नुहोस् अथवा हालको डाटा प्राप्त गर्नका लागि \'सिन्क\' छान्नुहोस्</string>
+  <string name="no_records_subtitle_non_monitored">डाटा संकलनको लागि \'+\' को प्रयोग गर्नुहोस्</string>
   <!--Verify if this works for transifex-->
+  <string name="data_points_sync_no_data_points">सिन्क गर्न कुनै डाटा प्वाइन्ट छैन</string>
+  <string name="app_update_dialog_title">नयाँ फ्लो भर्सन उपलब्ध छ</string>
+  <string name="app_update_dialog_subtitle">आफ्नो फ्लो एप्पको अधिकतम प्रयोग गर्न एप्प अप्डेट गर्नुहोस्</string>
 </resources>

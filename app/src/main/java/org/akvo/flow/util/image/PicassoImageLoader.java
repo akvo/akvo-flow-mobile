@@ -22,10 +22,6 @@ package org.akvo.flow.util.image;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;

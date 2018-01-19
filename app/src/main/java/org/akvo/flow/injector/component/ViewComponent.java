@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.component;
 
 import org.akvo.flow.activity.AddUserActivity;
+import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.injector.PerActivity;
@@ -76,4 +77,6 @@ public interface ViewComponent {
     void inject(MediaQuestionView mediaQuestionView);
 
     void inject(CascadeQuestionView cascadeQuestionView);
+
+    void inject(AppUpdateActivity appUpdateActivity);
 }

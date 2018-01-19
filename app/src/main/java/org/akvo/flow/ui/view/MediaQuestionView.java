@@ -110,7 +110,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         }
         mMediaButton.setOnClickListener(this);
         if (isReadOnly()) {
-            mMediaButton.setEnabled(false);
+            mMediaButton.setVisibility(GONE);
         }
 
         mImageView.setOnClickListener(this);

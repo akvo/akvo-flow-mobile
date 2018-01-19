@@ -101,7 +101,7 @@ public class SignatureQuestionView extends QuestionView {
         imageLoader = new PicassoImageLoader((Activity) getContext());
 
         if (isReadOnly()) {
-            signButton.setEnabled(false);
+            signButton.setVisibility(GONE);
         } else {
             signButton.setOnClickListener(new OnClickListener() {
                 @Override

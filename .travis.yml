@@ -7,6 +7,10 @@ env:
 jdk:
   - oraclejdk8
 
+addons:
+  apt_packages:
+    - pandoc
+
 android:
   components:
     - tools
@@ -32,3 +36,6 @@ before_script:
 script:
   - ./gradlew check --continue --stacktrace
   - ./gradlew connectedFlowDebugAndroidTest --continue --stacktrace
+
+after_failure:
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.OptionsFormActivityTest.html -t plain

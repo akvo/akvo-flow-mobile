@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -67,6 +67,8 @@ import org.akvo.flow.ui.adapter.SurveyTabAdapter;
 import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.MediaFileHelper;
@@ -91,7 +93,8 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
-        QuestionInteractionListener {
+        QuestionInteractionListener,
+        GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
@@ -844,6 +847,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     return; // only one warning per survey, even of we passed >1 limit
                 }
             }
+        }
+    }
+
+    @Override
+    public void confirmGeoFieldReset(String questionId) {
+        View viewWithTag = mPager.findViewWithTag(questionId);
+        if (viewWithTag instanceof GeoQuestionView) {
+            ((GeoQuestionView) viewWithTag).startListeningToLocation();
         }
     }
 }

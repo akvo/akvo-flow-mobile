@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -56,8 +56,8 @@ public class GeoQuestionView extends QuestionView
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
-    public static final int POSITION_LATITUDE = 0;
-    public static final int POSITION_LONGITUDE = 1;
+    private static final int POSITION_LATITUDE = 0;
+    private static final int POSITION_LONGITUDE = 1;
     private static final int POSITION_ALTITUDE = 2;
     private static final int POSITION_CODE = 3;
 
@@ -101,15 +101,31 @@ public class GeoQuestionView extends QuestionView
         if (mLocationListener.isListening()) {
             stopLocationListener();
         } else {
-            startListeningToLocation();
+            if (TextUtils.isEmpty(geoInputContainer.getLatitudeText()) || TextUtils
+                    .isEmpty(geoInputContainer.getLongitudeText())) {
+                startListeningToLocation();
+            } else {
+                displayConfirmResetFields();
+            }
         }
     }
 
-    private void startListeningToLocation() {
+    public void startListeningToLocation() {
         resetQuestion(true);
         showLocationListenerStarted();
         resetResponseValues();
         startLocation();
+    }
+
+    private void displayConfirmResetFields() {
+        Context context = getContext();
+        if (context instanceof AppCompatActivity) {
+            FragmentManager fragmentManager = ((AppCompatActivity) context)
+                    .getSupportFragmentManager();
+            DialogFragment newFragment = GeoFieldsResetConfirmDialogFragment
+                    .newInstance(getQuestion().getId());
+            newFragment.show(fragmentManager, GeoFieldsResetConfirmDialogFragment.GEO_DIALOG_TAG);
+        }
     }
 
     private void showLocationListenerStarted() {

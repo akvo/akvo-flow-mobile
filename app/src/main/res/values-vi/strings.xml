@@ -30,8 +30,6 @@
   <string name="toosmallerr">Giá trị quá nhỏ. Giá trị nhỏ nhất là: </string>
   <string name="toolargeerr">Giá trị quá lớn. Giá trị lớn nhất là: </string>
   <string name="baddatatypeerr">Câu trả lời phải là dạng số học</string>
-  <string name="reloadsurveyslabel">Tải lại toàn bộ những đợt khảo sát</string>
-  <string name="reloadsurveysdesc">Xóa và tải lại những khảo sát được giao (chỉ hoạt động khi được chỉ dẫn)</string>
   <string name="conftitle">Vui lòng xác minh</string>
   <string name="reloadconftext">Bạn có chắc chắn rằng bạn muốn làm sạch và tải lại những đợt khảo sát không?</string>
   <string name="submitcompletetitle">Khảo sát đã được đệ trình</string>
@@ -151,8 +149,6 @@
   <string name="status_submitted">Đã đệ trình</string>
   <string name="status_exported">Đã xuất dữ liệu</string>
   <!--APK update-->
-  <string name="app_update_activity">Cập nhật ứng dụng Ako Flow</string>
-  <string name="app_update">Ứng dụng Flow có một phiên bản mới. Nhấn \'Cập nhật\' để tải xuống và cài đặt phiên bản mới</string>
   <string name="update">Cập nhật</string>
   <string name="not_now">Không phải bây giờ</string>
   <string name="clicktoinstall">Phiên bản ứng dụng Flow đã được tải xuống. Bạn có muốn cài đặt nó không?</string>

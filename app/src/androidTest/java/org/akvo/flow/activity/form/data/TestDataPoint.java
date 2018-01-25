@@ -18,19 +18,23 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.activity.form.data;
 
-import android.widget.ImageView;
+import java.util.List;
 
-import java.io.File;
+public class TestDataPoint {
 
-public interface ImageLoader {
+    private List<TestResponse> responses;
 
-    void loadFromFile(File file, ImageLoaderListener listener);
+    public TestDataPoint(List<TestResponse> responses) {
+        this.responses = responses;
+    }
 
-    void loadFromFile(File file, ImageView imageView);
+    public List<TestResponse> getResponses() {
+        return responses;
+    }
 
-    void loadVideoThumbnail(String filepath, ImageView imageView);
-
-    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
+    public void setResponses(List<TestResponse> responses) {
+        this.responses = responses;
+    }
 }

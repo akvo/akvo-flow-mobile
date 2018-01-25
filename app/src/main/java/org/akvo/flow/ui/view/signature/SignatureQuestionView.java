@@ -78,7 +78,7 @@ public class SignatureQuestionView extends QuestionView {
         mediaFileHelper = new MediaFileHelper(context);
 
         if (isReadOnly()) {
-            signButton.setEnabled(false);
+            signButton.setVisibility(GONE);
         } else {
             signButton.setOnClickListener(new OnClickListener() {
                 @Override
@@ -127,10 +127,10 @@ public class SignatureQuestionView extends QuestionView {
         String base64ImageString = mSignature == null ? "" : mSignature.getImage();
         if (!TextUtils.isEmpty(base64ImageString)) {
             setUpName(name);
-            imageLoader.loadFromBase64String(base64ImageString, new ImageLoaderListener() {
+            imageLoader.loadFromBase64String(base64ImageString, mImage, new ImageLoaderListener() {
                 @Override
                 public void onImageReady(@Nullable Bitmap bitmap) {
-                    setUpImage(bitmap);
+                    mImage.setVisibility(VISIBLE);
                     updateSignButton();
                 }
             });

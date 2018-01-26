@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -149,7 +149,7 @@ public class SignatureQuestionView extends QuestionView {
         super.rehydrate(resp);
 
         QuestionResponse response = getResponse();
-        String value = response == null? null: response.getValue();
+        String value = response == null ? null : response.getValue();
         if (response == null || TextUtils.isEmpty(value)) {
             return;
         }

@@ -353,6 +353,7 @@ public class FormActivityTest {
 
     private void verifyDateButton(Question question) {
         ViewInteraction dateButton = getDateButton(question);
+        dateButton.perform(scrollTo());
         dateButton.check(matches(isDisplayed()));
         dateButton.check(matches(isEnabled()));
         dateButton.check(matches(withText(R.string.pickdate)));
@@ -370,6 +371,7 @@ public class FormActivityTest {
 
     private void verifyMediaButton(Question question, int textResId) {
         ViewInteraction mediaButton = getMediaButton(question);
+        mediaButton.perform(scrollTo());
         mediaButton.check(matches(withText(textResId)));
         mediaButton.check(matches(isDisplayed()));
     }
@@ -393,6 +395,7 @@ public class FormActivityTest {
 
     private void verifyGeoButton(Question question) {
         ViewInteraction geoButton = getGeoButton(question);
+        geoButton.perform(scrollTo());
         geoButton.check(matches(withText(R.string.getgeo)));
         geoButton.check(matches(isEnabled()));
         geoButton.check(matches(isDisplayed()));

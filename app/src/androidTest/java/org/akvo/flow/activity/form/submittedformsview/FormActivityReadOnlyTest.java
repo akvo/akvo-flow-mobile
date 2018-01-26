@@ -221,9 +221,8 @@ public class FormActivityReadOnlyTest {
         }
 
         ViewInteraction caddisflyButton = onView(allOf(withId(R.id.caddisfly_button),
-                withQuestionViewParent(question, CaddisflyQuestionView.class))).perform(scrollTo());
-        caddisflyButton.check(matches(
-                allOf(isDisplayed(), not(isEnabled()), withText(R.string.caddisfly_test))));
+                withQuestionViewParent(question, CaddisflyQuestionView.class)));
+        caddisflyButton.check(matches(not(isDisplayed())));
     }
 
     private void verifySignatureQuestionView(Question question) {
@@ -238,9 +237,8 @@ public class FormActivityReadOnlyTest {
 
     private void verifySignatureButton(Question question) {
         ViewInteraction signatureButton = onView(allOf(withId(R.id.sign_btn),
-                withQuestionViewParent(question, SignatureQuestionView.class))).perform(scrollTo());
-        signatureButton.check(matches(
-                allOf(isDisplayed(), not(isEnabled()), withText(R.string.modify_signature))));
+                withQuestionViewParent(question, SignatureQuestionView.class)));
+        signatureButton.check(matches(not(isDisplayed())));
     }
 
     private void verifySignatureName(Question question, String questionValue) {
@@ -324,24 +322,21 @@ public class FormActivityReadOnlyTest {
 
     private void verifyDateButton(Question question) {
         ViewInteraction dateButton = getDateButton(question);
-        dateButton.check(matches(isDisplayed()));
-        dateButton.check(matches(not(isEnabled())));
-        dateButton.check(matches(withText(R.string.pickdate)));
+        dateButton.check(matches(not(isDisplayed())));
     }
 
     private void verifyPhotoQuestionView(Question question) {
-        verifyMediaButton(question, R.string.takephoto);
+        verifyMediaButton(question);
         verifyMediaContent(question);
     }
 
-    private void verifyMediaButton(Question question, int textResId) {
+    private void verifyMediaButton(Question question) {
         ViewInteraction mediaButton = getMediaButton(question);
-        mediaButton.check(matches(withText(textResId)));
-        mediaButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
+        mediaButton.check(matches(not(isDisplayed())));
     }
 
     private void verifyVideoQuestionView(Question question) {
-        verifyMediaButton(question, R.string.takevideo);
+        verifyMediaButton(question);
         verifyMediaContent(question);
     }
 
@@ -380,9 +375,7 @@ public class FormActivityReadOnlyTest {
 
     private void verifyGeoButton(Question question) {
         ViewInteraction geoButton = getGeoButton(question);
-        geoButton.check(matches(withText(R.string.getgeo)));
-        geoButton.check(matches(not(isEnabled())));
-        geoButton.check(matches(isDisplayed()));
+        geoButton.check(matches(not(isDisplayed())));
     }
 
     private void verifyGeoInput(Question question, int resId, String text) {

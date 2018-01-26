@@ -201,14 +201,13 @@ public class FormActivityTestUtil {
     public static ViewInteraction getMediaButton(Question question) {
         return onView(
                 allOf(withId(R.id.media_btn),
-                        withQuestionViewParent(question, MediaQuestionView.class)))
-                .perform(scrollTo());
+                        withQuestionViewParent(question, MediaQuestionView.class)));
     }
 
     @NonNull
     public static ViewInteraction getDateButton(Question question) {
         return onView(allOf(withId(R.id.date_btn),
-                withQuestionViewParent(question, DateQuestionView.class))).perform(scrollTo());
+                withQuestionViewParent(question, DateQuestionView.class)));
     }
 
     @NonNull
@@ -221,10 +220,8 @@ public class FormActivityTestUtil {
 
     @NonNull
     public static ViewInteraction getGeoButton(Question question) {
-        ViewInteraction geoButton = onView(allOf(withId(R.id.geo_btn),
+        return onView(allOf(withId(R.id.geo_btn),
                 withQuestionViewParent(question, GeoQuestionView.class)));
-        geoButton.perform(scrollTo());
-        return geoButton;
     }
 
     public static void verifyGeoLabel(Question question, int resourceId) {

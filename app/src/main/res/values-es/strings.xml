@@ -157,8 +157,6 @@
   <string name="status_submitted">Finalizado</string>
   <string name="status_exported">Exportado</string>
   <!--APK update-->
-  <string name="app_update_activity">Actualización Akvo Flow</string>
-  <string name="app_update">Hay una nueva versión de la aplicación Flow disponible. Pulse \'Actualizar\' para descargar e instalar la nueva versión.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Ahora no</string>
   <string name="clicktoinstall">La nueva versión de Flow está descargada. ¿Quiere instalarla ahora?</string>
@@ -266,4 +264,7 @@
     <item quantity="other">%1$d puntos de datos sincronizados</item>
   </plurals>
   <string name="no_gps_status_message">GPS Status no está instalada en este dispositivo. ¿Quiere instalar la ahora?</string>
+  <string name="data_points_sync_no_data_points">No hay puntos de datos para sincronizar</string>
+  <string name="app_update_dialog_title">Hay una nueva version de Flow disponible</string>
+  <string name="app_update_dialog_subtitle">Actualiza para aprovechar al máximo tu aplicación Flow</string>
 </resources>

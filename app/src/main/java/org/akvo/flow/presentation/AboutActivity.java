@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -40,9 +40,6 @@ import butterknife.OnClick;
 
 public class AboutActivity extends BackActivity {
 
-    //TODO: this will be replaced by a year placed in a properties file
-    private static final String CURRENT_YEAR = "2017";
-
     @Inject
     Navigator navigator;
 
@@ -64,7 +61,7 @@ public class AboutActivity extends BackActivity {
 
     private void initializeViews() {
         version.setText(getString(R.string.about_view_version, BuildConfig.VERSION_NAME));
-        copyright.setText(getString(R.string.about_view_copyright, CURRENT_YEAR));
+        copyright.setText(getString(R.string.about_view_copyright, BuildConfig.BUILD_YEAR));
     }
 
     private void initializeInjector() {

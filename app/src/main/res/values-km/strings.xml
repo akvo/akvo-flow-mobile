@@ -25,8 +25,6 @@
   <string name="toosmallerr">តម្លៃតូចជ្រុល។ តម្លៃអប្បបរមាៈ  </string>
   <string name="toolargeerr">តម្លៃធំជ្រុល។ តម្លៃអតិបរមាៈ </string>
   <string name="baddatatypeerr">ចម្លើយត្រូវតែជាលេខ </string>
-  <string name="reloadsurveyslabel">ផ្ទុកការអង្កេតទាំងអស់ឡើងវិញ</string>
-  <string name="reloadsurveysdesc">លុប និងដោនឡូតការអង្កេតដែលបានកំណត់ឡើងវិញ (ប្រសិនបើមានការណែនាំតែប៉ុណ្ណោះ) </string>
   <string name="conftitle">សូមបញ្ជាក់ </string>
   <string name="reloadconftext">តើអ្នកប្រាកដទេថា អ្នកចង់ជម្រុះចោលការអង្កេត និងដោនឡូតវាឡើងវិញ?</string>
   <string name="submitcompletetitle">ការអង្កេតបានបញ្ជូនចេញរួច </string>
@@ -138,7 +136,6 @@
   <string name="status_submitted">បានបញ្ជូនចេញ </string>
   <string name="status_exported">បាននាំចេញ </string>
   <!--APK update-->
-  <string name="app_update_activity">ធ្វើបច្ចុប្បន្នភាព Akvo Flow</string>
   <string name="update">ធ្វើបច្ចុប្បន្នភាព</string>
   <string name="not_now">មិនមែនពេលនេះទេ </string>
   <!--Time check-->

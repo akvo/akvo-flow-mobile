@@ -15,7 +15,7 @@
   <string name="submitbutton">Dien in</string>
   <string name="geodialog">Schakel s.v.p. locatie instellingen in</string>
   <string name="settings">Instellingen</string>
-  <string name="preferences_settings_section">Instellingen</string>
+  <string name="preferences_general_section">Instellingen</string>
   <string name="aboutlabel">Over deze app</string>
   <string name="nogpsstatus">GPS Status is niet geinstalleerd op dit apparaat. Installeer het s.v.p. via de Google Play Store.</string>
   <string name="otherinstructions">Voeg s.v.p. een beschrijving toe</string>

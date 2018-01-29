@@ -15,7 +15,7 @@
   <string name="submitbutton">Enviar</string>
   <string name="geodialog">Habilita el acceso a la ubicación</string>
   <string name="settings">Ajustes</string>
-  <string name="preferences_settings_section">Ajustes</string>
+  <string name="preferences_general_section">Ajustes</string>
   <string name="aboutlabel">Acerca de</string>
   <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instale la aplicación a través de Google Play Store.</string>
   <string name="otherinstructions">Por favor, introduzca una descripción</string>

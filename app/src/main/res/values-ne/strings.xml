@@ -15,7 +15,7 @@
   <string name="submitbutton">बुझाउनुहोस्।</string>
   <string name="geodialog">स्थान सेटिङलाई समर्थ बनाउनुहोस्</string>
   <string name="settings">सेटिङहरु</string>
-  <string name="preferences_settings_section">सेटिङहरु</string>
+  <string name="preferences_general_section">सेटिङहरु</string>
   <string name="aboutlabel">हाम्रो बारेमा</string>
   <string name="nogpsstatus">GPS Status राखिएको छैन। कृपया गुगलको Play Store मा गएर डाउन्लोड ग रि राख्नु होला।</string>
   <string name="otherinstructions">कृपया वर्णन लेख्नुहोस्।</string>

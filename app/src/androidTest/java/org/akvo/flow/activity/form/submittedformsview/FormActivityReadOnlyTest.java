@@ -246,7 +246,7 @@ public class FormActivityReadOnlyTest {
         ViewInteraction name = onView(allOf(withId(R.id.signature_name),
                 withQuestionViewParent(question, SignatureQuestionView.class)))
                 .perform(scrollTo());
-        name.check(matches(allOf(isDisplayed(), withText(signature.getName()))));
+        name.check(matches(allOf(isDisplayed(), withText(signature.getName()), not(isEnabled()))));
     }
 
     private void verifySignatureNameLabel(Question question) {
@@ -347,8 +347,7 @@ public class FormActivityReadOnlyTest {
                     allOf(withId(R.id.media_download),
                             withQuestionViewParent(question, MediaQuestionView.class)))
                     .perform(scrollTo());
-            downloadButton.check(matches(isDisplayed()));
-            downloadButton.perform(click());
+            downloadButton.check(matches(allOf(isDisplayed(), isEnabled())));
         }
     }
 

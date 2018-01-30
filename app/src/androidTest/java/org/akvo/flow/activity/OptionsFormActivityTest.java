@@ -26,10 +26,13 @@ import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
 import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -39,8 +42,10 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
+import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
@@ -99,8 +104,9 @@ public class OptionsFormActivityTest {
     }
 
     private void fillOptionsQuestion(int option) {
-        ViewInteraction radioButton = onView(
-                allOf(withId(option), instanceOf(RadioButton.class)));
+        ViewInteraction radioButton = onView(allOf(withId(option),
+                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))))
+                .perform(scrollTo());
         radioButton.check(matches(isDisplayed()))
                 .perform(click());
         radioButton.check(matches(isDisplayed()))

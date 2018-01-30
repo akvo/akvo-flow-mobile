@@ -69,5 +69,4 @@ public class WeakLocationListener implements LocationListener {
         }
         locationListener.onProviderDisabled(provider);
     }
-
 }

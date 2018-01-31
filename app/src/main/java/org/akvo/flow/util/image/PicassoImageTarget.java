@@ -20,19 +20,26 @@
 
 package org.akvo.flow.util.image;
 
-import android.widget.ImageView;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
-import java.io.File;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
-public interface ImageLoader<T extends ImageTarget> {
+public abstract class PicassoImageTarget implements Target, ImageTarget {
 
-    void loadFromFile(File file, T target);
+    @Override
+    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        onBitmapLoaded(bitmap);
+    }
 
-    void loadFromFile(File file, ImageView imageView);
+    @Override
+    public void onBitmapFailed(Drawable errorDrawable) {
+        // Can be ignored
+    }
 
-    void loadVideoThumbnail(String filepath, ImageView imageView);
-
-    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
-
-    void clearImage(File imageFile);
+    @Override
+    public void onPrepareLoad(Drawable placeHolderDrawable) {
+        // Can be ignored
+    }
 }

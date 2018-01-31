@@ -26,6 +26,8 @@ import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.squareup.leakcanary.LeakCanary;
+
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
@@ -61,6 +63,7 @@ public class FlowApp extends Application {
         super.onCreate();
         initializeInjector();
         prefs = new Prefs(getApplicationContext());
+        LeakCanary.install(this);
         initLogging();
         init();
         startUpdateService();

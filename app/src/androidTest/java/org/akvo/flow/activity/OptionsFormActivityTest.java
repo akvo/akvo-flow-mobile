@@ -27,7 +27,6 @@ import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import org.akvo.flow.activity.testhelper.SurveyInstaller;
@@ -57,7 +56,6 @@ import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisa
 import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.optionsurvey;
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.Matchers.instanceOf;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)

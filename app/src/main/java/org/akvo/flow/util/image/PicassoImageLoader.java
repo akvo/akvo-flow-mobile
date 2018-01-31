@@ -22,17 +22,14 @@ package org.akvo.flow.util.image;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.File;
 
-public class PicassoImageLoader implements ImageLoader {
+public class PicassoImageLoader implements ImageLoader<PicassoImageTarget> {
 
     private final Picasso requestManager;
 
@@ -51,23 +48,8 @@ public class PicassoImageLoader implements ImageLoader {
     }
 
     @Override
-    public void loadFromFile(File file, final ImageLoaderListener listener) {
-        requestManager.load(file).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                listener.onImageReady(bitmap);
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                //Ignore
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                //Ignore
-            }
-        });
+    public void loadFromFile(File file, PicassoImageTarget target) {
+        requestManager.load(file).into(target);
     }
 
     @Override
@@ -96,5 +78,10 @@ public class PicassoImageLoader implements ImageLoader {
                     }
                 });
 
+    }
+
+    @Override
+    public void clearImage(File imageFile) {
+        requestManager.invalidate(imageFile);
     }
 }

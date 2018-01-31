@@ -15,7 +15,7 @@
   <string name="submitbutton">Kirim</string>
   <string name="geodialog"> Mohon nyalakan pengaturan lokasi</string>
   <string name="settings"> Pengaturan</string>
-  <string name="preferences_settings_section">Pengaturan</string>
+  <string name="preferences_general_section">Pengaturan</string>
   <string name="aboutlabel">Tentang</string>
   <string name="nogpsstatus">Aplikasi GPS Status belum terpasang dalam perangkat ini. Mohon pasang melalui Google Play Store</string>
   <string name="otherinstructions">Silakan beri keterangan singkat.</string>

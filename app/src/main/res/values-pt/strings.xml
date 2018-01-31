@@ -17,7 +17,7 @@ Sem espaço para armazenamento
   <string name="submitbutton">Submeter</string>
   <string name="geodialog">Autorize o acesso à sua localização</string>
   <string name="settings">Configurações</string>
-  <string name="preferences_settings_section">Configurações</string>
+  <string name="preferences_general_section">Configurações</string>
   <string name="aboutlabel">Sobre</string>
   <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>
   <string name="otherinstructions">Por favor, insira uma descrição</string>

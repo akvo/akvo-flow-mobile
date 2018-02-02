@@ -94,7 +94,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".broadcast.SyncDataReceiver">
+        <receiver android:exported="false" android:name=".broadcast.SyncDataReceiver">
             <intent-filter>
                 <action android:name="org.akvo.flow.DATA_SUBMITTED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>

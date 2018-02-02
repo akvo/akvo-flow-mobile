@@ -110,8 +110,6 @@ public class PhotoQuestionView extends QuestionView implements OnClickListener,
         mDownloadBtn.setOnClickListener(this);
 
         mMedia = null;
-
-        hideDownloadOptions();
     }
 
     private void initialiseInjector() {

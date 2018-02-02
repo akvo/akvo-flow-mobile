@@ -24,7 +24,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -55,14 +54,16 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
- * Question type that supports taking a video recording with the
- * device's on-board camera.
+ * Question type that supports taking a video recording
  *
  * @author Christopher Fagiani
  */
-public class VideoQuestionView extends QuestionView
-        implements OnClickListener, MediaSyncTask.DownloadListener {
+public class VideoQuestionView extends QuestionView implements MediaSyncTask.DownloadListener {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -70,10 +71,18 @@ public class VideoQuestionView extends QuestionView
     @Inject
     Navigator navigator;
 
-    private Button mMediaButton;
-    private ImageView mImageView;
-    private ProgressBar mProgressBar;
-    private View mDownloadBtn;
+    @BindView(R.id.media_btn)
+    Button mMediaButton;
+
+    @BindView(R.id.image)
+    ImageView mImageView;
+
+    @BindView(R.id.media_progress)
+    ProgressBar mProgressBar;
+
+    @BindView(R.id.media_download)
+    View mDownloadBtn;
+
     private Media mMedia;
     private ImageLoader imageLoader;
 
@@ -85,24 +94,15 @@ public class VideoQuestionView extends QuestionView
     private void init() {
         setQuestionView(R.layout.media_question_view);
         initialiseInjector();
+        ButterKnife.bind(this);
 
-        mMediaButton = (Button) findViewById(R.id.media_btn);
-        mImageView = (ImageView) findViewById(R.id.image);
-        mProgressBar = (ProgressBar) findViewById(R.id.media_progress);
-        mDownloadBtn = findViewById(R.id.media_download);
         imageLoader = new PicassoImageLoader(getContext());
         mMediaButton.setText(R.string.takevideo);
-        mMediaButton.setOnClickListener(this);
         if (isReadOnly()) {
             mMediaButton.setVisibility(GONE);
         }
 
-        mImageView.setOnClickListener(this);
-        mDownloadBtn.setOnClickListener(this);
-
         mMedia = null;
-
-        hideDownloadOptions();
     }
 
     private void initialiseInjector() {
@@ -121,27 +121,29 @@ public class VideoQuestionView extends QuestionView
         mDownloadBtn.setVisibility(View.GONE);
     }
 
-    /**
-     * handle the action button click
-     */
-    public void onClick(View v) {
-        if (v == mImageView) {
-            String filename = mMedia != null ? mMedia.getFilename() : null;
-            if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
-                showImageLoadError();
-                return;
-            }
-            navigator.navigateToVideoView(getContext(), filename);
-        } else if (v == mMediaButton) {
-            notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
-        } else if (v == mDownloadBtn) {
-            mDownloadBtn.setVisibility(GONE);
-            mProgressBar.setVisibility(VISIBLE);
-
-            MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
-                    new File(mMedia.getFilename()), this);
-            downloadTask.execute();
+    @OnClick(R.id.image)
+    void onVideoViewClicked() {
+        String filename = mMedia != null ? mMedia.getFilename() : null;
+        if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
+            showImageLoadError();
+            return;
         }
+        navigator.navigateToVideoView(getContext(), filename);
+    }
+
+    @OnClick(R.id.media_btn)
+    void onTakeVideoClicked() {
+        notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
+    }
+
+    @OnClick(R.id.media_download)
+    void onVideoDownloadClick() {
+        mDownloadBtn.setVisibility(GONE);
+        mProgressBar.setVisibility(VISIBLE);
+
+        MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
+                new File(mMedia.getFilename()), this);
+        downloadTask.execute();
     }
 
     /**

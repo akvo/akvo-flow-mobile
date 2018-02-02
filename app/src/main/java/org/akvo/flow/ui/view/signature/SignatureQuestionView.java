@@ -24,7 +24,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -56,6 +55,8 @@ import org.akvo.flow.util.image.PicassoImageTarget;
 import java.io.File;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
@@ -161,13 +162,18 @@ public class SignatureQuestionView extends QuestionView {
             setUpName(name);
             imageLoader.loadFromBase64String(base64ImageString, mImage, new ImageLoaderListener() {
                 @Override
-                public void onImageReady(@Nullable Bitmap bitmap) {
+                public void onImageReady() {
                     mImage.setVisibility(VISIBLE);
                     updateSignButton();
                 }
+
+                @Override
+                public void onImageError() {
+                    Timber.e("Error loading base64 string as image");
+                }
             });
         } else {
-            displayResponse(name, null);
+            resetResponse(name);
         }
 
     }
@@ -176,7 +182,7 @@ public class SignatureQuestionView extends QuestionView {
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mSignature = new Signature();
-        displayResponse("", null);
+        resetResponse("");
     }
 
     @Override
@@ -190,9 +196,9 @@ public class SignatureQuestionView extends QuestionView {
         setResponse(questionResponse);
     }
 
-    private void displayResponse(String name, Bitmap imageBitmap) {
+    private void resetResponse(String name) {
         setUpName(name);
-        setUpImage(imageBitmap);
+        setUpImage(null);
         updateSignButton();
     }
 

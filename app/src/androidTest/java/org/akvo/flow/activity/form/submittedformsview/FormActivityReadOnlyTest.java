@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -68,7 +68,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
@@ -81,7 +80,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
@@ -142,10 +140,7 @@ public class FormActivityReadOnlyTest {
     }
 
     @Test
-    public void viewResponsesTest() {
-        //make sure everything is loaded
-        addExecutionDelay(5000);
-
+    public void testViewFilledFormResponses() {
         verifyToolBar(survey.getName(), survey.getVersion());
 
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
@@ -226,9 +221,8 @@ public class FormActivityReadOnlyTest {
         }
 
         ViewInteraction caddisflyButton = onView(allOf(withId(R.id.caddisfly_button),
-                withQuestionViewParent(question, CaddisflyQuestionView.class))).perform(scrollTo());
-        caddisflyButton.check(matches(
-                allOf(isDisplayed(), not(isEnabled()), withText(R.string.caddisfly_test))));
+                withQuestionViewParent(question, CaddisflyQuestionView.class)));
+        caddisflyButton.check(matches(not(isDisplayed())));
     }
 
     private void verifySignatureQuestionView(Question question) {
@@ -243,9 +237,8 @@ public class FormActivityReadOnlyTest {
 
     private void verifySignatureButton(Question question) {
         ViewInteraction signatureButton = onView(allOf(withId(R.id.sign_btn),
-                withQuestionViewParent(question, SignatureQuestionView.class))).perform(scrollTo());
-        signatureButton.check(matches(
-                allOf(isDisplayed(), not(isEnabled()), withText(R.string.modify_signature))));
+                withQuestionViewParent(question, SignatureQuestionView.class)));
+        signatureButton.check(matches(not(isDisplayed())));
     }
 
     private void verifySignatureName(Question question, String questionValue) {
@@ -253,7 +246,7 @@ public class FormActivityReadOnlyTest {
         ViewInteraction name = onView(allOf(withId(R.id.signature_name),
                 withQuestionViewParent(question, SignatureQuestionView.class)))
                 .perform(scrollTo());
-        name.check(matches(allOf(isDisplayed(), withText(signature.getName()))));
+        name.check(matches(allOf(isDisplayed(), withText(signature.getName()), not(isEnabled()))));
     }
 
     private void verifySignatureNameLabel(Question question) {
@@ -329,24 +322,21 @@ public class FormActivityReadOnlyTest {
 
     private void verifyDateButton(Question question) {
         ViewInteraction dateButton = getDateButton(question);
-        dateButton.check(matches(isDisplayed()));
-        dateButton.check(matches(not(isEnabled())));
-        dateButton.check(matches(withText(R.string.pickdate)));
+        dateButton.check(matches(not(isDisplayed())));
     }
 
     private void verifyPhotoQuestionView(Question question) {
-        verifyMediaButton(question, R.string.takephoto);
+        verifyMediaButton(question);
         verifyMediaContent(question);
     }
 
-    private void verifyMediaButton(Question question, int textResId) {
+    private void verifyMediaButton(Question question) {
         ViewInteraction mediaButton = getMediaButton(question);
-        mediaButton.check(matches(withText(textResId)));
-        mediaButton.check(matches(allOf(isDisplayed(), not(isEnabled()))));
+        mediaButton.check(matches(not(isDisplayed())));
     }
 
     private void verifyVideoQuestionView(Question question) {
-        verifyMediaButton(question, R.string.takevideo);
+        verifyMediaButton(question);
         verifyMediaContent(question);
     }
 
@@ -357,8 +347,7 @@ public class FormActivityReadOnlyTest {
                     allOf(withId(R.id.media_download),
                             withQuestionViewParent(question, MediaQuestionView.class)))
                     .perform(scrollTo());
-            downloadButton.check(matches(isDisplayed()));
-            downloadButton.perform(click());
+            downloadButton.check(matches(allOf(isDisplayed(), isEnabled())));
         }
     }
 
@@ -385,9 +374,7 @@ public class FormActivityReadOnlyTest {
 
     private void verifyGeoButton(Question question) {
         ViewInteraction geoButton = getGeoButton(question);
-        geoButton.check(matches(withText(R.string.getgeo)));
-        geoButton.check(matches(not(isEnabled())));
-        geoButton.check(matches(isDisplayed()));
+        geoButton.check(matches(not(isDisplayed())));
     }
 
     private void verifyGeoInput(Question question, int resId, String text) {

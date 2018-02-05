@@ -45,7 +45,6 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     private final WeakReference<DownloadListener> mListener;
-    private final Context mContext;
     private final File mFile;
     private final ConnectivityStateManager connectivityStateManager;
     private final Prefs prefs;
@@ -54,11 +53,11 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
      * Download a media file. Provided file must be already updated to use the local filesystem path.
      */
     public MediaSyncTask(Context context, File file, DownloadListener listener) {
-        this.mContext = context.getApplicationContext();
+        Context applicationContext = context.getApplicationContext();
         this.mListener = new WeakReference<>(listener);
         this.mFile = file;
-        this.connectivityStateManager = new ConnectivityStateManager(mContext);
-        this.prefs = new Prefs(mContext);
+        this.connectivityStateManager = new ConnectivityStateManager(applicationContext);
+        this.prefs = new Prefs(applicationContext);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
 
         try {
             // Download resource and return success status
-            S3Api s3 = new S3Api(mContext);
+            S3Api s3 = new S3Api();
             s3.get(ConstantUtil.S3_IMAGE_DIR + mFile.getName(), mFile);
             return true;
         } catch (IOException e) {

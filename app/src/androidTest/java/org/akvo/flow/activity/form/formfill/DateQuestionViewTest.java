@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.activity;
+package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
@@ -30,8 +30,10 @@ import android.support.test.runner.AndroidJUnit4;
 import android.widget.DatePicker;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.testhelper.SurveyInstaller;
-import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.activity.Constants;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -49,16 +51,16 @@ import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static java.util.Calendar.SHORT;
-import static org.akvo.flow.activity.FormActivityTestUtil.clickNext;
-import static org.akvo.flow.activity.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonDisabled;
-import static org.akvo.flow.activity.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.datesurvey;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
+import static org.akvo.flow.tests.R.raw.date_form;
 import static org.hamcrest.Matchers.endsWith;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class DateFormActivityTest {
+public class DateQuestionViewTest {
 
     private static SurveyInstaller installer;
 
@@ -67,7 +69,7 @@ public class DateFormActivityTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(41713002L, "49803002", "DateForm");
+            return getFormActivityIntent(41713002L, "49803002", "DateForm", 0L, false);
         }
     };
 
@@ -76,7 +78,7 @@ public class DateFormActivityTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(datesurvey, InstrumentationRegistry.getContext());
+        installer.installSurvey(date_form, InstrumentationRegistry.getContext());
     }
 
     @After

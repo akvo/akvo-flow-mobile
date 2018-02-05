@@ -18,24 +18,22 @@
  *
  */
 
-package org.akvo.flow.activity;
+package org.akvo.flow.activity.form.submittedformsview;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.testhelper.SurveyInstaller;
-import org.akvo.flow.activity.testhelper.SurveyRequisite;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConstantUtil;
 import org.junit.AfterClass;
 import org.junit.Rule;
@@ -49,13 +47,16 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.MultiItemByPositionMatcher.getElementFromMatchAtPosition;
-import static org.akvo.flow.tests.R.raw.repeated_groups_survey;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.tests.R.raw.repeated_groups_form;
 import static org.hamcrest.core.AllOf.allOf;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class RepeatedGroupFreeTextFormActivityViewTest {
+public class RepeatedGroupsFormActivityReadOnlyTest {
 
+    public static final String SURVEY_TITLE = "RepeatedBarcodeGroup";
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
             FormActivity.class) {
@@ -65,21 +66,52 @@ public class RepeatedGroupFreeTextFormActivityViewTest {
             SurveyRequisite.setRequisites(targetContext);
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             Survey survey = installer
-                    .installSurvey(repeated_groups_survey, InstrumentationRegistry.getContext());
+                    .installSurvey(repeated_groups_form, InstrumentationRegistry.getContext());
             long id = installer
-                    .createDataPoint(survey.getSurveyGroup(), generateTestResponseData());
-            Context activityContext = InstrumentationRegistry.getInstrumentation()
-                    .getTargetContext();
-            Intent result = new Intent(activityContext, FormActivity.class);
-            result.putExtra(ConstantUtil.FORM_ID_EXTRA, "200389118");
-            result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, id);
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
-                    new SurveyGroup(207569117L, "RepeatedBarcodeGroup", null, false));
-            result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA,
-                    Constants.TEST_FORM_SURVEY_INSTANCE_ID);
-            return result;
+                    .createDataPoint(survey.getSurveyGroup(), generateTestResponseData()).first;
+            return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id, true);
         }
     };
+
+    @AfterClass
+    public static void afterClass() {
+        Context targetContext = InstrumentationRegistry.getTargetContext();
+        SurveyRequisite.resetRequisites(targetContext);
+        SurveyInstaller installer = new SurveyInstaller(targetContext);
+        installer.clearSurveys();
+    }
+
+    @Test
+    public void verifyOneRepetition() throws Exception {
+        clickOnTabNamed("RepeatedBarcodeGroup");
+        onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")));
+        verifyRepeatHeaderText("Repetitions:1");
+    }
+
+    private void verifyRepeatHeaderText(String text) {
+        onView(allOf(withId(R.id.repeat_header), isDisplayed()))
+                .check(matches(withText(text)));
+    }
+
+    @Test
+    public void verifyThreeRepetitions() throws Exception {
+        clickOnTabNamed("RepeatedTextGroup");
+        verifyRepeatHeaderText("Repetitions:3");
+
+        verifyQuestionIteration(0, "test1");
+        verifyQuestionIteration(1, "test2");
+        verifyQuestionIteration(2, "test3");
+    }
+
+    private void clickOnTabNamed(String tabText) {
+        onView(withText(tabText)).perform(click());
+        addExecutionDelay(800);
+    }
+
+    private void verifyQuestionIteration(int position, String textToVerify) {
+        onView(allOf(getElementFromMatchAtPosition(withId(R.id.input_et), position),
+                isDisplayed())).check(matches(withText(textToVerify)));
+    }
 
     @NonNull
     private QuestionResponse.QuestionResponseBuilder[] generateTestResponseData() {
@@ -104,48 +136,4 @@ public class RepeatedGroupFreeTextFormActivityViewTest {
                         .setIteration(2)
         };
     }
-
-    @AfterClass
-    public static void afterClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
-        SurveyRequisite.resetRequisites(targetContext);
-        SurveyInstaller installer = new SurveyInstaller(targetContext);
-        installer.clearSurveys();
-    }
-
-    @Test
-    public void verifyOneRepetition() throws Exception {
-        clickOnTabNamed("RepeatedBarcodeGroup");
-        onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")));
-        verifyRepeatHeaderText("Repetitions:1");
-    }
-
-    @NonNull
-    private ViewInteraction verifyRepeatHeaderText(String text) {
-        return onView(allOf(withId(R.id.repeat_header), isDisplayed()))
-                .check(matches(withText(text)));
-    }
-
-    @Test
-    public void verifyThreeRepetitions() throws Exception {
-        clickOnTabNamed("RepeatedTextGroup");
-        verifyRepeatHeaderText("Repetitions:3");
-
-        verifyQuestionIteration(0, "test1");
-        verifyQuestionIteration(1, "test2");
-        verifyQuestionIteration(2, "test3");
-    }
-
-    private void clickOnTabNamed(String tabText) {
-        onView(withText(tabText)).perform(click());
-        SystemClock.sleep(800);
-    }
-
-    @NonNull
-    private ViewInteraction verifyQuestionIteration(int position, String textToVerify) {
-        return onView(allOf(getElementFromMatchAtPosition(allOf(withId(R.id.input_et)), position),
-                isDisplayed())).check(matches(withText(textToVerify)));
-    }
-
-
 }

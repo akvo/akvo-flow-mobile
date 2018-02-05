@@ -177,6 +177,7 @@ public class LockedGeoQuestionViewTest {
                 accuracyFormat.format(MOCK_ACCURACY_ACCURATE))));
 
         clickGeoButton();
+        onView(withId(android.R.id.button1)).perform(click());
         addExecutionDelay(100);
 
         onView(withId(R.id.lat_et)).check(matches(withText("")));

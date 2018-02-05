@@ -20,9 +20,7 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -76,13 +74,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     @Inject
     Navigator navigator;
 
+    private final String mMediaType;
+    private final TimedLocationListener mLocationListener;
+
     private Button mMediaButton;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
     private View mDownloadBtn;
     private TextView mLocationInfo;
-    private String mMediaType;
-    private TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
 
@@ -111,7 +110,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         }
         mMediaButton.setOnClickListener(this);
         if (isReadOnly()) {
-            mMediaButton.setEnabled(false);
+            mMediaButton.setVisibility(GONE);
         }
 
         mImageView.setOnClickListener(this);
@@ -286,13 +285,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
             mImageView.setImageResource(R.drawable.blurry_image);
             mDownloadBtn.setVisibility(VISIBLE);
         } else if (isImage()) {
-            // Image thumbnail
             displayImage(filename, mImageView);
         } else {
-            // Video thumbnail
-            mImageView.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
-                    filename, MediaStore.Video.Thumbnails.MINI_KIND));
+            displayVideoThumbnail(filename);
         }
+    }
+
+    private void displayVideoThumbnail(String filename) {
+        imageLoader.loadVideoThumbnail(filename, mImageView);
     }
 
     private boolean isImage() {
@@ -350,7 +350,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         }
 
         mLocationInfo.setVisibility(VISIBLE);
-        float[] location = ImageUtil.getLocation(filename);
+        double[] location = ImageUtil.getLocation(filename);
         if (location != null) {
             mLocationInfo.setText(R.string.image_location_saved);
         } else if (mLocationListener.isListening()) {

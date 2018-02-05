@@ -1,12 +1,15 @@
 language: android
 sudo: required
-dist: trusty
 env:
   global:
     - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
 
 jdk:
   - oraclejdk8
+
+addons:
+  apt_packages:
+    - pandoc
 
 android:
   components:
@@ -33,3 +36,6 @@ before_script:
 
 script:
   - ./gradlew check --continue connectedFlowDebugAndroidTest --continue
+
+after_failure:
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.OptionsFormActivityTest.html -t plain

@@ -24,33 +24,36 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.io.File;
-import java.util.List;
 
 import javax.inject.Inject;
 
-public class FormFileBrowser {
+public class SignatureFileBrowser {
 
-    private static final String DIR_FORMS = "forms";
+    public static final String RESIZED_SUFFIX = "resized";
+    public static final String ORIGINAL_SUFFIX = "original";
+
+    private static final String DIR_TMP = "tmp";
+    private static final String IMAGE_SUFFIX = ".jpg";
+    private static final String SIGNATURE_IMAGE_PREFIX = "signature_";
 
     private final FileBrowser fileBrowser;
+    private Context context;
 
     @Inject
-    public FormFileBrowser(FileBrowser fileBrowser) {
+    public SignatureFileBrowser(FileBrowser fileBrowser, Context context) {
         this.fileBrowser = fileBrowser;
+        this.context = context;
     }
 
     @NonNull
-    public File getExistingAppInternalFolder(Context context) {
-        return fileBrowser.getExistingAppInternalFolder(context, DIR_FORMS);
+    public File getSignatureImageFile(String sizeSuffix, String questionId, String datapointId) {
+        String fileName = generateSignatureFileName(sizeSuffix, questionId, datapointId);
+        return new File(fileBrowser.getExistingAppInternalFolder(context, DIR_TMP), fileName);
     }
 
-    @NonNull
-    public File findFile(Context context, String fileName) {
-        return fileBrowser.findFile(context, DIR_FORMS, fileName);
-    }
-
-    @NonNull
-    public List<File> findAllPossibleFolders(Context context) {
-        return fileBrowser.findAllPossibleFolders(context, DIR_FORMS);
+    private String generateSignatureFileName(String sizeSuffix, String questionId,
+            String datapointId) {
+        return SIGNATURE_IMAGE_PREFIX + questionId + "_" + datapointId + "_" + sizeSuffix
+                + IMAGE_SUFFIX;
     }
 }

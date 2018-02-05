@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -67,6 +67,8 @@ import org.akvo.flow.ui.adapter.SurveyTabAdapter;
 import org.akvo.flow.ui.model.Language;
 import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.MediaFileHelper;
@@ -91,12 +93,20 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
-        QuestionInteractionListener {
+        QuestionInteractionListener,
+        GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
+
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    FormFileBrowser formFileBrowser;
+
+    @Inject
+    MediaFileHelper mediaFileHelper;
 
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
-
-    private MediaFileHelper mediaFileHelper;
 
     /**
      * When a request is done to perform photo, video, barcode scan, etc we store
@@ -107,18 +117,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private ViewPager mPager;
     private SurveyTabAdapter mAdapter;
 
-    private boolean mReadOnly;//flag to represent whether the Survey can be edited or not
+    /**
+     * flag to represent whether the Survey can be edited or not
+     */
+    private boolean mReadOnly;
     private long mSurveyInstanceId;
     private long mSessionStartTime;
     private String mRecordId;
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
-
-    @Inject
-    SurveyDbDataSource mDatabase;
-
-    @Inject
-    FormFileBrowser formFileBrowser;
 
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
     private Prefs prefs;
@@ -126,7 +133,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private String[] mLanguages;
     private LanguageMapper languageMapper;
 
-    private Map<String, QuestionResponse> mQuestionResponses;// QuestionId - QuestionResponse
+    private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
     private String surveyId;
 
     @Override
@@ -150,8 +157,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         languageMapper = new LanguageMapper(context);
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
                 new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
-
-        mediaFileHelper = new MediaFileHelper(this);
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
@@ -533,10 +538,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (mRequestQuestionId == null || resultCode != RESULT_OK) {
             mRequestQuestionId = null;
-            return;// Move along, nothing to see here
+            return;
         }
 
         switch (requestCode) {
@@ -546,7 +551,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 onMediaAcquired(imageAbsolutePath);
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                String videoAbsolutePath = mediaFileHelper.getVideoFilePath();
+                String videoAbsolutePath = mediaFileHelper.getVideoFilePath(intent);
                 onMediaAcquired(videoAbsolutePath);
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
@@ -555,7 +560,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case ConstantUtil.PLOTTING_REQUEST:
             case ConstantUtil.SIGNATURE_REQUEST:
             default:
-                mAdapter.onQuestionComplete(mRequestQuestionId, data.getExtras());
+                mAdapter.onQuestionComplete(mRequestQuestionId, intent.getExtras());
                 break;
         }
 
@@ -844,6 +849,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     return; // only one warning per survey, even of we passed >1 limit
                 }
             }
+        }
+    }
+
+    @Override
+    public void confirmGeoFieldReset(String questionId) {
+        View viewWithTag = mPager.findViewWithTag(questionId);
+        if (viewWithTag instanceof GeoQuestionView) {
+            ((GeoQuestionView) viewWithTag).startListeningToLocation();
         }
     }
 }

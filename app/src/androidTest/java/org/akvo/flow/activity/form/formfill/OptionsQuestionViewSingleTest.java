@@ -134,6 +134,4 @@ public class OptionsQuestionViewSingleTest {
         return onView(allOf(withId(option),
                 isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))));
     }
-
-
 }

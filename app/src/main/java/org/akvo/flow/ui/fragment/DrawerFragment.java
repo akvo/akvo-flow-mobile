@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -527,7 +527,7 @@ public class DrawerFragment extends Fragment implements LoaderManager.LoaderCall
                     divider.setMinimumHeight((int) PlatformUtil.dp2Pixel(getActivity(), 1));
                     tv.setTextSize(ITEM_TEXT_SIZE);
                     tv.setTextColor(Color.BLACK);
-                    tv.setText(getString(R.string.preferences_settings_section));
+                    tv.setText(getString(R.string.settings));
                     img.setVisibility(View.GONE);
                     dropdown.setVisibility(View.GONE);
                     break;

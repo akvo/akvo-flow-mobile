@@ -73,8 +73,11 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         mDateTextEdit = (EditText) findViewById(R.id.date_et);
 
         View pickButton = findViewById(R.id.date_btn);
-        pickButton.setOnClickListener(this);
-        pickButton.setEnabled(!isReadOnly());
+        if (isReadOnly()) {
+            pickButton.setVisibility(GONE);
+        } else {
+            pickButton.setOnClickListener(this);
+        }
     }
 
     @Override

@@ -20,19 +20,9 @@
 
 package org.akvo.flow.util.image;
 
-import android.widget.ImageView;
+import android.graphics.Bitmap;
 
-import java.io.File;
+public interface ImageTarget {
 
-public interface ImageLoader<T extends ImageTarget> {
-
-    void loadFromFile(File file, T target);
-
-    void loadFromFile(File file, ImageView imageView);
-
-    void loadVideoThumbnail(String filepath, ImageView imageView);
-
-    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
-
-    void clearImage(File imageFile);
+    void onBitmapLoaded(Bitmap bitmap);
 }

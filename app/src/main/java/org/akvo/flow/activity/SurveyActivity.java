@@ -99,7 +99,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerFragment mDrawer;
-    private Navigator navigator = new Navigator();
+    private final Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
     private long selectedSurveyId;
@@ -144,7 +144,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             displaySelectedUser();
         }
         activityJustCreated = true;
-
     }
 
     private void navigateToSetupIfNeeded() {

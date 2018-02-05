@@ -169,6 +169,4 @@ public class OptionsQuestionViewMultipleTest {
     private ViewInteraction getCheckbox(int option) {
         return onView(allOf(withId(option), IsInstanceOf.<View>instanceOf(CheckBox.class)));
     }
-
-
 }

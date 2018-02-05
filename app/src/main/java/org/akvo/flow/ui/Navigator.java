@@ -306,4 +306,20 @@ public class Navigator {
         intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
         context.startActivity(intent);
     }
+
+    /**
+     * Install the newest version of the app. This method will be called
+     * either after the file download is completed, or upon the app being started,
+     * if the newest version is found in the filesystem.
+     *
+     * @param context  Context
+     * @param filename Absolute path to the newer APK
+     */
+    public void installAppUpdate(Context context, String filename) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(filename)),
+                "application/vnd.android.package-archive");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 }

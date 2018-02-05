@@ -131,7 +131,7 @@ public class FlowApi {
             throws IOException {
         final String url = buildSurveyHeaderUrl(baseUrl, surveyId);
         String response = HttpUtil.httpGet(url);
-        if (response != null) {
+        if (!TextUtils.isEmpty(response)) {
             return new SurveyMetaParser().parseList(response, true);
         }
         return Collections.emptyList();
@@ -151,7 +151,7 @@ public class FlowApi {
         List<Survey> surveys = new ArrayList<>();
         final String url = buildSurveysUrl(baseUrl);
         String response = HttpUtil.httpGet(url);
-        if (response != null) {
+        if (!TextUtils.isEmpty(response)) {
             surveys = new SurveyMetaParser().parseList(response);
         }
         return surveys;

@@ -58,7 +58,7 @@
                 android:configChanges="locale|layoutDirection"
                 android:label="@string/app_update_activity"
                 android:launchMode="singleTop"
-                android:theme="@style/Flow.Dialog"/>
+                android:theme="@style/Theme.AppCompat.Light.Dialog"/>
         <activity
                 android:name=".activity.TimeCheckActivity"
                 android:configChanges="locale|layoutDirection"
@@ -131,7 +131,8 @@
         </activity>
         <activity
                 android:name=".presentation.settings.PreferenceActivity"
-                android:configChanges="locale|layoutDirection">
+                android:configChanges="locale|layoutDirection"
+                android:label="@string/settings">
         </activity>
         <activity
                 android:name=".presentation.FullImageActivity"

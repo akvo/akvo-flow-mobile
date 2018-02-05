@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -94,11 +94,11 @@ public class GeoQuestionView extends QuestionView
         mGeoButton.setOnClickListener(this);
 
         if (isReadOnly()) {
-            geoInputContainer.disableInputsFocusability();
-            mGeoButton.setEnabled(false);
+            geoInputContainer.disableManualInputs();
+            mGeoButton.setVisibility(View.GONE);
         }
         if (mQuestion.isLocked()) {
-            geoInputContainer.disableInputsFocusability();
+            geoInputContainer.disableManualInputs();
         }
     }
 
@@ -106,15 +106,31 @@ public class GeoQuestionView extends QuestionView
         if (mLocationListener.isListening()) {
             stopLocationListener();
         } else {
-            startListeningToLocation();
+            if (TextUtils.isEmpty(geoInputContainer.getLatitudeText()) || TextUtils
+                    .isEmpty(geoInputContainer.getLongitudeText())) {
+                startListeningToLocation();
+            } else {
+                displayConfirmResetFields();
+            }
         }
     }
 
-    private void startListeningToLocation() {
+    public void startListeningToLocation() {
         resetQuestion(true);
         showLocationListenerStarted();
         resetResponseValues();
         startLocation();
+    }
+
+    private void displayConfirmResetFields() {
+        Context context = getContext();
+        if (context instanceof AppCompatActivity) {
+            FragmentManager fragmentManager = ((AppCompatActivity) context)
+                    .getSupportFragmentManager();
+            DialogFragment newFragment = GeoFieldsResetConfirmDialogFragment
+                    .newInstance(getQuestion().getId());
+            newFragment.show(fragmentManager, GeoFieldsResetConfirmDialogFragment.GEO_DIALOG_TAG);
+        }
     }
 
     private void showLocationListenerStarted() {

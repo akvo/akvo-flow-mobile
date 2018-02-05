@@ -148,7 +148,7 @@ public class GeoInputContainer extends LinearLayout {
         elevationInput.addTextChangedListener(responseInputWatcher);
     }
 
-    void disableInputsFocusability() {
+    void disableManualInputs() {
         latitudeInput.setFocusable(false);
         latitudeInput.setEnabled(false);
         longitudeInput.setFocusable(false);

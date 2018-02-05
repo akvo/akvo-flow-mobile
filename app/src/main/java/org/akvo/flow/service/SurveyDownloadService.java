@@ -29,6 +29,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
@@ -40,7 +41,8 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.NotificationHelper;
 
@@ -55,6 +57,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
@@ -66,15 +70,21 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
  */
 public class SurveyDownloadService extends IntentService {
 
-    private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
-
     /**
      * Intent parameter to specify which survey needs to be downloaded
      */
     public static final String EXTRA_SURVEY_ID = "survey";
+    public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
+    private static final String TEST_SURVEY_ID = "0";
 
+    @Inject
+    FormFileBrowser formFileBrowser;
+
+    @Inject
+    FormResourcesFileBrowser resourcesFileUtil;
+
+    private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
     private static final String DEFAULT_TYPE = "Survey";
-    public static final String TEST_SURVEY_ID = "0";
 
     private SurveyDbDataSource databaseAdaptor;
     private Prefs prefs;
@@ -84,6 +94,13 @@ public class SurveyDownloadService extends IntentService {
         super(TAG);
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
+    }
+
     public void onHandleIntent(@Nullable Intent intent) {
         try {
             databaseAdaptor = new SurveyDbDataSource(this, null);
@@ -91,9 +108,11 @@ public class SurveyDownloadService extends IntentService {
             prefs = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
-                installSurvey(intent);
+                downloadSurvey(intent);
+            } else if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
+                reDownloadAllSurveys(intent);
             } else {
-                downloadAndInstallSurveys();
+                checkAndDownload(null);
             }
         } catch (Exception e) {
             Timber.e(e, e.getMessage());
@@ -103,53 +122,53 @@ public class SurveyDownloadService extends IntentService {
         }
     }
 
-    private void downloadAndInstallSurveys() {
-        if (!isConnectionAvailable()) {
-            return;
-        }
-        List<Survey> surveys = checkForSurveys();
-        updateSurveys(surveys);
+    private void reDownloadAllSurveys(@NonNull Intent intent) {
+        intent.removeExtra(EXTRA_DELETE_SURVEYS);
+        String[] surveyIds = databaseAdaptor.getSurveyIds();
+        databaseAdaptor.deleteAllSurveys();
+        checkAndDownload(surveyIds);
     }
 
-    private void installSurvey(@NonNull Intent intent) {
+    private void downloadSurvey(@NonNull Intent intent) {
         String surveyId = intent.getStringExtra(EXTRA_SURVEY_ID);
         intent.removeExtra(EXTRA_SURVEY_ID);
         if (TEST_SURVEY_ID.equals(surveyId)) {
-            installTestSurvey();
+            databaseAdaptor.reinstallTestSurvey();
         } else {
-            downloadAndInstallSurvey(surveyId);
+            checkAndDownload(new String[] { surveyId });
         }
     }
 
-    private void downloadAndInstallSurvey(String surveyId) {
-        if (!isConnectionAvailable()) {
+    /**
+     * if no surveyIds are passed in, this will check for new surveys and, if
+     * there are some new ones, downloads them to the DATA_DIR. If surveyIds are
+     * passed in, then those specific surveys will be downloaded. If they're already
+     * on the device, the surveys will be replaced with the new ones.
+     */
+    private void checkAndDownload(@Nullable String[] surveyIds) {
+        if (!connectivityStateManager.isConnectionAvailable(
+                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
+            //No internet or not allowed to sync
             return;
         }
-        List<Survey>surveys = getSurveyHeaders(surveyId);
-        updateSurveys(surveys);
-    }
 
-    private void installTestSurvey() {
-        databaseAdaptor.reinstallTestSurvey();
-    }
+        List<Survey> surveys;
+        if (surveyIds != null && surveyIds.length > 0) {
+            surveys = getSurveyHeaders(surveyIds);
+        } else {
+            surveys = checkForSurveys();
+        }
 
-    private boolean isConnectionAvailable() {
-        return connectivityStateManager.isConnectionAvailable(
-                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD));
-    }
-
-    private void updateSurveys(List<Survey> surveys) {
         // Update all survey groups
         syncSurveyGroups(surveys);
 
         // Check synced versions, and omit up-to-date surveys
-        List<Survey> outDatedSurveys = databaseAdaptor.checkSurveyVersions(surveys);
+        surveys = databaseAdaptor.checkSurveyVersions(surveys);
 
-        if (!outDatedSurveys.isEmpty()) {
+        if (!surveys.isEmpty()) {
             int synced = 0, failed = 0;
-            int numberOfSurveysToBeSynced = outDatedSurveys.size();
-            displayNotification(synced, failed, numberOfSurveysToBeSynced);
-            for (Survey survey : outDatedSurveys) {
+            displayNotification(synced, failed, surveys.size());
+            for (Survey survey : surveys) {
                 try {
                     downloadSurvey(survey);
                     databaseAdaptor.saveSurvey(survey);
@@ -161,18 +180,12 @@ public class SurveyDownloadService extends IntentService {
                     displayErrorNotification(ConstantUtil.NOTIFICATION_FORM_ERROR,
                             getString(R.string.error_form_download));
                 }
-                displayNotification(synced, failed, numberOfSurveysToBeSynced);
+                displayNotification(synced, failed, surveys.size());
             }
         }
 
-        downloadAllSurveysHelp();
-    }
-
-    /**
-     * Check if any previously downloaded surveys still miss help media or cascade resources
-     */
-    private void downloadAllSurveysHelp() {
-        List<Survey> surveys;
+        // now check if any previously downloaded surveys still need
+        // don't have their help media pre-cached
         surveys = databaseAdaptor.getSurveyList(SurveyGroup.ID_NONE);
         for (Survey survey : surveys) {
             if (!survey.isHelpDownloaded()) {
@@ -199,16 +212,17 @@ public class SurveyDownloadService extends IntentService {
     private void downloadSurvey(@NonNull Survey survey) throws IOException {
         final String filename = survey.getId() + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        final File file = new File(FileUtil.getFilesDir(FileType.FORMS), filename);
+        File formFolder = formFileBrowser.getExistingAppInternalFolder(getApplicationContext());
+        final File surveyFormsZipArchive = new File(formFolder, filename);
 
-        S3Api s3Api = new S3Api(this);
-        s3Api.get(objectKey, file); // Download zip file
+        S3Api s3Api = new S3Api();
+        s3Api.get(objectKey, surveyFormsZipArchive); // Download zip file
 
-        FileUtil.extract(new ZipInputStream(new FileInputStream(file)),
-                FileUtil.getFilesDir(FileType.FORMS));
+        FileUtil.extract(new ZipInputStream(new FileInputStream(surveyFormsZipArchive)),
+                formFolder);
 
         // Compressed file is not needed any more
-        if (!file.delete()) {
+        if (!surveyFormsZipArchive.delete()) {
             Timber.e("Could not delete survey zip file: " + filename);
         }
 
@@ -220,7 +234,7 @@ public class SurveyDownloadService extends IntentService {
     @Nullable
     private Survey loadSurvey(@NonNull Survey survey) {
         InputStream in = null;
-        Survey hydratedDurvey = null;
+        Survey hydratedSurvey = null;
         try {
             if (ConstantUtil.RESOURCE_LOCATION.equalsIgnoreCase(survey.getLocation())) {
                 // load from resource
@@ -229,23 +243,23 @@ public class SurveyDownloadService extends IntentService {
                         ConstantUtil.RAW_RESOURCE, ConstantUtil.RESOURCE_PACKAGE));
             } else {
                 // load from file
-                File f = new File(FileUtil.getFilesDir(FileType.FORMS), survey.getFileName());
+                File f = new File(formFileBrowser.getExistingAppInternalFolder(getApplicationContext()),
+                        survey.getFileName());
                 in = new FileInputStream(f);
             }
-            hydratedDurvey = SurveyDao.loadSurvey(survey, in);
+            hydratedSurvey = SurveyDao.loadSurvey(survey, in);
         } catch (FileNotFoundException e) {
-            Timber.e(e, "Could not parse survey survey file");
+            Timber.e(e, "Could not parse survey %s file", survey.getId());
         } finally {
             FileUtil.close(in);
         }
-        return hydratedDurvey;
+        return hydratedSurvey;
     }
 
     /**
      * checks to see if we should pre-cache help media files (based on the
      * property in the settings db) and, if we should, downloads the files
      *
-     * @param survey
      */
     private void downloadResources(@NonNull Survey survey) {
         Survey hydratedSurvey = loadSurvey(survey);
@@ -306,9 +320,9 @@ public class SurveyDownloadService extends IntentService {
         // resource is just a filename
         final String filename = resource + ConstantUtil.ARCHIVE_SUFFIX;
         final String objectKey = ConstantUtil.S3_SURVEYS_DIR + filename;
-        final File resDir = FileUtil.getFilesDir(FileType.RES);
+        final File resDir = resourcesFileUtil.getExistingAppInternalFolder(getApplicationContext());
         final File file = new File(resDir, filename);
-        S3Api s3 = new S3Api(SurveyDownloadService.this);
+        S3Api s3 = new S3Api();
         s3.syncFile(objectKey, file);
         FileUtil.extract(new ZipInputStream(new FileInputStream(file)), resDir);
         if (!file.delete()) {
@@ -318,7 +332,7 @@ public class SurveyDownloadService extends IntentService {
 
     private void downloadGaeResource(@NonNull String sid, @NonNull String url) throws IOException {
         final String filename = new File(url).getName();
-        final File surveyDir = new File(FileUtil.getFilesDir(FileType.FORMS), sid);
+        final File surveyDir = new File(formFileBrowser.getExistingAppInternalFolder(getApplicationContext()), sid);
         if (!surveyDir.exists()) {
             surveyDir.mkdir();
         }
@@ -329,19 +343,26 @@ public class SurveyDownloadService extends IntentService {
      * invokes a service call to get the header information for multiple surveys
      */
     @NonNull
-    private List<Survey> getSurveyHeaders(@NonNull String surveyId) {
+    private List<Survey> getSurveyHeaders(@NonNull String[] surveyIds) {
         List<Survey> surveys = new ArrayList<>();
         FlowApi flowApi = new FlowApi(getApplicationContext());
+        for (String id : surveyIds) {
             try {
-                surveys.addAll(flowApi.getSurveyHeader(surveyId));
+                surveys.addAll(flowApi.getSurveyHeader(id));
             } catch (IllegalArgumentException | IOException e) {
-                if (e instanceof IllegalArgumentException) {
+                if (!surveyHasBeenUnAssigned(e)) {
                     Timber.e(e);
                 }
                 displayErrorNotification(ConstantUtil.NOTIFICATION_HEADER_ERROR,
-                        getString(R.string.error_form_header, surveyId));
+                        getString(R.string.error_form_header, id));
             }
+        }
         return surveys;
+    }
+
+    private boolean surveyHasBeenUnAssigned(Exception e) {
+        return e instanceof IllegalArgumentException && e.getMessage() != null && e.getMessage()
+                .contains("null");
     }
 
     /**

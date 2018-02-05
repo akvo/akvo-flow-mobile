@@ -41,6 +41,7 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
@@ -102,7 +103,8 @@ public class OptionsFormActivityTest {
 
     private void fillOptionsQuestion(int option) {
         ViewInteraction radioButton = onView(allOf(withId(option),
-                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))));
+                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))))
+                .perform(scrollTo());
         radioButton.check(matches(isDisplayed()))
                 .perform(click());
         radioButton.check(matches(isDisplayed()))

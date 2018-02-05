@@ -126,10 +126,6 @@ public class SignatureQuestionView extends QuestionView {
         viewComponent.inject(this);
     }
 
-    private ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
-    }
-
     @Override
     public void questionComplete(Bundle data) {
         if (data != null) {

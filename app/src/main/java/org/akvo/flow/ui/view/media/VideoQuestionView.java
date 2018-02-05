@@ -110,10 +110,6 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
         viewComponent.inject(this);
     }
 
-    private ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
-    }
-
     private void hideDownloadOptions() {
         mProgressBar.setVisibility(View.GONE);
         mDownloadBtn.setVisibility(View.GONE);
@@ -266,6 +262,6 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
     }
 
     private void showImageLoadError() {
-        Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
+        snackBarManager.displaySnackBar(this, R.string.error_video_preview, getContext());
     }
 }

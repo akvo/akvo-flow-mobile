@@ -111,10 +111,6 @@ public class CascadeQuestionView extends QuestionView
         viewComponent.inject(this);
     }
 
-    protected ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
-    }
-
     @Override
     public void onResume() {
         if (mDatabase != null && !mDatabase.isOpen()) {

@@ -119,10 +119,6 @@ public class PhotoQuestionView extends QuestionView implements OnClickListener,
         viewComponent.inject(this);
     }
 
-    private ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
-    }
-
     private void hideDownloadOptions() {
         mProgressBar.setVisibility(View.GONE);
         mDownloadBtn.setVisibility(View.GONE);

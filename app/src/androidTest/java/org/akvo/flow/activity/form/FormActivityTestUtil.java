@@ -37,7 +37,6 @@ import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.FreetextQuestionView;
-import org.akvo.flow.ui.view.MediaQuestionView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
@@ -201,7 +200,7 @@ public class FormActivityTestUtil {
     public static ViewInteraction getMediaButton(Question question) {
         return onView(
                 allOf(withId(R.id.media_btn),
-                        withQuestionViewParent(question, MediaQuestionView.class)))
+                        withQuestionViewParent(question, QuestionView.class)))
                 .perform(scrollTo());
     }
 

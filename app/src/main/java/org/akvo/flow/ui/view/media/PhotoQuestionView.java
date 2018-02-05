@@ -131,7 +131,7 @@ public class PhotoQuestionView extends QuestionView implements
     void onImageViewClicked() {
         String filename = mMedia != null ? mMedia.getFilename() : null;
         if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
-            Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
+            showImageError();
             return;
         }
         AppCompatActivity activity = (AppCompatActivity) getContext();
@@ -268,7 +268,7 @@ public class PhotoQuestionView extends QuestionView implements
     @Override
     public void onResourceDownload(boolean done) {
         if (!done) {
-            Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
+            showImageError();
         }
         displayThumbnail();
         displayLocationInfo();
@@ -324,5 +324,9 @@ public class PhotoQuestionView extends QuestionView implements
         } else {
             mLocationInfo.setText(R.string.image_location_unknown);
         }
+    }
+
+    private void showImageError() {
+        snackBarManager.displaySnackBar(this, R.string.error_img_preview, getContext());
     }
 }

@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -33,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -42,7 +40,6 @@ import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
-import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
@@ -59,13 +56,17 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Question type that supports taking a picture with the
  * device's on-board camera.
  *
  * @author Christopher Fagiani
  */
-public class PhotoQuestionView extends QuestionView implements OnClickListener,
+public class PhotoQuestionView extends QuestionView implements
         TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
 
     @Inject
@@ -76,11 +77,21 @@ public class PhotoQuestionView extends QuestionView implements OnClickListener,
 
     private final TimedLocationListener mLocationListener;
 
-    private Button mMediaButton;
-    private ImageView mImageView;
-    private ProgressBar mProgressBar;
-    private View mDownloadBtn;
-    private TextView mLocationInfo;
+    @BindView(R.id.media_btn)
+    Button mMediaButton;
+
+    @BindView(R.id.image)
+    ImageView mImageView;
+
+    @BindView(R.id.media_progress)
+    ProgressBar mProgressBar;
+
+    @BindView(R.id.media_download)
+    View mDownloadBtn;
+
+    @BindView(R.id.location_info)
+    TextView mLocationInfo;
+
     private Media mMedia;
     private ImageLoader imageLoader;
 
@@ -93,21 +104,13 @@ public class PhotoQuestionView extends QuestionView implements OnClickListener,
     private void init() {
         setQuestionView(R.layout.media_question_view);
         initialiseInjector();
+        ButterKnife.bind(this);
 
-        mMediaButton = (Button) findViewById(R.id.media_btn);
-        mImageView = (ImageView) findViewById(R.id.image);
-        mProgressBar = (ProgressBar) findViewById(R.id.media_progress);
-        mDownloadBtn = findViewById(R.id.media_download);
-        mLocationInfo = (TextView) findViewById(R.id.location_info);
         imageLoader = new PicassoImageLoader(getContext());
         mMediaButton.setText(R.string.takephoto);
-        mMediaButton.setOnClickListener(this);
         if (isReadOnly()) {
             mMediaButton.setVisibility(GONE);
         }
-
-        mImageView.setOnClickListener(this);
-        mDownloadBtn.setOnClickListener(this);
 
         mMedia = null;
     }
@@ -124,28 +127,30 @@ public class PhotoQuestionView extends QuestionView implements OnClickListener,
         mDownloadBtn.setVisibility(View.GONE);
     }
 
-    /**
-     * handle the action button click
-     */
-    public void onClick(View v) {
-        if (v == mImageView) {
-            String filename = mMedia != null ? mMedia.getFilename() : null;
-            if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
-                Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            AppCompatActivity activity = (AppCompatActivity) getContext();
-            navigator.navigateToLargeImage(activity, filename);
-        } else if (v == mMediaButton) {
-            notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
-        } else if (v == mDownloadBtn) {
-            mDownloadBtn.setVisibility(GONE);
-            mProgressBar.setVisibility(VISIBLE);
-
-            MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
-                    new File(mMedia.getFilename()), this);
-            downloadTask.execute();
+    @OnClick(R.id.image)
+    void onImageViewClicked() {
+        String filename = mMedia != null ? mMedia.getFilename() : null;
+        if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
+            Toast.makeText(getContext(), R.string.error_img_preview, Toast.LENGTH_SHORT).show();
+            return;
         }
+        AppCompatActivity activity = (AppCompatActivity) getContext();
+        navigator.navigateToLargeImage(activity, filename);
+    }
+
+    @OnClick(R.id.media_btn)
+    void onTakePictureClicked() {
+        notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+    }
+
+    @OnClick(R.id.media_download)
+    void onVideoDownloadClick() {
+        mDownloadBtn.setVisibility(GONE);
+        mProgressBar.setVisibility(VISIBLE);
+
+        MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
+                new File(mMedia.getFilename()), this);
+        downloadTask.execute();
     }
 
     private void displayImage(String filename, ImageView imageView) {
@@ -320,5 +325,4 @@ public class PhotoQuestionView extends QuestionView implements OnClickListener,
             mLocationInfo.setText(R.string.image_location_unknown);
         }
     }
-
 }

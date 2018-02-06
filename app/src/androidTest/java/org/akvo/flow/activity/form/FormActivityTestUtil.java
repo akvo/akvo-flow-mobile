@@ -198,10 +198,8 @@ public class FormActivityTestUtil {
 
     @NonNull
     public static ViewInteraction getMediaButton(Question question) {
-        return onView(
-                allOf(withId(R.id.media_btn),
-                        withQuestionViewParent(question, QuestionView.class)))
-                .perform(scrollTo());
+        return onView(allOf(withId(R.id.media_btn),
+                withQuestionViewParent(question, QuestionView.class)));
     }
 
     @NonNull

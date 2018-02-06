@@ -29,7 +29,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.async.MediaSyncTask;

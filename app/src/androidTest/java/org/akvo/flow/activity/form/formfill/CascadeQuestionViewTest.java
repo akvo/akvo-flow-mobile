@@ -38,6 +38,9 @@ import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -57,12 +60,16 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
 import static org.akvo.flow.tests.R.raw.cascade_form;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.IsAnything.anything;
 
 @MediumTest
@@ -124,7 +131,7 @@ public class CascadeQuestionViewTest {
                 Node node = levelNodes.get(position);
                 levelNodes = cascadeNodes.get((int) node.getId());
 
-                selectSpinnerItem(cascadeLevelSpinner, position);
+                selectSpinnerItem(cascadeLevelSpinner, node.getName());
 
                 verifyCascadeNewState(cascadeLevelSpinner, node);
             }
@@ -137,13 +144,27 @@ public class CascadeQuestionViewTest {
         cascadeLevelSpinner.check(matches(withSpinnerText(R.string.select)));
     }
 
-    private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, int position) {
+    private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, String nodeName) {
         cascadeLevelSpinner.perform(click());
-        onData(anything()).atPosition(position + 1).perform(click());
+        onData(allOf(is(instanceOf(Node.class)), withName(is(nodeName)))).perform(click());
         addExecutionDelay(100);
     }
 
     private void verifyCascadeNewState(ViewInteraction cascadeLevelSpinner, Node node) {
         cascadeLevelSpinner.check(matches(withSpinnerText(node.getName())));
+    }
+
+    public static Matcher withName(final Matcher nameMatcher){
+        return new TypeSafeMatcher<Node>(){
+            @Override
+            public boolean matchesSafely(Node node) {
+                return nameMatcher.matches(node.getName());
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("matches with Node   ");
+            }
+        };
     }
 }

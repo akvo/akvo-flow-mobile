@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -34,7 +34,8 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.CascadeDB;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.database.cascade.CascadeDB;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
@@ -170,7 +171,7 @@ public class CascadeQuestionView extends QuestionView
         text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
         // Insert a fake 'Select' value
-        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null);
+        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null, ID_NONE);
         values.add(0, node);
 
         SpinnerAdapter adapter = new CascadeAdapter(getContext(), values);
@@ -248,7 +249,8 @@ public class CascadeQuestionView extends QuestionView
         super.resetQuestion(fireEvent);
         updateSpinners(POSITION_NONE);
         if (mDatabase == null) {
-            String error = "Cannot load cascade resource: " + getQuestion().getSrc();
+            String error = getContext()
+                    .getString(R.string.cascade_error_message, getQuestion().getSrc());
             Timber.e(new IllegalStateException(error), error);
             setError(error);
         }

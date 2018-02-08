@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,16 +24,19 @@ import android.support.test.InstrumentationRegistry;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.database.cascade.CascadeDB;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
@@ -241,5 +244,24 @@ public class SurveyInstaller {
         adapter.open();
         adapter.deleteResponses(surveyInstanceId);
         adapter.close();
+    }
+
+    public SparseArray<List<Node>> getAllNodes(Question question, Context context) {
+        String src = question.getSrc();
+        FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
+                new FileBrowser());
+        File cascadeFolder = formResourcesFileUtil
+                .getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext());
+        if (!TextUtils.isEmpty(src)) {
+            File db = new File(cascadeFolder, src);
+            if (db.exists()) {
+                CascadeDB cascadeDB = new CascadeDB(context, db.getAbsolutePath());
+                cascadeDB.open();
+                SparseArray<List<Node>> values = cascadeDB.getValues();
+                cascadeDB.close();
+                return values;
+            }
+        }
+        return new SparseArray<>(0);
     }
 }

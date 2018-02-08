@@ -277,5 +277,6 @@
     <string name="app_update_dialog_subtitle">Update to get the most out of your Flow app</string>
     <string name="error_getting_media">Error getting media, please try again.</string>
     <string name="geo_fields_update_title">Update GPS coordinates?</string>
+    <string name="cascade_error_message">Cannot load cascade resource: %1$s</string>
 
 </resources>

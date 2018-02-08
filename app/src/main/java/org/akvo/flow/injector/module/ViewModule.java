@@ -28,6 +28,7 @@ import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
+import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -84,5 +85,11 @@ public class ViewModule {
     @Named("saveKeepScreenOn")
     UseCase provideSaveKeepScreenOn(SaveKeepScreenOn saveKeepScreenOn) {
         return saveKeepScreenOn;
+    }
+
+    @Provides
+    @Named("saveResizedImage")
+    UseCase provideSaveResizedImage(SaveResizedImage saveResizedImage) {
+        return saveResizedImage;
     }
 }

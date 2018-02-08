@@ -39,7 +39,7 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewFactory;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
-import org.akvo.flow.ui.view.media.PhotoQuestionView;
+import org.akvo.flow.ui.view.media.PhotoQuestionViewImpl;
 import org.akvo.flow.ui.view.media.VideoQuestionView;
 import org.akvo.flow.ui.view.option.OptionQuestionFactory;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
@@ -299,7 +299,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new PhotoQuestionView(context, q, mSurveyListener);
+                questionView = new PhotoQuestionViewImpl(context, q, mSurveyListener);
             } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new VideoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {

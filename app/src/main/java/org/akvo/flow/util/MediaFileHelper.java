@@ -24,13 +24,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.R;
-
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -44,6 +47,7 @@ public class MediaFileHelper {
     private static final String VIDEO_SUFFIX = ".mp4";
 
     private final Context context;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
 
     @Inject
     public MediaFileHelper(Context context) {
@@ -51,26 +55,8 @@ public class MediaFileHelper {
     }
 
     @NonNull
-    public String getImageFilePath(int maxImgSize) {
-        File tmp = getImageTmpFile();
-        String tempAbsolutePath = tmp.getAbsolutePath();
-
-        // Ensure no image is saved in the DCIM folder
-        cleanDCIM(context, tempAbsolutePath);
-
-        File imgFile = getNamedMediaFile(IMAGE_SUFFIX);
-        String absolutePath = imgFile.getAbsolutePath();
-
-        if (ImageUtil.resizeImage(tempAbsolutePath, absolutePath, maxImgSize)) {
-            Timber.i("Image resized to: %s", getReadableImageSize(maxImgSize));
-            if (!tmp.delete()) { // must check return value to know if it failed
-                Timber.e("Media file delete failed");
-            }
-        } else if (!tmp.renameTo(imgFile)) {
-            // must check  return  value to  know if it  failed!
-            Timber.e("Media file rename failed");
-        }
-        return absolutePath;
+    public String getImageFilePath() {
+        return getNamedMediaFile(IMAGE_SUFFIX).getAbsolutePath();
     }
 
     @Nullable
@@ -78,7 +64,7 @@ public class MediaFileHelper {
         File tmp = getVideoTmpFile();
         if (tmp.exists()) {
             // Ensure no duplicated video is saved in the DCIM folder
-            cleanDCIM(context, tmp.getAbsolutePath());
+            cleanDCIM(tmp.getAbsolutePath());
         } else {
             tmp = new File(getVideoPathFromIntent(intent));
         }
@@ -124,21 +110,23 @@ public class MediaFileHelper {
         return getMediaFile(filename);
     }
 
-    @NonNull
+    @Nullable
     public File getImageTmpFile() {
-        String filename = TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX;
-        return getMediaFile(filename);
+        String timeStamp = dateFormat.format(new Date());
+        String imageFileName = TEMP_PHOTO_NAME_PREFIX + timeStamp + "_";
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        try {
+            return File.createTempFile(imageFileName, IMAGE_SUFFIX, storageDir);
+        } catch (IOException e) {
+            Timber.e(e, "Unable to create image file");
+        }
+        return null;
     }
 
     @NonNull
     private File getNamedMediaFile(String fileSuffix) {
         String filename = PlatformUtil.uuid() + fileSuffix;
         return new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), filename);
-    }
-
-    private String getReadableImageSize(int maxImgSize) {
-        return context.getResources()
-                .getStringArray(R.array.max_image_size_pref)[maxImgSize];
     }
 
     @NonNull
@@ -151,10 +139,9 @@ public class MediaFileHelper {
      * folder. This method will try to spot those situations and remove the
      * duplicated image.
      *
-     * @param context  Context
      * @param filepath The absolute path to the original image
      */
-    private void cleanDCIM(Context context, String filepath) {
+    private void cleanDCIM(String filepath) {
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 new String[] {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -31,6 +31,7 @@ import android.view.View;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
@@ -246,6 +247,13 @@ public class FormActivityTestUtil {
         } else {
             return radioButtonWithText(option, optionPosition);
         }
+    }
+
+    public static void verifyCascadeLevelNumber(Level level) {
+        ViewInteraction cascadeLevelNumber = onView(
+                allOf(withId(R.id.cascade_level_number), withText(level.getText())));
+        cascadeLevelNumber.perform(scrollTo());
+        cascadeLevelNumber.check(matches(isDisplayed()));
     }
 
     private static ViewInteraction checkBoxWithText(Option option, int optionPosition,

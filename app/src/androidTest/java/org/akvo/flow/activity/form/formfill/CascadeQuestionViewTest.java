@@ -150,8 +150,8 @@ public class CascadeQuestionViewTest {
         cascadeLevelSpinner.check(matches(withSpinnerText(node.getName())));
     }
 
-    public static Matcher withName(final Matcher nameMatcher){
-        return new TypeSafeMatcher<Node>(){
+    public static Matcher withName(final Matcher nameMatcher) {
+        return new TypeSafeMatcher<Node>() {
             @Override
             public boolean matchesSafely(Node node) {
                 return nameMatcher.matches(node.getName());

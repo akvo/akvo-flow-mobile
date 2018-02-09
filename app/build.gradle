@@ -24,6 +24,7 @@ android {
     def versionMinor = versionProps['VERSION_MINOR'].toString()
     def versionPatch = versionProps['VERSION_PATCH'].toString()
     def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
+    def buildYear = getBuildYear()
 
     defaultConfig {
         versionCode versionCodeProperty
@@ -108,6 +109,7 @@ android {
             it.buildConfigField "String", "AWS_SECRET_KEY", "\"${awsSecretKey}\""
             it.buildConfigField "String", "API_KEY", "\"${apiKey}\""
             it.buildConfigField "String", "SIGNING_KEY", "\"${signingKey}\""
+            it.buildConfigField "String", "BUILD_YEAR", "\"${buildYear}\""
         }
     }
 
@@ -169,6 +171,10 @@ private Properties loadProperties(String fileName) {
     versionProps
 }
 
+private static String getBuildYear() {
+    new Date().format('yyyy')
+}
+
 android.applicationVariants.all { variant ->
     variant.outputs.all { output ->
         outputFileName = file("/flow.apk")
@@ -178,6 +184,7 @@ android.applicationVariants.all { variant ->
 dependencies {
     implementation fileTree(include: '*.jar', dir: 'libs')
     implementation 'com.android.support:appcompat-v7:25.3.1'
+    implementation 'com.android.support:exifinterface:25.3.1'
     implementation 'com.android.support:recyclerview-v7:25.3.1'
     implementation 'com.android.support:support-annotations:25.3.1'
     implementation 'com.android.support:design:25.3.1'
@@ -197,6 +204,8 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     implementation 'com.google.code.gson:gson:2.8.2'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.4'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:1.10.19'

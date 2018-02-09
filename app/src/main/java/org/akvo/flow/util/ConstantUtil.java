@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -137,6 +137,7 @@ public class ConstantUtil {
     public static final String IMAGE_URL_EXTRA = "image_url";
     public static final String FORM_TITLE_EXTRA = "title";
     public static final String FORM_SUBTITLE_EXTRA = "subtitle";
+    public static final String QUESTION_ID_EXTRA = "question_id";
 
     /**
      * settings keys

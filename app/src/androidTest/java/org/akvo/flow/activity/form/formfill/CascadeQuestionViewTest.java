@@ -28,6 +28,8 @@ import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.SparseArray;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -38,6 +40,7 @@ import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.ui.view.SubmitTab;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -56,6 +59,8 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
@@ -64,8 +69,10 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
 import static org.akvo.flow.tests.R.raw.cascade_form;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.core.IsNot.not;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -142,7 +149,11 @@ public class CascadeQuestionViewTest {
     private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, Node node) {
         cascadeLevelSpinner.perform(click());
         addExecutionDelay(100);
-        onData(withNode(node)).perform(click());
+        onData(withNode(node))
+                .inAdapterView(allOf(
+                        isAssignableFrom(AdapterView.class),
+                        not(is(withId(R.id.submit_tab)))))
+                .perform(click());
         addExecutionDelay(100);
     }
 

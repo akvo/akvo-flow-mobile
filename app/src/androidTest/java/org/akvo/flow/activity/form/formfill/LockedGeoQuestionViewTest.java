@@ -146,9 +146,9 @@ public class LockedGeoQuestionViewTest {
     @Test
     public void ensureLocationValuesDisplayedCorrectly() throws Exception {
         clickGeoButton();
-
+        addExecutionDelay(100);
         provideMockLocation(MOCK_ACCURACY_ACCURATE);
-
+        addExecutionDelay(100);
         verifyGeoInput(R.id.lat_et, MOCK_LATITUDE + "");
         verifyGeoInput(R.id.lon_et, MOCK_LONGITUDE + "");
         verifyGeoInput(R.id.height_et, MOCK_ALTITUDE + "");
@@ -189,8 +189,11 @@ public class LockedGeoQuestionViewTest {
 
     @Test
     public void ensureLocationValuesDisplayedCorrectlyWhenCancelled() throws Exception {
+        onView(withId(R.id.lat_et)).perform(replaceText(""));
+        onView(withId(R.id.lon_et)).perform(replaceText(""));
+        onView(withId(R.id.height_et)).perform(replaceText(""));
+        
         clickGeoButton();
-
         addExecutionDelay(100);
 
         clickCancelButton();

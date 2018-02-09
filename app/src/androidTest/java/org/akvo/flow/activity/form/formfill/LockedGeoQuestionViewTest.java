@@ -192,7 +192,7 @@ public class LockedGeoQuestionViewTest {
         onView(withId(R.id.lat_et)).perform(replaceText(""));
         onView(withId(R.id.lon_et)).perform(replaceText(""));
         onView(withId(R.id.height_et)).perform(replaceText(""));
-        
+
         clickGeoButton();
         addExecutionDelay(100);
 

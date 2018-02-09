@@ -55,4 +55,26 @@ public class Node {
     public long getParent() {
         return parent;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Node node = (Node) o;
+
+        return mId == node.mId && parent == node.parent && mName.equals(node.mName) && mCode
+                .equals(node.mCode);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (mId ^ (mId >>> 32));
+        result = 31 * result + mName.hashCode();
+        result = 31 * result + mCode.hashCode();
+        result = 31 * result + (int) (parent ^ (parent >>> 32));
+        return result;
+    }
 }

@@ -64,7 +64,6 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
 import static org.akvo.flow.tests.R.raw.cascade_form;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
 
@@ -127,7 +126,7 @@ public class CascadeQuestionViewTest {
                 Node node = levelNodes.get(position);
                 levelNodes = cascadeNodes.get((int) node.getId());
 
-                selectSpinnerItem(cascadeLevelSpinner, node.getName());
+                selectSpinnerItem(cascadeLevelSpinner, node);
 
                 verifyCascadeNewState(cascadeLevelSpinner, node);
             }
@@ -140,9 +139,10 @@ public class CascadeQuestionViewTest {
         cascadeLevelSpinner.check(matches(withSpinnerText(R.string.select)));
     }
 
-    private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, String nodeName) {
+    private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, Node node) {
         cascadeLevelSpinner.perform(click());
-        onData(allOf(is(instanceOf(Node.class)), withName(is(nodeName)))).perform(click());
+        addExecutionDelay(100);
+        onData(withNode(node)).perform(click());
         addExecutionDelay(100);
     }
 
@@ -150,11 +150,11 @@ public class CascadeQuestionViewTest {
         cascadeLevelSpinner.check(matches(withSpinnerText(node.getName())));
     }
 
-    public static Matcher<Node> withName(final Matcher nameMatcher) {
+    public static Matcher<Node> withNode(final Node nodeToMatch) {
         return new TypeSafeMatcher<Node>() {
             @Override
             public boolean matchesSafely(Node node) {
-                return nameMatcher.matches(node.getName());
+                return nodeToMatch.equals(node);
             }
 
             @Override

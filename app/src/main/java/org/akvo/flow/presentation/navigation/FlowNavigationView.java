@@ -216,7 +216,6 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         super.onDetachedFromWindow();
     }
 
-
     public interface DrawerNavigationListener {
 
         void onSurveySelected(SurveyGroup surveyGroup);

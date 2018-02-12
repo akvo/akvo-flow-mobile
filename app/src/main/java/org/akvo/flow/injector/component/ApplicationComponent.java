@@ -74,6 +74,4 @@ public interface ApplicationComponent {
     void inject(SurveyDownloadService surveyDownloadService);
 
     void inject(BootstrapService bootstrapService);
-
-    void inject(SurveyDownloadService surveyDownloadService);
 }

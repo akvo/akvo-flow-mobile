@@ -77,7 +77,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
-import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
@@ -127,7 +126,7 @@ public class FormActivityTest {
 
     @After
     public void afterEachTest() {
-        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
+        installer.deleteResponses();
     }
 
     @AfterClass

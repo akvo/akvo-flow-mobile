@@ -32,10 +32,14 @@ before_script:
     - adb shell settings put global window_animation_scale 0 &
     - adb shell settings put global transition_animation_scale 0 &
     - adb shell settings put global animator_duration_scale 0 &
+    - adb shell settings put secure long_press_timeout 1500 &
     - adb shell input keyevent 82 &
 
 script:
   - ./gradlew check --continue connectedFlowDebugAndroidTest --continue
 
 after_failure:
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.OptionsQuestionViewSingleTest.html -t plain
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.LockedGeoQuestionViewTest.html -t plain
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain

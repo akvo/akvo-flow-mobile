@@ -52,7 +52,7 @@ public class AddUserActivityTest {
             AddUserActivity.class);
 
     @Test
-    public void testAddUser() {
+    public void testAddUser() throws Exception {
         ViewInteraction nameEditText = onView(
                 allOf(withId(R.id.username), isDisplayed()));
         nameEditText.check(matches(withHint(R.string.username)));

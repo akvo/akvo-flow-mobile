@@ -54,8 +54,7 @@ public class TimedLocationListener implements LocationListener {
     private boolean mListeningLocation;
 
     public TimedLocationListener(Context context, Listener listener, boolean allowMockupLocations) {
-        mLocationManager = (LocationManager) context.getApplicationContext()
-                .getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         listenerWeakReference = new WeakReference<>(listener);
         mListeningLocation = false;
         mAllowMockupLocations = allowMockupLocations;
@@ -149,11 +148,8 @@ public class TimedLocationListener implements LocationListener {
     }
 
     private boolean isLocationProviderValid(Location location) {
-        if (mAllowMockupLocations) {
-            return true;
-        }
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 || !location
-                .isFromMockProvider();
+        return mAllowMockupLocations || Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2
+                || !location.isFromMockProvider();
     }
 
     public interface Listener {

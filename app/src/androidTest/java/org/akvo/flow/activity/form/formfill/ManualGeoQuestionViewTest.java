@@ -22,8 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.filters.MediumTest;
@@ -46,19 +44,21 @@ import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.freetext_double_entry_form;
+import static org.akvo.flow.tests.R.raw.geo_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class FreeTextDoubleQuestionViewTest {
+public class ManualGeoQuestionViewTest {
 
-    private static final String FORM_TITLE = "FreeTextForm";
+    private static final double MOCK_LATITUDE = 10.0;
+    private static final double MOCK_LONGITUDE = 20.0;
+
     private static SurveyInstaller installer;
 
     @Rule
@@ -66,7 +66,7 @@ public class FreeTextDoubleQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(44173002L, "47313002", FORM_TITLE, 0L, false);
+            return getFormActivityIntent(155852013L, "156792013", "GeoForm", 0L, false);
         }
     };
 
@@ -75,7 +75,7 @@ public class FreeTextDoubleQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(freetext_double_entry_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(geo_form, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -90,58 +90,86 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     @Test
-    public void ensureCannotSubmitIfSecondEntryMissing() throws Exception {
-        verifyQuestionTitleDisplayed();
-        fillFreeTextQuestion("This is an answer to your question");
+    public void ensureUnableToSubmitIfLatitudeMissing() throws Exception {
+        onView(withId(R.id.lon_et)).perform(typeText(MOCK_LONGITUDE + ""));
+
         clickNext();
+
         verifySubmitButtonDisabled();
     }
 
     @Test
-    public void ensureCannotSubmitEmptyFreeText() throws Exception {
-        verifyQuestionTitleDisplayed();
-        fillFreeTextQuestion("");
+    public void ensureUnableToSubmitIfLongitudeMissing() throws Exception {
+        onView(withId(R.id.lat_et)).perform(typeText(MOCK_LATITUDE + ""));
+
         clickNext();
+
         verifySubmitButtonDisabled();
     }
 
     @Test
-    public void ensureCannotSubmitDifferentAnswers() throws Exception {
-        verifyQuestionTitleDisplayed();
+    public void ensureErrorShownWhenLatitudeTooSmall() throws Exception {
+        onView(withId(R.id.lat_et)).perform(typeText(-333 + ""));
+        Espresso.closeSoftKeyboard();
 
-        fillFreeTextQuestion("This is an answer to your question");
-        fillDoubleEntry("Something else");
-
-        verifyDoubleEntryMisMatchErrorDisplayed();
-
-        clickNext();
-        verifySubmitButtonDisabled();
+        onView(withId(R.id.lat_et))
+                .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
     }
 
     @Test
-    public void ensureCanSubmitCorrectQuestion() throws Exception {
-        verifyQuestionTitleDisplayed();
+    public void ensureErrorShownWhenLatitudeTooLarge() throws Exception {
+        onView(withId(R.id.lat_et)).perform(typeText(333 + ""));
+        Espresso.closeSoftKeyboard();
 
-        fillFreeTextQuestion("This is an answer to your question");
-        fillDoubleEntry("This is an answer to your question");
+        onView(withId(R.id.lat_et))
+                .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
+    }
+
+    @Test
+    public void ensureErrorShownWhenLongitudeTooSmall() throws Exception {
+        onView(withId(R.id.lon_et)).perform(typeText(-333 + ""));
+        Espresso.closeSoftKeyboard();
+
+        onView(withId(R.id.lon_et))
+                .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
+    }
+
+    @Test
+    public void ensureErrorShownWhenLongitudeTooLarge() throws Exception {
+        onView(withId(R.id.lon_et)).perform(typeText(333 + ""));
+        Espresso.closeSoftKeyboard();
+
+        onView(withId(R.id.lon_et))
+                .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
+    }
+
+    @Test
+    public void ensureErrorShownWhenAltitudeTooSmall() throws Exception {
+        onView(withId(R.id.height_et)).perform(typeText(-33333 + ""));
+        Espresso.closeSoftKeyboard();
+
+        onView(withId(R.id.height_et))
+                .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
+    }
+
+    @Test
+    public void ensureErrorShownWhenAltitudeTooLarge() throws Exception {
+        onView(withId(R.id.height_et)).perform(typeText(33333 + ""));
+        Espresso.closeSoftKeyboard();
+
+        onView(withId(R.id.height_et))
+                .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
+    }
+
+    @Test
+    public void ensureCanSubmitCorrectValues() throws Exception {
+        onView(withId(R.id.lat_et)).perform(typeText(MOCK_LATITUDE + ""));
+        onView(withId(R.id.lon_et)).perform(typeText(MOCK_LONGITUDE + ""));
+
+        onView(withId(R.id.acc_tv))
+                .check(matches(withText(R.string.geo_location_accuracy_default)));
 
         clickNext();
         verifySubmitButtonEnabled();
-    }
-
-    private void verifyDoubleEntryMisMatchErrorDisplayed() {
-        onView(withId(R.id.double_entry_et))
-                .check(matches(hasErrorText(getString(R.string.error_answer_match))));
-    }
-
-    private void fillDoubleEntry(String text) {
-        onView(withId(R.id.double_entry_et)).perform(typeText(text));
-        Espresso.closeSoftKeyboard();
-    }
-
-    @NonNull
-    private String getString(@StringRes int stringResId) {
-        return rule.getActivity().getApplicationContext().getResources()
-                .getString(stringResId);
     }
 }

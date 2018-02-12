@@ -136,11 +136,6 @@ public class ImageDataSource {
         return saveImage(resizedBitmap, absolutePath);
     }
 
-    /**
-     * resizeImage handles resizing a too-large image file from the camera,
-     *
-     * @return true if the image was successfully resized to the new file, false otherwise
-     */
     private Observable<Boolean> resizeImage(String origFilename, String outFilename,
             int sizePreference) {
         BitmapFactory.Options options = prepareBitmapOptions(origFilename, sizePreference);
@@ -190,11 +185,9 @@ public class ImageDataSource {
      * bitmaps using the decode* methods from {@link BitmapFactory}. This implementation calculates
      * the closest inSampleSize that will result in the final decoded bitmap having a width and
      * height equal to or larger than the requested width and height. This implementation does not
-     * ensure a power of 2 is returned for inSampleSize which can be faster when decoding but
-     * results in a larger bitmap which isn't as useful for caching purposes.
+     * ensure a power of 2 is returned for inSampleSize.
      *
-     * @param options   An options object with out* params already populated (run through a decode*
-     *                  method with inJustDecodeBounds==true
+     * @param options   An options object with out* params already populated
      * @param imageSize The requested width and height of the resulting bitmap
      * @return The value to be used for inSampleSize
      */
@@ -236,22 +229,30 @@ public class ImageDataSource {
     private Observable<Boolean> updateExifOrientationData(String originalImage,
             String resizedImage) {
         try {
-            ExifInterface exif1 = new ExifInterface(originalImage);
-            ExifInterface exif2 = new ExifInterface(resizedImage);
 
-            final String orientation1 = exif1.getAttribute(ExifInterface.TAG_ORIENTATION);
-            final String orientation2 = exif2.getAttribute(ExifInterface.TAG_ORIENTATION);
+            final String orientation1 = getExifOrientationTag(originalImage);
+            final String orientation2 = getExifOrientationTag(resizedImage);
 
             if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
-                Timber.d(
-                        "Orientation property in EXIF does not match. Overriding it with original value...");
-                exif2.setAttribute(ExifInterface.TAG_ORIENTATION, orientation1);
-                exif2.saveAttributes();
+                Timber.d("Exif orientation in resized image will be updated");
+                updateExifOrientation(orientation1, resizedImage);
+
             }
         } catch (IOException e) {
             Timber.e(e);
         }
         return Observable.just(true);
+    }
+
+    private void updateExifOrientation(String orientation, String filename) throws IOException {
+        ExifInterface exif = new ExifInterface(filename);
+        exif.setAttribute(ExifInterface.TAG_ORIENTATION, orientation);
+        exif.saveAttributes();
+    }
+
+    private String getExifOrientationTag(String filename) throws IOException {
+        ExifInterface exif = new ExifInterface(filename);
+        return exif.getAttribute(ExifInterface.TAG_ORIENTATION);
     }
 
     /**

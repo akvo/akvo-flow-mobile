@@ -62,10 +62,7 @@ public class MediaFileHelper {
     @Nullable
     public String getVideoFilePath(Intent intent) {
         File tmp = getVideoTmpFile();
-        if (tmp.exists()) {
-            // Ensure no duplicated video is saved in the DCIM folder
-            cleanDCIM(tmp.getAbsolutePath());
-        } else {
+        if (!tmp.exists()) {
             tmp = new File(getVideoPathFromIntent(intent));
         }
         return renameFile(tmp);
@@ -132,50 +129,5 @@ public class MediaFileHelper {
     @NonNull
     private File getMediaFile(String filename) {
         return new File(FileUtil.getFilesDir(FileUtil.FileType.TMP), filename);
-    }
-
-    /**
-     * Some manufacturers will duplicate the image saving a copy in the DCIM
-     * folder. This method will try to spot those situations and remove the
-     * duplicated image.
-     *
-     * @param filepath The absolute path to the original image
-     */
-    private void cleanDCIM(String filepath) {
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] {
-                        MediaStore.Images.ImageColumns.DATA,
-                        MediaStore.Images.ImageColumns.DATE_TAKEN
-                },
-                null,
-                null,
-                MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
-        );
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                final String lastImagePath = cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-
-                if ((!filepath.equals(lastImagePath))
-                        && (ImageUtil.compareImages(filepath, lastImagePath))) {
-                    final int result = context.getContentResolver().delete(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            MediaStore.Images.ImageColumns.DATA + " = ?",
-                            new String[] {
-                                    lastImagePath
-                            });
-
-                    if (result == 1) {
-                        Timber.i("Duplicated file successfully removed: %s", lastImagePath);
-                    } else {
-                        Timber.e("Error removing duplicated image: %s", lastImagePath);
-                    }
-                }
-            }
-
-            cursor.close();
-        }
     }
 }

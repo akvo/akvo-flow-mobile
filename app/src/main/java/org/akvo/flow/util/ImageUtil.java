@@ -67,38 +67,6 @@ public class ImageUtil {
 
     }
 
-    /**
-     * Compare to images to determine if their content is the same. To state
-     * that the two of them are the same, the datetime contained in their exif
-     * metadata will be compared. If the exif does not contain a datetime, the
-     * MD5 checksum of the images will be compared.
-     *
-     * @param image1 Absolute path to the first image
-     * @param image2 Absolute path to the second image
-     * @return true if their datetime is the same, false otherwise
-     */
-    static boolean compareImages(String image1, String image2) {
-        boolean equals = false;
-        try {
-            ExifInterface exif1 = new ExifInterface(image1);
-            ExifInterface exif2 = new ExifInterface(image2);
-
-            final String datetime1 = exif1.getAttribute(ExifInterface.TAG_DATETIME);
-            final String datetime2 = exif2.getAttribute(ExifInterface.TAG_DATETIME);
-
-            if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime2)) {
-                equals = datetime1.equals(datetime2);
-            } else {
-                Timber.d("Datetime is null or empty. The MD5 checksum will be compared");
-                equals = FileUtil.compareFilesChecksum(image1, image2);
-            }
-        } catch (IOException e) {
-            Timber.e(e);
-        }
-
-        return equals;
-    }
-
     private static String convertDMS(double coordinate) {
         if (coordinate < -180.0 || coordinate > 180.0 || Double.isNaN(coordinate)) {
             throw new IllegalArgumentException("coordinate=" + coordinate);

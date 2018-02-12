@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="geo_location_accuracy_default">Accuracy: unknown</string>
     <string name="geo_location_accuracy">Accuracy: %1$s m</string>
     <string name="nocardspacetitle">No Storage Space</string>
@@ -15,7 +15,7 @@
     <string name="submitbutton">Submit</string>
     <string name="geodialog">Please enable location settings</string>
     <string name="settings">Settings</string>
-    <string name="preferences_settings_section">Settings</string>
+    <string name="preferences_general_section">General</string>
     <string name="aboutlabel">About</string>
     <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>
     <string name="otherinstructions">Please enter a description</string>
@@ -157,6 +157,7 @@
     <string name="status_submitted">Submitted</string>
     <string name="status_exported">Exported</string>
     <!--APK update-->
+    <string name="app_update_activity">Akvo Flow Update</string>
     <string name="update">Update</string>
     <string name="not_now">Not now</string>
     <string name="clicktoinstall">New Flow version is downloaded. Do you want to install it now?</string>
@@ -273,5 +274,8 @@
 
     <string name="app_update_dialog_title">New Flow version available</string>
     <string name="app_update_dialog_subtitle">Update to get the most out of your Flow app</string>
+    <string name="error_getting_media">Error getting media, please try again.</string>
+    <string name="geo_fields_update_title">Update GPS coordinates?</string>
+    <string name="cascade_error_message">Cannot load cascade resource: %1$s</string>
 
 </resources>

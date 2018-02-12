@@ -543,10 +543,32 @@ public class SurveyDbAdapter {
      */
     public void clearCollectedData() {
         executeSql("DELETE FROM " + Tables.SYNC_TIME);
-        executeSql("DELETE FROM " + Tables.RESPONSE);
+        deleteAllResponses();
         executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE);
         executeSql("DELETE FROM " + Tables.RECORD);
         executeSql("DELETE FROM " + Tables.TRANSMISSION);
+    }
+
+    public void deleteAllResponses() {
+        executeSql("DELETE FROM " + Tables.RESPONSE);
+    }
+
+    /**
+     * performs a soft-delete on a user
+     *
+     * @param id
+     */
+    public void deleteUser(Long id) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(UserColumns.DELETED, 1);
+        database.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
+                new String[] {
+                        id.toString()
+                });
+    }
+
+    public void addSurveyGroup(ContentValues values) {
+        database.insert(Tables.SURVEY_GROUP, null, values);
     }
 
     public Cursor getSurveyGroup(long id) {

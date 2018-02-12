@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.component;
 
 import org.akvo.flow.activity.AddUserActivity;
+import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.injector.PerActivity;
@@ -36,6 +37,9 @@ import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.ui.view.MediaQuestionView;
+import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 
 import dagger.Component;
 
@@ -70,4 +74,12 @@ public interface ViewComponent {
     void inject(AppDownloadDialogFragment fragment);
 
     void inject(AddUserActivity addUserActivity);
+
+    void inject(MediaQuestionView mediaQuestionView);
+
+    void inject(AppUpdateActivity appUpdateActivity);
+
+    void inject(CascadeQuestionView cascadeQuestionView);
+
+    void inject(SignatureQuestionView signatureQuestionView);
 }

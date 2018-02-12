@@ -25,8 +25,6 @@
   <string name="toosmallerr"> संख्या अति छोटी है I नुन्यतम संख्या डाले :</string>
   <string name="toolargeerr">संख्या अति बड़ी है I अधिकतम संख्या डाले :</string>
   <string name="baddatatypeerr">उत्तर संख्या में दें </string>
-  <string name="reloadsurveyslabel">सभी सर्वे को पुनः लोड करें </string>
-  <string name="reloadsurveysdesc">सभी नियुक्त सर्वे को हटाने और पुनः डाउनलोड करने के लिए (निर्देश पर ही प्रयोग करें  )</string>
   <string name="conftitle">कृपया निश्चित करें </string>
   <string name="reloadconftext">क्या आप सर्वे को हटा कर पुनः डाउनलोड करना चाहतें हैं ?</string>
   <string name="submitcompletetitle">सर्वे जमा करें </string>
@@ -138,7 +136,6 @@
   <string name="status_submitted">जमा हो चूका है </string>
   <string name="status_exported">निर्यातित </string>
   <!--APK update-->
-  <string name="app_update_activity">Akvo Flow अपडेट </string>
   <string name="update">अपडेट </string>
   <string name="not_now">अभी नहीं </string>
   <!--Time check-->

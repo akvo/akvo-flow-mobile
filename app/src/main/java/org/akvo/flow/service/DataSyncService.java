@@ -32,6 +32,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.ResponseColumns;
@@ -51,6 +52,7 @@ import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.util.files.ZipFileBrowser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,6 +75,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -116,12 +119,22 @@ public class DataSyncService extends IntentService {
      */
     private static final int FILE_UPLOAD_RETRIES = 2;
 
+    @Inject
+    ZipFileBrowser zipFileBrowser;
+
     private SurveyDbDataSource mDatabase;
     private Prefs preferences;
     private ConnectivityStateManager connectivityStateManager;
 
     public DataSyncService() {
         super(TAG);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
     }
 
     @Override
@@ -179,11 +192,6 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    @NonNull
-    private File getSurveyInstanceFile(String uuid) {
-        return new File(FileUtil.getFilesDir(FileType.DATA), uuid + ConstantUtil.ARCHIVE_SUFFIX);
-    }
-
     private void checkExportedFiles() {
         Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.EXPORTED);
         if (cursor != null) {
@@ -193,7 +201,7 @@ public class DataSyncService extends IntentService {
                             .getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
                     String uuid = cursor
                             .getString(cursor.getColumnIndexOrThrow(SurveyInstanceColumns.UUID));
-                    if (!getSurveyInstanceFile(uuid).exists()) {
+                    if (!zipFileBrowser.getSurveyInstanceFile(uuid).exists()) {
                         Timber.d("Exported file for survey %s not found. It's status " +
                                 "will be set to 'submitted', and will be reprocessed", uuid);
                         updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
@@ -247,7 +255,7 @@ public class DataSyncService extends IntentService {
             }
 
             // The filename will match the Survey Instance UUID
-            File zipFile = getSurveyInstanceFile(zipFileData.uuid);
+            File zipFile = zipFileBrowser.getSurveyInstanceFile(zipFileData.uuid);
 
             // Write the data into the zip file
             String fileName = zipFile.getAbsolutePath();// Will normalize filename.

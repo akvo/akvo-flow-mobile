@@ -32,6 +32,7 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
+import org.akvo.flow.util.files.ZipFileBrowser;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -123,30 +124,33 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
 
     /**
      * Permanently deletes data from the external storage
-     * 
+     *
      * @param responsesOnly Flag to specify a partial deletion (user generated data).
      */
     private void clearExternalStorage(boolean responsesOnly) {
-        if (!responsesOnly) {
-            // Delete downloaded survey xml/zips
-            final Context context = mWeakContext.get();
-            if (context != null) {
-                FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
+        final Context context = mWeakContext.get();
+        if (context != null) {
+            Context applicationContext = context.getApplicationContext();
+            FileBrowser fileBrowser = new FileBrowser();
+            if (!responsesOnly) {
+                FormFileBrowser formFileBrowser = new FormFileBrowser(fileBrowser);
                 FormResourcesFileBrowser formResourcesFileBrowser = new FormResourcesFileBrowser(
-                        new FileBrowser());
-                Context applicationContext = context.getApplicationContext();
+                        fileBrowser);
                 List<File> files = formFileBrowser.findAllPossibleFolders(applicationContext);
                 files.addAll(formResourcesFileBrowser.findAllPossibleFolders(applicationContext));
                 for (File file : files) {
                     FileUtil.deleteFilesInDirectory(file, false);
                 }
+                // Delete bootstraps
+                FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INBOX), false);
             }
-            // Delete bootstraps
-            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.INBOX), false);
+            ZipFileBrowser zipFileBrowser = new ZipFileBrowser(fileBrowser, context);
+            List<File> files = zipFileBrowser.findAllPossibleFolders();
+            for (File file : files) {
+                FileUtil.deleteFilesInDirectory(file, true);
+            }
+            // Delete exported zip/image files
+            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.MEDIA), true);
         }
-
-        // Delete exported zip/image files
-        FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.DATA), true);
-        FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.MEDIA), true);
     }
 }

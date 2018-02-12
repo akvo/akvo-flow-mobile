@@ -37,7 +37,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
@@ -70,7 +69,7 @@ public class FreeTextQuestionViewTest {
 
     @After
     public void afterEachTest() {
-        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
+        installer.deleteResponses();
     }
 
     @AfterClass

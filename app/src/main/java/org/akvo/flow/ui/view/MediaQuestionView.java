@@ -74,13 +74,14 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
     @Inject
     Navigator navigator;
 
+    private final String mMediaType;
+    private final TimedLocationListener mLocationListener;
+
     private Button mMediaButton;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
     private View mDownloadBtn;
     private TextView mLocationInfo;
-    private String mMediaType;
-    private TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
 
@@ -349,7 +350,7 @@ public class MediaQuestionView extends QuestionView implements OnClickListener,
         }
 
         mLocationInfo.setVisibility(VISIBLE);
-        float[] location = ImageUtil.getLocation(filename);
+        double[] location = ImageUtil.getLocation(filename);
         if (location != null) {
             mLocationInfo.setText(R.string.image_location_saved);
         } else if (mLocationListener.isListening()) {

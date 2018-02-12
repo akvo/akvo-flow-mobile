@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,21 +18,11 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.data.database.cascade;
 
-import android.widget.ImageView;
-
-import java.io.File;
-
-public interface ImageLoader<T extends ImageTarget> {
-
-    void loadFromFile(File file, T target);
-
-    void loadFromFile(File file, ImageView imageView);
-
-    void loadVideoThumbnail(String filepath, ImageView imageView);
-
-    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
-
-    void clearImage(File imageFile);
+class NodeColumns {
+    static final String ID = "id";
+    static final String NAME = "name";
+    static final String CODE = "code";
+    static final String PARENT = "parent";
 }

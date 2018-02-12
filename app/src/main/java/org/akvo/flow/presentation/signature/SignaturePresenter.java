@@ -28,7 +28,7 @@ import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.files.SignatureFileBrowser;
 
 import java.io.File;
 import java.util.HashMap;
@@ -39,13 +39,13 @@ import javax.inject.Named;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.util.MediaFileHelper.ORIGINAL_SUFFIX;
-import static org.akvo.flow.util.MediaFileHelper.RESIZED_SUFFIX;
+import static org.akvo.flow.util.files.SignatureFileBrowser.ORIGINAL_SUFFIX;
+import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
 public class SignaturePresenter implements Presenter {
 
     private final UseCase saveImage;
-    private final MediaFileHelper mediaFileHelper;
+    private final SignatureFileBrowser signatureFileBrowser;
 
     private String questionId;
     private String datapointId;
@@ -53,9 +53,9 @@ public class SignaturePresenter implements Presenter {
 
     @Inject
     public SignaturePresenter(@Named("saveImage") UseCase saveImage,
-            MediaFileHelper mediaFileHelper) {
+            SignatureFileBrowser signatureFileBrowser) {
         this.saveImage = saveImage;
-        this.mediaFileHelper = mediaFileHelper;
+        this.signatureFileBrowser = signatureFileBrowser;
     }
 
     @Override
@@ -65,12 +65,12 @@ public class SignaturePresenter implements Presenter {
 
     @NonNull
     File getOriginalSignatureFile() {
-        return mediaFileHelper.getImageFile(ORIGINAL_SUFFIX, questionId, datapointId);
+        return signatureFileBrowser.getSignatureImageFile(ORIGINAL_SUFFIX, questionId, datapointId);
     }
 
     @NonNull
     private File getResizedSignatureFile() {
-        return mediaFileHelper.getImageFile(RESIZED_SUFFIX, questionId, datapointId);
+        return signatureFileBrowser.getSignatureImageFile(RESIZED_SUFFIX, questionId, datapointId);
     }
 
     public void setExtras(String questionId, String datapointId, String name) {

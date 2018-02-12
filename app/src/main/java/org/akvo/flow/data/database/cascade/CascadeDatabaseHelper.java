@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,21 +18,27 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.data.database.cascade;
 
-import android.widget.ImageView;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
-import java.io.File;
+public class CascadeDatabaseHelper extends SQLiteOpenHelper {
 
-public interface ImageLoader<T extends ImageTarget> {
+    private static final int VERSION = 1;
 
-    void loadFromFile(File file, T target);
+    public CascadeDatabaseHelper(Context context, String dbPath) {
+        super(context, dbPath, null, VERSION);
+    }
 
-    void loadFromFile(File file, ImageView imageView);
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        //EMPTY
+    }
 
-    void loadVideoThumbnail(String filepath, ImageView imageView);
-
-    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
-
-    void clearImage(File imageFile);
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //EMPTY
+    }
 }

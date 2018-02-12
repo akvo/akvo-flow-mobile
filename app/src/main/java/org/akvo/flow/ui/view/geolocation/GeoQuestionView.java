@@ -42,6 +42,7 @@ import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LocationValidator;
+import org.akvo.flow.util.PlatformUtil;
 
 import timber.log.Timber;
 
@@ -74,13 +75,17 @@ public class GeoQuestionView extends QuestionView
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mLocationListener = new TimedLocationListener(context, this, !q.isLocked());
+        mLocationListener = new TimedLocationListener(context, this, allowMockLocations(q));
         init();
+    }
+
+    private boolean allowMockLocations(Question q) {
+        return !q.isLocked() || PlatformUtil.isEmulator();
     }
 
     private void init() {
         setQuestionView(R.layout.geo_question_view);
-
+        setId(R.id.geo_question_view);
         mGeoButton = (Button) findViewById(R.id.geo_btn);
         geoLoading = findViewById(R.id.auto_geo_location_progress);
         geoInputContainer = (GeoInputContainer) findViewById(R.id.manual_geo_input_container);

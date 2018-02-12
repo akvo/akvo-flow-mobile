@@ -35,13 +35,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import io.reactivex.observers.DisposableObserver;
-
 public class PhotoQuestionPresenter implements Presenter {
 
     private final UseCase saveResizedImage;
     private final MediaFileHelper mediaFileHelper;
-    private PhotoQuestionView view;
+    private IPhotoQuestionView view;
 
     @Inject
     public PhotoQuestionPresenter(@Named("saveResizedImage") UseCase saveResizedImage,
@@ -50,7 +48,7 @@ public class PhotoQuestionPresenter implements Presenter {
         this.mediaFileHelper = mediaFileHelper;
     }
 
-    public void setView(PhotoQuestionView view) {
+    public void setView(IPhotoQuestionView view) {
         this.view = view;
     }
 

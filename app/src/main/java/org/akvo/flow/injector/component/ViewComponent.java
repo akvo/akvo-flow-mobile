@@ -38,7 +38,7 @@ import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CascadeQuestionView;
-import org.akvo.flow.ui.view.media.PhotoQuestionViewImpl;
+import org.akvo.flow.ui.view.media.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.VideoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 
@@ -76,7 +76,7 @@ public interface ViewComponent {
 
     void inject(AddUserActivity addUserActivity);
 
-    void inject(PhotoQuestionViewImpl photoQuestionViewImpl);
+    void inject(PhotoQuestionView photoQuestionViewImpl);
 
     void inject(VideoQuestionView videoQuestionView);
 

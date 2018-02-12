@@ -35,6 +35,8 @@ import org.akvo.flow.util.ConstantUtil;
  */
 public class SyncDataReceiver extends BroadcastReceiver {
 
+    public static final String CONNECTIVITY_ACTION = "android.net.conn.CONNECTIVITY_CHANGE";
+
     public void onReceive(Context context, Intent intent) {
         if (isIntentActionExpected(intent.getAction())) {
             context.startService(new Intent(context, DataSyncService.class));
@@ -46,6 +48,6 @@ public class SyncDataReceiver extends BroadcastReceiver {
      */
     private boolean isIntentActionExpected(String action) {
         return ConstantUtil.DATA_AVAILABLE_INTENT.equals(action)
-                || "android.net.conn.CONNECTIVITY_CHANGE".equals(action);
+                || CONNECTIVITY_ACTION.equals(action);
     }
 }

@@ -23,9 +23,11 @@ package org.akvo.flow.activity.form;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
 import org.akvo.flow.R;
@@ -44,8 +46,6 @@ import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsInstanceOf;
-
-import java.io.IOException;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -101,15 +101,15 @@ public class FormActivityTestUtil {
     }
 
     public static void clickNext() {
-        onView(withId(R.id.next_btn)).perform(click());
+        onView(withId(R.id.next_btn)).perform(scrollTo()).perform(click());
     }
 
-    public static void fillFreeTextQuestion(String text) throws IOException {
+    public static void fillFreeTextQuestion(String text) {
         onView(withId(R.id.input_et)).perform(typeText(text));
         Espresso.closeSoftKeyboard();
     }
 
-    public static void addExecutionDelay(int millis) {
+    public static void addExecutionDelay(long millis) {
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
@@ -142,13 +142,13 @@ public class FormActivityTestUtil {
         return questionHeader;
     }
 
-    public static ViewInteraction findQuestionTitle(String questionText) {
+    private static ViewInteraction findQuestionTitle(String questionText) {
         return onView(allOf(withId(R.id.question_tv), withText(questionText),
                 childAtPosition(linearLayoutChild(0), 0)));
     }
 
     @NonNull
-    public static Matcher<View> linearLayoutChild(int position) {
+    private static Matcher<View> linearLayoutChild(int position) {
         return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                 position);
     }
@@ -277,5 +277,19 @@ public class FormActivityTestUtil {
         }
         return onView(allOf(childAtPosition(linearLayoutChild(1), childPosition),
                 withText(option.getText())));
+    }
+
+    @NonNull
+    public static String getString(@StringRes int stringResId,
+            ActivityTestRule<FormActivity> rule, String param) {
+        return rule.getActivity().getApplicationContext().getResources()
+                .getString(stringResId, param);
+    }
+
+    @NonNull
+    public static String getString(@StringRes int stringResId,
+            ActivityTestRule<FormActivity> rule) {
+        return rule.getActivity().getApplicationContext().getResources()
+                .getString(stringResId);
     }
 }

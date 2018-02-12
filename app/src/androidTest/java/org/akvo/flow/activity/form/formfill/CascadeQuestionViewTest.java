@@ -28,6 +28,7 @@ import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.SparseArray;
+import android.widget.AdapterView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -38,6 +39,9 @@ import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -53,18 +57,18 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
-import static org.akvo.flow.activity.Constants.TEST_FORM_SURVEY_INSTANCE_ID;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
 import static org.akvo.flow.tests.R.raw.cascade_form;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.IsAnything.anything;
+import static org.hamcrest.core.IsNot.not;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -73,7 +77,7 @@ public class CascadeQuestionViewTest {
     private static SurveyInstaller installer;
     private static Survey survey;
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -94,7 +98,7 @@ public class CascadeQuestionViewTest {
 
     @After
     public void afterEachTest() {
-        installer.deleteResponses(TEST_FORM_SURVEY_INSTANCE_ID);
+        installer.deleteResponses();
     }
 
     @AfterClass
@@ -125,7 +129,7 @@ public class CascadeQuestionViewTest {
                 Node node = levelNodes.get(position);
                 levelNodes = cascadeNodes.get((int) node.getId());
 
-                selectSpinnerItem(cascadeLevelSpinner, position);
+                selectSpinnerItem(cascadeLevelSpinner, node);
 
                 verifyCascadeNewState(cascadeLevelSpinner, node);
             }
@@ -138,13 +142,32 @@ public class CascadeQuestionViewTest {
         cascadeLevelSpinner.check(matches(withSpinnerText(R.string.select)));
     }
 
-    private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, int position) {
+    private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, Node node) {
         cascadeLevelSpinner.perform(click());
-        onData(anything()).atPosition(position + 1).perform(click());
+        addExecutionDelay(100);
+        onData(withNode(node))
+                .inAdapterView(allOf(
+                        isAssignableFrom(AdapterView.class),
+                        not(is(withId(R.id.submit_tab)))))
+                .perform(click());
         addExecutionDelay(100);
     }
 
     private void verifyCascadeNewState(ViewInteraction cascadeLevelSpinner, Node node) {
         cascadeLevelSpinner.check(matches(withSpinnerText(node.getName())));
+    }
+
+    public static Matcher<Node> withNode(final Node nodeToMatch) {
+        return new TypeSafeMatcher<Node>() {
+            @Override
+            public boolean matchesSafely(Node node) {
+                return nodeToMatch.equals(node);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("matches with Node   ");
+            }
+        };
     }
 }

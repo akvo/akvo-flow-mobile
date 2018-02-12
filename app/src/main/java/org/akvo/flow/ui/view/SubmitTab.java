@@ -45,7 +45,7 @@ public class SubmitTab extends ListView implements OnClickListener {
 
     public SubmitTab(Context context, SurveyListener listener) {
         super(context);
-
+        setId(R.id.submit_tab);
         mListener = listener;
 
         mHeaderView = new TextView(context);

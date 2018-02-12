@@ -543,10 +543,14 @@ public class SurveyDbAdapter {
      */
     public void clearCollectedData() {
         executeSql("DELETE FROM " + Tables.SYNC_TIME);
-        executeSql("DELETE FROM " + Tables.RESPONSE);
+        deleteAllResponses();
         executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE);
         executeSql("DELETE FROM " + Tables.RECORD);
         executeSql("DELETE FROM " + Tables.TRANSMISSION);
+    }
+
+    public void deleteAllResponses() {
+        executeSql("DELETE FROM " + Tables.RESPONSE);
     }
 
     /**

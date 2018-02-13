@@ -37,6 +37,7 @@ import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.media.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.VideoQuestionView;
@@ -85,4 +86,6 @@ public interface ViewComponent {
     void inject(CascadeQuestionView cascadeQuestionView);
 
     void inject(SignatureQuestionView signatureQuestionView);
+
+    void inject(CaddisflyQuestionView caddisflyQuestionView);
 }

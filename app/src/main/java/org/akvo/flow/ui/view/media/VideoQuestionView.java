@@ -43,6 +43,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;
 import org.akvo.flow.util.image.PicassoImageLoader;
@@ -67,6 +68,9 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    MediaFileHelper mediaFileHelper;
 
     @BindView(R.id.media_btn)
     Button mMediaButton;
@@ -181,7 +185,7 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
             // Looks like the image is not present in the filesystem (i.e. remote URL)
             // Update response, matching the local path. Note: In the future, media responses should
             // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
-            file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
+            file = mediaFileHelper.getMediaFile(file.getName());
             filename = file.getAbsolutePath();
             captureResponse();
         }

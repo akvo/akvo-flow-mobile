@@ -27,6 +27,7 @@ import android.widget.Toast;
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.FileUtil.FileType;
@@ -146,11 +147,12 @@ public class ClearDataAsyncTask extends AsyncTask<Boolean, Void, Boolean> {
             }
             ZipFileBrowser zipFileBrowser = new ZipFileBrowser(fileBrowser, context);
             List<File> files = zipFileBrowser.findAllPossibleFolders();
+
+            MediaFileHelper mediaFileHelper = new MediaFileHelper(context, fileBrowser);
+            files.addAll(mediaFileHelper.findAllPossibleFolders());
             for (File file : files) {
                 FileUtil.deleteFilesInDirectory(file, true);
             }
-            // Delete exported zip/image files
-            FileUtil.deleteFilesInDirectory(FileUtil.getFilesDir(FileType.MEDIA), true);
         }
     }
 }

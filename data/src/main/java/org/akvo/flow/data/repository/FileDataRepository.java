@@ -44,4 +44,9 @@ public class FileDataRepository implements FileRepository {
         return dataSourceFactory.getImageDataSource()
                 .saveImages(bitmap, originalFilePath, resizedFilePath);
     }
+
+    @Override
+    public Observable<Boolean> saveResizedImage(String originalImagePath, String resizedImagePath, int imageSize) {
+        return dataSourceFactory.getImageDataSource().saveResizedImage(originalImagePath, resizedImagePath, imageSize);
+    }
 }

@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
@@ -44,6 +45,7 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -345,6 +347,10 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     protected void notifyQuestionListeners(String type) {
         notifyQuestionListeners(type, null);
+    }
+
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
     /**

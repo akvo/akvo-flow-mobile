@@ -27,4 +27,6 @@ import io.reactivex.Observable;
 public interface FileRepository {
 
     Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
+
+    Observable<Boolean> saveResizedImage(String fileName, String resizedFilePath, int imageSize);
 }

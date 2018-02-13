@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,21 +18,13 @@
  *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.ui.view.media;
 
-import android.widget.ImageView;
+public interface IPhotoQuestionView {
 
-import java.io.File;
+    void showLoading();
 
-public interface ImageLoader<T extends ImageTarget> {
+    void displayImage(String mediaFilePath);
 
-    void loadFromFile(File file, T target);
-
-    void loadFromFile(File file, ImageView imageView);
-
-    void loadVideoThumbnail(String filepath, ImageView imageView, ImageLoaderListener listener);
-
-    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
-
-    void clearImage(File imageFile);
+    void showErrorGettingMedia();
 }

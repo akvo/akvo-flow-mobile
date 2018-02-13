@@ -30,7 +30,7 @@ public interface ImageLoader<T extends ImageTarget> {
 
     void loadFromFile(File file, ImageView imageView);
 
-    void loadVideoThumbnail(String filepath, ImageView imageView);
+    void loadVideoThumbnail(String filepath, ImageView imageView, ImageLoaderListener listener);
 
     void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
 

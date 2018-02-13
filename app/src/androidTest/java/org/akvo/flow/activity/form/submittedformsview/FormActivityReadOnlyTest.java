@@ -49,7 +49,7 @@ import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
-import org.akvo.flow.ui.view.MediaQuestionView;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewReadOnly;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
@@ -345,7 +345,7 @@ public class FormActivityReadOnlyTest {
         if (!TextUtils.isEmpty(questionValue)) {
             ViewInteraction downloadButton = onView(
                     allOf(withId(R.id.media_download),
-                            withQuestionViewParent(question, MediaQuestionView.class)))
+                            withQuestionViewParent(question, QuestionView.class)))
                     .perform(scrollTo());
             downloadButton.check(matches(allOf(isDisplayed(), isEnabled())));
         }

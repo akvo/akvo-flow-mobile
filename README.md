@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4734a039c271422599b8592b5af4be1e)](https://app.codacy.com/app/valllllll2000/akvo-flow-mobile?utm_source=github.com&utm_medium=referral&utm_content=akvo/akvo-flow-mobile&utm_campaign=badger)
 # Akvo Flow app [![Build Status](https://travis-ci.org/akvo/akvo-flow-mobile.svg?branch=develop)](https://travis-ci.org/akvo/akvo-flow-mobile)
 The Akvo Flow app is the mobile application for the [Akvo Flow data collection tool](https://github.com/akvo/akvo-flow).
 

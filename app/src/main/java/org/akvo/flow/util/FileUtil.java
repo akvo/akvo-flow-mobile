@@ -37,7 +37,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -210,13 +209,6 @@ public class FileUtil {
     }
 
     /**
-     * Compute MD5 checksum of the given path's file
-     */
-    private static byte[] getMD5Checksum(String path) {
-        return getMD5Checksum(new File(path));
-    }
-
-    /**
      * Compute MD5 checksum of the given file
      */
     public static byte[] getMD5Checksum(File file) {
@@ -256,23 +248,6 @@ public class FileUtil {
 
     public static String hexMd5(File file) {
         return hexMd5(getMD5Checksum(file));
-    }
-
-    /**
-     * Compare to files to determine if their content is the same. To state that
-     * the two of them are the same, the MD5 checksum will be compared. Note
-     * that if any of the files does not exist, or if its checksum cannot be
-     * computed, false will be returned.
-     *
-     * @param path1 Absolute path to the first file
-     * @param path2 Absolute path to the second file
-     * @return true if their MD5 checksum is the same, false otherwise.
-     */
-    static boolean compareFilesChecksum(String path1, String path2) {
-        final byte[] checksum1 = getMD5Checksum(path1);
-        final byte[] checksum2 = getMD5Checksum(path2);
-
-        return Arrays.equals(checksum1, checksum2);
     }
 
     /**

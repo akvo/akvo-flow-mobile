@@ -57,6 +57,8 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
@@ -111,8 +113,13 @@ public class Navigator {
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
         Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
-        activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
+        if (i.resolveActivity(activity.getPackageManager()) != null) {
+            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
+            activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
+        } else {
+            Timber.e(new Exception("No app found to take pictures"));
+            //TODO: notify user
+        }
     }
 
     public void navigateToTakeVideo(@NonNull Activity activity, Uri uri) {

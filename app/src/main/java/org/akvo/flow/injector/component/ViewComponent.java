@@ -76,7 +76,7 @@ public interface ViewComponent {
 
     void inject(AddUserActivity addUserActivity);
 
-    void inject(PhotoQuestionView photoQuestionView);
+    void inject(PhotoQuestionView photoQuestionViewImpl);
 
     void inject(VideoQuestionView videoQuestionView);
 

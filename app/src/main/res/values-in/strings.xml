@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default"> Akurasi: Tidak diketahui</string>
   <string name="geo_location_accuracy"> Akurasi: %1$sm</string>
   <string name="nocardspacetitle">Media Penyimpanan Penuh</string>
@@ -15,7 +15,6 @@
   <string name="submitbutton">Kirim</string>
   <string name="geodialog"> Mohon nyalakan pengaturan lokasi</string>
   <string name="settings"> Pengaturan</string>
-  <string name="preferences_settings_section">Pengaturan</string>
   <string name="aboutlabel">Tentang</string>
   <string name="nogpsstatus">Aplikasi GPS Status belum terpasang dalam perangkat ini. Mohon pasang melalui Google Play Store</string>
   <string name="otherinstructions">Silakan beri keterangan singkat.</string>

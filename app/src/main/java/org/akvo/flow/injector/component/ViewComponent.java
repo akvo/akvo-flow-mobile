@@ -39,6 +39,7 @@ import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.MediaQuestionView;
+import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 
 import dagger.Component;
 
@@ -76,7 +77,9 @@ public interface ViewComponent {
 
     void inject(MediaQuestionView mediaQuestionView);
 
+    void inject(AppUpdateActivity appUpdateActivity);
+
     void inject(CascadeQuestionView cascadeQuestionView);
 
-    void inject(AppUpdateActivity appUpdateActivity);
+    void inject(SignatureQuestionView signatureQuestionView);
 }

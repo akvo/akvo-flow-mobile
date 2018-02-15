@@ -20,13 +20,9 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.support.media.ExifInterface;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import org.akvo.flow.app.FlowApp;
 
@@ -60,7 +56,6 @@ public class FileUtil {
     private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
 
     // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/forms)
-
     private static final String DIR_TMP = "tmp"; // Temporary files
 
     private static final int BUFFER_SIZE = 2048;
@@ -80,7 +75,6 @@ public class FileUtil {
      * @param type FileType to determine the type of resource attempting to use.
      * @return File representing the root directory for the given FileType.
      */
-    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
@@ -99,6 +93,7 @@ public class FileUtil {
         }
         File dir = new File(path);
         if (!dir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             dir.mkdirs();
         }
         return dir;
@@ -264,38 +259,6 @@ public class FileUtil {
     }
 
     /**
-     * Compare to images to determine if their content is the same. To state
-     * that the two of them are the same, the datetime contained in their exif
-     * metadata will be compared. If the exif does not contain a datetime, the
-     * MD5 checksum of the images will be compared.
-     *
-     * @param image1 Absolute path to the first image
-     * @param image2 Absolute path to the second image
-     * @return true if their datetime is the same, false otherwise
-     */
-    private static boolean compareImages(String image1, String image2) {
-        boolean equals = false;
-        try {
-            ExifInterface exif1 = new ExifInterface(image1);
-            ExifInterface exif2 = new ExifInterface(image2);
-
-            final String datetime1 = exif1.getAttribute(ExifInterface.TAG_DATETIME);
-            final String datetime2 = exif2.getAttribute(ExifInterface.TAG_DATETIME);
-
-            if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime1)) {
-                equals = datetime1.equals(datetime2);
-            } else {
-                Timber.d("Datetime is null or empty. The MD5 checksum will be compared");
-                equals = compareFilesChecksum(image1, image2);
-            }
-        } catch (IOException e) {
-            Timber.e(e.getMessage());
-        }
-
-        return equals;
-    }
-
-    /**
      * Compare to files to determine if their content is the same. To state that
      * the two of them are the same, the MD5 checksum will be compared. Note
      * that if any of the files does not exist, or if its checksum cannot be
@@ -305,55 +268,11 @@ public class FileUtil {
      * @param path2 Absolute path to the second file
      * @return true if their MD5 checksum is the same, false otherwise.
      */
-    private static boolean compareFilesChecksum(String path1, String path2) {
+    static boolean compareFilesChecksum(String path1, String path2) {
         final byte[] checksum1 = getMD5Checksum(path1);
         final byte[] checksum2 = getMD5Checksum(path2);
 
         return Arrays.equals(checksum1, checksum2);
-    }
-
-    /**
-     * Some manufacturers will duplicate the image saving a copy in the DCIM
-     * folder. This method will try to spot those situations and remove the
-     * duplicated image.
-     *
-     * @param context  Context
-     * @param filepath The absolute path to the original image
-     */
-    public static void cleanDCIM(Context context, String filepath) {
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] {
-                        MediaStore.Images.ImageColumns.DATA,
-                        MediaStore.Images.ImageColumns.DATE_TAKEN
-                },
-                null,
-                null,
-                MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
-        );
-
-        if (cursor.moveToFirst()) {
-            final String lastImagePath = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-
-            if ((!filepath.equals(lastImagePath))
-                    && (FileUtil.compareImages(filepath, lastImagePath))) {
-                final int result = context.getContentResolver().delete(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        MediaStore.Images.ImageColumns.DATA + " = ?",
-                        new String[] {
-                                lastImagePath
-                        });
-
-                if (result == 1) {
-                    Timber.i("Duplicated file successfully removed: " + lastImagePath);
-                } else {
-                    Timber.e("Error removing duplicated image:" + lastImagePath);
-                }
-            }
-        }
-
-        cursor.close();
     }
 
     /**

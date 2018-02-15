@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default">अज्ञात जि .पि .एस्. शुद्धत्ता</string>
   <string name="geo_location_accuracy">जि .पि .एस्. शुद्धत्ता: %1$sमिटर</string>
   <string name="nocardspacetitle">डाटाको ठाउँ छैन</string>
@@ -15,7 +15,6 @@
   <string name="submitbutton">बुझाउनुहोस्।</string>
   <string name="geodialog">स्थान सेटिङलाई समर्थ बनाउनुहोस्</string>
   <string name="settings">सेटिङहरु</string>
-  <string name="preferences_settings_section">सेटिङहरु</string>
   <string name="aboutlabel">हाम्रो बारेमा</string>
   <string name="nogpsstatus">GPS Status राखिएको छैन। कृपया गुगलको Play Store मा गएर डाउन्लोड ग रि राख्नु होला।</string>
   <string name="otherinstructions">कृपया वर्णन लेख्नुहोस्।</string>

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default">Précision: inconnue</string>
   <string name="geo_location_accuracy">Précision: %1$s m</string>
   <string name="nocardspacetitle">Stockage disponible insuffisant</string>
@@ -15,7 +15,7 @@
   <string name="submitbutton">Envoyer</string>
   <string name="geodialog">Veuillez autoriser l\'accès aux données de localisation</string>
   <string name="settings">Paramètres</string>
-  <string name="preferences_settings_section">Settings </string>
+  <string name="preferences_general_section">Paramètres généraux</string>
   <string name="aboutlabel">A propos</string>
   <string name="nogpsstatus">GPS Status n\'est pas installée sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
   <string name="otherinstructions">Veuillez entrer une description</string>
@@ -157,6 +157,7 @@
   <string name="status_submitted">Envoyé</string>
   <string name="status_exported">Exporté</string>
   <!--APK update-->
+  <string name="app_update_activity">Mise à jour de Akvo Flow</string>
   <string name="update">Mise à jour</string>
   <string name="not_now">Pas maintenant</string>
   <string name="clicktoinstall">La mise à jour a été téléchargée. Voulez-vous l\'installer maintenant?</string>
@@ -267,4 +268,7 @@
   <string name="data_points_sync_no_data_points">Aucun enregistrement à synchroniser</string>
   <string name="app_update_dialog_title">Une nouvelle version de Flow est disponible</string>
   <string name="app_update_dialog_subtitle">Effectuez la mise à jour afin de tirer le meilleur parti de votre application Flow</string>
+  <string name="error_getting_media">Erreur d\'obtention de fichiers media, veuillez réessayer.</string>
+  <string name="geo_fields_update_title">Mettre à jour les coordonnées GPS?</string>
+  <string name="cascade_error_message">Erreur de téléchargement des resources de cascade: %1$s</string>
 </resources>

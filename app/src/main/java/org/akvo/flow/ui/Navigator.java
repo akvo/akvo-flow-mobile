@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
@@ -310,7 +311,11 @@ public class Navigator {
 
     public void navigateToVideoView(Context context, String filename) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
+//        Uri data = Uri.fromFile(new File(filename));
+        Uri data = FileProvider
+                .getUriForFile(context, "org.akvo.flow.fileprovider", new File(filename));
+        intent.setDataAndType(data, "video/mp4");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(intent);
     }
 

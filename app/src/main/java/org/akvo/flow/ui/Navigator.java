@@ -311,10 +311,9 @@ public class Navigator {
 
     public void navigateToVideoView(Context context, String filename) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-//        Uri data = Uri.fromFile(new File(filename));
-        Uri data = FileProvider
+        Uri fileUri = FileProvider
                 .getUriForFile(context, "org.akvo.flow.fileprovider", new File(filename));
-        intent.setDataAndType(data, "video/mp4");
+        intent.setDataAndType(fileUri, "video/mp4");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(intent);
     }

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="nocardspacetitle">जगह नहीं है </string>
   <string name="lowcardspacetitle">कम जगह है </string>
   <string name="nocardspacedialog">SD कार्ड पूरी तरह भर चूका है, अधिक डेटा एकत्रित करने के लिए कार्ड में जगह नहीं है | आगे बढ़ने के लिए, SD कार्ड पर जगह बनाएं ।</string>

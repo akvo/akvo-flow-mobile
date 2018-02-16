@@ -1,5 +1,19 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.5
+Date: 15 February 2018
+
+# New and noteworthy
+* **Pull latest strings for the app** - [#1013](https://github.com/akvo/akvo-flow-mobile/issues/1013) Updated strings for French, Spanish and Portuguese.
+* **App settings changes** - [#994](https://github.com/akvo/akvo-flow-mobile/issues/994) Made the settings title and section more consistent.
+* **Flow app UI testing** - [#930](https://github.com/akvo/akvo-flow-mobile/issues/930) Added Flow ui app testing for the forms section.
+* **Add leak canary library to debug builds** - [#850](https://github.com/akvo/akvo-flow-mobile/issues/850) Added new tool to track memory leaks in debug builds.
+
+# Resolved issues
+* **Remove ScoringRule** - [#975](https://github.com/akvo/akvo-flow-mobile/issues/975) Removed unused class.
+* **Move signature temp files to internal storage** - [#970](https://github.com/akvo/akvo-flow-mobile/issues/970) Signature image files now secure in app private storage.
+
+---------------
 # ver 2.4.4
 Date: 25 January 2018
 

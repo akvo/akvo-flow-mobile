@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
 import org.akvo.flow.BuildConfig;
@@ -44,12 +45,15 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
+import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -280,5 +284,42 @@ public class Navigator {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse(BuildConfig.SERVER_BASE + "/" + "gps"));
         context.startActivity(browserIntent);
+    }
+
+    public void navigateToLargeImage(AppCompatActivity activity, String filename) {
+        if (activity != null) {
+            Intent intent = new Intent(activity, FullImageActivity.class);
+            intent.putExtra(ConstantUtil.IMAGE_URL_EXTRA, filename);
+            ActionBar supportActionBar = activity.getSupportActionBar();
+            if (supportActionBar != null) {
+                CharSequence title = supportActionBar.getTitle();
+                CharSequence subtitle = supportActionBar.getSubtitle();
+                intent.putExtra(ConstantUtil.FORM_TITLE_EXTRA, title);
+                intent.putExtra(ConstantUtil.FORM_SUBTITLE_EXTRA, subtitle);
+            }
+            activity.startActivity(intent);
+        }
+    }
+
+    public void navigateToVideoView(Context context, String filename) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
+        context.startActivity(intent);
+    }
+
+    /**
+     * Install the newest version of the app. This method will be called
+     * either after the file download is completed, or upon the app being started,
+     * if the newest version is found in the filesystem.
+     *
+     * @param context  Context
+     * @param filename Absolute path to the newer APK
+     */
+    public void installAppUpdate(Context context, String filename) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(filename)),
+                "application/vnd.android.package-archive");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 }

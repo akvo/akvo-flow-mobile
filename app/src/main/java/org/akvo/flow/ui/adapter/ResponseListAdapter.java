@@ -39,6 +39,8 @@ import java.util.Date;
 
 public class ResponseListAdapter extends CursorAdapter {
 
+    private static final String DEFAULT_USERNAME = "IMPORTER";
+
     private final int[] backgrounds = new int[2];
 
     public ResponseListAdapter(Context activityContext) {
@@ -77,11 +79,9 @@ public class ResponseListAdapter extends CursorAdapter {
 
         String username = cursor.getString(SurveyDbAdapter.FormInstanceQuery.SUBMITTER);
         if (TextUtils.isEmpty(username)) {
-            userView.setVisibility(View.GONE);
-        } else {
-            userView.setVisibility(View.VISIBLE);
-            userView.setText(username);
+            username = DEFAULT_USERNAME;
         }
+        userView.setText(username);
 
         // Format the date string
         Date date = new Date(displayDate);

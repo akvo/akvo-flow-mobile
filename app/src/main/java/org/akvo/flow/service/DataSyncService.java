@@ -533,7 +533,7 @@ public class DataSyncService extends IntentService {
             }
 
             final String objectKey = dir + fileName;
-            S3Api s3Api = new S3Api(this);
+            S3Api s3Api = new S3Api();
             ok = s3Api.put(objectKey, file, contentType, isPublic);
             if (!ok && retries > 0) {
                 // If we have not expired all the retry attempts, try again.

@@ -211,6 +211,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                         new MigrationLanguageMapper(context)));
         boolean nameResetNeeded = surveyId != null && surveyId
                 .equals(mSurveyGroup.getRegisterSurveyId());
+        db.open();
         if (nameResetNeeded) {
             db.clearSurveyedLocaleName(surveyInstanceId);
         }

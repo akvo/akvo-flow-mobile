@@ -5,7 +5,7 @@
     <include layout="@layout/question_header" />
 
     <android.support.v7.widget.RecyclerView
-            android:id="@+id/results_recycler_view"
+            android:id="@+id/caddisfly_results_recycler_view"
             android:scrollbars="none"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="4dp"
@@ -13,7 +13,7 @@
             android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/caddisfly_button"
         style="@style/button_primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

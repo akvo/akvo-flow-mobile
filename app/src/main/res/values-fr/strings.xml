@@ -15,7 +15,7 @@
   <string name="submitbutton">Envoyer</string>
   <string name="geodialog">Veuillez autoriser l\'accès aux données de localisation</string>
   <string name="settings">Paramètres</string>
-  <string name="preferences_settings_section">Settings </string>
+  <string name="preferences_general_section">Settings </string>
   <string name="aboutlabel">A propos</string>
   <string name="nogpsstatus">GPS Status n\'est pas installée sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
   <string name="otherinstructions">Veuillez entrer une description</string>
@@ -39,7 +39,6 @@
   <string name="langoption">Langues</string>
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
-  <string name="pleasewait">Veuillez attendre</string>
   <string name="preference_download_form_title">Télécharger le formulaire en utilisant l\'ID du formulaire</string>
   <string name="preference_download_form_subtitle">Faites-le seulenet si demandé</string>
   <string name="downloadsurveylabel">Téléchargement du formulaire</string>
@@ -78,14 +77,11 @@
   <string name="sync">Sync</string>
   <string name="sort">Trier</string>
   <string name="stats">Stats</string>
-  <string name="syncing_records">Synchronisation des enregistrements en cours...</string>
-  <string name="synced_records">%1$d enregistrements synchronisés</string>
-  <string name="sync_error">La synchronisation des enregistrements à échoué</string>
-  <string name="syncing_corrupted_data_points_error">Veuillez synchroniser de nouveau.</string>
-  <string name="network_error">Erreur de réseau</string>
+  <string name="data_points_sync_error_message_network">La synchronisation a échoué. Pas de connection.</string>
+  <string name="data_points_sync_error_message_assignment">La synchronisation a échoué. Affectation manquante.</string>
+  <string name="data_points_sync_error_message_default">La synchronisation a échoué.</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
-  <string name="error_assignment_text">Affectation requise sur le tableau de bord de Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_all">Formulaires synchronisés: %1$d - Echoués: %2$d</string>
   <string name="data_sync_synced">Formulaires synchronisés: %1$d</string>
@@ -94,7 +90,8 @@
   <!--Localization-->
   <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
-  <string name="no_datapoints_error_text">Vous n\'avez pas encore de points de données. Cliquer sur \'+\' pour ajouter un nouveau point de données.</string>
+  <string name="no_datapoints_error_text">Vous n\'avez pas encore de points de données</string>
+  <string name="no_search_results_error_text">Aucun résultat trouvé</string>
   <string name="no_survey_selected_text">Vous n\'avez pas de questionnaire sélectionné.</string>
   <!--ToolBar-->
   <string name="more">Plus</string>
@@ -117,10 +114,8 @@
   <string name="or">ou</string>
   <string name="capture_shape">capturer la surface</string>
   <string name="view_shape">voir la forme</string>
-  <string name="clear_point_title">Supprimer le point</string>
-  <string name="clear_point_text">Voulez vous effacer ce point?</string>
-  <string name="clear_feature_title">Supprimer cette fonction</string>
-  <string name="clear_feature_text">Voulez vous supprimer cette fonction?</string>
+  <string name="delete_point_title">Supprimer le point?</string>
+  <string name="delete_shape_title">Supprimer la surface?</string>
   <string name="repeat_group">Répéter le groupe</string>
   <string name="repetitions">Répétitions:</string>
   <string name="view_map">Voir carte.</string>
@@ -162,8 +157,6 @@
   <string name="status_submitted">Envoyé</string>
   <string name="status_exported">Exporté</string>
   <!--APK update-->
-  <string name="app_update_activity">Mise à jour de Akvo Flow</string>
-  <string name="app_update">Une mise à jour de Flow est disponible. Cliquez \"mettre à jour\" pour télécharger et installer la nouvelle version.</string>
   <string name="update">Mise à jour</string>
   <string name="not_now">Pas maintenant</string>
   <string name="clicktoinstall">La mise à jour a été téléchargée. Voulez-vous l\'installer maintenant?</string>
@@ -261,4 +254,17 @@
   <string name="preferences_section_information">Information</string>
   <string name="preference_identifier">Identifiant de l\'appareil</string>
   <string name="preference_instance_name">Nom de l\'instance</string>
+  <string name="data_points_sync_error_mobile_data_sync">La synchronisation via données mobiles est désactivée</string>
+  <string name="action_settings">Paramètres</string>
+  <string name="no_records_subtitle_monitored">Utilisez \'+\' pour capturer des données ou \'Syncronizer\' pour obtenir des données existantes</string>
+  <string name="no_records_subtitle_non_monitored">Utilisez \'+\' pour capturer des données.</string>
+  <!--Verify if this works for transifex-->
+  <plurals name="data_points_sync_success_message">
+    <item quantity="one">%1$d enregistrement synchronisé</item>
+    <item quantity="other">%1$d enregistrements synchronisés</item>
+  </plurals>
+  <string name="no_gps_status_message">GPS Status n\'est pas installé sur cet appareil. Voulez-vous l\'installer maintenant?</string>
+  <string name="data_points_sync_no_data_points">Aucun enregistrement à synchroniser</string>
+  <string name="app_update_dialog_title">Une nouvelle version de Flow est disponible</string>
+  <string name="app_update_dialog_subtitle">Effectuez la mise à jour afin de tirer le meilleur parti de votre application Flow</string>
 </resources>

@@ -38,13 +38,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-            </intent-filter>
-
-            <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable"/>
         </activity>
         <activity
                 android:name=".activity.RecordActivity"
@@ -65,7 +58,7 @@
                 android:configChanges="locale|layoutDirection"
                 android:label="@string/app_update_activity"
                 android:launchMode="singleTop"
-                android:theme="@style/Flow.Dialog"/>
+                android:theme="@style/Theme.AppCompat.Light.Dialog"/>
         <activity
                 android:name=".activity.TimeCheckActivity"
                 android:configChanges="locale|layoutDirection"
@@ -92,10 +85,25 @@
             </intent-filter>
         </service>
 
+        <service
+                android:name=".service.FileChangeTrackingService"
+                android:exported="true"
+                android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
+
         <receiver android:name=".broadcast.SyncDataReceiver">
             <intent-filter>
                 <action android:name="org.akvo.flow.DATA_SUBMITTED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".broadcast.BootStrapReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="org.akvo.flow.BOOTSTRAP_NEEDED"/>
             </intent-filter>
         </receiver>
 
@@ -106,31 +114,30 @@
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version"/>
 
-        <provider
-                android:name=".data.DataProvider"
-                android:authorities="org.akvo.flow"
-                android:label="@string/app_name"
-                android:syncable="true"
-                android:writePermission="org.akvo.flow.permission.WRITE_SCHEDULE"/>
-
         <activity
                 android:name=".presentation.AboutActivity"
-                android:configChanges="locale"
+                android:configChanges="locale|layoutDirection"
                 android:label="@string/about_activity_title">
         </activity>
         <activity
                 android:name=".presentation.help.HelpActivity"
-                android:configChanges="locale"
+                android:configChanges="locale|layoutDirection"
                 android:label="@string/help">
         </activity>
         <activity
                 android:name=".presentation.legal.LegalNoticesActivity"
-                android:configChanges="locale"
+                android:configChanges="locale|layoutDirection"
                 android:label="@string/licences_title">
         </activity>
         <activity
                 android:name=".presentation.settings.PreferenceActivity"
-                android:configChanges="locale">
+                android:configChanges="locale|layoutDirection"
+                android:label="@string/settings">
+        </activity>
+        <activity
+                android:name=".presentation.FullImageActivity"
+                android:label=""
+                android:configChanges="locale|layoutDirection">
         </activity>
     </application>
 

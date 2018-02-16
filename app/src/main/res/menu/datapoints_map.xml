@@ -12,9 +12,6 @@
         <menu>
 
             <item
-                    android:id="@+id/search"
-                    android:title="@string/search"/>
-            <item
                     android:id="@+id/stats"
                     android:title="@string/stats"/>
 

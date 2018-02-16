@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey
+        name="CascadeForm"
+        defaultLanguageCode="en"
+        version='2.0'
+        app="akvoflow-dev2"
+        surveyGroupId="155852013"
+        surveyGroupName="New survey"
+        surveyId="156792013">
+    <questionGroup>
+        <heading>group2</heading>
+        <question
+                order="1"
+                type="cascade"
+                cascadeResource=""
+                mandatory="false"
+                localeNameFlag="false"
+                id="153562014">
+            <levels>
+                <level>
+                    <text>1</text>
+                </level>
+                <level>
+                    <text>2</text>
+                </level>
+                <level>
+                    <text>3</text>
+                </level>
+                <level>
+                    <text>4</text>
+                </level>
+            </levels>
+            <text>cascade 2</text>
+        </question>
+    </questionGroup>
+</survey>

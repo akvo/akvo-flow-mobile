@@ -148,7 +148,7 @@ public class GeoInputContainer extends LinearLayout {
         elevationInput.addTextChangedListener(responseInputWatcher);
     }
 
-    void disableInputsFocusability() {
+    void disableManualInputs() {
         latitudeInput.setFocusable(false);
         latitudeInput.setEnabled(false);
         longitudeInput.setFocusable(false);
@@ -172,15 +172,16 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     private void resetChildViewsToDefaultValues() {
+        disableWatchers = true;
         statusIndicator.setText(R.string.geo_location_accuracy_default);
         latitudeInput.setText("");
         longitudeInput.setText("");
         elevationInput.setText("");
+        disableWatchers = false;
     }
 
     void displayCoordinates(@NonNull String latitude, @NonNull String longitude,
-            @Nullable String altitude,
-            float accuracy) {
+            @Nullable String altitude, float accuracy) {
         statusIndicator.setText(getContext()
                 .getString(R.string.geo_location_accuracy, accuracyFormat.format(accuracy)));
         displayCoordinates(latitude, longitude, altitude);

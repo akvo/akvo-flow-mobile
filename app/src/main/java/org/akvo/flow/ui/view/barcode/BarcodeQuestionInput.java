@@ -58,10 +58,10 @@ public abstract class BarcodeQuestionInput extends LinearLayout {
 
     private void init() {
         inflate(getContext(), R.layout.barcode_question_input, this);
-        this.barcodeEdit = (EditText) findViewById(R.id.input);
-        this.addButton = (ImageButton) findViewById(R.id.add_btn);
+        this.barcodeEdit = (EditText) findViewById(R.id.barcode_input);
+        this.addButton = (ImageButton) findViewById(R.id.barcode_add_btn);
         this.scanButton = (Button) findViewById(R.id.scan_btn);
-        this.manualInputSeparator = findViewById(R.id.manual_input_separator);
+        this.manualInputSeparator = findViewById(R.id.barcode_manual_input_separator);
     }
 
     void setBarcodeEditListener(BarcodeEditListener barcodeEditListener) {

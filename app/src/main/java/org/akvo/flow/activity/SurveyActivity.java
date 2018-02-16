@@ -55,12 +55,12 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.presentation.EditUserDialog;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
-import org.akvo.flow.presentation.navigation.FlowNavigation;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
@@ -72,6 +72,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -86,8 +87,7 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DatapointsFragment.DatapointFragmentListener,
-        FlowNavigation.DrawerNavigationListener,
+        FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener {
@@ -104,17 +104,16 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     FloatingActionButton addDataPointFab;
 
     @BindView(R.id.nav_view)
-    FlowNavigation navigationView;
+    FlowNavigationView navigationView;
 
     @Nullable
     private SurveyDbDataSource mDatabase;
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private Navigator navigator = new Navigator();
+    private final Navigator navigator = new Navigator();
     private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
-
     private long selectedSurveyId;
     private boolean activityJustCreated;
 
@@ -470,11 +469,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
                     Toast.LENGTH_LONG).show();
         }
-    }
-
-    @Override
-    public boolean onSearchTap() {
-        return onSearchRequested();
     }
 
     private void reloadDrawer() {

@@ -20,7 +20,6 @@ package org.akvo.flow.util;
 
 import android.graphics.Bitmap;
 import android.support.media.ExifInterface;
-import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;

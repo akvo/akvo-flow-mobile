@@ -28,6 +28,7 @@ import org.akvo.flow.util.ConstantUtil;
 public class QuestionResponse {
 
     public static final int NO_ITERATION = -1;
+    public static final int ONE_ITERATION = 0;
 
     private final String value;
     private final String type;
@@ -154,7 +155,7 @@ public class QuestionResponse {
      */
     public String getResponseKey() {
         String responseKey = getQuestionId();
-        if (getIteration() > QuestionResponse.NO_ITERATION) {
+        if (getIteration() > ONE_ITERATION) {
             responseKey = responseKey + "|" + getIteration();
         }
         return responseKey;
@@ -221,7 +222,8 @@ public class QuestionResponse {
         }
 
         @Nullable
-        public QuestionResponse createFromQuestionResponse(@Nullable QuestionResponse questionResponse,
+        public QuestionResponse createFromQuestionResponse(
+                @Nullable QuestionResponse questionResponse,
                 long id) {
             if (questionResponse == null) {
                 return null;
@@ -238,7 +240,8 @@ public class QuestionResponse {
         }
 
         @Nullable
-        public QuestionResponse createFromQuestionResponse(@Nullable QuestionResponse questionResponse,
+        public QuestionResponse createFromQuestionResponse(
+                @Nullable QuestionResponse questionResponse,
                 boolean includeFlag) {
             if (questionResponse == null) {
                 return null;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -134,6 +134,10 @@ public class ConstantUtil {
     public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
     public static final String RECORD_ID_EXTRA = "record_id";
     public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
+    public static final String IMAGE_URL_EXTRA = "image_url";
+    public static final String FORM_TITLE_EXTRA = "title";
+    public static final String FORM_SUBTITLE_EXTRA = "subtitle";
+    public static final String QUESTION_ID_EXTRA = "question_id";
     public static final String VIEW_USER_EXTRA = "view_user";
 
     /**
@@ -149,6 +153,7 @@ public class ConstantUtil {
      * intents
      */
     public static final String DATA_AVAILABLE_INTENT = "org.akvo.flow.DATA_SUBMITTED";
+    public static final String BOOTSTRAP_INTENT = "org.akvo.flow.BOOTSTRAP_NEEDED";
     public static final String GPS_STATUS_PACKAGE_V2 = "com.eclipsim.gpsstatus2";
     public static final String GPS_STATUS_PACKAGE_V1 = "com.eclipsim.gpsstatus";
     public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";

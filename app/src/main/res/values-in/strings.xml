@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+  <string name="geo_location_accuracy_default"> Akurasi: Tidak diketahui</string>
+  <string name="geo_location_accuracy"> Akurasi: %1$sm</string>
   <string name="nocardspacetitle">Media Penyimpanan Penuh</string>
   <string name="lowcardspacetitle">Media Penyimpanan Hampir Penuh</string>
   <string name="nocardspacedialog">Memori SD card penuh dan tidak bisa digunakan untuk menyimpan data. Untuk melanjutkan, hapus atau kosongi memori tersebut.</string>
@@ -11,6 +13,9 @@
   <string name="lon">Garis Bujur</string>
   <string name="elevation">Ketinggian</string>
   <string name="submitbutton">Kirim</string>
+  <string name="geodialog"> Mohon nyalakan pengaturan lokasi</string>
+  <string name="settings"> Pengaturan</string>
+  <string name="preferences_general_section">Pengaturan</string>
   <string name="aboutlabel">Tentang</string>
   <string name="nogpsstatus">Aplikasi GPS Status belum terpasang dalam perangkat ini. Mohon pasang melalui Google Play Store</string>
   <string name="otherinstructions">Silakan beri keterangan singkat.</string>
@@ -25,8 +30,6 @@
   <string name="toosmallerr">Nilai terlalu kecil. Nilai paling kecil:</string>
   <string name="toolargeerr">Nilai terlalu besar. Nilai paling besar:</string>
   <string name="baddatatypeerr">Jawaban harus numerik</string>
-  <string name="reloadsurveyslabel">Muat kembali semua survei</string>
-  <string name="reloadsurveysdesc">Hapus dan unduh kembali penugasan survei (jalankan jika diperintahkan)</string>
   <string name="conftitle">Silakan Konfirmasi</string>
   <string name="reloadconftext">Apakah Anda ingin menghapus dan mengunduh ulang survey?</string>
   <string name="submitcompletetitle">Survey telah terkirim</string>
@@ -34,7 +37,8 @@
   <string name="langoption">Bahasa</string>
   <string name="langmandatorytitle">Pilihan Invalid</string>
   <string name="langmandatorytext">Anda harus memilih sedikitnya satu bahasa</string>
-  <string name="pleasewait">Mohon tunggu</string>
+  <string name="preference_download_form_title"> Unduh Formulir menggunakan ID Formulir</string>
+  <string name="preference_download_form_subtitle">Hanya dijalankan jika mendapat instruksi</string>
   <string name="downloadsurveylabel">Mengunduh Formulir</string>
   <string name="downloadsurveyinstr">Masukkan identitas formulir yang ingin Anda unduh.</string>
   <string name="deletealldatawarning">Proses ini akan menghapus semua data (survei, respon, gambar, dan pengguna) di perangkat ini secara permanen. Data yang hilang tidak akan dapat dikembalikan. Klik OK untuk melanjutkan atau batal untuk membatalkan</string>
@@ -55,11 +59,13 @@
   <string name="bootstrapstart">Memuat data survei dari kartu Memori/SD card</string>
   <string name="bootstrapcomplete">Selesai memuat data dari kartu memori/SD card</string>
   <string name="bootstraperror">Ada kesalahan dalam memproses file zip bootsrap</string>
+  <string name="bootstrap_invalid_app">Kesalahan: Formulir tidak ditemukan di dalam Instansi Flow ini</string>
   <string name="transmissionhist">Riwayat Transmisi</string>
   <string name="transstartdate">Dimulai:</string>
   <string name="transenddate">Selesai:</string>
   <string name="resetalldesc">Menghapus semua suvey, respon (termasuk gambar dan file zip) dan pengguna, secara permanen</string>
   <string name="reset_responses_desc">Hapus semua survey respons (termasuk gambar dan file zip yang telah terekspor) secara permanen</string>
+  <string name="checksd"> Ketersediaan penyimpanan</string>
   <string name="sdmissing">Kartu memori hilang atau tidak terpasang. Pastikan Anda telah mematikan \"Menduplikat data USB\"</string>
   <string name="pickdate">Pilih Tanggal</string>
   <string name="pleasewaitforbootstrap">Mohon tunggu sampai file bootstrap selesai diproses.</string>
@@ -69,19 +75,18 @@
   <string name="sync">Sinkronisasi</string>
   <string name="sort">Sortir</string>
   <string name="stats">Statistik</string>
-  <string name="syncing_records">Sinkronisasi Data Point...</string>
-  <string name="synced_records">Menyinkronisasi %1$d Data Point</string>
-  <string name="sync_error">Sinkronisasi Data Point gagal</string>
-  <string name="network_error">Kesalahan Jaringan</string>
   <string name="prefill_title">Mengisi respons awal</string>
   <string name="prefill_text">Mengisi formulir dengan jawaban sebelumnya?</string>
-  <string name="error_assignment_text">Membutuhkan penugasan dalam dasbor Akvo Flow.</string>
   <!--Data sync-->
   <string name="data_sync_all">Sinkronisasi formulir: %1$d - Gagal: %2$d</string>
   <string name="data_sync_synced">Sinkronisasi Formulir: %1$d</string>
+  <string name="data_sync_error_form_deleted_title">Form terhapus</string>
+  <string name="data_sync_error_form_deleted_text">Form %1$s terhapus</string>
   <!--Localization-->
   <string name="please_restart">Mohon memulai ulang aplikasi</string>
   <!--Empty Views-->
+  <string name="no_datapoints_error_text">Anda belum mempunyai titik data.</string>
+  <string name="no_search_results_error_text">Ubah tanda tangan</string>
   <string name="no_survey_selected_text">Anda belum memilih Survei. Buka menu samping untuk memilih Survei.</string>
   <!--ToolBar-->
   <string name="more">Selanjutnya</string>
@@ -104,10 +109,6 @@
   <string name="or">atau</string>
   <string name="capture_shape">Rekam bentuk</string>
   <string name="view_shape">Tayangkan bentuk</string>
-  <string name="clear_point_title">Hapus titik</string>
-  <string name="clear_point_text">Apakah Anda ingin menghapus titik ini?</string>
-  <string name="clear_feature_title">Hapus fitur</string>
-  <string name="clear_feature_text">Apakah Anda ingin menghapus fitur ini?</string>
   <string name="repeat_group">Ulang grup</string>
   <string name="repetitions">Pengulangan:</string>
   <string name="view_map">Lihat peta</string>
@@ -148,9 +149,10 @@
   <string name="status_submitted">Terkirim</string>
   <string name="status_exported">Terekspor</string>
   <!--APK update-->
-  <string name="app_update_activity">Pembaruan Akvo Flow</string>
   <string name="update">Perbarui</string>
   <string name="not_now">Lain waktu</string>
+  <string name="clicktoinstall">Versi Flow terbaru sudah terunduh. Apakah Anda ingin memasangnya sekarang?</string>
+  <string name="apk_upgrade_error">Kesalahan dalam mengunduh Flow terbaru.</string>
   <!--Time check-->
   <string name="time_check_activity">Tanggal dan Waktu</string>
   <string name="time_warning">Pengaturan waktu pada perangkat Anda tidak akurat! Atur ulang waktunya dan coba lagi. Tanggal dan waktu di perangkat Anda adalah:</string>
@@ -158,9 +160,13 @@
   <!--Form sync-->
   <string name="downloading_forms">Mengunduh formulir</string>
   <string name="error_form_sync_title">Ada kesalahan dalam menyingkronisasi formulir</string>
+  <string name="error_assignment_read">Formulir penugasan tidak dapat terbaca oleh dasbor Flow.</string>
+  <string name="error_form_header">Formulir %1$s tidak dapat terbaca oleh dasbor Flow.</string>
   <string name="error_form_download">Pastikan formulir ini sudah diterbitkan, dan pengaturan waktu Anda sudah benar</string>
   <string name="form_deleted">Formulir tersebut telah dihapus</string>
   <!--File sync-->
+  <string name="sync_error_message">Mungkin telah terhapus.</string>
+  <string name="sync_error_title">Formulir %1$s tidak ada</string>
   <!--Plotting-->
   <string name="geoshape_area">Area</string>
   <string name="geoshape_line">Garis</string>
@@ -189,9 +195,58 @@
   <string name="clearbutton">Bersihkan</string>
   <string name="yes">Ya</string>
   <string name="no">Tidak</string>
-  <string name="action_retry">Coba kembali</string>
   <string name="delete">Hapus</string>
   <string name="drawer_open">Laci terbuka</string>
   <string name="drawer_close">Laci tertutup</string>
   <!--app update service-->
+  <string name="apk_update_service_no_update">Anda menjalankan versi terbaru aplikasi.</string>
+  <string name="apk_update_service_error_update">Ada kesalahan ketika memperbarui aplikasi. Mohon ulangi lagi.</string>
+  <string name="apk_update_service_error_no_internet">Ada kesalahan ketika memperbarui aplikasi. Anda tidak terhubung dengan internet.</string>
+  <string name="locale_list_error_unknown_location">Lokasi tidak diketahui.</string>
+  <string name="location_timeout">Tidak dapat mendapatkan lokasi.</string>
+  <string name="auto_geo_location_pending">Menunggu lokasi perangkat…</string>
+  <string name="invalid_latitude">Lintang tidak benar</string>
+  <string name="invalid_longitude">Bujur tidak benar</string>
+  <string name="invalid_elevation">Ketinggian tidak benar</string>
+  <string name="about_activity_title">Tentang</string>
+  <string name="about_view_title">Aplikasi Akvo Flow</string>
+  <string name="app_icon_description">Ikon Aplikasi</string>
+  <string name="about_view_subtitle">Mengambil kualitas data lebih baik, lebih cepat</string>
+  <string name="about_view_version">Versi %1$s</string>
+  <string name="about_view_copyright">Hak cipta © 2010-%1$s Stichting Akvo</string>
+  <string name="about_view_update">Periksa pembaharuan</string>
+  <string name="about_view_legal">Informasi hukum</string>
+  <string name="about_view_release_notes">Catatan rilis</string>
+  <string name="about_view_terms">Syarat penggunaan</string>
+  <string name="licences_title">Lisensi pihak ketiga</string>
+  <string name="licences_description">Perangkat lunak ini menggabungkan material dari proyek di bawah ini.</string>
+  <string name="apache_licence_title">Apache License 2.0</string>
+  <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
+  <string name="mit_licence_title">MIT License</string>
+  <string name="barcode_scanner_missing_error">Tidak ada aplikasi pemindai terpasang di perangkat ini. Apakah Anda ingin memasang nya sekarang?</string>
+  <string name="install">Pasang</string>
+  <string name="signature_name_hint">Mohon masukan nama Anda</string>
+  <string name="saving">Menyimpan..</string>
+  <string name="error_saving_signature">Kesalahan menyimpan tanda tangan, mohon ulangi kembali</string>
+  <string name="help">Bantuan</string>
+  <string name="error_loading_help">Kesalahan dalam memuat bantuan konten</string>
+  <string name="error_mobile_data_sync">Sinkronisasi data perangkat dimatikan</string>
+  <string name="preference_screen_on">Jaga layar agar tetap menyala selama mengisi formulir</string>
+  <string name="preference_mobile_data">Menyalakan penggunaan data perangkat</string>
+  <string name="preference_app_language">Bahasa aplikasi</string>
+  <string name="preference_image_size">Ukuran gambar</string>
+  <string name="preferences_data_section">Data</string>
+  <string name="preference_sync_datapoints">Kirim titik data yang terkumpul ke instansi Flow</string>
+  <string name="preference_delete_collected_data">Hapus data dan gambar yang telah terkumpul</string>
+  <string name="preference_delete_everything">Hapus semua</string>
+  <string name="preferences_configuration_section">Konfigurasi</string>
+  <string name="preference_gps">Perbaikan GPS</string>
+  <string name="preference_storage">Ketersediaan penyimpanan</string>
+  <string name="preferences_section_information">Informasi </string>
+  <string name="preference_identifier">Identitas Perangkat</string>
+  <string name="preference_instance_name">Nama instansi</string>
+  <string name="data_points_sync_error_mobile_data_sync">Sinkronisasi data perangkat dimatikan</string>
+  <string name="action_settings">Pengaturan</string>
+  <string name="no_records_subtitle_monitored">Tekan \'+\' untuk menambahkan titik data baru.</string>
+  <!--Verify if this works for transifex-->
 </resources>

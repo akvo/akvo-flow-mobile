@@ -58,6 +58,12 @@ public class SurveyDbAdapter {
             "survey LEFT OUTER JOIN survey_instance ON "
             + "survey.survey_id=survey_instance.survey_id";
 
+    public static final String[] RESPONSE_COLUMNS = {
+            ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
+            ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
+            ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
+    };
+
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
@@ -232,11 +238,7 @@ public class SurveyDbAdapter {
 
     public Cursor getResponses(long surveyInstanceId) {
         return database.query(Tables.RESPONSE,
-                new String[] {
-                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
-                },
+                RESPONSE_COLUMNS,
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) },
                 null, null, null);
@@ -251,11 +253,7 @@ public class SurveyDbAdapter {
      */
     public Cursor getResponse(Long surveyInstanceId, String questionId) {
         return database.query(Tables.RESPONSE,
-                new String[] {
-                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
-                },
+                RESPONSE_COLUMNS,
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                         + " =?",
                 new String[] { String.valueOf(surveyInstanceId), questionId },
@@ -264,11 +262,7 @@ public class SurveyDbAdapter {
 
     public Cursor getResponse(Long surveyInstanceId, String questionId, int iteration) {
         return database.query(Tables.RESPONSE,
-                new String[] {
-                        ResponseColumns._ID, ResponseColumns.QUESTION_ID, ResponseColumns.ANSWER,
-                        ResponseColumns.TYPE, ResponseColumns.SURVEY_INSTANCE_ID,
-                        ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
-                },
+                RESPONSE_COLUMNS,
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
                         + " =? AND " + "CAST(" + ResponseColumns.ITERATION + " as TEXT) = ? ",
                 new String[] { String.valueOf(surveyInstanceId), questionId,
@@ -549,10 +543,14 @@ public class SurveyDbAdapter {
      */
     public void clearCollectedData() {
         executeSql("DELETE FROM " + Tables.SYNC_TIME);
-        executeSql("DELETE FROM " + Tables.RESPONSE);
+        deleteAllResponses();
         executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE);
         executeSql("DELETE FROM " + Tables.RECORD);
         executeSql("DELETE FROM " + Tables.TRANSMISSION);
+    }
+
+    public void deleteAllResponses() {
+        executeSql("DELETE FROM " + Tables.RESPONSE);
     }
 
     /**
@@ -561,12 +559,12 @@ public class SurveyDbAdapter {
      * @param id
      */
     public void deleteUser(Long id) {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(UserColumns.DELETED, 1);
-            database.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
-                    new String[] {
-                            id.toString()
-                    });
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(UserColumns.DELETED, 1);
+        database.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
+                new String[] {
+                        id.toString()
+                });
     }
 
     public void addSurveyGroup(ContentValues values) {
@@ -643,15 +641,6 @@ public class SurveyDbAdapter {
                         SurveyColumns.HELP_DOWNLOADED, SurveyColumns.VERSION, SurveyColumns.LOCATION
                 },
                 whereClause, whereParams, null, null, null);
-    }
-
-    public void deleteSurveyGroup(long surveyGroupId) {
-        // First the group
-        database.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
-        // Now the surveys
-        database.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
-                new String[] { String.valueOf(surveyGroupId) });
     }
 
     /**

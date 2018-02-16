@@ -35,7 +35,7 @@
                 android:orientation="vertical">
 
             <TextView
-                    android:text="@string/preferences_settings_section"
+                    android:text="@string/preferences_general_section"
                     style="@style/PreferenceSectionTitleStyle"/>
 
             <android.support.v7.widget.SwitchCompat

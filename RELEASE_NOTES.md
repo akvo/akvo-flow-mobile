@@ -1,6 +1,33 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.4
+Date: 25 January 2018
 
+# New and noteworthy
+* **Pull latest strings for the app** - [#985](https://github.com/akvo/akvo-flow-mobile/issues/985) Translations for some languages have been updated.
+* **Confirm overwriting geolocation data** - [#981](https://github.com/akvo/akvo-flow-mobile/issues/981) Before overwriting existing gps data we will request user confirmation to prevent accidental deletions of location.
+* **Update copyright to 2018** - [#980](https://github.com/akvo/akvo-flow-mobile/issues/980) Copyright year has been updated to use current year generated at build time.
+* **View filled survey responses improvements** - [#949](https://github.com/akvo/akvo-flow-mobile/issues/949) Removed unnecessary buttons from read-only response viewing screen.
+
+# Resolved issues
+* **If Image or Video taking fails nothing is displayed** - [#972](https://github.com/akvo/akvo-flow-mobile/issues/972) Show an error message when image or video acquisition fails.
+* **Use app dedicated public storage for apk files** - [#968](https://github.com/akvo/akvo-flow-mobile/issues/968) APK files are now stored in app dedicated public storage.
+* **Form files seem to have been deleted from the device** - [#959](https://github.com/akvo/akvo-flow-mobile/issues/959) Form files are now stored inside app private storage (not accessible to other apps).
+* **Video file not found on sony experia** - [#612](https://github.com/akvo/akvo-flow-mobile/issues/612) Fixed error when on sometimes the video URI was not correct.
+
+---------------
+# ver 2.4.3
+Date: 14 December 2017
+
+# New and noteworthy
+* **login screen tests** - [#936](https://github.com/akvo/akvo-flow-mobile/issues/936) Added tests to the login screen.
+* **Improve copy for new update message** - [#903](https://github.com/akvo/akvo-flow-mobile/issues/903) The message inviting to update the app is now shorter and clearer.
+* **Update Sentry Android SDK** - [#789](https://github.com/akvo/akvo-flow-mobile/issues/789) Using the new sentry library to send error logs.
+
+# Resolved issues
+* **Improve upload-apk module** - [#946](https://github.com/akvo/akvo-flow-mobile/issues/946) The upload-sdk module has been improved.
+
+---------------
 # ver 2.4.2.1
 Date: 06 December 2017
 

@@ -22,47 +22,34 @@ package org.akvo.flow.util.image;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.util.Base64;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.File;
 
-public class PicassoImageLoader implements ImageLoader {
+public class PicassoImageLoader implements ImageLoader<PicassoImageTarget> {
 
     private final Picasso requestManager;
 
     public PicassoImageLoader(Context context) {
-        requestManager = Picasso.with(context);
+        requestManager = new Picasso.Builder(context)
+                .addRequestHandler(new VideoRequestHandler())
+                .addRequestHandler(new Base64RequestHandler())
+                .build();
     }
 
     public PicassoImageLoader(Activity activity) {
-        requestManager = Picasso.with(activity);
+        requestManager =  new Picasso.Builder(activity)
+                .addRequestHandler(new VideoRequestHandler())
+                .addRequestHandler(new Base64RequestHandler())
+                .build();
     }
 
     @Override
-    public void loadFromFile(File file, final ImageLoaderListener listener) {
-        requestManager.load(file).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                listener.onImageReady(bitmap);
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                //Ignore
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                //Ignore
-            }
-        });
+    public void loadFromFile(File file, PicassoImageTarget target) {
+        requestManager.load(file).into(target);
     }
 
     @Override
@@ -71,9 +58,30 @@ public class PicassoImageLoader implements ImageLoader {
     }
 
     @Override
-    public void loadFromBase64String(String image, ImageLoaderListener listener) {
-        byte[] decode = Base64.decode(image, Base64.DEFAULT);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
-        listener.onImageReady(bitmap);
+    public void loadVideoThumbnail(String filepath, ImageView imageView) {
+        requestManager.load(VideoRequestHandler.SCHEME_VIDEO + ":" + filepath).into(imageView);
+    }
+
+    @Override
+    public void loadFromBase64String(String image, ImageView imageView,
+            final ImageLoaderListener listener) {
+        requestManager.load(Base64RequestHandler.SCHEME_BASE64 + ":" + image).into(imageView,
+                new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        listener.onImageReady(null);
+                    }
+
+                    @Override
+                    public void onError() {
+                        //Empty
+                    }
+                });
+
+    }
+
+    @Override
+    public void clearImage(File imageFile) {
+        requestManager.invalidate(imageFile);
     }
 }

@@ -38,7 +38,6 @@ import org.akvo.flow.ui.adapter.CaddisflyResultsAdapter;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.MediaFileHelper;
 
 import java.io.File;

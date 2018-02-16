@@ -11,7 +11,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    <org.akvo.flow.presentation.navigation.FlowNavigation
+    <org.akvo.flow.presentation.navigation.FlowNavigationView
             android:id="@+id/nav_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -19,5 +19,5 @@
             app:headerLayout="@layout/drawer_header_layout"
             app:menu="@menu/drawer_menu"
             android:fitsSystemWindows="true">
-    </org.akvo.flow.presentation.navigation.FlowNavigation>
+    </org.akvo.flow.presentation.navigation.FlowNavigationView>
 </android.support.v4.widget.DrawerLayout>

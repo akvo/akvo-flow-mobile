@@ -2,17 +2,17 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:3.0.0'
         classpath 'io.sentry:sentry-android-gradle-plugin:1.5.3'
     }
 }
 
 ext {
     compileSdkVersion = 25
-    buildToolsVersion = "25.0.1"
     minSdkVersion = 10
     targetSdkVersion = 21
 }
@@ -21,6 +21,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url "https://jitpack.io" }
+        google()
     }
 }
 

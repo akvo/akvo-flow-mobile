@@ -15,7 +15,7 @@
   <string name="submitbutton">Dien in</string>
   <string name="geodialog">Schakel s.v.p. locatie instellingen in</string>
   <string name="settings">Instellingen</string>
-  <string name="preferences_settings_section">Instellingen</string>
+  <string name="preferences_general_section">Instellingen</string>
   <string name="aboutlabel">Over deze app</string>
   <string name="nogpsstatus">GPS Status is niet geinstalleerd op dit apparaat. Installeer het s.v.p. via de Google Play Store.</string>
   <string name="otherinstructions">Voeg s.v.p. een beschrijving toe</string>
@@ -30,8 +30,8 @@
   <string name="toosmallerr">Waarde is te klein. Minimum waarde:</string>
   <string name="toolargeerr">Waarde is te groot. Maximum waarde:</string>
   <string name="baddatatypeerr">Antwoorden moeten een numerieke waarde zijn</string>
-  <string name="reloadsurveyslabel">Opnieuw laden alle vragenlijsten</string>
-  <string name="reloadsurveysdesc">Verwijdert en downloadt toegewezen vragenlijsten opnieuw (voer alleen uit als u hier instructies voor ontvangen hebt)</string>
+  <string name="reloadsurveyslabel"> Herlaad alle surveys.</string>
+  <string name="reloadsurveysdesc"> Verwijdert en herlaadt alle toegewezen surveys (voer alleen uit als u daartoe instructies ontvangt).</string>
   <string name="conftitle">Bevestig s.v.p.</string>
   <string name="reloadconftext">Weet u zeker dat u alle vragenlijsten wil verwijderen en opnieuw downloaden?</string>
   <string name="submitcompletetitle">Vragenlijst ingediend</string>
@@ -39,7 +39,6 @@
   <string name="langoption">Talen</string>
   <string name="langmandatorytitle">Ongeldige selectie</string>
   <string name="langmandatorytext">U dient ten minste een taal te selecteren</string>
-  <string name="pleasewait">Wacht s.v.p.</string>
   <string name="preference_download_form_title">Download formulier met gebruik van formulier ID</string>
   <string name="preference_download_form_subtitle">Voer alleen uit als u hiertoe instructies ontvangt</string>
   <string name="downloadsurveylabel">Download formulier</string>
@@ -78,14 +77,11 @@
   <string name="sync">Synchroniseer </string>
   <string name="sort">Sorteer</string>
   <string name="stats">Statistieken</string>
-  <string name="syncing_records">Bezig met synchroniseren datapunten…</string>
-  <string name="synced_records">%1$d datapunten gesynchroniseerd</string>
-  <string name="sync_error">Synchronisatie data punten mislukt</string>
-  <string name="syncing_corrupted_data_points_error">Synchroniseer s.v.p. opnieuw</string>
-  <string name="network_error">Netwerkfout</string>
+  <string name="data_points_sync_error_message_network"> Synchronisatie mislukt. Geen verbinding.</string>
+  <string name="data_points_sync_error_message_assignment"> Synchronisatie mislukt. Toewijzing ontbreekt.</string>
+  <string name="data_points_sync_error_message_default"> Synchronisatie mislukt.</string>
   <string name="prefill_title">Vooraf invullen antwoorden</string>
   <string name="prefill_text">Vul het formulier in met eerder gegeven antwoorden?</string>
-  <string name="error_assignment_text">Flow dashboard toewijzing nodig</string>
   <!--Data sync-->
   <string name="data_sync_all">Gesynchroniseerde formulieren: %1$d - Mislukt: %2$d</string>
   <string name="data_sync_synced">Gesynchroniseerde formulieren: %1$d</string>
@@ -94,7 +90,8 @@
   <!--Localization-->
   <string name="please_restart">Herstart s.v.p. de app</string>
   <!--Empty Views-->
-  <string name="no_datapoints_error_text">U heeft nog geen datapunten. Klik \'+\' om een nieuw datapunt toe te voegen</string>
+  <string name="no_datapoints_error_text"> U heeft geen datapunten.</string>
+  <string name="no_search_results_error_text"> Geen resultaten gevonden.</string>
   <string name="no_survey_selected_text">U heeft nog geen vragenlijst geselecteerd. Open het zij-menu om een vragenlijst te selecteren.</string>
   <!--ToolBar-->
   <string name="more">Meer</string>
@@ -117,10 +114,8 @@
   <string name="or">of</string>
   <string name="capture_shape">Vorm vastleggen</string>
   <string name="view_shape">bekijk vorm</string>
-  <string name="clear_point_title">Verwijder punt</string>
-  <string name="clear_point_text">Wilt u dit punt verwijderen?</string>
-  <string name="clear_feature_title">Verwijder functie</string>
-  <string name="clear_feature_text">Wilt u deze functie verwijderen?</string>
+  <string name="delete_point_title">Verwijder punt?</string>
+  <string name="delete_shape_title">Verwijder vorm?</string>
   <string name="repeat_group">Herhaal groep</string>
   <string name="repetitions">Herhalingen:</string>
   <string name="view_map">Bekijk kaart</string>
@@ -162,8 +157,6 @@
   <string name="status_submitted">Ingediend</string>
   <string name="status_exported">Geexporteerd</string>
   <!--APK update-->
-  <string name="app_update_activity">Akvo Flow update</string>
-  <string name="app_update">Een nieuwe versie van de Flow app is beschikbaar. Klik \'update\' om de nieuwe versie te downloaden en installeren.</string>
   <string name="update">Update</string>
   <string name="not_now">Niet nu</string>
   <string name="clicktoinstall">Nieuwe versie Flow is gedownload. Wilt u deze nu installeren?</string>
@@ -261,4 +254,17 @@
   <string name="preferences_section_information">Informatie</string>
   <string name="preference_identifier">Identificatiecode van het apparaat</string>
   <string name="preference_instance_name">Naam van de instance</string>
+  <string name="data_points_sync_error_mobile_data_sync">Mobiele data synchronisatie uitgeschakeld.</string>
+  <string name="action_settings">Instellingen</string>
+  <string name="no_records_subtitle_monitored"> Gebruik \'+\" om data te verzamelen of \"synchroniseer\" om bestaande data te zien.</string>
+  <string name="no_records_subtitle_non_monitored"> Gebruik \'+\" om data te verzamelen.</string>
+  <!--Verify if this works for transifex-->
+  <plurals name="data_points_sync_success_message">
+    <item quantity="one">%1$d data punt gesynchroniseerd</item>
+    <item quantity="other">%1$d data punten gesynchroniseerd</item>
+  </plurals>
+  <string name="no_gps_status_message"> GPS status is niet geinstalleerd op dit apparaat. Wilt u het installeren?</string>
+  <string name="data_points_sync_no_data_points"> Geen datapunten om te synchroniseren.</string>
+  <string name="app_update_dialog_title"> Nieuwe versie van Flow beschikbaar.</string>
+  <string name="app_update_dialog_subtitle"> Update om het maximale uit uw Flow app te halen.</string>
 </resources>

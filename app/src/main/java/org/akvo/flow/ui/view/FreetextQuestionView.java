@@ -62,7 +62,6 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
 
     private void init() {
         setQuestionView(R.layout.freetext_question_view);
-
         mEditText = (EditText)findViewById(R.id.input_et);
         mDoubleEntryText = (EditText)findViewById(R.id.double_entry_et);
 
@@ -74,8 +73,8 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
         }
 
         if (isReadOnly()) {
-            mEditText.setFocusable(false);
-            mDoubleEntryText.setFocusable(false);
+            mEditText.setEnabled(false);
+            mDoubleEntryText.setEnabled(false);
         }
 
         int maxLength = ValidationRule.DEFAULT_MAX_LENGTH;

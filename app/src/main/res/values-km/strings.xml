@@ -25,8 +25,6 @@
   <string name="toosmallerr">តម្លៃតូចជ្រុល។ តម្លៃអប្បបរមាៈ  </string>
   <string name="toolargeerr">តម្លៃធំជ្រុល។ តម្លៃអតិបរមាៈ </string>
   <string name="baddatatypeerr">ចម្លើយត្រូវតែជាលេខ </string>
-  <string name="reloadsurveyslabel">ផ្ទុកការអង្កេតទាំងអស់ឡើងវិញ</string>
-  <string name="reloadsurveysdesc">លុប និងដោនឡូតការអង្កេតដែលបានកំណត់ឡើងវិញ (ប្រសិនបើមានការណែនាំតែប៉ុណ្ណោះ) </string>
   <string name="conftitle">សូមបញ្ជាក់ </string>
   <string name="reloadconftext">តើអ្នកប្រាកដទេថា អ្នកចង់ជម្រុះចោលការអង្កេត និងដោនឡូតវាឡើងវិញ?</string>
   <string name="submitcompletetitle">ការអង្កេតបានបញ្ជូនចេញរួច </string>
@@ -34,7 +32,6 @@
   <string name="langoption">ភាសា</string>
   <string name="langmandatorytitle">ការជ្រើសរើសមិនត្រឹមត្រូវ </string>
   <string name="langmandatorytext">អ្នកត្រូវជ្រើសរើសភាសាមួយ តិចបំផុត </string>
-  <string name="pleasewait">សូមរង់ចាំ </string>
   <string name="downloadsurveylabel">ដោនឡូតទម្រង់</string>
   <string name="downloadsurveyinstr">បញ្ចូលលេខសំគាល់របស់ទំរង់ដែលអ្នកចង់ដោនឡូត </string>
   <string name="deletealldatawarning">រាល់ទិន្នន័យទាំងអស់ (ការអង្កេត, ចម្លើយ, រូបភាព និងអ្នកប្រើប្រាស់) នឹងត្រូវលុបជាអចិន្ត្រៃយ៍ក្នុងឧបករណ៍នេះ។ ប្រតិបត្តិការនេះមិនអាចត្រឡប់ក្រោយវិញបានឡើយ។ ចុច OK ដើម្បីបន្ត ឬចុច Cancel ដើម្បីបញ្ឈប់។  </string>
@@ -69,13 +66,8 @@
   <string name="sync">ធ្វើឲ្យចេញដំណាលគ្នា</string>
   <string name="sort">ដាក់ទៅតាមប្រភេទ </string>
   <string name="stats">ស្ថានភាព </string>
-  <string name="syncing_records">កំពុងធ្វើឲ្យចំណុចទិន្នន័យនានាចេញដំណាលគ្នា...</string>
-  <string name="synced_records">បានធ្វើឲ្យចំណុចទិន្នន័យចេញដំណាលគ្នាចំនួន​ %1$d  </string>
-  <string name="sync_error">ការធ្វើឲ្យចំណុចទិន្នន័យចេញដំណាលគ្នា​ មិនសម្រេច </string>
-  <string name="network_error">កំហុសឆ្គងណិតវើក </string>
   <string name="prefill_title">បំពេញចម្លើយជាមុន </string>
   <string name="prefill_text">បំពេញទម្រង់ជាមុន ដោយប្រើចម្លើយលើកមុន?</string>
-  <string name="error_assignment_text">ត្រូវការ ការចាត់ចែងកិច្ចការ នៅក្នុងដាសបូតរបស់ Akvo Flow</string>
   <!--Data sync-->
   <string name="data_sync_all">ដាក់ទម្រង់ឲ្យចេញដំណាលគ្នាៈ %1$d - មិនសម្រេចៈ​ %2$d​ </string>
   <string name="data_sync_synced">បានដាក់ទំរង់ឲ្យចេញដំណាលគ្នា: %1$d </string>
@@ -104,10 +96,6 @@
   <string name="or">ឬ</string>
   <string name="capture_shape">ចាប់ទ្រង់ទ្រាយ </string>
   <string name="view_shape">មើលទ្រង់ទ្រាយ</string>
-  <string name="clear_point_title">លុបចំណុច </string>
-  <string name="clear_point_text">តើអ្នកចង់លុបចំណុចនេះឬទេ?</string>
-  <string name="clear_feature_title">លុបលក្ខណៈសណ្ឋាន </string>
-  <string name="clear_feature_text">តើអ្នកចង់លុបលក្ខណៈសណ្ឋាននេះឬទេ? </string>
   <string name="repeat_group">បន្ថែមមួយទៀត  </string>
   <string name="repetitions">ចំនួនសំណួរដែលបានឆ្លើយ</string>
   <string name="view_map">​មើលផែនទី </string>
@@ -148,7 +136,6 @@
   <string name="status_submitted">បានបញ្ជូនចេញ </string>
   <string name="status_exported">បាននាំចេញ </string>
   <!--APK update-->
-  <string name="app_update_activity">ធ្វើបច្ចុប្បន្នភាព Akvo Flow</string>
   <string name="update">ធ្វើបច្ចុប្បន្នភាព</string>
   <string name="not_now">មិនមែនពេលនេះទេ </string>
   <!--Time check-->
@@ -189,9 +176,9 @@
   <string name="clearbutton">លុបចេញ (Clear) </string>
   <string name="yes">បាទ/ចាស</string>
   <string name="no">ទេ</string>
-  <string name="action_retry">ព្យាយាមម្តងទៀត</string>
   <string name="delete">លុប (Delete) </string>
   <string name="drawer_open">ថត បើក</string>
   <string name="drawer_close">ថត បិទ </string>
   <!--app update service-->
+  <!--Verify if this works for transifex-->
 </resources>

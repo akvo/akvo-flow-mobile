@@ -96,24 +96,11 @@ public class SurveyDbDataSource {
         Cursor cursor = surveyDbAdapter.getResponses(surveyInstanceId);
 
         if (cursor != null) {
-            int idCol = cursor.getColumnIndexOrThrow(ResponseColumns._ID);
-            int answerCol = cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER);
-            int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
-            int qidCol = cursor.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
-            int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
-            int filenameCol = cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME);
-            int iterationCol = cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION);
             if (cursor.moveToFirst()) {
+                QuestionResponseColumns columns = new QuestionResponseColumns(cursor);
                 do {
-                    QuestionResponse response = new QuestionResponse.QuestionResponseBuilder()
-                            .setValue(cursor.getString(answerCol))
-                            .setType(cursor.getString(typeCol))
-                            .setId(cursor.getLong(idCol))
+                    QuestionResponse response = getQuestionResponseBuilder(cursor,columns)
                             .setSurveyInstanceId(surveyInstanceId)
-                            .setQuestionId(cursor.getString(qidCol))
-                            .setFilename(cursor.getString(filenameCol))
-                            .setIncludeFlag(cursor.getInt(includeCol) == 1)
-                            .setIteration(cursor.getInt(iterationCol))
                             .createQuestionResponse();
                     responses.put(response.getResponseKey(), response);
                 } while (cursor.moveToNext());
@@ -122,6 +109,18 @@ public class SurveyDbDataSource {
         }
 
         return responses;
+    }
+
+    private QuestionResponse.QuestionResponseBuilder getQuestionResponseBuilder(Cursor cursor,
+          QuestionResponseColumns columns) {
+        return new QuestionResponse.QuestionResponseBuilder()
+                .setValue(cursor.getString(columns.getAnswerColumn()))
+                .setType(cursor.getString(columns.getTypeColumn()))
+                .setId(cursor.getLong(columns.getIdColumn()))
+                .setQuestionId(cursor.getString(columns.getQuestionIdColumn()))
+                .setFilename(cursor.getString(columns.getFilenameColumn()))
+                .setIncludeFlag(cursor.getInt(columns.getIncludeColumn()) == 1)
+                .setIteration(cursor.getInt(columns.getIterationColumn()));
     }
 
     /**
@@ -135,20 +134,12 @@ public class SurveyDbDataSource {
         Cursor cursor = surveyDbAdapter.getResponses(surveyInstanceId);
 
         if (cursor != null) {
-            int answerCol = cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER);
-            int typeCol = cursor.getColumnIndexOrThrow(ResponseColumns.TYPE);
-            int includeCol = cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE);
-            int filenameCol = cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME);
-            int iterationCol = cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION);
             if (cursor.moveToFirst()) {
+                QuestionResponseColumns columns = new QuestionResponseColumns(cursor);
                 do {
-                    QuestionResponse response = new QuestionResponse.QuestionResponseBuilder()
-                            .setValue(cursor.getString(answerCol))
-                            .setType(cursor.getString(typeCol))
+                    QuestionResponse response = getQuestionResponseBuilder(cursor, columns)
+                            .setId(null)
                             .setSurveyInstanceId(newSurveyInstanceId)
-                            .setFilename(cursor.getString(filenameCol))
-                            .setIncludeFlag(cursor.getInt(includeCol) == 1)
-                            .setIteration(cursor.getInt(iterationCol))
                             .createQuestionResponse();
                     responses.put(response.getResponseKey(), response);
                 } while (cursor.moveToNext());
@@ -163,23 +154,10 @@ public class SurveyDbDataSource {
         QuestionResponse resp = null;
         Cursor cursor = surveyDbAdapter.getResponse(surveyInstanceId, questionId);
         if (cursor != null && cursor.moveToFirst()) {
-            String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.ANSWER));
-            String type = cursor.getString(cursor.getColumnIndexOrThrow(ResponseColumns.TYPE));
-            Long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseColumns._ID));
-            String filename = cursor
-                    .getString(cursor.getColumnIndexOrThrow(ResponseColumns.FILENAME));
-            boolean include =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.INCLUDE)) == 1;
-            int iteration = cursor.getInt(cursor.getColumnIndexOrThrow(ResponseColumns.ITERATION));
-            resp = new QuestionResponse.QuestionResponseBuilder()
-                    .setValue(value)
-                    .setType(type)
-                    .setId(id)
-                    .setSurveyInstanceId(surveyInstanceId)
+            QuestionResponseColumns columns = new QuestionResponseColumns(cursor);
+            resp = getQuestionResponseBuilder(cursor, columns)
                     .setQuestionId(questionId)
-                    .setFilename(filename)
-                    .setIncludeFlag(include)
-                    .setIteration(iteration)
+                    .setSurveyInstanceId(surveyInstanceId)
                     .createQuestionResponse();
         }
 
@@ -664,5 +642,9 @@ public class SurveyDbDataSource {
 
     public long createOrUpdateUser(Long id, String username) {
         return surveyDbAdapter.createOrUpdateUser(id, username);
+    }
+
+    public void deleteAllResponses() {
+        surveyDbAdapter.deleteAllResponses();
     }
 }

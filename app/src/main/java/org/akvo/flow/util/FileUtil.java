@@ -73,9 +73,6 @@ public class FileUtil {
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
-//            case MEDIA:
-//                path = getFilesStorageDir(false) + File.separator + DIR_MEDIA;
-//                break;
             case INBOX:
                 path = getFilesStorageDir(false) + File.separator + DIR_INBOX;
                 break;

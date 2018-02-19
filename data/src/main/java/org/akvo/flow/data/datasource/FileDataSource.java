@@ -22,6 +22,7 @@ package org.akvo.flow.data.datasource;
 
 import android.content.Context;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
@@ -31,6 +32,7 @@ public class FileDataSource {
 
     private final Context context;
 
+    @Inject
     public FileDataSource(Context context) {
         this.context = context;
     }

@@ -47,8 +47,6 @@ import org.akvo.flow.domain.response.Response;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.NotificationHelper;

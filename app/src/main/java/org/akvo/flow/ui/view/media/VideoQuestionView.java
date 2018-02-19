@@ -42,7 +42,6 @@ import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;

@@ -26,10 +26,7 @@ import android.text.TextUtils;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.serialization.response.value.MediaValue;
-import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.MediaFileHelper;
 
 import java.io.File;

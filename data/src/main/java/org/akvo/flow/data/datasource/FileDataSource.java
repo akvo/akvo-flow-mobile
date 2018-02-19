@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,19 +18,28 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.data.datasource;
 
-import android.graphics.Bitmap;
+import android.content.Context;
+
+import javax.inject.Singleton;
 
 import io.reactivex.Observable;
 
-public interface FileRepository {
+@Singleton
+public class FileDataSource {
 
-    Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
+    private final Context context;
 
-    Observable<Boolean> saveResizedImage(String fileName, String resizedFilePath, int imageSize);
+    public FileDataSource(Context context) {
+        this.context = context;
+    }
 
-    Observable<Boolean> deleteZipFiles();
+    public Observable<Boolean> deleteZipFiles() {
+        return null;
+    }
 
-    Observable<Boolean> moveMediaFiles();
+    public Observable<Boolean> moveMediaFiles() {
+        return null;
+    }
 }

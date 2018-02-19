@@ -49,4 +49,14 @@ public class FileDataRepository implements FileRepository {
     public Observable<Boolean> saveResizedImage(String originalImagePath, String resizedImagePath, int imageSize) {
         return dataSourceFactory.getImageDataSource().saveResizedImage(originalImagePath, resizedImagePath, imageSize);
     }
+
+    @Override
+    public Observable<Boolean> deleteZipFiles() {
+        return dataSourceFactory.getFileDataSource().deleteZipFiles();
+    }
+
+    @Override
+    public Observable<Boolean> moveMediaFiles() {
+        return dataSourceFactory.getFileDataSource().moveMediaFiles();
+    }
 }

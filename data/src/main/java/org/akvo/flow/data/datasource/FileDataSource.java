@@ -21,6 +21,9 @@
 package org.akvo.flow.data.datasource;
 
 import android.content.Context;
+import android.os.Environment;
+
+import java.io.File;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,6 +33,8 @@ import io.reactivex.Observable;
 @Singleton
 public class FileDataSource {
 
+    private static final String DIR_DATA = "akvoflow/data/files";
+
     private final Context context;
 
     @Inject
@@ -37,8 +42,21 @@ public class FileDataSource {
         this.context = context;
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public Observable<Boolean> deleteZipFiles() {
-        return null;
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
+                + DIR_DATA;
+        File file = new File(path);
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    f.delete();
+                }
+            }
+            file.delete();
+        }
+        return Observable.just(true);
     }
 
     public Observable<Boolean> moveMediaFiles() {

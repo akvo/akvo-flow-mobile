@@ -66,7 +66,7 @@ import butterknife.OnClick;
  * @author Christopher Fagiani
  */
 public class PhotoQuestionView extends QuestionView implements
-        TimedLocationListener.Listener, MediaSyncTask.DownloadListener {
+        TimedLocationListener.Listener, MediaSyncTask.DownloadListener, IPhotoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -74,7 +74,8 @@ public class PhotoQuestionView extends QuestionView implements
     @Inject
     Navigator navigator;
 
-    private final TimedLocationListener mLocationListener;
+    @Inject
+    PhotoQuestionPresenter presenter;
 
     @BindView(R.id.media_btn)
     Button mMediaButton;
@@ -91,6 +92,7 @@ public class PhotoQuestionView extends QuestionView implements
     @BindView(R.id.location_info)
     TextView mLocationInfo;
 
+    private final TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
 
@@ -104,6 +106,8 @@ public class PhotoQuestionView extends QuestionView implements
         setQuestionView(R.layout.media_question_view);
         initialiseInjector();
         ButterKnife.bind(this);
+
+        presenter.setView(this);
 
         imageLoader = new PicassoImageLoader(getContext());
         mMediaButton.setText(R.string.takephoto);
@@ -119,11 +123,6 @@ public class PhotoQuestionView extends QuestionView implements
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
-    }
-
-    private void hideDownloadOptions() {
-        mProgressBar.setVisibility(View.GONE);
-        mDownloadBtn.setVisibility(View.GONE);
     }
 
     @OnClick(R.id.image)
@@ -144,12 +143,17 @@ public class PhotoQuestionView extends QuestionView implements
 
     @OnClick(R.id.media_download)
     void onVideoDownloadClick() {
-        mDownloadBtn.setVisibility(GONE);
-        mProgressBar.setVisibility(VISIBLE);
+        showLoading();
 
         MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
                 new File(mMedia.getFilename()), this);
         downloadTask.execute();
+    }
+
+    @Override
+    public void showLoading() {
+        mDownloadBtn.setVisibility(GONE);
+        mProgressBar.setVisibility(VISIBLE);
     }
 
     private void displayImage(String filename, ImageView imageView) {
@@ -162,22 +166,34 @@ public class PhotoQuestionView extends QuestionView implements
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        String mediaFilePath =
-                mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
-        if (mediaFilePath != null && new File(mediaFilePath).exists()) {
-            mMedia = new Media();
-            mMedia.setFilename(mediaFilePath);
+        presenter.onImageReady(getImagePath(mediaData));
+    }
 
-            captureResponse();
-            displayThumbnail();
+    private String getImagePath(Bundle mediaData) {
+        return mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
+    }
 
-            if (ImageUtil.getLocation(mediaFilePath) == null) {
-                mLocationListener.start();
-            }
-            displayLocationInfo();
-        } else {
-            snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
+    @Override
+    public void displayImage(String mediaFilePath) {
+        mMedia = new Media();
+        mMedia.setFilename(mediaFilePath);
+
+        captureResponse();
+        displayThumbnail();
+
+        updateImageLocation(mediaFilePath);
+    }
+
+    private void updateImageLocation(String mediaFilePath) {
+        if (ImageUtil.getLocation(mediaFilePath) == null) {
+            mLocationListener.start();
         }
+        displayLocationInfo();
+    }
+
+    @Override
+    public void showErrorGettingMedia() {
+        snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
     }
 
     /**
@@ -220,7 +236,7 @@ public class PhotoQuestionView extends QuestionView implements
         super.resetQuestion(fireEvent);
         mMedia = null;
         mImageView.setImageDrawable(null);
-        hideDownloadOptions();
+        hideDownloadViews();
         mLocationInfo.setVisibility(GONE);
         mLocationListener.stop();
     }
@@ -247,10 +263,11 @@ public class PhotoQuestionView extends QuestionView implements
         if (mLocationListener.isListening()) {
             mLocationListener.stop();
         }
+        presenter.destroy();
     }
 
     private void displayThumbnail() {
-        hideDownloadOptions();
+        hideDownloadViews();
 
         String filename = mMedia != null ? mMedia.getFilename() : null;
         if (TextUtils.isEmpty(filename)) {
@@ -262,6 +279,11 @@ public class PhotoQuestionView extends QuestionView implements
         } else {
             displayImage(filename, mImageView);
         }
+    }
+
+    private void hideDownloadViews() {
+        mProgressBar.setVisibility(View.GONE);
+        mDownloadBtn.setVisibility(View.GONE);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -76,7 +76,7 @@ public interface ViewComponent {
 
     void inject(AddUserActivity addUserActivity);
 
-    void inject(PhotoQuestionView photoQuestionView);
+    void inject(PhotoQuestionView photoQuestionViewImpl);
 
     void inject(VideoQuestionView videoQuestionView);
 

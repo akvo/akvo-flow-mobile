@@ -22,7 +22,6 @@ package org.akvo.flow.data.datasource;
 
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.io.Closeable;
 import java.io.File;

@@ -21,7 +21,7 @@
 package org.akvo.flow.data.datasource;
 
 import android.content.Context;
-import android.os.Environment;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 
@@ -34,32 +34,67 @@ import io.reactivex.Observable;
 public class FileDataSource {
 
     private static final String DIR_DATA = "akvoflow/data/files";
+    private static final String DIR_MEDIA = "akvoflow/data/media";
 
     private final Context context;
+    private final FileHelper fileHelper;
 
     @Inject
-    public FileDataSource(Context context) {
+    public FileDataSource(Context context, FileHelper fileHelper) {
         this.context = context;
+        this.fileHelper = fileHelper;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public Observable<Boolean> deleteZipFiles() {
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
-                + DIR_DATA;
-        File file = new File(path);
+        File file = fileHelper.getPublicFolder(DIR_DATA);
         if (file.exists()) {
             File[] files = file.listFiles();
-            if (files != null) {
-                for (File f : files) {
-                    f.delete();
-                }
-            }
+            deleteFiles(files);
+            //noinspection ResultOfMethodCallIgnored
             file.delete();
         }
         return Observable.just(true);
     }
 
     public Observable<Boolean> moveMediaFiles() {
-        return null;
+        File file = fileHelper.getPublicFolder(DIR_MEDIA);
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            copyFiles(files);
+            deleteFiles(files);
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
+        }
+        return Observable.just(true);
     }
+
+    private void deleteFiles(@Nullable File[] files) {
+        if (files != null) {
+            for (File f : files) {
+                //noinspection ResultOfMethodCallIgnored
+                f.delete();
+            }
+        }
+    }
+
+
+    private void copyFiles(@Nullable File[] files) {
+        if (files != null) {
+            File folder = getPrivateMediaFolder();
+            for (File f : files) {
+                fileHelper.copyFile(f, folder);
+            }
+        }
+    }
+
+    private File getPrivateMediaFolder() {
+        File folder = new File(
+                context.getFilesDir().getAbsolutePath() + File.separator + DIR_MEDIA);
+        if (!folder.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            folder.mkdirs();
+        }
+        return folder;
+    }
+
 }

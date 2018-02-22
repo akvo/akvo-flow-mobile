@@ -34,13 +34,13 @@ import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
-import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.SurveyFileNameGenerator;
 import org.akvo.flow.util.SurveyIdGenerator;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,15 +80,13 @@ public class BootstrapService extends IntentService {
 
     public volatile static boolean isProcessing = false;
 
+    private static final String TAG = "BOOTSTRAP_SERVICE";
+
     @Inject
     FormFileBrowser formFileBrowser;
 
     @Inject
     FormResourcesFileBrowser resourcesFileUtil;
-
-    private static final String TAG = "BOOTSTRAP_SERVICE";
-
-    private static final String TAG = "BOOTSTRAP_SERVICE";
 
     @Inject
     SurveyDbDataSource databaseAdapter;
@@ -96,7 +94,6 @@ public class BootstrapService extends IntentService {
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
     private final ZipFileLister zipFileLister = new ZipFileLister();
-    private SurveyDbDataSource databaseAdapter;
     private Handler mHandler;
 
     public BootstrapService() {
@@ -115,9 +112,6 @@ public class BootstrapService extends IntentService {
         isProcessing = true;
         int installed = checkAndInstall();
         isProcessing = false;
-        if (installed > 0) {
-            sendBroadcastNotification();
-        }
     }
 
     /**
@@ -359,38 +353,5 @@ public class BootstrapService extends IntentService {
         String entryName = entry.getName();
         String entryPaths[] = entryName == null ? new String[0] : entryName.split(File.separator);
         return entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
-    }
-
-    /**
-     * Dispatch a Broadcast notification to notify of surveys synchronization.
-     * This notification will be received in SurveyHomeActivity, in order to
-     * refresh its data
-     */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
-    }
-    /**
-     * returns an ordered list of zip files that exist in the device's bootstrap
-     * directory
-     */
-    private ArrayList<File> getZipFiles() {
-        ArrayList<File> zipFiles = new ArrayList<>();
-        // zip files can only be loaded on the SD card (not internal storage) so
-        // we only need to look there
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = FileUtil.getFilesDir(FileType.INBOX);
-            File[] fileList = dir.listFiles();
-            if (fileList != null) {
-                for (File file : fileList) {
-                    if (file.isFile() && file.getName().toLowerCase()
-                                .endsWith(ConstantUtil.ARCHIVE_SUFFIX)) {
-                        zipFiles.add(file);
-                    }
-                }
-            }
-            Collections.sort(zipFiles);
-        }
-        return zipFiles;
     }
 }

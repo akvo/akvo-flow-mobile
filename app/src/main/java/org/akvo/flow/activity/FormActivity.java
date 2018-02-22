@@ -97,9 +97,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     @Inject
-    SurveyDbDataSource mDatabase;
-
-    @Inject
     FormFileBrowser formFileBrowser;
 
     @Inject

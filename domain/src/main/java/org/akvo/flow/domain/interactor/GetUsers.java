@@ -61,7 +61,7 @@ public class GetUsers extends UseCase {
                                     public Pair<User, List<User>> apply(final Long selectedUserId) {
                                         User currentUser = null;
                                         for (User u : users) {
-                                            if (selectedUserId == u.getId()) {
+                                            if (selectedUserId.equals(u.getId())) {
                                                 currentUser = u;
                                                 break;
                                             }

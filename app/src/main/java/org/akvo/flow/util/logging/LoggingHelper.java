@@ -20,7 +20,13 @@
 
 package org.akvo.flow.util.logging;
 
+import android.support.annotation.Nullable;
+
 public interface LoggingHelper {
 
     void init();
+
+    void initLoginData(@Nullable String username, @Nullable String deviceId);
+
+    void clearUser();
 }

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default">Precisión: desconocida</string>
   <string name="geo_location_accuracy">Precisión: %1$s m</string>
   <string name="nocardspacetitle">No hay espacio de almacenamiento</string>
@@ -15,7 +15,7 @@
   <string name="submitbutton">Enviar</string>
   <string name="geodialog">Habilita el acceso a la ubicación</string>
   <string name="settings">Ajustes</string>
-  <string name="preferences_settings_section">Ajustes</string>
+  <string name="preferences_general_section">General</string>
   <string name="aboutlabel">Acerca de</string>
   <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instale la aplicación a través de Google Play Store.</string>
   <string name="otherinstructions">Por favor, introduzca una descripción</string>
@@ -158,7 +158,6 @@
   <string name="status_exported">Exportado</string>
   <!--APK update-->
   <string name="app_update_activity">Actualización Akvo Flow</string>
-  <string name="app_update">Hay una nueva versión de la aplicación Flow disponible. Pulse \'Actualizar\' para descargar e instalar la nueva versión.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Ahora no</string>
   <string name="clicktoinstall">La nueva versión de Flow está descargada. ¿Quiere instalarla ahora?</string>
@@ -266,4 +265,10 @@
     <item quantity="other">%1$d puntos de datos sincronizados</item>
   </plurals>
   <string name="no_gps_status_message">GPS Status no está instalada en este dispositivo. ¿Quiere instalar la ahora?</string>
+  <string name="data_points_sync_no_data_points">No hay puntos de datos para sincronizar</string>
+  <string name="app_update_dialog_title">Hay una nueva version de Flow disponible</string>
+  <string name="app_update_dialog_subtitle">Actualiza para aprovechar al máximo tu aplicación Flow</string>
+  <string name="error_getting_media">Error al obtener ficheros de midia, por favor intente de nuevo.</string>
+  <string name="geo_fields_update_title">¿Actualizar las coordenadas de GPS?</string>
+  <string name="cascade_error_message">Error al cargar el recurso de la cascada: %1$s</string>
 </resources>

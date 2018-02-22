@@ -34,6 +34,9 @@ import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.service.BootstrapService;
+import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.FileChangeTrackingService;
+import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.util.logging.LoggingHelper;
@@ -68,7 +71,11 @@ public interface ApplicationComponent {
 
     UserRepository userRepository();
 
+    void inject(FileChangeTrackingService fileChangeTrackingService);
+
     void inject(SurveyDownloadService surveyDownloadService);
+
+    void inject(BootstrapService bootstrapService);
 
     void inject(BootstrapService bootstrapService);
 

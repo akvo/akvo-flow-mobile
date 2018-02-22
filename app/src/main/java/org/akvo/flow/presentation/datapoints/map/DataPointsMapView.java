@@ -43,4 +43,6 @@ interface DataPointsMapView {
     void showErrorNoNetwork();
 
     void showErrorSync();
+
+    void showNoDataPointsToSync();
 }

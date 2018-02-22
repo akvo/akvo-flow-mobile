@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2012,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -26,7 +26,6 @@ import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
-import org.akvo.flow.domain.ScoringRule;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.ValidationRule;
@@ -78,10 +77,6 @@ public class SurveyHandler extends DefaultHandler {
     private static final String LANG = "language";
     private static final String LOCKED = "locked";
     private static final String HELP = "help";
-    private static final String SCORING = "scoring";
-    private static final String SCORE = "score";
-    private static final String RANGE_MIN = "rangeLow";
-    private static final String RANGE_MAX = "rangeHigh";
     private static final String STRENGTH_MIN = "strengthMin";
     private static final String STRENGTH_MAX = "strengthMax";
     private static final String NAME = "name";
@@ -114,13 +109,10 @@ public class SurveyHandler extends DefaultHandler {
     private QuestionGroup currentQuestionGroup;
     private Question currentQuestion;
     private Option currentOption;
-    private Dependency currentDependency;
     private ArrayList<Option> currentOptions;
     private ValidationRule currentValidation;
     private AltText currentAltText;
     private QuestionHelp currentHelp;
-    private ScoringRule currentScoringRule;
-    private String currentScoringType;
     private Level currentLevel;
     private List<Level> currentLevels;
 
@@ -176,11 +168,6 @@ public class SurveyHandler extends DefaultHandler {
                     currentQuestion.addQuestionHelp(currentHelp);
                 }
                 currentHelp = null;
-            } else if (localName.equalsIgnoreCase(SCORE)) {
-                currentQuestion.addScoringRule(currentScoringRule);
-                currentScoringRule = null;
-            } else if (localName.equalsIgnoreCase(SCORING)) {
-                currentScoringType = null;
             }
         }
         if (currentOption != null) {
@@ -392,7 +379,7 @@ public class SurveyHandler extends DefaultHandler {
             currentQuestion.setAllowLine(Boolean.parseBoolean(attributes.getValue(ALLOW_LINE)));
             currentQuestion.setAllowPolygon(Boolean.parseBoolean(attributes.getValue(ALLOW_POLYGON)));
         } else if (localName.equalsIgnoreCase(OPTIONS)) {
-            currentOptions = new ArrayList<Option>();
+            currentOptions = new ArrayList<>();
             if (currentQuestion != null) {
                 if (attributes.getValue(ALLOW_OTHER) != null) {
                     currentQuestion.setAllowOther(Boolean
@@ -416,13 +403,12 @@ public class SurveyHandler extends DefaultHandler {
         } else if (localName.equalsIgnoreCase(LEVEL)) {
             currentLevel = new Level();
         } else if (localName.equalsIgnoreCase(DEPENDENCY)) {
-            currentDependency = new Dependency();
+            Dependency currentDependency = new Dependency();
             currentDependency.setQuestion(attributes.getValue(QUESTION));
             currentDependency.setAnswer(attributes.getValue(ANSWER));
             if (currentQuestion != null) {
                 currentQuestion.addDependency(currentDependency);
             }
-            currentDependency = null;
         } else if (localName.equalsIgnoreCase(VALIDATION_RULE)) {
             currentValidation = new ValidationRule(
                     attributes.getValue(VALIDATION_TYPE));
@@ -439,14 +425,6 @@ public class SurveyHandler extends DefaultHandler {
             currentHelp = new QuestionHelp();
             currentHelp.setType(attributes.getValue(TYPE));
             currentHelp.setValue(attributes.getValue(VALUE));
-        } else if (localName.equalsIgnoreCase(SCORING)) {
-            currentScoringType = attributes.getValue(TYPE);
-        } else if (localName.equalsIgnoreCase(SCORE)) {
-            currentScoringRule = new ScoringRule(currentScoringType,
-                    attributes.getValue(RANGE_MIN),
-                    attributes.getValue(RANGE_MAX), attributes.getValue(TEXT),
-                    attributes.getValue(VALUE));
         }
     }
-    
 }

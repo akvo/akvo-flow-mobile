@@ -43,9 +43,9 @@ public class QuestionHeaderView extends QuestionView implements View.OnClickList
     private void init() {
         setQuestionView(R.layout.invalid_question_view);
         if (mDisplayShortcut) {
-            findViewById(R.id.open_btn).setOnClickListener(this);
+            findViewById(R.id.invalid_question_open_btn).setOnClickListener(this);
         } else {
-            findViewById(R.id.open_btn).setVisibility(GONE);
+            findViewById(R.id.invalid_question_open_btn).setVisibility(GONE);
         }
     }
 

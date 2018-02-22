@@ -20,7 +20,6 @@
 
 package org.akvo.flow.presentation.datapoints.list;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -68,6 +67,7 @@ import org.akvo.flow.ui.fragment.OrderByDialogFragment;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.WeakLocationListener;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -90,6 +90,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     private TextView emptySubTitleTv;
     private ImageView emptyIv;
     private ProgressBar progressBar;
+    private WeakLocationListener weakLocationListener;
 
     /**
      * BroadcastReceiver to notify of data synchronisation. This should be
@@ -124,11 +125,12 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
+        FragmentActivity activity = getActivity();
         try {
             mListener = (RecordListListener) activity;
         } catch (ClassCastException e) {
@@ -146,8 +148,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mLocationManager = (LocationManager) getActivity()
+        mLocationManager = (LocationManager) getActivity().getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
+        weakLocationListener = new WeakLocationListener(this);
         View view = getView();
         ListView listView = (ListView) view.findViewById(R.id.locales_lv);
         View emptyView = view.findViewById(R.id.empty_view);
@@ -219,7 +222,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 mAdapter.updateLocation(mLatitude, mLongitude);
                 presenter.onLocationReady(mLatitude, mLongitude);
             }
-            mLocationManager.requestLocationUpdates(provider, 1000, 0, this);
+            mLocationManager.requestLocationUpdates(provider, 1000, 0, weakLocationListener);
         }
     }
 
@@ -227,7 +230,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
-        mLocationManager.removeUpdates(this);
+        mLocationManager.removeUpdates(weakLocationListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mLocationManager.removeUpdates(weakLocationListener);
     }
 
     @Override
@@ -370,7 +379,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void onLocationChanged(Location location) {
         // a single location is all we need
-        mLocationManager.removeUpdates(this);
+        mLocationManager.removeUpdates(weakLocationListener);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
         presenter.onLocationReady(mLatitude, mLongitude);
@@ -469,6 +478,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         if (emptyIv != null) {
             emptyIv.setImageResource(R.drawable.ic_search_results_error);
         }
+    }
+
+    @Override
+    public void showNoDataPointsToSync() {
+        dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
     }
 
     //TODO: once we insert data using brite database this will no longer be necessary either

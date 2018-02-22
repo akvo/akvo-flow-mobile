@@ -28,4 +28,14 @@ public class DebugLoggingHelper implements LoggingHelper {
     public void init() {
         Timber.plant(new Timber.DebugTree());
     }
+
+    @Override
+    public void initLoginData(String username, String deviceId) {
+        // ignored
+    }
+
+    @Override
+    public void clearUser() {
+        // ignored
+    }
 }

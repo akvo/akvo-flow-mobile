@@ -59,6 +59,8 @@ import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
 import org.akvo.flow.presentation.navigation.FlowNavigation;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
@@ -83,6 +85,7 @@ import butterknife.OnClick;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigation.DrawerNavigationListener,
+        FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener {
@@ -100,7 +103,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     FloatingActionButton addDataPointFab;
 
     @BindView(R.id.nav_view)
-    FlowNavigation navigationView;
+    FlowNavigationView navigationView;
 
     @Inject
     SurveyDbDataSource mDatabase;
@@ -114,6 +117,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
+    private final Navigator navigator = new Navigator();
+    private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
     private long selectedSurveyId;
     private boolean activityJustCreated;

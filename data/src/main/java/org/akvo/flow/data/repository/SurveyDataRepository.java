@@ -109,7 +109,8 @@ public class SurveyDataRepository implements SurveyRepository {
                     @Override
                     public Flowable<Integer> apply(Throwable throwable) {
                         if (isErrorForbidden(throwable)) {
-                            throw new AssignmentRequiredException("Dashboard Assignment missing");
+                            return Flowable.error(new AssignmentRequiredException(
+                                    "Dashboard Assignment missing"));
                         } else {
                             return Flowable.error(throwable);
                         }

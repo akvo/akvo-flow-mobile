@@ -47,7 +47,6 @@ import timber.log.Timber;
 
 public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener {
 
-    private Button mButton;
     private String mValue;
     private String mImage;
     private final CaddisflyJsonMapper caddisflyJsonMapper = new CaddisflyJsonMapper();
@@ -61,19 +60,22 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     private void init() {
         setQuestionView(R.layout.caddisfly_question_view);
-        RecyclerView resultsRv = (RecyclerView) findViewById(R.id.results_recycler_view);
+        RecyclerView resultsRv = (RecyclerView) findViewById(R.id.caddisfly_results_recycler_view);
         resultsRv.setLayoutManager(new LinearLayoutManager(resultsRv.getContext()));
         caddisflyResultsAdapter = new CaddisflyResultsAdapter(
                 new ArrayList<CaddisflyTestResult>());
         resultsRv.setAdapter(caddisflyResultsAdapter);
-        mButton = (Button) findViewById(R.id.button);
-        mButton.setOnClickListener(this);
+        Button mButton = (Button) findViewById(R.id.caddisfly_button);
+        if (isReadOnly()) {
+            mButton.setVisibility(GONE);
+        } else {
+            mButton.setOnClickListener(this);
+        }
         displayResponseView();
     }
 
     private void displayResponseView() {
         caddisflyResultsAdapter.setCaddisflyTestResults(caddisflyTestResults);
-        mButton.setEnabled(!mSurveyListener.isReadOnly());
     }
 
     @Override

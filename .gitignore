@@ -1,6 +1,5 @@
 # Globally ignored files
 .DS_Store
-*.class
 *.rpc
 *.swp
 *build.properties
@@ -46,3 +45,5 @@ captures/
 
 #sentry config files
 sentry.properties
+
+!/util/upload-apk/build/libs/deploy-1.0.jar

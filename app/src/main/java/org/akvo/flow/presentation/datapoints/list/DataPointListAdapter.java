@@ -29,7 +29,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,26 +41,25 @@ import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * List Adapter to bind the Surveyed Locales into the list items
- */
-class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
+class DataPointListAdapter extends BaseAdapter {
 
     private Double latitude;
     private Double longitude;
     private final LayoutInflater inflater;
     private final String dataLabel;
+    private final List<ListDataPoint> dataPoints;
 
     DataPointListAdapter(Context context, @Nullable Double latitude,
             @Nullable Double longitude, SurveyGroup surveyGroup) {
-        super(context, R.layout.surveyed_locale_item);
         this.latitude = latitude;
         this.longitude = longitude;
         this.inflater = LayoutInflater.from(context);
         this.dataLabel = context.getString(getDateLabel(surveyGroup));
+        dataPoints = new ArrayList<>();
     }
 
     @StringRes
@@ -70,6 +69,22 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         } else {
             return R.string.last_modified_regular;
         }
+    }
+
+    @Override
+    public int getCount() {
+        return dataPoints.size();
+    }
+
+    @Nullable
+    @Override
+    public ListDataPoint getItem(int position) {
+        return dataPoints.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @NonNull
@@ -165,10 +180,8 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
     }
 
     void setDataPoints(List<ListDataPoint> dataPoints) {
-        clear();
-        for (ListDataPoint listDataPoint : dataPoints) {
-            add(listDataPoint);
-        }
+        this.dataPoints.clear();
+        this.dataPoints.addAll(dataPoints);
         notifyDataSetChanged();
     }
 

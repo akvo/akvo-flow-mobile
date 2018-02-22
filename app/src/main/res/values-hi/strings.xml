@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="nocardspacetitle">जगह नहीं है </string>
   <string name="lowcardspacetitle">कम जगह है </string>
   <string name="nocardspacedialog">SD कार्ड पूरी तरह भर चूका है, अधिक डेटा एकत्रित करने के लिए कार्ड में जगह नहीं है | आगे बढ़ने के लिए, SD कार्ड पर जगह बनाएं ।</string>
@@ -25,8 +25,6 @@
   <string name="toosmallerr"> संख्या अति छोटी है I नुन्यतम संख्या डाले :</string>
   <string name="toolargeerr">संख्या अति बड़ी है I अधिकतम संख्या डाले :</string>
   <string name="baddatatypeerr">उत्तर संख्या में दें </string>
-  <string name="reloadsurveyslabel">सभी सर्वे को पुनः लोड करें </string>
-  <string name="reloadsurveysdesc">सभी नियुक्त सर्वे को हटाने और पुनः डाउनलोड करने के लिए (निर्देश पर ही प्रयोग करें  )</string>
   <string name="conftitle">कृपया निश्चित करें </string>
   <string name="reloadconftext">क्या आप सर्वे को हटा कर पुनः डाउनलोड करना चाहतें हैं ?</string>
   <string name="submitcompletetitle">सर्वे जमा करें </string>
@@ -34,7 +32,6 @@
   <string name="langoption">भाषाएं </string>
   <string name="langmandatorytitle">फॉर्म डाउनलोड करें </string>
   <string name="langmandatorytext">किसी भी  एक भाषा का चनाव करें </string>
-  <string name="pleasewait">कृपया प्रतीक्षा करें </string>
   <string name="downloadsurveylabel">फॉर्म को डाउनलोड करें </string>
   <string name="downloadsurveyinstr">वह फॉर्म आईडी  डालें जिसे डाउनलोड करना है </string>
   <string name="deletealldatawarning">ऐसा करने पर सभी डेटा स्थाईरुप से हट जायेगा (सर्वे प्रतिउत्तर , चित्र आदि ) I यह प्रतिक्रिया उलटनीय  नहीं है  आगे बढ़ने के लिए OK तथा समाप्त करने के लिए कैंसिल दबाएं I</string>
@@ -69,13 +66,8 @@
   <string name="sync">सिंक </string>
   <string name="sort">छाँटिएन </string>
   <string name="stats">आंकड़े</string>
-  <string name="syncing_records">डेटा पॉइंट्स सिंक हो रहे हैं </string>
-  <string name="synced_records">%1$d डेटा पॉइंट्स सिंक हो चुके हैं </string>
-  <string name="sync_error"> डेटा पॉइंट्स सिंकिंग असफल </string>
-  <string name="network_error">नेटवर्क में त्रुटि  </string>
   <string name="prefill_title">पूर्व दिए उत्तर </string>
   <string name="prefill_text">पूर्व भरे फॉर्म, पिछले दिए गय उत्तरों के साथ ?</string>
-  <string name="error_assignment_text">कृपया डैशबोर्ड में असाइनमेंट बनाये </string>
   <!--Data sync-->
   <string name="data_sync_all">सिंक हुआ फॉर्म: %1$d-  असफल %2$d</string>
   <string name="data_sync_synced">सिंक हुआ फॉर्म: %1$d</string>
@@ -104,10 +96,6 @@
   <string name="or">या </string>
   <string name="capture_shape">आकर लेने के लिए</string>
   <string name="view_shape">आकार देखें </string>
-  <string name="clear_point_title">पॉइंट हटाने के लिए </string>
-  <string name="clear_point_text">क्या आप इस पॉइंट को हटाना चाहेंगे ?</string>
-  <string name="clear_feature_title"> फीचर डिलीट करें </string>
-  <string name="clear_feature_text">क्या आप इस फीचर को हटाना चाहेंगे ?</string>
   <string name="repeat_group">सवाल दोहराइए </string>
   <string name="repetitions">दुहराव</string>
   <string name="view_map">मैप देखिये </string>
@@ -148,7 +136,6 @@
   <string name="status_submitted">जमा हो चूका है </string>
   <string name="status_exported">निर्यातित </string>
   <!--APK update-->
-  <string name="app_update_activity">Akvo Flow अपडेट </string>
   <string name="update">अपडेट </string>
   <string name="not_now">अभी नहीं </string>
   <!--Time check-->
@@ -189,7 +176,7 @@
   <string name="clearbutton">हटाएं </string>
   <string name="yes">हाँ </string>
   <string name="no">नहीं </string>
-  <string name="action_retry">पुन: प्रयास</string>
   <string name="delete">हटाएं </string>
   <!--app update service-->
+  <!--Verify if this works for transifex-->
 </resources>

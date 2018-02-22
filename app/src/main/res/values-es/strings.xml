@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default">Precisión: desconocida</string>
   <string name="geo_location_accuracy">Precisión: %1$s m</string>
   <string name="nocardspacetitle">No hay espacio de almacenamiento</string>
@@ -15,6 +15,7 @@
   <string name="submitbutton">Enviar</string>
   <string name="geodialog">Habilita el acceso a la ubicación</string>
   <string name="settings">Ajustes</string>
+  <string name="preferences_general_section">General</string>
   <string name="aboutlabel">Acerca de</string>
   <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instale la aplicación a través de Google Play Store.</string>
   <string name="otherinstructions">Por favor, introduzca una descripción</string>
@@ -38,7 +39,8 @@
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selección no válida</string>
   <string name="langmandatorytext">Debe elegir al menos un idioma</string>
-  <string name="pleasewait">Por favor, espere</string>
+  <string name="preference_download_form_title">Descargar formulario usando su ID</string>
+  <string name="preference_download_form_subtitle">Solo ejecute en caso de instrucción</string>
   <string name="downloadsurveylabel">Descargar formulario</string>
   <string name="downloadsurveyinstr">Introduzca el ID del formulario que desea descargar</string>
   <string name="deletealldatawarning">Esta acción borrará permanentemente todos los datos (encuestas, respuestas, imágenes y usuarios) en el dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
@@ -65,6 +67,7 @@
   <string name="transenddate">Fin:</string>
   <string name="resetalldesc">Borrar permanentemente todas las encuentas, respuestas (incluyendo imágenes y archivos zip exportados) y usuarios</string>
   <string name="reset_responses_desc">Borrar permanentemente todas las respuestas (incluyendo imágenes y archivos zip exportados)</string>
+  <string name="checksd">Memória disponible</string>
   <string name="sdmissing">La tarjeta SD no está montada correctamente. Asegúrese de haber desactivado la opción \"Copia de archivos USB\"</string>
   <string name="pickdate">Seleccione fecha</string>
   <string name="pleasewaitforbootstrap">Por favor, espere a que el archivo bootstrap haya sido procesado.</string>
@@ -74,14 +77,11 @@
   <string name="sync">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estadísticas</string>
-  <string name="syncing_records">Sincronizando Puntos de Datos...</string>
-  <string name="synced_records">%1$d Puntos de Datos sincronizados</string>
-  <string name="sync_error">Sincronización de Puntos de Datos fallida</string>
-  <string name="syncing_corrupted_data_points_error">Vuelva a sincronizar.</string>
-  <string name="network_error">Error de conexión</string>
+  <string name="data_points_sync_error_message_network">Fallo de sincronización. No tiene conexión.</string>
+  <string name="data_points_sync_error_message_assignment">Fallo de sincronización. Falta assignación.</string>
+  <string name="data_points_sync_error_message_default">Fallo de sincronización</string>
   <string name="prefill_title">Pre-llenar respuestas</string>
   <string name="prefill_text">Pre-llenar respuestas con previos valores de las mismas preguntas</string>
-  <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control Flow</string>
   <!--Data sync-->
   <string name="data_sync_all">Formularios sincronizados: %1$d - Fallidos: %2$d</string>
   <string name="data_sync_synced">Formularios sincronizados: %1$d</string>
@@ -90,6 +90,8 @@
   <!--Localization-->
   <string name="please_restart">Por favor, reinicie la aplicación</string>
   <!--Empty Views-->
+  <string name="no_datapoints_error_text">No hay puntos de datos.</string>
+  <string name="no_search_results_error_text">No se han encontrado resultados</string>
   <string name="no_survey_selected_text">No ha seleccionado ninguna Encuesta. Abra el menú lateral para seleccionar una.</string>
   <!--ToolBar-->
   <string name="more">Más</string>
@@ -112,16 +114,15 @@
   <string name="or">o</string>
   <string name="capture_shape">capturar figura</string>
   <string name="view_shape">ver figura</string>
-  <string name="clear_point_title">Borrar punto</string>
-  <string name="clear_point_text">¿Quiere borrar este punto?</string>
-  <string name="clear_feature_title">Borrar figura</string>
-  <string name="clear_feature_text">¿Quiere borrar esta figura?</string>
+  <string name="delete_point_title">Borrar punto?</string>
+  <string name="delete_shape_title">Borrar figura?</string>
   <string name="repeat_group">Repetir grupo</string>
   <string name="repetitions">Repeticiones:</string>
   <string name="view_map">Ver mapa</string>
   <string name="delete_group_title">Eliminar grupo</string>
   <string name="delete_group_text">¿Está seguro de que desea eliminar este grupo?</string>
   <string name="add_signature">Añadir firma</string>
+  <string name="modify_signature">Editar firma</string>
   <string name="signed_by">Firmado por:</string>
   <string name="signature_terms">Entiendo que esta es una representación electrónica de mi firma</string>
   <string name="image_location_unknown">Geolocalización no conocida</string>
@@ -157,7 +158,6 @@
   <string name="status_exported">Exportado</string>
   <!--APK update-->
   <string name="app_update_activity">Actualización Akvo Flow</string>
-  <string name="app_update">Hay una nueva versión de la aplicación Flow disponible. Pulse \'Actualizar\' para descargar e instalar la nueva versión.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Ahora no</string>
   <string name="clicktoinstall">La nueva versión de Flow está descargada. ¿Quiere instalarla ahora?</string>
@@ -233,4 +233,42 @@
   <string name="apache_licence_title">Apache License 2.0</string>
   <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
   <string name="mit_licence_title">MIT License</string>
+  <string name="barcode_scanner_missing_error">No hay ninguna aplicación de escáner instalada en este dispositivo. ¿Quiere instalar una ahora?</string>
+  <string name="install">Instalar</string>
+  <string name="signature_name_hint">Por favor, escribe su nombre</string>
+  <string name="saving">Guardando...</string>
+  <string name="error_saving_signature">Error al guardar la firma, intente de nuevo.</string>
+  <string name="help">Ayuda</string>
+  <string name="error_loading_help">Error al cargar el contenido de ayuda</string>
+  <string name="error_mobile_data_sync">Sincronización via datos móviles deshabilitada</string>
+  <string name="preference_screen_on">Mantener la pantalla activa durante la recopilación de datos</string>
+  <string name="preference_mobile_data">Habilitar el uso de datos móviles</string>
+  <string name="preference_app_language">Idioma de la aplicación</string>
+  <string name="preference_image_size">Tamaño de las imagenes</string>
+  <string name="preferences_data_section">Datos</string>
+  <string name="preference_sync_datapoints">Enviar puntos de datos entregados a instancia de Flow</string>
+  <string name="preference_delete_collected_data">Borrar datos recolectados e imágenes</string>
+  <string name="preference_delete_everything">Borrar todo</string>
+  <string name="preferences_configuration_section">Configuración</string>
+  <string name="preference_gps">Arreglos de GPS</string>
+  <string name="preference_storage">Memória disponible</string>
+  <string name="preferences_section_information">Información</string>
+  <string name="preference_identifier">Identificador de dispositivo</string>
+  <string name="preference_instance_name">Nombre de instancia</string>
+  <string name="data_points_sync_error_mobile_data_sync">Sincronización via datos móviles deshabilitada</string>
+  <string name="action_settings">Ajustes</string>
+  <string name="no_records_subtitle_monitored">Use \'+\' para capturar datos o \'Sincronizar\' para obtener datos existentes</string>
+  <string name="no_records_subtitle_non_monitored">Use \'+\' para capturar datos</string>
+  <!--Verify if this works for transifex-->
+  <plurals name="data_points_sync_success_message">
+    <item quantity="one">%1$d punto de datos sincronizado</item>
+    <item quantity="other">%1$d puntos de datos sincronizados</item>
+  </plurals>
+  <string name="no_gps_status_message">GPS Status no está instalada en este dispositivo. ¿Quiere instalar la ahora?</string>
+  <string name="data_points_sync_no_data_points">No hay puntos de datos para sincronizar</string>
+  <string name="app_update_dialog_title">Hay una nueva version de Flow disponible</string>
+  <string name="app_update_dialog_subtitle">Actualiza para aprovechar al máximo tu aplicación Flow</string>
+  <string name="error_getting_media">Error al obtener ficheros de midia, por favor intente de nuevo.</string>
+  <string name="geo_fields_update_title">¿Actualizar las coordenadas de GPS?</string>
+  <string name="cascade_error_message">Error al cargar el recurso de la cascada: %1$s</string>
 </resources>

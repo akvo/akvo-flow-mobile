@@ -84,4 +84,11 @@ public class DataPointSyncSnackBarManager {
                     onClickListener, rootView.getContext());
         }
     }
+
+    public void showNoDataPointsToSync(View rootView) {
+        if (rootView != null) {
+            displaySnackBar(rootView.getContext()
+                    .getString(R.string.data_points_sync_no_data_points), rootView);
+        }
+    }
 }

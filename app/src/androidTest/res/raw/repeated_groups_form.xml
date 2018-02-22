@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey name="RepeatedBarcodeForm" defaultLanguageCode="en" version='1.0' app="akvoflowsandbox"
+        surveyGroupId="207569117" surveyGroupName="RepeatedBarcodeGroup" surveyId="200389118">
+    <questionGroup repeatable="true">
+        <heading>RepeatedBarcodeGroup</heading>
+        <question order="1" type="scan" mandatory="true" localeNameFlag="false" id="205929117">
+            <text>RepeatedBarcodeQuestion</text>
+        </question>
+    </questionGroup>
+    <questionGroup repeatable="true">
+        <heading>RepeatedTextGroup</heading>
+        <question order="1" type="free" mandatory="true" localeNameFlag="false" id="205929118">
+            <text>RepeatedTextQuestion</text>
+        </question>
+    </questionGroup>
+</survey>

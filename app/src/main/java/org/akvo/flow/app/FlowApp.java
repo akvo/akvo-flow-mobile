@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,6 +21,7 @@ package org.akvo.flow.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
@@ -28,6 +29,7 @@ import android.text.TextUtils;
 
 import com.squareup.leakcanary.LeakCanary;
 
+import org.akvo.flow.broadcast.SyncDataReceiver;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
@@ -46,7 +48,8 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 public class FlowApp extends Application {
-    private static FlowApp app;// Singleton
+
+    private static FlowApp app;
 
     @Nullable
     private User mUser;
@@ -70,6 +73,7 @@ public class FlowApp extends Application {
         app = this;
         startBootstrapFolderTracker();
         updateLoggingInfo();
+        registerReceiver(new SyncDataReceiver(), new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
     }
 
     private void updateLoggingInfo() {

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default">Độ chính xác: chưa xác định</string>
   <string name="geo_location_accuracy">Độ chính xác: %1$s mét </string>
   <string name="nocardspacetitle">Bộ nhớ trong đầy dữ liệu</string>
@@ -15,7 +15,6 @@
   <string name="submitbutton">Đệ trình</string>
   <string name="geodialog">Vui lòng kích hoạt chức năng định vị </string>
   <string name="settings">Cài đặt</string>
-  <string name="preferences_general_section">Cài đặt</string>
   <string name="aboutlabel">Phiên bản</string>
   <string name="nogpsstatus">Ứng dụng định vị tọa độ chưa được cài đặt trên thiết bị này. Vui lòng cài đặt nó bằng sử dụng kho dữ liệu của Google Play</string>
   <string name="otherinstructions">Vui lòng nhập một mô tả</string>
